@@ -56,9 +56,6 @@ class AuthIntegrationTest extends BaseIntegrationTest {
         .uri("/api/v1/auth/me")
         .exchange()
         .expectStatus()
-        .isOk()
-        .expectBody(User.class)
-        .consumeWith(
-            response -> assertThat(response.getResponseBody().name()).isEqualTo("testUser"));
+        .is4xxClientError();
   }
 }

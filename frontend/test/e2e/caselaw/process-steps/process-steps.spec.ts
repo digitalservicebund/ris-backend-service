@@ -5,8 +5,7 @@ import {
   navigateToManagementData,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
-// eslint-disable-next-line playwright/no-skipped-test
-test.skip("process steps", { tag: ["@RISDEV-8565"] }, () => {
+test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
   test("rendering initial state, click on 'Weitergeben'", async ({
     pageWithBghUser,
     decisionBgh,

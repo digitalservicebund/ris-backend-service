@@ -23,7 +23,7 @@ class DocumentationUnitProcessStepTransformerTest {
     DocumentationUnitProcessStepDTO documentationUnitProcessStepDTO =
         DocumentationUnitProcessStepDTO.builder()
             .id(documentationUnitProcessStepId)
-            .userId(user.id())
+            .user(UserTransformer.transformToDTO(user))
             .createdAt(createdAt)
             .processStep(processStepDTO)
             .build();

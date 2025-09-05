@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -44,6 +45,7 @@ public class AuthUtils {
                       claims.put("roles", Collections.singletonList(role));
                       claims.put("name", "testUser"); // This is the name from OIDC token
                       claims.put("email", "test@test.com");
+                      claims.put("given_name", "testUser");
                       // If userId is null, generate a random one
                       claims.put("sub", (userId != null ? userId : UUID.randomUUID()).toString());
                     }));
@@ -163,6 +165,16 @@ public class AuthUtils {
                     .build()))
         .when(userGroupService)
         .getAllUserGroups();
+
+    doAnswer(
+            invocation -> {
+              List<String> userGroups = invocation.getArgument(0);
+              return userGroupService.getAllUserGroups().stream()
+                  .filter(group -> userGroups.contains(group.userGroupPathName()))
+                  .findFirst();
+            })
+        .when(userGroupService)
+        .getDocumentationOfficeFromGroupPathNames(anyList());
   }
 
   /**

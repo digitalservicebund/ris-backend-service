@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitP
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PendingProceedingTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ReferenceTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.StatusTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -669,16 +670,14 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       return true;
     }
 
-    if (currentDocumentationUnitProcessStepDTOFromDB.getUserId() != null
-        && currentDocunitProcessStepFromFrontend.getUser() == null) {
-      return true;
-    }
-    UUID lastUserId =
-        currentDocunitProcessStepFromFrontend.getUser() != null
-            ? currentDocunitProcessStepFromFrontend.getUser().id()
-            : null;
+    UserDTO currentUserInDb = currentDocumentationUnitProcessStepDTOFromDB.getUser();
+    User currentUserFromFrontend = currentDocunitProcessStepFromFrontend.getUser();
+
+    UUID lastUserId = currentUserFromFrontend != null ? currentUserFromFrontend.id() : null;
+
+    UUID currentUserId = currentUserInDb != null ? currentUserInDb.getId() : null;
     // If User id has changed in process step
-    return !Objects.equals(currentDocumentationUnitProcessStepDTOFromDB.getUserId(), lastUserId);
+    return !Objects.equals(currentUserId, lastUserId);
   }
 
   private DocumentationUnitProcessStepDTO createAndSaveNewProcessStep(
@@ -686,14 +685,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       ProcessStepDTO processStepDTO,
       DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend) {
 
-    UUID processStepUserId = null;
-    if (currentDocunitProcessStepFromFrontend.getUser() != null) {
-      processStepUserId = currentDocunitProcessStepFromFrontend.getUser().id();
-    }
-
     DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO =
         DocumentationUnitProcessStepDTO.builder()
-            .userId(processStepUserId)
+            .user(UserTransformer.transformToDTO(currentDocunitProcessStepFromFrontend.getUser()))
             .createdAt(LocalDateTime.now())
             .processStep(processStepDTO)
             .documentationUnit(documentationUnitDTO)

@@ -25,7 +25,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverReportDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.IgnoredTextCheckWordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HandoverMailTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.RelatedDocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
@@ -42,7 +41,6 @@ import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.User;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -63,7 +61,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 
 @Sql(scripts = {"classpath:legal_periodical_init.sql"})
@@ -87,7 +84,6 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
   @Autowired private LegalPeriodicalEditionRepository legalPeriodicalEditionRepository;
   @Autowired private DatabaseIgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
   @Autowired private DocumentationUnitHistoryLogService docUnitHistoryLogService;
-  @MockitoSpyBean private UserService userService;
 
   private DocumentationOfficeDTO docOffice;
   private final UUID oidcLoggedInUserId = UUID.fromString("c0a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5");
@@ -95,16 +91,6 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
   @BeforeEach
   void setUp() {
     docOffice = documentationOfficeRepository.findByAbbreviation("DS");
-
-    // Mock the UserService.getUser(UUID) for the OIDC logged-in user
-    // This user's ID will be put into the OIDC token's 'sub' claim by AuthUtils.getMockLogin
-    when(userService.getUser(oidcLoggedInUserId))
-        .thenReturn(
-            User.builder()
-                .id(oidcLoggedInUserId)
-                .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
-                .documentationOffice(DocumentationOfficeTransformer.transformToDomain(docOffice))
-                .build());
 
     when(featureToggleService.isEnabled("neuris.text-check-noindex-handover")).thenReturn(true);
   }

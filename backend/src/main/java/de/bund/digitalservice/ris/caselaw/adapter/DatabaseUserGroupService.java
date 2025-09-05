@@ -86,6 +86,20 @@ public class DatabaseUserGroupService implements UserGroupService {
     return this.userGroups.stream().map(UserGroupTransformer::transformToDomain).toList();
   }
 
+  /**
+   * Returns the first match where a provided list of {@link UserGroup user groups} contains a known
+   * {@link UserGroup user group}. Examples:
+   *
+   * <ol>
+   *   <li>Known groups: /ABC/DEF, /HIJ/KLM | provided groups: /HIJ/KLM, /OPQ -> result: /HIJ/KLM
+   *   <li>Known groups: /ABC/DEF, /HIJ/KLM | provided groups: /HIJ/KLM, /ABC/DEF -> result:
+   *       /ABC/DEF
+   * </ol>
+   *
+   * @param userGroups the {@link UserGroup user groups} to match against the known {@link UserGroup
+   *     user groups}
+   * @return the first match or an empty optional if no match could be found
+   */
   @Override
   public Optional<UserGroup> getDocumentationOfficeFromGroupPathNames(
       List<String> userGroupPathNames) {

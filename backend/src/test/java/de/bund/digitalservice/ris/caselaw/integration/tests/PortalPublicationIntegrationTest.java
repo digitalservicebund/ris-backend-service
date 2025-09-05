@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitHistoryLogRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
@@ -75,6 +76,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseDocumentationUnitHistoryLogRepository historyLogRepository;
+  @Autowired private DatabaseUserRepository databaseUserRepository;
 
   @MockitoBean(name = "portalS3Client")
   private S3Client s3Client;
@@ -130,13 +132,14 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
 
     var historyLogs =
         historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
+    var userDbId = databaseUserRepository.findByExternalId(userId).get().getId();
     assertThat(historyLogs)
         .hasSize(2)
         .satisfiesExactly(
             historyLog -> {
               assertThat(historyLog.getEventType())
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
-              assertThat(historyLog.getUserId()).isEqualTo(userId);
+              assertThat(historyLog.getUserId()).isEqualTo(userDbId);
               assertThat(historyLog.getDescription())
                   .isEqualTo("Dokeinheit im Portal veröffentlicht");
             },
@@ -191,20 +194,21 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
         .isAfter(updatedDto.getManagementData().getFirstPublishedAtDateTime());
     var historyLogs =
         historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
+    var userDbId = databaseUserRepository.findByExternalId(userId).get().getId();
     assertThat(historyLogs)
         .hasSize(3)
         .satisfiesExactly(
             historyLog -> {
               assertThat(historyLog.getEventType())
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
-              assertThat(historyLog.getUserId()).isEqualTo(userId);
+              assertThat(historyLog.getUserId()).isEqualTo(userDbId);
               assertThat(historyLog.getDescription())
                   .isEqualTo("Dokeinheit im Portal veröffentlicht");
             },
             historyLog -> {
               assertThat(historyLog.getEventType())
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
-              assertThat(historyLog.getUserId()).isEqualTo(userId);
+              assertThat(historyLog.getUserId()).isEqualTo(userDbId);
               assertThat(historyLog.getDescription())
                   .isEqualTo("Dokeinheit im Portal veröffentlicht");
             },
@@ -453,13 +457,14 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
 
     var historyLogs =
         historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
+    var userDbId = databaseUserRepository.findByExternalId(userId).get().getId();
     assertThat(historyLogs)
         .hasSize(2)
         .satisfiesExactly(
             historyLog -> {
               assertThat(historyLog.getEventType())
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
-              assertThat(historyLog.getUserId()).isEqualTo(userId);
+              assertThat(historyLog.getUserId()).isEqualTo(userDbId);
               assertThat(historyLog.getDescription())
                   .isEqualTo("Dokeinheit wurde aus dem Portal zurückgezogen");
             },

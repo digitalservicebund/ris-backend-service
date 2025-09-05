@@ -28,7 +28,7 @@ function renderComponent() {
         plugins: [
           createTestingPinia({
             initialState: {
-              session: { user: { roles: ["Internal"] } },
+              session: { user: { internal: true } },
               docunitStore: {
                 documentUnit: new Decision("foo", {
                   documentNumber: "1234567891234",

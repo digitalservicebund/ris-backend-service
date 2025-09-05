@@ -2,8 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
-import de.bund.digitalservice.ris.caselaw.domain.User;
-import java.util.UUID;
 
 public class DocumentationUnitProcessStepTransformer {
 
@@ -20,13 +18,9 @@ public class DocumentationUnitProcessStepTransformer {
     if (entity == null) {
       return null;
     }
-    User user = null;
-    if (entity.getUserId() != null) {
-      user = User.builder().id(entity.getUserId()).build();
-    }
     return DocumentationUnitProcessStep.builder()
         .id(entity.getId())
-        .user(user)
+        .user(UserTransformer.transformToDomain(entity.getUser()))
         .createdAt(entity.getCreatedAt())
         .processStep(ProcessStepTransformer.toDomain(entity.getProcessStep()))
         .build();
@@ -38,13 +32,8 @@ public class DocumentationUnitProcessStepTransformer {
       return null;
     }
 
-    UUID userId = null;
-    if (documentationUnitProcessStep.getUser() != null) {
-      userId = documentationUnitProcessStep.getUser().id();
-    }
-
     return DocumentationUnitProcessStepDTO.builder()
-        .userId(userId)
+        .user(UserTransformer.transformToDTO(documentationUnitProcessStep.getUser()))
         .processStep(ProcessStepTransformer.toDto(documentationUnitProcessStep.getProcessStep()))
         .createdAt(documentationUnitProcessStep.getCreatedAt())
         .id(documentationUnitProcessStep.getId())

@@ -10,7 +10,7 @@ function mockUser(role: string) {
     documentationOffice: undefined,
     email: undefined,
     name: "",
-    roles: [role],
+    internal: role === "Internal",
     initials: "",
   }
   return mockedSessionStore

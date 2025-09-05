@@ -8,8 +8,8 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
 
 import ch.qos.logback.classic.Level;
 import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
-import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -107,7 +107,7 @@ class UserGroupIntegrationTest extends BaseIntegrationTest {
   @Test
   void testGetUserGroups_withExternalUser_shouldReturnNoUserGroupsAndWarnings() {
     doReturn(List.of()).when(userGroupService).getExternalUserGroups(any());
-    TestMemoryAppender memoryAppender = new TestMemoryAppender(KeycloakUserService.class);
+    TestMemoryAppender memoryAppender = new TestMemoryAppender(UserService.class);
 
     risWebTestClient
         .withLogin("/NOT-EXISTING")

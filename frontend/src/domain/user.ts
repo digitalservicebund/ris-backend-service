@@ -5,6 +5,6 @@ export type User = {
     abbreviation: string
   }
   email?: string
-  roles?: string[]
+  internal?: boolean
   initials: string
 }

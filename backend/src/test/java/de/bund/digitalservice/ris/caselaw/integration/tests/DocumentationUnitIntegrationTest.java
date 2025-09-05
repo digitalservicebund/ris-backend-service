@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentC
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitProcessStepRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseInputTypeRepository;
@@ -28,6 +29,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeri
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcessStepRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeletedDocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
@@ -47,6 +49,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexResultRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
@@ -145,6 +148,11 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @Autowired private EurLexResultRepository eurLexResultRepository;
   @Autowired private DatabaseInputTypeRepository inputTypeRepository;
   @Autowired private DatabaseProcessStepRepository processStepRepository;
+  @Autowired private DatabaseUserRepository databaseUserRepository;
+
+  @Autowired
+  private DatabaseDocumentationUnitProcessStepRepository
+      databaseDocumentationUnitProcessStepRepository;
 
   @MockitoBean private MailService mailService;
   @MockitoBean private AttachmentService attachmentService;
@@ -173,17 +181,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             .findByName("Ersterfassung")
             .orElseThrow(
                 () -> new AssertionError("Process step 'Ersterfassung' not found in repository."));
-
-    // Mock the UserService.getUser(UUID) for the OIDC logged-in user
-    // This user's ID will be put into the OIDC token's 'sub' claim by AuthUtils.getMockLogin
-    // We need this to assert on history logs
-    when(userService.getUser(oidcLoggedInUserId))
-        .thenReturn(
-            User.builder()
-                .id(oidcLoggedInUserId)
-                .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
-                .documentationOffice(docOffice)
-                .build());
   }
 
   @AfterEach
@@ -926,14 +923,28 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             neuProcessStep,
             neuProcessStep);
 
-    List<UUID> users =
-        Arrays.asList(
-            oidcLoggedInUserId,
-            oidcLoggedInUserId,
-            UUID.randomUUID(),
-            null,
-            UUID.randomUUID(),
-            null);
+    var userDbId1 =
+        databaseUserRepository
+            .save(
+                UserDTO.builder()
+                    .externalId(oidcLoggedInUserId)
+                    .documentationOffice(documentationOffice)
+                    .firstName("Krümel")
+                    .lastName("Monster")
+                    .build())
+            .getId();
+    var userDbId2 =
+        databaseUserRepository
+            .save(
+                UserDTO.builder()
+                    .externalId(UUID.randomUUID())
+                    .documentationOffice(documentationOffice)
+                    .firstName("Krümel")
+                    .lastName("Monster")
+                    .build())
+            .getId();
+
+    List<UUID> users = Arrays.asList(userDbId1, userDbId1, userDbId2, null, userDbId2, null);
 
     for (int i = 0; i < 6; i++) {
 
@@ -962,7 +973,10 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
                   .processSteps(
                       List.of(
                           DocumentationUnitProcessStepDTO.builder()
-                              .userId(users.get(i))
+                              .user(
+                                  users.get(i) == null
+                                      ? null
+                                      : databaseUserRepository.findById(users.get(i)).get())
                               .processStep(processSteps.get(i))
                               .createdAt(LocalDateTime.now())
                               .build())),

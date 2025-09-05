@@ -28,6 +28,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcessSt
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRelatedDocumentationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -38,6 +39,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RelatedDocumentationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
@@ -96,12 +98,14 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
   @Autowired private ObjectMapper objectMapper;
   @Autowired private DocumentationUnitHistoryLogService documentationUnitHistoryLogService;
+  @Autowired private DatabaseUserRepository databaseUserRepository;
   @MockitoSpyBean private UserService userService;
-  private final UUID oidcLoggedInUserId = UUID.randomUUID();
+  private final UUID oidcLoggedInUserId = UUID.fromString("88888888-3333-4444-4444-121212121212");
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private UUID court1Id;
   private UUID court2Id;
   private UUID region1Id;
+  private UUID userDbId2;
 
   @BeforeEach
   void setUp() {
@@ -141,14 +145,42 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                     .build())
             .getId();
 
+    var documentationOffice =
+        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
+    var userDbId1 =
+        databaseUserRepository
+            .findByExternalId(oidcLoggedInUserId)
+            .orElse(
+                databaseUserRepository.save(
+                    UserDTO.builder()
+                        .externalId(oidcLoggedInUserId)
+                        .documentationOffice(documentationOffice)
+                        .firstName("Krümel")
+                        .lastName("Monster")
+                        .build()))
+            .getId();
+    userDbId2 =
+        databaseUserRepository
+            .save(
+                UserDTO.builder()
+                    .externalId(UUID.randomUUID())
+                    .firstName("Test")
+                    .lastName("User 2")
+                    .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                    .build())
+            .getId();
+
     // Mock the UserService.getUser(UUID) for the OIDC logged-in user
     // This user's ID will be put into the OIDC token's 'sub' claim by AuthUtils.getMockLogin
     // We need this to assert on history logs
-    when(userService.getUser(oidcLoggedInUserId))
+    when(userService.getUser(userDbId1))
         .thenReturn(
             User.builder()
-                .id(oidcLoggedInUserId)
+                .id(userDbId1)
+                .externalId(oidcLoggedInUserId)
                 .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
+                .firstName("Krümel")
+                .lastName("Monster")
                 .documentationOffice(docOffice)
                 .build());
   }
@@ -163,6 +195,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     procedureRepository.deleteAll();
     patchRepository.deleteAll();
     relatedDocumentationRepository.deleteAll();
+    databaseUserRepository.deleteAll();
   }
 
   @Test
@@ -393,8 +426,8 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
             HistoryLogEventType.UPDATE,
             HistoryLogEventType.SCHEDULED_PUBLICATION,
             HistoryLogEventType.CREATE);
-    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser", null);
-    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", null);
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser", "testUser");
+    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
     assertThat(logs.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
     assertThat(logs.get(1).description()).isEqualTo("Terminierte Abgabe gelöscht");
     assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
@@ -4640,18 +4673,9 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       ProcessStepDTO fachdokumentationProcessStep =
           processStepRepository.findByName("Fachdokumentation").orElseThrow();
 
-      UUID newUserId = UUID.randomUUID();
-      when(userService.getUser(newUserId))
-          .thenReturn(
-              User.builder()
-                  .id(newUserId)
-                  .name("testUser2")
-                  .documentationOffice(docOffice)
-                  .build());
-
       // Mock a user with a documentation office for the patch payload
       ObjectNode userNode = JsonNodeFactory.instance.objectNode();
-      userNode.put("id", newUserId.toString());
+      userNode.put("id", userDbId2.toString());
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(
@@ -4699,8 +4723,8 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       // the last step
       assertThat(documentationUnitDTO.getProcessSteps().getFirst().getProcessStep().getName())
           .isEqualTo("Fachdokumentation");
-      assertThat(documentationUnitDTO.getProcessSteps().getFirst().getUserId())
-          .isEqualTo(newUserId);
+      assertThat(documentationUnitDTO.getProcessSteps().getFirst().getUser().getId())
+          .isEqualTo(userDbId2);
 
       // the previous (initial) step
       assertThat(documentationUnitDTO.getProcessSteps().get(1).getProcessStep().getName())
@@ -4708,8 +4732,9 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       // When calling generateEmptyDocumentationUnitWithMockedUser() a new docunit with
       // oidcLoggedInUserId is created and the initial process step for the respective
       // docoffice is set with currently the logged in user
-      assertThat(documentationUnitDTO.getProcessSteps().get(1).getUserId())
-          .isEqualTo(oidcLoggedInUserId);
+      var userDbId = databaseUserRepository.findByExternalId(oidcLoggedInUserId).get().getId();
+      assertThat(documentationUnitDTO.getProcessSteps().get(1).getUser().getId())
+          .isEqualTo(userDbId);
 
       TestTransaction.end();
 
@@ -4726,7 +4751,103 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           .map(HistoryLog::createdBy)
           .containsExactly("testUser", "testUser", "testUser");
       assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
-      assertThat(logs.get(0).description()).isEqualTo("Person geändert: testUser → testUser2");
+      assertThat(logs.get(0).description()).isEqualTo("Person geändert: testUser → Test User 2");
+      assertThat(logs.get(1).description())
+          .isEqualTo("Schritt geändert: Ersterfassung → Fachdokumentation");
+      assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
+    }
+
+    @Test
+    @Transactional
+    void
+        testPartialUpdateByUuid_withProcessStepAndNonExistingUserUpdate_shouldWriteCorrectHistoryLogs() {
+      TestTransaction.flagForCommit();
+      TestTransaction.end();
+
+      Decision decision = generateEmptyDocumentationUnitWithMockedUser();
+      assertThat(decision.currentDocumentationUnitProcessStep().getProcessStep().name())
+          .isEqualTo("Ersterfassung");
+      ProcessStepDTO fachdokumentationProcessStep =
+          processStepRepository.findByName("Fachdokumentation").orElseThrow();
+
+      // Mock a user with a documentation office for the patch payload
+      ObjectNode userNode = JsonNodeFactory.instance.objectNode();
+      userNode.put("id", UUID.randomUUID().toString());
+
+      List<JsonPatchOperation> operationsUser1 =
+          List.of(
+              new ReplaceOperation("/currentDocumentationUnitProcessStep/user", userNode),
+              new ReplaceOperation(
+                  "/currentDocumentationUnitProcessStep/processStep/abbreviation",
+                  new TextNode("FD")),
+              new ReplaceOperation(
+                  "/currentDocumentationUnitProcessStep/processStep/name",
+                  new TextNode("Fachdokumentation")),
+              new ReplaceOperation(
+                  "/currentDocumentationUnitProcessStep/processStep/uuid",
+                  new TextNode(fachdokumentationProcessStep.getId().toString())));
+
+      RisJsonPatch patchUser1 =
+          new RisJsonPatch(0L, new JsonPatch(operationsUser1), Collections.emptyList());
+
+      risWebTestClient
+          .withDefaultLogin(oidcLoggedInUserId)
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
+          .bodyValue(patchUser1)
+          .exchange()
+          .expectStatus()
+          .is2xxSuccessful()
+          .expectBody(RisJsonPatch.class)
+          .consumeWith(
+              response -> {
+                RisJsonPatch responsePatch = response.getResponseBody();
+                assertThat(responsePatch).isNotNull();
+                assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
+              });
+
+      TestTransaction.start();
+      List<DocumentationUnitDTO> allDocumentationUnits = repository.findAll();
+      assertThat(allDocumentationUnits).hasSize(1);
+      DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
+
+      assertThat(documentationUnitDTO.getCurrentProcessStep().getProcessStep().getName())
+          .isEqualTo("Fachdokumentation");
+
+      assertThat(documentationUnitDTO.getProcessSteps()).hasSize(2);
+
+      // the last step
+      assertThat(documentationUnitDTO.getProcessSteps().getFirst().getProcessStep().getName())
+          .isEqualTo("Fachdokumentation");
+      assertThat(documentationUnitDTO.getProcessSteps().getFirst().getUser()).isNull();
+
+      // the previous (initial) step
+      assertThat(documentationUnitDTO.getProcessSteps().get(1).getProcessStep().getName())
+          .isEqualTo("Ersterfassung");
+      // When calling generateEmptyDocumentationUnitWithMockedUser() a new docunit with
+      // oidcLoggedInUserId is created and the initial process step for the respective
+      // docoffice is set with currently the logged in user
+      var userDbId = databaseUserRepository.findByExternalId(oidcLoggedInUserId).get().getId();
+      assertThat(documentationUnitDTO.getProcessSteps().get(1).getUser().getId())
+          .isEqualTo(userDbId);
+
+      TestTransaction.end();
+
+      var user = User.builder().documentationOffice(buildDSDocOffice()).build();
+      var logs = documentationUnitHistoryLogService.getHistoryLogs(decision.uuid(), user);
+      assertThat(logs).hasSize(3);
+      assertThat(logs)
+          .map(HistoryLog::eventType)
+          .containsExactly(
+              HistoryLogEventType.PROCESS_STEP_USER,
+              HistoryLogEventType.PROCESS_STEP,
+              HistoryLogEventType.CREATE);
+      assertThat(logs)
+          .map(HistoryLog::createdBy)
+          .containsExactly("testUser", "testUser", "testUser");
+      assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+      assertThat(logs.get(0).description()).isEqualTo("Person entfernt: testUser");
       assertThat(logs.get(1).description())
           .isEqualTo("Schritt geändert: Ersterfassung → Fachdokumentation");
       assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
@@ -4824,7 +4945,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       assertThat(doc.getProcessSteps()).hasSize(2);
       assertThat(doc.getProcessSteps().getFirst().getProcessStep().getName())
           .isEqualTo("Ersterfassung");
-      assertThat(doc.getProcessSteps().getFirst().getUserId()).isNull();
+      assertThat(doc.getProcessSteps().getFirst().getUser()).isNull();
       TestTransaction.end();
 
       var visibleUser = User.builder().documentationOffice(buildDSDocOffice()).build();

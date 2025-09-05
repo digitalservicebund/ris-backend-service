@@ -33,7 +33,11 @@ public class AuthController {
   @GetMapping(value = "me", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<User> getUser(@AuthenticationPrincipal OidcUser oidcUser) {
-    return ResponseEntity.ok(userService.getUser(oidcUser));
+    User user = userService.getUser(oidcUser);
+    if (user == null) {
+      return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(user);
   }
 
   /**

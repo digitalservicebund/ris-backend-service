@@ -84,7 +84,7 @@ function renderComponent(options?: {
             initialState: {
               session: {
                 user: {
-                  roles: [options?.isExternalUser ? "External" : "Internal"],
+                  internal: !options?.isExternalUser,
                 },
               },
               docunitStore: {

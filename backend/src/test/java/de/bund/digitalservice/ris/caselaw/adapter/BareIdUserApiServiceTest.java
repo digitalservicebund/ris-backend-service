@@ -8,12 +8,15 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.UserApiException;
+import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -90,12 +93,22 @@ class BareIdUserApiServiceTest {
             any(HttpEntity.class),
             eq(BareUserApiResponse.UserApiResponse.class));
 
+    when(userGroupService.getDocumentationOfficeFromGroupPathNames(List.of("/caselaw")))
+        .thenReturn(
+            Optional.of(
+                UserGroup.builder()
+                    .isInternal(false)
+                    .docOffice(DocumentationOffice.builder().abbreviation("BFH").build())
+                    .build()));
+
     var userResult = bareIdUserApiService.getUser(userId);
 
     Assertions.assertEquals("Foo Taxpayer", userResult.name());
     Assertions.assertEquals("FT", userResult.initials());
     Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
-    Assertions.assertEquals(userId, userResult.id());
+    Assertions.assertEquals(userId, userResult.externalId());
+    Assertions.assertEquals("BFH", userResult.documentationOffice().abbreviation());
+    Assertions.assertFalse(userResult.internal());
   }
 
   @Test
@@ -115,7 +128,7 @@ class BareIdUserApiServiceTest {
 
     var userResult = bareIdUserApiService.getUser(userId);
 
-    Assertions.assertEquals(userId, userResult.id());
+    Assertions.assertEquals(userId, userResult.externalId());
     Assertions.assertNull(userResult.name());
   }
 
@@ -142,7 +155,7 @@ class BareIdUserApiServiceTest {
 
     Assertions.assertNull(userResult.name());
     Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
-    Assertions.assertEquals(userId, userResult.id());
+    Assertions.assertEquals(userId, userResult.externalId());
   }
 
   private BareUserApiResponse.BareUser generateBareUser(
