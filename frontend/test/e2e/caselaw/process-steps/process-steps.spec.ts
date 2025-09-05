@@ -112,7 +112,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
       })
 
       await test.step("Select bgh test user", async () => {
-        await selectUser(pageWithBghUser, "BgH", "BGH  testUser", "BT")
+        await selectUser(pageWithBghUser, "BgH  test", "BGH  testUser", "BT")
       })
 
       await test.step("Save changes and close dialog", async () => {
@@ -163,7 +163,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
           name: "Neuer Schritt",
         })
         await expect(processStepDropBox).toContainText("QS formal")
-        await selectUser(pageWithBghUser, "BGH", "BGH  testUser", "BT")
+        await selectUser(pageWithBghUser, "BGH  test", "BGH  testUser", "BT")
         await saveChangesAndCloseDialog(pageWithBghUser)
       })
 
@@ -231,7 +231,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
         name: "Neuer Schritt",
       })
       await expect(processStepDropBox).toContainText("QS formal")
-      await selectUser(pageWithBghUser, "BGH", "BGH  testUser", "BT")
+      await selectUser(pageWithBghUser, "BGH  test", "BGH  testUser", "BT")
       await saveChangesAndCloseDialog(pageWithBghUser)
 
       await expect(infoPanel).toContainText("QS formal")
