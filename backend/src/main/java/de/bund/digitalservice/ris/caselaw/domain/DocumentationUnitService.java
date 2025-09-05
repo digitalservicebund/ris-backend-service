@@ -702,6 +702,7 @@ public class DocumentationUnitService {
                 patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit),
                 newVersion);
 
+        // HERE!!!
         toUpdate =
             patchMapperService.extractAndStoreBase64Images(
                 toUpdate, existingDocumentationUnit, null);
