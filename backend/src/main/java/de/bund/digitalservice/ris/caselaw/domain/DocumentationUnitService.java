@@ -522,8 +522,11 @@ public class DocumentationUnitService {
                       return false;
                     }
 
-                    return processStep.getUser().documentationOffice().id()
-                        == user.documentationOffice().id();
+                    return processStep
+                        .getUser()
+                        .documentationOffice()
+                        .id()
+                        .equals(user.documentationOffice().id());
                   })
               .toList();
     }
