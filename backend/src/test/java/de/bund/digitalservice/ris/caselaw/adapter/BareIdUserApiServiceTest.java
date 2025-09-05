@@ -169,14 +169,6 @@ class BareIdUserApiServiceTest {
         attributes);
   }
 
-  //  @Test
-  //  void testGetUsers_shouldSucceed() {
-  //    var results = bareIdUserApiService.getUsers("/caselaw/BGH/Intern");
-  //    Assertions.assertEquals(1, results.size());
-  //    Assertions.assertEquals("Tina Taxpayer", results.getFirst().name());
-  //    Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", results.getFirst().email());
-  //  }
-
   @Test
   void testGetUsers_withEmptyPath_shouldThrowException() {
     var exception = assertThrows(UserApiException.class, () -> bareIdUserApiService.getUsers(""));
