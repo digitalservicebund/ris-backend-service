@@ -201,11 +201,6 @@ public class BareIdUserApiService implements UserApiService {
         .toList();
   }
 
-  @Override
-  public List<User> getUsersInGroup(String userGroupPathName) {
-    return List.of();
-  }
-
   private Optional<UserGroup> getDocumentationOfficeFromGroups(
       List<BareUserApiResponse.Group> userGroups) {
     List<String> userGroupPaths = userGroups.stream().map(BareUserApiResponse.Group::path).toList();

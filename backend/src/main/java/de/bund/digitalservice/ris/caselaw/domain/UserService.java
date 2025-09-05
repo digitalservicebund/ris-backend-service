@@ -23,8 +23,6 @@ public abstract class UserService {
 
   public abstract List<User> getUsersInSameDocOffice(UserGroup userGroup);
 
-  public abstract List<User> getUsersInGroup(UserGroup userGroup);
-
   public List<User> getUsersInSameDocOffice(OidcUser oidcUser) {
     return getUsersInSameDocOffice(getUserGroup(oidcUser).orElse(null));
   }

@@ -109,9 +109,4 @@ public class DatabaseUserService extends UserService {
     return userRepository.getAllUsersForDocumentationOffice(userGroup.docOffice()).stream()
         .toList();
   }
-
-  @Override
-  public List<User> getUsersInGroup(UserGroup userGroup) {
-    return List.of();
-  }
 }

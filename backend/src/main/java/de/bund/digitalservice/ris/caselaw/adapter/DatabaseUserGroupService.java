@@ -96,8 +96,8 @@ public class DatabaseUserGroupService implements UserGroupService {
    *       /ABC/DEF
    * </ol>
    *
-   * @param userGroups the {@link UserGroup user groups} to match against the known {@link UserGroup
-   *     user groups}
+   * @param userGroupPathNames the {@link UserGroup user groups} to match against the known {@link
+   *     UserGroup user groups}
    * @return the first match or an empty optional if no match could be found
    */
   @Override
@@ -140,14 +140,6 @@ public class DatabaseUserGroupService implements UserGroupService {
   public List<UserGroup> getExternalUserGroups(DocumentationOffice documentationOffice) {
     return getAllUserGroups().stream()
         .filter(group -> group.docOffice().equals(documentationOffice) && !group.isInternal())
-        .toList();
-  }
-
-  @Override
-  public List<UserGroup> getAllGroupsForDocumentationOffice(
-      DocumentationOffice documentationOffice) {
-    return getAllUserGroups().stream()
-        .filter(group -> group.docOffice().equals(documentationOffice))
         .toList();
   }
 
