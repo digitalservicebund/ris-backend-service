@@ -44,13 +44,16 @@ class BareIdUserApiServiceTest {
   String instanceId = UUID.randomUUID().toString();
 
   private final BareUserApiResponse.Group caselawGroup =
-      generateBareUserGroup(UUID.fromString("00000000-0000-0000-0000-000000000001"), "caselaw");
+      generateBareUserGroup(
+          UUID.fromString("00000000-0000-0000-0000-000000000001"), "caselaw", "/caselaw");
 
   private final BareUserApiResponse.Group courtGroup =
-      generateBareUserGroup(UUID.fromString("00000000-0000-0000-0000-000000000002"), "BGH");
+      generateBareUserGroup(
+          UUID.fromString("00000000-0000-0000-0000-000000000002"), "BGH", "/caselaw/BGH");
 
   private final BareUserApiResponse.Group internGroup =
-      generateBareUserGroup(UUID.fromString("00000000-0000-0000-0000-000000000003"), "Intern");
+      generateBareUserGroup(
+          UUID.fromString("00000000-0000-0000-0000-000000000003"), "Intern", "/caselaw/BGH/Intern");
 
   @BeforeEach
   void setUp() {
@@ -170,6 +173,26 @@ class BareIdUserApiServiceTest {
   }
 
   @Test
+  void testGetUsers_forGroupPathWithUser_shouldSucceed() {
+    var results = bareIdUserApiService.getUsers("/caselaw/BGH/Intern");
+    Assertions.assertEquals(1, results.size());
+    Assertions.assertEquals("Tina Taxpayer", results.getFirst().name());
+    Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", results.getFirst().email());
+  }
+
+  @Test
+  void testGetUsers_forGroupPathWithoutUser_shouldReturnEmptyList() {
+    var results = bareIdUserApiService.getUsers("/caselaw/BGH");
+    Assertions.assertEquals(0, results.size());
+  }
+
+  @Test
+  void testGetUsers_forWrongGroupPath_shouldReturnEmptyList() {
+    var results = bareIdUserApiService.getUsers("/caselaw/BGH/Something");
+    Assertions.assertEquals(0, results.size());
+  }
+
+  @Test
   void testGetUsers_withEmptyPath_shouldThrowException() {
     var exception = assertThrows(UserApiException.class, () -> bareIdUserApiService.getUsers(""));
     Assertions.assertEquals("User group path is empty or blank", exception.getMessage());
@@ -195,8 +218,8 @@ class BareIdUserApiServiceTest {
     Assertions.assertEquals("Could not fetch users", exception.getMessage());
   }
 
-  private BareUserApiResponse.Group generateBareUserGroup(UUID uuid, String name) {
-    return new BareUserApiResponse.Group(uuid, name, "/" + name);
+  private BareUserApiResponse.Group generateBareUserGroup(UUID uuid, String name, String path) {
+    return new BareUserApiResponse.Group(uuid, name, path);
   }
 
   private void mockRootGroupsResponse() {
