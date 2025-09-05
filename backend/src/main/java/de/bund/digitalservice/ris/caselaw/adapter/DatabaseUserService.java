@@ -37,9 +37,7 @@ public class DatabaseUserService extends UserService {
   /** On application start, we want to check if the user table is empty and if so, initialize */
   @EventListener
   public void onApplicationEvent(ContextRefreshedEvent event) {
-    if (userRepository.getCount() == 0) {
-      fetchAndPersistUsersFromKeycloak();
-    }
+    fetchAndPersistUsersFromKeycloak();
   }
 
   /** Nightly fetches users from the Keycloak User Service and persists them */

@@ -96,8 +96,8 @@ public class DatabaseUserGroupService implements UserGroupService {
    *       /ABC/DEF
    * </ol>
    *
-   * @param userGroups the {@link UserGroup user groups} to match against the known {@link UserGroup
-   *     user groups}
+   * @param userGroupPathNames the {@link UserGroup user groups} to match against the known {@link
+   *     UserGroup user groups}
    * @return the first match or an empty optional if no match could be found
    */
   @Override

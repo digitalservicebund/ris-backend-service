@@ -123,18 +123,17 @@ public class BareIdUserApiService implements UserApiService {
         getGroupByName(getGroupChildren(current.uuid()), userGroupsPathSegments.get(1));
 
     // Get all users under the  court
-    return getUsersRecursively(court);
+    return getUsersRecursively(court, userGroupPathName);
   }
 
-  private List<User> getUsersRecursively(BareUserApiResponse.Group group) {
+  private List<User> getUsersRecursively(BareUserApiResponse.Group group, String groupName) {
     List<User> users = new ArrayList<>();
-    try {
+    if (group.path().equals(groupName)) {
       users.addAll(getUsers(group.uuid()));
-    } catch (UserApiException exception) {
-      log.error("Error while fetching users: ", exception);
-    }
-    for (BareUserApiResponse.Group child : getGroupChildren(group.uuid())) {
-      users.addAll(getUsersRecursively(child));
+    } else {
+      for (BareUserApiResponse.Group child : getGroupChildren(group.uuid())) {
+        users.addAll(getUsersRecursively(child, groupName));
+      }
     }
     return users;
   }
