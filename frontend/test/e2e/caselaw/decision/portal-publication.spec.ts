@@ -200,6 +200,19 @@ test.describe(
           await expect(
             page.getByRole("button", { name: "Zurückziehen" }),
           ).toBeHidden()
+          await expect(
+            page.getByText(
+              "Portalseite der Dokumentationseinheit wurde entfernt",
+            ),
+          ).toBeVisible()
+          await expect(
+            page.getByRole("link", {
+              name: "Portalseite der Dokumentationseinheit",
+            }),
+          ).toHaveAttribute(
+            "href",
+            `https://ris-portal.dev.ds4g.net/case-law/${prefilledDocumentUnit.documentNumber}`,
+          )
         })
 
         // Portal is not available in local environment
