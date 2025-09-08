@@ -57,14 +57,14 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
         .thenReturn(
             User.builder()
                 .id(userIdDS)
-                .name("testUserDS")
+                .firstName("testUserDS")
                 .documentationOffice(docOfficeDS)
                 .build());
     when(userService.getUser(userIdBGH))
         .thenReturn(
             User.builder()
                 .id(userIdBGH)
-                .name("testUserBGH")
+                .firstName("testUserBGH")
                 .documentationOffice(docOfficeBGH)
                 .build());
   }
@@ -154,7 +154,8 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
     var user =
         User.builder()
             .id(UUID.randomUUID())
-            .name("Al Nam")
+            .firstName("Al")
+            .lastName("Nam")
             .documentationOffice(docOfficeDS)
             .build();
     documentationUnitService.updateDocumentationUnit(

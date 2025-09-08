@@ -177,10 +177,9 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
         .thenReturn(
             User.builder()
                 .id(userDbId1)
-                .externalId(oidcLoggedInUserId)
-                .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
-                .firstName("Krümel")
-                .lastName("Monster")
+                .externalId(oidcLoggedInUserId) // This name matches the 'name' claim in
+                // AuthUtils.getMockLogin
+                .firstName("testUser")
                 .documentationOffice(docOffice)
                 .build());
   }

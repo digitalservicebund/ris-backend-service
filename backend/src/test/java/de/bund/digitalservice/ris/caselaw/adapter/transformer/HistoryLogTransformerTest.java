@@ -18,7 +18,7 @@ class HistoryLogTransformerTest {
   }
 
   private User createUser(String name, DocumentationOffice office) {
-    return User.builder().name(name).documentationOffice(office).build();
+    return User.builder().firstName(name).documentationOffice(office).build();
   }
 
   @Test

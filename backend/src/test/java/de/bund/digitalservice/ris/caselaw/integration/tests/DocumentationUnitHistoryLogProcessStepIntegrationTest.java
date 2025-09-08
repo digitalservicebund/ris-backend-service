@@ -62,7 +62,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
   private final User creatorUserDS =
       User.builder()
           .id(creatorUserIdDS)
-          .name("testUserDS")
+          .firstName("testUserDS")
           .documentationOffice(docOfficeDS)
           .build();
 
@@ -70,7 +70,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
   private final User creatorUserBGH =
       User.builder()
           .id(creatorUserIdBGH)
-          .name("testUserBGH")
+          .firstName("testUserBGH")
           .documentationOffice(docOfficeBGH)
           .build();
 
