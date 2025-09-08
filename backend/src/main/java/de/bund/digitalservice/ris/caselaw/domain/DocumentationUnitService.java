@@ -401,9 +401,18 @@ public class DocumentationUnitService {
   public DocumentationUnitListItem takeOverDocumentationUnit(
       String documentNumber, OidcUser oidcUser) throws DocumentationUnitNotExistsException {
 
+    Optional<User> user = userService.getUser(oidcUser);
+    if (user.isEmpty()) {
+      log.atError()
+          .setMessage("Could not identify logged in user")
+          .addKeyValue("name", oidcUser.getName())
+          .log();
+      return null;
+    }
+
     Status status =
         Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build();
-    statusService.update(documentNumber, status, userService.getUser(oidcUser));
+    statusService.update(documentNumber, status, user.get());
 
     return addPermissions(
         oidcUser, repository.findDocumentationUnitListItemByDocumentNumber(documentNumber));
@@ -443,11 +452,18 @@ public class DocumentationUnitService {
 
   public DocumentationUnit getByDocumentNumberWithUser(String documentNumber, OidcUser oidcUser)
       throws DocumentationUnitNotExistsException {
-    User user = userService.getUser(oidcUser);
+    Optional<User> user = userService.getUser(oidcUser);
+    if (user.isEmpty()) {
+      log.atError()
+          .setMessage("Could not identify logged in user.")
+          .addKeyValue("name", oidcUser.getName())
+          .log();
+      return null;
+    }
 
-    var documentable = repository.findByDocumentNumber(documentNumber, user);
+    var documentable = repository.findByDocumentNumber(documentNumber, user.get());
 
-    documentable = filterProcessStepsOfOtherDocumentationOffices(documentable, user);
+    documentable = filterProcessStepsOfOtherDocumentationOffices(documentable, user.get());
 
     switch (documentable) {
       case Decision decision -> {

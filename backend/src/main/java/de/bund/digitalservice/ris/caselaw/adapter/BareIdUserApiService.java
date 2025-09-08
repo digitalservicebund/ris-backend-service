@@ -138,6 +138,9 @@ public class BareIdUserApiService implements UserApiService {
   private List<User> getUsersRecursively(BareUserApiResponse.Group group, String groupName)
       throws UserApiException {
     List<User> users = new ArrayList<>();
+    if (group == null) {
+      return users;
+    }
     if (group.path().equals(groupName)) {
       users.addAll(getUsers(group.uuid()));
     } else {

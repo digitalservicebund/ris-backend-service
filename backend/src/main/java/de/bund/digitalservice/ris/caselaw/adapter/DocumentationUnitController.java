@@ -127,8 +127,15 @@ public class DocumentationUnitController {
       @RequestBody(required = false) Optional<DocumentationUnitCreationParameters> parameters,
       @RequestParam(value = "kind", defaultValue = "DECISION") Kind kind) {
     try {
-      var documentationUnit =
-          service.generateNewDocumentationUnit(userService.getUser(oidcUser), parameters, kind);
+      Optional<User> user = userService.getUser(oidcUser);
+      if (user.isEmpty()) {
+        log.atError()
+            .setMessage("Could not identify logged in user")
+            .addKeyValue("name", oidcUser.getName())
+            .log();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+      }
+      var documentationUnit = service.generateNewDocumentationUnit(user.get(), parameters, kind);
       return ResponseEntity.status(HttpStatus.CREATED).body(documentationUnit);
     } catch (DocumentationUnitException e) {
       log.error("error in generate new documentation unit", e);
@@ -151,8 +158,16 @@ public class DocumentationUnitController {
       @RequestBody(required = false) Optional<EurlexCreationParameters> parameters) {
     try {
       if (parameters.isPresent()) {
+        Optional<User> user = userService.getUser(oidcUser);
+        if (user.isEmpty()) {
+          log.atError()
+              .setMessage("Could not identify logged in user")
+              .addKeyValue("name", oidcUser.getName())
+              .log();
+          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         List<String> documentationNumbers =
-            service.generateNewDecisionFromEurlex(userService.getUser(oidcUser), parameters);
+            service.generateNewDecisionFromEurlex(user.get(), parameters);
         eurLexSOAPSearchService.updateResultStatus(parameters.get().celexNumbers());
         return ResponseEntity.status(HttpStatus.CREATED).body(documentationNumbers);
       }
@@ -200,18 +215,26 @@ public class DocumentationUnitController {
       @RequestBody byte[] bytes,
       @RequestHeader HttpHeaders httpHeaders) {
 
+    Optional<User> user = userService.getUser(oidcUser);
+    if (user.isEmpty()) {
+      log.atError()
+          .setMessage("Could not identify logged in user")
+          .addKeyValue("name", oidcUser.getName())
+          .log();
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
     var attachmentPath =
         attachmentService
-            .attachFileToDocumentationUnit(
-                uuid, ByteBuffer.wrap(bytes), httpHeaders, userService.getUser(oidcUser))
+            .attachFileToDocumentationUnit(uuid, ByteBuffer.wrap(bytes), httpHeaders, user.get())
             .s3path();
     try {
       var attachment2Html = converterService.getConvertedObject(attachmentPath);
-      initializeCoreDataAndCheckDuplicates(uuid, attachment2Html, userService.getUser(oidcUser));
+      initializeCoreDataAndCheckDuplicates(uuid, attachment2Html, user.get());
       return ResponseEntity.status(HttpStatus.OK).body(attachment2Html);
 
     } catch (Exception e) {
-      attachmentService.deleteByS3Path(attachmentPath, uuid, userService.getUser(oidcUser));
+      attachmentService.deleteByS3Path(attachmentPath, uuid, user.get());
       return ResponseEntity.unprocessableEntity().build();
     }
   }
@@ -249,8 +272,16 @@ public class DocumentationUnitController {
       @PathVariable UUID uuid,
       @PathVariable String s3Path) {
 
+    Optional<User> user = userService.getUser(oidcUser);
+    if (user.isEmpty()) {
+      log.atError()
+          .setMessage("Could not identify logged in user")
+          .addKeyValue("name", oidcUser.getName())
+          .log();
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
     try {
-      attachmentService.deleteByS3Path(s3Path, uuid, userService.getUser(oidcUser));
+      attachmentService.deleteByS3Path(s3Path, uuid, user.get());
       return ResponseEntity.noContent().build();
     } catch (Exception e) {
       log.error("Error by deleting attachment '{}' for documentation unit {}", s3Path, uuid, e);
@@ -399,8 +430,8 @@ public class DocumentationUnitController {
       if (documentationUnit != null) {
         documentNumber = documentationUnit.documentNumber();
       }
-      User user = userService.getUser(oidcUser);
-      var newPatch = service.updateDocumentationUnit(uuid, patch, user);
+      var user = userService.getUser(oidcUser);
+      var newPatch = service.updateDocumentationUnit(uuid, patch, user.get());
 
       return ResponseEntity.ok().body(newPatch);
     } catch (DocumentationUnitNotExistsException e) {
@@ -426,10 +457,18 @@ public class DocumentationUnitController {
   public ResponseEntity<HandoverMail> handoverDocumentationUnitAsMail(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
 
+    Optional<User> user = userService.getUser(oidcUser);
+    if (user.isEmpty()) {
+      log.atError()
+          .setMessage("Could not identify logged in user")
+          .addKeyValue("name", oidcUser.getName())
+          .log();
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
     try {
       HandoverMail handoverMail =
           handoverService.handoverDocumentationUnitAsMail(
-              uuid, userService.getEmail(oidcUser), userService.getUser(oidcUser));
+              uuid, userService.getEmail(oidcUser), user.get());
       if (handoverMail == null || !handoverMail.isSuccess()) {
         log.warn("Failed to send mail for documentation unit {}", uuid);
         return ResponseEntity.unprocessableEntity().body(handoverMail);
@@ -489,7 +528,7 @@ public class DocumentationUnitController {
     var documentationOffice = userService.getDocumentationOffice(oidcUser);
     return service.searchLinkableDocumentationUnits(
         relatedDocumentationUnit,
-        documentationOffice,
+        documentationOffice.orElse(null),
         documentNumberToExclude,
         PageRequest.of(page, size));
   }
@@ -620,9 +659,9 @@ public class DocumentationUnitController {
   @PreAuthorize("@userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<Void> publishDocumentationUnit(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
-    User user = userService.getUser(oidcUser);
+    var user = userService.getUser(oidcUser);
     try {
-      portalPublicationService.publishDocumentationUnitWithChangelog(uuid, user);
+      portalPublicationService.publishDocumentationUnitWithChangelog(uuid, user.get());
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {
       log.atError()
@@ -643,9 +682,9 @@ public class DocumentationUnitController {
   @PreAuthorize("@userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<Void> withdrawDocumentationUnit(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
-    User user = userService.getUser(oidcUser);
+    var user = userService.getUser(oidcUser);
     try {
-      portalPublicationService.withdrawDocumentationUnitWithChangelog(uuid, user);
+      portalPublicationService.withdrawDocumentationUnitWithChangelog(uuid, user.get());
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {
       log.atError()
@@ -667,8 +706,9 @@ public class DocumentationUnitController {
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestBody @Valid BulkAssignProcedureRequest body) {
     try {
-      User user = userService.getUser(oidcUser);
-      service.bulkAssignProcedure(body.getDocumentationUnitIds(), body.getProcedureLabel(), user);
+      var user = userService.getUser(oidcUser);
+      service.bulkAssignProcedure(
+          body.getDocumentationUnitIds(), body.getProcedureLabel(), user.get());
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {
       return ResponseEntity.notFound().build();
@@ -723,10 +763,18 @@ public class DocumentationUnitController {
       @AuthenticationPrincipal OidcUser oidcUser,
       @PathVariable @NonNull UUID documentationUnitId,
       @PathVariable @NonNull UUID documentationOfficeId) {
+
+    Optional<User> user = userService.getUser(oidcUser);
+    if (user.isEmpty()) {
+      log.atError()
+          .setMessage("Could not identify logged in user")
+          .addKeyValue("name", oidcUser.getName())
+          .log();
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
     try {
       var result =
-          service.assignDocumentationOffice(
-              documentationUnitId, documentationOfficeId, userService.getUser(oidcUser));
+          service.assignDocumentationOffice(documentationUnitId, documentationOfficeId, user.get());
       return ResponseEntity.ok().body(result);
     } catch (DocumentationUnitNotExistsException e) {
       log.warn("Documentation unit not found: {}", documentationUnitId, e);

@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -35,29 +36,28 @@ public class KeycloakUserService extends UserService {
    * @return the user domain object including the documentation office
    */
   @Override
-  public User getUser(OidcUser oidcUser) {
-    DocumentationOffice documentationOffice = getDocumentationOffice(oidcUser);
-    if (documentationOffice == null) {
-      return null;
-    }
-    return UserTransformer.transformToDomain(oidcUser, documentationOffice);
+  public Optional<User> getUser(OidcUser oidcUser) {
+    return getDocumentationOffice(oidcUser)
+        .map(
+            documentationOffice ->
+                UserTransformer.transformToDomain(oidcUser, documentationOffice));
   }
 
   @Override
-  public DocumentationOffice getDocumentationOffice(OidcUser oidcUser) {
-    return getUserGroup(oidcUser).map(UserGroup::docOffice).orElse(null);
+  public Optional<DocumentationOffice> getDocumentationOffice(OidcUser oidcUser) {
+    return getUserGroup(oidcUser).map(UserGroup::docOffice);
   }
 
   @Override
-  public User getUser(UUID uuid) {
+  public Optional<User> getUser(UUID uuid) {
     try {
       LOGGER.atInfo().setMessage("Fetching user with uuid").addKeyValue("id", uuid).log();
-      return userApiService.getUser(uuid);
+      return Optional.of(userApiService.getUser(uuid));
     } catch (UserApiException ex) {
       log.error("user api throw exception", ex);
     }
 
-    return null;
+    return Optional.empty();
   }
 
   @Override

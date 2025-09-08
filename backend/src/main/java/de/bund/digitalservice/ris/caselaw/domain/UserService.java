@@ -17,9 +17,9 @@ public abstract class UserService {
     this.userGroupService = userGroupService;
   }
 
-  public abstract User getUser(OidcUser oidcUser);
+  public abstract Optional<User> getUser(OidcUser oidcUser);
 
-  public abstract User getUser(UUID uuid);
+  public abstract Optional<User> getUser(UUID uuid);
 
   public abstract List<User> getUsersInSameDocOffice(UserGroup userGroup);
 
@@ -27,13 +27,14 @@ public abstract class UserService {
     return getUsersInSameDocOffice(getUserGroup(oidcUser).orElse(null));
   }
 
-  public DocumentationOffice getDocumentationOffice(OidcUser oidcUser) {
-    User user = getUser(oidcUser);
-    if (user == null) return null;
-    if (user.documentationOffice() == null) {
-      LOGGER.warn("No doc office associated with user: {}", user.name());
-    }
-    return user.documentationOffice();
+  public Optional<DocumentationOffice> getDocumentationOffice(OidcUser oidcUser) {
+    var optionalUser = getUser(oidcUser);
+    if (optionalUser.isEmpty()) return Optional.empty();
+    User user = optionalUser.get();
+    if (user.documentationOffice() == null)
+      LOGGER.warn("No doc office associated with optionalUser: {}", user.name());
+
+    return Optional.ofNullable(user.documentationOffice());
   }
 
   public String getEmail(OidcUser oidcUser) {
