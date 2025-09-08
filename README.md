@@ -64,8 +64,8 @@ Then, store the credentials in 1Password:
 
 ```shell
 op item create --category login --title 'NeuRIS S3' \
-'access-key-id=[your-access-key-id]' \
-'secret-access-key=[your-secret-access-key]'
+'access-key-id=<your-access-key-id>' \
+'secret-access-key=<your-secret-access-key>'
 ```
 
 ## Getting started
