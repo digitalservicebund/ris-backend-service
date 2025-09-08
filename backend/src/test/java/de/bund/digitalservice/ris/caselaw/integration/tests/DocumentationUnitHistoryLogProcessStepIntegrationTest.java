@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildBGHDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
@@ -24,7 +23,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
-import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Instant;
@@ -58,21 +56,6 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
   private final DocumentationOffice docOfficeDS = buildDSDocOffice();
   private final DocumentationOffice docOfficeBGH = buildBGHDocOffice();
   // Define user IDs and user for mocking
-  private final UUID creatorUserIdDS = UUID.randomUUID();
-  private final User creatorUserDS =
-      User.builder()
-          .id(creatorUserIdDS)
-          .name("testUserDS")
-          .documentationOffice(docOfficeDS)
-          .build();
-
-  private final UUID creatorUserIdBGH = UUID.randomUUID();
-  private final User creatorUserBGH =
-      User.builder()
-          .id(creatorUserIdBGH)
-          .name("testUserBGH")
-          .documentationOffice(docOfficeBGH)
-          .build();
 
   private final UUID userNullId = UUID.randomUUID();
 
@@ -85,8 +68,8 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
   private DocumentationOfficeDTO documentationOfficeBGH;
   private static final String HISTORY_LOG_ENDPOINT = "/api/v1/caselaw/documentunits/";
 
-  private UserDTO user1IdDS;
-  private UserDTO user2IdDS;
+  private UserDTO user1DS;
+  private UserDTO user2DS;
 
   @BeforeEach
   void setUp() {
@@ -94,11 +77,8 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
         documentationOfficeRepository.findByAbbreviation(docOfficeDS.abbreviation());
     documentationOfficeBGH =
         documentationOfficeRepository.findByAbbreviation(docOfficeBGH.abbreviation());
-    // Mock the userService to return fake User objects for the history logs
-    when(userService.getUser(creatorUserIdDS)).thenReturn(creatorUserDS);
-    when(userService.getUser(creatorUserIdBGH)).thenReturn(creatorUserBGH);
 
-    user1IdDS =
+    user1DS =
         userRepository.save(
             UserDTO.builder()
                 .externalId(UUID.randomUUID())
@@ -107,7 +87,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
                 .documentationOffice(documentationOfficeDS)
                 .build());
 
-    user2IdDS =
+    user2DS =
         userRepository.save(
             UserDTO.builder()
                 .externalId(UUID.randomUUID())
@@ -150,14 +130,14 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(ersterfassungProcessStep)
-            .user(user1IdDS)
+            .user(user1DS)
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step2DTO =
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(qsformalProcessStep)
-            .user(user2IdDS)
+            .user(user2DS)
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step3DTO =
@@ -173,7 +153,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
     saveProcessStepHistoryLog(
         testDocumentationUnitDS.getId(),
-        creatorUserDS,
+        user1DS,
         HistoryLogEventType.PROCESS_STEP,
         "Schritt gesetzt: Ersterfassung",
         null,
@@ -181,7 +161,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
     saveProcessStepHistoryLog(
         testDocumentationUnitDS.getId(),
-        creatorUserDS,
+        user1DS,
         HistoryLogEventType.PROCESS_STEP_USER,
         null,
         null,
@@ -189,7 +169,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
     saveProcessStepHistoryLog(
         testDocumentationUnitDS.getId(),
-        creatorUserDS,
+        user2DS,
         HistoryLogEventType.PROCESS_STEP,
         "Schritt geändert: Ersterfassung → QS formal",
         step1DTO,
@@ -197,7 +177,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
     saveProcessStepHistoryLog(
         testDocumentationUnitDS.getId(),
-        creatorUserDS,
+        user2DS,
         HistoryLogEventType.PROCESS_STEP_USER,
         null,
         step1DTO,
@@ -205,7 +185,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
     saveProcessStepHistoryLog(
         testDocumentationUnitDS.getId(),
-        creatorUserDS,
+        user1DS,
         HistoryLogEventType.PROCESS_STEP_USER,
         null,
         step2DTO,
@@ -238,27 +218,27 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
     HistoryLog log5 = historyLogs.get(4);
 
     // Order is now descending, by created at
-    assertThat(log1.createdBy()).isEqualTo("testUserDS");
+    assertThat(log1.createdBy()).isEqualTo("user 1");
     assertThat(log1.documentationOffice()).isEqualTo("DS");
     assertThat(log1.description()).isEqualTo("Person entfernt: user 2");
     assertThat(log1.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP_USER);
 
-    assertThat(log2.createdBy()).isEqualTo("testUserDS");
+    assertThat(log2.createdBy()).isEqualTo("user 2");
     assertThat(log2.documentationOffice()).isEqualTo("DS");
     assertThat(log2.description()).isEqualTo("Person geändert: user 1 → user 2");
     assertThat(log2.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP_USER);
 
-    assertThat(log3.createdBy()).isEqualTo("testUserDS");
+    assertThat(log3.createdBy()).isEqualTo("user 2");
     assertThat(log3.documentationOffice()).isEqualTo("DS");
     assertThat(log3.description()).isEqualTo("Schritt geändert: Ersterfassung → QS formal");
     assertThat(log3.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP);
 
-    assertThat(log4.createdBy()).isEqualTo("testUserDS");
+    assertThat(log4.createdBy()).isEqualTo("user 1");
     assertThat(log4.documentationOffice()).isEqualTo("DS");
     assertThat(log4.description()).isEqualTo("Person gesetzt: user 1");
     assertThat(log4.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP_USER);
 
-    assertThat(log5.createdBy()).isEqualTo("testUserDS");
+    assertThat(log5.createdBy()).isEqualTo("user 1");
     assertThat(log5.documentationOffice()).isEqualTo("DS");
     assertThat(log5.description()).isEqualTo("Schritt gesetzt: Ersterfassung");
     assertThat(log5.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP);
@@ -272,14 +252,14 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(ersterfassungProcessStep)
-            .user(user1IdDS)
+            .user(user1DS)
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step2DTO =
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(qsformalProcessStep)
-            .user(user2IdDS)
+            .user(user2DS)
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step3DTO =
@@ -295,7 +275,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
     saveProcessStepHistoryLog(
         testDocumentationUnitBGH.getId(),
-        creatorUserDS,
+        user1DS,
         HistoryLogEventType.PROCESS_STEP,
         "Schritt gesetzt: Ersterfassung",
         null,
@@ -303,7 +283,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
     saveProcessStepHistoryLog(
         testDocumentationUnitBGH.getId(),
-        creatorUserDS,
+        user1DS,
         HistoryLogEventType.PROCESS_STEP_USER,
         null,
         null,
@@ -311,7 +291,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
     saveProcessStepHistoryLog(
         testDocumentationUnitBGH.getId(),
-        creatorUserDS,
+        user1DS,
         HistoryLogEventType.PROCESS_STEP,
         "Schritt geändert: Ersterfassung → QS formal",
         step1DTO,
@@ -319,7 +299,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
     saveProcessStepHistoryLog(
         testDocumentationUnitBGH.getId(),
-        creatorUserDS,
+        user1DS,
         HistoryLogEventType.PROCESS_STEP_USER,
         null,
         step1DTO,
@@ -327,7 +307,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
     saveProcessStepHistoryLog(
         testDocumentationUnitBGH.getId(),
-        creatorUserDS,
+        user1DS,
         HistoryLogEventType.PROCESS_STEP_USER,
         null,
         step2DTO,
@@ -488,7 +468,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
   public void saveProcessStepHistoryLog(
       UUID documentationUnitId,
-      @Nullable User creatorUser,
+      @Nullable UserDTO creatorUser,
       HistoryLogEventType eventType,
       String description,
       @Nullable DocumentationUnitProcessStepDTO fromStepDto,
@@ -498,7 +478,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
         HistoryLogDTO.builder()
             .createdAt(Instant.now())
             .documentationUnitId(documentationUnitId)
-            .userId(creatorUser != null ? creatorUser.id() : null)
+            .user(creatorUser)
             .description(description)
             .eventType(eventType)
             .build();
