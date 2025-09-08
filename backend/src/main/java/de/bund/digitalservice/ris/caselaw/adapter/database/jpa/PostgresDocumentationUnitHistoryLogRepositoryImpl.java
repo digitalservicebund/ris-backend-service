@@ -48,9 +48,6 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
     return historyLogDTOs.stream()
         .map(
             dto -> {
-              // Todo: Use the following line of code instead, after ris-data-migration PR merged:
-              // https://github.com/digitalservicebund/ris-data-migration/pull/1322
-              // User creatorUser = UserTransformer.transformToDomain(dto.getUser());
               User creatorUser = null;
               if (dto.getUser() != null) {
                 creatorUser = userService.getUser(dto.getUser().getId());
