@@ -1051,7 +1051,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     var oldStatus = documentationUnitDTO.getPortalPublicationStatus();
 
     setLastUpdated(null, documentationUnitDTO);
-    savePublicationDateTime(documentationUnitId);
+    setPublicationDateTime(documentationUnitDTO);
 
     historyLogService.saveHistoryLog(
         documentationUnitId,
@@ -1059,13 +1059,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         HistoryLogEventType.PORTAL_PUBLICATION,
         "Status im Portal geändert: " + oldStatus.humanReadable + " → " + newStatus.humanReadable);
 
-    if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
-      documentationUnitDTO = decisionDTO.toBuilder().portalPublicationStatus(newStatus).build();
-    }
-    if (documentationUnitDTO instanceof PendingProceedingDTO pendingProceedingDTO) {
-      documentationUnitDTO =
-          pendingProceedingDTO.toBuilder().portalPublicationStatus(newStatus).build();
-    }
+    documentationUnitDTO.setPortalPublicationStatus(newStatus);
     repository.save(documentationUnitDTO);
   }
 
