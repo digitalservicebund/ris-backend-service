@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import de.bund.digitalservice.ris.caselaw.domain.UserApiException;
 import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
@@ -10,12 +11,14 @@ import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class KeycloakUserService extends UserService {
   private static final Logger LOGGER = LoggerFactory.getLogger(KeycloakUserService.class);
   private final UserApiService userApiService;
@@ -47,8 +50,14 @@ public class KeycloakUserService extends UserService {
 
   @Override
   public User getUser(UUID uuid) {
-    LOGGER.atInfo().setMessage("Fetching user with uuid").addKeyValue("id", uuid).log();
-    return userApiService.getUser(uuid);
+    try {
+      LOGGER.atInfo().setMessage("Fetching user with uuid").addKeyValue("id", uuid).log();
+      return userApiService.getUser(uuid);
+    } catch (UserApiException ex) {
+      log.error("user api throw exception", ex);
+    }
+
+    return null;
   }
 
   @Override
@@ -63,14 +72,14 @@ public class KeycloakUserService extends UserService {
           .addKeyValue("name", userGroup.userGroupPathName())
           .log();
       return userApiService.getUsers(userGroup.userGroupPathName());
-    } catch (Exception e) {
+    } catch (UserApiException e) {
       LOGGER
           .atError()
           .setMessage("Error reading group user information")
           .setCause(e)
           .addKeyValue("name", userGroup.userGroupPathName())
           .log();
-      return Collections.emptyList();
     }
+    return Collections.emptyList();
   }
 }

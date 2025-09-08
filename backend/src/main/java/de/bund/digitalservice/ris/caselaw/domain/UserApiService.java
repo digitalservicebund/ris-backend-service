@@ -5,9 +5,9 @@ import java.util.UUID;
 
 public interface UserApiService {
 
-  User getUser(UUID userId);
+  User getUser(UUID userId) throws UserApiException;
 
-  List<User> getUsers(String userGroupPathName);
+  List<User> getUsers(String userGroupPathName) throws UserApiException;
 
-  List<User> getUsers(UUID userGroupId);
+  List<User> getUsers(UUID userGroupId) throws UserApiException;
 }

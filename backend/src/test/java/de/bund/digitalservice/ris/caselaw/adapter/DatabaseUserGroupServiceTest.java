@@ -13,7 +13,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroup
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserGroupDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserGroupTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.UserApiException;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -206,7 +205,7 @@ class DatabaseUserGroupServiceTest {
 
     var result =
         this.service
-            .getDocumentationOfficeFromGroupPathNames(providedUserGroups)
+            .getUserGroupFromGroupPathNames(providedUserGroups)
             .map(UserGroup::userGroupPathName);
 
     assertThat(result).isEqualTo(Optional.ofNullable(expectedMatch));
@@ -244,7 +243,8 @@ class DatabaseUserGroupServiceTest {
     service.onApplicationEvent(null);
     var pathNames = List.of("/DS");
 
-    assertThatThrownBy(() -> service.getDocumentationOfficeFromGroupPathNames(pathNames))
-        .isInstanceOf(UserApiException.class);
+    Optional<UserGroup> userGroups = service.getUserGroupFromGroupPathNames(pathNames);
+
+    assertThat(userGroups).isEmpty();
   }
 }

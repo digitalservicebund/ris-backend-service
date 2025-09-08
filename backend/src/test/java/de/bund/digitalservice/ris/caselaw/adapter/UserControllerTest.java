@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import de.bund.digitalservice.ris.caselaw.domain.UserApiException;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -56,11 +57,11 @@ class UserControllerTest {
 
     doReturn(Optional.of(UserGroup.builder().userGroupPathName("test").build()))
         .when(userGroupService)
-        .getDocumentationOfficeFromGroupPathNames(anyList());
+        .getUserGroupFromGroupPathNames(anyList());
   }
 
   @Test
-  void testGetUsers_shouldSucceed() {
+  void testGetUsers_shouldSucceed() throws UserApiException {
 
     when(userApiService.getUsers(anyString())).thenReturn(testUsers);
 
@@ -80,11 +81,9 @@ class UserControllerTest {
   }
 
   @Test
-  void testGetUsers_shouldReturnEmptyList_onFailed() {
+  void testGetUsers_shouldReturnEmptyList_onFailed() throws UserApiException {
 
-    doReturn(Optional.empty())
-        .when(userGroupService)
-        .getDocumentationOfficeFromGroupPathNames(anyList());
+    doReturn(Optional.empty()).when(userGroupService).getUserGroupFromGroupPathNames(anyList());
 
     var result =
         risWebClient
@@ -102,7 +101,7 @@ class UserControllerTest {
   }
 
   @Test
-  void testGetUsersWithFilter_withEmptyString_shouldReturnAllUsers() {
+  void testGetUsersWithFilter_withEmptyString_shouldReturnAllUsers() throws UserApiException {
 
     when(userApiService.getUsers(anyString())).thenReturn(testUsers);
 
@@ -127,7 +126,8 @@ class UserControllerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"ch", "CH", "clara hoff", "Clara H", "Hoff"})
-  void testGetUsersWithFilter_shouldReturnEmptyList_onFailed(String queryFilter) {
+  void testGetUsersWithFilter_shouldReturnEmptyList_onFailed(String queryFilter)
+      throws UserApiException {
 
     when(userApiService.getUsers(anyString())).thenReturn(testUsers);
 
