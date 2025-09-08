@@ -92,17 +92,6 @@
       "automerge": true,
     },
     {
-      // due to aws upgrade problem
-      "groupName": "blocked-aws-header-error",
-      "matchPackageNames": [
-        "software.amazon.awssdk:bom",
-      ],
-      "automerge": false,
-      "labels": [
-        "no-automerge"
-      ]
-    },
-    {
       "groupName": "neuris-languagetool-docker-image",
       "automerge": true,
       "labels": [

@@ -11,7 +11,7 @@ public interface UserGroupService {
   /** Get all user groups from memory. (Will only be updated after server restart.) */
   List<UserGroup> getAllUserGroups();
 
-  Optional<UserGroup> getDocumentationOfficeFromGroupPathNames(List<String> userGroupPathNames);
+  Optional<UserGroup> getUserGroupFromGroupPathNames(List<String> userGroupPathNames);
 
   List<UserGroup> getExternalUserGroups(DocumentationOffice documentationOffice);
 }

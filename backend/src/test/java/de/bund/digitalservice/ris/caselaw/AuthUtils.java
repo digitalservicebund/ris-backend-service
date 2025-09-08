@@ -10,6 +10,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import de.bund.digitalservice.ris.caselaw.domain.UserApiException;
 import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
@@ -174,7 +175,7 @@ public class AuthUtils {
                   .findFirst();
             })
         .when(userGroupService)
-        .getDocumentationOfficeFromGroupPathNames(anyList());
+        .getUserGroupFromGroupPathNames(anyList());
   }
 
   /**
@@ -184,15 +185,19 @@ public class AuthUtils {
    */
   public static void mockUserApi(UserApiService userApiService) {
 
-    doAnswer(
-            invocation -> {
-              UUID id = invocation.getArgument(0);
-              if (id == null) {
-                return null;
-              }
-              return User.builder().id(id).build();
-            })
-        .when(userApiService)
-        .getUser(any(UUID.class));
+    try {
+      doAnswer(
+              invocation -> {
+                UUID id = invocation.getArgument(0);
+                if (id == null) {
+                  return null;
+                }
+                return User.builder().id(id).build();
+              })
+          .when(userApiService)
+          .getUser(any(UUID.class));
+    } catch (UserApiException ex) {
+      // only mock so no error handling necessary
+    }
   }
 }

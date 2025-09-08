@@ -50,7 +50,7 @@ public abstract class UserService {
 
   public Optional<UserGroup> getUserGroup(OidcUser oidcUser) {
     List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
-    var matchingUserGroup = userGroupService.getDocumentationOfficeFromGroupPathNames(userGroups);
+    var matchingUserGroup = userGroupService.getUserGroupFromGroupPathNames(userGroups);
     if (matchingUserGroup.isEmpty()) {
       LOGGER.warn(
           "No doc office user group associated with given Keycloak user groups: {}", userGroups);
