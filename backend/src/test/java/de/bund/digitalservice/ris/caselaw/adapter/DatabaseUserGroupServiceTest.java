@@ -1,12 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
@@ -24,30 +22,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.support.StaticApplicationContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Import({
-  DatabaseUserGroupService.class,
-  DatabaseDocumentationOfficeRepository.class,
-  DatabaseUserGroupRepository.class,
-})
 class DatabaseUserGroupServiceTest {
-
-  private final UserGroupFromConfig dsInternalGroupConfig =
-      UserGroupFromConfig.builder()
-          .docOfficeAbbreviation("DS")
-          .userGroupPathName("/DS")
-          .isInternal(true)
-          .build();
-  private final UserGroupFromConfig dsExternalGroupConfig =
-      UserGroupFromConfig.builder()
-          .docOfficeAbbreviation("DS")
-          .userGroupPathName("/DS")
-          .isInternal(false)
-          .build();
 
   private final DocumentationOfficeDTO dsDocOffice =
       DocumentationOfficeDTO.builder().abbreviation("DS").id(UUID.randomUUID()).build();
@@ -66,116 +47,33 @@ class DatabaseUserGroupServiceTest {
           .isInternal(false)
           .userGroupPathName("/DS")
           .build();
-  private final UserGroupDTO bghInternalGroupDTO =
-      UserGroupDTO.builder()
-          .documentationOffice(bghDocOffice)
-          .isInternal(true)
-          .userGroupPathName("/BGH")
-          .build();
 
   private DatabaseUserGroupService service;
 
-  @MockitoBean private DatabaseDocumentationOfficeRepository officeRepository;
   @MockitoBean private DatabaseUserGroupRepository groupRepository;
+  @MockitoBean private DatabaseDocumentationOfficeRepository officeRepository;
 
   @Test
-  void shouldHandleEmptyConfig() {
-    doReturn(List.of()).when(this.groupRepository).findAll();
-    doReturn(List.of()).when(this.officeRepository).findAll();
-    List<UserGroupFromConfig> configuredGroups = List.of();
-    this.service =
-        new DatabaseUserGroupService(groupRepository, officeRepository, configuredGroups);
+  void shouldThrowErrorWhenConfigIsEmpty() {
+    DatabaseUserGroupRepository groupRepository = mock(DatabaseUserGroupRepository.class);
+    when(groupRepository.findAll()).thenReturn(List.of());
 
-    this.service.onApplicationEvent(null);
+    DatabaseUserGroupService service = new DatabaseUserGroupService(groupRepository);
 
-    verify(this.groupRepository, never()).saveAll(any());
-    verify(this.groupRepository, never()).deleteAll(any());
-  }
-
-  @Test
-  void shouldThrowOnNonExistentDocOffice() {
-    doReturn(List.of()).when(this.groupRepository).findAll();
-    doReturn(List.of()).when(this.officeRepository).findAll();
-    List<UserGroupFromConfig> configuredGroups = List.of(dsInternalGroupConfig);
-    this.service =
-        new DatabaseUserGroupService(groupRepository, officeRepository, configuredGroups);
-
-    assertThatThrownBy(() -> this.service.onApplicationEvent(null))
-        .isInstanceOf(NoSuchElementException.class);
-
-    verify(this.groupRepository, never()).saveAll(any());
-    verify(this.groupRepository, never()).deleteAll(any());
-  }
-
-  @Test
-  void shouldCreateNewGroup() {
-    doReturn(List.of()).when(this.groupRepository).findAll();
-    doReturn(List.of(dsDocOffice)).when(this.officeRepository).findAll();
-    List<UserGroupFromConfig> configuredGroups = List.of(dsInternalGroupConfig);
-    this.service =
-        new DatabaseUserGroupService(groupRepository, officeRepository, configuredGroups);
-
-    this.service.onApplicationEvent(null);
-
-    verify(this.groupRepository, times(1)).saveAll(List.of(dsInternalGroupDTO));
-    verify(this.groupRepository, never()).deleteAll(any());
-  }
-
-  @Test
-  void shouldDeleteObsoleteGroup() {
-    doReturn(List.of(dsInternalGroupDTO)).when(this.groupRepository).findAll();
-    doReturn(List.of(dsDocOffice)).when(this.officeRepository).findAll();
-    List<UserGroupFromConfig> configuredGroups = List.of();
-    this.service =
-        new DatabaseUserGroupService(groupRepository, officeRepository, configuredGroups);
-
-    this.service.onApplicationEvent(null);
-
-    verify(this.groupRepository, times(1)).deleteAll(List.of(dsInternalGroupDTO));
-    verify(this.groupRepository, never()).saveAll(any());
-  }
-
-  @Test
-  void shouldRecreateGroupWithNewConfig_InternalFlagChanged() {
-    doReturn(List.of(dsInternalGroupDTO)).when(this.groupRepository).findAll();
-    doReturn(List.of(dsDocOffice)).when(this.officeRepository).findAll();
-    List<UserGroupFromConfig> configuredGroups = List.of(dsExternalGroupConfig);
-    this.service =
-        new DatabaseUserGroupService(groupRepository, officeRepository, configuredGroups);
-
-    this.service.onApplicationEvent(null);
-
-    verify(this.groupRepository, times(1)).deleteAll(List.of(dsInternalGroupDTO));
-    verify(this.groupRepository, times(1)).saveAll(List.of(dsExternalGroupDTO));
-  }
-
-  @Test
-  void shouldRecreateGroupWithNewConfig_DocOfficeChanged() {
-    doReturn(List.of(bghInternalGroupDTO)).when(this.groupRepository).findAll();
-    doReturn(List.of(dsDocOffice, bghDocOffice)).when(this.officeRepository).findAll();
-    List<UserGroupFromConfig> configuredGroups = List.of(dsInternalGroupConfig);
-    this.service =
-        new DatabaseUserGroupService(groupRepository, officeRepository, configuredGroups);
-
-    this.service.onApplicationEvent(null);
-
-    verify(this.groupRepository, times(1)).deleteAll(List.of(bghInternalGroupDTO));
-    verify(this.groupRepository, times(1)).saveAll(List.of(dsInternalGroupDTO));
+    var event = new ContextRefreshedEvent(new StaticApplicationContext());
+    assertThrows(NoSuchElementException.class, () -> service.onApplicationEvent(event));
   }
 
   @Test
   void shouldIdleWhenDatabaseGroupsMatchConfiguration() {
+
     doReturn(List.of(dsInternalGroupDTO, dsExternalGroupDTO)).when(this.groupRepository).findAll();
     doReturn(List.of(bghDocOffice, dsDocOffice)).when(this.officeRepository).findAll();
-    List<UserGroupFromConfig> configuredGroups =
-        List.of(dsExternalGroupConfig, dsInternalGroupConfig);
-    this.service =
-        new DatabaseUserGroupService(groupRepository, officeRepository, configuredGroups);
+
+    this.service = new DatabaseUserGroupService(groupRepository);
 
     this.service.onApplicationEvent(null);
 
-    verify(this.groupRepository, never()).saveAll(any());
-    verify(this.groupRepository, never()).deleteAll(any());
     var expectedGroups =
         Stream.of(dsInternalGroupDTO, dsExternalGroupDTO)
             .map(UserGroupTransformer::transformToDomain)
@@ -200,7 +98,7 @@ class DatabaseUserGroupServiceTest {
         .when(this.groupRepository)
         .findAll();
 
-    this.service = new DatabaseUserGroupService(groupRepository, officeRepository, List.of());
+    this.service = new DatabaseUserGroupService(groupRepository);
     this.service.onApplicationEvent(null);
 
     var result =
@@ -223,8 +121,6 @@ class DatabaseUserGroupServiceTest {
         Arguments.of(List.of("/A", "/B"), List.of("/C", "/D"), null),
         // Empty provided groups list
         Arguments.of(List.of("/A", "/B"), List.of(), null),
-        // Empty known groups list
-        Arguments.of(List.of(), List.of("/A", "/B"), null),
         // Case sensitivity check
         Arguments.of(List.of("/a"), List.of("/A"), null));
   }
@@ -234,11 +130,7 @@ class DatabaseUserGroupServiceTest {
     doReturn(List.of(dsInternalGroupDTO, dsExternalGroupDTO)).when(groupRepository).findAll();
     doReturn(List.of(dsDocOffice)).when(officeRepository).findAll();
 
-    service =
-        new DatabaseUserGroupService(
-            groupRepository,
-            officeRepository,
-            List.of(dsInternalGroupConfig, dsExternalGroupConfig));
+    this.service = new DatabaseUserGroupService(groupRepository);
 
     service.onApplicationEvent(null);
     var pathNames = List.of("/DS");
