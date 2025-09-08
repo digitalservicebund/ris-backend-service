@@ -354,33 +354,31 @@ class BareIdUserApiServiceTest {
     assertThat(userResult.documentationOffice()).isNull();
   }
 
-  // TODO: move to transformer test
-  //  @Test
-  //  void testGetUser_withEmptyNamesAttributes_shouldReturnNullName() {
-  //    final UUID userId = UUID.randomUUID();
-  //
-  //    BareUserApiResponse.BareUser user = generateBareUser(userId, null);
-  //    BareUserApiResponse.UserApiResponse userResponse =
-  //        new BareUserApiResponse.UserApiResponse(user);
-  //
-  //    ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
-  //        ResponseEntity.ok(userResponse);
-  //
-  //    doReturn(mockResponse)
-  //        .when(restTemplate)
-  //        .exchange(
-  //            anyString(),
-  //            eq(HttpMethod.GET),
-  //            any(HttpEntity.class),
-  //            eq(BareUserApiResponse.UserApiResponse.class));
-  //
-  //    var userResult = bareIdUserApiService.getUser(userId);
-  //
-  //
-  //    Assertions.assertNull(userResult.name());
-  //    Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
-  //    Assertions.assertEquals(userId, userResult.id());
-  //  }
+  @Test
+  void testGetUser_withEmptyNamesAttributes_shouldReturnNullName() throws UserApiException {
+    final UUID userId = UUID.randomUUID();
+
+    BareUserApiResponse.BareUser user = generateBareUser(userId, null);
+    BareUserApiResponse.UserApiResponse userResponse =
+        new BareUserApiResponse.UserApiResponse(user);
+
+    ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
+        ResponseEntity.ok(userResponse);
+
+    doReturn(mockResponse)
+        .when(restTemplate)
+        .exchange(
+            anyString(),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(BareUserApiResponse.UserApiResponse.class));
+
+    var userResult = bareIdUserApiService.getUser(userId);
+
+    Assertions.assertNull(userResult.name());
+    Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
+    Assertions.assertEquals(userId, userResult.externalId());
+  }
 
   private BareUserApiResponse.BareUser generateBareUser(
       UUID userId, Map<String, BareUserApiResponse.AttributeValues> attributes) {
