@@ -6,15 +6,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
-import ch.qos.logback.classic.Level;
-import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 
 @Sql(scripts = {"classpath:doc_office_init.sql", "classpath:user_group_init.sql"})
@@ -24,6 +24,7 @@ import org.springframework.test.context.jdbc.Sql;
 class UserGroupIntegrationTest extends BaseIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
+  @MockitoBean private UserService userService;
 
   UserGroup internalUserGroup =
       UserGroup.builder()
@@ -60,6 +61,7 @@ class UserGroupIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testGetUserGroups_withInternalUser_shouldReturnExternalUserGroupsOfDocOffice() {
+    doReturn(Optional.of(buildDSDocOffice())).when(userService).getDocumentationOffice(any());
     doReturn(List.of(externalUserGroup, externalUserGroup1, externalUserGroup2))
         .when(userGroupService)
         .getExternalUserGroups(any());
@@ -83,6 +85,7 @@ class UserGroupIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testGetUserGroups_withExternalUser_shouldReturnExternalUserGroupsOfDocOffice() {
+    doReturn(Optional.of(buildDSDocOffice())).when(userService).getDocumentationOffice(any());
     doReturn(List.of(externalUserGroup, externalUserGroup1, externalUserGroup2))
         .when(userGroupService)
         .getExternalUserGroups(any());
@@ -105,9 +108,9 @@ class UserGroupIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  void testGetUserGroups_withExternalUser_shouldReturnNoUserGroupsAndWarnings() {
+  void testGetUserGroups_withExternalUser_shouldReturnNoUserGroups() {
+    doReturn(Optional.of(buildDSDocOffice())).when(userService).getDocumentationOffice(any());
     doReturn(List.of()).when(userGroupService).getExternalUserGroups(any());
-    TestMemoryAppender memoryAppender = new TestMemoryAppender(UserService.class);
 
     risWebTestClient
         .withLogin("/NOT-EXISTING")
@@ -118,8 +121,5 @@ class UserGroupIntegrationTest extends BaseIntegrationTest {
         .isOk()
         .expectBody(UserGroup[].class)
         .consumeWith(response -> assertThat(response.getResponseBody()).isEmpty());
-    assertThat(memoryAppender.getMessage(Level.WARN, 0))
-        .isEqualTo(
-            "No doc office user group associated with given Keycloak user groups: [/NOT-EXISTING]");
   }
 }

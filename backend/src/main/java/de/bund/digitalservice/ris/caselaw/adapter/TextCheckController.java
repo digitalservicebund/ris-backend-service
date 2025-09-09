@@ -111,8 +111,12 @@ public class TextCheckController {
       @AuthenticationPrincipal OidcUser oidcUser) {
 
     var documentationOffice = userService.getDocumentationOffice(oidcUser);
+    if (documentationOffice.isEmpty()) {
+      return ResponseEntity.badRequest().build();
+    }
     try {
-      return ResponseEntity.ok(textCheckService.addIgnoreWord(request.word(), documentationOffice));
+      return ResponseEntity.ok(
+          textCheckService.addIgnoreWord(request.word(), documentationOffice.get()));
 
     } catch (Exception e) {
       log.error("Adding word failed", e);

@@ -32,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -125,7 +126,7 @@ class DocumentationUnitHistoryLogControllerTest {
   void getHistoryLog_shouldReturn403_whenUserIsInternalAndNoWriteAccess() {
     Mockito.reset(userService);
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
-    when(userService.getDocumentationOffice(any())).thenReturn(office);
+    when(userService.getDocumentationOffice(any())).thenReturn(Optional.of(office));
 
     risWebTestClient
         .withDefaultLogin()
