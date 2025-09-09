@@ -19,14 +19,14 @@ public class PortalSanityCheckService {
   private final PortalPublicationService portalPublicationService;
   private final RiiService riiService;
   private final DocumentationUnitRepository documentationUnitRepository;
-  private final PortalBucket portalBucket;
+  private final S3Bucket portalBucket;
   private final Environment env;
 
   public PortalSanityCheckService(
       PortalPublicationService portalPublicationService,
       RiiService riiService,
       DocumentationUnitRepository documentationUnitRepository,
-      PortalBucket portalBucket,
+      S3Bucket portalBucket,
       Environment env) {
     this.portalPublicationService = portalPublicationService;
     this.riiService = riiService;
