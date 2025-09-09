@@ -71,7 +71,7 @@ class DocumentationUnitHistoryLogControllerTest {
 
   @BeforeEach
   void setup() throws DocumentationUnitNotExistsException {
-    doReturn(docOffice)
+    doReturn(Optional.of(docOffice))
         .when(userService)
         .getDocumentationOffice(
             argThat(

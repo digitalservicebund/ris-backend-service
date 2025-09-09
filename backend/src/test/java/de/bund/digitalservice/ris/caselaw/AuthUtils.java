@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor;
@@ -59,7 +60,7 @@ public class AuthUtils {
       DocumentationOffice docOffice2,
       String docOffice2Group) {
     doReturn(true).when(userService).isInternal(any());
-    doReturn(docOffice1)
+    doReturn(Optional.of(docOffice1))
         .when(userService)
         .getDocumentationOffice(
             argThat(
@@ -67,7 +68,7 @@ public class AuthUtils {
                   List<String> groups = user.getAttribute("groups");
                   return Objects.requireNonNull(groups).get(0).equals(docOffice1Group);
                 }));
-    doReturn(docOffice2)
+    doReturn(Optional.of(docOffice2))
         .when(userService)
         .getDocumentationOffice(
             argThat(

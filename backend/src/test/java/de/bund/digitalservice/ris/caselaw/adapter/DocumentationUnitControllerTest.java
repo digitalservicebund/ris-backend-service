@@ -135,7 +135,7 @@ class DocumentationUnitControllerTest {
 
   @BeforeEach
   void setup() throws DocumentationUnitNotExistsException {
-    doReturn(docOffice)
+    doReturn(Optional.of(docOffice))
         .when(userService)
         .getDocumentationOffice(
             argThat(
@@ -733,6 +733,9 @@ class DocumentationUnitControllerTest {
     when(service.searchLinkableDocumentationUnits(
             linkedDocumentationUnit, docOffice, Optional.of("KORE0000000000"), pageRequest))
         .thenReturn(new PageImpl<>(List.of(), pageRequest, 0));
+
+    when(userService.getUser(any(OidcUser.class)))
+        .thenReturn(Optional.of(User.builder().firstName("testUser").build()));
 
     risWebClient
         .withDefaultLogin()

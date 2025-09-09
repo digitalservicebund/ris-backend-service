@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeCategory;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeService;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
@@ -36,6 +37,7 @@ class DocumentTypeControllerTest {
   @MockitoBean private DocumentTypeService service;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
+  @MockitoBean private UserService userService;
 
   private DocumentType documentType1;
   private DocumentType documentType2;
