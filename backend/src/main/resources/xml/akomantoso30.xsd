@@ -5084,18 +5084,9 @@
             name that is not used in this schema. The 'name' attribute must be used for naming the element. It is also a
             characteristic of this schema that all named elements are equivalent, and can be substituted to, the
             corresponding generic element with their name as the value of the name attribute. Thus, by definition,
-            <p>
-            =
-            <block name="p">
-            ,
-            <part>
-            =
-            <hcontainer name="part">
-            ,
-            <act>
-            =
-            <container name="act">
-            , etc. Pattern: Generic Document + Role Attribute Reference:
+            &lt;p&gt; = &lt;block name="p"&gt; , &lt;part&gt; = &lt;hcontainer name="part"&gt; ,
+            &lt;act&gt; = &lt;container name="act"&gt; , etc.
+            Pattern: Generic Document + Role Attribute Reference:
             http://www.xmlpatterns.com/GenericDocumentMain.shtml + http://www.xmlpatterns.com/RoleAttributeMain.shtml
             =====================================================================
         </xsd:documentation>
