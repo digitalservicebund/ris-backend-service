@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,18 +27,18 @@ public record User(
   public String name() {
     String name =
         Stream.of(firstName, lastName)
-            .filter(StringUtils::hasText)
+            .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
             .collect(Collectors.joining(" "));
-    return name.isEmpty() ? null : fullName;
+    return name.isEmpty() ? null : name;
   }
 
   @JsonGetter("initials")
   public String initials() {
-    if (firstName == null || firstName.isEmpty() || lastName == null || lastName.isEmpty()) {
-      return null;
-    }
-    return ""
-        + Character.toUpperCase(firstName.charAt(0))
-        + Character.toUpperCase(lastName.charAt(0));
+    String initials =
+        Stream.of(firstName, lastName)
+            .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
+            .map(s -> s.substring(0, 1).toUpperCase())
+            .collect(Collectors.joining(""));
+    return initials.isEmpty() ? null : initials;
   }
 }
