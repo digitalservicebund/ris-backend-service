@@ -1,7 +1,8 @@
-import { expect, Page } from "@playwright/test"
+import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   expectHistoryLogRow,
+  loginToPortal,
   navigateToCategories,
   navigateToManagementData,
   navigateToPublication,
@@ -146,6 +147,26 @@ test.describe(
           ).toBeHidden()
         })
 
+        // Portal is not available in local environment
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (baseURL !== "http://127.0.0.1") {
+          await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
+            const portalPage = await page.context().newPage()
+            await portalPage.goto(
+              `https://ris-portal.dev.ds4g.net/api/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
+            )
+
+            await loginToPortal(portalPage)
+
+            // eslint-disable-next-line playwright/no-conditional-expect
+            await expect(
+              portalPage.getByRole("heading", {
+                name: "testHeadline",
+              }),
+            ).toBeVisible()
+          })
+        }
+
         await test.step("Eine veröffentlichte Dokumentationseinheit kann nicht gelöscht werden", async () => {
           await navigateToManagementData(
             page,
@@ -171,26 +192,6 @@ test.describe(
             prefilledDocumentUnit.documentNumber,
           )
         })
-
-        // Portal is not available in local environment
-        // eslint-disable-next-line playwright/no-conditional-in-test
-        if (baseURL !== "http://127.0.0.1") {
-          await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
-            const portalPage = await page.context().newPage()
-            await portalPage.goto(
-              `https://ris-portal.dev.ds4g.net/api/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
-            )
-
-            await loginToPortal(portalPage)
-
-            // eslint-disable-next-line playwright/no-conditional-expect
-            await expect(
-              portalPage.getByRole("heading", {
-                name: "testHeadline",
-              }),
-            ).toBeVisible()
-          })
-        }
 
         await test.step("Erfolgreiches Zurückziehen ändert den Status", async () => {
           await page.getByRole("button", { name: "Zurückziehen" }).click()
@@ -568,9 +569,3 @@ test.describe(
     )
   },
 )
-
-async function loginToPortal(portalPage: Page) {
-  await portalPage.fill("#username", process.env.E2E_TEST_USER as string)
-  await portalPage.fill("#password", process.env.E2E_TEST_PASSWORD as string)
-  await portalPage.locator("input#kc-login").click()
-}

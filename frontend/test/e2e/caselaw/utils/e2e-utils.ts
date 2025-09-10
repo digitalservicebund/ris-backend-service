@@ -252,6 +252,12 @@ export const navigateToSettings = async (page: Page) => {
   })
 }
 
+export async function loginToPortal(portalPage: Page) {
+  await portalPage.fill("#username", process.env.E2E_TEST_USER as string)
+  await portalPage.fill("#password", process.env.E2E_TEST_PASSWORD as string)
+  await portalPage.locator("input#kc-login").click()
+}
+
 export const handoverDocumentationUnit = async (
   page: Page,
   documentNumber: string,

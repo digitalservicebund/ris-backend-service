@@ -2,6 +2,7 @@ import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   expectHistoryLogRow,
+  loginToPortal,
   navigateToManagementData,
   navigateToPublication,
 } from "~/e2e/caselaw/utils/e2e-utils"
@@ -47,7 +48,7 @@ test.describe(
       {
         tag: ["@RISDEV-7896", "@RISDEV-8460"],
       },
-      async ({ page, prefilledPendingProceeding }) => {
+      async ({ page, prefilledPendingProceeding, baseURL }) => {
         await navigateToPublication(
           page,
           prefilledPendingProceeding.documentNumber,
@@ -82,6 +83,52 @@ test.describe(
           await expect(
             page.getByRole("button", { name: "Zurückziehen" }),
           ).toBeVisible()
+        })
+
+        // Portal is not available in local environment
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (baseURL !== "http://127.0.0.1") {
+          await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
+            const portalPage = await page.context().newPage()
+            await portalPage.goto(
+              `https://ris-portal.dev.ds4g.net/api/v1/case-law/${prefilledPendingProceeding.documentNumber}.html`,
+            )
+
+            await loginToPortal(portalPage)
+
+            // eslint-disable-next-line playwright/no-conditional-expect
+            await expect(
+              portalPage.getByRole("heading", {
+                name: "test headline",
+              }),
+            ).toBeVisible()
+          })
+        }
+
+        await test.step("Eine veröffentlichte Dokumentationseinheit kann nicht gelöscht werden", async () => {
+          await navigateToManagementData(
+            page,
+            prefilledPendingProceeding.documentNumber,
+          )
+
+          await page
+            .getByRole("button", { name: "Dokumentationseinheit löschen" })
+            .click()
+
+          await page
+            .getByRole("button", { name: "Löschen", exact: true })
+            .click()
+
+          await expect(
+            page.getByText(
+              "Die Dokumentationseinheit konnte nicht gelöscht werden, da Sie im Portal veröffentlicht ist.",
+            ),
+          ).toBeVisible()
+
+          await navigateToPublication(
+            page,
+            prefilledPendingProceeding.documentNumber,
+          )
         })
 
         await test.step("Erfolgreiches Zurückziehen ändert den Status", async () => {
