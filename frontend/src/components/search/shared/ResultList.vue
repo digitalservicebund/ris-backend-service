@@ -7,26 +7,36 @@ import dayjsUtc from "dayjs/plugin/utc"
 import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
+import Menu from "primevue/menu"
+import { useToast } from "primevue/usetoast"
+
 import { computed, ref, onMounted, onUnmounted } from "vue"
 
 import AssigneeBadge from "@/components/AssigneeBadge.vue"
 import CurrentAndPreviousProcessStepBadge from "@/components/CurrentAndPreviousProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
+import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
+import UpdateProcessStepInSearchDialog from "@/components/UpdateProcessStepInSearchDialog.vue"
 
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { PublicationState } from "@/domain/publicationStatus"
 
+import FeatureToggleService from "@/services/featureToggleService"
+
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
 import IconError from "~icons/ic/baseline-error"
 import IconSubject from "~icons/ic/baseline-subject"
+import IconLayers from "~icons/ic/layers"
 import IconNote from "~icons/ic/outline-comment-bank"
 import IconEdit from "~icons/ic/outline-edit"
 import IconView from "~icons/ic/outline-remove-red-eye"
 import IconClock from "~icons/ic/outline-watch-later"
 import IconArrowDown from "~icons/mdi/arrow-down-drop"
+import { storeToRefs } from "pinia"
+import useSessionStore from "@/stores/sessionStore"
 
 const props = defineProps<{
   kind: Kind
@@ -132,24 +142,154 @@ defineSlots<{
   "empty-state-content"?: (props: Record<string, never>) => unknown
 }>()
 
-onMounted(() => {
+const multiEditActive = ref()
+onMounted(async () => {
   window.addEventListener("scroll", handleScroll)
+  multiEditActive.value = (
+    await FeatureToggleService.isEnabled("neuris.multi-edit")
+  ).data
 })
 
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll)
 })
+
+// multi edit
+const selectedDocumentationUnits = ref<DocumentUnitListEntry[]>([])
+const selectedDocumentationUnitIds = computed(() =>
+  selectedDocumentationUnits.value.map((unit) => unit.uuid),
+)
+
+const selectionErrorMessage = ref<string | undefined>()
+const selectionErrorDocUnitIds = ref<string[]>([])
+const updateProcessStepDialogOpen = ref(false)
+function resetErrorMessages() {
+  selectionErrorMessage.value = undefined
+  selectionErrorDocUnitIds.value = []
+}
+
+function assignProcessStep() {
+  if (selectedDocumentationUnits.value.length === 0) {
+    selectionErrorMessage.value =
+      "Wählen Sie mindestens eine Dokumentationsseinheit aus."
+    return
+  }
+
+  if (checkRightsToChangeDocumentationUnit()) {
+    updateProcessStepDialogOpen.value = true
+  }
+}
+
+const { user } = storeToRefs(useSessionStore())
+function checkRightsToChangeDocumentationUnit(): boolean {
+  const notSameDocumentationOffice = selectedDocumentationUnits.value.filter(
+    (unit) => unit.documentationOffice !== user.value?.documentationOffice,
+  )
+
+  const externalHandoverPending = selectedDocumentationUnits.value.filter(
+    (unit) =>
+      unit.status?.publicationStatus ===
+      PublicationState.EXTERNAL_HANDOVER_PENDING,
+  )
+
+  selectionErrorDocUnitIds.value = notSameDocumentationOffice.map(
+    (unit) => unit.uuid,
+  )
+  selectionErrorDocUnitIds.value <<
+    externalHandoverPending.map((unit) => unit.uuid)
+
+  if (notSameDocumentationOffice.length > 0) {
+    selectionErrorMessage.value =
+      "Dokumentationseinheiten von fremden Dokstellen können nicht bearbeitet werden."
+    return false
+  }
+
+  if (externalHandoverPending.length > 0) {
+    selectionErrorMessage.value =
+      "Nehmen Sie die Fremdanlage(n) im Eingang an, um sie bearbeiten zu können."
+    return false
+  }
+
+  return true
+}
+
+const toast = useToast()
+async function updateSelectedDocumentationUnits() {
+  toast.add({
+    severity: "success",
+    summary: "Weitergeben erfolgreich",
+    life: 5_000,
+  })
+  updateProcessStepDialogOpen.value = false
+}
+
+const menuModel = ref([{ label: "Weitergeben", command: assignProcessStep }])
+const menuRef = ref()
+const toogleMenu = (event: MouseEvent) => {
+  menuRef.value.toggle(event)
+}
+
+const rowStyleClass = (rowData: DocumentUnitListEntry) => {
+  if (selectionErrorDocUnitIds.value.includes(rowData.uuid!)) {
+    return "bg-red-200"
+  }
+
+  if (selectedDocumentationUnitIds.value.includes(rowData.uuid)) {
+    return "bg-blue-300"
+  }
+
+  return ""
+}
 </script>
 
 <template>
   <div ref="tableWrapper" data-testId="search-result-list">
+    <InputErrorMessages
+      v-if="selectionErrorMessage"
+      class="pl-16"
+      :error-message="selectionErrorMessage"
+    />
+    <UpdateProcessStepInSearchDialog
+      v-if="
+        updateProcessStepDialogOpen && selectedDocumentationUnits.length !== 0
+      "
+      v-model:visible="updateProcessStepDialogOpen"
+      :documentation-unit-ids="selectedDocumentationUnitIds"
+      @on-cancelled="updateProcessStepDialogOpen = false"
+      @on-process-step-updated="updateSelectedDocumentationUnits"
+    />
     <Pagination
       :is-loading="loading"
       navigation-position="bottom"
       :page="pageEntries"
       @update-page="emit('updatePage', $event)"
     >
-      <DataTable :loading="loading" :pt="stickyHeaderPT" :value="entries">
+      <DataTable
+        v-model:selection="selectedDocumentationUnits"
+        :loading="loading"
+        :pt="stickyHeaderPT"
+        :row-class="rowStyleClass"
+        :value="entries"
+      >
+        <Column
+          v-if="multiEditActive"
+          header-style="width: 3rem"
+          :pt="{
+            pcRowCheckbox: {
+              input: {
+                style: `${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
+                onClick: () => resetErrorMessages(),
+              },
+            },
+            pcHeaderCheckbox: {
+              input: {
+                style: `${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
+                onClick: () => resetErrorMessages(),
+              },
+            },
+          }"
+          selection-mode="multiple"
+        />
         <Column field="documentNumber" header="Dokumentnummer">
           <template #body="{ data: item }">
             <div class="flex flex-row items-center gap-8">
@@ -342,7 +482,25 @@ onUnmounted(() => {
         </Column>
         <Column field="actions">
           <template #header>
-            <span class="sr-only">Aktionen</span>
+            <span v-if="!multiEditActive" class="sr-only">Aktionen</span>
+            <div v-else class="flex flex-row justify-end">
+              <Button
+                v-tooltip.bottom="{
+                  value: 'Aktionen',
+                  appendTo: 'body',
+                }"
+                aria-label="Aktionen"
+                class="z-10"
+                severity="secondary"
+                size="small"
+                @click="toogleMenu"
+              >
+                <template #icon>
+                  <IconLayers />
+                </template>
+              </Button>
+              <Menu ref="menuRef" :model="menuModel" popup></Menu>
+            </div>
           </template>
           <template #body="{ data: item }">
             <div class="flex flex-row justify-end -space-x-2">
