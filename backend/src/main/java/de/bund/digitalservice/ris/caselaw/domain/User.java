@@ -28,10 +28,9 @@ public record User(
   public String name() {
     String name =
         Stream.of(firstName, lastName)
-            .filter(Objects::nonNull)
-            .filter(s -> !s.isEmpty())
+            .filter(StringUtils::hasText)
             .collect(Collectors.joining(" "));
-    return name.isEmpty() ? null : name;
+    return name.isEmpty() ? null : fullName;
   }
 
   @JsonGetter("initials")
