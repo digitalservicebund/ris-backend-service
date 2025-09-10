@@ -129,6 +129,8 @@ public class BareIdUserApiService implements UserApiService {
   /**
    * Recursively collects users from a group hierarchy following the given path.
    *
+   * <p>If reaches the target group -> fetch users otherwise continue iterating
+   *
    * @param group the root group to start traversal from
    * @param userGroupsPathSegments a list of the hierarchical path of groups (for instance:
    *     /parent/child/grandchild)
@@ -144,13 +146,11 @@ public class BareIdUserApiService implements UserApiService {
       return Collections.emptyList();
     }
 
-    // If at the final segment reaches add users;
     if (group.name().equals(userGroupsPathSegments.get(depth))
         && depth == userGroupsPathSegments.size() - 1) {
       return getUsers(group.uuid());
     }
 
-    // Otherwise continue iterating on  children
     List<User> users = new ArrayList<>();
     for (BareUserApiResponse.Group child : getGroupChildren(group.uuid())) {
       users.addAll(getUsersFromGroupPath(child, userGroupsPathSegments, depth + 1));

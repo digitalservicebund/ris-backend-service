@@ -33,6 +33,7 @@ import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.context.annotation.Import;
@@ -95,289 +96,293 @@ class BareIdUserApiServiceTest {
     memoryAppender.detachLoggingTestAppender();
   }
 
-  @Test
-  void testGetUser_shouldSucceed() throws UserApiException {
-    final UUID userId = UUID.randomUUID();
+  @Nested
+  class GetUser {
 
-    var attributes =
-        Map.of(
-            "firstName", new BareUserApiResponse.AttributeValues(List.of("Foo")),
-            "lastName", new BareUserApiResponse.AttributeValues(List.of("Taxpayer")));
+    @Test
+    void testGetUser_shouldSucceed() throws UserApiException {
+      final UUID userId = UUID.randomUUID();
 
-    BareUserApiResponse.BareUser user = generateBareUser(userId, attributes);
-    BareUserApiResponse.UserApiResponse userResponse =
-        new BareUserApiResponse.UserApiResponse(user);
+      var attributes =
+          Map.of(
+              "firstName", new BareUserApiResponse.AttributeValues(List.of("Foo")),
+              "lastName", new BareUserApiResponse.AttributeValues(List.of("Taxpayer")));
 
-    ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
-        ResponseEntity.ok(userResponse);
+      BareUserApiResponse.BareUser user = generateBareUser(userId, attributes);
+      BareUserApiResponse.UserApiResponse userResponse =
+          new BareUserApiResponse.UserApiResponse(user);
 
-    doReturn(mockResponse)
-        .when(restTemplate)
-        .exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.UserApiResponse.class));
+      ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
+          ResponseEntity.ok(userResponse);
 
-    when(userGroupService.getUserGroupFromGroupPathNames(List.of("/caselaw")))
-        .thenReturn(
-            Optional.of(
-                UserGroup.builder()
-                    .isInternal(false)
-                    .docOffice(DocumentationOffice.builder().abbreviation("BFH").build())
-                    .build()));
+      doReturn(mockResponse)
+          .when(restTemplate)
+          .exchange(
+              anyString(),
+              eq(HttpMethod.GET),
+              any(HttpEntity.class),
+              eq(BareUserApiResponse.UserApiResponse.class));
 
-    var userResult = bareIdUserApiService.getUser(userId);
+      when(userGroupService.getUserGroupFromGroupPathNames(List.of("/caselaw")))
+          .thenReturn(
+              Optional.of(
+                  UserGroup.builder()
+                      .isInternal(false)
+                      .docOffice(DocumentationOffice.builder().abbreviation("BFH").build())
+                      .build()));
 
-    Assertions.assertEquals("Foo Taxpayer", userResult.name());
-    Assertions.assertEquals("FT", userResult.initials());
-    Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
-    Assertions.assertEquals(userId, userResult.externalId());
-    Assertions.assertEquals("BFH", userResult.documentationOffice().abbreviation());
-    Assertions.assertFalse(userResult.internal());
-  }
+      var userResult = bareIdUserApiService.getUser(userId);
 
-  @Test
-  void testGetUser_whenApiReturnsNoBody_shouldThrowUserApiException() {
-    final UUID userId = UUID.randomUUID();
+      Assertions.assertEquals("Foo Taxpayer", userResult.name());
+      Assertions.assertEquals("FT", userResult.initials());
+      Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
+      Assertions.assertEquals(userId, userResult.externalId());
+      Assertions.assertEquals("BFH", userResult.documentationOffice().abbreviation());
+      Assertions.assertFalse(userResult.internal());
+    }
 
-    ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
-        ResponseEntity.badRequest().build();
+    @Test
+    void testGetUser_whenApiReturnsNoBody_shouldThrowUserApiException() {
+      final UUID userId = UUID.randomUUID();
 
-    doReturn(mockResponse)
-        .when(restTemplate)
-        .exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.UserApiResponse.class));
+      ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
+          ResponseEntity.badRequest().build();
 
-    assertThatExceptionOfType(UserApiException.class)
-        .isThrownBy(() -> bareIdUserApiService.getUser(userId))
-        .withMessage("User not found or could not be parsed");
-  }
+      doReturn(mockResponse)
+          .when(restTemplate)
+          .exchange(
+              anyString(),
+              eq(HttpMethod.GET),
+              any(HttpEntity.class),
+              eq(BareUserApiResponse.UserApiResponse.class));
 
-  @Test
-  void testGetUser_whenApiReturnsBodyWithoutUser_shouldThrowUserApiException() {
-    final UUID userId = UUID.randomUUID();
+      assertThatExceptionOfType(UserApiException.class)
+          .isThrownBy(() -> bareIdUserApiService.getUser(userId))
+          .withMessage("User not found or could not be parsed");
+    }
 
-    ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
-        ResponseEntity.ok(new UserApiResponse(null));
+    @Test
+    void testGetUser_whenApiReturnsBodyWithoutUser_shouldThrowUserApiException() {
+      final UUID userId = UUID.randomUUID();
 
-    doReturn(mockResponse)
-        .when(restTemplate)
-        .exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.UserApiResponse.class));
+      ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
+          ResponseEntity.ok(new UserApiResponse(null));
 
-    assertThatExceptionOfType(UserApiException.class)
-        .isThrownBy(() -> bareIdUserApiService.getUser(userId))
-        .withMessage("User not found or could not be parsed");
-  }
+      doReturn(mockResponse)
+          .when(restTemplate)
+          .exchange(
+              anyString(),
+              eq(HttpMethod.GET),
+              any(HttpEntity.class),
+              eq(BareUserApiResponse.UserApiResponse.class));
 
-  @Test
-  void testGetUser_whenApiThrowsRestClientException_shouldThrowUserApiException() {
-    final UUID userId = UUID.randomUUID();
+      assertThatExceptionOfType(UserApiException.class)
+          .isThrownBy(() -> bareIdUserApiService.getUser(userId))
+          .withMessage("User not found or could not be parsed");
+    }
 
-    doThrow(RestClientException.class)
-        .when(restTemplate)
-        .exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.UserApiResponse.class));
+    @Test
+    void testGetUser_whenApiThrowsRestClientException_shouldThrowUserApiException() {
+      final UUID userId = UUID.randomUUID();
 
-    assertThatExceptionOfType(UserApiException.class)
-        .isThrownBy(() -> bareIdUserApiService.getUser(userId))
-        .withMessage("Error by fetching user");
-  }
+      doThrow(RestClientException.class)
+          .when(restTemplate)
+          .exchange(
+              anyString(),
+              eq(HttpMethod.GET),
+              any(HttpEntity.class),
+              eq(BareUserApiResponse.UserApiResponse.class));
 
-  @Test
-  void testGetUser_whenGroupApiThrowsRestClientException_shouldThrowUserApiException() {
-    final UUID userId = UUID.randomUUID();
+      assertThatExceptionOfType(UserApiException.class)
+          .isThrownBy(() -> bareIdUserApiService.getUser(userId))
+          .withMessage("Error by fetching user");
+    }
 
-    BareUser bareUser =
-        new BareUser(userId, true, true, "user name", "email", Collections.emptyMap());
-    when(restTemplate.exchange(
-            anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserApiResponse.class)))
-        .thenReturn(ResponseEntity.ok(new UserApiResponse(bareUser)));
-    doThrow(RestClientException.class)
-        .when(restTemplate)
-        .exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.GroupResponse.class));
+    @Test
+    void testGetUser_whenGroupApiThrowsRestClientException_shouldThrowUserApiException() {
+      final UUID userId = UUID.randomUUID();
 
-    assertThatExceptionOfType(UserApiException.class)
-        .isThrownBy(() -> bareIdUserApiService.getUser(userId))
-        .withMessage("Error by getting groups for user");
-  }
+      BareUser bareUser =
+          new BareUser(userId, true, true, "user name", "email", Collections.emptyMap());
+      when(restTemplate.exchange(
+              anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserApiResponse.class)))
+          .thenReturn(ResponseEntity.ok(new UserApiResponse(bareUser)));
+      doThrow(RestClientException.class)
+          .when(restTemplate)
+          .exchange(
+              anyString(),
+              eq(HttpMethod.GET),
+              any(HttpEntity.class),
+              eq(BareUserApiResponse.GroupResponse.class));
 
-  @Test
-  void testGetUser_whenGroupApiReturnsNoBody_shouldThrowUserApiException() {
-    final UUID userId = UUID.randomUUID();
+      assertThatExceptionOfType(UserApiException.class)
+          .isThrownBy(() -> bareIdUserApiService.getUser(userId))
+          .withMessage("Error by getting groups for user");
+    }
 
-    BareUser bareUser =
-        new BareUser(userId, true, true, "user name", "email", Collections.emptyMap());
-    when(restTemplate.exchange(
-            anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserApiResponse.class)))
-        .thenReturn(ResponseEntity.ok(new UserApiResponse(bareUser)));
-    when(restTemplate.exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.GroupResponse.class)))
-        .thenReturn(ResponseEntity.ok(null));
+    @Test
+    void testGetUser_whenGroupApiReturnsNoBody_shouldThrowUserApiException() {
+      final UUID userId = UUID.randomUUID();
 
-    assertThatExceptionOfType(UserApiException.class)
-        .isThrownBy(() -> bareIdUserApiService.getUser(userId))
-        .withMessage("User group could not be found");
-  }
+      BareUser bareUser =
+          new BareUser(userId, true, true, "user name", "email", Collections.emptyMap());
+      when(restTemplate.exchange(
+              anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserApiResponse.class)))
+          .thenReturn(ResponseEntity.ok(new UserApiResponse(bareUser)));
+      when(restTemplate.exchange(
+              anyString(),
+              eq(HttpMethod.GET),
+              any(HttpEntity.class),
+              eq(BareUserApiResponse.GroupResponse.class)))
+          .thenReturn(ResponseEntity.ok(null));
 
-  @Test
-  void testGetUser_whenGroupApiReturnsBodyWithoutGroups_shouldThrowUserApiException()
-      throws UserApiException {
-    final UUID userId = UUID.randomUUID();
+      assertThatExceptionOfType(UserApiException.class)
+          .isThrownBy(() -> bareIdUserApiService.getUser(userId))
+          .withMessage("User group could not be found");
+    }
 
-    BareUser bareUser =
-        new BareUser(userId, true, true, "user name", "email", Collections.emptyMap());
-    when(restTemplate.exchange(
-            anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserApiResponse.class)))
-        .thenReturn(ResponseEntity.ok(new UserApiResponse(bareUser)));
-    when(restTemplate.exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.GroupResponse.class)))
-        .thenReturn(ResponseEntity.ok(new GroupResponse(null)));
+    @Test
+    void testGetUser_whenGroupApiReturnsBodyWithoutGroups_shouldThrowUserApiException()
+        throws UserApiException {
+      final UUID userId = UUID.randomUUID();
 
-    User user = bareIdUserApiService.getUser(userId);
+      BareUser bareUser =
+          new BareUser(userId, true, true, "user name", "email", Collections.emptyMap());
+      when(restTemplate.exchange(
+              anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserApiResponse.class)))
+          .thenReturn(ResponseEntity.ok(new UserApiResponse(bareUser)));
+      when(restTemplate.exchange(
+              anyString(),
+              eq(HttpMethod.GET),
+              any(HttpEntity.class),
+              eq(BareUserApiResponse.GroupResponse.class)))
+          .thenReturn(ResponseEntity.ok(new GroupResponse(null)));
 
-    assertThat(user.documentationOffice()).isNull();
-  }
+      User user = bareIdUserApiService.getUser(userId);
 
-  @Test
-  void testGetUser_whenGroupApiReturnsBodyWithEmptyGroupList_shouldThrowUserApiException()
-      throws UserApiException {
-    final UUID userId = UUID.randomUUID();
+      assertThat(user.documentationOffice()).isNull();
+    }
 
-    BareUser bareUser =
-        new BareUser(userId, true, true, "user name", "email", Collections.emptyMap());
-    when(restTemplate.exchange(
-            anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserApiResponse.class)))
-        .thenReturn(ResponseEntity.ok(new UserApiResponse(bareUser)));
-    when(restTemplate.exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.GroupResponse.class)))
-        .thenReturn(ResponseEntity.ok(new GroupResponse(Collections.emptyList())));
+    @Test
+    void testGetUser_whenGroupApiReturnsBodyWithEmptyGroupList_shouldThrowUserApiException()
+        throws UserApiException {
+      final UUID userId = UUID.randomUUID();
 
-    User user = bareIdUserApiService.getUser(userId);
+      BareUser bareUser =
+          new BareUser(userId, true, true, "user name", "email", Collections.emptyMap());
+      when(restTemplate.exchange(
+              anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserApiResponse.class)))
+          .thenReturn(ResponseEntity.ok(new UserApiResponse(bareUser)));
+      when(restTemplate.exchange(
+              anyString(),
+              eq(HttpMethod.GET),
+              any(HttpEntity.class),
+              eq(BareUserApiResponse.GroupResponse.class)))
+          .thenReturn(ResponseEntity.ok(new GroupResponse(Collections.emptyList())));
 
-    assertThat(user.documentationOffice()).isNull();
-  }
+      User user = bareIdUserApiService.getUser(userId);
 
-  @Test
-  void testGetUser_whenAllGroupListDoesNotContainUserGroup_shouldReturnDocOfficeNull()
-      throws UserApiException {
-    final UUID userId = UUID.randomUUID();
-    var attributes =
-        Map.of(
-            "firstName", new BareUserApiResponse.AttributeValues(List.of("user")),
-            "lastName", new BareUserApiResponse.AttributeValues(List.of("name")));
+      assertThat(user.documentationOffice()).isNull();
+    }
 
-    BareUser bareUser = generateBareUser(userId, attributes);
-    when(restTemplate.exchange(
-            anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserApiResponse.class)))
-        .thenReturn(ResponseEntity.ok(new UserApiResponse(bareUser)));
-    List<Group> userGroups =
-        List.of(new Group(UUID.randomUUID(), "group name", "not the right group path"));
-    when(restTemplate.exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.GroupResponse.class)))
-        .thenReturn(ResponseEntity.ok(new GroupResponse(userGroups)));
-    List<UserGroup> allUserGroups =
-        List.of(
-            new UserGroup(
-                UUID.randomUUID(), "group path", DocumentationOffice.builder().build(), true));
-    when(userGroupService.getAllUserGroups()).thenReturn(allUserGroups);
+    @Test
+    void testGetUser_whenAllGroupListDoesNotContainUserGroup_shouldReturnDocOfficeNull()
+        throws UserApiException {
+      final UUID userId = UUID.randomUUID();
+      var attributes =
+          Map.of(
+              "firstName", new BareUserApiResponse.AttributeValues(List.of("user")),
+              "lastName", new BareUserApiResponse.AttributeValues(List.of("name")));
 
-    var userResult = bareIdUserApiService.getUser(userId);
+      BareUser bareUser = generateBareUser(userId, attributes);
+      when(restTemplate.exchange(
+              anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserApiResponse.class)))
+          .thenReturn(ResponseEntity.ok(new UserApiResponse(bareUser)));
+      List<Group> userGroups =
+          List.of(new Group(UUID.randomUUID(), "group name", "not the right group path"));
+      when(restTemplate.exchange(
+              anyString(),
+              eq(HttpMethod.GET),
+              any(HttpEntity.class),
+              eq(BareUserApiResponse.GroupResponse.class)))
+          .thenReturn(ResponseEntity.ok(new GroupResponse(userGroups)));
+      List<UserGroup> allUserGroups =
+          List.of(
+              new UserGroup(
+                  UUID.randomUUID(), "group path", DocumentationOffice.builder().build(), true));
+      when(userGroupService.getAllUserGroups()).thenReturn(allUserGroups);
 
-    assertThat(userResult.name()).isEqualTo("user name");
-    Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
-    Assertions.assertEquals(userId, userResult.externalId());
-  }
+      var userResult = bareIdUserApiService.getUser(userId);
 
-  @Test
-  void testGetUser_whenWithMoreThanOneDocumentationOffice_shouldReturnDocOfficeNull()
-      throws UserApiException {
-    final UUID userId = UUID.randomUUID();
+      assertThat(userResult.name()).isEqualTo("user name");
+      Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
+      Assertions.assertEquals(userId, userResult.externalId());
+    }
 
-    BareUser bareUser =
-        new BareUser(userId, true, true, "user name", "email", Collections.emptyMap());
-    when(restTemplate.exchange(
-            anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserApiResponse.class)))
-        .thenReturn(ResponseEntity.ok(new UserApiResponse(bareUser)));
-    List<Group> userGroups =
-        List.of(
-            new Group(UUID.randomUUID(), "group name 1", "group path 1"),
-            new Group(UUID.randomUUID(), "group name 2", "group path 2"));
-    when(restTemplate.exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.GroupResponse.class)))
-        .thenReturn(ResponseEntity.ok(new GroupResponse(userGroups)));
-    List<UserGroup> allUserGroups =
-        List.of(
-            new UserGroup(
-                UUID.randomUUID(),
-                "group path 1",
-                DocumentationOffice.builder().id(UUID.randomUUID()).build(),
-                true),
-            new UserGroup(
-                UUID.randomUUID(),
-                "group path 2",
-                DocumentationOffice.builder().id(UUID.randomUUID()).build(),
-                true));
-    when(userGroupService.getAllUserGroups()).thenReturn(allUserGroups);
+    @Test
+    void testGetUser_whenWithMoreThanOneDocumentationOffice_shouldReturnDocOfficeNull()
+        throws UserApiException {
+      final UUID userId = UUID.randomUUID();
 
-    var userResult = bareIdUserApiService.getUser(userId);
+      BareUser bareUser =
+          new BareUser(userId, true, true, "user name", "email", Collections.emptyMap());
+      when(restTemplate.exchange(
+              anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserApiResponse.class)))
+          .thenReturn(ResponseEntity.ok(new UserApiResponse(bareUser)));
+      List<Group> userGroups =
+          List.of(
+              new Group(UUID.randomUUID(), "group name 1", "group path 1"),
+              new Group(UUID.randomUUID(), "group name 2", "group path 2"));
+      when(restTemplate.exchange(
+              anyString(),
+              eq(HttpMethod.GET),
+              any(HttpEntity.class),
+              eq(BareUserApiResponse.GroupResponse.class)))
+          .thenReturn(ResponseEntity.ok(new GroupResponse(userGroups)));
+      List<UserGroup> allUserGroups =
+          List.of(
+              new UserGroup(
+                  UUID.randomUUID(),
+                  "group path 1",
+                  DocumentationOffice.builder().id(UUID.randomUUID()).build(),
+                  true),
+              new UserGroup(
+                  UUID.randomUUID(),
+                  "group path 2",
+                  DocumentationOffice.builder().id(UUID.randomUUID()).build(),
+                  true));
+      when(userGroupService.getAllUserGroups()).thenReturn(allUserGroups);
 
-    assertThat(userResult.documentationOffice()).isNull();
-  }
+      var userResult = bareIdUserApiService.getUser(userId);
 
-  @Test
-  void testGetUser_withEmptyNamesAttributes_shouldReturnNullName() throws UserApiException {
-    final UUID userId = UUID.randomUUID();
+      assertThat(userResult.documentationOffice()).isNull();
+    }
 
-    BareUserApiResponse.BareUser user = generateBareUser(userId, null);
-    BareUserApiResponse.UserApiResponse userResponse =
-        new BareUserApiResponse.UserApiResponse(user);
+    @Test
+    void testGetUser_withEmptyNamesAttributes_shouldReturnNullName() throws UserApiException {
+      final UUID userId = UUID.randomUUID();
 
-    ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
-        ResponseEntity.ok(userResponse);
+      BareUserApiResponse.BareUser user = generateBareUser(userId, null);
+      BareUserApiResponse.UserApiResponse userResponse =
+          new BareUserApiResponse.UserApiResponse(user);
 
-    doReturn(mockResponse)
-        .when(restTemplate)
-        .exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.UserApiResponse.class));
+      ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
+          ResponseEntity.ok(userResponse);
 
-    var userResult = bareIdUserApiService.getUser(userId);
+      doReturn(mockResponse)
+          .when(restTemplate)
+          .exchange(
+              anyString(),
+              eq(HttpMethod.GET),
+              any(HttpEntity.class),
+              eq(BareUserApiResponse.UserApiResponse.class));
 
-    Assertions.assertNull(userResult.name());
-    Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
-    Assertions.assertEquals(userId, userResult.externalId());
+      var userResult = bareIdUserApiService.getUser(userId);
+
+      Assertions.assertNull(userResult.name());
+      Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
+      Assertions.assertEquals(userId, userResult.externalId());
+    }
   }
 
   private BareUserApiResponse.BareUser generateBareUser(
@@ -391,150 +396,155 @@ class BareIdUserApiServiceTest {
         attributes);
   }
 
-  @Test
-  void testGetUsers_forGroupPathWithUser_shouldSucceed() throws UserApiException {
+  @Nested
+  class GetUsers {
 
-    var results = bareIdUserApiService.getUsers("/caselaw/BGH/Intern");
+    @Test
+    void testGetUsers_forGroupPathWithUser_shouldSucceed() throws UserApiException {
 
-    assertThat(results).hasSize(1);
-    assertThat(results)
-        .extracting("name", "email")
-        .containsExactly(Tuple.tuple("Tina Taxpayer", "e2e_tests_bfh@digitalservice.bund.de"));
-  }
+      var results = bareIdUserApiService.getUsers("/caselaw/BGH/Intern");
 
-  @Test
-  void testGetUsers_withEmptyPath_shouldReturnEmptyList() throws UserApiException {
+      assertThat(results).hasSize(1);
+      assertThat(results)
+          .extracting("name", "email")
+          .containsExactly(Tuple.tuple("Tina Taxpayer", "e2e_tests_bfh@digitalservice.bund.de"));
+    }
 
-    List<User> users = bareIdUserApiService.getUsers("");
+    @Test
+    void testGetUsers_withEmptyPath_shouldReturnEmptyList() throws UserApiException {
 
-    assertThat(users).isEmpty();
-    assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(1L);
-    assertThat(memoryAppender.getMessage(Level.ERROR, 0))
-        .isEqualTo("User group path is empty or blank");
-  }
+      List<User> users = bareIdUserApiService.getUsers("");
 
-  @Test
-  void testGetUsers_withGetGroupChildrenThrowsException_shouldThrowUserApiException() {
-    doThrow(RestClientException.class)
-        .when(restTemplate)
-        .exchange(
-            anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(GroupApiResponse.class));
+      assertThat(users).isEmpty();
+      assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(1L);
+      assertThat(memoryAppender.getMessage(Level.ERROR, 0))
+          .isEqualTo("User group path is empty or blank");
+    }
 
-    assertThatExceptionOfType(UserApiException.class)
-        .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
-        .withMessage("Error while fetching users");
-  }
+    @Test
+    void testGetUsers_withGetGroupChildrenThrowsException_shouldThrowUserApiException() {
+      doThrow(RestClientException.class)
+          .when(restTemplate)
+          .exchange(
+              anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(GroupApiResponse.class));
 
-  @Test
-  void testGetUsers_forGroupPathWithoutUser_shouldReturnEmptyList() throws UserApiException {
-    var results = bareIdUserApiService.getUsers("/caselaw/BGH");
-    Assertions.assertEquals(0, results.size());
-  }
+      assertThatExceptionOfType(UserApiException.class)
+          .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
+          .withMessage("Error while fetching users");
+    }
 
-  @Test
-  void testGetUsers_forWrongGroupPath_shouldReturnEmptyList() throws UserApiException {
-    var results = bareIdUserApiService.getUsers("/caselaw/BGH/Something");
-    Assertions.assertEquals(0, results.size());
-  }
+    @Test
+    void testGetUsers_forGroupPathWithoutUser_shouldReturnEmptyList() throws UserApiException {
+      var results = bareIdUserApiService.getUsers("/caselaw/BGH");
+      Assertions.assertEquals(0, results.size());
+    }
 
-  @Test
-  void testGetUsers_withGetGroupChildrenHasNoBody_shouldThrowUserApiException() {
-    when(restTemplate.exchange(
-            anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(GroupApiResponse.class)))
-        .thenReturn(ResponseEntity.ok(null));
+    @Test
+    void testGetUsers_forWrongGroupPath_shouldReturnEmptyList() throws UserApiException {
+      var results = bareIdUserApiService.getUsers("/caselaw/BGH/Something");
+      Assertions.assertEquals(0, results.size());
+    }
 
-    assertThatExceptionOfType(UserApiException.class)
-        .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
-        .withMessage("Children for group could not be found");
-  }
+    @Test
+    void testGetUsers_withGetGroupChildrenHasNoBody_shouldThrowUserApiException() {
+      when(restTemplate.exchange(
+              anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(GroupApiResponse.class)))
+          .thenReturn(ResponseEntity.ok(null));
 
-  @Test
-  void testGetUsers_withGetGroupChildrenBodyWithoutChildren_shouldThrowUserApiException() {
-    when(restTemplate.exchange(
-            anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(GroupApiResponse.class)))
-        .thenReturn(
-            ResponseEntity.ok(
-                new GroupApiResponse(UUID.randomUUID(), "group name", "group path", null)));
+      assertThatExceptionOfType(UserApiException.class)
+          .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
+          .withMessage("Children for group could not be found");
+    }
 
-    assertThatExceptionOfType(UserApiException.class)
-        .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
-        .withMessage("Children for group could not be found");
-  }
+    @Test
+    void testGetUsers_withGetGroupChildrenBodyWithoutChildren_shouldThrowUserApiException() {
+      when(restTemplate.exchange(
+              anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(GroupApiResponse.class)))
+          .thenReturn(
+              ResponseEntity.ok(
+                  new GroupApiResponse(UUID.randomUUID(), "group name", "group path", null)));
 
-  @Test
-  void testGetUsers_withGetTopLevelGroupThrowsException_shouldThrowUserApiException() {
-    doThrow(RestClientException.class)
-        .when(restTemplate)
-        .exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(GroupResponse.class));
+      assertThatExceptionOfType(UserApiException.class)
+          .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
+          .withMessage("Children for group could not be found");
+    }
 
-    assertThatExceptionOfType(UserApiException.class)
-        .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
-        .withMessage("Error while fetching top level groups");
-  }
+    @Test
+    void testGetUsers_withGetTopLevelGroupThrowsException_shouldThrowUserApiException() {
+      doThrow(RestClientException.class)
+          .when(restTemplate)
+          .exchange(
+              anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(GroupResponse.class));
 
-  @Test
-  void testGetUsers_withGetTopLevelGroupHasNoBody_shouldThrowUserApiException() {
-    when(restTemplate.exchange(
-            anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(GroupResponse.class)))
-        .thenReturn(ResponseEntity.ok(null));
+      assertThatExceptionOfType(UserApiException.class)
+          .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
+          .withMessage("Error while fetching top level groups");
+    }
 
-    assertThatExceptionOfType(UserApiException.class)
-        .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
-        .withMessage("Top level groups could not be found");
-  }
+    @Test
+    void testGetUsers_withGetTopLevelGroupHasNoBody_shouldThrowUserApiException() {
+      when(restTemplate.exchange(
+              anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(GroupResponse.class)))
+          .thenReturn(ResponseEntity.ok(null));
 
-  @Test
-  void testGetUsers_withGetTopLevelGroupsBodyWithoutGroups_shouldThrowUserApiException() {
-    when(restTemplate.exchange(
-            anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(GroupResponse.class)))
-        .thenReturn(ResponseEntity.ok(new GroupResponse(null)));
+      assertThatExceptionOfType(UserApiException.class)
+          .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
+          .withMessage("Top level groups could not be found");
+    }
 
-    assertThatExceptionOfType(UserApiException.class)
-        .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
-        .withMessage("Top level groups could not be found");
-  }
+    @Test
+    void testGetUsers_withGetTopLevelGroupsBodyWithoutGroups_shouldThrowUserApiException() {
+      when(restTemplate.exchange(
+              anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(GroupResponse.class)))
+          .thenReturn(ResponseEntity.ok(new GroupResponse(null)));
 
-  @Test
-  void testGetUsers_withUserApiThrowsException_shouldThrowException() {
-    doThrow(RestClientException.class)
-        .when(restTemplate)
-        .exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.UsersApiResponse.class));
+      assertThatExceptionOfType(UserApiException.class)
+          .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
+          .withMessage("Top level groups could not be found");
+    }
 
-    assertThatExceptionOfType(UserApiException.class)
-        .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
-        .withMessage("Error while fetching users");
-  }
+    @Test
+    void testGetUsers_withUserApiThrowsException_shouldThrowException() {
+      doThrow(RestClientException.class)
+          .when(restTemplate)
+          .exchange(
+              anyString(),
+              eq(HttpMethod.GET),
+              any(HttpEntity.class),
+              eq(BareUserApiResponse.UsersApiResponse.class));
 
-  @Test
-  void testGetUsers_withUserApiReturnsBodyIsNull_shouldThrowException() {
-    when(restTemplate.exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.UsersApiResponse.class)))
-        .thenReturn(ResponseEntity.ok(null));
+      assertThatExceptionOfType(UserApiException.class)
+          .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
+          .withMessage("Error while fetching users");
+    }
 
-    assertThatExceptionOfType(UserApiException.class)
-        .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
-        .withMessage("Could not fetch users");
-  }
+    @Test
+    void testGetUsers_withUserApiReturnsBodyIsNull_shouldThrowException() {
+      when(restTemplate.exchange(
+              anyString(),
+              eq(HttpMethod.GET),
+              any(HttpEntity.class),
+              eq(BareUserApiResponse.UsersApiResponse.class)))
+          .thenReturn(ResponseEntity.ok(null));
 
-  @Test
-  void testGetUsers_withUserApiReturnsBodyWithoutUsers_shouldThrowException() {
-    when(restTemplate.exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.UsersApiResponse.class)))
-        .thenReturn(ResponseEntity.ok(new UsersApiResponse(null)));
+      assertThatExceptionOfType(UserApiException.class)
+          .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
+          .withMessage("Could not fetch users");
+    }
 
-    assertThatExceptionOfType(UserApiException.class)
-        .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
-        .withMessage("Could not fetch users");
+    @Test
+    void testGetUsers_withUserApiReturnsBodyWithoutUsers_shouldThrowException() {
+      when(restTemplate.exchange(
+              anyString(),
+              eq(HttpMethod.GET),
+              any(HttpEntity.class),
+              eq(BareUserApiResponse.UsersApiResponse.class)))
+          .thenReturn(ResponseEntity.ok(new UsersApiResponse(null)));
+
+      assertThatExceptionOfType(UserApiException.class)
+          .isThrownBy(() -> bareIdUserApiService.getUsers("/caselaw/BGH/Intern"))
+          .withMessage("Could not fetch users");
+    }
   }
 
   private BareUserApiResponse.Group generateBareUserGroup(UUID uuid, String name, String path) {
