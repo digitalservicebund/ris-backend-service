@@ -118,37 +118,44 @@ public class BareIdUserApiService implements UserApiService {
     List<String> userGroupsPathSegments =
         Arrays.stream(userGroupPathName.split("/")).filter(s -> !s.isBlank()).toList();
 
-    if (userGroupsPathSegments.size() < 2) {
-      log.error("User group path must contain at least two segments, e.g., \"caselaw/court\"");
-      return Collections.emptyList();
-    }
-
     // List all top level groups and get the current
-    BareUserApiResponse.Group current =
+    BareUserApiResponse.Group rootLevelGroup =
         getGroupByName(getTopLevelGroups(), userGroupsPathSegments.getFirst());
 
-    // Get the group court like the BGH
-    BareUserApiResponse.Group court =
-        getGroupByName(getGroupChildren(current.uuid()), userGroupsPathSegments.get(1));
-
-    // Get all users under the  court
-    return getUsersRecursively(court, userGroupPathName);
+    // Get all users under the given user group path name
+    return getUsersFromGroupPath(rootLevelGroup, userGroupsPathSegments, 0);
   }
 
-  private List<User> getUsersRecursively(BareUserApiResponse.Group group, String groupName)
+  /**
+   * Recursively collects users from a group hierarchy following the given path.
+   *
+   * @param group the root group to start traversal from
+   * @param userGroupsPathSegments a list of the hierarchical path of groups (for instance:
+   *     /parent/child/grandchild)
+   * @param depth the current depth in the path (starts at 0, stops when the end of the path is
+   *     reached)
+   * @return the list of users belonging to the target group defined by the path
+   */
+  private List<User> getUsersFromGroupPath(
+      BareUserApiResponse.Group group, List<String> userGroupsPathSegments, int depth)
       throws UserApiException {
-    if (group == null) {
+
+    if (group == null || depth >= userGroupsPathSegments.size()) {
       return Collections.emptyList();
     }
 
-    List<User> users = new ArrayList<>();
-    if (group.path().equals(groupName)) {
-      users.addAll(getUsers(group.uuid()));
-    } else {
-      for (BareUserApiResponse.Group child : getGroupChildren(group.uuid())) {
-        users.addAll(getUsersRecursively(child, groupName));
-      }
+    // If at the final segment reaches add users;
+    if (group.name().equals(userGroupsPathSegments.get(depth))
+        && depth == userGroupsPathSegments.size() - 1) {
+      return getUsers(group.uuid());
     }
+
+    // Otherwise continue iterating on  children
+    List<User> users = new ArrayList<>();
+    for (BareUserApiResponse.Group child : getGroupChildren(group.uuid())) {
+      users.addAll(getUsersFromGroupPath(child, userGroupsPathSegments, depth + 1));
+    }
+
     return users;
   }
 

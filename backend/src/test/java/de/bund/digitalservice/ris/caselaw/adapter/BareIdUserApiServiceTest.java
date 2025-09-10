@@ -414,17 +414,6 @@ class BareIdUserApiServiceTest {
   }
 
   @Test
-  void testGetUsers_withOnlyOnePathSegment_shouldReturnEmptyList() throws UserApiException {
-
-    List<User> users = bareIdUserApiService.getUsers("/top level");
-
-    assertThat(users).isEmpty();
-    assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(1L);
-    assertThat(memoryAppender.getMessage(Level.ERROR, 0))
-        .isEqualTo("User group path must contain at least two segments, e.g., \"caselaw/court\"");
-  }
-
-  @Test
   void testGetUsers_withGetGroupChildrenThrowsException_shouldThrowUserApiException() {
     doThrow(RestClientException.class)
         .when(restTemplate)
