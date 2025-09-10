@@ -61,14 +61,14 @@ test.describe(
       ],
     })
     test(
-      "Dokumentationseinheit kann veröffentlicht und zurückgezogen werden",
+      "Entscheidung kann veröffentlicht und zurückgezogen werden",
       {
         tag: ["@RISDEV-8456", "@RISDEV-8460"],
       },
       async ({ page, prefilledDocumentUnit, baseURL }) => {
         await navigateToPublication(page, prefilledDocumentUnit.documentNumber)
 
-        await test.step("Anzeige einer Unveröffentlichten Dok-Einheit mit allen Checks und ohne Fehler", async () => {
+        await test.step("Anzeige einer unveröffentlichten Entscheidung mit allen Checks und ohne Fehler", async () => {
           await expect(
             page.getByRole("heading", { name: "Plausibilitätsprüfung" }),
           ).toBeVisible()

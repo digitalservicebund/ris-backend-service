@@ -43,9 +43,9 @@ test.describe(
       ],
     })
     test(
-      "Dokumentationseinheit kann veröffentlicht und zurückgezogen werden",
+      "Anhängiges Verfahren kann veröffentlicht und zurückgezogen werden",
       {
-        tag: ["@RISDEV-8456", "@RISDEV-8460"],
+        tag: ["@RISDEV-7896", "@RISDEV-8460"],
       },
       async ({ page, prefilledPendingProceeding }) => {
         await navigateToPublication(
@@ -56,7 +56,7 @@ test.describe(
           },
         )
 
-        await test.step("Anzeige eines Unveröffentlichten Verfahrens ohne Fehler", async () => {
+        await test.step("Anzeige eines unveröffentlichten Verfahrens ohne Fehler", async () => {
           await expect(page.getByTitle("LDML Vorschau")).toBeVisible()
           await expect(
             page.getByRole("heading", {
@@ -131,9 +131,9 @@ test.describe(
     )
 
     test(
-      "LDML Vorschau",
+      "LDML Vorschau Anhängiges Verfahren",
       {
-        tag: ["@RISDEV-8456", "@RISDEV-8843"],
+        tag: ["@RISDEV-7896", "@RISDEV-8843"],
       },
       async ({ pageWithBfhUser, pendingProceedings }) => {
         const { createdPendingProceedings } = pendingProceedings
