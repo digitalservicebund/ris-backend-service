@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.eurlex;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.SearchResult;
 import de.bund.digitalservice.ris.caselaw.domain.SearchService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -40,11 +39,14 @@ public class EurLexController {
       @RequestParam(value = "start-date") Optional<LocalDate> startDate,
       @RequestParam(value = "end-date") Optional<LocalDate> endDate) {
 
-    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser);
-
-    return ResponseEntity.ok(
-        service.getSearchResults(
-            page, documentationOffice, fileNumber, celex, court, startDate, endDate));
+    return userService
+        .getDocumentationOffice(oidcUser)
+        .map(
+            office ->
+                ResponseEntity.ok(
+                    service.getSearchResults(
+                        page, office, fileNumber, celex, court, startDate, endDate)))
+        .orElseGet(() -> ResponseEntity.badRequest().build());
   }
 
   @PostMapping("testdata/seed")

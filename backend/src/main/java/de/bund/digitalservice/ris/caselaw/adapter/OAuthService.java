@@ -317,7 +317,8 @@ public class OAuthService implements AuthService {
       DocumentationOffice creatingDocOffice,
       DocumentationOffice documentationOffice,
       Status status) {
-    DocumentationOffice userDocumentationOffice = userService.getDocumentationOffice(oidcUser);
+    DocumentationOffice userDocumentationOffice =
+        userService.getDocumentationOffice(oidcUser).orElse(null);
     return userHasSameDocOfficeAsDocument(userDocumentationOffice, documentationOffice)
         || (status != null
             && isPendingStatus(status)
@@ -330,7 +331,8 @@ public class OAuthService implements AuthService {
       DocumentationOffice creatingDocOffice,
       DocumentationOffice documentationOffice,
       Status status) {
-    DocumentationOffice userDocumentationOffice = userService.getDocumentationOffice(oidcUser);
+    DocumentationOffice userDocumentationOffice =
+        userService.getDocumentationOffice(oidcUser).orElse(null);
     return userHasSameDocOfficeAsDocument(userDocumentationOffice, documentationOffice)
         || (isPendingStatus(status)
             && userHasSameDocOfficeAsDocumentCreator(userDocumentationOffice, creatingDocOffice))
@@ -368,7 +370,7 @@ public class OAuthService implements AuthService {
     Optional<OidcUser> oidcUser = getOidcUser();
     if (oidcUser.isPresent()) {
       DocumentationOffice documentationOfficeOfUser =
-          userService.getDocumentationOffice(oidcUser.get());
+          userService.getDocumentationOffice(oidcUser.get()).orElse(null);
       return documentationOffice.equals(documentationOfficeOfUser);
     }
     return false;
@@ -383,7 +385,7 @@ public class OAuthService implements AuthService {
   }
 
   private Optional<DocumentationOffice> getUserDocumentationOffice() {
-    return getOidcUser().map(userService::getDocumentationOffice);
+    return getOidcUser().flatMap(userService::getDocumentationOffice);
   }
 
   /**
@@ -412,7 +414,8 @@ public class OAuthService implements AuthService {
     RandomStringGenerator rsg =
         RandomStringGenerator.builder().withinRange(allowedCharacters).get();
 
-    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser);
+    DocumentationOffice documentationOffice =
+        userService.getDocumentationOffice(oidcUser).orElse(null);
     DocumentationOfficeDTO documentationOfficeDTO = null;
     if (documentationOffice != null) {
       documentationOfficeDTO =

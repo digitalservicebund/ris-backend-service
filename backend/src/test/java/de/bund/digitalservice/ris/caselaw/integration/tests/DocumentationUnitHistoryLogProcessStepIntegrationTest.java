@@ -30,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
@@ -74,8 +75,6 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
           .documentationOffice(docOfficeBGH)
           .build();
 
-  private final UUID userNullId = UUID.randomUUID();
-
   private ProcessStepDTO ersterfassungProcessStep;
   private ProcessStepDTO qsformalProcessStep;
   private DocumentationUnitDTO testDocumentationUnitDS;
@@ -95,8 +94,8 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
     documentationOfficeBGH =
         documentationOfficeRepository.findByAbbreviation(docOfficeBGH.abbreviation());
     // Mock the userService to return fake User objects for the history logs
-    when(userService.getUser(creatorUserIdDS)).thenReturn(creatorUserDS);
-    when(userService.getUser(creatorUserIdBGH)).thenReturn(creatorUserBGH);
+    when(userService.getUser(creatorUserIdDS)).thenReturn(Optional.of(creatorUserDS));
+    when(userService.getUser(creatorUserIdBGH)).thenReturn(Optional.of(creatorUserBGH));
 
     user1IdDS =
         userRepository.save(
@@ -396,14 +395,14 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(ersterfassungProcessStep)
-            .user(UserDTO.builder().id(userNullId).build())
+            .user(null)
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step2DTO =
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(qsformalProcessStep)
-            .user(UserDTO.builder().id(userNullId).build())
+            .user(null)
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step3DTO =

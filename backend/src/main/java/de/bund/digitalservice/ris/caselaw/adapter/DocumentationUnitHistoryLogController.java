@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.MediaType;
@@ -18,12 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v1/caselaw/documentunits/{documentationUnitId}/historylogs")
 public class DocumentationUnitHistoryLogController {
   private final DocumentationUnitHistoryLogService service;
-  private final UserService userService;
 
-  public DocumentationUnitHistoryLogController(
-      DocumentationUnitHistoryLogService service, UserService userService) {
+  public DocumentationUnitHistoryLogController(DocumentationUnitHistoryLogService service) {
     this.service = service;
-    this.userService = userService;
   }
 
   /**
@@ -36,7 +33,9 @@ public class DocumentationUnitHistoryLogController {
   @PreAuthorize(
       "@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#documentationUnitId)")
   public List<HistoryLog> getHistoryLog(
-      @AuthenticationPrincipal OidcUser oidcUser, @PathVariable UUID documentationUnitId) {
-    return service.getHistoryLogs(documentationUnitId, userService.getUser(oidcUser));
+      User user,
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @PathVariable UUID documentationUnitId) {
+    return service.getHistoryLogs(documentationUnitId, user);
   }
 }

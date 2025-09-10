@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,18 +56,20 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
     // Mock the userService to return fake User objects
     when(userService.getUser(userIdDS))
         .thenReturn(
-            User.builder()
-                .id(userIdDS)
-                .name("testUserDS")
-                .documentationOffice(docOfficeDS)
-                .build());
+            Optional.of(
+                User.builder()
+                    .id(userIdDS)
+                    .name("testUserDS")
+                    .documentationOffice(docOfficeDS)
+                    .build()));
     when(userService.getUser(userIdBGH))
         .thenReturn(
-            User.builder()
-                .id(userIdBGH)
-                .name("testUserBGH")
-                .documentationOffice(docOfficeBGH)
-                .build());
+            Optional.of(
+                User.builder()
+                    .id(userIdBGH)
+                    .name("testUserBGH")
+                    .documentationOffice(docOfficeBGH)
+                    .build()));
   }
 
   @AfterEach

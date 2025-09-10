@@ -123,12 +123,12 @@ public class DocumentationUnitController {
   @PutMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated() and @userIsInternal.apply(#oidcUser)")
   public ResponseEntity<DocumentationUnit> generateNewDocumentationUnit(
+      User user,
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestBody(required = false) Optional<DocumentationUnitCreationParameters> parameters,
       @RequestParam(value = "kind", defaultValue = "DECISION") Kind kind) {
     try {
-      var documentationUnit =
-          service.generateNewDocumentationUnit(userService.getUser(oidcUser), parameters, kind);
+      var documentationUnit = service.generateNewDocumentationUnit(user, parameters, kind);
       return ResponseEntity.status(HttpStatus.CREATED).body(documentationUnit);
     } catch (DocumentationUnitException e) {
       log.error("error in generate new documentation unit", e);
@@ -147,12 +147,12 @@ public class DocumentationUnitController {
   @PutMapping(value = "new/eurlex", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated() and @userIsInternal.apply(#oidcUser)")
   public ResponseEntity<List<String>> generateNewDecisionFromEurlex(
+      User user,
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestBody(required = false) Optional<EurlexCreationParameters> parameters) {
     try {
       if (parameters.isPresent()) {
-        List<String> documentationNumbers =
-            service.generateNewDecisionFromEurlex(userService.getUser(oidcUser), parameters);
+        List<String> documentationNumbers = service.generateNewDecisionFromEurlex(user, parameters);
         eurLexSOAPSearchService.updateResultStatus(parameters.get().celexNumbers());
         return ResponseEntity.status(HttpStatus.CREATED).body(documentationNumbers);
       }
@@ -196,22 +196,22 @@ public class DocumentationUnitController {
   @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<Attachment2Html> attachFileToDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser,
+      User user,
       @PathVariable UUID uuid,
       @RequestBody byte[] bytes,
       @RequestHeader HttpHeaders httpHeaders) {
 
     var attachmentPath =
         attachmentService
-            .attachFileToDocumentationUnit(
-                uuid, ByteBuffer.wrap(bytes), httpHeaders, userService.getUser(oidcUser))
+            .attachFileToDocumentationUnit(uuid, ByteBuffer.wrap(bytes), httpHeaders, user)
             .s3path();
     try {
       var attachment2Html = converterService.getConvertedObject(attachmentPath);
-      initializeCoreDataAndCheckDuplicates(uuid, attachment2Html, userService.getUser(oidcUser));
+      initializeCoreDataAndCheckDuplicates(uuid, attachment2Html, user);
       return ResponseEntity.status(HttpStatus.OK).body(attachment2Html);
 
     } catch (Exception e) {
-      attachmentService.deleteByS3Path(attachmentPath, uuid, userService.getUser(oidcUser));
+      attachmentService.deleteByS3Path(attachmentPath, uuid, user);
       return ResponseEntity.unprocessableEntity().build();
     }
   }
@@ -245,12 +245,12 @@ public class DocumentationUnitController {
   @DeleteMapping(value = "/{uuid}/file/{s3Path}")
   @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<Object> removeAttachmentFromDocumentationUnit(
+      User user,
       @AuthenticationPrincipal OidcUser oidcUser,
       @PathVariable UUID uuid,
       @PathVariable String s3Path) {
-
     try {
-      attachmentService.deleteByS3Path(s3Path, uuid, userService.getUser(oidcUser));
+      attachmentService.deleteByS3Path(s3Path, uuid, user);
       return ResponseEntity.noContent().build();
     } catch (Exception e) {
       log.error("Error by deleting attachment '{}' for documentation unit {}", s3Path, uuid, e);
@@ -384,6 +384,7 @@ public class DocumentationUnitController {
   @PreAuthorize(
       "@userHasWriteAccess.apply(#uuid) and (@userIsInternal.apply(#oidcUser) or (@isAssignedViaProcedure.apply(#uuid) and @isPatchAllowedForExternalUsers.apply(#patch)))")
   public ResponseEntity<RisJsonPatch> partialUpdateByUuid(
+      User user,
       @AuthenticationPrincipal OidcUser oidcUser,
       @PathVariable UUID uuid,
       @RequestBody RisJsonPatch patch) {
@@ -399,7 +400,6 @@ public class DocumentationUnitController {
       if (documentationUnit != null) {
         documentNumber = documentationUnit.documentNumber();
       }
-      User user = userService.getUser(oidcUser);
       var newPatch = service.updateDocumentationUnit(uuid, patch, user);
 
       return ResponseEntity.ok().body(newPatch);
@@ -424,12 +424,12 @@ public class DocumentationUnitController {
   @PutMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<HandoverMail> handoverDocumentationUnitAsMail(
-      @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
+      User user, @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
 
     try {
       HandoverMail handoverMail =
           handoverService.handoverDocumentationUnitAsMail(
-              uuid, userService.getEmail(oidcUser), userService.getUser(oidcUser));
+              uuid, userService.getEmail(oidcUser), user);
       if (handoverMail == null || !handoverMail.isSuccess()) {
         log.warn("Failed to send mail for documentation unit {}", uuid);
         return ResponseEntity.unprocessableEntity().body(handoverMail);
@@ -480,13 +480,14 @@ public class DocumentationUnitController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
+      User user,
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
       @RequestParam(value = "documentNumber") Optional<String> documentNumberToExclude,
       @RequestBody RelatedDocumentationUnit relatedDocumentationUnit,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
-    var documentationOffice = userService.getDocumentationOffice(oidcUser);
+    var documentationOffice = user.documentationOffice();
     return service.searchLinkableDocumentationUnits(
         relatedDocumentationUnit,
         documentationOffice,
@@ -619,8 +620,7 @@ public class DocumentationUnitController {
   @PutMapping(value = "/{uuid}/publish")
   @PreAuthorize("@userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<Void> publishDocumentationUnit(
-      @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
-    User user = userService.getUser(oidcUser);
+      User user, @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
     try {
       portalPublicationService.publishDocumentationUnitWithChangelog(uuid, user);
       return ResponseEntity.ok().build();
@@ -642,8 +642,7 @@ public class DocumentationUnitController {
   @PutMapping(value = "/{uuid}/withdraw")
   @PreAuthorize("@userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<Void> withdrawDocumentationUnit(
-      @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
-    User user = userService.getUser(oidcUser);
+      User user, @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
     try {
       portalPublicationService.withdrawDocumentationUnitWithChangelog(uuid, user);
       return ResponseEntity.ok().build();
@@ -664,10 +663,10 @@ public class DocumentationUnitController {
   @PatchMapping(value = "/bulk-assign-procedure")
   @PreAuthorize("@userHasBulkWriteAccess.apply(#body.getDocumentationUnitIds())")
   public ResponseEntity<Void> bulkAssignProcedure(
+      User user,
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestBody @Valid BulkAssignProcedureRequest body) {
     try {
-      User user = userService.getUser(oidcUser);
       service.bulkAssignProcedure(body.getDocumentationUnitIds(), body.getProcedureLabel(), user);
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {
@@ -720,13 +719,14 @@ public class DocumentationUnitController {
   @PreAuthorize(
       "isAuthenticated() and @userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#documentationUnitId)")
   public ResponseEntity<String> assignDocumentationOffice(
+      User user,
       @AuthenticationPrincipal OidcUser oidcUser,
       @PathVariable @NonNull UUID documentationUnitId,
       @PathVariable @NonNull UUID documentationOfficeId) {
+
     try {
       var result =
-          service.assignDocumentationOffice(
-              documentationUnitId, documentationOfficeId, userService.getUser(oidcUser));
+          service.assignDocumentationOffice(documentationUnitId, documentationOfficeId, user);
       return ResponseEntity.ok().body(result);
     } catch (DocumentationUnitNotExistsException e) {
       log.warn("Documentation unit not found: {}", documentationUnitId, e);

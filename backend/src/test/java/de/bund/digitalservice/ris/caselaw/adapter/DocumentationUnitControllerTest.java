@@ -135,7 +135,7 @@ class DocumentationUnitControllerTest {
 
   @BeforeEach
   void setup() throws DocumentationUnitNotExistsException {
-    doReturn(docOffice)
+    doReturn(Optional.of(docOffice))
         .when(userService)
         .getDocumentationOffice(
             argThat(
@@ -160,7 +160,7 @@ class DocumentationUnitControllerTest {
     void
         testGenerateNewDocumentationUnit_withInternalUserAndNoKind_shouldSuccessfullyCreateDecision() {
       // userService.getDocumentationOffice is mocked in @BeforeEach
-      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(Optional.of(user));
       when(service.generateNewDocumentationUnit(user, Optional.empty(), Kind.DECISION))
           .thenReturn(
               Decision.builder()
@@ -184,7 +184,7 @@ class DocumentationUnitControllerTest {
     void
         testGenerateNewDocumentationUnit_withInternalUserAndKindPendingProceeding_shouldSuccessfullyCreatePendingProceeding() {
       // Arrange
-      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(Optional.of(user));
       when(service.generateNewDocumentationUnit(user, Optional.empty(), Kind.PENDING_PROCEEDING))
           .thenReturn(
               PendingProceeding.builder()
@@ -268,7 +268,7 @@ class DocumentationUnitControllerTest {
     @Test
     void testGenerateNewDocumentationUnit_withUnsupportedKind_shouldBeForbidden() {
       // Arrange
-      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(Optional.of(user));
       when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
       when(service.generateNewDocumentationUnit(user, Optional.empty(), Kind.UNSUPPORTED))
           .thenThrow(DocumentationUnitException.class);
@@ -734,6 +734,9 @@ class DocumentationUnitControllerTest {
             linkedDocumentationUnit, docOffice, Optional.of("KORE0000000000"), pageRequest))
         .thenReturn(new PageImpl<>(List.of(), pageRequest, 0));
 
+    when(userService.getUser(any(OidcUser.class)))
+        .thenReturn(Optional.of(User.builder().firstName("testUser").build()));
+
     risWebClient
         .withDefaultLogin()
         .put()
@@ -892,7 +895,7 @@ class DocumentationUnitControllerTest {
         throws DocumentationUnitNotExistsException {
       Mockito.reset(userService);
       DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
-      when(userService.getDocumentationOffice(any())).thenReturn(office);
+      when(userService.getDocumentationOffice(any())).thenReturn(Optional.of(office));
       String documentNumber = "ABCD202200001";
       Decision decision =
           Decision.builder()

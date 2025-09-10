@@ -126,10 +126,14 @@ public class DatabaseProcedureService implements ProcedureService {
   @Transactional
   public List<DocumentationUnitListItem> getDocumentationUnits(
       UUID procedureId, OidcUser oidcUser) {
-    DocumentationOffice documentationOfficeOfUser = userService.getDocumentationOffice(oidcUser);
+    Optional<DocumentationOffice> documentationOfficeOfUser =
+        userService.getDocumentationOffice(oidcUser);
+    if (documentationOfficeOfUser.isEmpty()) {
+      return List.of();
+    }
     boolean isInternalUser = userService.isInternal(oidcUser);
     return repository
-        .findByIdAndDocumentationOffice(procedureId, documentationOfficeOfUser.id())
+        .findByIdAndDocumentationOffice(procedureId, documentationOfficeOfUser.get().id())
         .map(
             procedureDTO ->
                 procedureDTO.getDocumentationUnits().stream()

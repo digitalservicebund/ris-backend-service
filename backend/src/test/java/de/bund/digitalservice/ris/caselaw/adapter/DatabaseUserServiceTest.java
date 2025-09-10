@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -56,6 +55,8 @@ class DatabaseUserServiceTest {
           .documentationOffice(DocumentationOffice.builder().abbreviation("BVerwG").build())
           .build();
 
+  private final Optional<User> optionalUser = Optional.of(user);
+
   private final UserGroup userGroup =
       UserGroup.builder()
           .id(GROUP_UUID)
@@ -95,11 +96,11 @@ class DatabaseUserServiceTest {
             OidcIdToken.withTokenValue("token").claim("sub", EXTERNAL_ID.toString()).build());
 
     when(userRepository.findByExternalId(UserTransformer.getOidcUserId(oidcUser)))
-        .thenReturn(Optional.of(user));
+        .thenReturn(optionalUser);
 
-    User retrievedUser = databaseUserService.getUser(oidcUser);
+    var retrievedUser = databaseUserService.getUser(oidcUser);
 
-    assertEquals(user, retrievedUser);
+    assertEquals(optionalUser, retrievedUser);
     verify(userRepository, times(1)).findByExternalId(EXTERNAL_ID);
     verify(keycloakUserService, never()).getUser(any(OidcUser.class));
     verify(userRepository, never()).saveOrUpdate(any(User.class));
@@ -115,12 +116,12 @@ class DatabaseUserServiceTest {
 
     when(userRepository.findByExternalId(UserTransformer.getOidcUserId(oidcUser)))
         .thenReturn(Optional.empty());
-    when(keycloakUserService.getUser(oidcUser)).thenReturn(user);
-    when(userRepository.saveOrUpdate(user)).thenReturn(Optional.of(user));
+    when(keycloakUserService.getUser(oidcUser)).thenReturn(optionalUser);
+    when(userRepository.saveOrUpdate(user)).thenReturn(optionalUser);
 
-    User retrievedUser = databaseUserService.getUser(oidcUser);
+    var retrievedUser = databaseUserService.getUser(oidcUser);
 
-    assertEquals(user, retrievedUser);
+    assertEquals(optionalUser, retrievedUser);
     verify(userRepository, times(1)).findByExternalId(EXTERNAL_ID);
     verify(keycloakUserService, times(1)).getUser(oidcUser);
     verify(userRepository, times(1)).saveOrUpdate(user);
@@ -138,20 +139,20 @@ class DatabaseUserServiceTest {
     when(keycloakUserService.getUser(oidcUser)).thenReturn(null);
     when(userRepository.saveOrUpdate(any(User.class))).thenReturn(Optional.empty());
 
-    User retrievedUser = databaseUserService.getUser(oidcUser);
+    var retrievedUser = databaseUserService.getUser(oidcUser);
 
-    assertNull(retrievedUser);
+    assertThat(retrievedUser).isEmpty();
     verify(userRepository, times(1)).findByExternalId(EXTERNAL_ID);
     verify(keycloakUserService, times(1)).getUser(oidcUser);
   }
 
   @Test
   void testGetUserByUUID_withUserInDatabaseById_shouldReturnUserFromDatabase() {
-    when(userRepository.getUser(USER_UUID)).thenReturn(Optional.of(user));
+    when(userRepository.getUser(USER_UUID)).thenReturn(optionalUser);
 
-    User retrievedUser = databaseUserService.getUser(USER_UUID);
+    var retrievedUser = databaseUserService.getUser(USER_UUID);
 
-    assertEquals(user, retrievedUser);
+    assertEquals(optionalUser, retrievedUser);
     verify(userRepository, times(1)).getUser(USER_UUID);
     verify(userRepository, never()).findByExternalId(any(UUID.class));
     verify(keycloakUserService, never()).getUser(any(UUID.class));
@@ -161,11 +162,11 @@ class DatabaseUserServiceTest {
   @Test
   void testGetUserByUUID_withUserNotInDatabaseByIdButByExternalId_shouldReturnUserFromDatabase() {
     when(userRepository.getUser(USER_UUID)).thenReturn(Optional.empty());
-    when(userRepository.findByExternalId(USER_UUID)).thenReturn(Optional.of(user));
+    when(userRepository.findByExternalId(USER_UUID)).thenReturn(optionalUser);
 
-    User retrievedUser = databaseUserService.getUser(USER_UUID);
+    var retrievedUser = databaseUserService.getUser(USER_UUID);
 
-    assertEquals(user, retrievedUser);
+    assertEquals(optionalUser, retrievedUser);
     verify(userRepository, times(1)).getUser(USER_UUID);
     verify(userRepository, times(1)).findByExternalId(USER_UUID);
     verify(keycloakUserService, never()).getUser(any(UUID.class));
@@ -177,9 +178,9 @@ class DatabaseUserServiceTest {
     when(userRepository.getUser(USER_UUID)).thenReturn(Optional.empty());
     when(userRepository.findByExternalId(USER_UUID)).thenReturn(Optional.empty());
 
-    User retrievedUser = databaseUserService.getUser(USER_UUID);
+    var retrievedUser = databaseUserService.getUser(USER_UUID);
 
-    assertNull(retrievedUser);
+    assertThat(retrievedUser).isEmpty();
     verify(userRepository, times(1)).getUser(USER_UUID);
     verify(userRepository, times(1)).findByExternalId(USER_UUID);
     verify(userRepository, never()).saveOrUpdate(any(User.class));
@@ -187,9 +188,9 @@ class DatabaseUserServiceTest {
 
   @Test
   void testGetUserByUUID_withNullUUID_shouldReturnNull() {
-    User retrievedUser = databaseUserService.getUser((UUID) null);
+    var retrievedUser = databaseUserService.getUser((UUID) null);
 
-    assertNull(retrievedUser);
+    assertThat(retrievedUser).isEmpty();
     verify(userRepository, never()).getUser(any(UUID.class));
   }
 

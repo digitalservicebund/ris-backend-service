@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,7 @@ class FieldOfLawControllerTest {
   @MockitoBean private FieldOfLawService service;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
+  @MockitoBean private UserService userService;
 
   @Test
   void testGetFieldsOfLaw_withoutQuery_shouldCallServiceWithoutValue() {

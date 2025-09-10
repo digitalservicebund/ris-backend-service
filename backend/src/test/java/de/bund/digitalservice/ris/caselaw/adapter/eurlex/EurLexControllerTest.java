@@ -41,7 +41,7 @@ class EurLexControllerTest {
 
   @BeforeEach
   void setUp() {
-    doReturn(docOffice)
+    doReturn(Optional.of(docOffice))
         .when(userService)
         .getDocumentationOffice(
             argThat(

@@ -142,6 +142,9 @@ public class BareIdUserApiService implements UserApiService {
     }
 
     List<User> users = new ArrayList<>();
+    if (group == null) {
+      return users;
+    }
     if (group.path().equals(groupName)) {
       users.addAll(getUsers(group.uuid()));
     } else {

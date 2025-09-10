@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserRepository;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -67,11 +68,10 @@ public class DatabaseUserService extends UserService {
    * @return the user domain object
    */
   @Override
-  public User getUser(OidcUser oidcUser) {
+  public Optional<User> getUser(OidcUser oidcUser) {
     return userRepository
         .findByExternalId(UserTransformer.getOidcUserId(oidcUser))
-        .orElseGet(
-            () -> userRepository.saveOrUpdate(keycloakUserService.getUser(oidcUser)).orElse(null));
+        .or(() -> keycloakUserService.getUser(oidcUser).flatMap(userRepository::saveOrUpdate));
   }
 
   /**
@@ -86,13 +86,11 @@ public class DatabaseUserService extends UserService {
    * @return the user
    */
   @Override
-  public User getUser(UUID uuid) {
+  public Optional<User> getUser(UUID uuid) {
     if (uuid == null) {
-      return null;
+      return Optional.empty();
     }
-    return userRepository
-        .getUser(uuid)
-        .orElseGet(() -> userRepository.findByExternalId(uuid).orElse(null));
+    return userRepository.getUser(uuid).or(() -> userRepository.findByExternalId(uuid));
   }
 
   /**

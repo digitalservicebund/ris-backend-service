@@ -47,7 +47,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
     return historyLogDTOs.stream()
         .map(
             dto -> {
-              User creatorUser = userService.getUser(dto.getUserId());
+              User creatorUser = userService.getUser(dto.getUserId()).orElse(null);
               User fromUser = null;
               User toUser = null;
 
@@ -62,7 +62,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
                               historyLogProcessStepDTO.getFromDocumentationUnitProcessStep())
                           .map(DocumentationUnitProcessStepDTO::getUser)
                           .map(UserDTO::getId)
-                          .map(userService::getUser)
+                          .flatMap(userService::getUser)
                           .orElse(null);
 
                   toUser =
@@ -70,7 +70,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
                               historyLogProcessStepDTO.getToDocumentationUnitProcessStep())
                           .map(DocumentationUnitProcessStepDTO::getUser)
                           .map(UserDTO::getId)
-                          .map(userService::getUser)
+                          .flatMap(userService::getUser)
                           .orElse(null);
                 }
               }

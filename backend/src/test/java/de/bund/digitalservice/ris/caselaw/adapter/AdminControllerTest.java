@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.EnvironmentResponse;
 import de.bund.digitalservice.ris.caselaw.domain.MailStatus;
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,7 @@ class AdminControllerTest {
   @MockitoBean private EnvironmentService environmentService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
+  @MockitoBean private UserService userService;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
 

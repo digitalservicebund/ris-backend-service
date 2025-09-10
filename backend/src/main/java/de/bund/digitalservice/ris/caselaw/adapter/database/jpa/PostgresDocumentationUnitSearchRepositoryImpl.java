@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchRepository;
@@ -10,7 +9,6 @@ import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
-import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -264,13 +262,16 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       OidcUser oidcUser) {
     List<Predicate> predicates = new ArrayList<>();
     if (parameters.assignedToMe) {
-      User user = userService.getUser(oidcUser);
+      var user = userService.getUser(oidcUser);
+      if (user.isEmpty()) {
+        return predicates;
+      }
       Predicate assignedToMePredicate =
           cb.equal(
               root.get(DocumentationUnitDTO_.currentProcessStep)
                   .get(DocumentationUnitProcessStepDTO_.user)
                   .get(UserDTO_.id),
-              user.id());
+              user.get().id());
       predicates.add(assignedToMePredicate);
     }
     return predicates;
@@ -524,11 +525,19 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
 
   private SearchParameters getSearchParameters(
       DocumentationUnitSearchInput searchInput, OidcUser oidcUser) {
-    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser);
-    log.debug("Find by overview search: {}, {}", documentationOffice.abbreviation(), searchInput);
 
-    DocumentationOfficeDTO documentationOfficeDTO =
-        documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
+    Optional<DocumentationOfficeDTO> documentationOfficeDTO =
+        userService
+            .getDocumentationOffice(oidcUser)
+            .map(
+                documentationOffice -> {
+                  log.debug(
+                      "Find by overview search: {}, {}",
+                      documentationOffice.abbreviation(),
+                      searchInput);
+                  return documentationOfficeRepository.findByAbbreviation(
+                      documentationOffice.abbreviation());
+                });
 
     PublicationStatus status =
         searchInput.status() != null ? searchInput.status().publicationStatus() : null;
@@ -551,7 +560,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         .resolutionDateEnd(Optional.ofNullable(searchInput.resolutionDateEnd()))
         .isResolved(searchInput.isResolved())
         .inboxStatus(Optional.ofNullable(searchInput.inboxStatus()))
-        .documentationOfficeDTO(documentationOfficeDTO)
+        .documentationOfficeDTO(documentationOfficeDTO.orElse(null))
         .kind(Optional.ofNullable(searchInput.kind()))
         .processStep(Optional.ofNullable(searchInput.processStep()))
         .assignedToMe(searchInput.assignedToMe())

@@ -175,14 +175,16 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     // We need this to assert on history logs
     when(userService.getUser(userDbId1))
         .thenReturn(
-            User.builder()
-                .id(userDbId1)
-                .externalId(oidcLoggedInUserId)
-                .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
-                .firstName("Krümel")
-                .lastName("Monster")
-                .documentationOffice(docOffice)
-                .build());
+            Optional.of(
+                User.builder()
+                    .id(userDbId1)
+                    .externalId(oidcLoggedInUserId)
+                    .name(
+                        "testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
+                    .firstName("Krümel")
+                    .lastName("Monster")
+                    .documentationOffice(docOffice)
+                    .build()));
   }
 
   @AfterEach

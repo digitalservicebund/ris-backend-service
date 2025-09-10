@@ -1096,9 +1096,9 @@ class DocumentationUnitServiceTest {
             .currentDocumentationUnitProcessStep(processStep1)
             .processSteps(List.of(processStep1, processStepOtherDocOffice, processStep2))
             .build();
-    when(userService.getUser(oidcUser)).thenReturn(user);
-    when(userService.getUser(userId)).thenReturn(user);
-    when(userService.getUser(otherUserId)).thenReturn(otherUser);
+    when(userService.getUser(oidcUser)).thenReturn(Optional.of(user));
+    when(userService.getUser(userId)).thenReturn(Optional.of(user));
+    when(userService.getUser(otherUserId)).thenReturn(Optional.of(otherUser));
     when(repository.findByDocumentNumber("XXRE200000001", user)).thenReturn(decision);
 
     DocumentationUnit result = service.getByDocumentNumberWithUser("XXRE200000001", oidcUser);
@@ -1153,9 +1153,9 @@ class DocumentationUnitServiceTest {
                 List.of(
                     processStep1, processStepOtherDocOffice, processStep2, processStepWithoutUser))
             .build();
-    when(userService.getUser(oidcUser)).thenReturn(user);
-    when(userService.getUser(userId)).thenReturn(user);
-    when(userService.getUser(otherUserId)).thenReturn(otherUser);
+    when(userService.getUser(oidcUser)).thenReturn(Optional.of(user));
+    when(userService.getUser(userId)).thenReturn(Optional.of(user));
+    when(userService.getUser(otherUserId)).thenReturn(Optional.of(otherUser));
     when(repository.findByDocumentNumber("XXRE200000001", user)).thenReturn(decision);
 
     DocumentationUnit result = service.getByDocumentNumberWithUser("XXRE200000001", oidcUser);
@@ -1214,9 +1214,9 @@ class DocumentationUnitServiceTest {
                     processStep2,
                     processStepWithUserWithoutDocOffice))
             .build();
-    when(userService.getUser(oidcUser)).thenReturn(user);
-    when(userService.getUser(userId)).thenReturn(user);
-    when(userService.getUser(otherUserId)).thenReturn(otherUser);
+    when(userService.getUser(oidcUser)).thenReturn(Optional.of(user));
+    when(userService.getUser(userId)).thenReturn(Optional.of(user));
+    when(userService.getUser(otherUserId)).thenReturn(Optional.of(otherUser));
     when(repository.findByDocumentNumber("XXRE200000001", user)).thenReturn(decision);
 
     DocumentationUnit result = service.getByDocumentNumberWithUser("XXRE200000001", oidcUser);

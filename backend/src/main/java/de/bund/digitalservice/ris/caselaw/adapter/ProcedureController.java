@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
@@ -7,8 +8,10 @@ import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/v1/caselaw/procedure")
+@Slf4j
 public class ProcedureController {
   private final ProcedureService service;
   private final UserService userService;
@@ -43,9 +47,20 @@ public class ProcedureController {
       @RequestParam(value = "pg") Optional<Integer> page,
       @RequestParam(value = "sz") Integer size,
       @RequestParam(value = "withDocUnits") Optional<Boolean> withDocUnits) {
+
+    Optional<DocumentationOffice> documentationOffice =
+        userService.getDocumentationOffice(oidcUser);
+    if (documentationOffice.isEmpty()) {
+      log.atError()
+          .setMessage("Could not identify logged in user or their documentation office")
+          .addKeyValue("name", oidcUser.getName())
+          .log();
+      return new SliceImpl<>(List.of());
+    }
+
     return service.search(
         query,
-        userService.getDocumentationOffice(oidcUser),
+        documentationOffice.get(),
         PageRequest.of(page.orElse(0), size),
         withDocUnits,
         oidcUser);

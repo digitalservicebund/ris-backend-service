@@ -73,11 +73,11 @@ public class ProcessStepController {
       @AuthenticationPrincipal OidcUser oidcUser) {
     try {
       var documentationOffice = userService.getDocumentationOffice(oidcUser);
-      if (documentationOffice == null) {
+      if (documentationOffice.isEmpty()) {
         return ResponseEntity.notFound().build();
       }
       List<ProcessStep> possibleSteps =
-          processStepService.getAssignableProcessStepsForDocOffice(documentationOffice.id());
+          processStepService.getAssignableProcessStepsForDocOffice(documentationOffice.get().id());
       return ResponseEntity.ok(possibleSteps);
     } catch (DocumentationOfficeNotExistsException e) {
       return ResponseEntity.notFound().build();
