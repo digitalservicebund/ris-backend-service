@@ -48,11 +48,6 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
     return historyLogDTOs.stream()
         .map(
             dto -> {
-              User creatorUser = null;
-              if (dto.getUser() != null) {
-                creatorUser = userService.getUser(dto.getUser().getId());
-              }
-
               User fromUser = null;
               User toUser = null;
 
@@ -80,8 +75,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
                 }
               }
 
-              return HistoryLogTransformer.transformToDomain(
-                  dto, currentUser, creatorUser, fromUser, toUser);
+              return HistoryLogTransformer.transformToDomain(dto, currentUser, fromUser, toUser);
             })
         .toList();
   }
@@ -97,7 +91,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
     return databaseRepository
         .findFirstByDocumentationUnitIdAndUserIdAndEventTypeAndCreatedAtBetween(
             documentationUnitId, userId, HistoryLogEventType.UPDATE, start, end)
-        .map(dto -> HistoryLogTransformer.transformToDomain(dto, user, user, null, null));
+        .map(dto -> HistoryLogTransformer.transformToDomain(dto, user, null, null));
   }
 
   @Override
