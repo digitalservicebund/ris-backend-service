@@ -57,8 +57,6 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
   private final DocumentationOffice docOfficeBGH = buildBGHDocOffice();
   // Define user IDs and user for mocking
 
-  private final UUID userNullId = UUID.randomUUID();
-
   private ProcessStepDTO ersterfassungProcessStep;
   private ProcessStepDTO qsformalProcessStep;
   private DocumentationUnitDTO testDocumentationUnitDS;
@@ -376,14 +374,14 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(ersterfassungProcessStep)
-            .user(UserDTO.builder().id(userNullId).build())
+            .user(null)
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step2DTO =
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(qsformalProcessStep)
-            .user(UserDTO.builder().id(userNullId).build())
+            .user(null)
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step3DTO =

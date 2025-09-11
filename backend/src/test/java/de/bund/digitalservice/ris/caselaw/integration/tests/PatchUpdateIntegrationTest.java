@@ -4740,13 +4740,9 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       ProcessStepDTO fachdokumentationProcessStep =
           processStepRepository.findByName("Fachdokumentation").orElseThrow();
 
-      // Mock a user with a documentation office for the patch payload
-      ObjectNode userNode = JsonNodeFactory.instance.objectNode();
-      userNode.put("id", UUID.randomUUID().toString());
-
       List<JsonPatchOperation> operationsUser1 =
           List.of(
-              new ReplaceOperation("/currentDocumentationUnitProcessStep/user", userNode),
+              new RemoveOperation("/currentDocumentationUnitProcessStep/user"),
               new ReplaceOperation(
                   "/currentDocumentationUnitProcessStep/processStep/abbreviation",
                   new TextNode("FD")),
