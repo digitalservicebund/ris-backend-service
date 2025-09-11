@@ -149,6 +149,8 @@ public class BareIdUserApiService implements UserApiService {
     if (group.name().equals(userGroupsPathSegments.get(depth))
         && depth == userGroupsPathSegments.size() - 1) {
       return getUsers(group.uuid());
+    } else if (!group.name().equals(userGroupsPathSegments.get(depth))) {
+      return Collections.emptyList();
     }
 
     List<User> users = new ArrayList<>();
