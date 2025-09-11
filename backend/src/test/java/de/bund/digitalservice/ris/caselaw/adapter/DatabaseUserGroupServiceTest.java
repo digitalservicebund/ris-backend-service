@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
@@ -55,13 +54,14 @@ class DatabaseUserGroupServiceTest {
 
   @Test
   void shouldThrowErrorWhenConfigIsEmpty() {
-    DatabaseUserGroupRepository groupRepository = mock(DatabaseUserGroupRepository.class);
     when(groupRepository.findAll()).thenReturn(List.of());
 
-    DatabaseUserGroupService service = new DatabaseUserGroupService(groupRepository);
+    DatabaseUserGroupService databaseUserGroupService =
+        new DatabaseUserGroupService(groupRepository);
 
     var event = new ContextRefreshedEvent(new StaticApplicationContext());
-    assertThrows(NoSuchElementException.class, () -> service.onApplicationEvent(event));
+    assertThrows(
+        NoSuchElementException.class, () -> databaseUserGroupService.onApplicationEvent(event));
   }
 
   @Test
