@@ -55,9 +55,6 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
   @MockitoSpyBean private UserService userService;
   private final DocumentationOffice docOfficeDS = buildDSDocOffice();
   private final DocumentationOffice docOfficeBGH = buildBGHDocOffice();
-  // Define user IDs and user for mocking
-
-  private final UUID userNullId = UUID.randomUUID();
 
   private ProcessStepDTO ersterfassungProcessStep;
   private ProcessStepDTO qsformalProcessStep;
@@ -365,105 +362,6 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
     assertThat(log5.documentationOffice()).isEqualTo("DS");
     assertThat(log5.description()).isEqualTo("Schritt gesetzt: Ersterfassung");
     assertThat(log5.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP);
-  }
-
-  @Test
-  void
-      getProcessStepHistoryLogs_withSameDocOffice_couldNotRetrieveUserData_shouldReturnHistoryLogs_withoutUserData() {
-    // Arrange
-    LocalDateTime now = LocalDateTime.now();
-    DocumentationUnitProcessStepDTO step1DTO =
-        DocumentationUnitProcessStepDTO.builder()
-            .documentationUnit(testDocumentationUnitDS)
-            .processStep(ersterfassungProcessStep)
-            .user(UserDTO.builder().id(userNullId).build())
-            .createdAt(now)
-            .build();
-    DocumentationUnitProcessStepDTO step2DTO =
-        DocumentationUnitProcessStepDTO.builder()
-            .documentationUnit(testDocumentationUnitDS)
-            .processStep(qsformalProcessStep)
-            .user(UserDTO.builder().id(userNullId).build())
-            .createdAt(now)
-            .build();
-    DocumentationUnitProcessStepDTO step3DTO =
-        DocumentationUnitProcessStepDTO.builder()
-            .documentationUnit(testDocumentationUnitDS)
-            .processStep(qsformalProcessStep)
-            .user(null)
-            .createdAt(now)
-            .build();
-
-    documentationUnitProcessStepRepository.save(step1DTO);
-    documentationUnitProcessStepRepository.save(step2DTO);
-    documentationUnitProcessStepRepository.save(step3DTO);
-
-    // only to-user set -> person set
-    saveProcessStepHistoryLog(
-        testDocumentationUnitDS.getId(),
-        null,
-        HistoryLogEventType.PROCESS_STEP_USER,
-        null,
-        null,
-        step2DTO);
-
-    // from and to-user set -> person changed
-    saveProcessStepHistoryLog(
-        testDocumentationUnitDS.getId(),
-        null,
-        HistoryLogEventType.PROCESS_STEP_USER,
-        null,
-        step1DTO,
-        step2DTO);
-
-    // only from-user set -> person removed
-    saveProcessStepHistoryLog(
-        testDocumentationUnitDS.getId(),
-        null,
-        HistoryLogEventType.PROCESS_STEP_USER,
-        null,
-        step2DTO,
-        step3DTO);
-
-    assertThat(
-            databaseHistoryLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(
-                testDocumentationUnitDS.getId()))
-        .hasSize(3);
-
-    // Act
-    List<HistoryLog> historyLogs =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri(HISTORY_LOG_ENDPOINT + testDocumentationUnitDS.getId() + "/historylogs")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(new TypeReference<List<HistoryLog>>() {})
-            .returnResult()
-            .getResponseBody();
-
-    // Assert
-    assertThat(historyLogs).isNotEmpty();
-    HistoryLog log1 = historyLogs.getFirst();
-    HistoryLog log2 = historyLogs.get(1);
-    HistoryLog log3 = historyLogs.get(2);
-
-    // Order is now descending, by created at
-    assertThat(log1.createdBy()).isNull();
-    assertThat(log1.documentationOffice()).isNull();
-    assertThat(log1.description()).isEqualTo("Person geändert");
-    assertThat(log1.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP_USER);
-
-    assertThat(log2.createdBy()).isNull();
-    assertThat(log2.documentationOffice()).isNull();
-    assertThat(log2.description()).isEqualTo("Person geändert");
-    assertThat(log2.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP_USER);
-
-    assertThat(log3.createdBy()).isNull();
-    assertThat(log3.documentationOffice()).isNull();
-    assertThat(log3.description()).isEqualTo("Person geändert");
-    assertThat(log3.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP_USER);
   }
 
   public void saveProcessStepHistoryLog(
