@@ -37,8 +37,10 @@ public class PortalPublicationJobService {
   @Scheduled(cron = "0 30 4 * * *", zone = "Europe/Berlin")
   @SchedulerLock(name = "nightly-changelog-publish")
   public void publishNightlyChangelog() {
+    log.info("Publishing nightly changelog...");
     try {
       portalPublicationService.uploadFullReindexChangelog();
+      log.info("Finished publishing nightly changelog.");
     } catch (Exception e) {
       log.error("Could not upload nightly changelog file.", e);
     }

@@ -33,7 +33,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@d0351b4837dd42a4a838ef25daec3bf530e20aaf
+        uses: actions/setup-java@a7ab372554b6eb1a8eb25e7d9aec1cc9f3ea1a76
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -73,7 +73,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@d0351b4837dd42a4a838ef25daec3bf530e20aaf
+        uses: actions/setup-java@a7ab372554b6eb1a8eb25e7d9aec1cc9f3ea1a76
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -160,7 +160,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Set up JDK
-        uses: actions/setup-java@d0351b4837dd42a4a838ef25daec3bf530e20aaf
+        uses: actions/setup-java@a7ab372554b6eb1a8eb25e7d9aec1cc9f3ea1a76
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -190,7 +190,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version-file: ./frontend/package.json
           cache: npm
@@ -339,7 +339,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1
+        uses: docker/login-action@bdf14dc17331d6af6f3653e7ca655ee4a136baa5
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -387,7 +387,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1
+        uses: docker/login-action@bdf14dc17331d6af6f3653e7ca655ee4a136baa5
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -423,7 +423,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@f632aec66edeebe245ad686a33a0c0a2160cac31
+      - uses: chainguard-dev/actions/setup-gitsign@cd899cc96227b82170571cad1c3d6378d8cba678
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -482,7 +482,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version-file: ./frontend/package.json
           cache: npm
@@ -574,7 +574,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@f632aec66edeebe245ad686a33a0c0a2160cac31
+      - uses: chainguard-dev/actions/setup-gitsign@cd899cc96227b82170571cad1c3d6378d8cba678
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -616,7 +616,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@f632aec66edeebe245ad686a33a0c0a2160cac31
+      - uses: chainguard-dev/actions/setup-gitsign@cd899cc96227b82170571cad1c3d6378d8cba678
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -670,7 +670,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@d0351b4837dd42a4a838ef25daec3bf530e20aaf
+        uses: actions/setup-java@a7ab372554b6eb1a8eb25e7d9aec1cc9f3ea1a76
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -707,7 +707,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Set up JDK
-        uses: actions/setup-java@d0351b4837dd42a4a838ef25daec3bf530e20aaf
+        uses: actions/setup-java@a7ab372554b6eb1a8eb25e7d9aec1cc9f3ea1a76
         with:
           java-version: "21.0"
           distribution: "temurin"

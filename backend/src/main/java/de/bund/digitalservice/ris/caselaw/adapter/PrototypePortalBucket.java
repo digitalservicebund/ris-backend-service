@@ -7,12 +7,12 @@ import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.S3Client;
 
 @Component
-@Profile("!production")
-public class PortalBucket extends S3Bucket {
+@Profile("production")
+public class PrototypePortalBucket extends S3Bucket {
 
-  public PortalBucket(
+  public PrototypePortalBucket(
       @Qualifier("portalS3Client") S3Client s3Client,
-      @Value("${s3.file-storage.case-law.bucket-name:no-bucket}") String bucketName) {
+      @Value("${s3.file-storage.case-law-prototype.bucket-name:no-bucket}") String bucketName) {
     super(s3Client, bucketName);
   }
 }

@@ -2,7 +2,9 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
@@ -37,6 +39,15 @@ class HistoryLogTransformerTest {
             .id(id)
             .createdAt(now)
             .systemName(systemName)
+            .user(
+                UserDTO.builder()
+                    .firstName("creatorUser")
+                    .documentationOffice(
+                        DocumentationOfficeDTO.builder()
+                            .id(docOfficeId)
+                            .abbreviation(officeAbbreviation)
+                            .build())
+                    .build())
             .description(description)
             .eventType(eventType)
             .documentationUnitId(UUID.randomUUID())
@@ -44,7 +55,6 @@ class HistoryLogTransformerTest {
 
     // Current user in the same office as the creator
     User currentUser = createUser("currentUser", createDocOffice(docOfficeId, officeAbbreviation));
-    User creatorUser = createUser("creatorUser", createDocOffice(docOfficeId, officeAbbreviation));
 
     HistoryLog expected =
         HistoryLog.builder()
@@ -57,8 +67,7 @@ class HistoryLogTransformerTest {
             .build();
 
     // Act
-    HistoryLog result =
-        HistoryLogTransformer.transformToDomain(dto, currentUser, creatorUser, null, null);
+    HistoryLog result = HistoryLogTransformer.transformToDomain(dto, currentUser, null, null);
 
     // Assert
     assertThat(result).isEqualTo(expected);
@@ -78,6 +87,15 @@ class HistoryLogTransformerTest {
             .id(id)
             .createdAt(now)
             .systemName(systemName)
+            .user(
+                UserDTO.builder()
+                    .firstName("creatorUser")
+                    .documentationOffice(
+                        DocumentationOfficeDTO.builder()
+                            .id(UUID.randomUUID())
+                            .abbreviation("BGH")
+                            .build())
+                    .build())
             .description(description)
             .eventType(eventType)
             .documentationUnitId(UUID.randomUUID())
@@ -85,7 +103,6 @@ class HistoryLogTransformerTest {
 
     // Current user in a different office than the creator
     User currentUser = createUser("currentUser", createDocOffice(UUID.randomUUID(), "DS"));
-    User creatorUser = createUser("creatorUser", createDocOffice(UUID.randomUUID(), "BGH"));
 
     HistoryLog expected =
         HistoryLog.builder()
@@ -98,8 +115,7 @@ class HistoryLogTransformerTest {
             .build();
 
     // Act
-    HistoryLog result =
-        HistoryLogTransformer.transformToDomain(dto, currentUser, creatorUser, null, null);
+    HistoryLog result = HistoryLogTransformer.transformToDomain(dto, currentUser, null, null);
 
     // Assert
     assertThat(result).isEqualTo(expected);
@@ -120,14 +136,21 @@ class HistoryLogTransformerTest {
             .id(id)
             .createdAt(now)
             .description(description) // No system name set
+            .user(
+                UserDTO.builder()
+                    .firstName("creatorUser")
+                    .documentationOffice(
+                        DocumentationOfficeDTO.builder()
+                            .id(UUID.randomUUID())
+                            .abbreviation(officeAbbreviation)
+                            .build())
+                    .build())
             .eventType(eventType)
             .documentationUnitId(UUID.randomUUID())
             .build();
 
     // Current user in a different office than the creator
     User currentUser = createUser("currentUser", createDocOffice(UUID.randomUUID(), "DS"));
-    User creatorUser =
-        createUser("creatorUser", createDocOffice(UUID.randomUUID(), officeAbbreviation));
 
     HistoryLog expected =
         HistoryLog.builder()
@@ -140,8 +163,7 @@ class HistoryLogTransformerTest {
             .build();
 
     // Act
-    HistoryLog result =
-        HistoryLogTransformer.transformToDomain(dto, currentUser, creatorUser, null, null);
+    HistoryLog result = HistoryLogTransformer.transformToDomain(dto, currentUser, null, null);
 
     // Assert
     assertThat(result).isEqualTo(expected);
@@ -161,13 +183,21 @@ class HistoryLogTransformerTest {
             .id(id)
             .createdAt(now)
             .systemName(systemName)
+            .user(
+                UserDTO.builder()
+                    .firstName("creatorUser")
+                    .documentationOffice(
+                        DocumentationOfficeDTO.builder()
+                            .id(UUID.randomUUID())
+                            .abbreviation("DS")
+                            .build())
+                    .build())
             .description(description)
             .eventType(eventType)
             .documentationUnitId(UUID.randomUUID())
             .build();
 
     // No current user
-    User creatorUser = createUser("testUser", createDocOffice(UUID.randomUUID(), "DS"));
 
     HistoryLog expectedLog =
         HistoryLog.builder()
@@ -180,8 +210,7 @@ class HistoryLogTransformerTest {
             .build();
 
     // Act
-    HistoryLog actualLog =
-        HistoryLogTransformer.transformToDomain(dto, null, creatorUser, null, null);
+    HistoryLog actualLog = HistoryLogTransformer.transformToDomain(dto, null, null, null);
 
     // Assert
     assertThat(actualLog).isEqualTo(expectedLog);
@@ -200,12 +229,20 @@ class HistoryLogTransformerTest {
             .id(id)
             .createdAt(now)
             .description(description)
+            .user(
+                UserDTO.builder()
+                    .firstName("testUser")
+                    .documentationOffice(
+                        DocumentationOfficeDTO.builder()
+                            .id(UUID.randomUUID())
+                            .abbreviation("BGH")
+                            .build())
+                    .build())
             .eventType(eventType)
             .documentationUnitId(UUID.randomUUID())
             .build();
 
     // No current user, no system name
-    User creatorUser = createUser("testUser", createDocOffice(UUID.randomUUID(), "BGH"));
 
     HistoryLog expectedLog =
         HistoryLog.builder()
@@ -218,8 +255,7 @@ class HistoryLogTransformerTest {
             .build();
 
     // Act
-    HistoryLog actualLog =
-        HistoryLogTransformer.transformToDomain(dto, null, creatorUser, null, null);
+    HistoryLog actualLog = HistoryLogTransformer.transformToDomain(dto, null, null, null);
 
     // Assert
     assertThat(actualLog).isEqualTo(expectedLog);
@@ -239,6 +275,7 @@ class HistoryLogTransformerTest {
             .id(id)
             .createdAt(now)
             .systemName(systemName)
+            .user(null)
             .description(description)
             .eventType(eventType)
             .documentationUnitId(UUID.randomUUID())
@@ -257,8 +294,7 @@ class HistoryLogTransformerTest {
             .build();
 
     // Act
-    HistoryLog actualLog =
-        HistoryLogTransformer.transformToDomain(dto, currentUser, null, null, null);
+    HistoryLog actualLog = HistoryLogTransformer.transformToDomain(dto, currentUser, null, null);
 
     // Assert
     assertThat(actualLog).isEqualTo(expectedLog);
@@ -278,11 +314,16 @@ class HistoryLogTransformerTest {
             .id(id)
             .createdAt(now)
             .eventType(eventType)
+            .user(
+                UserDTO.builder()
+                    .firstName("creatorUser")
+                    .documentationOffice(
+                        DocumentationOfficeDTO.builder().id(officeId).abbreviation("DS").build())
+                    .build())
             .documentationUnitId(UUID.randomUUID())
             .build();
 
     User currentUser = createUser("currentUser", office);
-    User creatorUser = createUser("creatorUser", office);
     User toUser = createUser("New Person", office); // Same office as current user
 
     HistoryLog expected =
@@ -296,8 +337,7 @@ class HistoryLogTransformerTest {
             .build();
 
     // Act
-    HistoryLog result =
-        HistoryLogTransformer.transformToDomain(dto, currentUser, creatorUser, null, toUser);
+    HistoryLog result = HistoryLogTransformer.transformToDomain(dto, currentUser, null, toUser);
 
     // Assert
     assertThat(result).isEqualTo(expected);
@@ -315,11 +355,19 @@ class HistoryLogTransformerTest {
             .id(id)
             .createdAt(now)
             .eventType(eventType)
+            .user(
+                UserDTO.builder()
+                    .firstName("creatorUser")
+                    .documentationOffice(
+                        DocumentationOfficeDTO.builder()
+                            .id(UUID.randomUUID())
+                            .abbreviation("BGH")
+                            .build())
+                    .build())
             .documentationUnitId(UUID.randomUUID())
             .build(); // No initial description
 
     User currentUser = createUser("currentUser", createDocOffice(UUID.randomUUID(), "DS"));
-    User creatorUser = createUser("creatorUser", createDocOffice(UUID.randomUUID(), "BGH"));
     User toUser =
         createUser("New Person", createDocOffice(UUID.randomUUID(), "BGH")); // Different office
 
@@ -334,8 +382,7 @@ class HistoryLogTransformerTest {
             .build();
 
     // Act
-    HistoryLog result =
-        HistoryLogTransformer.transformToDomain(dto, currentUser, creatorUser, null, toUser);
+    HistoryLog result = HistoryLogTransformer.transformToDomain(dto, currentUser, null, toUser);
 
     // Assert
     assertThat(result).isEqualTo(expected);
@@ -355,11 +402,16 @@ class HistoryLogTransformerTest {
             .id(id)
             .createdAt(now)
             .eventType(eventType)
+            .user(
+                UserDTO.builder()
+                    .firstName("creatorUser")
+                    .documentationOffice(
+                        DocumentationOfficeDTO.builder().id(officeId).abbreviation("DS").build())
+                    .build())
             .documentationUnitId(UUID.randomUUID())
             .build(); // No initial description
 
     User currentUser = createUser("currentUser", office);
-    User creatorUser = createUser("creatorUser", office);
     User fromUser = createUser("Old Person", office);
 
     HistoryLog expected =
@@ -373,8 +425,7 @@ class HistoryLogTransformerTest {
             .build();
 
     // Act
-    HistoryLog result =
-        HistoryLogTransformer.transformToDomain(dto, currentUser, creatorUser, fromUser, null);
+    HistoryLog result = HistoryLogTransformer.transformToDomain(dto, currentUser, fromUser, null);
 
     // Assert
     assertThat(result).isEqualTo(expected);
@@ -393,11 +444,19 @@ class HistoryLogTransformerTest {
             .id(id)
             .createdAt(now)
             .eventType(eventType)
+            .user(
+                UserDTO.builder()
+                    .firstName("creatorUser")
+                    .documentationOffice(
+                        DocumentationOfficeDTO.builder()
+                            .id(UUID.randomUUID())
+                            .abbreviation("BGH")
+                            .build())
+                    .build())
             .documentationUnitId(UUID.randomUUID())
             .build(); // No initial description
 
     User currentUser = createUser("currentUser", createDocOffice(UUID.randomUUID(), "DS"));
-    User creatorUser = createUser("creatorUser", otherDocOffice);
     User fromUser = createUser("Old Person", otherDocOffice);
 
     HistoryLog expected =
@@ -412,8 +471,7 @@ class HistoryLogTransformerTest {
             .build();
 
     // Act
-    HistoryLog result =
-        HistoryLogTransformer.transformToDomain(dto, currentUser, creatorUser, fromUser, null);
+    HistoryLog result = HistoryLogTransformer.transformToDomain(dto, currentUser, fromUser, null);
 
     // Assert
     assertThat(result).isEqualTo(expected);
@@ -433,11 +491,16 @@ class HistoryLogTransformerTest {
             .id(id)
             .createdAt(now)
             .eventType(eventType)
+            .user(
+                UserDTO.builder()
+                    .firstName("creatorUser")
+                    .documentationOffice(
+                        DocumentationOfficeDTO.builder().id(officeId).abbreviation("DS").build())
+                    .build())
             .documentationUnitId(UUID.randomUUID())
             .build(); // No initial description
 
     User currentUser = createUser("currentUser", office);
-    User creatorUser = createUser("creatorUser", office);
     User fromUser = createUser("Old Person", office);
     User toUser = createUser("New Person", office);
 
@@ -452,8 +515,7 @@ class HistoryLogTransformerTest {
             .build();
 
     // Act
-    HistoryLog result =
-        HistoryLogTransformer.transformToDomain(dto, currentUser, creatorUser, fromUser, toUser);
+    HistoryLog result = HistoryLogTransformer.transformToDomain(dto, currentUser, fromUser, toUser);
 
     // Assert
     assertThat(result).isEqualTo(expected);
@@ -465,19 +527,26 @@ class HistoryLogTransformerTest {
     UUID id = UUID.randomUUID();
     Instant now = Instant.now();
     HistoryLogEventType eventType = HistoryLogEventType.PROCESS_STEP_USER;
+    DocumentationOffice otherDocOffice = createDocOffice(UUID.randomUUID(), "BGH");
 
     HistoryLogDTO dto =
         HistoryLogDTO.builder()
             .id(id)
             .createdAt(now)
             .eventType(eventType)
+            .user(
+                UserDTO.builder()
+                    .firstName("creatorUser")
+                    .documentationOffice(
+                        DocumentationOfficeDTO.builder()
+                            .id(otherDocOffice.id())
+                            .abbreviation(otherDocOffice.abbreviation())
+                            .build())
+                    .build())
             .documentationUnitId(UUID.randomUUID())
             .build(); // No initial description
 
-    DocumentationOffice otherDocOffice = createDocOffice(UUID.randomUUID(), "BGH");
-
     User currentUser = createUser("currentUser", createDocOffice(UUID.randomUUID(), "DS"));
-    User creatorUser = createUser("creatorUser", otherDocOffice);
     User fromUser = createUser("Old Person", otherDocOffice);
     User toUser = createUser("New Person", otherDocOffice);
 
@@ -492,8 +561,7 @@ class HistoryLogTransformerTest {
             .build();
 
     // Act
-    HistoryLog result =
-        HistoryLogTransformer.transformToDomain(dto, currentUser, creatorUser, fromUser, toUser);
+    HistoryLog result = HistoryLogTransformer.transformToDomain(dto, currentUser, fromUser, toUser);
 
     // Assert
     assertThat(result).isEqualTo(expected);
@@ -515,11 +583,19 @@ class HistoryLogTransformerTest {
             .id(id)
             .createdAt(now)
             .eventType(eventType)
+            .user(
+                UserDTO.builder()
+                    .firstName("creatorUser")
+                    .documentationOffice(
+                        DocumentationOfficeDTO.builder()
+                            .id(otherUserOffice.id())
+                            .abbreviation(otherUserOffice.abbreviation())
+                            .build())
+                    .build())
             .documentationUnitId(UUID.randomUUID())
             .build(); // No initial description
 
     User currentUser = createUser("currentUser", currentUserOffice);
-    User creatorUser = createUser("creatorUser", otherUserOffice);
     User fromUser = createUser("Old Person", otherUserOffice); // Different office
     User toUser = createUser("New Person", currentUserOffice); // Same office
 
@@ -534,8 +610,7 @@ class HistoryLogTransformerTest {
             .build();
 
     // Act
-    HistoryLog result =
-        HistoryLogTransformer.transformToDomain(dto, currentUser, creatorUser, fromUser, toUser);
+    HistoryLog result = HistoryLogTransformer.transformToDomain(dto, currentUser, fromUser, toUser);
 
     // Assert
     assertThat(result).isEqualTo(expected);
@@ -555,11 +630,19 @@ class HistoryLogTransformerTest {
             .id(id)
             .createdAt(now)
             .eventType(eventType)
+            .user(
+                UserDTO.builder()
+                    .firstName("creatorUser")
+                    .documentationOffice(
+                        DocumentationOfficeDTO.builder()
+                            .id(currentUserOffice.id())
+                            .abbreviation(currentUserOffice.abbreviation())
+                            .build())
+                    .build())
             .documentationUnitId(UUID.randomUUID())
             .build(); // No initial description
 
     User currentUser = createUser("currentUser", currentUserOffice);
-    User creatorUser = createUser("creatorUser", currentUserOffice);
     User fromUser = createUser("Old Person", currentUserOffice); // Same office
     User toUser =
         createUser("New Person", createDocOffice(UUID.randomUUID(), "BGH")); // Different office
@@ -575,8 +658,7 @@ class HistoryLogTransformerTest {
             .build();
 
     // Act
-    HistoryLog result =
-        HistoryLogTransformer.transformToDomain(dto, currentUser, creatorUser, fromUser, toUser);
+    HistoryLog result = HistoryLogTransformer.transformToDomain(dto, currentUser, fromUser, toUser);
 
     // Assert
     assertThat(result).isEqualTo(expected);
@@ -596,6 +678,7 @@ class HistoryLogTransformerTest {
             .id(id)
             .createdAt(now)
             .systemName(systemName)
+            .user(null)
             .description(preExistingDescription) // Explicitly set description
             .eventType(eventType)
             .documentationUnitId(UUID.randomUUID())
@@ -616,8 +699,7 @@ class HistoryLogTransformerTest {
             .build();
 
     // Act
-    HistoryLog result =
-        HistoryLogTransformer.transformToDomain(dto, currentUser, null, fromUser, toUser);
+    HistoryLog result = HistoryLogTransformer.transformToDomain(dto, currentUser, fromUser, toUser);
 
     // Assert
     assertThat(result).isEqualTo(expected);

@@ -30,13 +30,11 @@ public class HistoryLogTransformer {
    * @param historyLogDTO the history log DTO containing information about change events of a
    *     documentation unit
    * @param currentUser the currently authenticated user, can be {@code null}
-   * @param creatorUser the user, who created the log, can be {@code null}
    * @return a {@link HistoryLog} domain object built from the input DTO
    */
   public static HistoryLog transformToDomain(
       HistoryLogDTO historyLogDTO,
       @Nullable User currentUser,
-      @Nullable User creatorUser,
       @Nullable User fromUser,
       @Nullable User toUser) {
     // The currently logged-in user's doc office.
@@ -45,17 +43,17 @@ public class HistoryLogTransformer {
 
     // The history log creators' doc office
     DocumentationOffice creatorDocumentationOffice =
-        Optional.ofNullable(creatorUser).map(User::documentationOffice).orElse(null);
+        historyLogDTO.getUser() != null
+            ? DocumentationOfficeTransformer.transformToDomain(
+                historyLogDTO.getUser().getDocumentationOffice())
+            : null;
 
     return HistoryLog.builder()
         .id(historyLogDTO.getId())
         .createdAt(historyLogDTO.getCreatedAt())
         .createdBy(
             transformCreatedBy(
-                historyLogDTO,
-                creatorUser,
-                currentUserDocumentationOffice,
-                creatorDocumentationOffice))
+                historyLogDTO, currentUserDocumentationOffice, creatorDocumentationOffice))
         .documentationOffice(
             creatorDocumentationOffice != null ? creatorDocumentationOffice.abbreviation() : null)
         .description(
@@ -66,11 +64,13 @@ public class HistoryLogTransformer {
 
   private static String transformCreatedBy(
       HistoryLogDTO historyLogDTO,
-      @Nullable User creatorUser,
       DocumentationOffice currentUserDocumentationOffice,
       DocumentationOffice creatorDocumentationOffice) {
 
-    String creatorUserName = Optional.ofNullable(creatorUser).map(User::name).orElse(null);
+    String creatorUserName =
+        historyLogDTO.getUser() != null
+            ? UserTransformer.transformToDomain(historyLogDTO.getUser()).name()
+            : null;
 
     if (creatorUserName != null
         && isUserAllowedToSeeCreatorUserName(

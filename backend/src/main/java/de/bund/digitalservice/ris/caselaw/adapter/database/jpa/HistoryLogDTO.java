@@ -7,6 +7,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
@@ -35,8 +37,9 @@ public class HistoryLogDTO {
   @Column(name = "documentation_unit_id", nullable = false)
   private UUID documentationUnitId;
 
-  @Column(name = "user_id")
-  private UUID userId;
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private UserDTO user;
 
   @Column(name = "system_name")
   private String systemName;
