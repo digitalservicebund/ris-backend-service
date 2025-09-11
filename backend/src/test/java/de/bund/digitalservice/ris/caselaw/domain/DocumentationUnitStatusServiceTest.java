@@ -83,7 +83,7 @@ class DocumentationUnitStatusServiceTest {
             .withError(true)
             .build();
 
-    var user = User.builder().id(UUID.randomUUID()).name("Flea Bag").build();
+    var user = User.builder().id(UUID.randomUUID()).firstName("Flea").lastName("Bag").build();
     statusService.update(DOCUMENT_NUMBER, newStatus, user);
 
     verify(databaseDocumentationUnitRepository, times(1)).save(captor.capture());
@@ -132,7 +132,7 @@ class DocumentationUnitStatusServiceTest {
             .withError(true)
             .build();
 
-    var user = User.builder().id(UUID.randomUUID()).name("Flea Bag").build();
+    var user = User.builder().id(UUID.randomUUID()).firstName("Flea").lastName("Bag").build();
     statusService.update(DOCUMENT_NUMBER, newStatus, user);
 
     verify(databaseDocumentationUnitRepository, times(1)).save(any());

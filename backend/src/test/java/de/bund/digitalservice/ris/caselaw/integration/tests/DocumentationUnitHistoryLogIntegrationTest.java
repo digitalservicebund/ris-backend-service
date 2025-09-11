@@ -58,7 +58,6 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
         documentationOfficeRepository.findByAbbreviation(docOfficeDS.abbreviation());
     documentationOfficeBGH =
         documentationOfficeRepository.findByAbbreviation(docOfficeBGH.abbreviation());
-
     userDS =
         userRepository.save(
             UserDTO.builder()
