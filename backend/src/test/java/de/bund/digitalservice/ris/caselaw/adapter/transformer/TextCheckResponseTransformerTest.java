@@ -11,11 +11,20 @@ import de.bund.digitalservice.ris.caselaw.adapter.languagetool.Match;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.Replacement;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.Rule;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.Type;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.Suggestion;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckAllResponse;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckType;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class TextCheckResponseTransformerTest {
+  public static UUID SOME_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
+
   @Test
   void transformToListOfDomainMatches_shouldTransformCorrectly() {
     // Arrange
@@ -81,5 +90,86 @@ class TextCheckResponseTransformerTest {
     assertEquals("teh sentence.", domainMatch.context().text());
     assertEquals(0, domainMatch.context().offset());
     assertEquals(3, domainMatch.context().length());
+  }
+
+  @Test
+  void givenListOfErrorsWithIgnoredWords_whenTransforming_thenVerifyCorrectIgnoredWordsCount() {
+    // Arrange = given
+    List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches = new ArrayList<>();
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement replacementOne =
+        new de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement("Richtig");
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Context contextOne =
+        new de.bund.digitalservice.ris.caselaw.domain.textcheck.Context("<p>Rihctig<p>", 3, 7);
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Context contextTwo =
+        new de.bund.digitalservice.ris.caselaw.domain.textcheck.Context("<p>geanu<p>", 3, 5);
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Type type =
+        new de.bund.digitalservice.ris.caselaw.domain.textcheck.Type("UnknownWord");
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Category category =
+        new de.bund.digitalservice.ris.caselaw.domain.textcheck.Category(
+            "TYPOS", "Mögliche Tippfehler");
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord
+        ignoredWord =
+            new de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words
+                .IgnoredTextCheckWord(SOME_ID, IgnoredTextCheckType.DOCUMENTATION_UNIT, "geanu");
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule rule =
+        de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule.builder()
+            .id("GERMAN_SPELLER_RULE")
+            .description("Möglicher Rechtschreibfehler")
+            .issueType("misspelling")
+            .category(category)
+            .build();
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Match matchOne =
+        de.bund.digitalservice.ris.caselaw.domain.textcheck.Match.builder()
+            .id(1)
+            .word("Rihctig")
+            .message("Möglicher Tippfehler gefunden.")
+            .shortMessage("Rechtschreibfehler")
+            .category(CategoryType.GUIDING_PRINCIPLE)
+            .replacements(List.of(replacementOne))
+            .offset(3)
+            .length(7)
+            .context(contextOne)
+            .sentence("Rihctig geanu")
+            .type(type)
+            .rule(rule)
+            .ignoreForIncompleteSentence(false)
+            .contextForSureMatch(0)
+            .ignoredTextCheckWords(List.of())
+            .build();
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Match matchTwo =
+        de.bund.digitalservice.ris.caselaw.domain.textcheck.Match.builder()
+            .id(2)
+            .word("geanu")
+            .message("Möglicher Tippfehler gefunden.")
+            .shortMessage("Rechtschreibfehler")
+            .category(CategoryType.GUIDING_PRINCIPLE)
+            .replacements(Collections.emptyList())
+            .offset(11)
+            .length(5)
+            .context(contextTwo)
+            .sentence("Rihctig geanu")
+            .type(type)
+            .rule(rule)
+            .ignoreForIncompleteSentence(false)
+            .contextForSureMatch(0)
+            .ignoredTextCheckWords(List.of(ignoredWord))
+            .build();
+    matches.add(matchOne);
+    matches.add(matchTwo);
+
+    Suggestion suggestionOne = new Suggestion("Rihctig", List.of(matchOne));
+    Suggestion suggestionTwo = new Suggestion("geanu", List.of(matchTwo));
+    TextCheckAllResponse expected =
+        TextCheckAllResponse.builder()
+            .suggestions(List.of(suggestionOne, suggestionTwo))
+            .categoryTypes(Set.of(CategoryType.GUIDING_PRINCIPLE))
+            .totalTextCheckErrors(1)
+            .build();
+
+    // Act = when
+    var result = TextCheckResponseTransformer.transformToAllDomain(matches);
+
+    // Assert = then
+    assertEquals(expected, result);
   }
 }
