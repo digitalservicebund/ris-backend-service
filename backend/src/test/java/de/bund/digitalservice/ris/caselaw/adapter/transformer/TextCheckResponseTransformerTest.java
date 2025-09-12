@@ -94,7 +94,7 @@ class TextCheckResponseTransformerTest {
   @Test
   void givenListOfErrorsWithIgnoredWords_whenTransforming_thenVerifyCorrectIgnoredWordsCount() {
     // Arrange = given
-    var IgnoredWordId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    var ignoredWordId = UUID.fromString("00000000-0000-0000-0000-000000000001");
     List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches = new ArrayList<>();
     de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement replacementOne =
         new de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement("Richtig");
@@ -111,7 +111,7 @@ class TextCheckResponseTransformerTest {
         ignoredWord =
             new de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words
                 .IgnoredTextCheckWord(
-                IgnoredWordId, IgnoredTextCheckType.DOCUMENTATION_UNIT, "geanu");
+                ignoredWordId, IgnoredTextCheckType.DOCUMENTATION_UNIT, "geanu");
     de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule rule =
         de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule.builder()
             .id("GERMAN_SPELLER_RULE")
