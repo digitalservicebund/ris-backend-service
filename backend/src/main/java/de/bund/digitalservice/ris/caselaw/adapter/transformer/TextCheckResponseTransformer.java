@@ -1,72 +1,69 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolResponse;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Category;
-import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Context;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match.MatchBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule;
-import de.bund.digitalservice.ris.caselaw.domain.textcheck.Suggestion;
-import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckAllResponse;
-import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class TextCheckResponseTransformer {
   private TextCheckResponseTransformer() {}
 
-  public static TextCheckAllResponse transformToAllDomain(
-      List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches) {
-    List<Suggestion> suggestions = new ArrayList<>();
-    Set<CategoryType> categoryTypes = new HashSet<>();
-    AtomicInteger totalTextCheckErrors = new AtomicInteger();
+  public static de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckAllResponse
+      transformToAllDomain(
+          List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches) {
+    Set<de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType> categoryTypes =
+        new HashSet<>();
+    List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Suggestion> suggestions =
+        new ArrayList<>();
+    int totalTextCheckErrors = 0;
 
-    matches.forEach(
-        match -> {
-          String word =
-              match
-                  .context()
-                  .text()
-                  .substring(
-                      match.context().offset(),
-                      match.context().offset() + match.context().length());
+    for (de.bund.digitalservice.ris.caselaw.domain.textcheck.Match match : matches) {
+      String word = extractWordFromMatchRecord(match);
 
-          if (suggestions.stream().noneMatch(suggestion -> suggestion.word().equals(word))) {
-            suggestions.add(new Suggestion(word, new ArrayList<>()));
-          }
+      de.bund.digitalservice.ris.caselaw.domain.textcheck.Suggestion suggestion =
+          suggestions.stream()
+              .filter(s -> s.word().equals(word))
+              .findFirst()
+              .orElseGet(
+                  () -> {
+                    de.bund.digitalservice.ris.caselaw.domain.textcheck.Suggestion newSuggestion =
+                        new de.bund.digitalservice.ris.caselaw.domain.textcheck.Suggestion(
+                            word, new ArrayList<>());
+                    suggestions.add(newSuggestion);
+                    return newSuggestion;
+                  });
 
-          Optional<Suggestion> suggestionOptional =
-              suggestions.stream().filter(suggestion -> suggestion.word().equals(word)).findFirst();
+      suggestion.matches().add(match);
+      categoryTypes.add(match.category());
+      if (!isIgnored(match)) {
+        totalTextCheckErrors++;
+      }
+    }
 
-          suggestionOptional.ifPresent(
-              suggestion -> {
-                suggestion.matches().add(match);
-                categoryTypes.add(match.category());
-                totalTextCheckErrors.getAndIncrement();
-              });
-        });
-
-    return TextCheckAllResponse.builder()
+    return de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckAllResponse.builder()
         .suggestions(suggestions)
         .categoryTypes(categoryTypes)
-        .totalTextCheckErrors(totalTextCheckErrors.get())
+        .totalTextCheckErrors(totalTextCheckErrors)
         .build();
   }
 
-  public static TextCheckResponse transformToDomain(
-      List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches) {
-    return TextCheckResponse.builder().matches(matches).build();
+  public static de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckResponse
+      transformToDomain(List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches) {
+    return de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckResponse.builder()
+        .matches(matches)
+        .build();
   }
 
   public static List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match>
-      transformToListOfDomainMatches(LanguageToolResponse response) {
+      transformToListOfDomainMatches(
+          de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolResponse response) {
     List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches = new ArrayList<>();
 
     for (int i = 0; i < response.getMatches().size(); i++) {
@@ -121,5 +118,24 @@ public class TextCheckResponseTransformer {
     }
 
     return matches;
+  }
+
+  private static String extractWordFromMatchRecord(
+      de.bund.digitalservice.ris.caselaw.domain.textcheck.Match match) {
+    return match
+        .context()
+        .text()
+        .substring(match.context().offset(), match.context().offset() + match.context().length());
+  }
+
+  private static boolean isIgnored(
+      de.bund.digitalservice.ris.caselaw.domain.textcheck.Match match) {
+    var ignoredWords = match.ignoredTextCheckWords();
+    if (ignoredWords == null) {
+      return false;
+    } else {
+      return ignoredWords.stream()
+          .anyMatch(ignoredWordObj -> ignoredWordObj.word().equals(match.word()));
+    }
   }
 }
