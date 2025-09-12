@@ -1,8 +1,9 @@
 <script setup lang="ts" generic="TDocument">
 import dayjs from "dayjs"
+import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import { useToast } from "primevue/usetoast"
-import { computed, ref, toRaw, watchEffect } from "vue"
+import { computed, Ref, ref, toRaw, watchEffect } from "vue"
 import { useRoute } from "vue-router"
 import CurrentAndPreviousProcessStepBadge from "@/components/CurrentAndPreviousProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
@@ -11,6 +12,10 @@ import UpdateProcessStepDialog from "@/components/UpdateProcessStepDialog.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { DocumentationUnit } from "@/domain/documentationUnit"
+import ProcessStep from "@/domain/processStep"
+import { User } from "@/domain/user"
+import { ResponseError } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { isDecision } from "@/utils/typeGuards"
 import IconError from "~icons/ic/baseline-error"
 import IconPerson from "~icons/ic/baseline-person"
@@ -77,13 +82,31 @@ const processStepsEnabled = isDecision(props.documentUnit)
 const showProcessStepDialog = ref(false)
 const toast = useToast()
 
-async function onProcessStepUpdated() {
+async function onProcessStepUpdated(
+  nextProcessStep: ProcessStep,
+  nextProcessStepUser: User | undefined,
+): Promise<ResponseError | undefined> {
+  const store = useDocumentUnitStore()
+  const { documentUnit } = storeToRefs(store) as {
+    documentUnit: Ref<DocumentationUnit>
+  }
+  documentUnit.value!.currentDocumentationUnitProcessStep = {
+    processStep: nextProcessStep,
+    user: nextProcessStepUser,
+  }
+  const response = await store.updateDocumentUnit()
+  if (response.error) {
+    return response.error
+  }
+
   toast.add({
     severity: "success",
     summary: "Weitergeben erfolgreich",
     life: 5_000,
   })
   showProcessStepDialog.value = false
+
+  return undefined
 }
 
 watchEffect(() => {
@@ -188,8 +211,9 @@ watchEffect(() => {
     <UpdateProcessStepDialog
       v-if="processStepsEnabled"
       v-model:visible="showProcessStepDialog"
+      :multi-edit="false"
+      :update-func="onProcessStepUpdated"
       @on-cancelled="showProcessStepDialog = false"
-      @on-process-step-updated="onProcessStepUpdated"
     />
   </div>
 </template>

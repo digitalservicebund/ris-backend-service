@@ -4,6 +4,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjsTimezone from "dayjs/plugin/timezone"
 import dayjsUtc from "dayjs/plugin/utc"
 
+import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
@@ -17,15 +18,20 @@ import CurrentAndPreviousProcessStepBadge from "@/components/CurrentAndPreviousP
 import IconBadge from "@/components/IconBadge.vue"
 import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
-import UpdateProcessStepInSearchDialog from "@/components/UpdateProcessStepInSearchDialog.vue"
+import UpdateProcessStepDialog from "@/components/UpdateProcessStepDialog.vue"
 
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import ProcessStep from "@/domain/processStep"
 import { PublicationState } from "@/domain/publicationStatus"
 
-import FeatureToggleService from "@/services/featureToggleService"
+import { User } from "@/domain/user"
+import service from "@/services/documentUnitService"
+import featureToggleService from "@/services/featureToggleService"
 
+import { ResponseError } from "@/services/httpClient"
+import useSessionStore from "@/stores/sessionStore"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
 import IconError from "~icons/ic/baseline-error"
 import IconSubject from "~icons/ic/baseline-subject"
@@ -35,8 +41,6 @@ import IconEdit from "~icons/ic/outline-edit"
 import IconView from "~icons/ic/outline-remove-red-eye"
 import IconClock from "~icons/ic/outline-watch-later"
 import IconArrowDown from "~icons/mdi/arrow-down-drop"
-import { storeToRefs } from "pinia"
-import useSessionStore from "@/stores/sessionStore"
 
 const props = defineProps<{
   kind: Kind
@@ -146,7 +150,7 @@ const multiEditActive = ref()
 onMounted(async () => {
   window.addEventListener("scroll", handleScroll)
   multiEditActive.value = (
-    await FeatureToggleService.isEnabled("neuris.multi-edit")
+    await featureToggleService.isEnabled("neuris.multi-edit")
   ).data
 })
 
@@ -157,7 +161,9 @@ onUnmounted(() => {
 // multi edit
 const selectedDocumentationUnits = ref<DocumentUnitListEntry[]>([])
 const selectedDocumentationUnitIds = computed(() =>
-  selectedDocumentationUnits.value.map((unit) => unit.uuid),
+  selectedDocumentationUnits.value
+    .map((unit) => unit.uuid)
+    .filter((uuid): uuid is string => uuid !== undefined),
 )
 
 const selectionErrorMessage = ref<string | undefined>()
@@ -180,10 +186,37 @@ function assignProcessStep() {
   }
 }
 
+const toast = useToast()
+async function updateSelectedDocumentationUnits(
+  nextProcessStep: ProcessStep,
+  nextUser: User | undefined,
+): Promise<ResponseError | undefined> {
+  const response = await service.bulkAssignProcessStepAndUser(
+    selectedDocumentationUnitIds.value,
+    nextProcessStep,
+    nextUser,
+  )
+
+  if (response.error) {
+    return response.error
+  }
+
+  toast.add({
+    severity: "success",
+    summary: "Weitergeben erfolgreich",
+    life: 5_000,
+  })
+  updateProcessStepDialogOpen.value = false
+
+  return undefined
+}
+
 const { user } = storeToRefs(useSessionStore())
 function checkRightsToChangeDocumentationUnit(): boolean {
   const notSameDocumentationOffice = selectedDocumentationUnits.value.filter(
-    (unit) => unit.documentationOffice !== user.value?.documentationOffice,
+    (unit) =>
+      unit.documentationOffice?.abbreviation !==
+      user.value?.documentationOffice?.abbreviation,
   )
 
   const externalHandoverPending = selectedDocumentationUnits.value.filter(
@@ -193,10 +226,11 @@ function checkRightsToChangeDocumentationUnit(): boolean {
   )
 
   selectionErrorDocUnitIds.value = notSameDocumentationOffice.map(
-    (unit) => unit.uuid,
+    (unit) => unit.uuid!,
   )
-  selectionErrorDocUnitIds.value <<
-    externalHandoverPending.map((unit) => unit.uuid)
+  selectionErrorDocUnitIds.value.concat(
+    externalHandoverPending.map((unit) => unit.uuid!),
+  )
 
   if (notSameDocumentationOffice.length > 0) {
     selectionErrorMessage.value =
@@ -213,16 +247,6 @@ function checkRightsToChangeDocumentationUnit(): boolean {
   return true
 }
 
-const toast = useToast()
-async function updateSelectedDocumentationUnits() {
-  toast.add({
-    severity: "success",
-    summary: "Weitergeben erfolgreich",
-    life: 5_000,
-  })
-  updateProcessStepDialogOpen.value = false
-}
-
 const menuModel = ref([{ label: "Weitergeben", command: assignProcessStep }])
 const menuRef = ref()
 const toogleMenu = (event: MouseEvent) => {
@@ -232,10 +256,6 @@ const toogleMenu = (event: MouseEvent) => {
 const rowStyleClass = (rowData: DocumentUnitListEntry) => {
   if (selectionErrorDocUnitIds.value.includes(rowData.uuid!)) {
     return "bg-red-200"
-  }
-
-  if (selectedDocumentationUnitIds.value.includes(rowData.uuid)) {
-    return "bg-blue-300"
   }
 
   return ""
@@ -249,14 +269,15 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
       class="pl-16"
       :error-message="selectionErrorMessage"
     />
-    <UpdateProcessStepInSearchDialog
+    <UpdateProcessStepDialog
       v-if="
         updateProcessStepDialogOpen && selectedDocumentationUnits.length !== 0
       "
       v-model:visible="updateProcessStepDialogOpen"
       :documentation-unit-ids="selectedDocumentationUnitIds"
+      multi-edit
+      :update-func="updateSelectedDocumentationUnits"
       @on-cancelled="updateProcessStepDialogOpen = false"
-      @on-process-step-updated="updateSelectedDocumentationUnits"
     />
     <Pagination
       :is-loading="loading"

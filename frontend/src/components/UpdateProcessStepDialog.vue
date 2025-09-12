@@ -23,8 +23,15 @@ import { ResponseError } from "@/services/httpClient"
 import processStepService from "@/services/processStepService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-const emit = defineEmits<{
-  onProcessStepUpdated: []
+const props = defineProps<{
+  multiEdit: boolean
+  updateFunc: (
+    nextProcessStep: ProcessStep,
+    nextProcessUser: User | undefined,
+  ) => Promise<ResponseError | undefined>
+}>()
+
+defineEmits<{
   onCancelled: []
 }>()
 
@@ -33,9 +40,13 @@ const visible = defineModel<boolean>("visible", {
   type: Boolean,
 })
 
-const store = useDocumentUnitStore()
-const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentationUnit>
+let documentUnit: Ref<DocumentationUnit, DocumentationUnit>
+if (!props.multiEdit) {
+  const store = useDocumentUnitStore()
+  const storeValue = storeToRefs(store) as {
+    documentUnit: Ref<DocumentationUnit>
+  }
+  documentUnit = storeValue.documentUnit
 }
 
 const processSteps = ref<ProcessStep[]>()
@@ -64,18 +75,19 @@ const selectedUser = computed({
 
 async function updateProcessStep(): Promise<void> {
   if (nextProcessStep.value) {
-    documentUnit.value!.currentDocumentationUnitProcessStep = {
-      processStep: nextProcessStep.value,
-      user: nextProcessStepUser.value,
-    }
-    const response = await store.updateDocumentUnit()
-    if (response.error) {
+    errors.value = []
+
+    const error = await props.updateFunc(
+      nextProcessStep.value,
+      nextProcessStepUser.value,
+    )
+
+    if (error) {
       errors.value?.push({
         title: "Die Dokumentationseinheit konnte nicht weitergegeben werden.",
         description: "Versuchen Sie es erneut.",
       })
     } else {
-      emit("onProcessStepUpdated")
       nextProcessStepUser.value = undefined
     }
   }
@@ -90,13 +102,15 @@ const fetchData = async () => {
     processSteps.value = processStepsResponse.data
   }
 
-  const nextProcessStepResponse = await processStepService.getNextProcessStep(
-    documentUnit.value.uuid,
-  )
-  if (nextProcessStepResponse.error) {
-    errors.value?.push(nextProcessStepResponse.error)
-  } else {
-    nextProcessStep.value = nextProcessStepResponse.data
+  if (!props.multiEdit) {
+    const nextProcessStepResponse = await processStepService.getNextProcessStep(
+      documentUnit.value.uuid,
+    )
+    if (nextProcessStepResponse.error) {
+      errors.value?.push(nextProcessStepResponse.error)
+    } else {
+      nextProcessStep.value = nextProcessStepResponse.data
+    }
   }
 }
 
@@ -185,6 +199,7 @@ watch(
       </div>
 
       <DataTable
+        v-if="!props.multiEdit"
         class="overflow-x-scroll pt-32"
         :row-class="rowClass"
         :value="documentUnit.processSteps"

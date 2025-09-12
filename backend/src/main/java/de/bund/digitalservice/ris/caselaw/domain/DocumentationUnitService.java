@@ -41,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 @SuppressWarnings("java:S6539") // Too many dependencies warning
-public class DocumentationUnitService {
+public abstract class DocumentationUnitService {
 
   private final DocumentationUnitRepository repository;
   private final DocumentNumberService documentNumberService;
@@ -71,7 +71,7 @@ public class DocumentationUnitService {
   private final DocumentationUnitHistoryLogService historyLogService;
   private final DocumentationUnitSearchRepository docUnitSearchRepository;
 
-  public DocumentationUnitService(
+  protected DocumentationUnitService(
       DocumentationUnitRepository repository,
       DocumentNumberService documentNumberService,
       DocumentTypeService documentTypeService,
@@ -921,6 +921,9 @@ public class DocumentationUnitService {
                         + " and image name: "
                         + imageName));
   }
+
+  public abstract UUID[] assignProcessStepAndUser(
+      User currentUser, List<UUID> documentationUnitIds, ProcessStep processStep, User user);
 
   public enum DuplicateCheckStatus {
     ENABLED,

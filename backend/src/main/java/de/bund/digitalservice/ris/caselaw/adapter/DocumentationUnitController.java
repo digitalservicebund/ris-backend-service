@@ -25,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.LdmlTransformationResult;
+import de.bund.digitalservice.ris.caselaw.domain.ProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
@@ -743,4 +744,30 @@ public class DocumentationUnitController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
   }
+
+  @PutMapping(value = "/assign-process-step-and-user")
+  @PreAuthorize("isAuthenticated() and @userIsInternal.apply(#oidcUser)")
+  public ResponseEntity<UUID[]> assignProcessStepAndUser(
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @RequestBody AssignProcessStepAndUserRequest request) {
+    User currentUser = userService.getUser(oidcUser);
+    UUID[] documentationUnitIdsWithError = null;
+    try {
+      documentationUnitIdsWithError =
+          service.assignProcessStepAndUser(
+              currentUser, request.documentationUnitIds, request.processStep, request.user);
+    } catch (DocumentationUnitException ex) {
+      log.error("Could not assign process step and user", ex);
+      return ResponseEntity.internalServerError().body(documentationUnitIdsWithError);
+    }
+
+    if (documentationUnitIdsWithError == null || documentationUnitIdsWithError.length == 0) {
+      return ResponseEntity.ok(documentationUnitIdsWithError);
+    } else {
+      return ResponseEntity.unprocessableEntity().body(documentationUnitIdsWithError);
+    }
+  }
+
+  public record AssignProcessStepAndUserRequest(
+      List<UUID> documentationUnitIds, ProcessStep processStep, User user) {}
 }
