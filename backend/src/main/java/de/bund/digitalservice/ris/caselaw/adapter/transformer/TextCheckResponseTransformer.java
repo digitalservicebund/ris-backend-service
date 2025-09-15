@@ -2,10 +2,13 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Category;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Context;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match.MatchBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.Suggestion;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckAllResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,27 +18,22 @@ import java.util.Set;
 public class TextCheckResponseTransformer {
   private TextCheckResponseTransformer() {}
 
-  public static de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckAllResponse
-      transformToAllDomain(
-          List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches) {
-    Set<de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType> categoryTypes =
-        new HashSet<>();
-    List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Suggestion> suggestions =
-        new ArrayList<>();
+  public static TextCheckAllResponse transformToAllDomain(
+      List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches) {
+    Set<CategoryType> categoryTypes = new HashSet<>();
+    List<Suggestion> suggestions = new ArrayList<>();
     int totalTextCheckErrors = 0;
 
     for (de.bund.digitalservice.ris.caselaw.domain.textcheck.Match match : matches) {
-      String word = extractWordFromMatchRecord(match);
+      String word = getMatchWord(match);
 
-      de.bund.digitalservice.ris.caselaw.domain.textcheck.Suggestion suggestion =
+      Suggestion suggestion =
           suggestions.stream()
               .filter(s -> s.word().equals(word))
               .findFirst()
               .orElseGet(
                   () -> {
-                    de.bund.digitalservice.ris.caselaw.domain.textcheck.Suggestion newSuggestion =
-                        new de.bund.digitalservice.ris.caselaw.domain.textcheck.Suggestion(
-                            word, new ArrayList<>());
+                    Suggestion newSuggestion = new Suggestion(word, new ArrayList<>());
                     suggestions.add(newSuggestion);
                     return newSuggestion;
                   });
@@ -120,7 +118,7 @@ public class TextCheckResponseTransformer {
     return matches;
   }
 
-  private static String extractWordFromMatchRecord(
+  private static String getMatchWord(
       de.bund.digitalservice.ris.caselaw.domain.textcheck.Match match) {
     return match
         .context()
