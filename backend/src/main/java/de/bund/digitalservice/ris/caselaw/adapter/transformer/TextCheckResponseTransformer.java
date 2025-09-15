@@ -80,9 +80,7 @@ public class TextCheckResponseTransformer {
       }
 
       if (match.getContext() != null) {
-        int startIndex = match.getContext().getOffset();
-        int endIndex = match.getContext().getOffset() + match.getContext().getLength();
-        String word = match.getContext().getText().substring(startIndex, endIndex);
+        String word = getMatchWord(match);
         matchBuilder
             .word(word)
             .context(
@@ -126,10 +124,16 @@ public class TextCheckResponseTransformer {
         .substring(match.context().offset(), match.context().offset() + match.context().length());
   }
 
+  private static String getMatchWord(Match match) {
+    int startIndex = match.getContext().getOffset();
+    int endIndex = match.getContext().getOffset() + match.getContext().getLength();
+    return match.getContext().getText().substring(startIndex, endIndex);
+  }
+
   private static boolean isIgnored(
       de.bund.digitalservice.ris.caselaw.domain.textcheck.Match match) {
     var ignoredWords = match.ignoredTextCheckWords();
-    if (ignoredWords == null) {
+    if (ignoredWords == null || ignoredWords.isEmpty()) {
       return false;
     } else {
       return ignoredWords.stream()
