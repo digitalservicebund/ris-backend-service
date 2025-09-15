@@ -134,7 +134,7 @@ To run the frontend stack only (without backend and initialization) run:
 To run the only required stack setup (without frontend and frontend) run:
 
 ```bash
-./run.sh dev -n
+./run.sh dev -n -f
 ./run.sh dev --no-backend --no-frontend
 ```
 
