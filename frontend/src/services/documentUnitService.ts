@@ -5,15 +5,14 @@ import httpClient, {
 import { Page } from "@/components/Pagination.vue"
 import { Decision } from "@/domain/decision"
 import { DocumentationUnit } from "@/domain/documentationUnit"
+import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { EurlexParameters } from "@/domain/eurlex"
 import { DuplicateRelationStatus } from "@/domain/managementData"
 import PendingProceeding from "@/domain/pendingProceeding"
-import ProcessStep from "@/domain/processStep"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import { SingleNormValidationInfo } from "@/domain/singleNorm"
-import { User } from "@/domain/user"
 import errorMessages from "@/i18n/errors.json"
 import { DocumentationUnitCreationParameters } from "@/types/documentationUnitCreationParameters"
 import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
@@ -47,6 +46,11 @@ interface DocumentUnitService {
     documentationUnitIds: string[],
   ): Promise<ServiceResponse<unknown>>
 
+  bulkAssignProcessStep(
+    documentationUnitProcessStep: DocumentationUnitProcessStep,
+    documentationUnitIds: string[],
+  ): Promise<ServiceResponse<unknown>>
+
   searchByRelatedDocumentation(
     query: RelatedDocumentation,
     requestParams?: { [key: string]: string } | undefined,
@@ -70,12 +74,6 @@ interface DocumentUnitService {
     documentUnitId: string,
     documentationOfficeId: string,
   ): Promise<ServiceResponse<unknown>>
-
-  bulkAssignProcessStepAndUser(
-    documentationUnitIds: string[],
-    processStep: ProcessStep,
-    user: User | undefined,
-  ): Promise<ServiceResponse<string[]>>
 }
 
 const service: DocumentUnitService = {
@@ -239,6 +237,36 @@ const service: DocumentUnitService = {
     return response
   },
 
+  async bulkAssignProcessStep(
+    documentationUnitProcessStep: DocumentationUnitProcessStep,
+    documentationUnitIds: string[],
+  ): Promise<ServiceResponse<unknown>> {
+    const response = await httpClient.patch<
+      {
+        documentationUnitIds: string[]
+        documentationUnitProcessStep: DocumentationUnitProcessStep
+      },
+      unknown
+    >(
+      `caselaw/documentunits/bulk-assign-process-step`,
+      {},
+      { documentationUnitProcessStep, documentationUnitIds },
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title:
+          errorMessages
+            .DOCUMENTATION_UNIT_DOCUMENTATION_OFFICE_COULD_NOT_BE_ASSIGNED
+            .title,
+        description:
+          errorMessages
+            .DOCUMENTATION_UNIT_DOCUMENTATION_OFFICE_COULD_NOT_BE_ASSIGNED
+            .description,
+      }
+    }
+    return response
+  },
+
   async searchByRelatedDocumentation(
     query: RelatedDocumentation = new RelatedDocumentation(),
     requestParams: { [K in DocumentationUnitSearchParameter]?: string } = {},
@@ -353,44 +381,6 @@ const service: DocumentUnitService = {
             .description,
       }
     }
-    return response
-  },
-
-  async bulkAssignProcessStepAndUser(
-    documentationUnitIds: string[],
-    processStep: ProcessStep,
-    user: User | undefined,
-  ): Promise<ServiceResponse<string[]>> {
-    const response = await httpClient.put<
-      {
-        documentationUnitIds: string[]
-        processStep: ProcessStep
-        user: User | undefined
-      },
-      string[]
-    >(
-      `caselaw/documentunits/assign-process-step-and-user`,
-      {},
-      {
-        documentationUnitIds,
-        processStep,
-        user,
-      },
-    )
-
-    if (response.status >= 300) {
-      response.error = {
-        title:
-          errorMessages
-            .DOCUMENTATION_UNIT_DOCUMENTATION_OFFICE_COULD_NOT_BE_ASSIGNED
-            .title,
-        description:
-          errorMessages
-            .DOCUMENTATION_UNIT_DOCUMENTATION_OFFICE_COULD_NOT_BE_ASSIGNED
-            .description,
-      }
-    }
-
     return response
   },
 }

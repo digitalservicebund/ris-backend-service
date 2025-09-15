@@ -67,6 +67,7 @@ const entries = computed(() => props.pageEntries?.content || [])
 
 const tableWrapper = ref<HTMLElement | null>(null)
 const isSticky = ref(false)
+const toast = useToast()
 
 const handleScroll = () => {
   if (tableWrapper.value) {
@@ -168,7 +169,7 @@ const selectedDocumentationUnitIds = computed(() =>
 
 const selectionErrorMessage = ref<string | undefined>()
 const selectionErrorDocUnitIds = ref<string[]>([])
-const updateProcessStepDialogOpen = ref(false)
+const showProcessStepDialog = ref(false)
 function resetErrorMessages() {
   selectionErrorMessage.value = undefined
   selectionErrorDocUnitIds.value = []
@@ -182,19 +183,20 @@ function assignProcessStep() {
   }
 
   if (checkRightsToChangeDocumentationUnit()) {
-    updateProcessStepDialogOpen.value = true
+    showProcessStepDialog.value = true
   }
 }
 
-const toast = useToast()
 async function updateSelectedDocumentationUnits(
   nextProcessStep: ProcessStep,
   nextUser: User | undefined,
 ): Promise<ResponseError | undefined> {
-  const response = await service.bulkAssignProcessStepAndUser(
+  const response = await service.bulkAssignProcessStep(
+    {
+      processStep: nextProcessStep,
+      user: nextUser,
+    },
     selectedDocumentationUnitIds.value,
-    nextProcessStep,
-    nextUser,
   )
 
   if (response.error) {
@@ -206,7 +208,7 @@ async function updateSelectedDocumentationUnits(
     summary: "Weitergeben erfolgreich",
     life: 5_000,
   })
-  updateProcessStepDialogOpen.value = false
+  showProcessStepDialog.value = false
 
   return undefined
 }
@@ -270,14 +272,12 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
       :error-message="selectionErrorMessage"
     />
     <UpdateProcessStepDialog
-      v-if="
-        updateProcessStepDialogOpen && selectedDocumentationUnits.length !== 0
-      "
-      v-model:visible="updateProcessStepDialogOpen"
+      v-if="showProcessStepDialog && selectedDocumentationUnits.length !== 0"
+      v-model:visible="showProcessStepDialog"
       :documentation-unit-ids="selectedDocumentationUnitIds"
       multi-edit
       :update-func="updateSelectedDocumentationUnits"
-      @on-cancelled="updateProcessStepDialogOpen = false"
+      @on-cancelled="showProcessStepDialog = false"
     />
     <Pagination
       :is-loading="loading"

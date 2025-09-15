@@ -908,6 +908,12 @@ public abstract class DocumentationUnitService {
     }
   }
 
+  @Transactional(rollbackFor = BadRequestException.class)
+  public abstract void bulkAssignProcessStep(
+      @NotNull List<UUID> documentationUnitIds,
+      DocumentationUnitProcessStep documentationUnitProcessStep)
+      throws DocumentationUnitNotExistsException, BadRequestException;
+
   public Image getImageBytes(String documentNumber, String imageName)
       throws ImageNotExistsException, DocumentationUnitNotExistsException {
     var docUnitId = repository.findIdForDocumentNumber(documentNumber);
@@ -921,9 +927,6 @@ public abstract class DocumentationUnitService {
                         + " and image name: "
                         + imageName));
   }
-
-  public abstract UUID[] assignProcessStepAndUser(
-      User currentUser, List<UUID> documentationUnitIds, ProcessStep processStep, User user);
 
   public enum DuplicateCheckStatus {
     ENABLED,
