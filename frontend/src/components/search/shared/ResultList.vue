@@ -407,7 +407,7 @@ onUnmounted(() => {
             <BulkAssignProcessStep
               v-else
               :documentation-units="selectedDocumentationUnits"
-              @procedure-assigned="reloadList"
+              @process-step-assigned="reloadList"
               @update-selection-errors="updateSelectionErrors"
             ></BulkAssignProcessStep>
           </template>
