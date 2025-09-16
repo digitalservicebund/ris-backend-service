@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitProcessStepTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HistoryLogTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
@@ -47,7 +48,6 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
     return historyLogDTOs.stream()
         .map(
             dto -> {
-              User creatorUser = userService.getUser(dto.getUserId());
               User fromUser = null;
               User toUser = null;
 
@@ -75,8 +75,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
                 }
               }
 
-              return HistoryLogTransformer.transformToDomain(
-                  dto, currentUser, creatorUser, fromUser, toUser);
+              return HistoryLogTransformer.transformToDomain(dto, currentUser, fromUser, toUser);
             })
         .toList();
   }
@@ -92,7 +91,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
     return databaseRepository
         .findFirstByDocumentationUnitIdAndUserIdAndEventTypeAndCreatedAtBetween(
             documentationUnitId, userId, HistoryLogEventType.UPDATE, start, end)
-        .map(dto -> HistoryLogTransformer.transformToDomain(dto, user, user, null, null));
+        .map(dto -> HistoryLogTransformer.transformToDomain(dto, user, null, null));
   }
 
   @Override
@@ -103,10 +102,10 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
       HistoryLogEventType eventType,
       String description) {
     String systemName = null;
-    UUID userId = null;
+    User creatorUser = null;
 
     if (user != null) {
-      userId = user.id();
+      creatorUser = userService.getUser(user.id());
     } else {
       systemName = "NeuRIS";
     }
@@ -119,7 +118,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
             .id(historyLogId)
             .createdAt(Instant.now())
             .documentationUnitId(documentationUnitId)
-            .userId(userId)
+            .user(UserTransformer.transformToDTO(creatorUser))
             .systemName(systemName)
             .description(description)
             .eventType(eventType)
@@ -138,6 +137,11 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
       @Nullable DocumentationUnitProcessStep fromStep,
       @Nullable DocumentationUnitProcessStep toStep) {
 
+    User creatorUser = null;
+    if (user != null) {
+      creatorUser = userService.getUser(user.id());
+    }
+
     // Convert domain objects to DTOs for persistence
     DocumentationUnitProcessStepDTO fromStepDto =
         Optional.ofNullable(fromStep)
@@ -152,7 +156,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
         HistoryLogDTO.builder()
             .createdAt(Instant.now())
             .documentationUnitId(documentationUnitId)
-            .userId(user != null ? user.id() : null)
+            .user(UserTransformer.transformToDTO(creatorUser))
             .systemName(systemName)
             .description(description)
             .eventType(eventType)

@@ -131,6 +131,13 @@ To run the frontend stack only (without backend and initialization) run:
 ./run.sh dev --no-backend
 ```
 
+To run the only required stack setup (without frontend and frontend) run:
+
+```bash
+./run.sh dev -n -f
+./run.sh dev --no-backend --no-frontend
+```
+
 When choosing the no-backend variant, checkout the [backend manual](./backend/README.md) on how to run the backend
 stand-alone without docker. The easiest way would be to start the
 backend [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart)

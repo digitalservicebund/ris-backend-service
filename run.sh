@@ -115,10 +115,9 @@ _dev() {
     _fail "Dev requires docker, please install first"
     exit 1
   fi
-  docker build ./frontend -f frontend/Dockerfile -t neuris/frontend
 
   wait=""
-  services=""
+  services=("traefik" "redis" "postgres14" "frontend" "backend")
   for arg in "$@"; do
     case $arg in
       -i|--init)
@@ -126,13 +125,21 @@ _dev() {
         services="initialization"
         ;;
       -n|--no-backend)
-        services="traefik redis postgres14 frontend"
+        services=("${services[@]/backend}")
+        ;;
+      -f|--no-frontend)
+        services=("${services[@]/frontend}")
         ;;
       -d|--detached)
         wait="--wait"
         ;;
     esac
   done
+
+  if [[ " ${services[*]} " == *" frontend "* ]]; then
+    docker build ./frontend -f frontend/Dockerfile -t neuris/frontend
+  fi
+
   docker compose up $wait $services
 
   echo "The application is available at http://127.0.0.1"
@@ -182,6 +189,7 @@ _help() {
   echo "init                  Initialize development environment (git hooks, env vars)"
   echo "dev                   Start full-stack development environment with loopup table initialization"
   echo "                      Add '-n' or '--no-backend' to start everything but backend and initialization"
+  echo "                      Add '-f' or '--no-frontend' to start everything but frontend and initialization"
   echo "                      Add '-i' or '--init' to only initialize the lookup tables (read ./migration_image.md for prerequisites)"
   echo "                      Add '-d' or '--detached' to check the health of the services in the background instead of showing the log stream"
   echo "down                  Stop development environment"

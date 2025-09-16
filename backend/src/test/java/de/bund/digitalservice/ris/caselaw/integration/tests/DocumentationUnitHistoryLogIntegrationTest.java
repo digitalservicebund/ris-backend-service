@@ -3,17 +3,19 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildBGHDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitHistoryLogRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
@@ -39,33 +41,39 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseDocumentationUnitHistoryLogRepository databaseHistoryLogRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DocumentationUnitService documentationUnitService;
+  @Autowired private DatabaseUserRepository userRepository;
   @MockitoSpyBean private UserService userService;
   private final DocumentationOffice docOfficeDS = buildDSDocOffice();
   private final DocumentationOffice docOfficeBGH = buildBGHDocOffice();
-  // Define user IDs for mocking
-  private final UUID userIdDS = UUID.randomUUID();
-  private final UUID userIdBGH = UUID.randomUUID();
-  private DocumentationOfficeDTO documentationOffice;
+  private DocumentationOfficeDTO documentationOfficeDS;
+  private DocumentationOfficeDTO documentationOfficeBGH;
+
   private static final String HISTORY_LOG_ENDPOINT = "/api/v1/caselaw/documentunits/";
+  private UserDTO userDS;
+  private UserDTO userBGH;
 
   @BeforeEach
   void setUp() {
-    documentationOffice =
+    documentationOfficeDS =
         documentationOfficeRepository.findByAbbreviation(docOfficeDS.abbreviation());
-    // Mock the userService to return fake User objects
-    when(userService.getUser(userIdDS))
-        .thenReturn(
-            User.builder()
-                .id(userIdDS)
-                .name("testUserDS")
-                .documentationOffice(docOfficeDS)
+    documentationOfficeBGH =
+        documentationOfficeRepository.findByAbbreviation(docOfficeBGH.abbreviation());
+    userDS =
+        userRepository.save(
+            UserDTO.builder()
+                .externalId(UUID.randomUUID())
+                .firstName("testUser")
+                .lastName("DS")
+                .documentationOffice(documentationOfficeDS)
                 .build());
-    when(userService.getUser(userIdBGH))
-        .thenReturn(
-            User.builder()
-                .id(userIdBGH)
-                .name("testUserBGH")
-                .documentationOffice(docOfficeBGH)
+
+    userBGH =
+        userRepository.save(
+            UserDTO.builder()
+                .externalId(UUID.randomUUID())
+                .firstName("testUser")
+                .lastName("BGH")
+                .documentationOffice(documentationOfficeBGH)
                 .build());
   }
 
@@ -80,14 +88,14 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
         EntityBuilderTestUtil.createAndSaveDecision(
                 repository,
                 DecisionDTO.builder()
-                    .documentationOffice(documentationOffice)
+                    .documentationOffice(documentationOfficeDS)
                     .documentNumber("docnr12345678"))
             .getId();
 
     assertThat(repository.findById(entityId)).isPresent();
 
-    HistoryLogDTO dto1 = saveHistoryLog(entityId, userIdDS, null);
-    HistoryLogDTO dto2 = saveHistoryLog(entityId, userIdBGH, null);
+    HistoryLogDTO dto1 = saveHistoryLog(entityId, userDS, null);
+    HistoryLogDTO dto2 = saveHistoryLog(entityId, userBGH, null);
     HistoryLogDTO dto3 = saveHistoryLog(entityId, null, "migration");
 
     assertThat(databaseHistoryLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(entityId))
@@ -134,7 +142,7 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
     assertThat(log3.createdAt().truncatedTo(ChronoUnit.MILLIS))
         .isEqualTo(dto1.getCreatedAt().truncatedTo(ChronoUnit.MILLIS));
     // user from same doc office is allowed to see username
-    assertThat(log3.createdBy()).isEqualTo("testUserDS");
+    assertThat(log3.createdBy()).isEqualTo("testUser DS");
     // doc office derived from user API via userId
     assertThat(log3.documentationOffice()).isEqualTo("DS");
     assertThat(log3.description()).isEqualTo(dto1.getDescription());
@@ -147,16 +155,11 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
         EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
-                .documentationOffice(documentationOffice)
+                .documentationOffice(documentationOfficeDS)
                 .documentNumber("docnr12345678"));
 
     docUnit.setScheduledPublicationDateTime(LocalDateTime.now());
-    var user =
-        User.builder()
-            .id(UUID.randomUUID())
-            .name("Al Nam")
-            .documentationOffice(docOfficeDS)
-            .build();
+    User user = UserTransformer.transformToDomain(userDS);
     documentationUnitService.updateDocumentationUnit(
         DecisionTransformer.transformToDomain((DecisionDTO) docUnit),
         DocumentationUnitService.DuplicateCheckStatus.DISABLED,
@@ -185,14 +188,14 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
     // All other attributes are the same
     assertThat(firstLog.getEventType()).isEqualTo(secondLog.getEventType());
     assertThat(firstLog.getDocumentationUnitId()).isEqualTo(secondLog.getDocumentationUnitId());
-    assertThat(firstLog.getUserId()).isEqualTo(secondLog.getUserId());
+    assertThat(firstLog.getUser().getId()).isEqualTo(secondLog.getUser().getId());
     assertThat(firstLog.getDescription()).isEqualTo(secondLog.getDescription());
     assertThat(firstLog.getSystemName()).isEqualTo(secondLog.getSystemName());
-    assertThat(firstLog.getUserId()).isEqualTo(secondLog.getUserId());
+    assertThat(firstLog.getUser().getId()).isEqualTo(secondLog.getUser().getId());
     assertThat(firstLog.getId()).isEqualTo(secondLog.getId());
   }
 
-  private HistoryLogDTO saveHistoryLog(UUID docUnitId, UUID userId, String systemName) {
+  private HistoryLogDTO saveHistoryLog(UUID docUnitId, UserDTO user, String systemName) {
     HistoryLogDTO dto =
         HistoryLogDTO.builder()
             .createdAt(Instant.now())
@@ -200,7 +203,7 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
             .eventType(HistoryLogEventType.UPDATE)
             .description("something updated")
             .systemName(systemName)
-            .userId(userId)
+            .user(user)
             .build();
 
     return databaseHistoryLogRepository.save(dto);
@@ -212,7 +215,7 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
         EntityBuilderTestUtil.createAndSaveDecision(
                 repository,
                 DecisionDTO.builder()
-                    .documentationOffice(documentationOffice)
+                    .documentationOffice(documentationOfficeDS)
                     .documentNumber("docnr_empty"))
             .getId();
 
