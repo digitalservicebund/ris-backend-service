@@ -516,7 +516,8 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       )
 
       await test.step("Befülle Langtexte und Kurztexte mit texts", async () => {
-        const text = "<p>das wort hat einen Flerher</p>"
+        const text =
+          "<p>Das Wort hat einen Flerher, und Testgnorierteswort soll nicht als Fehler mitgezählt werden.</p>"
 
         const documentationUnit = {
           ...prefilledDocumentUnit,
@@ -552,6 +553,11 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
         await expect(
           page.getByText("Es wurden Rechtschreibfehler identifiziert:"),
         ).toBeVisible()
+
+        await page.getByTestId("total-text-check-errors-container").isVisible()
+        await expect(page.getByTestId("total-text-check-errors")).toHaveText(
+          "2",
+        )
       })
     },
   )
