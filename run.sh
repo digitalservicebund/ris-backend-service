@@ -117,7 +117,7 @@ _dev() {
   fi
 
   wait=""
-  services=("traefik" "redis" "postgres14" "frontend" "backend")
+  services="traefik redis postgres14 frontend backend"
   for arg in "$@"; do
     case $arg in
       -i|--init)
@@ -125,10 +125,10 @@ _dev() {
         services="initialization"
         ;;
       -n|--no-backend)
-        services=("${services[@]/backend}")
+        services="${services/backend/}"
         ;;
       -f|--no-frontend)
-        services=("${services[@]/frontend}")
+        services="${services/frontend/}"
         ;;
       -d|--detached)
         wait="--wait"
