@@ -25,7 +25,6 @@ import de.bund.digitalservice.ris.caselaw.domain.ProcessStepService;
 import de.bund.digitalservice.ris.caselaw.domain.TransformationService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
-import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
@@ -91,7 +90,7 @@ public class DatabaseDocumentationUnitService extends DocumentationUnitService {
   public void bulkAssignProcessStep(
       @NotNull List<UUID> documentationUnitIds,
       DocumentationUnitProcessStep documentationUnitProcessStep)
-      throws DocumentationUnitNotExistsException, BadRequestException {
+      throws BadRequestException {
 
     Optional<ProcessStepDTO> processStepDTO =
         processStepRepository.findByName(documentationUnitProcessStep.getProcessStep().name());
@@ -102,11 +101,16 @@ public class DatabaseDocumentationUnitService extends DocumentationUnitService {
               + " not found");
     }
 
-    Optional<UserDTO> userDTO =
-        userRepository.findByExternalId(documentationUnitProcessStep.getUser().externalId());
-    if (userDTO.isEmpty()) {
-      throw new DocumentationUnitException(
-          "User with id " + documentationUnitProcessStep.getUser().externalId() + " not found");
+    Optional<UserDTO> userDTO;
+    if (documentationUnitProcessStep.getUser() != null) {
+      userDTO =
+          userRepository.findByExternalId(documentationUnitProcessStep.getUser().externalId());
+      if (userDTO.isEmpty()) {
+        throw new DocumentationUnitException(
+            "User with id " + documentationUnitProcessStep.getUser().externalId() + " not found");
+      }
+    } else {
+      userDTO = Optional.empty();
     }
 
     for (UUID documentationUnitId : documentationUnitIds) {
@@ -117,7 +121,7 @@ public class DatabaseDocumentationUnitService extends DocumentationUnitService {
             DocumentationUnitProcessStepDTO.builder()
                 .processStep(processStepDTO.get())
                 .documentationUnit(documentationUnitDTO)
-                .user(userDTO.get())
+                .user(userDTO.orElse(null))
                 .createdAt(LocalDateTime.now())
                 .build();
         documentationUnitDTO.setCurrentProcessStep(newProcessStep);
