@@ -47,10 +47,17 @@ async function handleAssignProcessStep(
   } else {
     emit("processStepAssigned")
     showProcessStepDialog.value = false
+
+    let detailMessage = `Die Dokumentationseinheiten sind jetzt im Schritt ${documentationUnitProcessStep.processStep?.name}`
+    if (documentationUnitProcessStep.user) {
+      detailMessage += ` und der Person ${documentationUnitProcessStep.user.name} zugewiesen`
+    }
+    detailMessage += `.`
+
     toast.add({
       severity: "success",
       summary: "Weitergeben erfolgreich",
-      detail: `Die Dokumentationseinheit(en) wurden erfolgreich weitergegeben.`,
+      detail: detailMessage,
       life: 5_000,
     })
     return undefined
