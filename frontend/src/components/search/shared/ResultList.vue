@@ -3,39 +3,24 @@ import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjsTimezone from "dayjs/plugin/timezone"
 import dayjsUtc from "dayjs/plugin/utc"
-
-import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
-import Menu from "primevue/menu"
-import { useToast } from "primevue/usetoast"
-
 import { computed, ref, onMounted, onUnmounted } from "vue"
-
 import AssigneeBadge from "@/components/AssigneeBadge.vue"
+import BulkAssignProcessStep from "@/components/BulkAssignProcessStep.vue"
 import CurrentAndPreviousProcessStepBadge from "@/components/CurrentAndPreviousProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
-import UpdateProcessStepDialog from "@/components/UpdateProcessStepDialog.vue"
-
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
-import ProcessStep from "@/domain/processStep"
 import { PublicationState } from "@/domain/publicationStatus"
-
-import { User } from "@/domain/user"
-import service from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
-
-import { ResponseError } from "@/services/httpClient"
-import useSessionStore from "@/stores/sessionStore"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
 import IconError from "~icons/ic/baseline-error"
 import IconSubject from "~icons/ic/baseline-subject"
-import IconLayers from "~icons/ic/layers"
 import IconNote from "~icons/ic/outline-comment-bank"
 import IconEdit from "~icons/ic/outline-edit"
 import IconView from "~icons/ic/outline-remove-red-eye"
@@ -64,10 +49,8 @@ const isDecision = computed(() => props.kind === Kind.DECISION)
 const entries = computed(() => props.pageEntries?.content || [])
 
 // --- START: sticky header logic ---
-
 const tableWrapper = ref<HTMLElement | null>(null)
 const isSticky = ref(false)
-const toast = useToast()
 
 const handleScroll = () => {
   if (tableWrapper.value) {
@@ -91,7 +74,6 @@ const stickyHeaderPT = computed(() => {
       }
     : {}
 })
-
 // --- END: sticky header logic ---
 
 const attachmentText = (listEntry: DocumentUnitListEntry) =>
@@ -148,6 +130,36 @@ defineSlots<{
 }>()
 
 const multiEditActive = ref()
+
+// multi edit
+const selectedDocumentationUnits = ref<DocumentUnitListEntry[]>([])
+const selectionErrorMessage = ref<string | undefined>(undefined)
+const selectionErrorDocUnitIds = ref<string[]>([])
+function updateSelectionErrors(
+  error: string | undefined,
+  docUnitIds: string[],
+) {
+  selectionErrorMessage.value = error
+  selectionErrorDocUnitIds.value = docUnitIds
+}
+
+function reloadList() {
+  selectedDocumentationUnits.value = []
+  emit("updatePage", 0)
+}
+function resetErrorMessages() {
+  selectionErrorMessage.value = undefined
+  selectionErrorDocUnitIds.value = []
+}
+
+const rowStyleClass = (rowData: DocumentUnitListEntry) => {
+  if (selectionErrorDocUnitIds.value.includes(rowData.uuid!)) {
+    return "bg-red-200"
+  }
+
+  return ""
+}
+
 onMounted(async () => {
   window.addEventListener("scroll", handleScroll)
   multiEditActive.value = (
@@ -158,110 +170,6 @@ onMounted(async () => {
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll)
 })
-
-// multi edit
-const selectedDocumentationUnits = ref<DocumentUnitListEntry[]>([])
-const selectedDocumentationUnitIds = computed(() =>
-  selectedDocumentationUnits.value
-    .map((unit) => unit.uuid)
-    .filter((uuid): uuid is string => uuid !== undefined),
-)
-
-const selectionErrorMessage = ref<string | undefined>()
-const selectionErrorDocUnitIds = ref<string[]>([])
-const showProcessStepDialog = ref(false)
-function resetErrorMessages() {
-  selectionErrorMessage.value = undefined
-  selectionErrorDocUnitIds.value = []
-}
-
-function assignProcessStep() {
-  if (selectedDocumentationUnits.value.length === 0) {
-    selectionErrorMessage.value =
-      "Wählen Sie mindestens eine Dokumentationsseinheit aus."
-    return
-  }
-
-  if (checkRightsToChangeDocumentationUnit()) {
-    showProcessStepDialog.value = true
-  }
-}
-
-async function updateSelectedDocumentationUnits(
-  nextProcessStep: ProcessStep,
-  nextUser: User | undefined,
-): Promise<ResponseError | undefined> {
-  const response = await service.bulkAssignProcessStep(
-    {
-      processStep: nextProcessStep,
-      user: nextUser,
-    },
-    selectedDocumentationUnitIds.value,
-  )
-
-  if (response.error) {
-    return response.error
-  }
-
-  toast.add({
-    severity: "success",
-    summary: "Weitergeben erfolgreich",
-    life: 5_000,
-  })
-  showProcessStepDialog.value = false
-
-  return undefined
-}
-
-const { user } = storeToRefs(useSessionStore())
-function checkRightsToChangeDocumentationUnit(): boolean {
-  const notSameDocumentationOffice = selectedDocumentationUnits.value.filter(
-    (unit) =>
-      unit.documentationOffice?.abbreviation !==
-      user.value?.documentationOffice?.abbreviation,
-  )
-
-  const externalHandoverPending = selectedDocumentationUnits.value.filter(
-    (unit) =>
-      unit.status?.publicationStatus ===
-      PublicationState.EXTERNAL_HANDOVER_PENDING,
-  )
-
-  selectionErrorDocUnitIds.value = notSameDocumentationOffice.map(
-    (unit) => unit.uuid!,
-  )
-  selectionErrorDocUnitIds.value.concat(
-    externalHandoverPending.map((unit) => unit.uuid!),
-  )
-
-  if (notSameDocumentationOffice.length > 0) {
-    selectionErrorMessage.value =
-      "Dokumentationseinheiten von fremden Dokstellen können nicht bearbeitet werden."
-    return false
-  }
-
-  if (externalHandoverPending.length > 0) {
-    selectionErrorMessage.value =
-      "Nehmen Sie die Fremdanlage(n) im Eingang an, um sie bearbeiten zu können."
-    return false
-  }
-
-  return true
-}
-
-const menuModel = ref([{ label: "Weitergeben", command: assignProcessStep }])
-const menuRef = ref()
-const toogleMenu = (event: MouseEvent) => {
-  menuRef.value.toggle(event)
-}
-
-const rowStyleClass = (rowData: DocumentUnitListEntry) => {
-  if (selectionErrorDocUnitIds.value.includes(rowData.uuid!)) {
-    return "bg-red-200"
-  }
-
-  return ""
-}
 </script>
 
 <template>
@@ -270,14 +178,6 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
       v-if="selectionErrorMessage"
       class="pl-16"
       :error-message="selectionErrorMessage"
-    />
-    <UpdateProcessStepDialog
-      v-if="showProcessStepDialog && selectedDocumentationUnits.length !== 0"
-      v-model:visible="showProcessStepDialog"
-      :documentation-unit-ids="selectedDocumentationUnitIds"
-      multi-edit
-      :update-func="updateSelectedDocumentationUnits"
-      @on-cancelled="showProcessStepDialog = false"
     />
     <Pagination
       :is-loading="loading"
@@ -504,24 +404,12 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
         <Column field="actions">
           <template #header>
             <span v-if="!multiEditActive" class="sr-only">Aktionen</span>
-            <div v-else class="flex flex-row justify-end">
-              <Button
-                v-tooltip.bottom="{
-                  value: 'Aktionen',
-                  appendTo: 'body',
-                }"
-                aria-label="Aktionen"
-                class="z-10"
-                severity="secondary"
-                size="small"
-                @click="toogleMenu"
-              >
-                <template #icon>
-                  <IconLayers />
-                </template>
-              </Button>
-              <Menu ref="menuRef" :model="menuModel" popup></Menu>
-            </div>
+            <BulkAssignProcessStep
+              v-else
+              :documentation-units="selectedDocumentationUnits"
+              @procedure-assigned="reloadList"
+              @update-selection-errors="updateSelectionErrors"
+            ></BulkAssignProcessStep>
           </template>
           <template #body="{ data: item }">
             <div class="flex flex-row justify-end -space-x-2">
