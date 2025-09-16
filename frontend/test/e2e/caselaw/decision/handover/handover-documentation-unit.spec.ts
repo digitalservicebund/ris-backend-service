@@ -554,9 +554,9 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
           page.getByText("Es wurden Rechtschreibfehler identifiziert:"),
         ).toBeVisible()
 
-        await page.getByTestId("total-text-check-errors").isVisible()
+        await page.getByTestId("total-text-check-errors-container").isVisible()
         await expect(page.getByTestId("total-text-check-errors")).toHaveText(
-          "Anzahl2RubrikTenorSonstiger Orientierungssatz",
+          "2",
         )
       })
     },
