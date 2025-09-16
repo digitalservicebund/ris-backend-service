@@ -12,7 +12,6 @@ import ComboboxInput from "@/components/ComboboxInput.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
-import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import { useProcessStepBadge } from "@/composables/useProcessStepBadge"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
@@ -173,17 +172,12 @@ watch(
         </div>
       </div>
 
-      <InputErrorMessages
-        v-if="hasNoProcessStepSelectedError"
-        class="self-start"
-        error-message="Wählen Sie einen Vorgang aus"
-      />
-
       <div
         class="modal-buttons-container flex w-full flex-row gap-[1rem] pt-32"
       >
         <Button
           aria-label="Weitergeben"
+          :disabled="!nextProcessStep"
           label="Weitergeben"
           severity="primary"
           size="small"
