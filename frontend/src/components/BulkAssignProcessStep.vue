@@ -12,6 +12,7 @@ import DocumentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
 import useSessionStore from "@/stores/sessionStore"
 import IconLayers from "~icons/ic/layers"
+import IconApprovalDelegation from "~icons/material-symbols/approval-delegation-outline"
 
 const props = defineProps<{
   documentationUnits: DocumentUnitListEntry[] | undefined
@@ -71,7 +72,11 @@ const showAssignProcessStepDialog = () => {
 }
 
 const menuModel = ref([
-  { label: "Weitergeben", command: showAssignProcessStepDialog },
+  {
+    label: "Weitergeben",
+    component: IconApprovalDelegation,
+    command: showAssignProcessStepDialog,
+  },
 ])
 const menuRef = ref()
 const toggleMenu = (event: MouseEvent) => {
@@ -150,7 +155,20 @@ const areSelectedDocUnitsValid = () => {
           <IconLayers />
         </template>
       </Button>
-      <Menu ref="menuRef" :model="menuModel" popup></Menu>
+      <Menu ref="menuRef" class="min-w-[225px]" :model="menuModel" popup>
+        <template #item="{ item, props: slotPropsps }">
+          <a
+            v-ripple
+            class="min-w-225 cursor-pointer"
+            v-bind="slotPropsps.action"
+          >
+            <span class="p-menuitem-icon">
+              <component :is="item.component" />
+            </span>
+            <span class="p-menuitem-text">{{ item.label }}</span>
+          </a>
+        </template>
+      </Menu>
     </div>
     <AssignProcessStep
       v-model:visible="showProcessStepDialog"
