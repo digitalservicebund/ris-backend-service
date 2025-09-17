@@ -130,6 +130,9 @@ _dev() {
       -f|--no-frontend)
         services="${services/frontend/}"
         ;;
+      -l|--with-languagetool)
+        services="$services languagetool"
+        ;;
       -d|--detached)
         wait="--wait"
         ;;
@@ -190,6 +193,7 @@ _help() {
   echo "dev                   Start full-stack development environment with loopup table initialization"
   echo "                      Add '-n' or '--no-backend' to start everything but backend and initialization"
   echo "                      Add '-f' or '--no-frontend' to start everything but frontend and initialization"
+  echo "                      Add '-l' or '--with-languagetool' to start with languagetool"
   echo "                      Add '-i' or '--init' to only initialize the lookup tables (read ./migration_image.md for prerequisites)"
   echo "                      Add '-d' or '--detached' to check the health of the services in the background instead of showing the log stream"
   echo "down                  Stop development environment"

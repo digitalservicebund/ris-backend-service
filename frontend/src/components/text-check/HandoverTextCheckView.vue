@@ -89,10 +89,13 @@ onBeforeMount(async () => {
                 <dl class="my-16">
                   <div
                     class="grid grid-cols-[auto_1fr] gap-x-16 px-0"
-                    data-testid="total-text-check-errors"
+                    data-testid="total-text-check-errors-container"
                   >
                     <dt class="ris-label2-bold self-center">Anzahl</dt>
-                    <dd class="ris-body2-regular">
+                    <dd
+                      class="ris-body2-regular"
+                      data-testid="total-text-check-errors"
+                    >
                       {{ totalTextCheckErrors }}
                     </dd>
                     <dt class="ris-label2-bold self-center">Rubrik</dt>
