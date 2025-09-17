@@ -9,7 +9,10 @@ import PendingProceeding from "@/domain/pendingProceeding"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import errorMessages from "@/i18n/errors.json"
 import documentUnitService from "@/services/documentUnitService"
-import { FailedValidationServerResponse, ServiceResponse } from "@/services/httpClient"
+import {
+  FailedValidationServerResponse,
+  ServiceResponse,
+} from "@/services/httpClient"
 import { Match } from "@/types/textCheck"
 import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
 
