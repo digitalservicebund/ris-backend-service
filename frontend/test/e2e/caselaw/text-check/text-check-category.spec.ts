@@ -270,6 +270,24 @@ test.describe(
               `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
           )
         })
+
+        await test.step("match modal should still appear after navigation", async () => {
+          await page
+            .getByTestId("caselaw-documentUnit-documentNumber-handover")
+            .click()
+
+          await expect(
+            page.getByRole("heading", { name: "Rechtschreibprüfung" }),
+          ).toBeVisible()
+
+          await page
+            .getByTestId("side-toggle-navigation")
+            .getByRole("link", { name: "Rubriken" })
+            .click()
+
+          await page.locator("text-check").nth(0).click()
+          await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
+        })
       },
     )
   },
