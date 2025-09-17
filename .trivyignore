@@ -1,4 +1,2 @@
-// Reason: CVE-2025-47907 appears in go stdlib used in paketobuildpacks, only used for build process
-CVE-2025-47907
 CVE-2025-41249
 CVE-2025-41248
