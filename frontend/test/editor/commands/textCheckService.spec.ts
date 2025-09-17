@@ -56,16 +56,16 @@ describe("check category service", () => {
       },
     } as unknown as Editor
 
-    const textCheckService = new NeurisTextCheckService()
+    const textCheckService = new NeurisTextCheckService("tenor")
 
-    await textCheckService.checkCategory(mockEditor, "tenor")
+    await textCheckService.checkCategory(mockEditor)
 
     expect(store.updateDocumentUnit).toHaveBeenCalledTimes(1)
     expect(store.updateDocumentUnit).toHaveBeenCalledWith()
   })
 
   it("clear selected match sets it to undefined ", async () => {
-    const textCheckService = new NeurisTextCheckService()
+    const textCheckService = new NeurisTextCheckService("tenor")
 
     textCheckService.selectedMatch.value = generateMatch()
 
@@ -74,7 +74,7 @@ describe("check category service", () => {
   })
 
   it("resets selected match if not in matches, otherwise sets it", async () => {
-    const textCheckService = new NeurisTextCheckService()
+    const textCheckService = new NeurisTextCheckService("tenor")
 
     const match = generateMatch()
     textCheckService.selectedMatch.value = match
@@ -94,7 +94,7 @@ describe("check category service", () => {
   it.each(["global", "documentation_unit"] as const)(
     "removing a %s ignored word updates the selected match ignored words list accordingly",
     async (type: DocumentationType) => {
-      const textCheckService = new NeurisTextCheckService()
+      const textCheckService = new NeurisTextCheckService("tenor")
       if (type === "global") {
         vi.spyOn(languageToolService, "removeGlobalIgnore").mockResolvedValue({
           status: 200,
@@ -131,7 +131,7 @@ describe("check category service", () => {
   it.each(["global", "documentation_unit"] as const)(
     "adding a %s ignored word updates the selected match ignored words list accordingly",
     async (type: DocumentationType) => {
-      const textCheckService = new NeurisTextCheckService()
+      const textCheckService = new NeurisTextCheckService("tenor")
 
       if (type == "documentation_unit") {
         vi.spyOn(languageToolService, "removeLocalIgnore").mockResolvedValue({
