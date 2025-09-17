@@ -6,6 +6,7 @@ import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import {
   IgnoredTextCheckWord,
+  Match,
   TextCheckCategoryResponse,
   TextCheckService,
   TextCheckTagName,
@@ -13,13 +14,9 @@ import {
 
 class NeurisTextCheckService implements TextCheckService {
   loading = ref(false)
+  matches: Match[] = []
   selectedMatch = ref()
   responseError = ref()
-  category: string
-
-  constructor(category: string) {
-    this.category = category
-  }
 
   public static readonly isTextCheckTagSelected = (editor: Editor): boolean => {
     const { selection } = editor.state
@@ -62,13 +59,13 @@ class NeurisTextCheckService implements TextCheckService {
    * @param editor
    * @param category
    */
-  checkCategory = async (editor: Editor) => {
+  checkCategory = async (editor: Editor, category?: string) => {
     this.loading.value = true
     this.responseError.value = undefined
 
     const store = useDocumentUnitStore()
 
-    if (store.documentUnit?.uuid == undefined || this.category == undefined) {
+    if (store.documentUnit?.uuid == undefined) {
       return
     }
     await store.updateDocumentUnit()
@@ -76,11 +73,11 @@ class NeurisTextCheckService implements TextCheckService {
     const languageToolCheckResponse: ServiceResponse<TextCheckCategoryResponse> =
       await languageToolService.checkCategory(
         store.documentUnit?.uuid,
-        this.category,
+        category,
       )
 
     if (languageToolCheckResponse.status == 200) {
-      store.matches.set(this.category, languageToolCheckResponse.data!.matches)
+      this.matches = languageToolCheckResponse.data!.matches
       editor.commands.setContent(languageToolCheckResponse.data!.htmlText, true)
     } else if (languageToolCheckResponse.error) {
       this.responseError.value = languageToolCheckResponse.error
@@ -188,12 +185,8 @@ class NeurisTextCheckService implements TextCheckService {
    * @param matchId
    */
   selectMatch = (matchId?: number) => {
-    if (matchId && this.category) {
-      const store = useDocumentUnitStore()
-
-      const matches = store.matches.get(this.category) ?? []
-      const selectedMatch = matches.find((match) => match.id === matchId)
-
+    if (matchId) {
+      const selectedMatch = this.matches.find((match) => match.id === matchId)
       if (selectedMatch) {
         this.selectedMatch.value = selectedMatch
         return
