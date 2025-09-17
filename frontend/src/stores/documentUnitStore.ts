@@ -9,15 +9,14 @@ import PendingProceeding from "@/domain/pendingProceeding"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import errorMessages from "@/i18n/errors.json"
 import documentUnitService from "@/services/documentUnitService"
-import {
-  FailedValidationServerResponse,
-  ServiceResponse,
-} from "@/services/httpClient"
+import { FailedValidationServerResponse, ServiceResponse } from "@/services/httpClient"
+import { Match } from "@/types/textCheck"
 import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
 
 export const useDocumentUnitStore = defineStore("docunitStore", () => {
   const documentUnit = ref<DocumentationUnit | undefined>(undefined)
   const originalDocumentUnit = ref<DocumentationUnit | undefined>(undefined)
+  const matches: Map<string, Match[]> = new Map()
 
   async function loadDocumentUnit(
     documentNumber: string,
@@ -171,5 +170,6 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     loadDocumentUnit,
     unloadDocumentUnit,
     updateDocumentUnit,
+    matches,
   }
 })

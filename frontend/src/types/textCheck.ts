@@ -81,13 +81,11 @@ export interface IgnoredTextCheckWord {
 export type DocumentationType = "global" | "global_jdv" | "documentation_unit"
 
 export type TextCheckExtensionOptions = {
-  category?: string
   service?: TextCheckService
 }
 
 export interface TextCheckService {
   loading: Ref<boolean>
-  matches: Match[]
   selectedMatch: Ref<Match | undefined>
   responseError: Ref<ResponseError | undefined>
 
