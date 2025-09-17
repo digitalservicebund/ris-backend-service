@@ -66,7 +66,7 @@ test.describe(
     test(
       "clicking on text check button, save document and returns matches",
       {
-        tag: ["@RISDEV-6205", "@RISDEV-6154", "@RISDEV-7397"],
+        tag: ["@RISDEV-6205", "@RISDEV-6154", "@RISDEV-7397", "@RISDEV-9234"],
       },
       async ({ page, prefilledDocumentUnit }) => {
         const headNoteEditor = page.getByTestId("Orientierungssatz")
