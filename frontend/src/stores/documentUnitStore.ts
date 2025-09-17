@@ -19,11 +19,13 @@ import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
 export const useDocumentUnitStore = defineStore("docunitStore", () => {
   const documentUnit = ref<DocumentationUnit | undefined>(undefined)
   const originalDocumentUnit = ref<DocumentationUnit | undefined>(undefined)
-  const matches: Map<string, Match[]> = new Map()
+  const matches = ref<Map<string, Match[]>>(new Map())
 
   async function loadDocumentUnit(
     documentNumber: string,
   ): Promise<ServiceResponse<DocumentationUnit>> {
+    matches.value.clear()
+
     const response =
       await documentUnitService.getByDocumentNumber(documentNumber)
     if (response.data) {
@@ -37,6 +39,7 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
 
   async function unloadDocumentUnit(): Promise<void> {
     documentUnit.value = undefined
+    matches.value.clear()
   }
 
   // prettier-ignore
