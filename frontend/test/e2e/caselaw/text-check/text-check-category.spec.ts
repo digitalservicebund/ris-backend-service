@@ -35,6 +35,14 @@ function getTextCheckColorRGB(type: string | null): {
   return convertHexToRGB(hex)
 }
 
+// Contains examples of Categories we exclude
+// REPETITIONS_STYLE: Dann []. Dann []. Dann [].
+// STYLE: Helpdesk oder Help-Desk
+// COLLOQUIALISMS: I bims
+// REDUNDANCY: täglichen Alltag
+const textWithErrorsOfIgnoredCategories =
+  "I bims, LanguageTool. Im täglichen Alltag prüfe ich Texte. Dann habe ich Freizeit. Dann esse ich. Dann schlafe ich. Mir ist es egal, ob du Helpdesk oder Help-Desk schreibst."
+
 const textWithErrors = {
   text: "LanguageTool ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, zB. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten. Testgnorierteswort ist grün markiert",
   incorrectWords: [
@@ -57,6 +65,47 @@ test.describe(
     tag: ["@RISDEV-254"],
   },
   () => {
+    test(
+      "ignore irrelevant style-related text check categories",
+      {
+        tag: ["@RISDEV-9169"],
+      },
+      async ({ page, prefilledDocumentUnit }) => {
+        const headNoteEditor = page.getByTestId("Orientierungssatz")
+        const headNoteEditorTextArea = headNoteEditor.locator("div")
+
+        await test.step("navigate to headnote (Orientierungssatz) in categories", async () => {
+          await navigateToCategories(
+            page,
+            prefilledDocumentUnit.documentNumber,
+            { category: DocumentUnitCategoriesEnum.TEXTS },
+          )
+        })
+
+        await test.step("replace text in headnote (Orientierungssatz) with irrelevant style-related mistakes", async () => {
+          await clearTextField(page, headNoteEditorTextArea)
+
+          await headNoteEditorTextArea.fill(textWithErrorsOfIgnoredCategories)
+          await expect(headNoteEditorTextArea).toHaveText(
+            textWithErrorsOfIgnoredCategories,
+          )
+        })
+
+        await test.step("trigger category text button shows loading status and result in no matches", async () => {
+          await page
+            .getByLabel("Orientierungssatz Button")
+            .getByRole("button", { name: "Rechtschreibprüfung" })
+            .click()
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toHaveText("Rechtschreibprüfung läuft")
+
+          await expect(page.locator(`text-check`)).not.toBeAttached()
+        })
+      },
+    )
+
     test(
       "clicking on text check button, save document and returns matches",
       {
