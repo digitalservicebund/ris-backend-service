@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
+import de.bund.digitalservice.ris.caselaw.domain.AbstractDocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment2Html;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
@@ -80,6 +81,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class DocumentationUnitController {
   private final DocumentationUnitService service;
+  private final AbstractDocumentationUnitService abstractService;
   private final UserService userService;
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
@@ -92,6 +94,7 @@ public class DocumentationUnitController {
 
   public DocumentationUnitController(
       DocumentationUnitService service,
+      AbstractDocumentationUnitService abstractService,
       UserService userService,
       AttachmentService attachmentService,
       ConverterService converterService,
@@ -111,6 +114,7 @@ public class DocumentationUnitController {
         documentationUnitDocxMetadataInitializationService;
     this.duplicateCheckService = duplicateCheckService;
     this.eurLexSOAPSearchService = eurLexSOAPSearchService;
+    this.abstractService = abstractService;
   }
 
   /**
@@ -683,7 +687,7 @@ public class DocumentationUnitController {
   public ResponseEntity<Void> assignProcessStepAndUser(
       @RequestBody @Valid BulkAssignProcessStepRequest body) {
     try {
-      service.bulkAssignProcessStep(
+      abstractService.bulkAssignProcessStep(
           body.getDocumentationUnitIds(), body.getDocumentationUnitProcessStep());
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {

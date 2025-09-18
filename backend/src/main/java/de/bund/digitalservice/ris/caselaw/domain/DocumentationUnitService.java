@@ -41,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 @SuppressWarnings("java:S6539") // Too many dependencies warning
-public abstract class DocumentationUnitService {
+public class DocumentationUnitService {
 
   private final DocumentationUnitRepository repository;
   private final DocumentNumberService documentNumberService;
@@ -907,12 +907,6 @@ public abstract class DocumentationUnitService {
       }
     }
   }
-
-  @Transactional(rollbackFor = BadRequestException.class)
-  public abstract void bulkAssignProcessStep(
-      @NotNull List<UUID> documentationUnitIds,
-      DocumentationUnitProcessStep documentationUnitProcessStep)
-      throws DocumentationUnitNotExistsException, BadRequestException;
 
   public Image getImageBytes(String documentNumber, String imageName)
       throws ImageNotExistsException, DocumentationUnitNotExistsException {
