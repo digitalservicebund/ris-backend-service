@@ -565,6 +565,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend =
         documentationUnit.currentDocumentationUnitProcessStep();
+    List<DocumentationUnitProcessStep> docunitProcessStepsFromFrontend =
+        documentationUnit.processSteps();
     DocumentationUnitProcessStepDTO currentDocumentationUnitProcessStepDTOFromDB =
         documentationUnitDTO.getCurrentProcessStep();
 
@@ -593,7 +595,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       processStepChanged = true;
       DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO =
           createAndSaveNewProcessStep(
-              documentationUnitDTO, processStepDTO, currentDocunitProcessStepFromFrontend);
+              documentationUnitDTO,
+              processStepDTO,
+              currentDocunitProcessStepFromFrontend,
+              docunitProcessStepsFromFrontend);
 
       if (stepChanged) {
         String description =
@@ -683,7 +688,18 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private DocumentationUnitProcessStepDTO createAndSaveNewProcessStep(
       DocumentationUnitDTO documentationUnitDTO,
       ProcessStepDTO processStepDTO,
-      DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend) {
+      DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend,
+      List<DocumentationUnitProcessStep> docunitProcessStepsFromFrontend) {
+
+    // when assigning a new doc office, all previous process steps are removed
+    boolean isOwnerChangeScenario =
+        (docunitProcessStepsFromFrontend != null
+            && docunitProcessStepsFromFrontend.isEmpty()
+            && "Neu".equals(processStepDTO.getName()));
+
+    if (isOwnerChangeScenario) {
+      documentationUnitDTO.getProcessSteps().clear();
+    }
 
     DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO =
         DocumentationUnitProcessStepDTO.builder()

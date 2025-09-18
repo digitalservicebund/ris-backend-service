@@ -2199,7 +2199,8 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
   @Transactional
   @Test
-  void assignDocumentationOffice_withProcessStep_shouldAddProcessStepNeu() {
+  void
+      assignDocumentationOffice_withProcessStep_shouldEmptyPreviousProcessStepsAndAddProcessStepNeu() {
     // Arrange
     var bghDocOffice = documentationOfficeRepository.findByAbbreviation("BGH");
     var decisionBuilder =
@@ -2241,12 +2242,10 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
               assertThat(response.getResponseBody())
                   .isEqualTo("The documentation office [BGH] has been successfully assigned.");
               var docUnit = repository.findById(documentationUnit.getId());
-              assertThat(docUnit.get().getProcessSteps()).size().isEqualTo(2);
+              assertThat(docUnit.get().getProcessSteps()).size().isEqualTo(1);
               assertThat(docUnit.get().getCurrentProcessStep().getProcessStep())
                   .isEqualTo(neuProcessStep);
-              assertThat(docUnit.get().getProcessSteps().get(0).getProcessStep())
-                  .isEqualTo(ersterfassungProcessStep);
-              assertThat(docUnit.get().getProcessSteps().get(1).getProcessStep())
+              assertThat(docUnit.get().getProcessSteps().getFirst().getProcessStep())
                   .isEqualTo(neuProcessStep);
             });
   }
