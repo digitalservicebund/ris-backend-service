@@ -4,19 +4,19 @@ import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategor
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
 test.describe(
-  "matches store",
+  "text check store",
   {
-    tag: ["@RISDEV-254"],
+    tag: ["@RISDEV-9022"],
   },
   () => {
     test.use({
       decisionToBeCreated: {
-        shortTexts: { headnote: "Text mit Felelr" },
+        shortTexts: { headnote: "<p>Text mit Felelr</p>" },
       },
     })
 
     test(
-      "clicking on text check button, save document and returns matches",
+      "text check, preserves matches after navigation",
       {
         tag: ["@RISDEV-9234"],
       },
@@ -32,9 +32,7 @@ test.describe(
         })
 
         await test.step("Trigger text check in headnote (Orientierungssatz)", async () => {
-          await expect(
-            page.getByLabel("Orientierungssatz Button"),
-          ).toBeVisible()
+          await page.getByTestId("Orientierungssatz").locator("div").click()
 
           await page
             .getByLabel("Orientierungssatz Button")
@@ -53,17 +51,14 @@ test.describe(
         })
 
         await test.step("match modal should still appear after navigation", async () => {
-          await page
-            .getByTestId("caselaw-documentUnit-documentNumber-handover")
-            .click()
+          await page.getByRole("link", { name: "Übergabe an jDV" }).click()
 
           await expect(
             page.getByRole("heading", { name: "Rechtschreibprüfung" }),
           ).toBeVisible()
 
           await page
-            .getByTestId("side-toggle-navigation")
-            .getByRole("link", { name: "Rubriken" })
+            .getByRole("link", { name: "Rubriken", exact: true })
             .click()
 
           await expect(
