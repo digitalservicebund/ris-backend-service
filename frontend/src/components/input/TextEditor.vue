@@ -70,7 +70,7 @@ const emit = defineEmits<{
   updateValue: [newValue: string]
 }>()
 
-const textCheckService = new NeurisTextCheckService(props.category)
+const textCheckService = new NeurisTextCheckService()
 
 const editorElement = ref<HTMLElement>()
 const hasFocus = ref(false)
@@ -139,6 +139,7 @@ const editor: Editor = new Editor({
     }),
     TextCheckMark,
     TextCheckExtension.configure({
+      category: props.category,
       service: textCheckService,
     }),
   ],
