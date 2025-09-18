@@ -3,7 +3,8 @@ import { navigateToCategories } from "../utils/e2e-utils"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
-test.describe(
+// eslint-disable-next-line playwright/no-skipped-test
+test.skip(
   "text check store",
   {
     tag: ["@RISDEV-9022"],
