@@ -6,6 +6,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.hibernate.validator.internal.util.Contracts.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
@@ -181,7 +182,95 @@ class DocumentationUnitServiceTest {
     }
 
     @Test
-    void testGenerateNewDecisionWithParameters()
+    void testGenerateNewDecisionWithParameters_withCelexNumber()
+        throws DocumentationUnitExistsException,
+            DocumentNumberPatternException,
+            DocumentNumberFormatterException {
+
+      DocumentationOffice documentationOffice =
+          DocumentationOffice.builder().id(UUID.randomUUID()).build();
+      User user =
+          User.builder().id(UUID.randomUUID()).documentationOffice(documentationOffice).build();
+      Decision decision = Decision.builder().build();
+      DocumentationUnitCreationParameters parameters =
+          DocumentationUnitCreationParameters.builder()
+              .documentationOffice(documentationOffice)
+              .fileNumber("fileNumber")
+              .court(Court.builder().type("BGH").build())
+              .decisionDate(LocalDate.now())
+              .documentType(DocumentType.builder().label("Bes").build())
+              .reference(
+                  Reference.builder()
+                      .citation("2024, 4")
+                      .legalPeriodical(LegalPeriodical.builder().abbreviation("BAG").build())
+                      .build())
+              .build();
+
+      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any(), any()))
+          .thenReturn(decision);
+
+      when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
+          .thenReturn("nextDocumentNumber");
+
+      // To check the createdAt range later
+      LocalDateTime startTime = LocalDateTime.now();
+      String celexNumber = "celexNumber";
+
+      assertNotNull(service.generateNewDecision(user, Optional.of(parameters), celexNumber));
+
+      ArgumentCaptor<DocumentationUnitProcessStep> processStepCaptor =
+          ArgumentCaptor.forClass(DocumentationUnitProcessStep.class);
+
+      Decision expectedDecision =
+          Decision.builder()
+              .version(0L)
+              .documentNumber("nextDocumentNumber")
+              .inboxStatus(null)
+              .coreData(
+                  CoreData.builder()
+                      .creatingDocOffice(null)
+                      .documentationOffice(documentationOffice)
+                      .court(parameters.court())
+                      .legalEffect(LegalEffect.YES.getLabel())
+                      .decisionDate(parameters.decisionDate())
+                      .documentType(parameters.documentType())
+                      .build())
+              .build();
+
+      Status expectedStatus =
+          Status.builder()
+              .publicationStatus(PublicationStatus.UNPUBLISHED)
+              .withError(false)
+              .build();
+
+      verify(repository)
+          .createNewDocumentationUnit(
+              eq(expectedDecision),
+              eq(expectedStatus),
+              eq(parameters.reference()),
+              eq(parameters.fileNumber()),
+              eq(user),
+              processStepCaptor.capture());
+
+      DocumentationUnitProcessStep capturedStep = processStepCaptor.getValue();
+      LocalDateTime capturedTime = capturedStep.getCreatedAt();
+      LocalDateTime endTime = LocalDateTime.now();
+
+      assertNotNull(capturedStep);
+      assertNotNull(capturedTime);
+
+      assertTrue(
+          capturedTime.isAfter(startTime.minusSeconds(1))
+              && capturedTime.isBefore(endTime.plusSeconds(1)),
+          "The createdAt timestamp should be within a reasonable range of the test execution time.");
+
+      assertNull(capturedStep.getUser());
+      assertEquals(
+          proccessStepNeu, capturedStep.getProcessStep()); // 'Neu' because it comes from Eurlex
+    }
+
+    @Test
+    void testGenerateNewDecisionWithParameters_withStatusExternalHandoverPending()
         throws DocumentationUnitExistsException,
             DocumentNumberPatternException,
             DocumentNumberFormatterException {
@@ -265,7 +354,8 @@ class DocumentationUnitServiceTest {
               && capturedTime.isBefore(endTime.plusSeconds(1)),
           "The createdAt timestamp should be within a reasonable range of the test execution time.");
 
-      assertEquals(user, capturedStep.getUser());
+      // for status 'Fremdanlage' no initial user is set
+      assertNull(capturedStep.getUser());
       assertEquals(proccessStepNeu, capturedStep.getProcessStep()); // 'Neu' because of Fremdanlage
     }
 
