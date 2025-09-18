@@ -125,7 +125,7 @@ jobs:
       - name: Check SonarQube Quality Gate
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sonarsource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
+        uses: sonarsource/sonarqube-quality-gate-action@174f8360a05574d0a8fe9324af3c2f891ad33ddb
         with:
           scanMetadataReportFile: backend/build/sonar/report-task.txt
         timeout-minutes: 3 # Force to fail step after a specific time
