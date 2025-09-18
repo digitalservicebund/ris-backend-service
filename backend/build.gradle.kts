@@ -63,6 +63,7 @@ springBoot {
 
 testlogger {
     theme = ThemeType.MOCHA
+    showPassed = false
 }
 
 configurations {
