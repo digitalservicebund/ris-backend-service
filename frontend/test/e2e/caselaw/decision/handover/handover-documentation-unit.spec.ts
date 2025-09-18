@@ -508,13 +508,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
     {
       tag: ["@RISDEV-254", "@RISDEV-6245"],
     },
-    async ({ page, prefilledDocumentUnit, request, baseURL }) => {
-      // eslint-disable-next-line playwright/no-skipped-test
-      test.skip(
-        baseURL === "http://127.0.0.1",
-        "Skipping this test on local execution, as there is no languagetool running",
-      )
-
+    async ({ page, prefilledDocumentUnit, request }) => {
       await test.step("Befülle Langtexte und Kurztexte mit texts", async () => {
         const text =
           "<p>Das Wort hat einen Flerher, und Testgnorierteswort soll nicht als Fehler mitgezählt werden.</p>"
