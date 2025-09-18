@@ -122,7 +122,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
         courtRepository
             .save(
                 CourtDTO.builder()
-                    .region(region1DTO)
+                    .regions(List.of(region1DTO))
                     .type("LG")
                     .location("Detmold")
                     .isForeignCourt(false)
@@ -134,7 +134,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
         courtRepository
             .save(
                 CourtDTO.builder()
-                    .region(region2DTO)
+                    .regions(List.of(region2DTO))
                     .type("SG")
                     .location("Fulda")
                     .isForeignCourt(false)
@@ -2084,7 +2084,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                   .label("LG Detmold")
                   .id(court1Id)
                   .jurisdictionType("")
-                  .region("NW")
+                  .regions(List.of("NW"))
                   .build(),
               JsonNode.class);
       List<JsonPatchOperation> operationsUser1 =
@@ -2222,7 +2222,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                   .location("Detmold")
                   .label("LG Detmold")
                   .jurisdictionType("")
-                  .region("NW")
+                  .regions(List.of("NW"))
                   .id(court1Id)
                   .build(),
               JsonNode.class);
@@ -2435,7 +2435,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                   .location("Detmold")
                   .label("LG Detmold")
                   .jurisdictionType("")
-                  .region("NW")
+                  .regions(List.of("NW"))
                   .id(court1Id)
                   .build(),
               JsonNode.class);
