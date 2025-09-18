@@ -270,8 +270,8 @@ test.describe(
               `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
           )
         })
-        // eslint-disable-next-line playwright/no-skipped-test
-        test.skip("match modal should still appear after navigation", async () => {
+
+        await test.step("match modal should still appear after navigation", async () => {
           await page
             .getByTestId("caselaw-documentUnit-documentNumber-handover")
             .click()
