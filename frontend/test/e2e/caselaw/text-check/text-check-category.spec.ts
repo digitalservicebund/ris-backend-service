@@ -66,7 +66,7 @@ test.describe(
     test(
       "clicking on text check button, save document and returns matches",
       {
-        tag: ["@RISDEV-6205", "@RISDEV-6154", "@RISDEV-7397"],
+        tag: ["@RISDEV-6205", "@RISDEV-6154", "@RISDEV-7397", "@RISDEV-9234"],
       },
       async ({ page, prefilledDocumentUnit }) => {
         const headNoteEditor = page.getByTestId("Orientierungssatz")
@@ -269,6 +269,24 @@ test.describe(
             "2px solid " +
               `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
           )
+        })
+
+        await test.step("match modal should still appear after navigation", async () => {
+          await page
+            .getByTestId("caselaw-documentUnit-documentNumber-handover")
+            .click()
+
+          await expect(
+            page.getByRole("heading", { name: "Rechtschreibprüfung" }),
+          ).toBeVisible()
+
+          await page
+            .getByTestId("side-toggle-navigation")
+            .getByRole("link", { name: "Rubriken" })
+            .click()
+
+          await page.locator("text-check").nth(0).click()
+          await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
         })
       },
     )

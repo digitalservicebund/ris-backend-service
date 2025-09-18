@@ -1,10 +1,11 @@
-import { setActivePinia, createPinia } from "pinia"
+import { createPinia, setActivePinia } from "pinia"
 import { Decision } from "@/domain/decision"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import errorMessages from "@/i18n/errors.json"
 import documentUnitService from "@/services/documentUnitService"
 import { ServiceResponse } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import { generateMatch } from "~/test-helper/text-check-service-mock"
 
 vi.mock("@/services/documentUnitService")
 
@@ -35,6 +36,39 @@ describe("useDocumentUnitStore", () => {
       expect(documentUnitServiceMock).toHaveBeenCalledOnce()
       expect(response).toEqual(serviceResponse)
       expect(store.documentUnit).toEqual(mockDocumentUnit)
+    })
+
+    it("loads a document unit resets the matches", async () => {
+      const mockDocumentUnit = new Decision("123", { version: 1 })
+      const serviceResponse: ServiceResponse<Decision> = {
+        status: 200,
+        data: mockDocumentUnit,
+        error: undefined,
+      }
+
+      const documentUnitServiceMock = vi
+        .spyOn(documentUnitService, "getByDocumentNumber")
+        .mockResolvedValueOnce(serviceResponse)
+
+      const store = useDocumentUnitStore()
+      store.matches = new Map([["tenor", [generateMatch(3)]]])
+      expect(store.matches.size).toBe(1)
+
+      const response = await store.loadDocumentUnit("123")
+
+      expect(documentUnitServiceMock).toHaveBeenCalledOnce()
+      expect(response).toEqual(serviceResponse)
+      expect(store.matches.size, "matches map should be cleared").toBe(0)
+    })
+
+    it("unloads a document unit resets the matches", async () => {
+      const store = useDocumentUnitStore()
+      store.matches = new Map([["tenor", [generateMatch(3)]]])
+      expect(store.matches.size).toBe(1)
+
+      await store.unloadDocumentUnit()
+
+      expect(store.matches.size, "matches map should be cleared").toBe(0)
     })
 
     it("handles failure to load a document unit", async () => {
