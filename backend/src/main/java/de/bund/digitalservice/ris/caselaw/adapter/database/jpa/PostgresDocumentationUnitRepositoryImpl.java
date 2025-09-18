@@ -691,13 +691,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend,
       List<DocumentationUnitProcessStep> docunitProcessStepsFromFrontend) {
 
-    // when assigning a new doc office, all previous process steps are removed
-    boolean isOwnerChangeScenario =
-        (docunitProcessStepsFromFrontend != null
-            && docunitProcessStepsFromFrontend.isEmpty()
-            && "Neu".equals(processStepDTO.getName()));
-
-    if (isOwnerChangeScenario) {
+    if (newDocofficeAssigned(docunitProcessStepsFromFrontend, processStepDTO)
+        && documentationUnitDTO.getProcessSteps() != null) {
       documentationUnitDTO.getProcessSteps().clear();
     }
 
@@ -717,6 +712,24 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     repository.save(documentationUnitDTO);
 
     return newDocumentationUnitProcessStepDTO;
+  }
+
+  private boolean newDocofficeAssigned(
+      List<DocumentationUnitProcessStep> docunitProcessStepsFromFrontend,
+      ProcessStepDTO processStepDTO) {
+
+    ProcessStepDTO neuProcessStep =
+        processStepRepository
+            .findByName("Neu")
+            .orElseThrow(() -> new ProcessStepNotFoundException("Process Step \"Neu\" not found"));
+
+    // when the docunit has status EXTERNAL_HANDOVER_PENDING (Fremdanlage), the docunit comes from
+    // eurlex, or the docunit's docoffice has changed/ reassigned via management data page, the
+    // process step "Neu" is set and
+    // all previous process steps are cleared
+    return docunitProcessStepsFromFrontend != null
+        && docunitProcessStepsFromFrontend.isEmpty()
+        && neuProcessStep.getName().equals(processStepDTO.getName());
   }
 
   @Override
