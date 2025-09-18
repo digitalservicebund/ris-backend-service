@@ -10,12 +10,6 @@ test.skip(
   "Skipping firefox flaky test",
 )
 
-// eslint-disable-next-line playwright/no-skipped-test
-test.skip(
-  ({ baseURL }) => baseURL === "http://127.0.0.1",
-  "Skipping this test on local execution, as there is no languagetool running",
-)
-
 const textCheckUnderlinesColors = {
   uncategorized: "#e86a69",
   style: "#9d8eff",
@@ -66,7 +60,7 @@ test.describe(
     test(
       "clicking on text check button, save document and returns matches",
       {
-        tag: ["@RISDEV-6205", "@RISDEV-6154", "@RISDEV-7397"],
+        tag: ["@RISDEV-6205", "@RISDEV-6154", "@RISDEV-7397", "@RISDEV-9234"],
       },
       async ({ page, prefilledDocumentUnit }) => {
         const headNoteEditor = page.getByTestId("Orientierungssatz")
@@ -269,6 +263,30 @@ test.describe(
             "2px solid " +
               `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
           )
+        })
+
+        await test.step("match modal should still appear after navigation", async () => {
+          // eslint-disable-next-line playwright/no-skipped-test
+          test.skip()
+          await page
+            .getByTestId("caselaw-documentUnit-documentNumber-handover")
+            .click()
+
+          await expect(
+            page.getByRole("heading", { name: "Rechtschreibprüfung" }),
+          ).toBeVisible()
+
+          await page
+            .getByTestId("side-toggle-navigation")
+            .getByRole("link", { name: "Rubriken" })
+            .click()
+
+          await expect(
+            page.getByTestId("Orientierungssatz").locator("text-check").first(),
+          ).toBeVisible()
+
+          await page.locator("text-check").first().click()
+          await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
         })
       },
     )
