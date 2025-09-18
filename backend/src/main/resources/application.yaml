@@ -121,6 +121,8 @@ languagetool:
   url: http://languagetool:8181/v2/check
   language: de-DE
   enabled: true
+  disabledRules: WHITESPACE_RULE
+  disabledCategories: REPETITIONS_STYLE,STYLE,COLLOQUIALISMS,REDUNDANCY
 
 eurlex:
   url: ${EURLEX_URL}
