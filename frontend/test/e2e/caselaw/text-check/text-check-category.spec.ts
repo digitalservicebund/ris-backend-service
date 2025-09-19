@@ -10,12 +10,6 @@ test.skip(
   "Skipping firefox flaky test",
 )
 
-// eslint-disable-next-line playwright/no-skipped-test
-test.skip(
-  ({ baseURL }) => baseURL === "http://127.0.0.1",
-  "Skipping this test on local execution, as there is no languagetool running",
-)
-
 const textCheckUnderlinesColors = {
   uncategorized: "#e86a69",
   style: "#9d8eff",
@@ -190,7 +184,7 @@ test.describe(
         })
 
         await test.step("click on a selected suggestion, then click on a non-tag closes the text check modal", async () => {
-          await page.locator("text-check").nth(0).click()
+          await page.locator("text-check").first().click()
           await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
           await headNoteEditor.getByText("LanguageTool").click()
           await expect(page.getByTestId("text-check-modal-word")).toBeHidden()

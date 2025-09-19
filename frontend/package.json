@@ -63,7 +63,6 @@
     "@tiptap/vue-3": "^2.26.1",
     "@tiptap/starter-kit": "^2.26.1",
     "@unhead/vue": "^2.0.14",
-    "@unleash/proxy-client-vue": "^0.1.6",
     "@vueuse/core": "^13.9.0",
     "@vueuse/router": "^13.9.0",
     "axios": "^1.12.0",

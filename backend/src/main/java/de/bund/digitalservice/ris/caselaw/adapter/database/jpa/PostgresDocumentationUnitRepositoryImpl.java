@@ -565,6 +565,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend =
         documentationUnit.currentDocumentationUnitProcessStep();
+    List<DocumentationUnitProcessStep> docunitProcessStepsFromFrontend =
+        documentationUnit.processSteps();
     DocumentationUnitProcessStepDTO currentDocumentationUnitProcessStepDTOFromDB =
         documentationUnitDTO.getCurrentProcessStep();
 
@@ -593,7 +595,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       processStepChanged = true;
       DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO =
           createAndSaveNewProcessStep(
-              documentationUnitDTO, processStepDTO, currentDocunitProcessStepFromFrontend);
+              documentationUnitDTO,
+              processStepDTO,
+              currentDocunitProcessStepFromFrontend,
+              docunitProcessStepsFromFrontend);
 
       if (stepChanged) {
         String description =
@@ -683,7 +688,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private DocumentationUnitProcessStepDTO createAndSaveNewProcessStep(
       DocumentationUnitDTO documentationUnitDTO,
       ProcessStepDTO processStepDTO,
-      DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend) {
+      DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend,
+      List<DocumentationUnitProcessStep> docunitProcessStepsFromFrontend) {
+
+    if (newDocofficeAssigned(docunitProcessStepsFromFrontend, processStepDTO)
+        && documentationUnitDTO.getProcessSteps() != null) {
+      documentationUnitDTO.getProcessSteps().clear();
+    }
 
     DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO =
         DocumentationUnitProcessStepDTO.builder()
@@ -701,6 +712,24 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     repository.save(documentationUnitDTO);
 
     return newDocumentationUnitProcessStepDTO;
+  }
+
+  private boolean newDocofficeAssigned(
+      List<DocumentationUnitProcessStep> docunitProcessStepsFromFrontend,
+      ProcessStepDTO processStepDTO) {
+
+    ProcessStepDTO neuProcessStep =
+        processStepRepository
+            .findByName("Neu")
+            .orElseThrow(() -> new ProcessStepNotFoundException("Process Step \"Neu\" not found"));
+
+    // when the docunit has status EXTERNAL_HANDOVER_PENDING (Fremdanlage), the docunit comes from
+    // eurlex, or the docunit's docoffice has changed/ reassigned via management data page, the
+    // process step "Neu" is set and
+    // all previous process steps are cleared
+    return docunitProcessStepsFromFrontend != null
+        && docunitProcessStepsFromFrontend.isEmpty()
+        && neuProcessStep.getName().equals(processStepDTO.getName());
   }
 
   @Override

@@ -75,6 +75,7 @@ services:
       postgres14: { condition: service_healthy }
       redis: { condition: service_healthy }
       initialization: { condition: service_completed_successfully }
+      languagetool: { condition: service_healthy }
     ports:
       - 8080:8080
     healthcheck:

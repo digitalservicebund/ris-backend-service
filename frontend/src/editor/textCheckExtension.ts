@@ -22,7 +22,6 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
   addStorage() {},
   addOptions() {
     return {
-      category: undefined,
       service: undefined,
     }
   },
@@ -34,7 +33,7 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
         ({ editor }) => {
           const service = this.options.service as TextCheckService
 
-          void service.checkCategory(editor, this.options.category)
+          void service.checkCategory(editor)
           return true
         },
       handleMatchSelection:

@@ -210,7 +210,7 @@ public class DocumentationUnitService {
     return documentNumbers;
   }
 
-  private Decision generateNewDecision(
+  Decision generateNewDecision(
       User user, Optional<DocumentationUnitCreationParameters> parameters, String celexNumber) {
     var userDocOffice = user.documentationOffice();
     // default office is user office
@@ -259,12 +259,18 @@ public class DocumentationUnitService {
             .build();
 
     ProcessStep initialProcessStep = getInitialProcessStep(celexNumber, isExternalHandover);
+
+    User initialUser = null;
+    if (celexNumber == null && !isExternalHandover) {
+      initialUser = user;
+    }
+
     // create new DocumentationUnitProcessStep with first process step for dooffice
     var initialDocUnitProcessStep =
         DocumentationUnitProcessStep.builder()
             .createdAt(LocalDateTime.now())
             .processStep(initialProcessStep)
-            .user(user)
+            .user(initialUser)
             .build();
 
     var newDocumentationUnit =
@@ -846,6 +852,7 @@ public class DocumentationUnitService {
       // Procedures need to be unassigned as they are linked to the previous documentation Office
       repository.unassignProcedures(decision.uuid());
       repository.saveDocumentationOffice(documentationUnitId, documentationOffice, user);
+
       decision =
           decision.toBuilder()
               .currentDocumentationUnitProcessStep(
@@ -860,6 +867,7 @@ public class DocumentationUnitService {
                                       new ProcessStepNotFoundException(
                                           "Process Step 'Neu' not found")))
                       .build())
+              .processSteps(List.of())
               .build();
       repository.saveProcessSteps(decision, user);
       return "The documentation office [%s] has been successfully assigned."
