@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AbstractDocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,12 +42,12 @@ public class DatabaseDocumentationUnitService extends AbstractDocumentationUnitS
   public void bulkAssignProcessStep(
       @NotNull List<UUID> documentationUnitIds,
       DocumentationUnitProcessStep documentationUnitProcessStep)
-      throws BadRequestException {
+      throws BadRequestException, ProcessStepNotFoundException, DocumentationUnitException {
 
     Optional<ProcessStepDTO> processStepDTO =
         processStepRepository.findByName(documentationUnitProcessStep.getProcessStep().name());
     if (processStepDTO.isEmpty()) {
-      throw new DocumentationUnitException(
+      throw new ProcessStepNotFoundException(
           "Process step with name "
               + documentationUnitProcessStep.getProcessStep().name()
               + " not found");
