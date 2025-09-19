@@ -26,6 +26,7 @@ export default class DocumentUnitListEntry {
   isEditable?: boolean
   source?: string
   creatingDocumentationOffice?: DocumentationOffice
+  documentationOffice?: DocumentationOffice
   currentDocumentationUnitProcessStep?: DocumentationUnitProcessStep
   previousProcessStep?: ProcessStep
 

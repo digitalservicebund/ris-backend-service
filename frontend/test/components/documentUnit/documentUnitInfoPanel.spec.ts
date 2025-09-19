@@ -75,7 +75,6 @@ function renderComponent(options?: {
   return {
     user,
     ...render(DocumentUnitInfoPanel, {
-      props: { documentUnit: documentUnit },
       global: {
         directives: { tooltip: Tooltip },
         plugins: [

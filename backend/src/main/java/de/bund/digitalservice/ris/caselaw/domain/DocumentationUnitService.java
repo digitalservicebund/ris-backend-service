@@ -71,7 +71,7 @@ public class DocumentationUnitService {
   private final DocumentationUnitHistoryLogService historyLogService;
   private final DocumentationUnitSearchRepository docUnitSearchRepository;
 
-  public DocumentationUnitService(
+  protected DocumentationUnitService(
       DocumentationUnitRepository repository,
       DocumentNumberService documentNumberService,
       DocumentTypeService documentTypeService,
