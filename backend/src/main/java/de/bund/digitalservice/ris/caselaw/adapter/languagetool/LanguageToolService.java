@@ -63,7 +63,8 @@ public class LanguageToolService extends TextCheckService {
     formData.add("data", data.toString());
     formData.add("language", languageToolConfig.getLanguage());
     formData.add("mode", "all");
-    formData.add("disabledRules", "WHITESPACE_RULE");
+    formData.add("disabledRules", languageToolConfig.getDisabledRules());
+    formData.add("disabledCategories", languageToolConfig.getDisabledCategories());
 
     // Set headers (optional but good practice)
     HttpHeaders headers = new HttpHeaders();

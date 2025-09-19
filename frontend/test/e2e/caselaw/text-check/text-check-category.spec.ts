@@ -42,7 +42,6 @@ const textWithErrors = {
     "Rechtshcreibfehler",
     "markirt",
     "hervor gehoben",
-    "wie",
     "wussten",
     "Sie dass",
     "zB.",
@@ -57,6 +56,58 @@ test.describe(
     tag: ["@RISDEV-254"],
   },
   () => {
+    test(
+      "ignore irrelevant style-related text check categories",
+      {
+        tag: ["@RISDEV-9169"],
+      },
+      async ({ page, prefilledDocumentUnit }) => {
+        const headNoteEditor = page.getByTestId("Orientierungssatz")
+        const headNoteEditorTextArea = headNoteEditor.locator("div")
+
+        await test.step("navigate to headnote (Orientierungssatz) in categories", async () => {
+          await navigateToCategories(
+            page,
+            prefilledDocumentUnit.documentNumber,
+            { category: DocumentUnitCategoriesEnum.TEXTS },
+          )
+        })
+
+        await test.step("replace text in headnote (Orientierungssatz) with irrelevant style-related mistakes", async () => {
+          await clearTextField(page, headNoteEditorTextArea)
+
+          // Contains examples of Categories we disable
+          const textWithErrorsOfDisabledCategories =
+            "I bims, LanguageTool. " + // COLLOQUIALISMS: I bims
+            "Im täglichen Alltag prüfe ich Texte. " + // REDUNDANCY: täglichen Alltag
+            "Dann habe ich Freizeit. Dann esse ich. Dann schlafe ich. " + // REPETITIONS_STYLE: Dann []. Dann []. Dann [].
+            "Mir ist es egal, ob du Helpdesk oder Help-Desk schreibst." // STYLE: Helpdesk oder Help-Desk
+
+          await headNoteEditorTextArea.fill(textWithErrorsOfDisabledCategories)
+          await expect(headNoteEditorTextArea).toHaveText(
+            textWithErrorsOfDisabledCategories,
+          )
+        })
+
+        await test.step("trigger category text results in no matches for ignored categories", async () => {
+          await page
+            .getByLabel("Orientierungssatz Button")
+            .getByRole("button", { name: "Rechtschreibprüfung" })
+            .click()
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toHaveText("Rechtschreibprüfung läuft")
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toBeHidden({ timeout: 5_000 })
+
+          await expect(page.locator(`text-check`)).not.toBeAttached()
+        })
+      },
+    )
+
     test(
       "clicking on text check button, save document and returns matches",
       {
@@ -180,7 +231,7 @@ test.describe(
             textWithErrors.text.replace(textCheckLiteral, "z. B."),
           )
 
-          await expect(page.locator(`text-check[id='${8}']`)).not.toBeAttached()
+          await expect(page.locator(`text-check[id='${7}']`)).not.toBeAttached()
         })
 
         await test.step("click on a selected suggestion, then click on a non-tag closes the text check modal", async () => {

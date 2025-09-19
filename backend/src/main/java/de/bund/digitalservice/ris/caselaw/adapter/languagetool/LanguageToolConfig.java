@@ -11,4 +11,6 @@ public class LanguageToolConfig {
   private String url;
   private String language;
   private boolean enabled;
+  private String disabledRules;
+  private String disabledCategories;
 }
