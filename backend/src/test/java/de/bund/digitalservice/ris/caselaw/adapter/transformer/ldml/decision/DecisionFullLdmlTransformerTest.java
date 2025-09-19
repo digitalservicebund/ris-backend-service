@@ -443,7 +443,7 @@ class DecisionFullLdmlTransformerTest {
                <akn:FRBRuri value="YYTestDoc0013/dokument"/>
                <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
                <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-               <akn:FRBRlanguage language="de"/>
+               <akn:FRBRlanguage language="deu"/>
             </akn:FRBRExpression>
             <akn:FRBRManifestation>
                <akn:FRBRthis value="YYTestDoc0013/dokument.xml"/>
@@ -527,11 +527,11 @@ class DecisionFullLdmlTransformerTest {
                </ris:inputTypes>
                <ris:foreignLanguageVersions>
                   <ris:foreignLanguageVersion>
-                     <akn:FRBRlanguage language="en"/>
+                     <akn:FRBRlanguage language="eng"/>
                      <akn:documentRef href="https://ihre-url-zur-englischen-übersetzung" showAs="Englisch"/>
                   </ris:foreignLanguageVersion>
                   <ris:foreignLanguageVersion>
-                     <akn:FRBRlanguage language="fr"/>
+                     <akn:FRBRlanguage language="fra"/>
                      <akn:documentRef href="https://ihre-url-zur-französischen-übersetzung"
                                       showAs="Französisch"/>
                   </ris:foreignLanguageVersion>
@@ -755,6 +755,7 @@ class DecisionFullLdmlTransformerTest {
                                     .id(UUID.randomUUID())
                                     .label("Englisch")
                                     .isoCode("en")
+                                    .isoCode3Letters("eng")
                                     .build())
                             .link("https://ihre-url-zur-englischen-übersetzung")
                             .build(),
@@ -765,6 +766,7 @@ class DecisionFullLdmlTransformerTest {
                                     .id(UUID.randomUUID())
                                     .label("Französisch")
                                     .isoCode("fr")
+                                    .isoCode3Letters("fra")
                                     .build())
                             .link("https://ihre-url-zur-französischen-übersetzung")
                             .build()))

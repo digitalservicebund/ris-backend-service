@@ -139,7 +139,8 @@ public abstract class DecisionCommonLdmlTransformer
                                   .showAs(foreignLanguageVersion.languageCode().label())
                                   .build())
                           .frbrLanguage(
-                              new FrbrLanguage(foreignLanguageVersion.languageCode().isoCode()))
+                              new FrbrLanguage(
+                                  foreignLanguageVersion.languageCode().isoCode3Letters()))
                           .build())
               .toList(),
           builder::foreignLanguageVersions);
@@ -263,7 +264,7 @@ public abstract class DecisionCommonLdmlTransformer
         FrbrElement.builder()
             .frbrDate(frbrDate)
             .frbrAuthor(frbrAuthor)
-            .frbrLanguage(new FrbrLanguage("de"))
+            .frbrLanguage(new FrbrLanguage("deu"))
             .build()
             .withFrbrThisAndUri(uniqueId + "/dokument");
 
