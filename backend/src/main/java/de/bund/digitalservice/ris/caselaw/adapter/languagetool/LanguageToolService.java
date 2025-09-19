@@ -9,10 +9,8 @@ import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
@@ -21,26 +19,22 @@ import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.NodeTraversor;
 import org.jsoup.select.NodeVisitor;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 public class LanguageToolService extends TextCheckService {
   private final LanguageToolConfig languageToolConfig;
+  private final LanguageToolClient languageToolClient;
 
   public LanguageToolService(
-      LanguageToolConfig languageToolConfig,
       DocumentationUnitRepository documentationUnitRepository,
       IgnoredTextCheckWordRepository ignoredTextCheckWordRepository,
-      FeatureToggleService featureToggleService) {
+      FeatureToggleService featureToggleService,
+      LanguageToolConfig languageToolConfig,
+      LanguageToolClient languageToolClient) {
 
     super(documentationUnitRepository, ignoredTextCheckWordRepository, featureToggleService);
     this.languageToolConfig = languageToolConfig;
+    this.languageToolClient = languageToolClient;
   }
 
   @Override
@@ -50,36 +44,27 @@ public class LanguageToolService extends TextCheckService {
       return List.of();
     }
     Document document = Jsoup.parse(text);
-
-    JsonArray annotations = getAnnotationsArray(document);
-
     JsonObject data = new JsonObject();
-    data.add("annotation", annotations);
+    data.add("annotation", getAnnotationsArray(document));
 
-    RestTemplate restTemplate = new RestTemplate();
+    // Use the new client to get the response
+    LanguageToolResponse response = languageToolClient.checkText(data);
 
-    // Prepare the form data
-    MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-    formData.add("data", data.toString());
-    formData.add("language", languageToolConfig.getLanguage());
-    formData.add("mode", "all");
-    formData.add("disabledRules", languageToolConfig.getDisabledRules());
-    formData.add("disabledCategories", languageToolConfig.getDisabledCategories());
+    var filtered =
+        response.getMatches().stream()
+            .filter(
+                match -> {
+                  String categoryId = match.getRule().getCategory().getId();
+                  Map<String, List<String>> categoriesWithAllowedRules =
+                      languageToolConfig.getDisabledCategoriesWithWhitelistedRules();
+                  return !categoriesWithAllowedRules.containsKey(categoryId)
+                      || categoriesWithAllowedRules
+                          .get(categoryId)
+                          .contains(match.getRule().getId());
+                })
+            .toList();
 
-    // Set headers (optional but good practice)
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-
-    // Create the HTTP request
-    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
-
-    ResponseEntity<LanguageToolResponse> response =
-        restTemplate.postForEntity(
-            languageToolConfig.getUrl(), request, LanguageToolResponse.class);
-
-    return TextCheckResponseTransformer.transformToListOfDomainMatches(
-        Objects.requireNonNull(response.getBody()));
+    return TextCheckResponseTransformer.transformToListOfDomainMatches(filtered);
   }
 
   @NotNull

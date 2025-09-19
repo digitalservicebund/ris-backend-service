@@ -63,7 +63,7 @@ class TextCheckResponseTransformerTest {
 
     // Act
     List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> domainMatches =
-        TextCheckResponseTransformer.transformToListOfDomainMatches(response);
+        TextCheckResponseTransformer.transformToListOfDomainMatches(response.getMatches());
 
     // Assert
     assertNotNull(domainMatches);
