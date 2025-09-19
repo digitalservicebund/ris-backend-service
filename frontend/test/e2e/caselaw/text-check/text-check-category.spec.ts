@@ -35,14 +35,6 @@ function getTextCheckColorRGB(type: string | null): {
   return convertHexToRGB(hex)
 }
 
-// Contains examples of Categories we exclude
-// REPETITIONS_STYLE: Dann []. Dann []. Dann [].
-// STYLE: Helpdesk oder Help-Desk
-// COLLOQUIALISMS: I bims
-// REDUNDANCY: täglichen Alltag
-const textWithErrorsOfIgnoredCategories =
-  "I bims, LanguageTool. Im täglichen Alltag prüfe ich Texte. Dann habe ich Freizeit. Dann esse ich. Dann schlafe ich. Mir ist es egal, ob du Helpdesk oder Help-Desk schreibst."
-
 const textWithErrors = {
   text: "LanguageTool ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, zB. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten. Testgnorierteswort ist grün markiert",
   incorrectWords: [
@@ -50,7 +42,6 @@ const textWithErrors = {
     "Rechtshcreibfehler",
     "markirt",
     "hervor gehoben",
-    "wie",
     "wussten",
     "Sie dass",
     "zB.",
@@ -85,13 +76,20 @@ test.describe(
         await test.step("replace text in headnote (Orientierungssatz) with irrelevant style-related mistakes", async () => {
           await clearTextField(page, headNoteEditorTextArea)
 
-          await headNoteEditorTextArea.fill(textWithErrorsOfIgnoredCategories)
+          // Contains examples of Categories we disable
+          const textWithErrorsOfDisabledCategories =
+            "I bims, LanguageTool. " + // COLLOQUIALISMS: I bims
+            "Im täglichen Alltag prüfe ich Texte. " + // REDUNDANCY: täglichen Alltag
+            "Dann habe ich Freizeit. Dann esse ich. Dann schlafe ich. " + // REPETITIONS_STYLE: Dann []. Dann []. Dann [].
+            "Mir ist es egal, ob du Helpdesk oder Help-Desk schreibst." // STYLE: Helpdesk oder Help-Desk
+
+          await headNoteEditorTextArea.fill(textWithErrorsOfDisabledCategories)
           await expect(headNoteEditorTextArea).toHaveText(
-            textWithErrorsOfIgnoredCategories,
+            textWithErrorsOfDisabledCategories,
           )
         })
 
-        await test.step("trigger category text button shows loading status and result in no matches", async () => {
+        await test.step("trigger category text results in no matches for ignored categories", async () => {
           await page
             .getByLabel("Orientierungssatz Button")
             .getByRole("button", { name: "Rechtschreibprüfung" })
@@ -100,6 +98,10 @@ test.describe(
           await expect(
             page.getByTestId("text-check-loading-status"),
           ).toHaveText("Rechtschreibprüfung läuft")
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toBeHidden({ timeout: 5_000 })
 
           await expect(page.locator(`text-check`)).not.toBeAttached()
         })
@@ -229,7 +231,7 @@ test.describe(
             textWithErrors.text.replace(textCheckLiteral, "z. B."),
           )
 
-          await expect(page.locator(`text-check[id='${8}']`)).not.toBeAttached()
+          await expect(page.locator(`text-check[id='${7}']`)).not.toBeAttached()
         })
 
         await test.step("click on a selected suggestion, then click on a non-tag closes the text check modal", async () => {
