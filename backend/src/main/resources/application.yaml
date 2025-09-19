@@ -121,8 +121,13 @@ languagetool:
   url: http://languagetool:8181/v2/check
   language: de-DE
   enabled: true
-  disabledRules: WHITESPACE_RULE
-  disabledCategories: REPETITIONS_STYLE,STYLE,COLLOQUIALISMS,REDUNDANCY
+  disabledRules: UPPERCASE_SENTENCE_START
+  disabledCategories: REPETITIONS_STYLE,STYLE,COLLOQUIALISMS,WIKIPEDIA,GENDER_NEUTRALITY,FALSE_FRIENDS,REGIONALISMS,MISC,TYPOGRAPHY,CONFUSED_WORDS,IDIOMS,GRAMMAR,COMPOUNDING
+  disabledCategoriesWithWhitelistedRules:
+    REDUNDANCY:
+      - "GERMAN_WORD_REPEAT_RULE"
+    PUNCTUATION:
+      - "DE_UNPAIRED_QUOTES"
 
 eurlex:
   url: ${EURLEX_URL}

@@ -1,17 +1,85 @@
 package de.bund.digitalservice.ris.caselaw.adapter.languagetool;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolService.getAnnotationsArray;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import com.google.gson.JsonArray;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(SpringExtension.class)
+@Import({
+  LanguageToolService.class,
+})
 class LanguageToolServiceTest {
+
+  @MockitoSpyBean LanguageToolService languageToolService;
+
+  @MockitoBean LanguageToolClient languageToolClient;
+  @MockitoBean LanguageToolConfig languageToolConfig;
+  @MockitoBean DocumentationUnitRepository documentationUnitRepository;
+  @MockitoBean IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
+  @MockitoBean FeatureToggleService featureToggleService;
+
+  @Test
+  void testRequestTool_withCategoriesWithAllowedRules() {
+    when(languageToolConfig.getDisabledCategoriesWithWhitelistedRules())
+        .thenReturn(
+            Map.of(
+                "DISABLED_CATEGORY_1", List.of("ENABLED_RULE_1", "ENABLED_RULE_2"),
+                "DISABLED_CATEGORY_2", List.of("ENABLED_RULE_3")));
+
+    when(languageToolConfig.isEnabled()).thenReturn(true);
+
+    when(languageToolClient.checkText(any()))
+        .thenReturn(
+            LanguageToolResponse.builder()
+                .matches(
+                    List.of(
+                        // not filtered because in RANDOM_CATEGORY_1 is not restricted
+                        createMatch("RANDOM_RULE_1", "RANDOM_CATEGORY_1"),
+                        // filtered because only rules ENABLED_RULE_1 and ENABLED_RULE_2 are allowed
+                        // in DISABLED_CATEGORY_1
+                        createMatch("RANDOM_RULE_2", "DISABLED_CATEGORY_1"),
+                        // not filtered because rule ENABLED_RULE_1 is allowed in
+                        // DISABLED_CATEGORY_1
+                        createMatch("ENABLED_RULE_1", "DISABLED_CATEGORY_1"),
+                        // filtered because only rule ENABLED_RULE_3 is allowed in
+                        // DISABLED_CATEGORY_2
+                        createMatch("ENABLED_RULE_2", "DISABLED_CATEGORY_2")))
+                .build());
+
+    String html = "<body><div>Hello, world!</div></body>";
+
+    var response = languageToolService.requestTool(html);
+    Assertions.assertEquals(2, response.size());
+    Assertions.assertEquals("RANDOM_RULE_1", response.getFirst().rule().id());
+    Assertions.assertEquals("RANDOM_CATEGORY_1", response.getFirst().rule().category().id());
+    Assertions.assertEquals("ENABLED_RULE_1", response.get(1).rule().id());
+    Assertions.assertEquals("DISABLED_CATEGORY_1", response.get(1).rule().category().id());
+  }
+
+  private static Match createMatch(String rule, String category) {
+    return Match.builder()
+        .rule(Rule.builder().id(rule).category(Category.builder().id(category).build()).build())
+        .build();
+  }
 
   @Test
   void testSimpleText() {
