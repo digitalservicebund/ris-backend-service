@@ -237,7 +237,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
         FrbrElement.builder()
             .frbrDate(frbrDate)
             .frbrAuthor(frbrAuthor)
-            .frbrLanguage(new FrbrLanguage("de"))
+            .frbrLanguage(new FrbrLanguage("deu"))
             .build()
             .withFrbrThisAndUri(uniqueId + "/dokument");
 
