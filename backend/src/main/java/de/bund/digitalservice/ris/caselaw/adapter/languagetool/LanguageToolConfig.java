@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.languagetool;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
@@ -15,12 +16,13 @@ public class LanguageToolConfig implements InitializingBean {
   private String url;
   private String language;
   private boolean enabled;
-  private String disabledRules;
-  private String disabledCategories;
-  private Map<String, List<String>> disabledCategoriesWithWhitelistedRules;
+  private String disabledRules = "";
+  private String disabledCategories = "";
+  private Map<String, List<String>> disabledCategoriesWithWhitelistedRules = new HashMap<>();
 
   @Override
   public void afterPropertiesSet() throws IncompatibleConfigurationException {
+
     for (String categoryId : disabledCategories.split(",")) {
       if (disabledCategoriesWithWhitelistedRules.containsKey(categoryId)) {
         throw new IncompatibleConfigurationException(
@@ -28,14 +30,15 @@ public class LanguageToolConfig implements InitializingBean {
                 + categoryId
                 + " is entirely disabled but has whitelisted rules. Remove it from the disabledCategories list to allow specific rules or remove the disabledCategoriesWithWhitelistedRules config to disable all rules in the category");
       }
-    }
-    for (String ruleId : disabledRules.split(",")) {
-      if (disabledCategoriesWithWhitelistedRules.values().stream()
-          .anyMatch(list -> list.contains(ruleId))) {
-        throw new IncompatibleConfigurationException(
-            "Rule "
-                + ruleId
-                + " is disabled but is whitelisted in a category. Remove it from the disabledRules to allow it or remove it from the category in disabledCategoriesWithWhitelistedRules to disable it");
+
+      for (String ruleId : disabledRules.split(",")) {
+        if (disabledCategoriesWithWhitelistedRules.values().stream()
+            .anyMatch(list -> list.contains(ruleId))) {
+          throw new IncompatibleConfigurationException(
+              "Rule "
+                  + ruleId
+                  + " is disabled but is whitelisted in a category. Remove it from the disabledRules to allow it or remove it from the category in disabledCategoriesWithWhitelistedRules to disable it");
+        }
       }
     }
   }
