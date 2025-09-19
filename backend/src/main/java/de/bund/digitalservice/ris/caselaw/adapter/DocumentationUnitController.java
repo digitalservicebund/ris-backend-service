@@ -684,7 +684,7 @@ public class DocumentationUnitController {
 
   @PatchMapping(value = "/bulk-assign-process-step")
   @PreAuthorize("@userHasBulkWriteAccess.apply(#body.getDocumentationUnitIds())")
-  public ResponseEntity<Void> assignProcessStepAndUser(
+  public ResponseEntity<Void> bulkAssignProcessStep(
       @RequestBody @Valid BulkAssignProcessStepRequest body) {
     try {
       abstractService.bulkAssignProcessStep(
