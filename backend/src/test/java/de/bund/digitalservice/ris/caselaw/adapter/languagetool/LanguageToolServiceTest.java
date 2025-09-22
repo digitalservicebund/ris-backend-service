@@ -208,16 +208,29 @@ class LanguageToolServiceTest {
 
   @Test
   void testEmptyContent() {
-    String html = "<body></body>";
+    String html = "<body><div>< ></div></body>";
     Document doc = Jsoup.parse(html);
+    JsonArray result = getAnnotationsArray(doc);
+
+    Assertions.assertEquals(5, result.size());
+    Assertions.assertEquals("<div>", result.get(0).getAsJsonObject().get("markup").getAsString());
+    Assertions.assertEquals("&lt;", result.get(1).getAsJsonObject().get("markup").getAsString());
+    Assertions.assertEquals(" ", result.get(2).getAsJsonObject().get("text").getAsString());
+    Assertions.assertEquals("&gt;", result.get(3).getAsJsonObject().get("markup").getAsString());
+    Assertions.assertEquals("</div>", result.get(4).getAsJsonObject().get("markup").getAsString());
+  }
+
+  @Test
+  void testEmpty() {
+    Document doc = Jsoup.parse("");
     JsonArray result = getAnnotationsArray(doc);
 
     Assertions.assertEquals(0, result.size());
   }
 
   @Test
-  void testEmpty() {
-    Document doc = Jsoup.parse("");
+  void testComment() {
+    Document doc = Jsoup.parse("<body><div><!-- # test --></div></body>");
     JsonArray result = getAnnotationsArray(doc);
 
     Assertions.assertEquals(0, result.size());
