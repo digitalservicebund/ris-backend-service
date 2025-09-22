@@ -159,13 +159,12 @@ class DatabaseDocumentationUnitServiceTest {
     void testBulkAssignProcessStep_withProcessStepNotFound_shouldThrowException() {
       // Arrange
       when(processStepRepository.findByName(anyString())).thenReturn(Optional.empty());
+      List<UUID> docunitList = List.of(TEST_DOC_UNIT_ID_1);
 
       // Act & Assert
       assertThrows(
           ProcessStepNotFoundException.class,
-          () ->
-              service.bulkAssignProcessStep(
-                  List.of(TEST_DOC_UNIT_ID_1), documentationUnitProcessStepWithUser));
+          () -> service.bulkAssignProcessStep(docunitList, documentationUnitProcessStepWithUser));
 
       // Assert
       verify(processStepRepository, times(1)).findByName(TEST_PROCESS_STEP_NAME);
@@ -178,12 +177,12 @@ class DatabaseDocumentationUnitServiceTest {
       when(processStepRepository.findByName(anyString())).thenReturn(Optional.of(processStepDTO));
       when(userRepository.findByExternalId(any())).thenReturn(Optional.empty());
 
+      List<UUID> docunitList = List.of(TEST_DOC_UNIT_ID_1);
+
       // Act & Assert
       assertThrows(
           DocumentationUnitException.class,
-          () ->
-              service.bulkAssignProcessStep(
-                  List.of(TEST_DOC_UNIT_ID_1), documentationUnitProcessStepWithUser));
+          () -> service.bulkAssignProcessStep(docunitList, documentationUnitProcessStepWithUser));
 
       // Assert
       verify(processStepRepository, times(1)).findByName(anyString());
@@ -198,12 +197,13 @@ class DatabaseDocumentationUnitServiceTest {
       when(repository.findById(any(UUID.class)))
           .thenReturn(Optional.of(PendingProceedingDTO.builder().build()));
 
+      List<UUID> docunitList = List.of(TEST_DOC_UNIT_ID_1);
+
       // Act & Assert
       assertThrows(
           BadRequestException.class,
           () ->
-              service.bulkAssignProcessStep(
-                  List.of(TEST_DOC_UNIT_ID_1), documentationUnitProcessStepWithoutUser));
+              service.bulkAssignProcessStep(docunitList, documentationUnitProcessStepWithoutUser));
 
       // Assert
       verify(processStepRepository, times(1)).findByName(anyString());
