@@ -1500,7 +1500,7 @@ class DocumentationUnitControllerTest {
       private final DocumentationUnitProcessStep processStep =
           DocumentationUnitProcessStep.builder()
               .processStep(ProcessStep.builder().uuid(UUID.randomUUID()).name("NewStep").build())
-              .user(User.builder().id(UUID.randomUUID()).name("TestUser").build())
+              .user(User.builder().id(UUID.randomUUID()).firstName("Test").lastName("User").build())
               .build();
 
       @Test
