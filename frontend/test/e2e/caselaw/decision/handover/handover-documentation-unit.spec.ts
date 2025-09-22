@@ -3,10 +3,10 @@ import { Decision } from "@/domain/decision"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   addIgnoreWordToDocumentationUnit,
-  patchDocumentationUnit,
   updateDocumentationUnit,
 } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import {
+  clearTextField,
   fillActiveCitationInputs,
   fillCombobox,
   fillEnsuingDecisionInputs,
@@ -17,6 +17,12 @@ import {
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("ensuring the handover of documentunits works as expected", () => {
+  test.use({
+    decisionToBeCreated: {
+      longTexts: { tenor: "<p>Text mit Fehler</p>" },
+    },
+  })
+
   test("handover page shows all possible missing required fields when no fields filled", async ({
     page,
     documentNumber,
@@ -505,90 +511,54 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
   )
 
   test(
-    "handover shows text check mistakes",
+    "error count should correctly show number of errors",
     {
-      tag: ["@RISDEV-254", "@RISDEV-6245"],
+      tag: ["@RISDEV-254", "@RISDEV-6245", "@RISDEV-9094"],
     },
-    async ({ page, prefilledDocumentUnit, request }) => {
-      await test.step("Befülle Langtexte und Kurztexte mit texts", async () => {
-        const text =
-          "<p>Das Wort hat einen Flerher, und Testgnorierteswort soll nicht als Fehler mitgezählt werden.</p>"
+    async ({ page, decision }) => {
+      await navigateToHandover(page, decision.createdDecision.documentNumber!)
+      const handover = page.getByLabel("Rechtschreibprüfung")
 
-        const documentationUnit = {
-          ...prefilledDocumentUnit,
-          shortTexts: {
-            headline: undefined,
-            guidingPrinciple: undefined,
-            headnote: undefined,
-            otherHeadnote: text,
-          },
-          longTexts: {
-            tenor: text,
-            caseFacts: undefined,
-            decisionReasons: undefined,
-            otherLongText: undefined,
-            dissentingOpinion: undefined,
-          },
-        } as Decision
-        await updateDocumentationUnit(page, documentationUnit, request)
-      })
-
-      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
-
-      await test.step("Validate errors are counted", async () => {
-        const handover = page.getByLabel("Rechtschreibprüfung")
-
+      await test.step("Validate document has no errors", async () => {
         await expect(
-          handover.getByLabel("Ladestatus"),
+          handover.getByLabel("Rechtschreibprüfung").getByLabel("Ladestatus"),
           "Text check might take longer then expected",
         ).toBeHidden({
           timeout: 20_000,
         })
 
         await expect(
-          page.getByText("Es wurden Rechtschreibfehler identifiziert:"),
+          page.getByText("Es wurden keine Rechtschreibfehler identifiziert"),
+        ).toBeVisible()
+      })
+
+      await test.step("Validate document has text check errors", async () => {
+        await navigateToCategories(
+          page,
+          decision.createdDecision.documentNumber!,
+        )
+        const tenorEditor = page.getByTestId("Tenor")
+        await clearTextField(page, tenorEditor)
+        await tenorEditor.locator("div").fill("Text mit Feler")
+
+        await navigateToHandover(page, decision.createdDecision.documentNumber!)
+
+        await expect(
+          handover.getByLabel("Rechtschreibprüfung").getByLabel("Ladestatus"),
+          "Text check might take longer then expected",
+        ).toBeHidden({
+          timeout: 20_000,
+        })
+
+        await expect(
+          page.getByText("Es wurden Rechtschreibfehler identifiziert"),
         ).toBeVisible()
 
         await page.getByTestId("total-text-check-errors-container").isVisible()
         await expect(page.getByTestId("total-text-check-errors")).toHaveText(
-          "2",
+          "1",
         )
       })
-    },
-  )
-
-  test(
-    "error count should correctly show number of errors",
-    {
-      tag: ["@RISDEV-9094"],
-    },
-    async ({ page, prefilledDocumentUnit, request }) => {
-      const noErrorText = "<p>Das ist ein Fehler.</p>"
-
-      const documentationUnitNoError = {
-        ...prefilledDocumentUnit,
-        shortTexts: {
-          headline: undefined,
-          guidingPrinciple: undefined,
-          headnote: undefined,
-          otherHeadnote: noErrorText,
-        },
-      } as Decision
-      await patchDocumentationUnit(page, documentationUnitNoError, request)
-
-      const errorText = "<p>Das ist ein Felher.</p>"
-      const documentationUnitWithError = {
-        ...prefilledDocumentUnit,
-        shortTexts: {
-          headline: undefined,
-          guidingPrinciple: undefined,
-          headnote: undefined,
-          otherHeadnote: errorText,
-        },
-      } as Decision
-      await patchDocumentationUnit(page, documentationUnitWithError, request)
-
-      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
 
       await test.step("Validate errors are counted", async () => {
         const handover = page.getByLabel("Rechtschreibprüfung")
