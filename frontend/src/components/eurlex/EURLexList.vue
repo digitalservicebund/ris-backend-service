@@ -87,7 +87,7 @@ async function handleAssignToDocOffice() {
         severity: "success",
         summary: "Zuweisen erfolgreich",
         detail: `Die Dokumentationseinheit${verb} der Dokumentationsstelle ${selectedDocumentationOffice.value.abbreviation} zugewiesen.`,
-        life: 5_000,
+        life: 5000,
       })
     } else {
       emit("handleServiceError", response.error)

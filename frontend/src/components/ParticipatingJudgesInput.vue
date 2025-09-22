@@ -26,10 +26,11 @@ const validationStore =
 
 function validateRequiredInput() {
   validationStore.reset()
-
-  participatingJudge.value.missingRequiredFields.forEach((missingField) =>
-    validationStore.add("Pflichtfeld nicht befüllt", missingField),
-  )
+  if (participatingJudge.value.missingRequiredFields?.length) {
+    for (const missingField of participatingJudge.value.missingRequiredFields) {
+      validationStore.add("Pflichtfeld nicht befüllt", missingField)
+    }
+  }
 }
 
 async function addParticipatingJudge() {

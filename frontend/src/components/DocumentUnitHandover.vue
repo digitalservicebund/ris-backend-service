@@ -21,7 +21,7 @@ async function handoverDocument() {
   if (!eventLog.value) eventLog.value = []
   if (response.data && response.data?.success) {
     const handover = new HandoverMail(response.data)
-    handover.setContent(handover.getContent().replace(/[ \t]{2,}/g, ""))
+    handover.setContent(handover.getContent().replaceAll(/[ \t]{2,}/g, ""))
 
     eventLog.value.unshift(handover)
 

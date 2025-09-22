@@ -164,11 +164,11 @@ function jumpToMatch(match: Match) {
 
 onBeforeUnmount(() => {
   // Remove the event listener when the component is unmounted
-  window.removeEventListener("keydown", handleKeyDown)
+  globalThis.removeEventListener("keydown", handleKeyDown)
 })
 
 onMounted(async () => {
-  window.addEventListener("keydown", handleKeyDown)
+  globalThis.addEventListener("keydown", handleKeyDown)
   await requestDocumentUnitFromServer()
 })
 </script>

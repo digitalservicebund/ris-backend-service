@@ -101,9 +101,9 @@ const fetchData = async () => {
 }
 
 function rowClass(data: DocumentationUnitProcessStep): string {
-  return data.id !== documentUnit.value.processSteps?.at(0)?.id
-    ? "bg-gray-100"
-    : ""
+  return data.id === documentUnit.value.processSteps?.at(0)?.id
+    ? ""
+    : "bg-gray-100"
 }
 
 watch(

@@ -47,10 +47,10 @@ function validate() {
   if (definition.value.isEmpty) {
     validationStore.reset()
   } else {
-    if (!definition.value.definedTerm) {
-      validationStore.add("Pflichtfeld nicht befüllt", "definedTerm")
-    } else {
+    if (definition.value.definedTerm) {
       validationStore.remove("definedTerm")
+    } else {
+      validationStore.add("Pflichtfeld nicht befüllt", "definedTerm")
     }
     if (borderNumberInvalid.value) {
       validationStore.add("Randnummer existiert nicht", "definingBorderNumber")

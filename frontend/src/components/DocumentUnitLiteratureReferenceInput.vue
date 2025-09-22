@@ -51,9 +51,12 @@ const legalPeriodical = computed({
 
 async function validateRequiredInput() {
   validationStore.reset()
-  reference.value.missingRequiredLiteratureFields.forEach((missingField) =>
-    validationStore.add("Pflichtfeld nicht befüllt", missingField),
-  )
+  if (reference.value.missingRequiredLiteratureFields) {
+    for (const missingField of reference.value
+      .missingRequiredLiteratureFields) {
+      validationStore.add("Pflichtfeld nicht befüllt", missingField)
+    }
+  }
 }
 
 async function addReference() {

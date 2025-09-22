@@ -48,11 +48,9 @@ onMounted(() => {
 
 <template>
   <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
-  <div
+  <dialog
     :aria-label="ariaLabel"
     class="popup-modal-wrapper fixed top-0 left-0 z-50 flex h-full w-screen items-center justify-center bg-black/40"
-    role="dialog"
-    tabindex="0"
     @click.self="$emit('closeModal')"
     @keydown.esc="$emit('closeModal')"
   >
@@ -91,5 +89,5 @@ onMounted(() => {
         ></Button>
       </div>
     </div>
-  </div>
+  </dialog>
 </template>

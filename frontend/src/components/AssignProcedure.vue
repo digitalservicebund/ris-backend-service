@@ -14,10 +14,10 @@ const procedure = ref<Procedure | undefined>(undefined)
 const hasNoProcedureSelectedError = ref(false)
 
 const assignProcedures = () => {
-  if (!procedure.value) {
-    hasNoProcedureSelectedError.value = true
-  } else {
+  if (procedure.value) {
     hasNoProcedureSelectedError.value = false
+  } else {
+    hasNoProcedureSelectedError.value = true
   }
 
   emit("assignProcedure", procedure.value)
