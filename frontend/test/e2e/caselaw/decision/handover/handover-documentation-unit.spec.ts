@@ -3,6 +3,7 @@ import { Decision } from "@/domain/decision"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   addIgnoreWordToDocumentationUnit,
+  patchDocumentationUnit,
   updateDocumentationUnit,
 } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import {
@@ -551,6 +552,61 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
         await page.getByTestId("total-text-check-errors-container").isVisible()
         await expect(page.getByTestId("total-text-check-errors")).toHaveText(
           "2",
+        )
+      })
+    },
+  )
+
+  test(
+    "error count should correctly show number of errors",
+    {
+      tag: ["@RISDEV-9094"],
+    },
+    async ({ page, prefilledDocumentUnit, request }) => {
+      const noErrorText = "<p>Das ist ein Fehler.</p>"
+
+      const documentationUnitNoError = {
+        ...prefilledDocumentUnit,
+        shortTexts: {
+          headline: undefined,
+          guidingPrinciple: undefined,
+          headnote: undefined,
+          otherHeadnote: noErrorText,
+        },
+      } as Decision
+      await patchDocumentationUnit(page, documentationUnitNoError, request)
+
+      const errorText = "<p>Das ist ein Felher.</p>"
+      const documentationUnitWithError = {
+        ...prefilledDocumentUnit,
+        shortTexts: {
+          headline: undefined,
+          guidingPrinciple: undefined,
+          headnote: undefined,
+          otherHeadnote: errorText,
+        },
+      } as Decision
+      await patchDocumentationUnit(page, documentationUnitWithError, request)
+
+      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+
+      await test.step("Validate errors are counted", async () => {
+        const handover = page.getByLabel("Rechtschreibprüfung")
+
+        await expect(
+          handover.getByLabel("Ladestatus"),
+          "Text check might take longer then expected",
+        ).toBeHidden({
+          timeout: 20_000,
+        })
+
+        await expect(
+          page.getByText("Es wurden Rechtschreibfehler identifiziert:"),
+        ).toBeVisible()
+
+        await page.getByTestId("total-text-check-errors-container").isVisible()
+        await expect(page.getByTestId("total-text-check-errors")).toHaveText(
+          "1",
         )
       })
     },

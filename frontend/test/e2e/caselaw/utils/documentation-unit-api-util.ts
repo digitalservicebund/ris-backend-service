@@ -21,6 +21,24 @@ export async function updateDocumentationUnit(
   )
 }
 
+export async function patchDocumentationUnit(
+  page: Page,
+  documentUnit: Decision,
+  request: APIRequestContext,
+): Promise<APIResponse> {
+  const cookies = await page.context().cookies()
+  const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+  return await request.patch(
+    `/api/v1/caselaw/documentunits/${documentUnit.uuid}`,
+    {
+      data: {
+        ...documentUnit,
+      },
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    },
+  )
+}
+
 export async function addIgnoreWordToDocumentationUnit(
   page: Page,
   uuid: string,
