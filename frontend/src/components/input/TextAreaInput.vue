@@ -62,8 +62,8 @@ async function determineTextareaHeight() {
     textareaRef.value as Element,
   )
 
-  const borderTop = parseInt(borderTopWidth)
-  const borderBottom = parseInt(borderBottomWidth)
+  const borderTop = Number.parseInt(borderTopWidth)
+  const borderBottom = Number.parseInt(borderBottomWidth)
 
   const calculatedHeight =
     textareaRef.value.scrollHeight + borderTop + borderBottom

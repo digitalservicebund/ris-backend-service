@@ -357,7 +357,7 @@ const editorButtons = computed(() =>
 )
 const buttonSize = 48
 const maxButtonEntries = computed(() =>
-  props.containerWidth !== undefined
+  props.containerWidth
     ? Math.floor((props.containerWidth - 100) / buttonSize)
     : Number.MAX_VALUE,
 )

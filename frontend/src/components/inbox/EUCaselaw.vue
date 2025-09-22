@@ -31,10 +31,10 @@ async function search() {
   if (currentPage.value) currentPage.value.content = []
 
   const response = await service.searchByDocumentUnitSearchInput({
-    ...(pageNumber.value != undefined
-      ? { pg: pageNumber.value.toString() }
-      : {}),
-    ...(itemsPerPage != undefined ? { sz: itemsPerPage.toString() } : {}),
+    ...(pageNumber.value == undefined
+      ? {}
+      : { pg: pageNumber.value.toString() }),
+    ...(itemsPerPage == undefined ? {} : { sz: itemsPerPage.toString() }),
     ...searchQuery.value,
     inboxStatus: "EU",
     myDocOfficeOnly: "true",

@@ -75,9 +75,9 @@ function collapseNode(collapsedNode: FieldOfLaw) {
 function addExpandedNodes(
   map: Map<string, FieldOfLaw>,
 ): Map<string, FieldOfLaw> {
-  expandedNodes.value.forEach((node) => {
+  for (const node of expandedNodes.value) {
     map.set(node.identifier, node)
-  })
+  }
   return map
 }
 
