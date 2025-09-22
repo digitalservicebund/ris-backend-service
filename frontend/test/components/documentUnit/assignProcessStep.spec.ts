@@ -1,4 +1,3 @@
-import { createTestingPinia } from "@pinia/testing"
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { UseFetchReturn } from "@vueuse/core"
@@ -140,18 +139,7 @@ function renderComponent(
       },
       global: {
         directives: { tooltip: Tooltip },
-        plugins: [
-          router,
-          createTestingPinia({
-            initialState: {
-              docunitStore: {
-                originalDocumentUnit: defaultDocumentUnit,
-                documentUnit: defaultDocumentUnit,
-              },
-            },
-            stubActions: false,
-          }),
-        ],
+        plugins: [router],
       },
     }),
     visible,

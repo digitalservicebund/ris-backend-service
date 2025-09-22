@@ -6,6 +6,7 @@ import ResultList from "@/components/search/shared/ResultList.vue"
 import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { PublicationState } from "@/domain/publicationStatus"
+import featureToggleService from "@/services/featureToggleService"
 import routes from "~/test-helper/routes"
 
 const mockEntries = [
@@ -102,6 +103,13 @@ function renderComponent(props?: {
 }
 
 describe("Search Result List", () => {
+  beforeEach(() => {
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+    vi.resetAllMocks()
+  })
   it("renders document numbers", () => {
     renderComponent()
     const rows = screen.getAllByRole("row")
