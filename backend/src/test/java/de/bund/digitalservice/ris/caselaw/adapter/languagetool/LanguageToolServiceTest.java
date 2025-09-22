@@ -82,6 +82,12 @@ class LanguageToolServiceTest {
   }
 
   @Test
+  void shouldReturnEmptyListWhenDisabled() {
+    when(languageToolConfig.isEnabled()).thenReturn(false);
+    Assertions.assertEquals(0, languageToolService.requestTool("").size());
+  }
+
+  @Test
   void testSimpleText() {
     String html = "<body><div>Hello, world!</div></body>";
     Document doc = Jsoup.parse(html);
