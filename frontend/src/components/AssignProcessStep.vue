@@ -111,7 +111,6 @@ function rowClass(data: DocumentationUnitProcessStep): string {
 watch(
   visible,
   async (newValue) => {
-    console.log(newValue)
     if (newValue === true) {
       fetchProcessStepsErrors.value = []
       await fetchData()
