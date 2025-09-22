@@ -3,11 +3,11 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
-import de.bund.digitalservice.ris.caselaw.domain.AbstractDocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment2Html;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcessStepRequest;
+import de.bund.digitalservice.ris.caselaw.domain.BulkDocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -81,7 +81,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class DocumentationUnitController {
   private final DocumentationUnitService service;
-  private final AbstractDocumentationUnitService abstractService;
+  private final BulkDocumentationUnitService abstractService;
   private final UserService userService;
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
@@ -94,7 +94,7 @@ public class DocumentationUnitController {
 
   public DocumentationUnitController(
       DocumentationUnitService service,
-      AbstractDocumentationUnitService abstractService,
+      BulkDocumentationUnitService abstractService,
       UserService userService,
       AttachmentService attachmentService,
       ConverterService converterService,

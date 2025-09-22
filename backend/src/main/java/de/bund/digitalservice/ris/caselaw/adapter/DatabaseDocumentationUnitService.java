@@ -8,7 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserDTO;
-import de.bund.digitalservice.ris.caselaw.domain.AbstractDocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.BulkDocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepNotFoundException;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class DatabaseDocumentationUnitService extends AbstractDocumentationUnitService {
+public class DatabaseDocumentationUnitService implements BulkDocumentationUnitService {
   private final DatabaseDocumentationUnitRepository repository;
   private final DatabaseProcessStepRepository processStepRepository;
   private final DatabaseUserRepository userRepository;
