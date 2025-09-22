@@ -21,6 +21,11 @@ import { ServiceResponse } from "@/services/httpClient"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
+const addToastMock = vi.fn()
+vi.mock("primevue/usetoast", () => ({
+  useToast: () => ({ add: addToastMock }),
+}))
+
 const server = setupServer(
   http.get("/api/v1/caselaw/courts", () => {
     const court: Court = {
@@ -35,6 +40,9 @@ const server = setupServer(
       { uuid: "a", abbreviation: "A", name: "Step A" },
       { uuid: "b", abbreviation: "B", name: "Step B" },
     ] as ProcessStep[])
+  }),
+  http.get("/api/v1/feature-toggles/neuris.multi-edit", () => {
+    return HttpResponse.json(true)
   }),
 )
 
@@ -55,6 +63,7 @@ function renderComponent(
         directives: {
           "ctrl-enter": onSearchShortcutDirective,
           tooltip: {},
+          ripple: {},
         },
         plugins: [
           router,
