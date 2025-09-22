@@ -207,6 +207,23 @@ class LanguageToolServiceTest {
   }
 
   @Test
+  void testEmptyContent() {
+    String html = "<body></body>";
+    Document doc = Jsoup.parse(html);
+    JsonArray result = getAnnotationsArray(doc);
+
+    Assertions.assertEquals(0, result.size());
+  }
+
+  @Test
+  void testEmpty() {
+    Document doc = Jsoup.parse("");
+    JsonArray result = getAnnotationsArray(doc);
+
+    Assertions.assertEquals(0, result.size());
+  }
+
+  @Test
   void testEmptyText() {
     String html = "<body><p></p></body>";
     Document doc = Jsoup.parse(html);
