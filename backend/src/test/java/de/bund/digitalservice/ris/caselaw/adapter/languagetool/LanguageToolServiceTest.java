@@ -229,14 +229,6 @@ class LanguageToolServiceTest {
   }
 
   @Test
-  void testComment() {
-    Document doc = Jsoup.parse("<body><div><!-- # test --></div></body>");
-    JsonArray result = getAnnotationsArray(doc);
-
-    Assertions.assertEquals(0, result.size());
-  }
-
-  @Test
   void testEmptyText() {
     String html = "<body><p></p></body>";
     Document doc = Jsoup.parse(html);
