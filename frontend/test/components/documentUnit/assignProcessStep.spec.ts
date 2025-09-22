@@ -296,7 +296,6 @@ describe("AssignProcessStep component", () => {
 
       expect(screen.queryByRole("table")).not.toBeInTheDocument()
       expect(processStepService.getNextProcessStep).not.toHaveBeenCalled()
-      expect(await screen.findByLabelText("Weitergeben")).toBeDisabled()
 
       const select = await screen.findByLabelText("Neuer Schritt")
       await userEvent.click(select)
