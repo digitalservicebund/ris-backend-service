@@ -42,20 +42,16 @@ const shouldDeleteLegalForces = computed(() => {
  * Deletes the legal forces from all single norms in the norms of the updated document unit.
  */
 function deleteLegalForces() {
-  const norms = documentUnit.value?.contentRelatedIndexing?.norms
-  if (!norms) {
-    return
-  }
-  for (const norm of norms) {
-    if (norm.singleNorms) {
-      norm.singleNorms = norm.singleNorms.filter((singleNorm) => {
-        if (singleNorm.legalForce) {
-          singleNorm.legalForce = undefined
-        }
-        return !singleNorm.isEmpty
-      })
-    }
-  }
+  const norms = documentUnit.value!.contentRelatedIndexing.norms
+
+  norms?.forEach((norm) => {
+    norm.singleNorms = norm.singleNorms?.filter((singleNorm) => {
+      if (singleNorm.legalForce) {
+        singleNorm.legalForce = undefined
+      }
+      return !singleNorm.isEmpty
+    })
+  })
 }
 
 const coreData = computed({
