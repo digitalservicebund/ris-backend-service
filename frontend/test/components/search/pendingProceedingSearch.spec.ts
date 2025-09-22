@@ -16,6 +16,7 @@ import PendingProceeding from "@/domain/pendingProceeding"
 import ProcessStep from "@/domain/processStep"
 import errorMessages from "@/i18n/errors.json"
 import documentUnitService from "@/services/documentUnitService"
+import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
@@ -83,6 +84,10 @@ describe("Pending Proceeding Search", () => {
     config.global.stubs = {
       InputMask: InputText,
     }
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
     vi.resetAllMocks()
   })
 
