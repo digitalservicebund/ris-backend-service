@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
+import de.bund.digitalservice.ris.caselaw.domain.AbstractDocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
@@ -61,6 +62,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class DocumentationUnitControllerAuthTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @MockitoBean private DocumentationUnitService service;
+  @MockitoBean private AbstractDocumentationUnitService abstractDocumentationUnitService;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService

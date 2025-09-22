@@ -189,7 +189,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @AfterEach
   void cleanUp() {
     fileNumberRepository.deleteAll();
-    databaseDocumentationUnitProcessStepRepository.deleteAll();
     repository.deleteAll();
     databaseDocumentTypeRepository.deleteAll();
     databaseDocumentNumberRepository.deleteAll();
