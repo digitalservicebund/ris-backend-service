@@ -63,7 +63,6 @@ function renderComponent(
         directives: {
           "ctrl-enter": onSearchShortcutDirective,
           tooltip: {},
-          ripple: {},
         },
         plugins: [
           router,

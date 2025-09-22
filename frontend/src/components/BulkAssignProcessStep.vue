@@ -157,11 +157,7 @@ const areSelectedDocUnitsValid = () => {
       </Button>
       <Menu ref="menuRef" class="min-w-[225px]" :model="menuModel" popup>
         <template #item="{ item, props: slotPropsps }">
-          <a
-            v-ripple
-            class="min-w-225 cursor-pointer"
-            v-bind="slotPropsps.action"
-          >
+          <a class="min-w-225 cursor-pointer" v-bind="slotPropsps.action">
             <span class="p-menuitem-icon">
               <component :is="item.component" />
             </span>
