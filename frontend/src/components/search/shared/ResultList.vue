@@ -161,14 +161,14 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
 }
 
 onMounted(async () => {
-  window.addEventListener("scroll", handleScroll)
+  globalThis.addEventListener("scroll", handleScroll)
   multiEditActive.value = (
     await featureToggleService.isEnabled("neuris.multi-edit")
   ).data
 })
 
 onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll)
+  globalThis.removeEventListener("scroll", handleScroll)
 })
 </script>
 
