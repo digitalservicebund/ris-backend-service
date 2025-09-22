@@ -13,6 +13,7 @@ import IconBadge from "@/components/IconBadge.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import { useProcessStepBadge } from "@/composables/useProcessStepBadge"
+import { useValidationStore } from "@/composables/useValidationStore"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
 import ProcessStep from "@/domain/processStep"
@@ -27,6 +28,9 @@ const props = defineProps<{
     documentationUnitProcessStep: DocumentationUnitProcessStep,
   ) => Promise<ResponseError | undefined>
 }>()
+
+type ProcessStepField = ["nextProcessStep", "processStepPerson"][number]
+const validationStore = useValidationStore<ProcessStepField>()
 
 const visible = defineModel<boolean>("visible", {
   default: false,
@@ -57,14 +61,21 @@ const selectedUser = computed({
   },
 })
 
-async function assignProcessStep(): Promise<void> {
+function validate() {
+  validationStore.reset()
   if (!nextProcessStep.value) {
-    hasNoProcessStepSelectedError.value = true
+    validationStore.add("Pflichtfeld nicht befüllt", "nextProcessStep")
+    return false
   } else {
-    hasNoProcessStepSelectedError.value = false
+    validationStore.remove("nextProcessStep")
+    return true
+  }
+}
 
+async function assignProcessStep(): Promise<void> {
+  if (validate()) {
     const error = await props.handleAssignProcessStep({
-      processStep: nextProcessStep.value,
+      processStep: nextProcessStep.value!,
       user: nextUser.value,
     })
 
@@ -115,6 +126,7 @@ watch(
       fetchProcessStepsErrors.value = []
       await fetchData()
     }
+    validationStore.reset()
   },
   { immediate: true },
 )
@@ -147,15 +159,22 @@ watch(
 
       <div class="flex gap-32">
         <div class="flex-1">
-          <InputField id="nextProcessStep" label="Neuer Schritt">
+          <InputField
+            id="nextProcessStep"
+            v-slot="slotProps"
+            label="Neuer Schritt"
+            :validation-error="validationStore.getByField('nextProcessStep')"
+          >
             <Select
               v-model="nextProcessStep"
               aria-label="Neuer Schritt"
               class="w-full"
               :has-error="hasNoProcessStepSelectedError"
+              :invalid="slotProps.hasError"
               option-label="name"
               :options="processSteps"
-              @focus="() => (hasNoProcessStepSelectedError = false)"
+              @blur="validate"
+              @focus="validationStore.remove('nextProcessStep')"
             ></Select>
           </InputField>
         </div>
@@ -176,7 +195,6 @@ watch(
       >
         <Button
           aria-label="Weitergeben"
-          :disabled="!nextProcessStep"
           label="Weitergeben"
           severity="primary"
           size="small"

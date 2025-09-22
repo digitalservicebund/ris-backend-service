@@ -270,16 +270,20 @@ describe("AssignProcessStep component", () => {
     ).toBeInTheDocument()
   })
 
-  // test("shows error when no process step is selected", async () => {
-  //   vi.spyOn(processStepService, "getNextProcessStep").mockImplementation(() =>
-  //     Promise.resolve({ status: 200, data: undefined }),
-  //   )
-  //   const { user } = renderComponent()
+  test("shows error when no process step is selected", async () => {
+    vi.spyOn(processStepService, "getNextProcessStep").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: undefined }),
+    )
+    const { user } = renderComponent()
 
-  //   await user.click(await screen.findByLabelText("Weitergeben"))
+    expect(
+      screen.queryByText("Pflichtfeld nicht befüllt"),
+    ).not.toBeInTheDocument()
 
-  //   expect(screen.getByText("Wählen Sie einen Vorgang aus")).toBeInTheDocument()
-  // })
+    await user.click(await screen.findByLabelText("Weitergeben"))
+
+    expect(screen.getByText("Pflichtfeld nicht befüllt")).toBeInTheDocument()
+  })
 
   describe("Multi-edit scenarios", () => {
     test("does not show history table and calls correct services in multi-edit scenario", async () => {
