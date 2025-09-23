@@ -10,7 +10,7 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.5.6"
+    id("org.springframework.boot") version "3.5.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "7.2.1"
     id("org.sonarqube") version "6.3.1.5724"
@@ -162,7 +162,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.5")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.4")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
 
@@ -186,7 +186,7 @@ dependencies {
     implementation("io.netty:netty-transport-classes-epoll:4.2.6.Final")
     implementation("io.netty:netty-transport-native-unix-common:4.2.6.Final")
 
-    implementation("org.postgresql:postgresql:42.7.8")
+    implementation("org.postgresql:postgresql:42.7.7")
 
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
@@ -245,7 +245,7 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.13.1"
+    val flywayCore = "org.flywaydb:flyway-core:11.13.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
     runtimeOnly("org.flywaydb:flyway-database-postgresql:11.13.1")
@@ -257,7 +257,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.7.11")
-    testImplementation("org.springframework.security:spring-security-test:6.5.5")
+    testImplementation("org.springframework.security:spring-security-test:6.5.4")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
@@ -371,4 +371,3 @@ tasks {
     }
 
 }
-
