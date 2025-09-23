@@ -117,7 +117,7 @@ export interface TextCheckService {
    * Updates a match mark in text based on its ignored status
    */
   updateIgnoredMark(
-    matchId: number,
+    match: Match,
     state: EditorState,
     /* eslint-disable @typescript-eslint/no-explicit-any */
     dispatch: ((args?: any) => any) | undefined,
@@ -140,10 +140,7 @@ export interface TextCheckService {
   /**
    * Add an ignored word to all matching entries in the store
    */
-  addIgnoredWordToMatches(
-    word: string,
-    ignoredTextCheckWord: IgnoredTextCheckWord,
-  ): void
+  addIgnoredWordToMatches(ignoredTextCheckWord: IgnoredTextCheckWord): void
 
   /**
    * Remove ignored words of given type from all matching entries in the store
