@@ -40,7 +40,6 @@ describe("check category service", () => {
     )
 
     store = useDocumentUnitStore()
-
     vi.spyOn(store, "updateDocumentUnit").mockImplementation(
       updateDocumentUnitMock,
     )
@@ -50,167 +49,167 @@ describe("check category service", () => {
     vi.restoreAllMocks()
   })
 
-  it("text check category update documentation unit before check", async () => {
-    const mockEditor: Editor = {
-      commands: {
-        setContent: vi.fn(),
-      },
-    } as unknown as Editor
-
-    const textCheckService = new NeurisTextCheckService(textCategory)
-
-    await textCheckService.checkCategory(mockEditor)
-
-    expect(store.updateDocumentUnit).toHaveBeenCalledTimes(1)
-    expect(store.updateDocumentUnit).toHaveBeenCalledWith()
-  })
-
-  it("clear selected match sets it to undefined ", async () => {
-    const textCheckService = new NeurisTextCheckService(textCategory)
-
-    textCheckService.selectedMatch.value = generateMatch()
-
-    textCheckService.clearSelectedMatch()
-    expect(textCheckService.selectedMatch.value).toBeUndefined()
-  })
-
-  it("resets selected match if not in matches", async () => {
-    const textCheckService = new NeurisTextCheckService(textCategory)
-
-    textCheckService.selectedMatch.value = generateMatch()
-    expect(textCheckService.selectedMatch.value).toBeDefined()
-
-    store.matches = new Map([["tenor", [generateMatch(4)]]])
-
-    textCheckService.selectMatch(3)
-    expect(textCheckService.selectedMatch.value).toBeUndefined()
-  })
-
-  it("set selected match if contained in matches", async () => {
-    const textCheckService = new NeurisTextCheckService(textCategory)
-
-    const match = generateMatch()
-    expect(textCheckService.selectedMatch.value).toBeUndefined()
-    store.matches = new Map([[textCategory, [match]]])
-
-    textCheckService.selectMatch(match.id)
-    expect(textCheckService.selectedMatch.value).toEqual(match)
-  })
-
-  it.each(["global", "documentation_unit"] as const)(
-    "removing a %s ignored word updates the all ignored words in matches accordingly",
-    async (type: DocumentationType) => {
-      const match = generateMatch()
-
-      expect(match.ignoredTextCheckWords).toEqual([
-        {
-          type: "documentation_unit",
-          word: "Rechtshcreibfehler",
-        },
-        {
-          type: "global",
-          word: "Rechtshcreibfehler",
-        },
-      ])
+  describe("check category", () => {
+    it("updates document unit before performing check", async () => {
+      const mockEditor: Editor = {
+        commands: { setContent: vi.fn() },
+      } as unknown as Editor
 
       const textCheckService = new NeurisTextCheckService(textCategory)
-      store.matches = new Map([
-        ["tenor", [match]],
-        ["reasons", [match]],
-      ])
 
-      if (type === "global") {
-        vi.spyOn(languageToolService, "removeGlobalIgnore").mockResolvedValue({
-          status: 200,
-          data: undefined,
-        })
+      await textCheckService.checkCategory(mockEditor)
 
-        await textCheckService.removeGloballyIgnoredWord(match.word)
+      expect(store.updateDocumentUnit).toHaveBeenCalledTimes(1)
+      expect(store.updateDocumentUnit).toHaveBeenCalledWith()
+    })
+  })
 
-        expect(store.matches.get("tenor")![0].ignoredTextCheckWords).toEqual([
-          {
-            type: "documentation_unit",
-            word: "Rechtshcreibfehler",
-          },
-        ])
+  describe("match selection", () => {
+    it("clears selected match", () => {
+      const textCheckService = new NeurisTextCheckService(textCategory)
+      textCheckService.selectedMatch.value = generateMatch()
 
-        expect(store.matches.get("reasons")![0].ignoredTextCheckWords).toEqual([
-          {
-            type: "documentation_unit",
-            word: "Rechtshcreibfehler",
-          },
-        ])
-      } else if (type === "documentation_unit") {
-        vi.spyOn(languageToolService, "removeLocalIgnore").mockResolvedValue({
-          status: 200,
-          data: undefined,
-        })
-        await textCheckService.removeIgnoredWord(match.word)
+      textCheckService.clearSelectedMatch()
 
-        expect(store.matches.get("tenor")![0].ignoredTextCheckWords).toEqual([
-          {
-            type: "global",
-            word: "Rechtshcreibfehler",
-          },
-        ])
+      expect(textCheckService.selectedMatch.value).toBeUndefined()
+    })
 
-        expect(store.matches.get("reasons")![0].ignoredTextCheckWords).toEqual([
-          {
-            type: "global",
-            word: "Rechtshcreibfehler",
-          },
-        ])
-      } else {
-        throw new Error("ignored type is not supported")
-      }
-    },
-  )
+    it("resets selected match if not in matches", () => {
+      const textCheckService = new NeurisTextCheckService(textCategory)
+      textCheckService.selectedMatch.value = generateMatch()
 
-  it.each(["global", "documentation_unit"] as const)(
-    "adding a %s ignored word updates the selected match ignored words list accordingly",
-    async (type: DocumentationType) => {
+      store.matches = new Map([["tenor", [generateMatch(4)]]])
+      textCheckService.selectMatch(3)
+
+      expect(textCheckService.selectedMatch.value).toBeUndefined()
+    })
+
+    it("sets selected match if contained in matches", () => {
       const textCheckService = new NeurisTextCheckService(textCategory)
       const match = generateMatch()
-      match.ignoredTextCheckWords = []
 
-      store.matches = new Map([
-        ["tenor", [match]],
-        ["reasons", [match]],
-      ])
+      store.matches = new Map([[textCategory, [match]]])
+      textCheckService.selectMatch(match.id)
 
-      const ignoredWord = generateIgnoredWord(type) as IgnoredTextCheckWord
+      expect(textCheckService.selectedMatch.value).toEqual(match)
+    })
+  })
 
-      if (type == "global") {
-        vi.spyOn(languageToolService, "addGlobalIgnore").mockResolvedValue({
-          status: 200,
-          data: generateIgnoredWord(type) as IgnoredTextCheckWord,
-        })
-        await textCheckService.ignoreWordGlobally(ignoredWord.word)
+  describe("ignored words", () => {
+    describe("removing ignored words", () => {
+      it.each(["global", "documentation_unit"] as const)(
+        "removing a %s ignored word updates matches accordingly",
+        async (type: DocumentationType) => {
+          const match = generateMatch()
+          const textCheckService = new NeurisTextCheckService(textCategory)
 
-        expect(store.matches.get("tenor")![0].ignoredTextCheckWords).toEqual([
-          {
-            id: "0dd15ae7-bece-4133-9eb3-e01563a39102",
-            type: "global",
-            word: "Rechtshcreibfehler",
-          },
-        ])
-      } else if (type == "documentation_unit") {
-        vi.spyOn(languageToolService, "addLocalIgnore").mockResolvedValue({
-          status: 200,
-          data: ignoredWord,
-        })
-        await textCheckService.ignoreWord(ignoredWord.word)
+          store.matches = new Map([
+            ["tenor", [match]],
+            ["reasons", [match]],
+          ])
 
-        expect(store.matches.get("tenor")![0].ignoredTextCheckWords).toEqual([
-          {
-            id: "0dd15ae7-bece-4133-9eb3-e01563a39102",
-            type: "documentation_unit",
-            word: "Rechtshcreibfehler",
-          },
-        ])
-      } else {
-        throw new Error("ignored type is not supported")
-      }
-    },
-  )
+          if (type === "global") {
+            vi.spyOn(
+              languageToolService,
+              "removeGlobalIgnore",
+            ).mockResolvedValue({
+              status: 200,
+              data: undefined,
+            })
+
+            await textCheckService.removeGloballyIgnoredWord(match.word)
+
+            const expectedIgnoredWord = {
+              type: "documentation_unit",
+              word: "Rechtshcreibfehler",
+            }
+
+            expect(
+              store.matches.get("tenor")![0].ignoredTextCheckWords,
+            ).toEqual([expectedIgnoredWord])
+
+            expect(
+              store.matches.get("reasons")![0].ignoredTextCheckWords,
+            ).toEqual([expectedIgnoredWord])
+          } else {
+            vi.spyOn(
+              languageToolService,
+              "removeLocalIgnore",
+            ).mockResolvedValue({
+              status: 200,
+              data: undefined,
+            })
+
+            await textCheckService.removeIgnoredWord(match.word)
+
+            expect(
+              store.matches.get("tenor")![0].ignoredTextCheckWords,
+            ).toEqual([{ type: "global", word: "Rechtshcreibfehler" }])
+          }
+        },
+      )
+    })
+
+    describe("adding ignored words", () => {
+      it.each(["global", "documentation_unit"] as const)(
+        "adding a %s ignored word updates matches accordingly",
+        async (type: DocumentationType) => {
+          const textCheckService = new NeurisTextCheckService(textCategory)
+          const match = generateMatch()
+          match.ignoredTextCheckWords = []
+
+          store.matches = new Map([
+            ["tenor", [match]],
+            ["reasons", [match]],
+          ])
+
+          const ignoredWord = generateIgnoredWord(type) as IgnoredTextCheckWord
+
+          if (type === "global") {
+            vi.spyOn(languageToolService, "addGlobalIgnore").mockResolvedValue({
+              status: 200,
+              data: generateIgnoredWord(type),
+            })
+
+            await textCheckService.ignoreWordGlobally(ignoredWord.word)
+
+            const expectedResult = {
+              id: "0dd15ae7-bece-4133-9eb3-e01563a39102",
+              type: "global",
+              word: "Rechtshcreibfehler",
+            }
+
+            expect(
+              store.matches.get("tenor")![0].ignoredTextCheckWords,
+            ).toEqual([expectedResult])
+
+            expect(
+              store.matches.get("reasons")![0].ignoredTextCheckWords,
+            ).toEqual([expectedResult])
+          } else {
+            vi.spyOn(languageToolService, "addLocalIgnore").mockResolvedValue({
+              status: 200,
+              data: ignoredWord,
+            })
+
+            await textCheckService.ignoreWord(ignoredWord.word)
+
+            const expectedResult = {
+              id: "0dd15ae7-bece-4133-9eb3-e01563a39102",
+              type: "documentation_unit",
+              word: "Rechtshcreibfehler",
+            }
+
+            expect(
+              store.matches.get("tenor")![0].ignoredTextCheckWords,
+            ).toEqual([expectedResult])
+
+            expect(
+              store.matches.get("reasons")![0].ignoredTextCheckWords,
+            ).toEqual([expectedResult])
+          }
+        },
+      )
+    })
+  })
 })
