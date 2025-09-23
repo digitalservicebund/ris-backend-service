@@ -229,10 +229,7 @@ const removeIgnoredWord = async (word: string) => {
  * Adds word to globally ignore and closes the modal
  */
 async function addGloballyIgnoredWord(word: string) {
-  const success = await textCheckService.ignoreWordGlobally(word)
-  if (success) {
-    editor.commands.toggleMatchIgnoredStatus(selectedMatch.value.id)
-  }
+  await textCheckService.ignoreWordGlobally(word)
   editor.commands.setSelectedMatch()
 }
 
@@ -308,16 +305,20 @@ const resizeObserver = new ResizeObserver((entries) => {
 
 defineExpose({ jumpToMatch })
 
+/*
+To detected changes in the matche ignores
+ */
 watch(
   () => store.matches.get(props.category),
   () => {
     editor.commands.updatedMatchesInText()
   },
-  { deep: true }, // to detect changes inside the array
+  { deep: true },
 )
 </script>
 
 <template>
+  {{ store.matches }}
   <!-- eslint-disable vuejs-accessibility/no-static-element-interactions -->
   <div
     id="text-editor"

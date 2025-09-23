@@ -7,6 +7,7 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import {
   DocumentationType,
   IgnoredTextCheckWord,
+  Match,
   TextCheckCategoryResponse,
   TextCheckService,
   TextCheckTagName,
@@ -154,48 +155,48 @@ class NeurisTextCheckService implements TextCheckService {
    * @param dispatch
    */
   updateIgnoredMark = (
-    matchId: number,
+    match: Match,
     state: EditorState,
-    dispatch: ((args?: any) => any) | undefined,
+    dispatch?: (args?: any) => any,
   ): void => {
     const { tr, schema } = state
 
-    const matches = this.store.matches.get(this.category)
+    if (!match) return
 
-    matches?.forEach((match) => {
-      const isIgnored = (match.ignoredTextCheckWords?.length ?? 0) > 0
+    state.doc.descendants((node, pos) => {
+      if (
+        node.isText &&
+        node.marks.some(
+          (mark) =>
+            mark.type.name === TextCheckTagName &&
+            mark.attrs.id === match.id.toString(),
+        )
+      ) {
+        const updatedMarks = node.marks.map((mark) => {
+          if (
+            mark.type.name === TextCheckTagName &&
+            mark.attrs.id === match.id.toString()
+          ) {
+            return mark.type.create({
+              ...mark.attrs,
+              ignored: this.isMatchedIgnored(match),
+            })
+          }
+          return mark
+        })
 
-      state.doc.descendants((node, pos) => {
-        if (
-          node.isText &&
-          node.marks.some(
-            (mark) =>
-              mark.type.name === TextCheckTagName &&
-              mark.attrs.id === matchId.toString(),
-          )
-        ) {
-          const updatedMarks = node.marks.map((mark) => {
-            if (
-              mark.type.name === TextCheckTagName &&
-              mark.attrs.id === matchId.toString()
-            ) {
-              return mark.type.create({
-                ...mark.attrs,
-                ignored: isIgnored,
-              })
-            }
-            return mark
-          })
-
-          const updatedText = schema.text(node.text ?? "", updatedMarks)
-          tr.replaceWith(pos, pos + node.nodeSize, updatedText)
-        }
-      })
+        const updatedText = schema.text(node.text ?? "", updatedMarks)
+        tr.replaceWith(pos, pos + node.nodeSize, updatedText)
+      }
     })
 
     if (dispatch) {
       dispatch(tr)
     }
+  }
+
+  isMatchedIgnored = (match: Match) => {
+    return (match.ignoredTextCheckWords?.length ?? 0) > 0
   }
 
   /**
@@ -210,7 +211,7 @@ class NeurisTextCheckService implements TextCheckService {
     const matches = this.store.matches.get(this.category)
 
     matches?.forEach((match) => {
-      this.updateIgnoredMark(match.id, state, dispatch)
+      this.updateIgnoredMark(match, state, dispatch)
     })
   }
 
@@ -246,7 +247,7 @@ class NeurisTextCheckService implements TextCheckService {
       if (response.status >= 300) {
         this.responseError.value = response.error
       } else if (response.data) {
-        this.addIgnoredWordToMatches(word, response.data)
+        this.addIgnoredWordToMatches(response.data)
         return true
       }
     }
@@ -272,20 +273,20 @@ class NeurisTextCheckService implements TextCheckService {
     return false
   }
 
-  addIgnoredWordToMatches = (
-    word: string,
-    ignoredTextCheckWord: IgnoredTextCheckWord,
-  ) => {
+  addIgnoredWordToMatches = (ignoredTextCheckWord: IgnoredTextCheckWord) => {
     for (const matchList of this.store.matches.values()) {
       matchList.forEach((match) => {
-        if (match.word == word && ignoredTextCheckWord) {
+        if (match.word === ignoredTextCheckWord.word) {
           match.ignoredTextCheckWords ??= []
 
-          const alreadyExists = match.ignoredTextCheckWords.some(
-            (ignored) => ignored.id === ignoredTextCheckWord.id,
+          const alreadyIgnored = match.ignoredTextCheckWords.some(
+            (ignored) =>
+              ignored.id === ignoredTextCheckWord.id ||
+              (ignored.type === ignoredTextCheckWord.type &&
+                ignored.word === ignoredTextCheckWord.word),
           )
 
-          if (!alreadyExists) {
+          if (!alreadyIgnored) {
             match.ignoredTextCheckWords.push(ignoredTextCheckWord)
           }
         }
@@ -302,7 +303,8 @@ class NeurisTextCheckService implements TextCheckService {
         if (match.word === word) {
           if (match.ignoredTextCheckWords) {
             match.ignoredTextCheckWords = match.ignoredTextCheckWords.filter(
-              ({ type }) => type !== ignoredType,
+              (ignored) =>
+                !(ignored.type === ignoredType && ignored.word === word),
             )
           }
         }
@@ -317,7 +319,7 @@ class NeurisTextCheckService implements TextCheckService {
     if (response.status >= 300) {
       this.responseError.value = response.error
     } else if (response.data) {
-      this.addIgnoredWordToMatches(word, response.data)
+      this.addIgnoredWordToMatches(response.data)
     }
     return false
   }
