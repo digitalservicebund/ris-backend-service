@@ -320,7 +320,6 @@ watch(
 </script>
 
 <template>
-  {{ store.matches }}
   <!-- eslint-disable vuejs-accessibility/no-static-element-interactions -->
   <div
     id="text-editor"
