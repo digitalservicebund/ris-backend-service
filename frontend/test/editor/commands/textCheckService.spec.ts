@@ -90,7 +90,6 @@ describe("check category service", () => {
     const textCheckService = new NeurisTextCheckService(textCategory)
 
     const match = generateMatch()
-    textCheckService.selectedMatch.value = undefined
     expect(textCheckService.selectedMatch.value).toBeUndefined()
     store.matches = new Map([[textCategory, [match]]])
 
