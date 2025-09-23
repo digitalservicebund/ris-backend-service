@@ -3,6 +3,12 @@ import { navigateToCategories } from "../utils/e2e-utils"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
+// eslint-disable-next-line playwright/no-skipped-test
+test.skip(
+  ({ browserName }) => browserName !== "chromium",
+  "Skipping firefox flaky test",
+)
+
 test.describe(
   "text check store",
   {
