@@ -281,7 +281,14 @@ class NeurisTextCheckService implements TextCheckService {
       matchList.forEach((match) => {
         if (match.word == word && ignoredTextCheckWord) {
           match.ignoredTextCheckWords ??= []
-          match.ignoredTextCheckWords.push(ignoredTextCheckWord)
+
+          const alreadyExists = match.ignoredTextCheckWords.some(
+            (ignored) => ignored.id === ignoredTextCheckWord.id,
+          )
+
+          if (!alreadyExists) {
+            match.ignoredTextCheckWords.push(ignoredTextCheckWord)
+          }
         }
       })
     }
