@@ -71,6 +71,8 @@ const emit = defineEmits<{
   updateValue: [newValue: string]
 }>()
 
+const store = useDocumentUnitStore()
+
 const textCheckService = new NeurisTextCheckService(props.category)
 
 const editorElement = ref<HTMLElement>()
@@ -180,8 +182,6 @@ const editorStyleClasses = computed(() => {
     ? `${fieldSizeClasses[props.fieldSize]} ${plainBorderNumberStyle} p-4`
     : undefined
 })
-
-const store = useDocumentUnitStore()
 
 const buttonsDisabled = computed(
   () => !(props.editable && (hasFocus.value || isHovered.value)),
@@ -310,9 +310,7 @@ defineExpose({ jumpToMatch })
 
 watch(
   () => store.matches.get(props.category),
-  (newMatches) => {
-    console.log("Sports matches changed:", newMatches)
-
+  () => {
     editor.commands.updatedMatchesInText()
   },
   { deep: true }, // to detect changes inside the array
