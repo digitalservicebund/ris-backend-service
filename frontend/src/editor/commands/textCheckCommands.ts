@@ -64,7 +64,6 @@ class NeurisTextCheckService implements TextCheckService {
   /**
    * Performs a spell check on a given {@link category}. The documentation unit is saved beforehand
    * @param editor
-   * @param category
    */
   checkCategory = async (editor: Editor) => {
     this.loading.value = true
