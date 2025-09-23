@@ -145,8 +145,8 @@ class NeurisTextCheckService implements TextCheckService {
   }
 
   /**
-   * Updates the ignored status of a match by id
-   * @param matchId match id to update status to
+   * Updates the ignored status in text by match
+   * @param match
    * @param state
    * @param dispatch
    */
