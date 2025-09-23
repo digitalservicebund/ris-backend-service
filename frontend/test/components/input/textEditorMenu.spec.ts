@@ -1,4 +1,5 @@
 /* eslint-disable testing-library/no-node-access */
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen, waitFor } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
@@ -29,7 +30,7 @@ describe("text editor toolbar", async () => {
         ariaLabel: "Gründe",
         editable: true,
       },
-      global: { plugins: [router] },
+      global: { plugins: [router, createTestingPinia()] },
     })
 
     await flushPromises()
