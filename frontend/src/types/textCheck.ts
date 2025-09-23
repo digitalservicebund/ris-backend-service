@@ -113,9 +113,14 @@ export interface TextCheckService {
 
   removeGloballyIgnoredWord(word: string): Promise<boolean>
 
-  toggleMatchIgnoredStatus(
+  updateIgnoredMark(
     matchId: number,
-    isIgnored: boolean,
+    state: EditorState,
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    dispatch: ((args?: any) => any) | undefined,
+  ): void
+
+  updatedMatchesInText(
     state: EditorState,
     /* eslint-disable @typescript-eslint/no-explicit-any */
     dispatch: ((args?: any) => any) | undefined,
