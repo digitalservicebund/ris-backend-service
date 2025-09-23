@@ -3,8 +3,7 @@ import { navigateToCategories } from "../utils/e2e-utils"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
-// eslint-disable-next-line playwright/no-skipped-test
-test.skip(
+test.describe(
   "text check store",
   {
     tag: ["@RISDEV-9022"],
@@ -52,10 +51,10 @@ test.skip(
         })
 
         await test.step("match modal should still appear after navigation", async () => {
-          await page.getByRole("link", { name: "Übergabe an jDV" }).click()
+          await page.getByRole("link", { name: "Dokumente" }).click()
 
           await expect(
-            page.getByRole("heading", { name: "Rechtschreibprüfung" }),
+            page.getByRole("heading", { name: "Dokumente" }),
           ).toBeVisible()
 
           await page
