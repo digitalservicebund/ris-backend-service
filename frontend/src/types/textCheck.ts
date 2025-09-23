@@ -113,6 +113,9 @@ export interface TextCheckService {
 
   removeGloballyIgnoredWord(word: string): Promise<boolean>
 
+  /**
+   * Updates a match mark in text based on its ignored status
+   */
   updateIgnoredMark(
     matchId: number,
     state: EditorState,
@@ -120,10 +123,34 @@ export interface TextCheckService {
     dispatch: ((args?: any) => any) | undefined,
   ): void
 
+  /**
+   * Updates all matches marks in text based on their ignored status
+   */
   updatedMatchesInText(
     state: EditorState,
     /* eslint-disable @typescript-eslint/no-explicit-any */
     dispatch: ((args?: any) => any) | undefined,
+  ): void
+
+  updatedMatchesInText(
+    state: EditorState,
+    dispatch: ((args?: any) => any) | undefined,
+  ): void
+
+  /**
+   * Add an ignored word to all matching entries in the store
+   */
+  addIgnoredWordToMatches(
+    word: string,
+    ignoredTextCheckWord: IgnoredTextCheckWord,
+  ): void
+
+  /**
+   * Remove ignored words of given type from all matching entries in the store
+   */
+  removeIgnoredWordFromMatches(
+    word: string,
+    ignoredType: DocumentationType,
   ): void
 }
 
