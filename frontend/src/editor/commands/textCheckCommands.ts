@@ -113,39 +113,19 @@ class NeurisTextCheckService implements TextCheckService {
     text: string,
     state: EditorState,
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    dispatch: ((args?: any) => any) | undefined,
+    dispatch?: (tr: any) => void,
   ) => {
-    const { tr } = state
-
+    const { tr, schema } = state
     state.doc.descendants((node, pos) => {
       if (
         node.isText &&
-        node.marks.some(
-          (mark) =>
-            mark.type.name === TextCheckTagName &&
-            mark.attrs.id === matchId.toString(),
-        )
+        NeurisTextCheckService.findTextCheckMark(node, matchId)
       ) {
-        const textCheckMark = node.marks.find(
-          (mark) =>
-            mark.type.name === TextCheckTagName &&
-            mark.attrs.id === matchId.toString(),
-        )
-
-        if (textCheckMark) {
-          tr.delete(pos, pos + node.nodeSize).insert(
-            pos,
-            state.schema.text(text),
-          )
-
-          if (dispatch) {
-            dispatch(tr)
-          }
-        }
+        tr.replaceWith(pos, pos + node.nodeSize, schema.text(text))
       }
-
-      this.clearSelectedMatch()
     })
+    dispatch?.(tr)
+    this.clearSelectedMatch()
   }
 
   /**
@@ -157,48 +137,43 @@ class NeurisTextCheckService implements TextCheckService {
   updateIgnoredMark = (
     match: Match,
     state: EditorState,
-    dispatch?: (args?: any) => any,
-  ): void => {
+    dispatch?: (tr: any) => void,
+  ) => {
+    if (!match) return
     const { tr, schema } = state
 
-    if (!match) return
-
     state.doc.descendants((node, pos) => {
-      if (
-        node.isText &&
-        node.marks.some(
-          (mark) =>
-            mark.type.name === TextCheckTagName &&
-            mark.attrs.id === match.id.toString(),
-        )
-      ) {
-        const updatedMarks = node.marks.map((mark) => {
-          if (
-            mark.type.name === TextCheckTagName &&
-            mark.attrs.id === match.id.toString()
-          ) {
-            return mark.type.create({
+      const mark = NeurisTextCheckService.findTextCheckMark(node, match.id)
+      if (!mark) return
+
+      const updatedMarks = node.marks.map((m) =>
+        m === mark
+          ? mark.type.create({
               ...mark.attrs,
-              ignored: this.isMatchedIgnored(match),
+              ignored: NeurisTextCheckService.isMatchedIgnored(match),
             })
-          }
-          return mark
-        })
-
-        const updatedText = schema.text(node.text ?? "", updatedMarks)
-        tr.replaceWith(pos, pos + node.nodeSize, updatedText)
-      }
+          : m,
+      )
+      tr.replaceWith(
+        pos,
+        pos + node.nodeSize,
+        schema.text(node.text ?? "", updatedMarks),
+      )
     })
-
-    if (dispatch) {
-      dispatch(tr)
-    }
+    dispatch?.(tr)
   }
 
-  isMatchedIgnored = (match: Match) => {
+  private static isMatchedIgnored(match: Match) {
     return (match.ignoredTextCheckWords?.length ?? 0) > 0
   }
 
+  private static findTextCheckMark(node: any, matchId?: number) {
+    return node.marks?.find(
+      (mark: any) =>
+        mark.type.name === TextCheckTagName &&
+        (matchId === undefined || mark.attrs.id === matchId.toString()),
+    )
+  }
   /**
    * Updates the ignored status of a match by id
    * @param state
