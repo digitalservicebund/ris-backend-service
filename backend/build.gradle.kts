@@ -54,7 +54,7 @@ jacoco {
 }
 
 lombok {
-    version = "1.18.40"
+    version = "1.18.42"
 }
 
 springBoot {
@@ -253,7 +253,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
     }
-    testImplementation("org.mockito:mockito-junit-jupiter:5.19.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.20.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.7.11")
@@ -371,4 +371,3 @@ tasks {
     }
 
 }
-
