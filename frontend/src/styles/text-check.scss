@@ -1,5 +1,6 @@
 text-check {
   text-decoration: underline wavy #cd5038 2px;
+  text-decoration-skip-ink: none;
   transition: background-color 0.25s ease-in-out;
 
   &:hover {
