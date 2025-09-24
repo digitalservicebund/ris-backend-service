@@ -242,6 +242,11 @@ const removeGloballyIgnoredWord = async (word: string) => {
   editor.commands.setSelectedMatch()
 }
 
+/**
+ * Currently selected match to show in modal
+ */
+const selectedMatch = computed(() => textCheckService.selectedMatch.value)
+
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 
 /**
@@ -290,7 +295,16 @@ watch(
   },
 )
 
-const selectedMatch = computed(() => textCheckService.selectedMatch.value)
+/*
+To detected changes in the matche ignores
+ */
+watch(
+  () => store.matches.get(props.category),
+  () => {
+    editor.commands.updatedMatchesInText()
+  },
+  { deep: true },
+)
 
 onMounted(async () => {
   const editorContainer = document.querySelector(".editor")
@@ -304,17 +318,6 @@ const resizeObserver = new ResizeObserver((entries) => {
 })
 
 defineExpose({ jumpToMatch })
-
-/*
-To detected changes in the matche ignores
- */
-watch(
-  () => store.matches.get(props.category),
-  () => {
-    editor.commands.updatedMatchesInText()
-  },
-  { deep: true },
-)
 </script>
 
 <template>
