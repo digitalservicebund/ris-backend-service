@@ -1,28 +1,28 @@
 text-check {
-  text-decoration: underline wavy #CD5038 2px;
+  text-decoration: underline wavy #cd5038 2px;
   transition: background-color 0.25s ease-in-out;
 
   &:hover {
-    background: rgba($color: #F5DCD7, $alpha: 20%);
+    background: rgba($color: #f5dcd7, $alpha: 20%);
   }
 
   &[type="style"],
   &[type="grammar"],
   &[type="typographical"],
   &[type="misspelling"] {
-    text-decoration-color: #CD5038;
+    text-decoration-color: #cd5038;
 
     &:hover {
-      background: rgba($color: #F5DCD7, $alpha: 20%) !important;
+      background: rgba($color: #f5dcd7, $alpha: 20%) !important;
     }
   }
 
   &[ignored="true"] {
-    border-bottom: 2px solid #66ADD3;
+    border-bottom: 2px solid #66add3;
     text-decoration: none;
 
     &:hover {
-      background: rgba($color: #CCE4F0, $alpha: 20%) !important;
+      background: rgba($color: #cce4f0, $alpha: 20%) !important;
     }
   }
 }
