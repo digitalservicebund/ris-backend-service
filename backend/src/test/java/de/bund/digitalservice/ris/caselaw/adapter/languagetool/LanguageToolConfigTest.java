@@ -17,8 +17,8 @@ class LanguageToolConfigTest {
   private static Stream<LanguageToolConfig> validConfigurations() {
     // Valid configuration with all fields populated
     LanguageToolConfig config1 = new LanguageToolConfig();
-    config1.setDisabledCategories("CAT1,CAT2");
-    config1.setDisabledRules("RULE1,RULE2");
+    config1.setDisabledCategories(List.of("CAT1", "CAT2"));
+    config1.setDisabledRules(List.of("RULE1", "RULE2"));
     config1.setDisabledCategoriesWithWhitelistedRules(
         Map.of(
             "CAT3", List.of("RULE3", "RULE4"),
@@ -26,20 +26,20 @@ class LanguageToolConfigTest {
 
     // Valid configuration with empty disabled categories list
     LanguageToolConfig config2 = new LanguageToolConfig();
-    config2.setDisabledCategories("");
-    config2.setDisabledRules("RULE1,RULE2");
+    config2.setDisabledCategories(List.of());
+    config2.setDisabledRules(List.of("RULE1", "RULE2"));
     config2.setDisabledCategoriesWithWhitelistedRules(Map.of("CAT1", List.of("RULE3")));
 
     // Valid configuration with empty disabled rules list
     LanguageToolConfig config3 = new LanguageToolConfig();
-    config3.setDisabledCategories("CAT1,CAT2");
-    config3.setDisabledRules("");
+    config3.setDisabledCategories(List.of("CAT1", "CAT2"));
+    config3.setDisabledRules(List.of());
     config3.setDisabledCategoriesWithWhitelistedRules(Map.of("CAT3", List.of("RULE3")));
 
     // All lists are empty
     LanguageToolConfig config4 = new LanguageToolConfig();
-    config4.setDisabledCategories("");
-    config4.setDisabledRules("");
+    config4.setDisabledCategories(List.of());
+    config4.setDisabledRules(List.of());
     config4.setDisabledCategoriesWithWhitelistedRules(Collections.emptyMap());
 
     return Stream.of(config1, config2, config3, config4);
@@ -49,8 +49,8 @@ class LanguageToolConfigTest {
   private static Stream<LanguageToolConfig> invalidConfigurations() {
     // Disabled category has whitelisted rules
     LanguageToolConfig config1 = new LanguageToolConfig();
-    config1.setDisabledCategories("CAT1,CAT2");
-    config1.setDisabledRules("RULE1");
+    config1.setDisabledCategories(List.of("CAT1", "CAT2"));
+    config1.setDisabledRules(List.of("RULE1"));
     config1.setDisabledCategoriesWithWhitelistedRules(
         Map.of(
             "CAT1", List.of("RULE3"),
@@ -58,8 +58,8 @@ class LanguageToolConfigTest {
 
     // Disabled rule is whitelisted in a category
     LanguageToolConfig config2 = new LanguageToolConfig();
-    config2.setDisabledCategories("CAT2,CAT3");
-    config2.setDisabledRules("RULE1,RULE2");
+    config2.setDisabledCategories(List.of("CAT1", "CAT2"));
+    config2.setDisabledRules(List.of("RULE1", "RULE2"));
     config2.setDisabledCategoriesWithWhitelistedRules(
         Map.of(
             "CAT4", List.of("RULE1", "RULE3"),
