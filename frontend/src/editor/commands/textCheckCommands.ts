@@ -146,21 +146,32 @@ class NeurisTextCheckService implements TextCheckService {
       const mark = NeurisTextCheckService.findTextCheckMark(node, match.id)
       if (!mark) return
 
-      const updatedMarks = node.marks.map((m) =>
-        m === mark
-          ? mark.type.create({
-              ...mark.attrs,
-              ignored: NeurisTextCheckService.isMatchedIgnored(match),
-            })
-          : m,
-      )
-      tr.replaceWith(
-        pos,
-        pos + node.nodeSize,
-        schema.text(node.text ?? "", updatedMarks),
-      )
+      const nextIgnoredStatus = NeurisTextCheckService.isMatchedIgnored(match)
+      // if there is no ignored it means, false
+      const prevIgnoredStatus = mark.attrs.ignored ?? false
+
+      // Only update if the ignore value changed
+      if (prevIgnoredStatus !== nextIgnoredStatus) {
+        const updatedMarks = node.marks.map((m) =>
+          m === mark
+            ? mark.type.create({
+                ...mark.attrs,
+                ignored: nextIgnoredStatus,
+              })
+            : m,
+        )
+
+        tr.replaceWith(
+          pos,
+          pos + node.nodeSize,
+          schema.text(node.text ?? "", updatedMarks),
+        )
+      }
     })
-    dispatch?.(tr)
+
+    if (tr.docChanged) {
+      dispatch?.(tr)
+    }
   }
 
   private static isMatchedIgnored(match: Match) {
