@@ -20,12 +20,12 @@ const tooltipVisible = ref(false)
 
 // Add the keydown event listener when the component is mounted
 onMounted(() => {
-  window.addEventListener("keydown", handleKeyDown)
+  globalThis.addEventListener("keydown", handleKeyDown)
 })
 
 // Cleanup the event listener when the component is unmounted
 onUnmounted(() => {
-  window.removeEventListener("keydown", handleKeyDown)
+  globalThis.removeEventListener("keydown", handleKeyDown)
 })
 
 const openTooltip = () => {

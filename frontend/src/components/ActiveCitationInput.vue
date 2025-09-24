@@ -84,22 +84,18 @@ async function search() {
     delete activeCitationRef["citationType"]
   }
 
-  const urlParams = window.location.pathname.split("/")
+  const urlParams = globalThis.location.pathname.split("/")
   const documentNumberToExclude =
     urlParams[urlParams.indexOf("documentunit") + 1]
 
   const response = await documentUnitService.searchByRelatedDocumentation(
     activeCitationRef,
     {
-      ...(pageNumber.value != undefined
-        ? { pg: pageNumber.value.toString() }
-        : {}),
-      ...(itemsPerPage.value != undefined
-        ? { sz: itemsPerPage.value.toString() }
-        : {}),
-      ...(documentNumberToExclude != undefined
-        ? { documentNumber: documentNumberToExclude.toString() }
-        : {}),
+      ...(pageNumber.value ? {} : { pg: pageNumber.value.toString() }),
+      ...(itemsPerPage.value ? {} : { sz: itemsPerPage.value.toString() }),
+      ...(documentNumberToExclude
+        ? {}
+        : { documentNumber: documentNumberToExclude.toString() }),
     },
   )
   if (response.data) {
@@ -128,9 +124,9 @@ async function updatePage(page: number) {
 function validateRequiredInput() {
   validationStore.reset()
 
-  activeCitation.value.missingRequiredFields.forEach((missingField) =>
-    validationStore.add("Pflichtfeld nicht befüllt", missingField),
-  )
+  for (const missingField of activeCitation.value.missingRequiredFields) {
+    validationStore.add("Pflichtfeld nicht befüllt", missingField)
+  }
 }
 
 async function addActiveCitation() {

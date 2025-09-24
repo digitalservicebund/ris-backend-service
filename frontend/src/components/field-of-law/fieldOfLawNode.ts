@@ -74,9 +74,9 @@ export class NodeHelper implements NodeHelperInterface {
       const response = await FieldOfLawService.getChildrenOf(node.identifier)
       if (response.data) {
         // Put resulting elements to nodes map
-        response.data.forEach((fieldOfLaw) =>
-          this.nodes.set(fieldOfLaw.identifier, fieldOfLaw),
-        )
+        for (const fieldOfLaw of response.data) {
+          this.nodes.set(fieldOfLaw.identifier, fieldOfLaw)
+        }
         // Add resulting elements as children to requested node and put it to map
         node.children = response.data
         this.nodes.set(node.identifier, node)

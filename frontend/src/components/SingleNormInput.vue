@@ -149,10 +149,10 @@ async function removeSingleNormEntry() {
 
 function validateLegalForce() {
   legalForceValidationStore.reset()
-  if (singleNorm.value.legalForce?.missingRequiredFields?.length) {
-    singleNorm.value.legalForce?.missingRequiredFields.forEach((field) => {
+  if (singleNorm.value.legalForce?.missingRequiredFields) {
+    for (const field of singleNorm.value.legalForce.missingRequiredFields) {
       legalForceValidationStore.add("Pflichtfeld nicht befüllt", field)
-    })
+    }
   }
 }
 

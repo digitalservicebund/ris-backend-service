@@ -67,22 +67,18 @@ async function search() {
     pageNumber.value = 0
   }
 
-  const urlParams = window.location.pathname.split("/")
+  const urlParams = globalThis.location.pathname.split("/")
   const documentNumberToExclude =
     urlParams[urlParams.indexOf("documentunit") + 1]
 
   const response = await documentUnitService.searchByRelatedDocumentation(
     previousDecisionRef,
     {
-      ...(pageNumber.value != undefined
-        ? { pg: pageNumber.value.toString() }
-        : {}),
-      ...(itemsPerPage.value != undefined
-        ? { sz: itemsPerPage.value.toString() }
-        : {}),
-      ...(documentNumberToExclude != undefined
-        ? { documentNumber: documentNumberToExclude.toString() }
-        : {}),
+      ...(pageNumber.value ? {} : { pg: pageNumber.value.toString() }),
+      ...(itemsPerPage.value ? {} : { sz: itemsPerPage.value.toString() }),
+      ...(documentNumberToExclude
+        ? {}
+        : { documentNumber: documentNumberToExclude.toString() }),
     },
   )
   if (response.data) {
@@ -108,12 +104,12 @@ async function updatePage(page: number) {
   await search()
 }
 
-async function validateRequiredInput() {
+function validateRequiredInput() {
   validationStore.reset()
-  if (previousDecision.value.missingRequiredFields?.length) {
-    previousDecision.value.missingRequiredFields.forEach((missingField) => {
+  if (previousDecision.value.missingRequiredFields) {
+    for (const missingField of previousDecision.value.missingRequiredFields) {
       validationStore.add("Pflichtfeld nicht befüllt", missingField)
-    })
+    }
   }
 }
 
