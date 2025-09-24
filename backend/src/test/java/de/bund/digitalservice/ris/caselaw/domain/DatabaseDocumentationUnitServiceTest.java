@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -88,7 +87,8 @@ class DatabaseDocumentationUnitServiceTest {
     @Test
     void testBulkAssignProcessStep_withValidDataAndUser_shouldSucceed() throws Exception {
       // Arrange
-      when(processStepRepository.findByName(anyString())).thenReturn(Optional.of(processStepDTO));
+      when(processStepRepository.findByName(TEST_PROCESS_STEP_NAME))
+          .thenReturn(Optional.of(processStepDTO));
       when(userRepository.findByExternalId(any(UUID.class))).thenReturn(Optional.of(userDTO));
       when(repository.findById(TEST_DOC_UNIT_ID_1)).thenReturn(Optional.of(docUnitDTO1));
       when(repository.findById(TEST_DOC_UNIT_ID_2)).thenReturn(Optional.of(docUnitDTO2));
@@ -128,7 +128,8 @@ class DatabaseDocumentationUnitServiceTest {
     @Test
     void testBulkAssignProcessStep_withValidDataWithoutUser_shouldSucceed() throws Exception {
       // Arrange
-      when(processStepRepository.findByName(anyString())).thenReturn(Optional.of(processStepDTO));
+      when(processStepRepository.findByName(TEST_PROCESS_STEP_NAME))
+          .thenReturn(Optional.of(processStepDTO));
       when(repository.findById(TEST_DOC_UNIT_ID_1)).thenReturn(Optional.of(docUnitDTO1));
       when(repository.save(any(DecisionDTO.class))).thenReturn(docUnitDTO1);
 
@@ -158,7 +159,7 @@ class DatabaseDocumentationUnitServiceTest {
     @Test
     void testBulkAssignProcessStep_withProcessStepNotFound_shouldThrowException() {
       // Arrange
-      when(processStepRepository.findByName(anyString())).thenReturn(Optional.empty());
+      when(processStepRepository.findByName(TEST_PROCESS_STEP_NAME)).thenReturn(Optional.empty());
       List<UUID> docunitList = List.of(TEST_DOC_UNIT_ID_1);
 
       // Act & Assert
@@ -174,7 +175,8 @@ class DatabaseDocumentationUnitServiceTest {
     @Test
     void testBulkAssignProcessStep_withUserNotFound_shouldThrowException() {
       // Arrange
-      when(processStepRepository.findByName(anyString())).thenReturn(Optional.of(processStepDTO));
+      when(processStepRepository.findByName(TEST_PROCESS_STEP_NAME))
+          .thenReturn(Optional.of(processStepDTO));
       when(userRepository.findByExternalId(any())).thenReturn(Optional.empty());
 
       List<UUID> docunitList = List.of(TEST_DOC_UNIT_ID_1);
@@ -185,7 +187,7 @@ class DatabaseDocumentationUnitServiceTest {
           () -> service.bulkAssignProcessStep(docunitList, documentationUnitProcessStepWithUser));
 
       // Assert
-      verify(processStepRepository, times(1)).findByName(anyString());
+      verify(processStepRepository, times(1)).findByName(TEST_PROCESS_STEP_NAME);
       verify(userRepository, times(1)).findByExternalId(any());
       verify(repository, never()).findById(any(UUID.class));
     }
@@ -193,7 +195,8 @@ class DatabaseDocumentationUnitServiceTest {
     @Test
     void testBulkAssignProcessStep_withUnsupportedDocumentationUnitType_shouldThrowException() {
       // Arrange
-      when(processStepRepository.findByName(anyString())).thenReturn(Optional.of(processStepDTO));
+      when(processStepRepository.findByName(TEST_PROCESS_STEP_NAME))
+          .thenReturn(Optional.of(processStepDTO));
       when(repository.findById(any(UUID.class)))
           .thenReturn(Optional.of(PendingProceedingDTO.builder().build()));
 
@@ -206,7 +209,7 @@ class DatabaseDocumentationUnitServiceTest {
               service.bulkAssignProcessStep(docunitList, documentationUnitProcessStepWithoutUser));
 
       // Assert
-      verify(processStepRepository, times(1)).findByName(anyString());
+      verify(processStepRepository, times(1)).findByName(TEST_PROCESS_STEP_NAME);
       verify(repository, times(1)).findById(any(UUID.class));
       verify(repository, never()).save(any());
     }

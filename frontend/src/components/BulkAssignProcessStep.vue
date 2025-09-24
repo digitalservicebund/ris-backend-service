@@ -66,7 +66,7 @@ async function handleAssignProcessStep(
 }
 
 const showAssignProcessStepDialog = () => {
-  if (areSelectedDocUnitsValid()) {
+  if (isSelectionValid()) {
     showProcessStepDialog.value = true
   }
 }
@@ -83,7 +83,7 @@ const toggleMenu = (event: MouseEvent) => {
   menuRef.value.toggle(event)
 }
 
-const areSelectedDocUnitsValid = () => {
+const isSelectionValid = () => {
   const notSameDocumentationOffice =
     props.documentationUnits?.filter(
       (unit) =>
@@ -156,8 +156,8 @@ const areSelectedDocUnitsValid = () => {
         </template>
       </Button>
       <Menu ref="menuRef" class="min-w-[225px]" :model="menuModel" popup>
-        <template #item="{ item, props: slotPropsps }">
-          <a class="min-w-225 cursor-pointer" v-bind="slotPropsps.action">
+        <template #item="{ item, props: slotProps }">
+          <a class="min-w-225 cursor-pointer" v-bind="slotProps.action">
             <span class="p-menuitem-icon">
               <component :is="item.component" />
             </span>

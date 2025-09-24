@@ -253,16 +253,8 @@ const service: DocumentUnitService = {
       { documentationUnitProcessStep, documentationUnitIds },
     )
     if (response.status >= 300) {
-      response.error = {
-        title:
-          errorMessages
-            .DOCUMENTATION_UNIT_DOCUMENTATION_OFFICE_COULD_NOT_BE_ASSIGNED
-            .title,
-        description:
-          errorMessages
-            .DOCUMENTATION_UNIT_DOCUMENTATION_OFFICE_COULD_NOT_BE_ASSIGNED
-            .description,
-      }
+      response.error =
+        errorMessages.DOCUMENTATION_UNIT_DOCUMENTATION_OFFICE_COULD_NOT_BE_ASSIGNED
     }
     return response
   },
