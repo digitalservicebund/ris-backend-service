@@ -53,8 +53,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexResultRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcessStepTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
+import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcessStepRequest;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
@@ -2025,6 +2028,171 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
           .patch()
           .uri("/api/v1/caselaw/documentunits/bulk-assign-procedure")
           .bodyValue(new BulkAssignProcedureRequest("new_procedure", docUnitIds))
+          .exchange()
+          .expectStatus()
+          .isForbidden();
+    }
+  }
+
+  @Nested
+  class BulkAssignProcessStep {
+    private UserDTO userDTO;
+
+    @BeforeEach
+    void setupBulkTests() {
+      userDTO =
+          databaseUserRepository.save(
+              UserDTO.builder()
+                  .externalId(oidcLoggedInUserId)
+                  .documentationOffice(documentationOffice)
+                  .firstName("Krümel")
+                  .lastName("Monster")
+                  .build());
+    }
+
+    @Test
+    @Transactional
+    void shouldAssignProcessStepToMultipleDocUnits() {
+      // Arrange
+      DocumentationUnitProcessStepDTO initialProcessStep1 =
+          DocumentationUnitProcessStepDTO.builder()
+              .processStep(ersterfassungProcessStep)
+              .user(userDTO)
+              .createdAt(LocalDateTime.now())
+              .build();
+
+      DocumentationUnitProcessStepDTO initialProcessStep2 =
+          DocumentationUnitProcessStepDTO.builder()
+              .processStep(ersterfassungProcessStep)
+              .user(userDTO)
+              .createdAt(LocalDateTime.now())
+              .build();
+
+      var decisionBuilder1 =
+          DecisionDTO.builder()
+              .documentNumber("DOCNUMBER_001")
+              .documentationOffice(documentationOffice)
+              .currentProcessStep(initialProcessStep1) // Link parent to child
+              .processSteps(new ArrayList<>(List.of(initialProcessStep1)));
+
+      var decisionBuilder2 =
+          DecisionDTO.builder()
+              .documentNumber("DOCNUMBER_002")
+              .documentationOffice(documentationOffice)
+              .currentProcessStep(initialProcessStep2) // Link parent to child
+              .processSteps(new ArrayList<>(List.of(initialProcessStep2)));
+
+      DocumentationUnitDTO docUnit1 =
+          EntityBuilderTestUtil.createAndSaveDecision(repository, decisionBuilder1);
+      DocumentationUnitDTO docUnit2 =
+          EntityBuilderTestUtil.createAndSaveDecision(repository, decisionBuilder2);
+
+      List<UUID> docUnitIds = List.of(docUnit1.getId(), docUnit2.getId());
+
+      DocumentationUnitProcessStep newProcessStep =
+          DocumentationUnitProcessStep.builder()
+              .processStep(ProcessStepTransformer.toDomain(neuProcessStep))
+              .user(UserTransformer.transformToDomain(userDTO))
+              .build();
+
+      // Act
+      risWebTestClient
+          .withDefaultLogin(oidcLoggedInUserId)
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/bulk-assign-process-step")
+          .bodyValue(new BulkAssignProcessStepRequest(newProcessStep, docUnitIds))
+          .exchange()
+          .expectStatus()
+          .isOk();
+
+      // Assert
+      var updatedDocUnits = repository.findAll();
+      assertThat(updatedDocUnits).hasSize(2);
+
+      assertThat(updatedDocUnits)
+          .extracting(unit -> unit.getCurrentProcessStep().getProcessStep().getId())
+          .containsOnly(neuProcessStep.getId());
+
+      assertThat(updatedDocUnits)
+          .extracting(unit -> unit.getCurrentProcessStep().getUser().getId())
+          .containsOnly(userDTO.getId());
+    }
+
+    @Test
+    @Transactional
+    void shouldRollbackIfOneUpdateFails() {
+      TestTransaction.end();
+      // Arrange
+      DocumentationUnitDTO docUnit1 =
+          EntityBuilderTestUtil.createAndSaveDecision(
+              repository,
+              DecisionDTO.builder()
+                  .documentNumber("DOCNUMBER_001")
+                  .documentationOffice(documentationOffice));
+      DocumentationUnitDTO docUnit2 =
+          EntityBuilderTestUtil.createAndSaveDecision(
+              repository,
+              DecisionDTO.builder()
+                  .documentNumber("DOCNUMBER_002")
+                  .documentationOffice(documentationOffice));
+      DocumentationUnitDTO pendingProceeding =
+          repository.save(
+              PendingProceedingDTO.builder()
+                  .documentNumber("DOCNUMBER_003")
+                  .documentationOffice(documentationOffice)
+                  .build());
+
+      var docUnitIds = List.of(docUnit1.getId(), docUnit2.getId(), pendingProceeding.getId());
+
+      DocumentationUnitProcessStep newProcessStep =
+          DocumentationUnitProcessStep.builder()
+              .processStep(ProcessStepTransformer.toDomain(neuProcessStep))
+              .user(UserTransformer.transformToDomain(userDTO))
+              .build();
+
+      // will return BadRequestException because process steps can not be assigned to
+      // pendingProceeding
+      risWebTestClient
+          .withDefaultLogin(oidcLoggedInUserId)
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/bulk-assign-process-step")
+          .bodyValue(new BulkAssignProcessStepRequest(newProcessStep, docUnitIds))
+          .exchange()
+          .expectStatus()
+          .isBadRequest();
+
+      TestTransaction.start();
+      // Assert that no changes were committed due to the rollback
+      var updatedDocUnits = repository.findAll();
+      assertThat(updatedDocUnits).hasSize(3);
+
+      assertThat(updatedDocUnits)
+          .extracting(unit -> unit.getCurrentProcessStep())
+          .map(processStep -> processStep != null ? processStep.getProcessStep().getId() : null)
+          .containsExactlyInAnyOrder(null, null, null);
+      TestTransaction.end();
+    }
+
+    @Test
+    @Transactional
+    void shouldRejectRequestForDocUnitFromOtherDocOffice() {
+      // Arrange
+      var bghDocOffice = documentationOfficeRepository.findByAbbreviation("BGH");
+      var docUnit = EntityBuilderTestUtil.createAndSaveDecision(repository, bghDocOffice);
+      var docUnitIds = List.of(docUnit.getId());
+
+      DocumentationUnitProcessStep newProcessStep =
+          DocumentationUnitProcessStep.builder()
+              .processStep(ProcessStepTransformer.toDomain(neuProcessStep))
+              .user(UserTransformer.transformToDomain(userDTO))
+              .build();
+
+      // Act & Assert
+      risWebTestClient
+          .withDefaultLogin(oidcLoggedInUserId)
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/bulk-assign-process-step")
+          .bodyValue(new BulkAssignProcessStepRequest(newProcessStep, docUnitIds))
           .exchange()
           .expectStatus()
           .isForbidden();

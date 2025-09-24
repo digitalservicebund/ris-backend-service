@@ -136,7 +136,7 @@ export enum LabelPosition {
       <IconErrorOutline class="pr-4 text-red-800" />
 
       <div
-        class="lex-row ris-label3-regular mt-2 text-red-800"
+        class="ris-label3-regular mt-2 flex-row text-red-800"
         :data-testid="id + '-validationError'"
       >
         {{ errorMessage }}

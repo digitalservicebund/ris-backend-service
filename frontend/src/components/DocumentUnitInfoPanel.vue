@@ -1,42 +1,47 @@
 <script setup lang="ts" generic="TDocument">
 import dayjs from "dayjs"
+import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import { useToast } from "primevue/usetoast"
-import { computed, ref, toRaw, watchEffect } from "vue"
+import { computed, Ref, ref, toRaw, watchEffect } from "vue"
 import { useRoute } from "vue-router"
+import AssignProcessStep from "@/components/AssignProcessStep.vue"
 import CurrentAndPreviousProcessStepBadge from "@/components/CurrentAndPreviousProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
-import UpdateProcessStepDialog from "@/components/UpdateProcessStepDialog.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { DocumentationUnit } from "@/domain/documentationUnit"
+import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
+import { ResponseError } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { isDecision } from "@/utils/typeGuards"
 import IconError from "~icons/ic/baseline-error"
 import IconPerson from "~icons/ic/baseline-person"
 import IconApprovalDelegation from "~icons/material-symbols/approval-delegation-outline"
 
-const props = defineProps<{
-  documentUnit: DocumentationUnit
-}>()
+const store = useDocumentUnitStore()
+const { documentUnit } = storeToRefs(store) as {
+  documentUnit: Ref<DocumentationUnit>
+}
 
 const route = useRoute()
 
 const isInternalUser = useInternalUser()
 
 const fileNumberInfo = computed(() => {
-  return props.documentUnit.coreData.fileNumbers?.[0] || ""
+  return documentUnit.value.coreData.fileNumbers?.[0] || ""
 })
 
 const decisionDateInfo = computed(() => {
-  return props.documentUnit.coreData.decisionDate
-    ? dayjs(props.documentUnit.coreData.decisionDate).format("DD.MM.YYYY")
+  return documentUnit.value.coreData.decisionDate
+    ? dayjs(documentUnit.value.coreData.decisionDate).format("DD.MM.YYYY")
     : ""
 })
 
 const hasPendingDuplicateWarning = computed(() => {
-  if (isDecision(props.documentUnit)) {
-    return (props.documentUnit.managementData.duplicateRelations ?? []).some(
+  if (isDecision(documentUnit.value)) {
+    return (documentUnit.value.managementData.duplicateRelations ?? []).some(
       (warning) => warning.status === "PENDING",
     )
   }
@@ -44,7 +49,7 @@ const hasPendingDuplicateWarning = computed(() => {
 })
 
 const courtInfo = computed(() => {
-  return props.documentUnit.coreData.court?.label || ""
+  return documentUnit.value.coreData.court?.label || ""
 })
 
 const formattedInfo = computed(() => {
@@ -56,7 +61,7 @@ const formattedInfo = computed(() => {
   return parts.join(", ")
 })
 
-const statusBadge = ref(useStatusBadge(props.documentUnit.status).value)
+const statusBadge = ref(useStatusBadge(documentUnit.value.status).value)
 
 const isRouteWithSaveButton = computed(
   () =>
@@ -66,28 +71,38 @@ const isRouteWithSaveButton = computed(
     route.path.includes("managementdata"),
 )
 
-const hasErrorStatus = computed(() => props.documentUnit.status?.withError)
+const hasErrorStatus = computed(() => documentUnit.value.status?.withError)
 const managementDataRoute = computed(() => ({
   name: "caselaw-documentUnit-documentNumber-managementdata",
-  params: { documentNumber: props.documentUnit.documentNumber },
+  params: { documentNumber: documentUnit.value.documentNumber },
 }))
 
-const processStepsEnabled = isDecision(props.documentUnit)
+const processStepsEnabled = isDecision(documentUnit.value)
 
 const showProcessStepDialog = ref(false)
 const toast = useToast()
 
-async function onProcessStepUpdated() {
+async function handleAssignProcessStep(
+  documentationUnitProcessStep: DocumentationUnitProcessStep,
+): Promise<ResponseError | undefined> {
+  documentUnit.value!.currentDocumentationUnitProcessStep =
+    documentationUnitProcessStep
+  const response = await store.updateDocumentUnit()
+  if (response.error) {
+    return response.error
+  }
+
   toast.add({
     severity: "success",
     summary: "Weitergeben erfolgreich",
-    life: 5_000,
+    life: 5000,
   })
   showProcessStepDialog.value = false
+  return undefined
 }
 
 watchEffect(() => {
-  statusBadge.value = useStatusBadge(props.documentUnit.status).value
+  statusBadge.value = useStatusBadge(documentUnit.value.status).value
 })
 </script>
 
@@ -96,7 +111,7 @@ watchEffect(() => {
     class="sticky top-0 z-30 flex h-[64px] flex-row items-center border-b border-solid border-gray-400 bg-blue-100 px-24 py-12"
     data-testid="document-unit-info-panel"
   >
-    <h1 class="ris-body1-bold">{{ props.documentUnit.documentNumber }}</h1>
+    <h1 class="ris-body1-bold">{{ documentUnit.documentNumber }}</h1>
     <span v-if="formattedInfo.length > 0" class="m-4"> | </span>
     <span
       class="overflow-hidden text-ellipsis whitespace-nowrap"
@@ -123,13 +138,13 @@ watchEffect(() => {
       <CurrentAndPreviousProcessStepBadge
         v-if="processStepsEnabled"
         :current-process-step="
-          props.documentUnit.currentDocumentationUnitProcessStep?.processStep
+          documentUnit.currentDocumentationUnitProcessStep?.processStep
         "
-        :previous-process-step="props.documentUnit.previousProcessStep"
+        :previous-process-step="documentUnit.previousProcessStep"
       />
       <IconBadge
         v-if="
-          props.documentUnit.currentDocumentationUnitProcessStep &&
+          documentUnit.currentDocumentationUnitProcessStep &&
           processStepsEnabled
         "
         background-color="bg-white"
@@ -138,8 +153,8 @@ watchEffect(() => {
         data-testid="info-panel-process-step-initials"
         :icon="IconPerson"
         :label="
-          props.documentUnit.currentDocumentationUnitProcessStep?.user
-            ?.initials || '-'
+          documentUnit.currentDocumentationUnitProcessStep?.user?.initials ||
+          '-'
         "
       />
     </div>
@@ -185,11 +200,10 @@ watchEffect(() => {
         </template>
       </Button>
     </SaveButton>
-    <UpdateProcessStepDialog
-      v-if="processStepsEnabled"
+    <AssignProcessStep
       v-model:visible="showProcessStepDialog"
-      @on-cancelled="showProcessStepDialog = false"
-      @on-process-step-updated="onProcessStepUpdated"
+      :documentation-unit="documentUnit"
+      :handle-assign-process-step="handleAssignProcessStep"
     />
   </div>
 </template>
