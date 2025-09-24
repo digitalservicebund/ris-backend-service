@@ -12,11 +12,11 @@ test.skip(
 
 const textCheckUnderlinesColors = {
   uncategorized: "#e86a69",
-  style: "#9d8eff",
-  grammar: "#eeb55c",
-  typographical: "#eeb55c",
-  ignored: "#26A7F2",
-  misspelling: "#e86a69",
+  style: "#cd5038",
+  grammar: "#cd5038",
+  typographical: "#cd5038",
+  ignored: "#66add3",
+  misspelling: "#cd5038",
   duplication: "#e86a69",
 } as const
 
@@ -343,11 +343,18 @@ test.describe(
 
           await expect(
             page.locator(`text-check[id='${textCheckId}']`).nth(0),
+          ).toHaveCSS("text-decoration-style", "wavy")
+
+          await expect(
+            page.locator(`text-check[id='${textCheckId}']`).nth(0),
           ).toHaveCSS(
-            "border-bottom",
-            "2px solid " +
-              `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
+            "text-decoration-color",
+            `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
           )
+
+          await expect(
+            page.locator(`text-check[id='${textCheckId}']`).nth(0),
+          ).toHaveCSS("border-bottom-style", "none")
         })
       },
     )
