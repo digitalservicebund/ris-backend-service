@@ -203,6 +203,41 @@ test.describe(
           }
         })
 
+        // await test.step("text check tags are marked by type with corresponded color", async () => {
+        //   const ignoredTags = page
+        //     .getByTestId("Orientierungssatz")
+        //     .locator('text-check[ignored="true"]')
+        //
+        //   const errorTags = page
+        //     .getByTestId("Orientierungssatz")
+        //     .locator('text-check:not([ignored="true"])')
+        //
+        //   const ignoredRGB = convertHexToRGB(textCheckUnderlinesColors.ignored)
+        //   for (let i = 0; i < (await ignoredTags.count()); i++) {
+        //     const currentTag = ignoredTags.nth(i)
+        //     await expect(currentTag).not.toHaveText("")
+        //     await expect(currentTag).toHaveCSS(
+        //       "border-bottom",
+        //       `2px solid rgb(${ignoredRGB.red}, ${ignoredRGB.green}, ${ignoredRGB.blue})`,
+        //     )
+        //   }
+        //
+        //   for (let i = 0; i < (await errorTags.count()); i++) {
+        //     const currentTag = errorTags.nth(i)
+        //     await expect(currentTag).not.toHaveText("")
+        //
+        //     const typeAttr = await currentTag.getAttribute("type")
+        //     const type = typeAttr ?? "uncategorized"
+        //     const errorRGB = getTextCheckColorRGB(type)
+        //
+        //     await expect(currentTag).toHaveCSS("text-decoration-style", "wavy")
+        //     await expect(currentTag).toHaveCSS(
+        //       "text-decoration-color",
+        //       `rgb(${errorRGB.red}, ${errorRGB.green}, ${errorRGB.blue})`,
+        //     )
+        //   }
+        // })
+
         await test.step("clicking on text check tags opens corresponded modal", async () => {
           for (
             let textCheckIndex = 0;
