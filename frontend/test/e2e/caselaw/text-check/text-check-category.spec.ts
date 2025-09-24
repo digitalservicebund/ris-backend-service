@@ -11,29 +11,12 @@ test.skip(
 )
 
 const textCheckUnderlinesColors = {
-  uncategorized: "#e86a69",
-  style: "#cd5038",
-  grammar: "#cd5038",
-  typographical: "#cd5038",
+  error: "#cd5038",
   ignored: "#66add3",
-  misspelling: "#cd5038",
-  duplication: "#e86a69",
 } as const
-
-type TextCheckType = keyof typeof textCheckUnderlinesColors
 
 async function getMarkId(tag: Locator): Promise<string | null> {
   return await tag.evaluate((el) => el.getAttribute("id"))
-}
-
-function getTextCheckColorRGB(type: string | null): {
-  red: number
-  green: number
-  blue: number
-} {
-  const typeKey = (type ?? "uncategorized") as TextCheckType
-  const hex = textCheckUnderlinesColors[typeKey]
-  return convertHexToRGB(hex)
 }
 
 const textWithErrors = {
@@ -187,48 +170,73 @@ test.describe(
         })
 
         await test.step("text check tags are marked by type with corresponded color", async () => {
-          const textCheckTags = page
+          const ignoredTags = page
             .getByTestId("Orientierungssatz")
-            .locator("text-check")
+            .locator('text-check[ignored="true"]')
 
-          const allTextCheckTags = page.locator(`text-check`)
+          const errorTags = page
+            .getByTestId("Orientierungssatz")
+            .locator('text-check:not([ignored="true"])')
 
-          for (
-            let ignoredTextCheckTag = 0;
-            ignoredTextCheckTag < (await allTextCheckTags.count());
-            ignoredTextCheckTag++
-          ) {
-            await expect(textCheckTags.nth(ignoredTextCheckTag)).not.toHaveText(
-              "",
-            )
-
-            const isTextCheckIgnored = await textCheckTags
-              .nth(ignoredTextCheckTag)
-              .getAttribute("ignored")
-
-            let expectedRGBUnderlinesColor
-
-            // eslint-disable-next-line playwright/no-conditional-in-test
-            if (isTextCheckIgnored == "true") {
-              expectedRGBUnderlinesColor = convertHexToRGB(
-                textCheckUnderlinesColors.ignored,
-              )
-            } else {
-              const typeAttr = await textCheckTags
-                .nth(ignoredTextCheckTag)
-                .getAttribute("type")
-              // eslint-disable-next-line playwright/no-conditional-in-test
-              const type = typeAttr ?? "uncategorized"
-              expectedRGBUnderlinesColor = getTextCheckColorRGB(type)
-            }
-
-            await expect(textCheckTags.nth(ignoredTextCheckTag)).toHaveCSS(
+          const ignoredRGB = convertHexToRGB(textCheckUnderlinesColors.ignored)
+          for (let i = 0; i < (await ignoredTags.count()); i++) {
+            const currentTag = ignoredTags.nth(i)
+            await expect(currentTag).not.toHaveText("")
+            await expect(currentTag).toHaveCSS(
               "border-bottom",
-              "2px solid " +
-                `rgb(${expectedRGBUnderlinesColor.red}, ${expectedRGBUnderlinesColor.green}, ${expectedRGBUnderlinesColor.blue})`,
+              `2px solid rgb(${ignoredRGB.red}, ${ignoredRGB.green}, ${ignoredRGB.blue})`,
+            )
+          }
+
+          // 3. Test all STANDARD ERROR words (wavy red line)
+          // Calculate the single error color once before the loop
+          const errorRGB = convertHexToRGB(textCheckUnderlinesColors.error)
+          for (let i = 0; i < (await errorTags.count()); i++) {
+            const currentTag = errorTags.nth(i)
+            await expect(currentTag).not.toHaveText("")
+
+            await expect(currentTag).toHaveCSS("text-decoration-style", "wavy")
+            await expect(currentTag).toHaveCSS(
+              "text-decoration-color",
+              `rgb(${errorRGB.red}, ${errorRGB.green}, ${errorRGB.blue})`,
             )
           }
         })
+
+        // await test.step("text check tags are marked by type with corresponded color", async () => {
+        //   const ignoredTags = page
+        //     .getByTestId("Orientierungssatz")
+        //     .locator('text-check[ignored="true"]')
+        //
+        //   const errorTags = page
+        //     .getByTestId("Orientierungssatz")
+        //     .locator('text-check:not([ignored="true"])')
+        //
+        //   const ignoredRGB = convertHexToRGB(textCheckUnderlinesColors.ignored)
+        //   for (let i = 0; i < (await ignoredTags.count()); i++) {
+        //     const currentTag = ignoredTags.nth(i)
+        //     await expect(currentTag).not.toHaveText("")
+        //     await expect(currentTag).toHaveCSS(
+        //       "border-bottom",
+        //       `2px solid rgb(${ignoredRGB.red}, ${ignoredRGB.green}, ${ignoredRGB.blue})`,
+        //     )
+        //   }
+        //
+        //   for (let i = 0; i < (await errorTags.count()); i++) {
+        //     const currentTag = errorTags.nth(i)
+        //     await expect(currentTag).not.toHaveText("")
+        //
+        //     const typeAttr = await currentTag.getAttribute("type")
+        //     const type = typeAttr ?? "uncategorized"
+        //     const errorRGB = getTextCheckColorRGB(type)
+        //
+        //     await expect(currentTag).toHaveCSS("text-decoration-style", "wavy")
+        //     await expect(currentTag).toHaveCSS(
+        //       "text-decoration-color",
+        //       `rgb(${errorRGB.red}, ${errorRGB.green}, ${errorRGB.blue})`,
+        //     )
+        //   }
+        // })
 
         await test.step("clicking on text check tags opens corresponded modal", async () => {
           for (
@@ -333,9 +341,7 @@ test.describe(
           )
           await removeIgnoredWordButton.click()
 
-          const rgbColors = convertHexToRGB(
-            textCheckUnderlinesColors.uncategorized,
-          )
+          const rgbColors = convertHexToRGB(textCheckUnderlinesColors.error)
 
           await expect(
             page.getByTestId("text-check-loading-status"),
@@ -351,10 +357,6 @@ test.describe(
             "text-decoration-color",
             `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
           )
-
-          await expect(
-            page.locator(`text-check[id='${textCheckId}']`).nth(0),
-          ).toHaveCSS("border-bottom-style", "none")
         })
       },
     )
