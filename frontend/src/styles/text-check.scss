@@ -1,41 +1,21 @@
 text-check {
-  border-bottom: 2px solid #e86a69;
-  transition: 0.25s ease-in-out;
+  text-decoration: underline;
+  text-decoration-color: #cd5038;
+  text-decoration-skip-ink: none;
+  text-decoration-style: wavy;
+  text-decoration-thickness: 12%;
+  transition: background-color 0.25s ease-in-out;
 
   &:hover {
-    background: rgba($color: #e86a69, $alpha: 20%);
-  }
-
-  &[type="style"] {
-    border-bottom: 2px solid #9d8eff;
-
-    &:hover {
-      background: rgba($color: #9d8eff, $alpha: 20%) !important;
-    }
-  }
-
-  &[type="typographical"],
-  &[type="grammar"] {
-    border-bottom: 2px solid #eeb55c;
-
-    &:hover {
-      background: rgba($color: #eeb55c, $alpha: 20%) !important;
-    }
-  }
-
-  &[type="misspelling"] {
-    border-bottom: 2px solid #e86a69;
-
-    &:hover {
-      background: rgba($color: #e86a69, $alpha: 20%) !important;
-    }
+    background: rgba($color: #f5dcd7, $alpha: 20%);
   }
 
   &[ignored="true"] {
-    border-bottom: 2px solid #26a7f2;
+    border-bottom: 2px solid #66add3;
+    text-decoration: none;
 
     &:hover {
-      background: rgba($color: #26a7f2, $alpha: 20%) !important;
+      background: rgba($color: #cce4f0, $alpha: 20%) !important;
     }
   }
 }
