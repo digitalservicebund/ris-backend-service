@@ -95,7 +95,7 @@ async function handleAssignProcessStep(
   toast.add({
     severity: "success",
     summary: "Weitergeben erfolgreich",
-    life: 5_000,
+    life: 5000,
   })
   showProcessStepDialog.value = false
   return undefined

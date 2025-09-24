@@ -59,7 +59,7 @@ async function handleAssignProcessStep(
       severity: "success",
       summary: "Weitergeben erfolgreich",
       detail: detailMessage,
-      life: 5_000,
+      life: 5000,
     })
     return undefined
   }

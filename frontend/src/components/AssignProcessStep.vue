@@ -63,12 +63,12 @@ const selectedUser = computed({
 
 function validate() {
   validationStore.reset()
-  if (!nextProcessStep.value) {
-    validationStore.add("Pflichtfeld nicht befüllt", "nextProcessStep")
-    return false
-  } else {
+  if (nextProcessStep.value) {
     validationStore.remove("nextProcessStep")
     return true
+  } else {
+    validationStore.add("Pflichtfeld nicht befüllt", "nextProcessStep")
+    return false
   }
 }
 
