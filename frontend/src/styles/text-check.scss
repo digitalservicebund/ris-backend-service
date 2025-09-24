@@ -1,6 +1,9 @@
 text-check {
-  text-decoration: underline wavy #cd5038 2px;
+  text-decoration: underline;
+  text-decoration-color: #cd5038;
   text-decoration-skip-ink: none;
+  text-decoration-style: wavy;
+  text-decoration-thickness: 12%;
   transition: background-color 0.25s ease-in-out;
 
   &:hover {
