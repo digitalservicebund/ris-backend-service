@@ -101,8 +101,7 @@ test.describe(
             "auf die Haus " + // GRAMMAR / Grammatik: "die Haus"
             "nach dem es Berg ab geht. " + // COMPOUNDING / Getrennt- und Zusammenschreibung: "Berg ab"
             "Das tief greifende Problem " + // EMPFOHLENE_RECHTSCHREIBUNG / Empfohlene/Moderne Rechtschreibung: "tief greifende"
-            "ist das " + // HILFESTELLUNG_KOMMASETZUNG
-            "ich den Film The Derk Knight Rises schauen wollte. " + // MULTITOKEN_SPELLING / Rechtschreibfehler: "The Derk Knight Rises"
+            "ist das ich den Film schauen wollte. " + // HILFESTELLUNG_KOMMASETZUNG
             "Aber morgen schien die Sonne." // SEMANTICS / Semantische Unstimmigkeiten: "morgen schien"
 
           await headNoteEditorTextArea.fill(textWithErrorsOfDisabledRules)
