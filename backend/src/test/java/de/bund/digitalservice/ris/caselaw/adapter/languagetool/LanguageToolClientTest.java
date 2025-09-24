@@ -46,8 +46,8 @@ class LanguageToolClientTest {
     // Common mock setup for the LanguageToolConfig
     when(languageToolConfig.getUrl()).thenReturn("http://localhost:8081/v2/check");
     when(languageToolConfig.getLanguage()).thenReturn("de-DE");
-    when(languageToolConfig.getDisabledRules()).thenReturn("RULE1,RULE2");
-    when(languageToolConfig.getDisabledCategories()).thenReturn("CAT1,CAT2");
+    when(languageToolConfig.getDisabledRules()).thenReturn(List.of("RULE1", "RULE2"));
+    when(languageToolConfig.getDisabledCategories()).thenReturn(List.of("CAT1", "CAT2"));
   }
 
   @Test

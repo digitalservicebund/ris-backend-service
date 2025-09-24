@@ -42,9 +42,6 @@ const textWithErrors = {
     "ist ist", // GERMAN_WORD_REPEAT_RULE
     "Rechtshcreibfehler",
     "markirt",
-    "Sie dass",
-    "Donnerstag, dem 13",
-    //    '"', // DE_UNPAIRED_QUOTES
   ],
   ignoredWords: ["zB", "Testgnorierteswort"],
 }
@@ -116,10 +113,14 @@ test.describe(
             "geschrieben.Noch " + // MISC / Sonstiges: "[Ein Satz].[Noch ein Satz]"
             "hat er mehr als 24Std. " + // TYPOGRAPHY / Typografie: "24Std."
             "oder gar 25 Std.. gedauert. " + // PUNCTUATION / Zeichensetzung: "Std.."
-            "Ich freue ich " + // CONFUSED_WORDS / Leicht zu verwechselnde Wörter : "Ich freue ich"
+            "Ich freue ich " + // CONFUSED_WORDS / Leicht zu verwechselnde Wörter: "Ich freue ich"
             "seit Geburt an, " + // IDIOMS / Redewendungen: "seit Geburt an"
             "auf die Haus " + // GRAMMAR / Grammatik: "die Haus"
-            "nach dem es Berg ab geht." // COMPOUNDING / Getrennt- und Zusammenschreibung: "Berg ab"
+            "nach dem es Berg ab geht. " + // COMPOUNDING / Getrennt- und Zusammenschreibung: "Berg ab"
+            "Das tief greifende Problem " + // EMPFOHLENE_RECHTSCHREIBUNG / Empfohlene/Moderne Rechtschreibung: "tief greifende"
+            "ist das " + // HILFESTELLUNG_KOMMASETZUNG
+            "ich den Film The Derk Knight Rises schauen wollte. " + // MULTITOKEN_SPELLING / Rechtschreibfehler: "The Derk Knight Rises"
+            "Aber morgen schien die Sonne." // SEMANTICS / Semantische Unstimmigkeiten: "morgen schien"
 
           await headNoteEditorTextArea.fill(textWithErrorsOfDisabledRules)
           await expect(headNoteEditorTextArea).toHaveText(
@@ -253,8 +254,6 @@ test.describe(
         })
 
         await test.step("accept a selected suggestion replaces in text", async () => {
-          await headNoteEditor.click()
-
           const textCheckLiteral = "Rechtshcreibfehler"
           await headNoteEditor.getByText(textCheckLiteral).click()
 
