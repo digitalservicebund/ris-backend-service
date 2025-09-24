@@ -6,17 +6,6 @@ text-check {
     background: rgba($color: #f5dcd7, $alpha: 20%);
   }
 
-  &[type="style"],
-  &[type="grammar"],
-  &[type="typographical"],
-  &[type="misspelling"] {
-    text-decoration-color: #cd5038;
-
-    &:hover {
-      background: rgba($color: #f5dcd7, $alpha: 20%) !important;
-    }
-  }
-
   &[ignored="true"] {
     border-bottom: 2px solid #66add3;
     text-decoration: none;
