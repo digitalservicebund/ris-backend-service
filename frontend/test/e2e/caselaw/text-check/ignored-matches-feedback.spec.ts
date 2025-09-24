@@ -66,10 +66,10 @@ test.describe(
           const textCheckId = await getMarkId(textCheckTag)
 
           const checks = page.locator(`text-check[id='${textCheckId}']`)
+
+          await expect(checks).toHaveCount(2)
+
           const count = await checks.count()
-
-          expect(count).toBeGreaterThan(0) // optional sanity check
-
           for (let i = 0; i < count; i++) {
             await expect(checks.nth(i)).toHaveCSS(
               "border-bottom",
@@ -95,10 +95,10 @@ test.describe(
           const textCheckId = await getMarkId(textCheckTag)
 
           const checks = page.locator(`text-check[id='${textCheckId}']`)
+
+          await expect(checks).toHaveCount(2)
+
           const count = await checks.count()
-
-          expect(count).toBeGreaterThan(0) // optional sanity check
-
           for (let i = 0; i < count; i++) {
             await expect(checks.nth(i)).toHaveCSS(
               "border-bottom",
