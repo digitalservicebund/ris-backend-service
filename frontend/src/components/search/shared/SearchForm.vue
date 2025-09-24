@@ -82,7 +82,9 @@ const myDocOfficeOnly = computed({
       : false,
   set: (data) => {
     if (isDecision.value) {
-      if (!data) {
+      if (data) {
+        query.value.myDocOfficeOnly = "true"
+      } else {
         // Clear related fields when myDocOfficeOnly is unchecked
         delete query.value.withError
         delete query.value.withDuplicateWarning
@@ -93,8 +95,6 @@ const myDocOfficeOnly = computed({
         delete query.value.assignedToMe
         delete query.value.unassigned
         resetErrors("publicationDate") // Clear validation for publicationDate
-      } else {
-        query.value.myDocOfficeOnly = "true"
       }
     }
   },
@@ -139,11 +139,11 @@ const assignedToMe = computed({
       : false,
   set: (data) => {
     if (isDecision.value) {
-      if (!data) {
-        delete query.value.assignedToMe
-      } else {
+      if (data) {
         query.value.assignedToMe = "true"
         if (query.value.unassigned) delete query.value.unassigned
+      } else {
+        delete query.value.assignedToMe
       }
     }
   },
@@ -156,11 +156,11 @@ const unassigned = computed({
       : false,
   set: (data) => {
     if (isDecision.value) {
-      if (!data) {
-        delete query.value.unassigned
-      } else {
+      if (data) {
         query.value.unassigned = "true"
         if (query.value.assignedToMe) delete query.value.assignedToMe
+      } else {
+        delete query.value.unassigned
       }
     }
   },
@@ -173,10 +173,10 @@ const withDuplicateWarning = computed({
       : false,
   set: (data) => {
     if (isDecision.value) {
-      if (!data) {
-        delete query.value.withDuplicateWarning
-      } else {
+      if (data) {
         query.value.withDuplicateWarning = "true"
+      } else {
+        delete query.value.withDuplicateWarning
       }
     }
   },

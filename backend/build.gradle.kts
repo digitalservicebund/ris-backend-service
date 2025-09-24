@@ -17,10 +17,10 @@ plugins {
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
-    id("com.github.ben-manes.versions") version "0.52.0"
-    id ("io.freefair.lombok") version "8.14.2"
-    id("org.flywaydb.flyway") version "11.12.0"
-    id("io.sentry.jvm.gradle") version "5.9.0"
+    id("com.github.ben-manes.versions") version "0.53.0"
+    id("io.freefair.lombok") version "8.14.2"
+    id("org.flywaydb.flyway") version "11.13.0"
+    id("io.sentry.jvm.gradle") version "5.12.0"
 }
 
 group = "de.bund.digitalservice"
@@ -54,7 +54,7 @@ jacoco {
 }
 
 lombok {
-    version = "1.18.40"
+    version = "1.18.42"
 }
 
 springBoot {
@@ -63,6 +63,7 @@ springBoot {
 
 testlogger {
     theme = ThemeType.MOCHA
+    showPassed = false
 }
 
 configurations {
@@ -161,12 +162,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.3")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.5")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.32.0")
+    implementation("com.google.protobuf:protobuf-java:4.32.1")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.6.0")
@@ -174,39 +175,39 @@ dependencies {
     // CVE-2025-58056
     // should be fixed with a new amazon version.
     // please take a look every time to remove this as soon as possible!
-    implementation("io.netty:netty-handler:4.2.5.Final")
-    implementation("io.netty:netty-codec-http2:4.2.5.Final")
-    implementation("io.netty:netty-buffer:4.2.5.Final")
-    implementation("io.netty:netty-codec-http:4.2.5.Final")
-    implementation("io.netty:netty-codec:4.2.5.Final")
-    implementation("io.netty:netty-common:4.2.5.Final")
-    implementation("io.netty:netty-resolver:4.2.5.Final")
-    implementation("io.netty:netty-transport:4.2.5.Final")
-    implementation("io.netty:netty-transport-classes-epoll:4.2.5.Final")
-    implementation("io.netty:netty-transport-native-unix-common:4.2.5.Final")
+    implementation("io.netty:netty-handler:4.2.6.Final")
+    implementation("io.netty:netty-codec-http2:4.2.6.Final")
+    implementation("io.netty:netty-buffer:4.2.6.Final")
+    implementation("io.netty:netty-codec-http:4.2.6.Final")
+    implementation("io.netty:netty-codec:4.2.6.Final")
+    implementation("io.netty:netty-common:4.2.6.Final")
+    implementation("io.netty:netty-resolver:4.2.6.Final")
+    implementation("io.netty:netty-transport:4.2.6.Final")
+    implementation("io.netty:netty-transport-classes-epoll:4.2.6.Final")
+    implementation("io.netty:netty-transport-native-unix-common:4.2.6.Final")
 
-    implementation("org.postgresql:postgresql:42.7.7")
+    implementation("org.postgresql:postgresql:42.7.8")
 
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
     // CVE-2025-48988 (found in 10.1.41 used by spring-boot-starter-web:3.5.0.)
-    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.44")
+    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.46")
 
-    implementation(platform("software.amazon.awssdk:bom:2.33.1"))
+    implementation(platform("software.amazon.awssdk:bom:2.34.2"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
-    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.4")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.5")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
     implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.7")
-    implementation("net.sf.saxon:Saxon-HE:12.8")
+    implementation("net.sf.saxon:Saxon-HE:12.9")
 
-    implementation("jakarta.mail:jakarta.mail-api:2.1.4")
-    implementation("org.eclipse.angus:angus-mail:2.0.4")
+    implementation("jakarta.mail:jakarta.mail-api:2.1.5")
+    implementation("org.eclipse.angus:angus-mail:2.0.5")
     implementation("com.icegreen:greenmail:2.1.5")
 
     // package served by private repo, requires authentication:
@@ -218,9 +219,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.91")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.96")
     // for local development:
-    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.91.jar"))
+    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.95.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.20.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
@@ -229,8 +230,8 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.15.3")
-    implementation("io.micrometer:micrometer-core:1.15.3")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.15.4")
+    implementation("io.micrometer:micrometer-core:1.15.4")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
@@ -244,19 +245,19 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.12.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.13.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.12.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.13.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
     }
-    testImplementation("org.mockito:mockito-junit-jupiter:5.19.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.20.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.7.9")
-    testImplementation("org.springframework.security:spring-security-test:6.5.3")
+    testImplementation("io.projectreactor:reactor-test:3.7.11")
+    testImplementation("org.springframework.security:spring-security-test:6.5.5")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
@@ -264,7 +265,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.28.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.29.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
@@ -370,4 +371,3 @@ tasks {
     }
 
 }
-

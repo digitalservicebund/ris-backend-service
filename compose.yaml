@@ -1,6 +1,6 @@
 services:
   initialization:
-    image: ghcr.io/digitalservicebund/ris-data-migration:a47d51950eee7af59feb56fb8dfd6d6c51744717 # https://github.com/digitalservicebund/ris-data-migration/pkgs/container/ris-data-migration
+    image: ghcr.io/digitalservicebund/ris-data-migration:168c5a38e631b8010ffcc2094914a583c94dc71e # https://github.com/digitalservicebund/ris-data-migration/pkgs/container/ris-data-migration
     depends_on:
       - postgres14
     environment:
@@ -75,6 +75,7 @@ services:
       postgres14: { condition: service_healthy }
       redis: { condition: service_healthy }
       initialization: { condition: service_completed_successfully }
+      languagetool: { condition: service_healthy }
     ports:
       - 8080:8080
     healthcheck:
@@ -153,7 +154,7 @@ services:
       timeout: 3s
 
   redis:
-    image: cgr.dev/chainguard/redis@sha256:b0ec1a9be4cca6aaa78ed4f3bcfb53cb2223544e047ce5fffb846b15ef8de6bc
+    image: cgr.dev/chainguard/redis@sha256:43183b13ef8a99c404f24ba1e3b818e44d1a2acdc6e911e4e36259699b41efd2
     extra_hosts:
       - localhost:host-gateway
     container_name: redis
@@ -178,7 +179,7 @@ services:
       timeout: 5s
 
   languagetool:
-    image: ghcr.io/digitalservicebund/neuris-languagetool:c9c1d444fdeba9b0ce218f862c9d10631c682cb3
+    image: ghcr.io/digitalservicebund/neuris-languagetool:5e7d8a4cf62a73851f38c2b2eb987decdb4f152b
     extra_hosts:
       - localhost:host-gateway
     ports:

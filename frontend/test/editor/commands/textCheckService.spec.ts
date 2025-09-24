@@ -13,6 +13,7 @@ import {
 } from "~/test-helper/text-check-service-mock"
 
 describe("check category service", () => {
+  const textCategory = "tenor"
   let store: ReturnType<typeof useDocumentUnitStore>
   const updateDocumentUnitMock = vi.fn()
 
@@ -56,16 +57,16 @@ describe("check category service", () => {
       },
     } as unknown as Editor
 
-    const textCheckService = new NeurisTextCheckService()
+    const textCheckService = new NeurisTextCheckService(textCategory)
 
-    await textCheckService.checkCategory(mockEditor, "tenor")
+    await textCheckService.checkCategory(mockEditor)
 
     expect(store.updateDocumentUnit).toHaveBeenCalledTimes(1)
     expect(store.updateDocumentUnit).toHaveBeenCalledWith()
   })
 
   it("clear selected match sets it to undefined ", async () => {
-    const textCheckService = new NeurisTextCheckService()
+    const textCheckService = new NeurisTextCheckService(textCategory)
 
     textCheckService.selectedMatch.value = generateMatch()
 
@@ -73,28 +74,33 @@ describe("check category service", () => {
     expect(textCheckService.selectedMatch.value).toBeUndefined()
   })
 
-  it("resets selected match if not in matches, otherwise sets it", async () => {
-    const textCheckService = new NeurisTextCheckService()
+  it("resets selected match if not in matches", async () => {
+    const textCheckService = new NeurisTextCheckService(textCategory)
+
+    textCheckService.selectedMatch.value = generateMatch()
+    expect(textCheckService.selectedMatch.value).toBeDefined()
+
+    store.matches = new Map([["tenor", [generateMatch(4)]]])
+
+    textCheckService.selectMatch(3)
+    expect(textCheckService.selectedMatch.value).toBeUndefined()
+  })
+
+  it("set selected match if contained in matches", async () => {
+    const textCheckService = new NeurisTextCheckService(textCategory)
 
     const match = generateMatch()
-    textCheckService.selectedMatch.value = match
-    textCheckService.matches = [match]
+    expect(textCheckService.selectedMatch.value).toBeUndefined()
+    store.matches = new Map([[textCategory, [match]]])
 
     textCheckService.selectMatch(match.id)
     expect(textCheckService.selectedMatch.value).toEqual(match)
-    textCheckService.selectedMatch.value = generateMatch()
-
-    const matchWithOtherId = generateMatch(4)
-    textCheckService.matches = [matchWithOtherId]
-
-    textCheckService.selectMatch(match.id)
-    expect(textCheckService.selectedMatch.value).toBeUndefined()
   })
 
   it.each(["global", "documentation_unit"] as const)(
     "removing a %s ignored word updates the selected match ignored words list accordingly",
     async (type: DocumentationType) => {
-      const textCheckService = new NeurisTextCheckService()
+      const textCheckService = new NeurisTextCheckService(textCategory)
       if (type === "global") {
         vi.spyOn(languageToolService, "removeGlobalIgnore").mockResolvedValue({
           status: 200,
@@ -131,7 +137,7 @@ describe("check category service", () => {
   it.each(["global", "documentation_unit"] as const)(
     "adding a %s ignored word updates the selected match ignored words list accordingly",
     async (type: DocumentationType) => {
-      const textCheckService = new NeurisTextCheckService()
+      const textCheckService = new NeurisTextCheckService(textCategory)
 
       if (type == "documentation_unit") {
         vi.spyOn(languageToolService, "removeLocalIgnore").mockResolvedValue({

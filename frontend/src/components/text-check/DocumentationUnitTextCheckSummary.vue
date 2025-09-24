@@ -24,6 +24,7 @@ const selectedSuggestion = ref()
 
 const checkAll = async () => {
   if (store.documentUnit) {
+    await store.updateDocumentUnit()
     const response = await languageToolService.checkAll(store.documentUnit.uuid)
 
     errors.value = response.data?.suggestions

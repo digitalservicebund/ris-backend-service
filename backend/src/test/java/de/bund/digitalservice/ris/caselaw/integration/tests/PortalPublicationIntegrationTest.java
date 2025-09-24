@@ -139,7 +139,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
             historyLog -> {
               assertThat(historyLog.getEventType())
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
-              assertThat(historyLog.getUserId()).isEqualTo(userDbId);
+              assertThat(historyLog.getUser().getId()).isEqualTo(userDbId);
               assertThat(historyLog.getDescription())
                   .isEqualTo("Dokeinheit im Portal veröffentlicht");
             },
@@ -147,7 +147,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
               assertThat(historyLog.getEventType())
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
               assertThat(historyLog.getSystemName()).isEqualTo("NeuRIS");
-              assertThat(historyLog.getUserId()).isNull();
+              assertThat(historyLog.getUser()).isNull();
               assertThat(historyLog.getDescription())
                   .isEqualTo("Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
             });
@@ -201,14 +201,14 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
             historyLog -> {
               assertThat(historyLog.getEventType())
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
-              assertThat(historyLog.getUserId()).isEqualTo(userDbId);
+              assertThat(historyLog.getUser().getId()).isEqualTo(userDbId);
               assertThat(historyLog.getDescription())
                   .isEqualTo("Dokeinheit im Portal veröffentlicht");
             },
             historyLog -> {
               assertThat(historyLog.getEventType())
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
-              assertThat(historyLog.getUserId()).isEqualTo(userDbId);
+              assertThat(historyLog.getUser().getId()).isEqualTo(userDbId);
               assertThat(historyLog.getDescription())
                   .isEqualTo("Dokeinheit im Portal veröffentlicht");
             },
@@ -216,7 +216,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
               assertThat(historyLog.getEventType())
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
               assertThat(historyLog.getSystemName()).isEqualTo("NeuRIS");
-              assertThat(historyLog.getUserId()).isNull();
+              assertThat(historyLog.getUser()).isNull();
               assertThat(historyLog.getDescription())
                   .isEqualTo("Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
             });
@@ -500,7 +500,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
             historyLog -> {
               assertThat(historyLog.getEventType())
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
-              assertThat(historyLog.getUserId()).isEqualTo(userDbId);
+              assertThat(historyLog.getUser().getId()).isEqualTo(userDbId);
               assertThat(historyLog.getDescription())
                   .isEqualTo("Dokeinheit wurde aus dem Portal zurückgezogen");
             },
@@ -508,7 +508,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
               assertThat(historyLog.getEventType())
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
               assertThat(historyLog.getSystemName()).isEqualTo("NeuRIS");
-              assertThat(historyLog.getUserId()).isNull();
+              assertThat(historyLog.getUser()).isNull();
               assertThat(historyLog.getDescription())
                   .isEqualTo("Status im Portal geändert: Veröffentlicht → Zurückgezogen");
             });

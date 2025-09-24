@@ -23,14 +23,21 @@
   "automergeType": "pr",
   "packageRules": [
     {
-      "matchPackageNames": ['@playwright/test', 'playwright'],
+      "matchPackageNames": [
+        '@playwright/test',
+        'playwright'
+      ],
       "rangeStrategy": "pin",
-      "allowedVersions": "1.52.0" // 1.53.0 breaks border-number, border-number-link and text-check e2e in chrome
+      "allowedVersions": "1.52.0"
+      // 1.53.0 breaks border-number, border-number-link and text-check e2e in chrome
     },
     {
-      "matchPackageNames": ['eslint-plugin-testing-library'],
+      "matchPackageNames": [
+        'eslint-plugin-testing-library'
+      ],
       "rangeStrategy": "pin",
-      "allowedVersions": "7.6.3" // later versions have a bug that reports false positives
+      "allowedVersions": "7.6.3"
+      // later versions have a bug that reports false positives
     },
     {
       "groupName": "all-frontend-non-major-dependencies",
@@ -45,7 +52,8 @@
         "digest"
       ],
       "labels": [
-        "frontend-updates"
+        "frontend-updates",
+        "renovate"
       ],
       "automerge": true,
     },
@@ -63,7 +71,8 @@
       ],
       "automerge": true,
       "labels": [
-        "backend-updates"
+        "backend-updates",
+        "renovate"
       ],
     },
     {
@@ -78,7 +87,8 @@
         "major"
       ],
       "labels": [
-        "no-automerge"
+        "no-automerge",
+        "renovate"
       ]
     },
     {

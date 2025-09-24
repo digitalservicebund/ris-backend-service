@@ -152,17 +152,17 @@ class UserControllerTest {
     var firstUser =
         User.builder()
             .id(UUID.randomUUID())
-            .name("Clara Hoffmann")
+            .firstName("Clara")
+            .lastName("Hoffmann")
             .email("clara.hoffmann@digitalservice.bund.de")
-            .initials("CH")
             .build();
 
     var secondUser =
         User.builder()
             .id(UUID.randomUUID())
-            .name("Jonas Bergmann")
+            .firstName("Jonas")
+            .lastName("Bergmann")
             .email("jonas.bergmann@digitalservice.bund.de")
-            .initials("JB")
             .build();
 
     var thirdServiceUnreachableUser = User.builder().id(UUID.randomUUID()).build();

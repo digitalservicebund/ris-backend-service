@@ -71,6 +71,8 @@ describe("text check handover", () => {
 
     await renderComponent()
 
+    await flushPromises()
+
     Object.entries(enabledTextCheckCategories).forEach(([key, value]) => {
       const element = screen.getByTestId(`text-check-handover-link-${key}`)
       expect(element).toHaveTextContent(value)
@@ -102,6 +104,8 @@ describe("text check handover", () => {
     } as ServiceResponse<TextCheckAllResponse>)
 
     await renderComponent()
+
+    await flushPromises()
 
     expect(
       screen.queryByText(errorMessages.TEXT_CHECK_FAILED.title),

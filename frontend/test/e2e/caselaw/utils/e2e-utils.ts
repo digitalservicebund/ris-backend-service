@@ -252,6 +252,12 @@ export const navigateToSettings = async (page: Page) => {
   })
 }
 
+export async function loginToPortal(portalPage: Page) {
+  await portalPage.fill("#username", process.env.E2E_TEST_USER as string)
+  await portalPage.fill("#password", process.env.E2E_TEST_PASSWORD as string)
+  await portalPage.locator("input#kc-login").click()
+}
+
 export const handoverDocumentationUnit = async (
   page: Page,
   documentNumber: string,
@@ -299,9 +305,13 @@ export const uploadTestfile = async (
 }
 
 export async function save(page: Page) {
-  const saveRequest = page.waitForRequest("**/api/v1/caselaw/documentunits/*", {
-    timeout: 5_000,
-  })
+  const saveRequest = page.waitForResponse(
+    (response) =>
+      response.url().includes("/api/v1/caselaw/documentunits/") &&
+      response.request().method() === "PATCH" &&
+      response.status() === 200,
+    { timeout: 7_000 },
+  )
   await page.getByLabel("Speichern Button", { exact: true }).click()
   await saveRequest
   await expect(page.getByText(`Gespeichert`).first()).toBeVisible()

@@ -31,7 +31,7 @@ public abstract class UserService {
     User user = getUser(oidcUser);
     if (user == null) return null;
     if (user.documentationOffice() == null) {
-      LOGGER.warn("No doc office associated with user: {}", user.name());
+      LOGGER.warn("No doc office associated with user: {}", user);
     }
     return user.documentationOffice();
   }

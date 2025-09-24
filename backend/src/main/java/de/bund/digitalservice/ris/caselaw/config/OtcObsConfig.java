@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.config;
 
 import de.bund.digitalservice.ris.caselaw.adapter.S3MockClient;
-import de.bund.digitalservice.ris.caselaw.adapter.S3NoOpClient;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +48,7 @@ public class OtcObsConfig {
   }
 
   @Bean(name = "portalS3Client")
-  @Profile({"staging", "uat"})
+  @Profile({"staging", "uat", "production"})
   public S3Client portalS3Client() throws URISyntaxException {
     return S3Client.builder()
         .credentialsProvider(
@@ -60,12 +59,6 @@ public class OtcObsConfig {
         .responseChecksumValidation(ResponseChecksumValidation.WHEN_REQUIRED)
         .requestChecksumCalculation(RequestChecksumCalculation.WHEN_REQUIRED)
         .build();
-  }
-
-  @Bean(name = "portalS3Client")
-  @Profile({"production"})
-  public S3Client portalS3NoopClient() {
-    return new S3NoOpClient();
   }
 
   @Bean(name = "docxS3Client")

@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -101,7 +100,6 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseUserRepository databaseUserRepository;
   @MockitoSpyBean private UserService userService;
   private final UUID oidcLoggedInUserId = UUID.fromString("88888888-3333-4444-4444-121212121212");
-  private final DocumentationOffice docOffice = buildDSDocOffice();
   private UUID court1Id;
   private UUID court2Id;
   private UUID region1Id;
@@ -145,20 +143,6 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                     .build())
             .getId();
 
-    var documentationOffice =
-        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
-    var userDbId1 =
-        databaseUserRepository
-            .findByExternalId(oidcLoggedInUserId)
-            .orElse(
-                databaseUserRepository.save(
-                    UserDTO.builder()
-                        .externalId(oidcLoggedInUserId)
-                        .documentationOffice(documentationOffice)
-                        .firstName("Krümel")
-                        .lastName("Monster")
-                        .build()))
-            .getId();
     userDbId2 =
         databaseUserRepository
             .save(
@@ -169,20 +153,6 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                     .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
                     .build())
             .getId();
-
-    // Mock the UserService.getUser(UUID) for the OIDC logged-in user
-    // This user's ID will be put into the OIDC token's 'sub' claim by AuthUtils.getMockLogin
-    // We need this to assert on history logs
-    when(userService.getUser(userDbId1))
-        .thenReturn(
-            User.builder()
-                .id(userDbId1)
-                .externalId(oidcLoggedInUserId)
-                .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
-                .firstName("Krümel")
-                .lastName("Monster")
-                .documentationOffice(docOffice)
-                .build());
   }
 
   @AfterEach
@@ -4770,13 +4740,9 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       ProcessStepDTO fachdokumentationProcessStep =
           processStepRepository.findByName("Fachdokumentation").orElseThrow();
 
-      // Mock a user with a documentation office for the patch payload
-      ObjectNode userNode = JsonNodeFactory.instance.objectNode();
-      userNode.put("id", UUID.randomUUID().toString());
-
       List<JsonPatchOperation> operationsUser1 =
           List.of(
-              new ReplaceOperation("/currentDocumentationUnitProcessStep/user", userNode),
+              new RemoveOperation("/currentDocumentationUnitProcessStep/user"),
               new ReplaceOperation(
                   "/currentDocumentationUnitProcessStep/processStep/abbreviation",
                   new TextNode("FD")),

@@ -8,12 +8,6 @@ import {
 } from "~/e2e/caselaw/utils/e2e-utils"
 import { generateString } from "~/test-helper/dataGenerators"
 
-// eslint-disable-next-line playwright/no-skipped-test
-test.skip(
-  ({ baseURL }) => baseURL === "http://127.0.0.1",
-  "Skipping this test on local execution, as there is no languagetool running",
-)
-
 test.describe(
   "global ignore",
   {

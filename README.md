@@ -64,8 +64,8 @@ Then, store the credentials in 1Password:
 
 ```shell
 op item create --category login --title 'NeuRIS S3' \
-'access-key-id=[your-access-key-id]' \
-'secret-access-key=[your-secret-access-key]'
+'access-key-id=<your-access-key-id>' \
+'secret-access-key=<your-secret-access-key>'
 ```
 
 ## Getting started
@@ -129,6 +129,13 @@ To run the frontend stack only (without backend and initialization) run:
 ```bash
 ./run.sh dev -n
 ./run.sh dev --no-backend
+```
+
+To run the only required stack setup (without frontend and frontend) run:
+
+```bash
+./run.sh dev -n -f
+./run.sh dev --no-backend --no-frontend
 ```
 
 When choosing the no-backend variant, checkout the [backend manual](./backend/README.md) on how to run the backend

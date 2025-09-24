@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolResponse;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Category;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
@@ -10,67 +9,62 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Suggestion;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckAllResponse;
-import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class TextCheckResponseTransformer {
   private TextCheckResponseTransformer() {}
 
   public static TextCheckAllResponse transformToAllDomain(
       List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches) {
-    List<Suggestion> suggestions = new ArrayList<>();
     Set<CategoryType> categoryTypes = new HashSet<>();
-    AtomicInteger totalTextCheckErrors = new AtomicInteger();
+    List<Suggestion> suggestions = new ArrayList<>();
+    int totalTextCheckErrors = 0;
 
-    matches.forEach(
-        match -> {
-          String word =
-              match
-                  .context()
-                  .text()
-                  .substring(
-                      match.context().offset(),
-                      match.context().offset() + match.context().length());
+    for (de.bund.digitalservice.ris.caselaw.domain.textcheck.Match match : matches) {
+      String word = getMatchWord(match);
 
-          if (suggestions.stream().noneMatch(suggestion -> suggestion.word().equals(word))) {
-            suggestions.add(new Suggestion(word, new ArrayList<>()));
-          }
+      Suggestion suggestion =
+          suggestions.stream()
+              .filter(s -> s.word().equals(word))
+              .findFirst()
+              .orElseGet(
+                  () -> {
+                    Suggestion newSuggestion = new Suggestion(word, new ArrayList<>());
+                    suggestions.add(newSuggestion);
+                    return newSuggestion;
+                  });
 
-          Optional<Suggestion> suggestionOptional =
-              suggestions.stream().filter(suggestion -> suggestion.word().equals(word)).findFirst();
+      suggestion.matches().add(match);
+      categoryTypes.add(match.category());
+      if (!isIgnored(match)) {
+        totalTextCheckErrors++;
+      }
+    }
 
-          suggestionOptional.ifPresent(
-              suggestion -> {
-                suggestion.matches().add(match);
-                categoryTypes.add(match.category());
-                totalTextCheckErrors.getAndIncrement();
-              });
-        });
-
-    return TextCheckAllResponse.builder()
+    return de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckAllResponse.builder()
         .suggestions(suggestions)
         .categoryTypes(categoryTypes)
-        .totalTextCheckErrors(totalTextCheckErrors.get())
+        .totalTextCheckErrors(totalTextCheckErrors)
         .build();
   }
 
-  public static TextCheckResponse transformToDomain(
-      List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches) {
-    return TextCheckResponse.builder().matches(matches).build();
+  public static de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckResponse
+      transformToDomain(List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches) {
+    return de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckResponse.builder()
+        .matches(matches)
+        .build();
   }
 
   public static List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match>
-      transformToListOfDomainMatches(LanguageToolResponse response) {
+      transformToListOfDomainMatches(List<Match> languageToolMatches) {
     List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches = new ArrayList<>();
 
-    for (int i = 0; i < response.getMatches().size(); i++) {
-      Match match = response.getMatches().get(i);
+    for (int i = 0; i < languageToolMatches.size(); i++) {
+      Match match = languageToolMatches.get(i);
       MatchBuilder matchBuilder =
           de.bund.digitalservice.ris.caselaw.domain.textcheck.Match.builder()
               .id(i + 1) // start from 1
@@ -85,9 +79,7 @@ public class TextCheckResponseTransformer {
       }
 
       if (match.getContext() != null) {
-        int startIndex = match.getContext().getOffset();
-        int endIndex = match.getContext().getOffset() + match.getContext().getLength();
-        String word = match.getContext().getText().substring(startIndex, endIndex);
+        String word = getMatchWord(match);
         matchBuilder
             .word(word)
             .context(
@@ -121,5 +113,30 @@ public class TextCheckResponseTransformer {
     }
 
     return matches;
+  }
+
+  private static String getMatchWord(
+      de.bund.digitalservice.ris.caselaw.domain.textcheck.Match match) {
+    return match
+        .context()
+        .text()
+        .substring(match.context().offset(), match.context().offset() + match.context().length());
+  }
+
+  private static String getMatchWord(Match match) {
+    int startIndex = match.getContext().getOffset();
+    int endIndex = match.getContext().getOffset() + match.getContext().getLength();
+    return match.getContext().getText().substring(startIndex, endIndex);
+  }
+
+  private static boolean isIgnored(
+      de.bund.digitalservice.ris.caselaw.domain.textcheck.Match match) {
+    var ignoredWords = match.ignoredTextCheckWords();
+    if (ignoredWords == null || ignoredWords.isEmpty()) {
+      return false;
+    } else {
+      return ignoredWords.stream()
+          .anyMatch(ignoredWordObj -> ignoredWordObj.word().equals(match.word()));
+    }
   }
 }

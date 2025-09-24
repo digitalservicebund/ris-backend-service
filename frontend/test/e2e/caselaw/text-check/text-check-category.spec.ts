@@ -10,12 +10,6 @@ test.skip(
   "Skipping firefox flaky test",
 )
 
-// eslint-disable-next-line playwright/no-skipped-test
-test.skip(
-  ({ baseURL }) => baseURL === "http://127.0.0.1",
-  "Skipping this test on local execution, as there is no languagetool running",
-)
-
 const textCheckUnderlinesColors = {
   uncategorized: "#e86a69",
   style: "#9d8eff",
@@ -23,6 +17,7 @@ const textCheckUnderlinesColors = {
   typographical: "#eeb55c",
   ignored: "#26A7F2",
   misspelling: "#e86a69",
+  duplication: "#e86a69",
 } as const
 
 type TextCheckType = keyof typeof textCheckUnderlinesColors
@@ -42,19 +37,16 @@ function getTextCheckColorRGB(type: string | null): {
 }
 
 const textWithErrors = {
-  text: "LanguageTool ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, zB. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten. Testgnorierteswort ist grün markiert",
+  text: "LanguageTool ist ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, z. B. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten. Testgnorierteswort ist zB. grün markiert",
   incorrectWords: [
-    "sie",
+    "ist ist", // GERMAN_WORD_REPEAT_RULE
     "Rechtshcreibfehler",
     "markirt",
-    "hervor gehoben",
-    "wie",
-    "wussten",
     "Sie dass",
-    "zB.",
     "Donnerstag, dem 13",
+    //    '"', // DE_UNPAIRED_QUOTES
   ],
-  ignoredWords: ["Testgnorierteswort"],
+  ignoredWords: ["zB", "Testgnorierteswort"],
 }
 
 test.describe(
@@ -63,6 +55,97 @@ test.describe(
     tag: ["@RISDEV-254"],
   },
   () => {
+    test(
+      "ignore irrelevant text check categories and rules",
+      {
+        tag: ["@RISDEV-9169", "@RISDEV-9170"],
+      },
+      async ({ page, prefilledDocumentUnit }) => {
+        const headNoteEditor = page.getByTestId("Orientierungssatz")
+        const headNoteEditorTextArea = headNoteEditor.locator("div")
+
+        await test.step("navigate to headnote (Orientierungssatz) in categories", async () => {
+          await navigateToCategories(
+            page,
+            prefilledDocumentUnit.documentNumber,
+            { category: DocumentUnitCategoriesEnum.TEXTS },
+          )
+        })
+
+        await test.step("replace text in headnote (Orientierungssatz) with irrelevant style-related mistakes", async () => {
+          await clearTextField(page, headNoteEditorTextArea)
+
+          // Contains examples of Categories we disable
+          const textWithErrorsOfDisabledCategories =
+            "I bims, LanguageTool. " + // COLLOQUIALISMS: I bims
+            "Im täglichen Alltag prüfe ich Texte. " + // REDUNDANCY: täglichen Alltag
+            "Dann habe ich Freizeit. Dann esse ich. Dann schlafe ich. " + // REPETITIONS_STYLE: Dann []. Dann []. Dann [].
+            "Mir ist es egal, ob du Helpdesk oder Help-Desk schreibst." // STYLE: Helpdesk oder Help-Desk
+
+          await headNoteEditorTextArea.fill(textWithErrorsOfDisabledCategories)
+          await expect(headNoteEditorTextArea).toHaveText(
+            textWithErrorsOfDisabledCategories,
+          )
+        })
+
+        await test.step("trigger category text results in no matches for ignored categories", async () => {
+          await page
+            .getByLabel("Orientierungssatz Button")
+            .getByRole("button", { name: "Rechtschreibprüfung" })
+            .click()
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toHaveText("Rechtschreibprüfung läuft")
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toBeHidden({ timeout: 10_000 })
+
+          await expect(page.locator(`text-check`)).not.toBeAttached()
+        })
+
+        await test.step("replace text in headnote (Orientierungssatz) with mistakes of ignored rules", async () => {
+          await clearTextField(page, headNoteEditorTextArea)
+
+          // Contains examples of Rules we disable
+          const textWithErrorsOfDisabledRules =
+            "der Satz wurde, " + // UPPERCASE_SENTENCE_START: "der"
+            "anders als oft behauptet, " + // WIKIPEDIA: "Anders als oft behauptet"
+            "nicht von Feuerwehrmännern " + // GENDER_NEUTRALITY / Geschlechtergerechte Sprache: "Erstsemsterin"
+            "geschrieben.Noch " + // MISC / Sonstiges: "[Ein Satz].[Noch ein Satz]"
+            "hat er mehr als 24Std. " + // TYPOGRAPHY / Typografie: "24Std."
+            "oder gar 25 Std.. gedauert. " + // PUNCTUATION / Zeichensetzung: "Std.."
+            "Ich freue ich " + // CONFUSED_WORDS / Leicht zu verwechselnde Wörter : "Ich freue ich"
+            "seit Geburt an, " + // IDIOMS / Redewendungen: "seit Geburt an"
+            "auf die Haus " + // GRAMMAR / Grammatik: "die Haus"
+            "nach dem es Berg ab geht." // COMPOUNDING / Getrennt- und Zusammenschreibung: "Berg ab"
+
+          await headNoteEditorTextArea.fill(textWithErrorsOfDisabledRules)
+          await expect(headNoteEditorTextArea).toHaveText(
+            textWithErrorsOfDisabledRules,
+          )
+        })
+
+        await test.step("trigger category text button shows results in no matches for ignored rules", async () => {
+          await page
+            .getByLabel("Orientierungssatz Button")
+            .getByRole("button", { name: "Rechtschreibprüfung" })
+            .click()
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toHaveText("Rechtschreibprüfung läuft")
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toBeHidden({ timeout: 10_000 })
+
+          await expect(page.locator(`text-check`)).not.toBeAttached()
+        })
+      },
+    )
+
     test(
       "clicking on text check button, save document and returns matches",
       {
@@ -172,25 +255,21 @@ test.describe(
         await test.step("accept a selected suggestion replaces in text", async () => {
           await headNoteEditor.click()
 
-          await headNoteEditor.getByText("zB.").click()
-
-          const textCheckLiteral = "zB."
-          await expect(
-            page.getByTestId("text-check-modal-word"),
-          ).not.toHaveText("zb.")
+          const textCheckLiteral = "Rechtshcreibfehler"
+          await headNoteEditor.getByText(textCheckLiteral).click()
 
           await page.getByTestId("suggestion-accept-button").click()
           await expect(page.getByTestId("text-check-modal")).toBeHidden()
 
           await expect(headNoteEditorTextArea).toHaveText(
-            textWithErrors.text.replace(textCheckLiteral, "z. B."),
+            textWithErrors.text.replace(textCheckLiteral, "Rechtschreibfehler"),
           )
 
-          await expect(page.locator(`text-check[id='${8}']`)).not.toBeAttached()
+          await expect(page.locator(`text-check[id='${2}']`)).not.toBeAttached()
         })
 
         await test.step("click on a selected suggestion, then click on a non-tag closes the text check modal", async () => {
-          await page.locator("text-check").nth(0).click()
+          await page.locator("text-check").first().click()
           await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
           await headNoteEditor.getByText("LanguageTool").click()
           await expect(page.getByTestId("text-check-modal-word")).toBeHidden()
@@ -230,7 +309,7 @@ test.describe(
           ).toBeHidden()
 
           await expect(
-            page.locator(`text-check[id='${textCheckId}']`),
+            page.locator(`text-check[id='${textCheckId}']`).nth(0),
           ).toHaveCSS(
             "border-bottom",
             "2px solid " +
@@ -263,7 +342,7 @@ test.describe(
           ).toBeHidden()
 
           await expect(
-            page.locator(`text-check[id='${textCheckId}']`),
+            page.locator(`text-check[id='${textCheckId}']`).nth(0),
           ).toHaveCSS(
             "border-bottom",
             "2px solid " +
