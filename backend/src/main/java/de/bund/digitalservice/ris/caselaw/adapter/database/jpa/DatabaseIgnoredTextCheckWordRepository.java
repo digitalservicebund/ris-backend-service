@@ -29,7 +29,7 @@ public interface DatabaseIgnoredTextCheckWordRepository
   List<IgnoredTextCheckWordDTO> findByDocumentationUnitIdOrByGlobalWords(
       @Param("documentationUnitId") UUID documentationUnitId, @Param("words") List<String> words);
 
-  int deleteByWordAndDocumentationUnitIdIsNullAndJurisIdIsNull(String word);
+  Integer deleteByWordAndDocumentationUnitIdIsNullAndJurisIdIsNull(String word);
 
   IgnoredTextCheckWordDTO findByDocumentationUnitIdIsNullAndWord(String word);
 }

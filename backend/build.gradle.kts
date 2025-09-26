@@ -10,7 +10,7 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.5.5"
+    id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "7.2.1"
     id("org.sonarqube") version "6.3.1.5724"
@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "8.14.2"
-    id("org.flywaydb.flyway") version "11.13.0"
+    id("org.flywaydb.flyway") version "11.13.2"
     id("io.sentry.jvm.gradle") version "5.12.0"
 }
 
@@ -172,30 +172,14 @@ dependencies {
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.6.0")
 
-    // CVE-2025-58056
-    // should be fixed with a new amazon version.
-    // please take a look every time to remove this as soon as possible!
-    implementation("io.netty:netty-handler:4.2.6.Final")
-    implementation("io.netty:netty-codec-http2:4.2.6.Final")
-    implementation("io.netty:netty-buffer:4.2.6.Final")
-    implementation("io.netty:netty-codec-http:4.2.6.Final")
-    implementation("io.netty:netty-codec:4.2.6.Final")
-    implementation("io.netty:netty-common:4.2.6.Final")
-    implementation("io.netty:netty-resolver:4.2.6.Final")
-    implementation("io.netty:netty-transport:4.2.6.Final")
-    implementation("io.netty:netty-transport-classes-epoll:4.2.6.Final")
-    implementation("io.netty:netty-transport-native-unix-common:4.2.6.Final")
-
     implementation("org.postgresql:postgresql:42.7.8")
 
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
+
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    // CVE-2025-48988 (found in 10.1.41 used by spring-boot-starter-web:3.5.0.)
-    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.46")
-
-    implementation(platform("software.amazon.awssdk:bom:2.34.2"))
+    implementation(platform("software.amazon.awssdk:bom:2.34.4"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -203,7 +187,7 @@ dependencies {
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
-    implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.7")
+    implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.8")
     implementation("net.sf.saxon:Saxon-HE:12.9")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.5")
