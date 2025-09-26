@@ -205,7 +205,7 @@ test.describe(
 
         await expect(
           page.getByText(
-            "Wählen Sie mindestens eine Dokumentationsseinheit aus.",
+            "Wählen Sie mindestens eine Dokumentationseinheit aus.",
           ),
         ).toBeVisible()
 
