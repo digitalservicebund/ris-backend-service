@@ -172,28 +172,12 @@ dependencies {
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.6.0")
 
-    // CVE-2025-58056
-    // should be fixed with a new amazon version.
-    // please take a look every time to remove this as soon as possible!
-    implementation("io.netty:netty-handler:4.2.6.Final")
-    implementation("io.netty:netty-codec-http2:4.2.6.Final")
-    implementation("io.netty:netty-buffer:4.2.6.Final")
-    implementation("io.netty:netty-codec-http:4.2.6.Final")
-    implementation("io.netty:netty-codec:4.2.6.Final")
-    implementation("io.netty:netty-common:4.2.6.Final")
-    implementation("io.netty:netty-resolver:4.2.6.Final")
-    implementation("io.netty:netty-transport:4.2.6.Final")
-    implementation("io.netty:netty-transport-classes-epoll:4.2.6.Final")
-    implementation("io.netty:netty-transport-native-unix-common:4.2.6.Final")
-
     implementation("org.postgresql:postgresql:42.7.8")
 
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
+
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
-
-    // CVE-2025-48988 (found in 10.1.41 used by spring-boot-starter-web:3.5.0.)
-    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.46")
 
     implementation(platform("software.amazon.awssdk:bom:2.34.4"))
     implementation("software.amazon.awssdk:netty-nio-client")
