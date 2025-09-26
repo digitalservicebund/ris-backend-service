@@ -1,3 +1,4 @@
+import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewLongTexts from "@/components/preview/PreviewLongTexts.vue"
@@ -13,6 +14,7 @@ function renderComponent(longTexts: LongTexts) {
       longTexts: longTexts,
     },
     global: {
+      plugins: [createTestingPinia()],
       provide: {
         [previewLayoutInjectionKey as symbol]: "wide",
       },
