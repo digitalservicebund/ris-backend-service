@@ -105,10 +105,10 @@ class DecisionReducedLdmlTransformerTest {
         String.format(
             """
                 <?xml version="1.0" encoding="utf-8"?>
-                <akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/WD17"
+                <akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0"
                                 xmlns:ris="http://example.com/0.1/"
                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/WD17 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/csprd02/part2-specs/schemas/akomantoso30.xsd">
+                                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/os/part2-specs/schemas/akomantoso30.xsd">
                    <akn:judgment name="attributsemantik-noch-undefiniert">
                       <akn:meta>
                          <akn:identification source="attributsemantik-noch-undefiniert">
@@ -127,7 +127,7 @@ class DecisionReducedLdmlTransformerTest {
                                <akn:FRBRuri value="YYTestDoc0013/dokument"/>
                                <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
                                <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-                               <akn:FRBRlanguage language="de"/>
+                               <akn:FRBRlanguage language="deu"/>
                             </akn:FRBRExpression>
                             <akn:FRBRManifestation>
                                <akn:FRBRthis value="YYTestDoc0013/dokument.xml"/>
@@ -174,11 +174,11 @@ class DecisionReducedLdmlTransformerTest {
                                <ris:judicialBody>appraisalBody test</ris:judicialBody>
                                <ris:foreignLanguageVersions>
                                   <ris:foreignLanguageVersion>
-                                     <akn:FRBRlanguage language="en"/>
+                                     <akn:FRBRlanguage language="eng"/>
                                      <akn:documentRef href="https://ihre-url-zur-englischen-übersetzung" showAs="Englisch"/>
                                   </ris:foreignLanguageVersion>
                                   <ris:foreignLanguageVersion>
-                                     <akn:FRBRlanguage language="fr"/>
+                                     <akn:FRBRlanguage language="fra"/>
                                      <akn:documentRef href="https://ihre-url-zur-französischen-übersetzung"
                                                       showAs="Französisch"/>
                                   </ris:foreignLanguageVersion>
@@ -397,6 +397,7 @@ class DecisionReducedLdmlTransformerTest {
                                         .id(UUID.randomUUID())
                                         .label("Englisch")
                                         .isoCode("en")
+                                        .isoCode3Letters("eng")
                                         .build())
                                 .link("https://ihre-url-zur-englischen-übersetzung")
                                 .build(),
@@ -407,6 +408,7 @@ class DecisionReducedLdmlTransformerTest {
                                         .id(UUID.randomUUID())
                                         .label("Französisch")
                                         .isoCode("fr")
+                                        .isoCode3Letters("fra")
                                         .build())
                                 .link("https://ihre-url-zur-französischen-übersetzung")
                                 .build()))
