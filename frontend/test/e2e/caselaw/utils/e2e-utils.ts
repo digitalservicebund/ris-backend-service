@@ -1143,3 +1143,26 @@ export async function checkContentOfDecisionResultRow(
     ).toBeEnabled()
   })
 }
+
+export async function selectUser(
+  page: Page,
+  searchTerm: string,
+  expectedUser: string,
+) {
+  const dialog = page.getByRole("dialog")
+
+  await expect(dialog).toBeVisible()
+
+  await expect(dialog.getByText("Neue Person")).toBeVisible()
+  await page.getByLabel("Neue Person", { exact: true }).fill(searchTerm)
+  await expect(page.getByTestId("combobox-spinner")).toBeVisible()
+  await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+
+  await expect(dialog.getByText(expectedUser)).toBeVisible()
+
+  const firstItem = dialog
+    .getByRole("button", { name: "dropdown-option" })
+    .first()
+  await expect(firstItem).toContainText(expectedUser)
+  await firstItem.click()
+}

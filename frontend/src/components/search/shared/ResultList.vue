@@ -63,8 +63,7 @@ const stickyHeaderPT = computed(() => {
   return isSticky.value
     ? {
         thead: {
-          class:
-            "sticky top-0 bg-white shadow-[0_1px_0_var(--color-blue-300)] z-999",
+          class: "sticky top-0 bg-white shadow-[0_1px_0_var(--color-blue-300)]",
         },
         tablecontainer: {
           style: {
@@ -72,7 +71,11 @@ const stickyHeaderPT = computed(() => {
           },
         },
       }
-    : {}
+    : {
+        thead: {
+          class: "z-999",
+        },
+      }
 })
 // --- END: sticky header logic ---
 

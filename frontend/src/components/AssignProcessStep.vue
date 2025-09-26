@@ -86,6 +86,7 @@ async function assignProcessStep(): Promise<void> {
       })
     } else {
       nextUser.value = undefined
+      nextProcessStep.value = undefined
     }
   }
 }
