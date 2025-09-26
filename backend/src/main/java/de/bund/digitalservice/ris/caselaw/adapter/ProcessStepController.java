@@ -77,7 +77,7 @@ public class ProcessStepController {
         return ResponseEntity.notFound().build();
       }
       List<ProcessStep> possibleSteps =
-          processStepService.getAssignableProcessStepsForDocOffice(documentationOffice.id());
+          processStepService.getAllProcessStepsForDocOffice(documentationOffice.id());
       return ResponseEntity.ok(possibleSteps);
     } catch (DocumentationOfficeNotExistsException e) {
       return ResponseEntity.notFound().build();
