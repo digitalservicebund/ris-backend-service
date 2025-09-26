@@ -136,7 +136,7 @@ const isSelectionValid = () => {
   if (!props.documentationUnits || props.documentationUnits.length === 0) {
     emit(
       "updateSelectionErrors",
-      "Wählen Sie mindestens eine Dokumentationseinheit aus",
+      "Wählen Sie mindestens eine Dokumentationsseinheit aus.",
       [],
     )
     return false

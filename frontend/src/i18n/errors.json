@@ -67,6 +67,10 @@
     "title": "Vorgang konnte nicht zugewiesen werden.",
     "description": ""
   },
+  "BULK_ASSIGN_PROCESS_STEP_FAILED": {
+    "title": "Die Dokumentationseinheit(en) konnten nicht weitergegeben werden.",
+    "description": "Versuchen Sie es erneut."
+  },
   "DOCUMENT_UNIT_DELETE_FAILED": {
     "title": "Dokumentationseinheit konnte nicht gelöscht werden.",
     "description": ""

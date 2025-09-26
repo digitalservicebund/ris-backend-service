@@ -67,7 +67,7 @@ function validate() {
     validationStore.remove("nextProcessStep")
     return true
   } else {
-    validationStore.add("Pflichtfeld nicht befüllt", "nextProcessStep")
+    validationStore.add("Wählen Sie einen Schritt", "nextProcessStep")
     return false
   }
 }
