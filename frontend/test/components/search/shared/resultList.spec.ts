@@ -211,6 +211,43 @@ describe("Search Result List", () => {
     })
   })
 
+  it("adjusts sticky header position when selection error is visible and scrolled", async () => {
+    renderComponent()
+
+    await vi.runAllTimersAsync()
+    await nextTick()
+
+    const tableWrapperElement = screen.getByTestId("search-result-list")
+
+    vi.spyOn(tableWrapperElement, "getBoundingClientRect").mockReturnValue({
+      top: -1,
+      width: 0,
+      height: 0,
+      x: 0,
+      y: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      toJSON: () => {},
+    })
+
+    const rowgroups = screen.getAllByRole("rowgroup")
+    const thead = rowgroups[0]
+
+    globalThis.dispatchEvent(new Event("scroll"))
+    await nextTick()
+
+    const triggerButton = screen.getByTestId("trigger-no-selection-error")
+    await fireEvent.click(triggerButton)
+    await nextTick()
+
+    await waitFor(() => {
+      expect(thead).toHaveStyle({ top: "60px" })
+    })
+
+    vi.spyOn(tableWrapperElement, "getBoundingClientRect").mockRestore()
+  })
+
   it("displays current user of process step", () => {
     renderComponent({ kind: Kind.DECISION })
     const rowWithProcessStep = screen.getAllByRole("row")[2]
