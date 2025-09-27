@@ -2121,6 +2121,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     @Test
     @Transactional
     void shouldRollbackIfOneUpdateFails() {
+      TestTransaction.flagForCommit();
       TestTransaction.end();
       // Arrange
       DocumentationUnitDTO docUnit1 =

@@ -253,8 +253,7 @@ const service: DocumentUnitService = {
       { documentationUnitProcessStep, documentationUnitIds },
     )
     if (response.status >= 300) {
-      response.error =
-        errorMessages.DOCUMENTATION_UNIT_DOCUMENTATION_OFFICE_COULD_NOT_BE_ASSIGNED
+      response.error = errorMessages.BULK_ASSIGN_PROCESS_STEP_FAILED
     }
     return response
   },

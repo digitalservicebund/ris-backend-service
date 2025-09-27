@@ -1505,6 +1505,7 @@ class DocumentationUnitControllerTest {
 
       @Test
       void testBulkAssignProcessStep_withValidRequest_shouldSucceed() throws Exception {
+        doReturn(user).when(userService).getUser(any(OidcUser.class));
         BulkAssignProcessStepRequest requestBody =
             new BulkAssignProcessStepRequest(processStep, documentationUnitIds);
 
@@ -1518,7 +1519,9 @@ class DocumentationUnitControllerTest {
             .expectStatus()
             .isOk();
 
-        verify(abstractService, times(1)).bulkAssignProcessStep(documentationUnitIds, processStep);
+        verify(userService, times(1)).getUser(any(OidcUser.class));
+        verify(abstractService, times(1))
+            .bulkAssignProcessStep(documentationUnitIds, processStep, user);
       }
 
       @Test
@@ -1529,7 +1532,7 @@ class DocumentationUnitControllerTest {
 
         doThrow(DocumentationUnitNotExistsException.class)
             .when(abstractService)
-            .bulkAssignProcessStep(any(), any());
+            .bulkAssignProcessStep(any(), any(), any());
 
         risWebClient
             .withDefaultLogin()
@@ -1550,7 +1553,7 @@ class DocumentationUnitControllerTest {
 
         doThrow(BadRequestException.class)
             .when(abstractService)
-            .bulkAssignProcessStep(any(), any());
+            .bulkAssignProcessStep(any(), any(), any());
 
         risWebClient
             .withDefaultLogin()
@@ -1580,7 +1583,7 @@ class DocumentationUnitControllerTest {
             .expectStatus()
             .isForbidden();
 
-        verify(abstractService, never()).bulkAssignProcessStep(any(), any());
+        verify(abstractService, never()).bulkAssignProcessStep(any(), any(), any());
       }
 
       @Test
@@ -1598,7 +1601,7 @@ class DocumentationUnitControllerTest {
             .expectStatus()
             .isBadRequest();
 
-        verify(abstractService, never()).bulkAssignProcessStep(any(), any());
+        verify(abstractService, never()).bulkAssignProcessStep(any(), any(), any());
       }
     }
   }

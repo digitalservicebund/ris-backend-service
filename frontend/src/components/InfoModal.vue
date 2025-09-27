@@ -70,6 +70,7 @@ watch(
       modalAttribute.borderClass,
       modalAttribute.backgroundColorClass,
     ]"
+    role="alert"
   >
     <InfoModalIcon :aria-label="ariaLabelIcon" :status="statusRef" />
 

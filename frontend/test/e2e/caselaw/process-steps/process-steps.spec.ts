@@ -3,6 +3,7 @@ import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   navigateToCategories,
   navigateToManagementData,
+  selectUser,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
@@ -15,7 +16,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
       const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
       // the initial step and user is set automatically
       await expect(infoPanel).toContainText("Ersterfassung")
-      // await expect(infoPanel).toContainText("BT")
+      await expect(infoPanel).toContainText("BT")
     })
 
     await test.step("Open process step dialog again, expect next logical step to be visible, save new process step", async () => {
@@ -39,7 +40,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
       await navigateToCategories(pageWithBghUser, decisionBgh.documentNumber)
       const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
       await expect(infoPanel).toContainText("Ersterfassung")
-      //   await expect(infoPanel).toContainText("BT")
+      await expect(infoPanel).toContainText("BT")
     })
 
     await test.step("Open process step dialog", async () => {
@@ -69,7 +70,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
       await navigateToCategories(pageWithBghUser, decisionBgh.documentNumber)
       const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
       await expect(infoPanel).toContainText("Ersterfassung")
-      //  await expect(infoPanel).toContainText("BT")
+      await expect(infoPanel).toContainText("BT")
     })
 
     await test.step("Open process step dialog, manually select 'Fachdokumentation', save new process step", async () => {
@@ -104,7 +105,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
           "document-unit-info-panel",
         )
         await expect(infoPanel).toContainText("Ersterfassung")
-        // await expect(infoPanel).toContainText("BT")
+        await expect(infoPanel).toContainText("BT")
       })
 
       await test.step("Open process step dialog", async () => {
@@ -112,7 +113,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
       })
 
       await test.step("Select bgh test user", async () => {
-        await selectUser(pageWithBghUser, "BgH  test", "BGH  testUser", "BT")
+        await selectUser(pageWithBghUser, "BgH  test", "BGH  testUser")
       })
 
       await test.step("Save changes and close dialog", async () => {
@@ -124,7 +125,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
           "document-unit-info-panel",
         )
         await expect(infoPanel).toContainText("QS formal")
-        //    await expect(infoPanel).toContainText("BT")
+        await expect(infoPanel).toContainText("BT")
       })
 
       await test.step("Open process step dialog", async () => {
@@ -135,7 +136,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
         const firstRow = pageWithBghUser.locator("tbody tr").first()
 
         await expect(firstRow).toContainText("QS formal")
-        //  await expect(firstRow).toContainText("BT")
+        await expect(firstRow).toContainText("BT")
       })
 
       await test.step("Close process step dialog", async () => {
@@ -154,7 +155,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
           "document-unit-info-panel",
         )
         await expect(infoPanel).toContainText("Ersterfassung")
-        //  await expect(infoPanel).toContainText("BT")
+        await expect(infoPanel).toContainText("BT")
       })
 
       await test.step("Set next process step 'QS formal' with same user", async () => {
@@ -163,7 +164,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
           name: "Neuer Schritt",
         })
         await expect(processStepDropBox).toContainText("QS formal")
-        await selectUser(pageWithBghUser, "BGH  test", "BGH  testUser", "BT")
+        await selectUser(pageWithBghUser, "BGH  test", "BGH  testUser")
         await saveChangesAndCloseDialog(pageWithBghUser)
       })
 
@@ -175,7 +176,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
         // previous step in short form
         await expect(infoPanel).toContainText("EE")
         await expect(infoPanel).toContainText("QS formal")
-        //    await expect(infoPanel).toContainText("BT")
+        await expect(infoPanel).toContainText("BT")
       })
 
       await test.step("Manually set to current step 'QS formal', remove user", async () => {
@@ -231,7 +232,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
         name: "Neuer Schritt",
       })
       await expect(processStepDropBox).toContainText("QS formal")
-      await selectUser(pageWithBghUser, "BGH  test", "BGH  testUser", "BT")
+      await selectUser(pageWithBghUser, "BGH  test", "BGH  testUser")
       await saveChangesAndCloseDialog(pageWithBghUser)
 
       await expect(infoPanel).toContainText("QS formal")
@@ -362,31 +363,6 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
         .click()
     })
   })
-
-  async function selectUser(
-    page: Page,
-    searchTerm: string,
-    expectedUser: string,
-    expectedInitials: string,
-  ) {
-    const dialog = page.getByRole("dialog")
-
-    await expect(dialog).toBeVisible()
-
-    await expect(dialog.getByText("Neue Person")).toBeVisible()
-    await page.getByLabel("Neue Person", { exact: true }).fill(searchTerm)
-    await expect(page.getByTestId("combobox-spinner")).toBeVisible()
-    await expect(page.getByTestId("combobox-spinner")).toBeHidden()
-
-    await expect(dialog.getByText(expectedUser)).toBeVisible()
-    await expect(dialog.getByText(expectedInitials)).toBeVisible()
-
-    const firstItem = dialog
-      .getByRole("button", { name: "dropdown-option" })
-      .first()
-    await expect(firstItem).toContainText(expectedUser)
-    await firstItem.click()
-  }
 
   async function openProcessStepDialog(page: Page) {
     const dialog = page.getByRole("dialog")

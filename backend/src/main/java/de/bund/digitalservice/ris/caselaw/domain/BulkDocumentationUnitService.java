@@ -21,6 +21,7 @@ public interface BulkDocumentationUnitService {
   @Transactional(rollbackFor = BadRequestException.class)
   void bulkAssignProcessStep(
       @NotNull List<UUID> documentationUnitIds,
-      DocumentationUnitProcessStep documentationUnitProcessStep)
+      DocumentationUnitProcessStep documentationUnitProcessStep,
+      User user)
       throws DocumentationUnitNotExistsException, BadRequestException;
 }

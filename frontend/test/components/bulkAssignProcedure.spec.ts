@@ -34,7 +34,7 @@ describe("BulkAssignProcedure", () => {
     await fireEvent.click(screen.getByText("AssignProcedureMock"))
 
     expect(emitted().updateSelectionErrors[0]).toEqual([
-      "Wählen Sie mindestens eine Dokumentationseinheit aus",
+      "Wählen Sie mindestens eine Dokumentationseinheit aus.",
       [],
     ])
     expect(emitted().procedureAssigned).toBeUndefined()
@@ -50,7 +50,7 @@ describe("BulkAssignProcedure", () => {
     await fireEvent.click(screen.getByText("AssignProcedureMock"))
 
     expect(emitted().updateSelectionErrors[0]).toEqual([
-      "Wählen Sie mindestens eine Dokumentationseinheit aus",
+      "Wählen Sie mindestens eine Dokumentationseinheit aus.",
       [],
     ])
     expect(emitted().procedureAssigned).toBeUndefined()

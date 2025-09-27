@@ -277,12 +277,12 @@ describe("AssignProcessStep component", () => {
     const { user } = renderComponent()
 
     expect(
-      screen.queryByText("Pflichtfeld nicht befüllt"),
+      screen.queryByText("Wählen Sie einen Schritt"),
     ).not.toBeInTheDocument()
 
     await user.click(await screen.findByLabelText("Weitergeben"))
 
-    expect(screen.getByText("Pflichtfeld nicht befüllt")).toBeInTheDocument()
+    expect(screen.getByText("Wählen Sie einen Schritt")).toBeInTheDocument()
   })
 
   describe("Multi-edit scenarios", () => {

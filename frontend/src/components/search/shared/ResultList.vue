@@ -62,9 +62,18 @@ const handleScroll = () => {
 const stickyHeaderPT = computed(() => {
   return isSticky.value
     ? {
-        thead: {
+        header: {
           class:
-            "sticky top-0 bg-white shadow-[0_1px_0_var(--color-blue-300)] z-999",
+            "sticky top-0 bg-white z-999 shadow-[0_1px_0_var(--color-blue-300)]",
+        },
+        // the error messages are placed within the header template slot, so the thead nees to be positioned like
+        // top-[height of error message component]
+        thead: {
+          class: "sticky bg-white z-999 shadow-[0_1px_0_var(--color-blue-300)]",
+          style: {
+            // Conditionally set the 'top' value based on the error message
+            top: selectionErrorMessage.value ? "60px" : "0",
+          },
         },
         tablecontainer: {
           style: {
@@ -72,7 +81,11 @@ const stickyHeaderPT = computed(() => {
           },
         },
       }
-    : {}
+    : {
+        thead: {
+          class: "bg-white z-999",
+        },
+      }
 })
 // --- END: sticky header logic ---
 
@@ -174,11 +187,6 @@ onUnmounted(() => {
 
 <template>
   <div ref="tableWrapper" data-testId="search-result-list">
-    <InputErrorMessages
-      v-if="selectionErrorMessage"
-      class="pl-16"
-      :error-message="selectionErrorMessage"
-    />
     <Pagination
       :is-loading="loading"
       navigation-position="bottom"
@@ -192,6 +200,14 @@ onUnmounted(() => {
         :row-class="rowStyleClass"
         :value="entries"
       >
+        <template #header>
+          <InputErrorMessages
+            v-if="selectionErrorMessage"
+            class="p-16"
+            data-testId="selection-errors"
+            :error-message="selectionErrorMessage"
+          />
+        </template>
         <Column
           v-if="multiEditActive"
           header-style="width: 3rem"
