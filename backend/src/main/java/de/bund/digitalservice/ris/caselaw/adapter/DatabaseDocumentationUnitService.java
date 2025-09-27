@@ -61,28 +61,8 @@ public class DatabaseDocumentationUnitService implements BulkDocumentationUnitSe
       @Nullable User currentUser)
       throws BadRequestException, ProcessStepNotFoundException, DocumentationUnitException {
 
-    ProcessStepDTO processStepDTO =
-        processStepRepository
-            .findByName(documentationUnitProcessStep.getProcessStep().name())
-            .orElseThrow(
-                () ->
-                    new ProcessStepNotFoundException(
-                        "Process step with name "
-                            + documentationUnitProcessStep.getProcessStep().name()
-                            + " not found"));
-
-    UserDTO userDTO = null;
-    if (documentationUnitProcessStep.getUser() != null) {
-      userDTO =
-          userRepository
-              .findById(documentationUnitProcessStep.getUser().id())
-              .orElseThrow(
-                  () ->
-                      new DocumentationUnitException(
-                          "User with id "
-                              + documentationUnitProcessStep.getUser().id()
-                              + " not found"));
-    }
+    ProcessStepDTO processStepDTO = findProcessStep(documentationUnitProcessStep);
+    UserDTO userDTO = findUser(documentationUnitProcessStep);
 
     for (UUID documentationUnitId : documentationUnitIds) {
       DocumentationUnitDTO documentationUnitDTO =
@@ -135,6 +115,35 @@ public class DatabaseDocumentationUnitService implements BulkDocumentationUnitSe
         throw new BadRequestException("Can only assign process steps to decisions.");
       }
     }
+  }
+
+  private ProcessStepDTO findProcessStep(DocumentationUnitProcessStep documentationUnitProcessStep)
+      throws ProcessStepNotFoundException {
+    return processStepRepository
+        .findByName(documentationUnitProcessStep.getProcessStep().name())
+        .orElseThrow(
+            () ->
+                new ProcessStepNotFoundException(
+                    "Process step with name "
+                        + documentationUnitProcessStep.getProcessStep().name()
+                        + " not found"));
+  }
+
+  private UserDTO findUser(DocumentationUnitProcessStep documentationUnitProcessStep)
+      throws DocumentationUnitException {
+    UserDTO userDTO = null;
+    if (documentationUnitProcessStep.getUser() != null) {
+      userDTO =
+          userRepository
+              .findById(documentationUnitProcessStep.getUser().id())
+              .orElseThrow(
+                  () ->
+                      new DocumentationUnitException(
+                          "User with id "
+                              + documentationUnitProcessStep.getUser().id()
+                              + " not found"));
+    }
+    return userDTO;
   }
 
   private static String getProcessStepHistoryLogDescription(

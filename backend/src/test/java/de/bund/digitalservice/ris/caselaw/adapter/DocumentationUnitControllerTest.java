@@ -1521,7 +1521,7 @@ class DocumentationUnitControllerTest {
 
         verify(userService, times(1)).getUser(any(OidcUser.class));
         verify(abstractService, times(1))
-            .bulkAssignProcessStep(eq(documentationUnitIds), eq(processStep), eq(user));
+            .bulkAssignProcessStep(documentationUnitIds, processStep, user);
       }
 
       @Test

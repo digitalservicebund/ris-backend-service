@@ -68,7 +68,7 @@ class DatabaseDocumentationUnitServiceTest {
 
   private final ProcessStepDTO processStepDTO =
       ProcessStepDTO.builder().id(TEST_PROCESS_STEP_ID).name(TEST_PROCESS_STEP_NAME).build();
-  private final ProcessStepDTO processStepDTO_OLD =
+  private final ProcessStepDTO processStepDtoOld =
       ProcessStepDTO.builder()
           .id(TEST_PROCESS_STEP_ID_OLD)
           .name(TEST_PROCESS_STEP_NAME_OLD)
@@ -334,7 +334,7 @@ class DatabaseDocumentationUnitServiceTest {
       // Arrange
       // DocUnit has a currrent step and no user
       DocumentationUnitProcessStepDTO currentProcessStepDTO =
-          createNewProcessStepDTO(docUnitDTO, null, processStepDTO_OLD);
+          createNewProcessStepDTO(docUnitDTO, null, processStepDtoOld);
       docUnitDTO.setCurrentProcessStep(currentProcessStepDTO);
 
       when(processStepRepository.findByName(TEST_PROCESS_STEP_NAME))
