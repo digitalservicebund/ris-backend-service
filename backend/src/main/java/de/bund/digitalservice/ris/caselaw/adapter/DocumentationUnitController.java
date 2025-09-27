@@ -685,10 +685,12 @@ public class DocumentationUnitController {
   @PatchMapping(value = "/bulk-assign-process-step")
   @PreAuthorize("@userHasBulkWriteAccess.apply(#body.getDocumentationUnitIds())")
   public ResponseEntity<Void> bulkAssignProcessStep(
+      @AuthenticationPrincipal OidcUser oidcUser,
       @RequestBody @Valid BulkAssignProcessStepRequest body) {
     try {
+      User user = userService.getUser(oidcUser);
       abstractService.bulkAssignProcessStep(
-          body.getDocumentationUnitIds(), body.getDocumentationUnitProcessStep());
+          body.getDocumentationUnitIds(), body.getDocumentationUnitProcessStep(), user);
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {
       return ResponseEntity.notFound().build();
