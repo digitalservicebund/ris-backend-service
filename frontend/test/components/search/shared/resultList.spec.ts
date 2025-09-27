@@ -1,7 +1,13 @@
 import { createTestingPinia } from "@pinia/testing"
 import userEvent from "@testing-library/user-event"
-import { render, screen, within } from "@testing-library/vue"
-import { nextTick } from "vue"
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/vue"
+import { defineComponent, nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { Page } from "@/components/Pagination.vue"
 import ResultList from "@/components/search/shared/ResultList.vue"
@@ -15,6 +21,48 @@ const addToastMock = vi.fn()
 vi.mock("primevue/usetoast", () => ({
   useToast: () => ({ add: addToastMock }),
 }))
+
+vi.mock("@/components/BulkAssignProcessStep.vue", () => {
+  const BulkAssignProcessStepMock = defineComponent({
+    props: {
+      documentationUnits: {
+        type: Array,
+        default: () => [],
+      },
+    },
+    emits: ["updateSelectionErrors"],
+
+    setup(_props, { emit }) {
+      // Expose functions to trigger the two error scenarios
+      const emitSelectionError = () => {
+        emit(
+          "updateSelectionErrors",
+          "Wählen Sie mindestens eine Dokumentationseinheit aus.",
+          [],
+        )
+      }
+
+      return { emitSelectionError }
+    },
+
+    // Render button to manually trigger selection errors
+    template: `
+    <div data-testid="bulk-assign-mock">
+        <span class="sr-only">Aktionen</span>
+        <button 
+            data-testid="trigger-no-selection-error" 
+            @click="emitSelectionError"
+        >
+            Trigger Selection Error
+        </button>
+    </div>
+  `,
+  })
+
+  return {
+    default: BulkAssignProcessStepMock,
+  }
+})
 
 const mockEntries = [
   new DocumentUnitListEntry({
@@ -142,6 +190,25 @@ describe("Search Result List", () => {
 
     const checkbox = within(firstDataRow).getByRole("checkbox")
     expect(checkbox).toBeInTheDocument()
+  })
+
+  it("renders selection error in table header", async () => {
+    renderComponent()
+
+    await vi.runAllTimersAsync()
+    await nextTick()
+
+    const triggerButton = screen.getByTestId("trigger-no-selection-error")
+
+    await fireEvent.click(triggerButton)
+    await nextTick()
+
+    await waitFor(() => {
+      const errorMessageText = screen.getByText(
+        "Wählen Sie mindestens eine Dokumentationseinheit aus.",
+      )
+      expect(errorMessageText).toBeInTheDocument()
+    })
   })
 
   it("displays current user of process step", () => {

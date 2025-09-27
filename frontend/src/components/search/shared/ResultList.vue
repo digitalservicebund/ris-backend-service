@@ -72,7 +72,6 @@ const stickyHeaderPT = computed(() => {
           class: "sticky bg-white z-999 shadow-[0_1px_0_var(--color-blue-300)]",
           style: {
             // Conditionally set the 'top' value based on the error message
-            // sonar-ignore-line
             top: selectionErrorMessage.value ? "60px" : "0",
           },
         },
@@ -205,6 +204,7 @@ onUnmounted(() => {
           <InputErrorMessages
             v-if="selectionErrorMessage"
             class="p-16"
+            data-testId="selection-errors"
             :error-message="selectionErrorMessage"
           />
         </template>
