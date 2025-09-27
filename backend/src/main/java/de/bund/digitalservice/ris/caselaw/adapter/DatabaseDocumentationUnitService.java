@@ -61,6 +61,7 @@ public class DatabaseDocumentationUnitService implements BulkDocumentationUnitSe
       @Nullable User currentUser)
       throws BadRequestException, ProcessStepNotFoundException, DocumentationUnitException {
 
+    // Extracted initial validation/lookups to reduce complexity
     ProcessStepDTO processStepDTO = findProcessStep(documentationUnitProcessStep);
     UserDTO userDTO = findUser(documentationUnitProcessStep);
 
@@ -78,38 +79,15 @@ public class DatabaseDocumentationUnitService implements BulkDocumentationUnitSe
         boolean userChanged = userChanged(currentDocumentationUnitProcessStepDTOFromDB, userDTO);
 
         if (stepChanged || userChanged) {
-          DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO =
-              createAndSaveNewProcessStep(documentationUnitDTO, processStepDTO, userDTO);
-
-          if (stepChanged) {
-            String description =
-                getProcessStepHistoryLogDescription(
-                    currentDocumentationUnitProcessStepDTOFromDB,
-                    newDocumentationUnitProcessStepDTO);
-
-            historyLogService.saveProcessStepHistoryLog(
-                documentationUnitDTO.getId(),
-                currentUser,
-                null,
-                HistoryLogEventType.PROCESS_STEP,
-                description,
-                DocumentationUnitProcessStepTransformer.toDomain(
-                    currentDocumentationUnitProcessStepDTOFromDB),
-                DocumentationUnitProcessStepTransformer.toDomain(
-                    newDocumentationUnitProcessStepDTO));
-          }
-          if (userChanged) {
-            historyLogService.saveProcessStepHistoryLog(
-                documentationUnitDTO.getId(),
-                currentUser,
-                null,
-                HistoryLogEventType.PROCESS_STEP_USER,
-                null, // description will be set dynamically in transformer.toDomain
-                DocumentationUnitProcessStepTransformer.toDomain(
-                    currentDocumentationUnitProcessStepDTOFromDB),
-                DocumentationUnitProcessStepTransformer.toDomain(
-                    newDocumentationUnitProcessStepDTO));
-          }
+          // Extracted saving and logging logic to reduce complexity
+          handleProcessStepUpdateAndLog(
+              documentationUnitDTO,
+              processStepDTO,
+              userDTO,
+              currentUser,
+              currentDocumentationUnitProcessStepDTOFromDB,
+              stepChanged,
+              userChanged);
         }
       } else {
         throw new BadRequestException("Can only assign process steps to decisions.");
@@ -129,7 +107,7 @@ public class DatabaseDocumentationUnitService implements BulkDocumentationUnitSe
                         + " not found"));
   }
 
-  private UserDTO findUser(DocumentationUnitProcessStep documentationUnitProcessStep)
+  private @Nullable UserDTO findUser(DocumentationUnitProcessStep documentationUnitProcessStep)
       throws DocumentationUnitException {
     UserDTO userDTO = null;
     if (documentationUnitProcessStep.getUser() != null) {
@@ -144,6 +122,46 @@ public class DatabaseDocumentationUnitService implements BulkDocumentationUnitSe
                               + " not found"));
     }
     return userDTO;
+  }
+
+  private void handleProcessStepUpdateAndLog(
+      DocumentationUnitDTO documentationUnitDTO,
+      ProcessStepDTO processStepDTO,
+      UserDTO userDTO,
+      @Nullable User currentUser,
+      @Nullable DocumentationUnitProcessStepDTO currentDocumentationUnitProcessStepDTOFromDB,
+      boolean stepChanged,
+      boolean userChanged) {
+
+    DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO =
+        createAndSaveNewProcessStep(documentationUnitDTO, processStepDTO, userDTO);
+
+    if (stepChanged) {
+      String description =
+          getProcessStepHistoryLogDescription(
+              currentDocumentationUnitProcessStepDTOFromDB, newDocumentationUnitProcessStepDTO);
+
+      historyLogService.saveProcessStepHistoryLog(
+          documentationUnitDTO.getId(),
+          currentUser,
+          null,
+          HistoryLogEventType.PROCESS_STEP,
+          description,
+          DocumentationUnitProcessStepTransformer.toDomain(
+              currentDocumentationUnitProcessStepDTOFromDB),
+          DocumentationUnitProcessStepTransformer.toDomain(newDocumentationUnitProcessStepDTO));
+    }
+    if (userChanged) {
+      historyLogService.saveProcessStepHistoryLog(
+          documentationUnitDTO.getId(),
+          currentUser,
+          null,
+          HistoryLogEventType.PROCESS_STEP_USER,
+          null, // description will be set dynamically in transformer.toDomain
+          DocumentationUnitProcessStepTransformer.toDomain(
+              currentDocumentationUnitProcessStepDTOFromDB),
+          DocumentationUnitProcessStepTransformer.toDomain(newDocumentationUnitProcessStepDTO));
+    }
   }
 
   private static String getProcessStepHistoryLogDescription(
