@@ -23,19 +23,23 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JudgmentBody;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Opinions;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.References;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RelatedDecision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.TlcElement;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -241,37 +245,42 @@ public abstract class DecisionCommonLdmlTransformer
     validateNotNull(
         nullSafeGet(decision.coreData(), CoreData::decisionDate), "DecisionDate missing");
 
-    // Case law handover: When we always have an ecli, use that instead for the uniqueId
     String uniqueId = decision.documentNumber();
-    FrbrDate frbrDate =
+    FrbrDate frbrDecisionDate =
         new FrbrDate(
             DateUtils.toDateString(nullSafeGet(decision.coreData(), CoreData::decisionDate)),
-            "entscheidungsdatum");
-    FrbrAuthor frbrAuthor = new FrbrAuthor();
+            "Entscheidungsdatum");
+    FrbrDate frbrPublicationDate =
+        new FrbrDate(DateUtils.toDateString(LocalDate.now()), "XML Transformation");
+    FrbrAuthor workExpressionAuthor =
+        new FrbrAuthor("#" + getCourtEid(nullSafeGet(decision.coreData(), CoreData::court)));
+    FrbrAuthor manifestationAuthor =
+        new FrbrAuthor(
+            "#" + getDocOfficeEid(nullSafeGet(decision.coreData(), CoreData::documentationOffice)));
 
     List<FrbrAlias> aliases = generateAliases(decision);
 
     FrbrElement work =
         FrbrElement.builder()
             .frbrAlias(aliases)
-            .frbrDate(frbrDate)
-            .frbrAuthor(frbrAuthor)
+            .frbrDate(frbrDecisionDate)
+            .frbrAuthor(workExpressionAuthor)
             .frbrCountry(new FrbrCountry())
             .build()
             .withFrbrThisAndUri(uniqueId);
 
     FrbrElement expression =
         FrbrElement.builder()
-            .frbrDate(frbrDate)
-            .frbrAuthor(frbrAuthor)
+            .frbrDate(frbrDecisionDate)
+            .frbrAuthor(workExpressionAuthor)
             .frbrLanguage(new FrbrLanguage("deu"))
             .build()
             .withFrbrThisAndUri(uniqueId + "/dokument");
 
     FrbrElement manifestation =
         FrbrElement.builder()
-            .frbrDate(frbrDate)
-            .frbrAuthor(frbrAuthor)
+            .frbrDate(frbrPublicationDate)
+            .frbrAuthor(manifestationAuthor)
             .build()
             .withFrbrThisAndUri(uniqueId + "/dokument.xml");
 
@@ -285,17 +294,49 @@ public abstract class DecisionCommonLdmlTransformer
   protected List<FrbrAlias> generateAliases(Decision decision) {
     List<FrbrAlias> aliases = new ArrayList<>();
 
-    aliases.add(new FrbrAlias("uebergreifende-id", decision.uuid().toString()));
+    aliases.add(new FrbrAlias("Übergreifende ID", decision.uuid().toString()));
+    aliases.add(new FrbrAlias("Dokumentnummer", decision.documentNumber()));
 
     if (decision.coreData() != null && decision.coreData().ecli() != null) {
-      aliases.add(new FrbrAlias("ecli", decision.coreData().ecli()));
+      aliases.add(new FrbrAlias("ECLI", decision.coreData().ecli()));
     }
 
     if (decision.coreData() != null && decision.coreData().celexNumber() != null) {
-      aliases.add(new FrbrAlias("celex", decision.coreData().celexNumber()));
+      aliases.add(new FrbrAlias("CELEX Nummer", decision.coreData().celexNumber()));
+    }
+
+    if (decision.coreData() != null && decision.coreData().fileNumbers() != null) {
+      decision
+          .coreData()
+          .fileNumbers()
+          .forEach(fileNumber -> aliases.add(new FrbrAlias("Aktenzeichen", fileNumber)));
     }
 
     return aliases;
+  }
+
+  protected References buildReferences(Decision decision) {
+    References.ReferencesBuilder referencesBuilder = References.builder();
+    List<TlcElement> tlcOrganizations = new ArrayList<>();
+
+    TlcElement ds =
+        new TlcElement("ds", "https://www.digitalservice.bund.de", "DigitalService des Bundes");
+    tlcOrganizations.add(ds);
+
+    if (decision.coreData() != null && decision.coreData().documentationOffice() != null) {
+      DocumentationOffice docOffice = decision.coreData().documentationOffice();
+      String docOfficeEId = getDocOfficeEid(docOffice);
+      TlcElement tlcDocOffice = new TlcElement(docOfficeEId, "", docOffice.abbreviation());
+      tlcOrganizations.add(tlcDocOffice);
+    }
+
+    if (decision.coreData() != null && decision.coreData().court() != null) {
+      String courtEId = getCourtEid(decision.coreData().court());
+      TlcElement tlcCourt = new TlcElement(courtEId, "", decision.coreData().court().label());
+      tlcOrganizations.add(tlcCourt);
+    }
+
+    return referencesBuilder.tlcOrganization(tlcOrganizations).build();
   }
 
   protected String nullIfEmpty(String input) {
@@ -318,5 +359,13 @@ public abstract class DecisionCommonLdmlTransformer
     } else {
       throw new ValidationException("Core data is null");
     }
+  }
+
+  private String getCourtEid(Court court) {
+    return court.type().toLowerCase() + "-" + court.location().toLowerCase();
+  }
+
+  private String getDocOfficeEid(DocumentationOffice documentationOffice) {
+    return documentationOffice.abbreviation().toLowerCase() + "-dok";
   }
 }

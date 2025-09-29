@@ -61,6 +61,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
     return builder
         .identification(buildIdentification(decision))
+        .references(buildReferences(decision))
         .proprietary(Proprietary.builder().meta(buildRisMeta(decision)).build())
         .build();
   }

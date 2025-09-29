@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class AknKeyword {
   @XmlAttribute(name = "dictionary")
-  private String dictionary = "attributsemantik-noch-undefiniert";
+  private String dictionary = "";
 
   @XmlAttribute(name = "showAs")
   private String showAs = "attributsemantik-noch-undefiniert";

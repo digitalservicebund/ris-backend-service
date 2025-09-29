@@ -21,6 +21,8 @@ public class CaseLawLdml {
   public static final String XSI_NS = "http://www.w3.org/2001/XMLSchema-instance";
   public static final String RIS_NS = "http://example.com/0.1/";
 
+  public static final String DS_REF = "#ds";
+
   @Builder.Default
   @XmlAttribute(name = "xsi:schemaLocation")
   private String schemaLocation =
