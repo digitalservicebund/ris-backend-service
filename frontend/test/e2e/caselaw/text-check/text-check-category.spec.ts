@@ -20,7 +20,7 @@ async function getMarkId(tag: Locator): Promise<string | null> {
 }
 
 const textWithErrors = {
-  text: "LanguageTool ist ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, z. B. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten. Testgnorierteswort ist zB. grün markiert",
+  text: "LanguageTool   ist ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, z. B. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten. Testgnorierteswort ist zB. grün markiert",
   incorrectWords: [
     "ist ist", // GERMAN_WORD_REPEAT_RULE
     "Rechtshcreibfehler",
@@ -167,6 +167,13 @@ test.describe(
             .locator("text-check")
             .first()
             .waitFor({ state: "visible" })
+        })
+
+        // make sure consecutive whitespaces are not removed (RISDEV-9343)
+        await test.step("returned text is unchanged", async () => {
+          await expect(headNoteEditorTextArea).toHaveText(
+            /LanguageTool {3}ist .*/,
+          )
         })
 
         await test.step("text check tags are marked by type with corresponded color", async () => {
