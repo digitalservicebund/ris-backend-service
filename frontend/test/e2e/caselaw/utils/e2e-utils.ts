@@ -1020,12 +1020,12 @@ export async function checkContentOfPendingProceedingResultRow(
   listRow: Locator,
   expectedItem: PendingProceeding,
 ) {
-  const docNumberCell = listRow.getByRole("cell").nth(1)
-  const courtCell = listRow.getByRole("cell").nth(2)
-  const decisionDateCell = listRow.getByRole("cell").nth(3)
-  const fileNumberCell = listRow.getByRole("cell").nth(4)
-  const statusCell = listRow.getByRole("cell").nth(5)
-  const resolutionDateCell = listRow.getByRole("cell").nth(6)
+  const docNumberCell = listRow.getByRole("cell").nth(0)
+  const courtCell = listRow.getByRole("cell").nth(1)
+  const decisionDateCell = listRow.getByRole("cell").nth(2)
+  const fileNumberCell = listRow.getByRole("cell").nth(3)
+  const statusCell = listRow.getByRole("cell").nth(4)
+  const resolutionDateCell = listRow.getByRole("cell").nth(5)
 
   await test.step("Fehler", async () => {
     if (expectedItem.status?.withError) {
