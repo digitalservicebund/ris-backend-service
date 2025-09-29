@@ -678,10 +678,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     UserDTO currentUserInDb = currentDocumentationUnitProcessStepDTOFromDB.getUser();
     User currentUserFromFrontend = currentDocunitProcessStepFromFrontend.getUser();
 
-    UUID lastUserId = currentUserFromFrontend != null ? currentUserFromFrontend.id() : null;
+    UUID currentUserId = currentUserFromFrontend != null ? currentUserFromFrontend.id() : null;
 
-    UUID currentUserId = currentUserInDb != null ? currentUserInDb.getId() : null;
-    // If User id has changed in process step
+    UUID lastUserId = currentUserInDb != null ? currentUserInDb.getId() : null;
     return !Objects.equals(currentUserId, lastUserId);
   }
 

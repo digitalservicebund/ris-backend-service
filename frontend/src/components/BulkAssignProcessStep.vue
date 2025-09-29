@@ -29,6 +29,14 @@ const { user } = storeToRefs(useSessionStore())
 const toast = useToast()
 const showProcessStepDialog = ref(false)
 
+/**
+ * Flag to control Menu visibility via v-if.
+ * The built-in PrimeVue `:popup="true"` prop relies on asynchronous Portal/Teleport
+ * rendering, which leads to flaky and failing Playwright E2E tests.
+ * Using v-if and absolute positioning makes the menu inline and stable.
+ */
+const menuVisible = ref(false)
+
 async function handleAssignProcessStep(
   documentationUnitProcessStep: DocumentationUnitProcessStep,
 ): Promise<ResponseError | undefined> {
@@ -69,6 +77,8 @@ const showAssignProcessStepDialog = () => {
   if (isSelectionValid()) {
     showProcessStepDialog.value = true
   }
+  // Close the menu regardless of validation success/failure
+  menuVisible.value = false
 }
 
 const menuModel = ref([
@@ -78,9 +88,9 @@ const menuModel = ref([
     command: showAssignProcessStepDialog,
   },
 ])
-const menuRef = ref()
-const toggleMenu = (event: MouseEvent) => {
-  menuRef.value.toggle(event)
+
+const toggleMenu = () => {
+  menuVisible.value = !menuVisible.value
 }
 
 const isSelectionValid = () => {
@@ -126,7 +136,7 @@ const isSelectionValid = () => {
   if (!props.documentationUnits || props.documentationUnits.length === 0) {
     emit(
       "updateSelectionErrors",
-      "Wählen Sie mindestens eine Dokumentationseinheit aus",
+      "Wählen Sie mindestens eine Dokumentationseinheit aus.",
       [],
     )
     return false
@@ -140,31 +150,37 @@ const isSelectionValid = () => {
 <template>
   <div class="flex flex-col gap-4">
     <div class="flex flex-row justify-end">
-      <Button
-        v-tooltip.bottom="{
-          value: 'Aktionen',
-          appendTo: 'body',
-        }"
-        aria-label="Aktionen"
-        class="z-10"
-        severity="secondary"
-        size="small"
-        @click="toggleMenu"
-      >
-        <template #icon>
-          <IconLayers />
-        </template>
-      </Button>
-      <Menu ref="menuRef" class="min-w-[225px]" :model="menuModel" popup>
-        <template #item="{ item, props: slotProps }">
-          <a class="min-w-225 cursor-pointer" v-bind="slotProps.action">
-            <span class="p-menuitem-icon">
-              <component :is="item.component" />
-            </span>
-            <span class="p-menuitem-text">{{ item.label }}</span>
-          </a>
-        </template>
-      </Menu>
+      <div class="relative inline-flex">
+        <Button
+          v-tooltip.bottom="{
+            value: 'Aktionen',
+            appendTo: 'body',
+          }"
+          aria-label="Aktionen"
+          class="z-10"
+          severity="secondary"
+          size="small"
+          @click="toggleMenu"
+        >
+          <template #icon>
+            <IconLayers />
+          </template>
+        </Button>
+        <Menu
+          v-if="menuVisible"
+          class="absolute top-full right-0 mt-1 min-w-[225px]"
+          :model="menuModel"
+        >
+          <template #item="{ item, props: slotProps }">
+            <a class="min-w-225 cursor-pointer" v-bind="slotProps.action">
+              <span class="p-menuitem-icon">
+                <component :is="item.component" />
+              </span>
+              <span class="p-menuitem-text">{{ item.label }}</span>
+            </a>
+          </template>
+        </Menu>
+      </div>
     </div>
     <AssignProcessStep
       v-model:visible="showProcessStepDialog"

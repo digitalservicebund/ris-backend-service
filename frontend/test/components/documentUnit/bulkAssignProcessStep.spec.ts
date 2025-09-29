@@ -134,7 +134,7 @@ describe("BulkAssignProcessStep component", () => {
       // Assert: The validation should emit an error without opening the dialog
       expect(emitted().updateSelectionErrors).toBeTruthy()
       expect(emitted().updateSelectionErrors[0]).toEqual([
-        "Wählen Sie mindestens eine Dokumentationseinheit aus",
+        "Wählen Sie mindestens eine Dokumentationseinheit aus.",
         [],
       ])
       expect(
