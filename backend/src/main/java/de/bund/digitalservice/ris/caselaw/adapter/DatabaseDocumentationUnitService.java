@@ -73,13 +73,11 @@ public class DatabaseDocumentationUnitService implements BulkDocumentationUnitSe
         DocumentationUnitProcessStepDTO currentDocumentationUnitProcessStepDTOFromDB =
             documentationUnitDTO.getCurrentProcessStep();
 
-        // Check if the process step or user has changed.
         boolean stepChanged =
             stepChanged(currentDocumentationUnitProcessStepDTOFromDB, processStepDTO);
         boolean userChanged = userChanged(currentDocumentationUnitProcessStepDTOFromDB, userDTO);
 
         if (stepChanged || userChanged) {
-          // Extracted saving and logging logic to reduce complexity
           handleProcessStepUpdateAndLog(
               documentationUnitDTO,
               processStepDTO,

@@ -681,7 +681,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     UUID currentUserId = currentUserFromFrontend != null ? currentUserFromFrontend.id() : null;
 
     UUID lastUserId = currentUserInDb != null ? currentUserInDb.getId() : null;
-    // If User id has changed in process step
     return !Objects.equals(currentUserId, lastUserId);
   }
 

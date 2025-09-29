@@ -116,7 +116,7 @@ class DatabaseDocumentationUnitServiceTest {
         databaseDocumentationUnitProcessStepRepository);
 
     // Default mock for the new ProcessStepDTO being created and saved
-    // This is essential because, to simulate this successful persistence
+    // This is essential to simulate this successful persistence
     // behavior for the service logic to run correctly.
     when(databaseDocumentationUnitProcessStepRepository.save(
             any(DocumentationUnitProcessStepDTO.class)))
@@ -233,7 +233,6 @@ class DatabaseDocumentationUnitServiceTest {
       // Arrange
       when(processStepRepository.findByName(TEST_PROCESS_STEP_NAME))
           .thenReturn(Optional.of(processStepDTO));
-      // **ADAPTED MOCK: findById returns empty**
       when(userRepository.findById(TEST_USER_ID)).thenReturn(Optional.empty());
 
       List<UUID> docunitList = List.of(TEST_DOC_UNIT_ID_1);
@@ -452,7 +451,6 @@ class DatabaseDocumentationUnitServiceTest {
       when(processStepRepository.findByName(TEST_PROCESS_STEP_NAME))
           .thenReturn(Optional.of(processStepDTO)); // Same step
 
-      // **ADAPTED MOCK: Use findById with TEST_USER_ID**
       when(userRepository.findById(TEST_USER_ID)).thenReturn(Optional.of(userDTO)); // Same user
       when(repository.findById(TEST_DOC_UNIT_ID_1)).thenReturn(Optional.of(docUnitDTO));
 
