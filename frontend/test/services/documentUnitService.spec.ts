@@ -163,6 +163,76 @@ describe("documentUnitService", () => {
     })
   })
 
+  describe("bulk assign process step", () => {
+    it("should return error with unsuccessful status", async () => {
+      const httpMock = vi.spyOn(HttpClient, "patch").mockResolvedValue({
+        status: 400,
+        data: "error",
+      })
+
+      const response = await service.bulkAssignProcessStep(
+        { processStep: { uuid: "1234", abbreviation: "T", name: "Test" } },
+        ["documentationOfficeId"],
+      )
+
+      expect(response).toEqual({
+        data: "error",
+        error: {
+          description: "Laden Sie die Seite neu.",
+          title: "Die Dokumentationseinheit konnte nicht zugewiesen werden.",
+        },
+        status: 400,
+      })
+
+      expect(httpMock).toHaveBeenCalledWith(
+        "caselaw/documentunits/bulk-assign-process-step",
+        {},
+        {
+          documentationUnitIds: ["documentationOfficeId"],
+          documentationUnitProcessStep: {
+            processStep: {
+              abbreviation: "T",
+              name: "Test",
+              uuid: "1234",
+            },
+          },
+        },
+      )
+    })
+
+    it("should return data on success", async () => {
+      const httpMock = vi.spyOn(HttpClient, "patch").mockResolvedValue({
+        status: 200,
+        data: "success",
+      })
+
+      const response = await service.bulkAssignProcessStep(
+        { processStep: { uuid: "1234", abbreviation: "T", name: "Test" } },
+        ["documentationOfficeId"],
+      )
+
+      expect(response).toEqual({
+        data: "success",
+        status: 200,
+      })
+
+      expect(httpMock).toHaveBeenCalledWith(
+        "caselaw/documentunits/bulk-assign-process-step",
+        {},
+        {
+          documentationUnitIds: ["documentationOfficeId"],
+          documentationUnitProcessStep: {
+            processStep: {
+              abbreviation: "T",
+              name: "Test",
+              uuid: "1234",
+            },
+          },
+        },
+      )
+    })
+  })
+
   describe("get by document number", () => {
     it("should return error with could not be loaded", async () => {
       const httpMock = vi.spyOn(HttpClient, "get").mockResolvedValue({

@@ -7,7 +7,7 @@ interface ProcessStepService {
 
   getNextProcessStep(
     documentUnitId: string,
-  ): Promise<ServiceResponse<ProcessStep>>
+  ): Promise<ServiceResponse<ProcessStep | undefined>>
 }
 
 const service: ProcessStepService = {

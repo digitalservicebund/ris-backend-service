@@ -47,7 +47,7 @@ async function recalculateBorderNumbers() {
 
   setTimeout(
     () => (showRecalculatingBorderNumbersFakeDelay.value = false),
-    3_000,
+    3000,
   )
 }
 

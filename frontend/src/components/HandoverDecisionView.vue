@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
-import { computed, onMounted, Ref, ref } from "vue"
+import { computed, onBeforeMount, Ref, ref } from "vue"
 import { RouterLink } from "vue-router"
 import ExpandableContent from "./ExpandableContent.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
@@ -74,7 +74,7 @@ const errorMessage = computed(
   () => frontendError.value ?? previewError.value ?? props.errorMessage,
 )
 
-onMounted(async () => {
+onBeforeMount(async () => {
   // Save doc unit in case there are any unsaved local changes before fetching xml preview
   await store.updateDocumentUnit()
 

@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.languagetool;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,12 +16,12 @@ import lombok.NoArgsConstructor;
 public class Match {
   private String message;
   private String shortMessage;
-  private List<Replacement> replacements;
+  @Builder.Default private List<Replacement> replacements = new ArrayList<>();
   private int offset;
   private int length;
   private Context context;
   private String sentence;
-  private Type type;
+  @Builder.Default private Type type = new Type();
   private Rule rule;
   private boolean ignoreForIncompleteSentence;
   private int contextForSureMatch;

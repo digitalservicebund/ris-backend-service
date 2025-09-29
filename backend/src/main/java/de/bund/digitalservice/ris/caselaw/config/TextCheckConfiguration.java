@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.config;
 
+import de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolClient;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -16,8 +17,13 @@ public class TextCheckConfiguration {
       LanguageToolConfig config,
       DocumentationUnitRepository documentationUnitRepository,
       IgnoredTextCheckWordRepository ignoredTextCheckWordRepository,
-      FeatureToggleService featureToggleService) {
+      FeatureToggleService featureToggleService,
+      LanguageToolClient languageToolClient) {
     return new LanguageToolService(
-        config, documentationUnitRepository, ignoredTextCheckWordRepository, featureToggleService);
+        documentationUnitRepository,
+        ignoredTextCheckWordRepository,
+        featureToggleService,
+        config,
+        languageToolClient);
   }
 }

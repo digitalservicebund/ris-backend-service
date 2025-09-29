@@ -1,12 +1,20 @@
+import { createTestingPinia } from "@pinia/testing"
 import userEvent from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue"
+import { render, screen, within } from "@testing-library/vue"
+import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { Page } from "@/components/Pagination.vue"
 import ResultList from "@/components/search/shared/ResultList.vue"
 import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { PublicationState } from "@/domain/publicationStatus"
+import featureToggleService from "@/services/featureToggleService"
 import routes from "~/test-helper/routes"
+
+const addToastMock = vi.fn()
+vi.mock("primevue/usetoast", () => ({
+  useToast: () => ({ add: addToastMock }),
+}))
 
 const mockEntries = [
   new DocumentUnitListEntry({
@@ -82,6 +90,7 @@ function renderComponent(props?: {
     history: createWebHistory(),
     routes: routes,
   })
+
   return {
     user,
     ...render(ResultList, {
@@ -95,18 +104,44 @@ function renderComponent(props?: {
         directives: {
           tooltip: {},
         },
-        plugins: [[router]],
+        plugins: [[router, createTestingPinia()]],
       },
     }),
   }
 }
 
 describe("Search Result List", () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.resetAllMocks()
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
   it("renders document numbers", () => {
     renderComponent()
     const rows = screen.getAllByRole("row")
     expect(rows[1]).toHaveTextContent("ABC123")
     expect(rows[2]).toHaveTextContent("DEF456")
+  })
+
+  it("renders a selectable checkbox in the first row", async () => {
+    renderComponent()
+    // Wait for the asynchronous onMounted hook to complete
+    // might be deleted after feature toggle removed
+    await vi.runAllTimersAsync()
+    await nextTick()
+
+    const rows = screen.getAllByRole("row")
+    const firstDataRow = rows[1]
+
+    const checkbox = within(firstDataRow).getByRole("checkbox")
+    expect(checkbox).toBeInTheDocument()
   })
 
   it("displays current user of process step", () => {
