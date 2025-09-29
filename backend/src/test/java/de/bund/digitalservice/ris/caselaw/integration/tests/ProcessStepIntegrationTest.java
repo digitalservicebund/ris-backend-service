@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ProcessStep;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +25,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 @Transactional
 class ProcessStepIntegrationTest extends BaseIntegrationTest {
@@ -181,6 +185,42 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
               List<ProcessStep> possibleSteps = response.getResponseBody();
               assertThat(possibleSteps).isNotNull().hasSize(8);
               assertThat(possibleSteps.get(0).name()).isEqualTo("Neu");
+              assertThat(possibleSteps.get(1).name()).isEqualTo("Ersterfassung");
+              assertThat(possibleSteps.get(2).name()).isEqualTo("QS formal");
+              assertThat(possibleSteps.get(3).name()).isEqualTo("Fachdokumentation");
+              assertThat(possibleSteps.get(4).name()).isEqualTo("QS fachlich");
+              assertThat(possibleSteps.get(5).name()).isEqualTo("Fertig");
+              assertThat(possibleSteps.get(6).name()).isEqualTo("Wiedervorlage");
+              assertThat(possibleSteps.get(7).name()).isEqualTo("Blockiert");
+            });
+  }
+
+  @Test
+  @DisplayName("GET /all - Should retrieve all assignable process steps for a documentation office")
+  void getAssignableProcessStepsForDocOffice_shouldReturnAllSteps() {
+
+    MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+    queryParams.add("assignableOnly", "true");
+    URI uri =
+        new DefaultUriBuilderFactory()
+            .builder()
+            .path(PROCESS_STEP_ENDPOINT + "processsteps")
+            .queryParams(queryParams)
+            .build();
+
+    // Act & Assert
+    risWebTestClient
+        .withLogin("/BGH")
+        .get()
+        .uri(uri)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<List<ProcessStep>>() {})
+        .consumeWith(
+            response -> {
+              List<ProcessStep> possibleSteps = response.getResponseBody();
+              assertThat(possibleSteps).isNotNull().hasSize(8);
               assertThat(possibleSteps.get(1).name()).isEqualTo("Ersterfassung");
               assertThat(possibleSteps.get(2).name()).isEqualTo("QS formal");
               assertThat(possibleSteps.get(3).name()).isEqualTo("Fachdokumentation");

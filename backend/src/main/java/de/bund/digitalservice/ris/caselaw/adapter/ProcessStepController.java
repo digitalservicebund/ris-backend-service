@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -62,6 +63,8 @@ public class ProcessStepController {
    * their defined rank. GET /api/v1/caselaw/processsteps
    *
    * @param oidcUser the logged-in user, to retrieve the docoffice from
+   * @param assignableOnly If true, only assignable process steps (excluding "Neu") are returned.
+   *     Defaults to false if not provided.
    * @return ResponseEntity with a list of ProcessStep objects (200 OK), potentially an empty list
    *     if the office exists but has no configured steps. Returns 404 Not Found if the
    *     documentation office is not found, or if an associated process step is not found (data
@@ -70,14 +73,22 @@ public class ProcessStepController {
   @GetMapping("/processsteps")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<List<ProcessStep>> getAllPossibleProcessStepsForDocOffice(
-      @AuthenticationPrincipal OidcUser oidcUser) {
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @RequestParam(required = false, defaultValue = "false") boolean assignableOnly) {
     try {
       var documentationOffice = userService.getDocumentationOffice(oidcUser);
       if (documentationOffice == null) {
         return ResponseEntity.notFound().build();
       }
-      List<ProcessStep> possibleSteps =
-          processStepService.getAllProcessStepsForDocOffice(documentationOffice.id());
+
+      List<ProcessStep> possibleSteps;
+      if (assignableOnly) {
+        possibleSteps =
+            processStepService.getAssignableProcessStepsForDocOffice(documentationOffice.id());
+      } else {
+        possibleSteps = processStepService.getAllProcessStepsForDocOffice(documentationOffice.id());
+      }
+
       return ResponseEntity.ok(possibleSteps);
     } catch (DocumentationOfficeNotExistsException e) {
       return ResponseEntity.notFound().build();
