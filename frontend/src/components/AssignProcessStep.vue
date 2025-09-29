@@ -91,9 +91,9 @@ async function assignProcessStep(): Promise<void> {
   }
 }
 
-// The logic you want to run every time the dialog is shown
 const fetchData = async () => {
-  const processStepsResponse = await processStepService.getProcessSteps()
+  // 💡 Call with 'true' to get only assignable steps: ?assignableOnly=true
+  const processStepsResponse = await processStepService.getProcessSteps(true)
   if (processStepsResponse.error) {
     fetchProcessStepsErrors.value?.push(processStepsResponse.error)
   } else {
