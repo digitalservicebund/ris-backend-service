@@ -209,7 +209,7 @@ onUnmounted(() => {
           />
         </template>
         <Column
-          v-if="multiEditActive"
+          v-if="multiEditActive && isDecision"
           header-style="width: 3rem"
           :pt="{
             pcRowCheckbox: {
@@ -419,13 +419,13 @@ onUnmounted(() => {
         </Column>
         <Column field="actions">
           <template #header>
-            <span v-if="!multiEditActive" class="sr-only">Aktionen</span>
             <BulkAssignProcessStep
-              v-else
+              v-if="multiEditActive && isDecision"
               :documentation-units="selectedDocumentationUnits"
               @process-step-assigned="reloadList"
               @update-selection-errors="updateSelectionErrors"
             ></BulkAssignProcessStep>
+            <span v-else class="sr-only">Aktionen</span>
           </template>
           <template #body="{ data: item }">
             <div class="flex flex-row justify-end -space-x-2">

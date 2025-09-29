@@ -192,6 +192,22 @@ describe("Search Result List", () => {
     expect(checkbox).toBeInTheDocument()
   })
 
+  it("does not render a selectable checkbox in the first row for pending proceeding", async () => {
+    renderComponent({ kind: Kind.PENDING_PROCEEDING })
+    // Wait for the asynchronous onMounted hook to complete
+    // might be deleted after feature toggle removed
+    await vi.runAllTimersAsync()
+    await nextTick()
+
+    const rows = screen.getAllByRole("row")
+    const firstDataRow = rows[1]
+
+    const checkbox = within(firstDataRow).queryByRole("checkbox")
+    expect(checkbox).not.toBeInTheDocument()
+
+    expect(screen.queryByTestId("bulk-assign-mock")).not.toBeInTheDocument()
+  })
+
   it("renders selection error in table header", async () => {
     renderComponent()
 
