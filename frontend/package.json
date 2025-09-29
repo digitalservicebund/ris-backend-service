@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "engines": {
-    "node": ">=22.19.0"
+    "node": ">=22.20.0"
   },
   "type": "module",
   "scripts": {
@@ -35,7 +35,7 @@
     "@digitalservicebund/ris-ui": "^3.14.1",
     "@guardian/prosemirror-invisibles": "^3.1.1",
     "@sentry/integrations": "^7.114.0",
-    "@sentry/vue": "^10.13.0",
+    "@sentry/vue": "^10.15.0",
     "@tailwindcss/postcss": "^4.1.13",
     "@tiptap/extension-blockquote": "^2.26.2",
     "@tiptap/extension-bold": "^2.26.2",
@@ -74,9 +74,9 @@
     "primevue": "^4.3.9",
     "resize-observer-polyfill": "^1.5.1",
     "tippy.js": "^6.3.7",
-    "vue": "^3.5.21",
+    "vue": "^3.5.22",
     "vue-router": "4.5.1",
-    "vue-tsc": "3.0.8"
+    "vue-tsc": "3.1.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
@@ -84,7 +84,7 @@
     "@eslint/compat": "^1.4.0",
     "@eslint/js": "^9.36.0",
     "@iconify-json/ic": "^1.2.4",
-    "@iconify-json/material-symbols": "^1.2.38",
+    "@iconify-json/material-symbols": "^1.2.39",
     "@iconify-json/mdi": "^1.2.3",
     "@namics/stylelint-bem": "^10.1.0",
     "@pinia/testing": "^1.0.2",
@@ -128,7 +128,7 @@
     "postcss-scrollbar": "^0.5.1",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
-    "sass": "^1.93.1",
+    "sass": "^1.93.2",
     "stylelint": "^16.24.0",
     "stylelint-config-idiomatic-order": "^10.0.0",
     "stylelint-config-prettier-scss": "^1.0.0",
