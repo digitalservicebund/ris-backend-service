@@ -385,15 +385,18 @@ test.describe(
       })
 
       await test.step("'Aktionen' Button öffnet Prozesschritt Modal", async () => {
-        await page.route("**/caselaw/processsteps", async (route) => {
-          await route.fulfill({
-            status: 500,
-            contentType: "application/json",
-            body: JSON.stringify({
-              message: "Internal Server Error",
-            }),
-          })
-        })
+        await page.route(
+          "**/caselaw/processsteps?assignableOnly=true",
+          async (route) => {
+            await route.fulfill({
+              status: 500,
+              contentType: "application/json",
+              body: JSON.stringify({
+                message: "Internal Server Error",
+              }),
+            })
+          },
+        )
         await page.getByRole("button", { name: "Aktionen" }).click()
         const weitergebenMenuItem = page.getByRole("menuitem", {
           name: "Weitergeben",
