@@ -64,6 +64,10 @@ export function useProcessStepBadge(step: ProcessStep) {
         badge.backgroundColor = "bg-green-300"
         badge.borderColor = "border-green-800"
         break
+      case "Fundstelle":
+        badge.backgroundColor = "bg-blue-100"
+        badge.borderColor = "border-blue-800"
+        break
     }
     return badge
   })
