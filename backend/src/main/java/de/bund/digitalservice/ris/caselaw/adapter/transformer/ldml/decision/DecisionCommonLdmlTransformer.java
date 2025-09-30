@@ -194,10 +194,7 @@ public abstract class DecisionCommonLdmlTransformer
         // Outline/Gliederung, Tenor/Tenor
         .introduction(buildIntroduction(decision))
         // set caseFacts/Tatbestand
-        .background(
-            JaxbHtml.build(
-                htmlTransformer.htmlStringToObjectList(
-                    nullSafeGet(longTexts, LongTexts::caseFacts))))
+        .background(buildBackground(decision))
         // set decisionReasons/Entscheidungsgründe, reasons/Gründe, otherLongText/"Sonstiger,
         // dissentingOpinion/"Abweichende Meinung"
         // Langtext"
@@ -213,6 +210,18 @@ public abstract class DecisionCommonLdmlTransformer
     }
 
     return judgmentBody;
+  }
+
+  private JaxbHtml buildBackground(Decision decision) {
+    var longTexts = decision.longTexts();
+    var caseFacts = nullSafeGet(longTexts, LongTexts::caseFacts);
+
+    if (StringUtils.isNotEmpty(caseFacts)) {
+      JaxbHtml backgroundHtml = JaxbHtml.build(htmlTransformer.htmlStringToObjectList(caseFacts));
+      backgroundHtml.setDomainTerm("Tatbestand");
+      return backgroundHtml;
+    }
+    return null;
   }
 
   private AknMultipleBlock buildDecision(Decision decision) {

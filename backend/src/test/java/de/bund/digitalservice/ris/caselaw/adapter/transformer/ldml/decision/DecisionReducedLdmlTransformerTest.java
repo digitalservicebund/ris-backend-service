@@ -433,7 +433,7 @@ class DecisionReducedLdmlTransformerTest {
         Arguments.of(
             "'caseFacts' (Tatbestand)",
             """
-                <akn:background>
+                <akn:background ris:domainTerm="Tatbestand">
                   <akn:p>caseFacts test</akn:p>
                 </akn:background>
                """),
