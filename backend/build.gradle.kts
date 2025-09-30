@@ -179,7 +179,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.34.5"))
+    implementation(platform("software.amazon.awssdk:bom:2.34.6"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -249,7 +249,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.29.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.30.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
