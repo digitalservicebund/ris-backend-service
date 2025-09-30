@@ -280,30 +280,60 @@ class DecisionFullLdmlTransformerTest {
   void testTransform_borderNumber() {
     String expected =
         """
-                                <akn:hcontainer name="randnummer">
-                                   <akn:num>1</akn:num>
-                                   <akn:content>
-                                     <akn:p>Lorem ipsum</akn:p>
-                                   </akn:content>
-                                </akn:hcontainer>
-                                """;
+        <akn:hcontainer eId="randnummer-1" name="Randnummer">
+           <akn:num>1</akn:num>
+           <akn:content>
+             <akn:p>Lorem ipsum</akn:p>
+           </akn:content>
+        </akn:hcontainer>
+        """;
     Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
             .longTexts(
                 LongTexts.builder()
                     .reasons(
                         """
-                                    <border-number>
-                                        <number>1</number>
-                                        <content>
-                                            <p>Lorem ipsum</p>
-                                        </content>
-                                    </border-number>
-                                    """)
+                        <border-number>
+                            <number>1</number>
+                            <content>
+                                <p>Lorem ipsum</p>
+                            </content>
+                        </border-number>
+                        """)
                     .build())
             .build();
 
     CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
+
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+    assertThat(fileContent).isPresent();
+    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+        .contains(StringUtils.deleteWhitespace(expected));
+  }
+
+  @Test
+  void testTransform_borderNumberLink() {
+    String expected =
+        """
+        <akn:p>Übertragungsleistungssteuerungsverfahren</akn:p>
+        <akn:p>
+          This is my guiding principle<akn:ref class="border-number-link" href="#randnummer-70">70</akn:ref>
+        </akn:p>
+        """;
+    Decision decision =
+        testDocumentUnit.toBuilder()
+            .shortTexts(
+                ShortTexts.builder()
+                    .guidingPrinciple(
+                        """
+                        <p>Übertragungsleistungssteuerungsverfahren</p>
+                        <p>This is my guiding principle<border-number-link nr="70">70</border-number-link></p>
+                        """)
+                    .build())
+            .build();
+
+    CaseLawLdml ldml = subject.transformToLdml(decision);
 
     Assertions.assertNotNull(ldml);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
