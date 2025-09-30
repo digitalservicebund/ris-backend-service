@@ -17,6 +17,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
@@ -79,7 +80,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     predicates.addAll(getDocNumberPredicates(parameters, cq, cb, root));
     predicates.addAll(getCourtTypePredicates(parameters, cb, root));
     predicates.addAll(getCourtLocationPredicates(parameters, cb, root));
-    predicates.addAll(getDecisionDatePredicates(parameters, cb, root));
+    predicates.addAll(getDecisionDatePredicates(parameters, cq, cb, root));
     predicates.addAll(getMyDocOfficePredicates(parameters, cb, root));
     predicates.addAll(getScheduledOnlyPredicates(parameters, cb, root));
     predicates.addAll(getErrorPredicates(parameters, cb, root));
@@ -186,8 +187,12 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
   }
 
   private List<Predicate> getDecisionDatePredicates(
-      SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
+      SearchParameters parameters,
+      CriteriaQuery<DocumentationUnitListItemDTO> cq,
+      HibernateCriteriaBuilder cb,
+      Root<DocumentationUnitDTO> root) {
     List<Predicate> predicates = new ArrayList<>();
+
     if (parameters.decisionDate.isPresent()) {
       Predicate decisionDatePredicate;
       if (parameters.decisionDateEnd.isPresent()) {
@@ -200,7 +205,31 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         decisionDatePredicate =
             cb.equal(root.get(DocumentationUnitDTO_.date), parameters.decisionDate.get());
       }
-      predicates.add(decisionDatePredicate);
+
+      Subquery<DeviatingDateDTO> deviatingDateSubquery = cq.subquery(DeviatingDateDTO.class);
+      Root<DocumentationUnitDTO> subRoot = deviatingDateSubquery.correlate(root);
+      Join<DocumentationUnitDTO, DeviatingDateDTO> deviatingDateJoin =
+          subRoot.join(DocumentationUnitDTO_.deviatingDates);
+
+      deviatingDateSubquery.select(deviatingDateJoin);
+
+      Predicate deviatingDateCondition;
+      if (parameters.decisionDateEnd.isPresent()) {
+        deviatingDateCondition =
+            cb.between(
+                deviatingDateJoin.get(DeviatingDateDTO_.value),
+                parameters.decisionDate.get(),
+                parameters.decisionDateEnd.get());
+      } else {
+        deviatingDateCondition =
+            cb.equal(deviatingDateJoin.get(DeviatingDateDTO_.value), parameters.decisionDate.get());
+      }
+
+      deviatingDateSubquery.where(deviatingDateCondition);
+      Predicate deviatingDatePredicate = cb.exists(deviatingDateSubquery);
+
+      Predicate datePredicate = cb.or(decisionDatePredicate, deviatingDatePredicate);
+      predicates.add(datePredicate);
     }
     return predicates;
   }
