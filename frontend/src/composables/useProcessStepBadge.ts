@@ -1,70 +1,37 @@
 import { computed } from "vue"
 import ProcessStep from "@/domain/processStep"
 
-export interface StepBadge {
-  borderColor: string
-  backgroundColor: string
-  class: string
-  label: string
+const stepConfigMap: { [key: string]: { bg: string; border: string } } = {
+  Neu: { bg: "bg-white", border: "border-gray-800" },
+  Dokumentationswürdigkeit: { bg: "bg-gray-400", border: "border-gray-800" },
+  Ersterfassung: { bg: "bg-gray-300", border: "border-gray-800" },
+  Fachdokumentation: { bg: "bg-gray-100", border: "border-gray-800" },
+  "QS formal": { bg: "bg-blue-300", border: "border-blue-800" },
+  "QS fachlich": { bg: "bg-blue-400", border: "border-blue-800" },
+  Blockiert: { bg: "bg-red-200", border: "border-red-600" },
+  Terminiert: { bg: "bg-green-200", border: "border-green-800" },
+  Abgabe: { bg: "bg-green-100", border: "border-green-800" },
+  Wiedervorlage: { bg: "bg-yellow-200", border: "border-yellow-900" },
+  Fertig: { bg: "bg-green-300", border: "border-green-800" },
+  Fundstelle: { bg: "bg-blue-100", border: "border-blue-800" },
+}
+
+const defaultStyles = {
+  bg: "bg-white",
+  border: "border-black",
 }
 
 export function useProcessStepBadge(step: ProcessStep) {
-  const badge: StepBadge = {
-    borderColor: "black",
-    backgroundColor: "white",
-    class: "px-8",
-    label: step.name,
-  }
-
   return computed(() => {
-    if (!step) return badge
+    const styles = step?.name
+      ? stepConfigMap[step.name] || defaultStyles
+      : defaultStyles
 
-    switch (step.name) {
-      case "Neu":
-        badge.backgroundColor = "bg-white"
-        badge.borderColor = "border-gray-800"
-        break
-      case "Dokumentationswürdigkeit":
-        badge.backgroundColor = "bg-gray-400"
-        badge.borderColor = "border-gray-800"
-        break
-      case "Ersterfassung":
-        badge.backgroundColor = "bg-gray-300"
-        badge.borderColor = "border-gray-800"
-        break
-      case "Fachdokumentation":
-        badge.backgroundColor = "bg-gray-100"
-        badge.borderColor = "border-gray-800"
-        break
-      case "QS formal":
-        badge.backgroundColor = "bg-blue-300"
-        badge.borderColor = "border-blue-800"
-        break
-      case "QS fachlich":
-        badge.backgroundColor = "bg-blue-400"
-        badge.borderColor = "border-blue-800"
-        break
-      case "Blockiert":
-        badge.backgroundColor = "bg-red-200"
-        badge.borderColor = "border-red-600"
-        break
-      case "Terminiert":
-        badge.backgroundColor = "bg-green-200"
-        badge.borderColor = "border-green-800"
-        break
-      case "Abgabe":
-        badge.backgroundColor = "bg-green-100"
-        badge.borderColor = "border-green-800"
-        break
-      case "Wiedervorlage":
-        badge.backgroundColor = "bg-yellow-200"
-        badge.borderColor = "border-yellow-900"
-        break
-      case "Fertig":
-        badge.backgroundColor = "bg-green-300"
-        badge.borderColor = "border-green-800"
-        break
+    return {
+      borderColor: styles.border,
+      backgroundColor: styles.bg,
+      class: "px-8",
+      label: step?.name || "",
     }
-    return badge
   })
 }
