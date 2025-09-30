@@ -15,7 +15,7 @@ public interface DatabaseDuplicateCheckRepository
   @Query(
       nativeQuery = true,
       value =
-          """
+"""
     -- We filter file numbers that occur more than 50 times (i.e. "XX"):
     -- They lead to explosion of duplicate relationships
     WITH filtered_file_numbers AS (

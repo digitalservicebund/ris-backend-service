@@ -13,7 +13,7 @@ public interface DuplicateRelationRepository
 
   @Query(
       value =
-          """
+"""
 SELECT duplicateRelation
 FROM DuplicateRelationDTO duplicateRelation
 WHERE duplicateRelation.id.documentationUnitId1 = :docUnitId
@@ -24,7 +24,7 @@ WHERE duplicateRelation.id.documentationUnitId1 = :docUnitId
   @Modifying
   @Query(
       value =
-          """
+"""
 WITH
     -- 1) Collect for each relevant criterion a full list of pairs of doc-unit-id and value, e.g. ("38e..34f", 2020-01-11)
     all_dates as(
@@ -135,7 +135,7 @@ WHERE (documentation_unit_id1, documentation_unit_id2) NOT IN
   @Modifying
   @Query(
       value =
-          """
+"""
 WITH
     all_dates as(
         SELECT documentation_unit_id as id, value
@@ -238,7 +238,7 @@ WHERE duplicate_relation.documentation_unit_id1 IS NULL;
   @Modifying
   @Query(
       value =
-          """
+"""
 UPDATE incremental_migration.duplicate_relation drel
 SET status = 'IGNORED'
 FROM incremental_migration.documentation_unit d1

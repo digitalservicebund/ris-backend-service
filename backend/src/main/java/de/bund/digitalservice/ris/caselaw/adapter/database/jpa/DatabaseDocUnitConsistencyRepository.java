@@ -14,7 +14,7 @@ public interface DatabaseDocUnitConsistencyRepository
   @Query(
       nativeQuery = true,
       value =
-          """
+"""
 SELECT documentation_unit.id, documentation_unit.document_number
 FROM incremental_migration.documentation_unit documentation_unit
          LEFT JOIN incremental_migration.decision decision ON documentation_unit.id = decision.id
