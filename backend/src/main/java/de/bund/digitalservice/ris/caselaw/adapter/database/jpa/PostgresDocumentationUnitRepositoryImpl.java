@@ -258,6 +258,33 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     documentationUnitDTO.setCurrentProcessStep(initialStepDTO);
     documentationUnitDTO.getProcessSteps().add(initialStepDTO);
 
+    String description = null;
+    if (initialProcessStep.getProcessStep() != null) {
+      description = "Schritt gesetzt: " + initialProcessStep.getProcessStep().name();
+    } else {
+      description = "Schritt gesetzt";
+    }
+
+    historyLogService.saveProcessStepHistoryLog(
+        documentationUnitDTO.getId(),
+        user,
+        null,
+        HistoryLogEventType.PROCESS_STEP,
+        description,
+        null,
+        DocumentationUnitProcessStepTransformer.toDomain(initialStepDTO));
+
+    if (initialProcessStep.getUser() != null) {
+      historyLogService.saveProcessStepHistoryLog(
+          documentationUnitDTO.getId(),
+          user,
+          null,
+          HistoryLogEventType.PROCESS_STEP_USER,
+          null, // description will be set dynamically in transformer.toDomain
+          null,
+          DocumentationUnitProcessStepTransformer.toDomain(initialStepDTO));
+    }
+
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
       decisionDTO.setSource(sources);
     }
