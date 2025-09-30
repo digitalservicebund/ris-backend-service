@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { ref } from "vue"
-import { useProcessStepBadge } from "../composables/useProcessStepBadge"
+import { useProcessStepBadge } from "@/composables/useProcessStepBadge"
 import ProcessStep from "@/domain/processStep"
 
 describe("useProcessStepBadge", () => {
