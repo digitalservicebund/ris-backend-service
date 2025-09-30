@@ -5,7 +5,6 @@ import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLIS
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -101,7 +100,6 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -212,13 +210,21 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     User user = User.builder().documentationOffice(docOffice).build();
     var historyLogs = historyLogRepository.findByDocumentationUnitId(list.getFirst().getId(), user);
-    assertThat(historyLogs).hasSize(1);
-    assertThat(historyLogs.getFirst().eventType()).isEqualTo(HistoryLogEventType.CREATE);
-    assertThat(historyLogs.getFirst().documentationOffice()).isEqualTo("DS");
-    assertThat(historyLogs.getFirst().description()).isEqualTo("Dokeinheit angelegt");
-    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("testUser");
-    assertThat(historyLogs.getFirst().createdAt())
-        .isCloseTo(Instant.now(), within(5, ChronoUnit.SECONDS));
+
+    assertThat(historyLogs).hasSize(3);
+    assertThat(historyLogs)
+        .map(HistoryLog::eventType)
+        .containsExactly(
+            HistoryLogEventType.PROCESS_STEP_USER,
+            HistoryLogEventType.PROCESS_STEP,
+            HistoryLogEventType.CREATE);
+    assertThat(historyLogs)
+        .map(HistoryLog::createdBy)
+        .containsExactly("testUser", "testUser", "testUser");
+    assertThat(historyLogs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+    assertThat(historyLogs.get(0).description()).isEqualTo("Person gesetzt: testUser");
+    assertThat(historyLogs.get(1).description()).isEqualTo("Schritt gesetzt: Ersterfassung");
+    assertThat(historyLogs.get(2).description()).isEqualTo("Dokeinheit angelegt");
   }
 
   @Test
@@ -1780,7 +1786,46 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  void testGenerateNewDocumentationUnit_isExternalHandover_shouldWriteHistoryLog() {
+  void testGenerateNewDocumentationUnit_shouldWriteHistoryLogs_forProcessSteps() {
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("DS", "XXREYYYY*****"));
+
+    Decision createdDocUnit =
+        risWebTestClient
+            .withDefaultLogin()
+            .put()
+            .uri("/api/v1/caselaw/documentunits/new")
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isCreated()
+            .expectBody(Decision.class)
+            .returnResult()
+            .getResponseBody();
+    User user = User.builder().documentationOffice(docOffice).build();
+    var logs = historyLogService.getHistoryLogs(createdDocUnit.uuid(), user);
+
+    assertThat(logs).hasSize(3);
+
+    // event types
+    assertThat(logs)
+        .map(HistoryLog::eventType)
+        .containsExactly(
+            HistoryLogEventType.PROCESS_STEP_USER,
+            HistoryLogEventType.PROCESS_STEP,
+            HistoryLogEventType.CREATE);
+
+    // description
+    assertThat(logs.get(0).description()).isEqualTo("Person gesetzt: testUser");
+    assertThat(logs.get(1).description()).isEqualTo("Schritt gesetzt: Ersterfassung");
+    assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
+
+    // creator user -> same docoffice is allowed to see user
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser", "testUser");
+  }
+
+  @Test
+  void testGenerateNewDocumentationUnit_isExternalHandover_shouldWriteHistoryLogs() {
     DocumentationOfficeDTO creatingDocumentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation("BGH");
 
@@ -1826,13 +1871,24 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     User user = User.builder().documentationOffice(creatingDocumentationOffice).build();
     var logs = historyLogService.getHistoryLogs(createdDocUnit.uuid(), user);
-    assertThat(logs).hasSize(2);
+
+    assertThat(logs).hasSize(3);
+
+    // event type -> for external handover no initial user is set and therefore no log
     assertThat(logs)
         .map(HistoryLog::eventType)
-        .containsExactly(HistoryLogEventType.EXTERNAL_HANDOVER, HistoryLogEventType.CREATE);
-    // As DS User I am not able to see the user from BGH docoffice, who created the docunit
-    assertThat(logs).map(HistoryLog::createdBy).containsExactly(null, null);
+        .containsExactly(
+            HistoryLogEventType.EXTERNAL_HANDOVER,
+            HistoryLogEventType.PROCESS_STEP,
+            HistoryLogEventType.CREATE);
+    // description
     assertThat(logs.getFirst().description()).isEqualTo("Fremdanalage angelegt für BGH");
+    assertThat(logs.get(1).description()).isEqualTo("Schritt gesetzt: Neu");
+    assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
+
+    // creator user -> as DS User I am not able to see the user from BGH docoffice, who created the
+    // docunit
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly(null, null, null);
   }
 
   @Test

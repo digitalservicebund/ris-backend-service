@@ -27,13 +27,25 @@ test.describe("Verwaltungsdaten", { tag: ["@RISDEV-8004"] }, () => {
       ).toBeHidden()
     })
 
-    await test.step("Die Historie hat ein 'Dokeinheit angelegt'-Event", async () => {
+    await test.step("Die Historie hat ein 'Dokeinheit angelegt'-Event und und initiale Prozesschritt Logs", async () => {
       await navigateToManagementData(page, pendingProceeding.documentNumber)
-      await expectHistoryCount(page, 1)
+      await expectHistoryCount(page, 3)
       await expectHistoryLogRow(
         page,
         0,
-        // "DS (e2e_tests DigitalService)",
+        "DS (e2e_tests DigitalService)",
+        "Person gesetzt: e2e_tests DigitalService",
+      )
+      await expectHistoryLogRow(
+        page,
+        1,
+        "DS (e2e_tests DigitalService)",
+        "Schritt gesetzt: Ersterfassung",
+      )
+      await expectHistoryLogRow(
+        page,
+        2,
+        "DS (e2e_tests DigitalService)",
         `Dokeinheit angelegt`,
       )
     })
@@ -70,18 +82,18 @@ test.describe("Verwaltungsdaten", { tag: ["@RISDEV-8004"] }, () => {
         /^\d{2}\.\d{2}\.\d{4} um \d{2}:\d{2} Uhr$/,
       )
       await expectLastUpdatedBy(page, "DS (e2e_tests DigitalService)")
-      await expectHistoryCount(page, 3)
+      await expectHistoryCount(page, 5)
       await expectHistoryLogRow(
         page,
         0,
-        // "DS (e2e_tests DigitalService)",
+        "DS (e2e_tests DigitalService)",
         `Verfahren als "Erledigt" markiert`,
       )
 
       await expectHistoryLogRow(
         page,
         1,
-        // "DS (e2e_tests DigitalService)",
+        "DS (e2e_tests DigitalService)",
         `Dokeinheit bearbeitet`,
       )
     })
