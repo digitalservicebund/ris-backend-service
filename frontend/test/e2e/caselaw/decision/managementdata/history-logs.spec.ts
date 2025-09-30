@@ -30,11 +30,23 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
   }) => {
     await test.step("Die Historie hat ein 'Dokeinheit angelegt'-Event", async () => {
       await navigateToManagementData(page, documentNumber)
-      await expectHistoryCount(page, 1)
+      await expectHistoryCount(page, 3)
       await expectHistoryLogRow(
         page,
         0,
-        // "DS (e2e_tests DigitalService)",
+        "DS (e2e_tests DigitalService)",
+        "Person gesetzt: e2e_tests DigitalService",
+      )
+      await expectHistoryLogRow(
+        page,
+        1,
+        "DS (e2e_tests DigitalService)",
+        "Schritt gesetzt: Ersterfassung",
+      )
+      await expectHistoryLogRow(
+        page,
+        2,
+        "DS (e2e_tests DigitalService)",
         `Dokeinheit angelegt`,
       )
     })
@@ -54,11 +66,11 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await page.getByLabel("ECLI", { exact: true }).fill("ECLI-12345")
       await save(page)
       await navigateToManagementData(page, documentNumber)
-      await expectHistoryCount(page, 2)
+      await expectHistoryCount(page, 4)
       await expectHistoryLogRow(
         page,
         0,
-        // "DS (e2e_tests DigitalService)",
+        "DS (e2e_tests DigitalService)",
         `Dokeinheit bearbeitet`,
       )
     })
@@ -68,11 +80,11 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await page.getByLabel("ECLI", { exact: true }).fill("ECLI-anderer-Wert")
       await save(page)
       await navigateToManagementData(page, documentNumber)
-      await expectHistoryCount(page, 2)
+      await expectHistoryCount(page, 4)
       await expectHistoryLogRow(
         page,
         0,
-        // "DS (e2e_tests DigitalService)",
+        "DS (e2e_tests DigitalService)",
         `Dokeinheit bearbeitet`,
       )
     })
@@ -93,11 +105,11 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
 
     await test.step("Nach einer Übergabe wird ein Historien-Log erstellt", async () => {
       await navigateToManagementData(page, documentNumber)
-      await expectHistoryCount(page, 3)
+      await expectHistoryCount(page, 5)
       await expectHistoryLogRow(
         page,
         0,
-        // "DS (e2e_tests DigitalService)",
+        "DS (e2e_tests DigitalService)",
         `Dokeinheit an jDV übergeben`,
       )
     })
@@ -120,17 +132,17 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
 
     await test.step("In der Historie sind zwei Historien-Events", async () => {
       await navigateToManagementData(page, documentNumber)
-      await expectHistoryCount(page, 3)
+      await expectHistoryCount(page, 5)
       await expectHistoryLogRow(
         page,
         0,
-        // "DS (e2e_tests DigitalService)",
+        "DS (e2e_tests DigitalService)",
         `Dokeinheit bearbeitet`,
       )
       await expectHistoryLogRow(
         page,
         1,
-        // "DS (e2e_tests DigitalService)",
+        "DS (e2e_tests DigitalService)",
         `Vorgang gesetzt: ${newProcedure}`,
       )
     })
@@ -150,11 +162,11 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
 
     await test.step("Bearbeitungsevent der Externen Person ist zusätzlich sichtbar", async () => {
       await navigateToManagementData(page, documentNumber)
-      await expectHistoryCount(page, 4)
+      await expectHistoryCount(page, 6)
       await expectHistoryLogRow(
         page,
         0,
-        // "DS (E2emila Extern)",
+        "DS (E2emila Extern)",
         `Dokeinheit bearbeitet`,
       )
     })
@@ -176,17 +188,17 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       // eslint-disable-next-line playwright/no-wait-for-timeout,playwright/no-conditional-in-test
       if (browserName === "firefox") await page.waitForTimeout(500)
       await navigateToManagementData(page, documentNumber)
-      await expectHistoryCount(page, 3)
+      await expectHistoryCount(page, 5)
       await expectHistoryLogRow(
         page,
         0,
-        // "DS (e2e_tests DigitalService)",
+        "DS (e2e_tests DigitalService)",
         `Dokeinheit bearbeitet`,
       )
       await expectHistoryLogRow(
         page,
         1,
-        // "DS (e2e_tests DigitalService)",
+        "DS (e2e_tests DigitalService)",
         `Word-Dokument hinzugefügt`,
       )
     })
@@ -200,11 +212,11 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
 
     await test.step("In der Historie gibt es zusätzlich ein Dokument gelöscht Historien-Event", async () => {
       await navigateToManagementData(page, documentNumber)
-      await expectHistoryCount(page, 4)
+      await expectHistoryCount(page, 6)
       await expectHistoryLogRow(
         page,
         0,
-        // "DS (e2e_tests DigitalService)",
+        "DS (e2e_tests DigitalService)",
         `Word-Dokument gelöscht`,
       )
     })
@@ -254,11 +266,11 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
 
     await test.step("BGH-User sieht nur BGH Namen in Verwaltungsdaten", async () => {
       await navigateToManagementData(pageWithBghUser, documentNumber)
-      await expectHistoryCount(pageWithBghUser, 3)
+      await expectHistoryCount(pageWithBghUser, 4)
       await expectHistoryLogRow(
         pageWithBghUser,
         1,
-        // "DS",
+        "DS",
         `Fremdanalage angelegt für BGH`,
       )
     })
@@ -267,7 +279,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await expectHistoryLogRow(
         pageWithBghUser,
         0,
-        // "BGH (BGH testUser)",
+        "BGH (BGH testUser)",
         `Status geändert: Fremdanlage → Unveröffentlicht`,
       )
     })
