@@ -34,6 +34,11 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.List;
@@ -52,6 +57,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.ComparisonResult;
+import org.xmlunit.diff.ComparisonType;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.DifferenceEvaluator;
 
 @ExtendWith(MockitoExtension.class)
 class DecisionFullLdmlTransformerTest {
@@ -87,12 +97,7 @@ class DecisionFullLdmlTransformerTest {
             .coreData(
                 CoreData.builder()
                     .ecli("testecli")
-                    .court(
-                        Court.builder()
-                            .type("testCourtType")
-                            .location("testCourtLocation")
-                            .label("Type Location")
-                            .build())
+                    .court(Court.builder().type("AG").location("Aachen").label("AG Aachen").build())
                     .documentType(
                         DocumentType.builder().label("testDocumentTypeAbbreviation").build())
                     .legalEffect("ja")
@@ -104,24 +109,6 @@ class DecisionFullLdmlTransformerTest {
             .shortTexts(ShortTexts.builder().build())
             .previousDecisions(List.of(related1, related2))
             .build();
-  }
-
-  @Test
-  @DisplayName("Fallback title test")
-  void documentNumberIsFallbackTitleTest() {
-    String expected =
-        """
-      <akn:header>
-         <akn:p>Type Location, 01.01.2020, testFileNumber</akn:p>
-      </akn:header>
-     """;
-    CaseLawLdml ldml = subject.transformToLdml(testDocumentUnit);
-    Assertions.assertNotNull(ldml);
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    Assertions.assertTrue(fileContent.isPresent());
-    Assertions.assertTrue(
-        StringUtils.deleteWhitespace(fileContent.get())
-            .contains(StringUtils.deleteWhitespace(expected)));
   }
 
   @Test
@@ -330,15 +317,33 @@ class DecisionFullLdmlTransformerTest {
   void testTransform_mixedTextInHeader() {
     String expected =
         """
-                                <akn:header>
-                                  <akn:p alternativeTo="textWrapper">Hello</akn:p>
-                                  <akn:p> paragraph</akn:p>
-                                  <akn:p alternativeTo="textWrapper"> world!</akn:p>
-                                </akn:header>
-                                """;
+       <akn:header>
+          <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">testFileNumber</akn:docNumber>
+          </akn:p>
+          <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
+          </akn:p>
+          <akn:p>Gericht: <akn:courtType refersTo="#ag-aachen">AG Aachen</akn:courtType>
+          </akn:p>
+          <akn:p>Dokumenttyp: <akn:docType ris:domainTerm="Dokumenttyp">testDocumentTypeAbbreviation</akn:docType></akn:p>
+          <akn:p>Entscheidungsname:
+          <akn:docTitle refersTo="#entscheidungsname">Entscheidungsname</akn:docTitle></akn:p>
+          <akn:p>Titelzeile:
+          <akn:shortTitle refersTo="#titelzeile">
+            <akn:embeddedStructure>
+              <akn:p alternativeTo="textWrapper">Hello</akn:p>
+              <akn:p> paragraph</akn:p>
+              <akn:p alternativeTo="textWrapper"> world!</akn:p>
+            </akn:embeddedStructure>
+          </akn:shortTitle></akn:p>
+        </akn:header>
+       """;
     Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
-            .shortTexts(ShortTexts.builder().headline("Hello<p> paragraph</p> world!").build())
+            .shortTexts(
+                ShortTexts.builder()
+                    .decisionName("Entscheidungsname")
+                    .headline("Hello<p> paragraph</p> world!")
+                    .build())
             .build();
 
     CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
@@ -415,196 +420,10 @@ class DecisionFullLdmlTransformerTest {
   }
 
   @Test
-  void testEntireLdml() {
+  void testEntireLdml() throws IOException {
     var documentationUnit = getEntireDocumentationUnit();
-    var expected =
-        String.format(
-            """
-<?xml version="1.0" encoding="utf-8"?>
-<akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0"
-                xmlns:ris="http://example.com/0.1/"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/os/part2-specs/schemas/akomantoso30.xsd">
-   <akn:judgment name="attributsemantik-noch-undefiniert">
-      <akn:meta>
-         <akn:identification source="attributsemantik-noch-undefiniert">
-            <akn:FRBRWork>
-               <akn:FRBRthis value="YYTestDoc0013"/>
-               <akn:FRBRuri value="YYTestDoc0013"/>
-               <akn:FRBRalias name="uebergreifende-id" value="%s"/>
-               <akn:FRBRalias name="ecli" value="ecli test"/>
-               <akn:FRBRalias name="celex" value="celex test"/>
-               <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
-               <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-               <akn:FRBRcountry value="de"/>
-            </akn:FRBRWork>
-            <akn:FRBRExpression>
-               <akn:FRBRthis value="YYTestDoc0013/dokument"/>
-               <akn:FRBRuri value="YYTestDoc0013/dokument"/>
-               <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
-               <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-               <akn:FRBRlanguage language="deu"/>
-            </akn:FRBRExpression>
-            <akn:FRBRManifestation>
-               <akn:FRBRthis value="YYTestDoc0013/dokument.xml"/>
-               <akn:FRBRuri value="YYTestDoc0013/dokument.xml"/>
-               <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
-               <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-            </akn:FRBRManifestation>
-         </akn:identification>
-         <akn:classification source="attributsemantik-noch-undefiniert">
-            <akn:keyword dictionary="attributsemantik-noch-undefiniert"
-                         showAs="attributsemantik-noch-undefiniert"
-                         value="keyword test"/>
-         </akn:classification>
-         <akn:proprietary source="attributsemantik-noch-undefiniert">
-            <ris:meta>
-               <ris:decisionNames>
-                  <ris:decisionName>decisionName test</ris:decisionName>
-               </ris:decisionNames>
-               <ris:previousDecisions>
-                  <ris:previousDecision date="2020-01-01">
-                     <ris:documentNumber>previous decision document number 1</ris:documentNumber>
-                     <ris:fileNumber>previous decision file number</ris:fileNumber>
-                     <ris:courtType>previous decision court type</ris:courtType>
-                  </ris:previousDecision>
-                  <ris:previousDecision date="2020-01-01">
-                     <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                     <ris:fileNumber>previous decision file number</ris:fileNumber>
-                     <ris:courtType>previous decision court type</ris:courtType>
-                  </ris:previousDecision>
-               </ris:previousDecisions>
-               <ris:ensuingDecisions>
-                  <ris:ensuingDecision date="2022-10-01">
-                     <ris:documentNumber>ensuing decision document number 1</ris:documentNumber>
-                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                     <ris:courtType>ensuing decision court type</ris:courtType>
-                  </ris:ensuingDecision>
-                  <ris:ensuingDecision date="2022-10-01">
-                     <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                     <ris:courtType>ensuing decision court type</ris:courtType>
-                  </ris:ensuingDecision>
-               </ris:ensuingDecisions>
-               <ris:fileNumbers>
-                  <ris:fileNumber>fileNumber test</ris:fileNumber>
-               </ris:fileNumbers>
-               <ris:documentType>documentType test</ris:documentType>
-               <ris:courtLocation>courtLocation test</ris:courtLocation>
-               <ris:courtType>courtType test</ris:courtType>
-               <ris:legalForces>
-                  <ris:legalForce>legalForce test</ris:legalForce>
-               </ris:legalForces>
-               <ris:legalEffect>ja</ris:legalEffect>
-               <ris:fieldOfLaws>
-                  <ris:fieldOfLaw>fieldOfLaw test</ris:fieldOfLaw>
-               </ris:fieldOfLaws>
-               <ris:judicialBody>appraisalBody test</ris:judicialBody>
-               <ris:deviatingCourts>
-                  <ris:deviatingCourt>deviating court</ris:deviatingCourt>
-               </ris:deviatingCourts>
-               <ris:deviatingDates>
-                  <ris:deviatingDate>2010-05-12</ris:deviatingDate>
-               </ris:deviatingDates>
-               <ris:deviatingDocumentNumbers>
-                  <ris:deviatingDocumentNumber>deviating documentNumber</ris:deviatingDocumentNumber>
-               </ris:deviatingDocumentNumbers>
-               <ris:deviatingEclis>
-                  <ris:deviatingEcli>deviating ecli test</ris:deviatingEcli>
-               </ris:deviatingEclis>
-               <ris:deviatingFileNumbers>
-                  <ris:deviatingFileNumber>deviating fileNumber</ris:deviatingFileNumber>
-               </ris:deviatingFileNumbers>
-               <ris:publicationStatus>PUBLISHED</ris:publicationStatus>
-               <ris:error>false</ris:error>
-               <ris:documentationOffice>documentationOffice test</ris:documentationOffice>
-               <ris:procedures>
-                  <ris:procedure>previous procedure test</ris:procedure>
-               </ris:procedures>
-               <ris:inputTypes>
-                  <ris:inputType>E-Mail</ris:inputType>
-                  <ris:inputType>Papier</ris:inputType>
-               </ris:inputTypes>
-               <ris:foreignLanguageVersions>
-                  <ris:foreignLanguageVersion>
-                     <akn:FRBRlanguage language="eng"/>
-                     <akn:documentRef href="https://ihre-url-zur-englischen-übersetzung" showAs="Englisch"/>
-                  </ris:foreignLanguageVersion>
-                  <ris:foreignLanguageVersion>
-                     <akn:FRBRlanguage language="fra"/>
-                     <akn:documentRef href="https://ihre-url-zur-französischen-übersetzung"
-                                      showAs="Französisch"/>
-                  </ris:foreignLanguageVersion>
-               </ris:foreignLanguageVersions>
-               <ris:definitions>
-                  <ris:definition ris:definedTerm="indirekte Steuern" ris:definingBorderNumber="2"/>
-                  <ris:definition ris:definedTerm="Sachgesamtheit"/>
-               </ris:definitions>
-               <ris:evfs>evsf test</ris:evfs>
-            </ris:meta>
-         </akn:proprietary>
-      </akn:meta>
-      <akn:header>
-         <akn:p>headline test</akn:p>
-      </akn:header>
-      <akn:judgmentBody>
-         <akn:motivation>
-            <akn:p>guidingPrinciple test</akn:p>
-         </akn:motivation>
-         <akn:introduction>
-            <akn:block name="Orientierungssatz">
-               <akn:embeddedStructure>
-                  <akn:p>headNote test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-            <akn:block name="Sonstiger Orientierungssatz">
-               <akn:embeddedStructure>
-                  <akn:p>otherHeadNote test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-            <akn:block name="Gliederung">
-               <akn:embeddedStructure>
-                  <akn:p>outline test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-            <akn:block name="Tenor">
-               <akn:embeddedStructure>
-                  <akn:p>tenor test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-         </akn:introduction>
-         <akn:background>
-            <akn:p>caseFacts test</akn:p>
-         </akn:background>
-         <akn:decision>
-            <akn:block name="Entscheidungsgründe">
-               <akn:embeddedStructure>
-                  <akn:p>decisionGrounds test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-            <akn:block name="Gründe">
-               <akn:embeddedStructure>
-                  <akn:p>grounds test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-            <akn:block name="Sonstiger Langtext">
-               <akn:embeddedStructure>
-                  <akn:p>otherLongText test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-            <akn:block name="Abweichende Meinung">
-               <akn:opinion>
-                  <akn:embeddedStructure>
-                     <akn:p>dissenting test</akn:p>
-                  </akn:embeddedStructure>
-               </akn:opinion>
-            </akn:block>
-         </akn:decision>
-      </akn:judgmentBody>
-   </akn:judgment>
-</akn:akomaNtoso>
-           """,
-            documentationUnitId);
+    Path expectedFilePath = Paths.get("src/test/resources/testdata/full_ldml.xml");
+    String expected = Files.readString(expectedFilePath, StandardCharsets.UTF_8);
 
     // Act
     CaseLawLdml ldml = subject.transformToLdml(documentationUnit);
@@ -612,7 +431,17 @@ class DecisionFullLdmlTransformerTest {
     // Assert
     Assertions.assertNotNull(ldml);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    assertThat(fileContent).isPresent().get().isEqualTo(expected);
+    Assertions.assertTrue(fileContent.isPresent());
+
+    Diff diff =
+        DiffBuilder.compare(expected)
+            .withTest(fileContent.get())
+            .withDifferenceEvaluator(ignoreIdAttributeEvaluator)
+            .ignoreWhitespace()
+            .checkForIdentical()
+            .build();
+
+    Assertions.assertFalse(diff.hasDifferences(), diff::toString);
   }
 
   Decision getEntireDocumentationUnit() {
@@ -801,4 +630,18 @@ class DecisionFullLdmlTransformerTest {
                     .build()))
         .build();
   }
+
+  DifferenceEvaluator ignoreIdAttributeEvaluator =
+      (comparison, outcome) -> {
+        if (outcome == ComparisonResult.DIFFERENT
+            && comparison.getType() == ComparisonType.ATTR_VALUE
+            && ("/akomaNtoso[1]/judgment[1]/meta[1]/identification[1]/FRBRWork[1]/FRBRalias[1]/@value"
+                    .equals(comparison.getControlDetails().getXPath())
+                || "/akomaNtoso[1]/judgment[1]/meta[1]/identification[1]/FRBRWork[1]/FRBRalias[1]/@value"
+                    .equals(comparison.getTestDetails().getXPath()))) {
+          return ComparisonResult.EQUAL;
+        }
+
+        return outcome;
+      };
 }

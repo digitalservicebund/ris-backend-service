@@ -76,4 +76,11 @@ public class DecisionReducedLdmlTransformer extends DecisionCommonLdmlTransforme
     }
     return null;
   }
+
+  @Override
+  protected JaxbHtml buildHeader(Decision decision) throws ValidationException {
+    validateCoreData(decision);
+
+    return JaxbHtml.build(htmlTransformer.htmlStringToObjectList(buildCommonHeader(decision)));
+  }
 }

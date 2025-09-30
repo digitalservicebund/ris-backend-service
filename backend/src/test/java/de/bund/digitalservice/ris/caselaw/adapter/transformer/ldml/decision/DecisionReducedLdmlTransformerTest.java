@@ -32,6 +32,10 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.List;
@@ -49,6 +53,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.ComparisonResult;
+import org.xmlunit.diff.ComparisonType;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.DifferenceEvaluator;
 
 @ExtendWith(MockitoExtension.class)
 class DecisionReducedLdmlTransformerTest {
@@ -99,144 +108,10 @@ class DecisionReducedLdmlTransformerTest {
   }
 
   @Test
-  void testEntireLdml() {
+  void testEntireLdml() throws Exception {
     // Arrange
-    var expected =
-        String.format(
-            """
-                <?xml version="1.0" encoding="utf-8"?>
-                <akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0"
-                                xmlns:ris="http://example.com/0.1/"
-                                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/os/part2-specs/schemas/akomantoso30.xsd">
-                   <akn:judgment name="attributsemantik-noch-undefiniert">
-                      <akn:meta>
-                         <akn:identification source="attributsemantik-noch-undefiniert">
-                            <akn:FRBRWork>
-                               <akn:FRBRthis value="YYTestDoc0013"/>
-                               <akn:FRBRuri value="YYTestDoc0013"/>
-                               <akn:FRBRalias name="uebergreifende-id" value="%s"/>
-                               <akn:FRBRalias name="ecli" value="ecli test"/>
-                               <akn:FRBRalias name="celex" value="celex test"/>
-                               <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
-                               <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-                               <akn:FRBRcountry value="de"/>
-                            </akn:FRBRWork>
-                            <akn:FRBRExpression>
-                               <akn:FRBRthis value="YYTestDoc0013/dokument"/>
-                               <akn:FRBRuri value="YYTestDoc0013/dokument"/>
-                               <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
-                               <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-                               <akn:FRBRlanguage language="deu"/>
-                            </akn:FRBRExpression>
-                            <akn:FRBRManifestation>
-                               <akn:FRBRthis value="YYTestDoc0013/dokument.xml"/>
-                               <akn:FRBRuri value="YYTestDoc0013/dokument.xml"/>
-                               <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
-                               <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-                            </akn:FRBRManifestation>
-                         </akn:identification>
-                         <akn:proprietary source="attributsemantik-noch-undefiniert">
-                            <ris:meta>
-                               <ris:previousDecisions>
-                                  <ris:previousDecision date="2020-01-01">
-                                     <ris:documentNumber>previous decision document number 1</ris:documentNumber>
-                                     <ris:fileNumber>previous decision file number</ris:fileNumber>
-                                     <ris:courtType>previous decision court type</ris:courtType>
-                                  </ris:previousDecision>
-                                  <ris:previousDecision date="2020-01-01">
-                                     <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                                     <ris:fileNumber>previous decision file number</ris:fileNumber>
-                                     <ris:courtType>previous decision court type</ris:courtType>
-                                  </ris:previousDecision>
-                               </ris:previousDecisions>
-                               <ris:ensuingDecisions>
-                                  <ris:ensuingDecision date="2022-10-01">
-                                     <ris:documentNumber>ensuing decision document number 1</ris:documentNumber>
-                                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                                     <ris:courtType>ensuing decision court type</ris:courtType>
-                                  </ris:ensuingDecision>
-                                  <ris:ensuingDecision date="2022-10-01">
-                                     <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                                     <ris:courtType>ensuing decision court type</ris:courtType>
-                                  </ris:ensuingDecision>
-                               </ris:ensuingDecisions>
-                               <ris:fileNumbers>
-                                  <ris:fileNumber>fileNumber test</ris:fileNumber>
-                               </ris:fileNumbers>
-                               <ris:documentType>documentType test</ris:documentType>
-                               <ris:courtLocation>courtLocation test</ris:courtLocation>
-                               <ris:courtType>courtType test</ris:courtType>
-                               <ris:legalForces>
-                                  <ris:legalForce>legalForce test</ris:legalForce>
-                               </ris:legalForces>
-                               <ris:judicialBody>appraisalBody test</ris:judicialBody>
-                               <ris:foreignLanguageVersions>
-                                  <ris:foreignLanguageVersion>
-                                     <akn:FRBRlanguage language="eng"/>
-                                     <akn:documentRef href="https://ihre-url-zur-englischen-übersetzung" showAs="Englisch"/>
-                                  </ris:foreignLanguageVersion>
-                                  <ris:foreignLanguageVersion>
-                                     <akn:FRBRlanguage language="fra"/>
-                                     <akn:documentRef href="https://ihre-url-zur-französischen-übersetzung"
-                                                      showAs="Französisch"/>
-                                  </ris:foreignLanguageVersion>
-                               </ris:foreignLanguageVersions>
-                            </ris:meta>
-                         </akn:proprietary>
-                      </akn:meta>
-                      <akn:header>
-                         <akn:p>headline test</akn:p>
-                      </akn:header>
-                      <akn:judgmentBody>
-                         <akn:motivation>
-                            <akn:p>guidingPrinciple test</akn:p>
-                         </akn:motivation>
-                         <akn:introduction>
-                            <akn:block name="Gliederung">
-                               <akn:embeddedStructure>
-                                  <akn:p>outline test</akn:p>
-                               </akn:embeddedStructure>
-                            </akn:block>
-                            <akn:block name="Tenor">
-                               <akn:embeddedStructure>
-                                  <akn:p>tenor test</akn:p>
-                               </akn:embeddedStructure>
-                            </akn:block>
-                         </akn:introduction>
-                         <akn:background>
-                            <akn:p>caseFacts test</akn:p>
-                         </akn:background>
-                         <akn:decision>
-                            <akn:block name="Entscheidungsgründe">
-                               <akn:embeddedStructure>
-                                  <akn:p>decisionGrounds test</akn:p>
-                               </akn:embeddedStructure>
-                            </akn:block>
-                            <akn:block name="Gründe">
-                               <akn:embeddedStructure>
-                                  <akn:p>grounds test</akn:p>
-                               </akn:embeddedStructure>
-                            </akn:block>
-                            <akn:block name="Sonstiger Langtext">
-                               <akn:embeddedStructure>
-                                  <akn:p>otherLongText test</akn:p>
-                               </akn:embeddedStructure>
-                            </akn:block>
-                            <akn:block name="Abweichende Meinung">
-                               <akn:opinion>
-                                  <akn:embeddedStructure>
-                                     <akn:p>dissenting test</akn:p>
-                                  </akn:embeddedStructure>
-                               </akn:opinion>
-                            </akn:block>
-                         </akn:decision>
-                      </akn:judgmentBody>
-                   </akn:judgment>
-                </akn:akomaNtoso>
-                """,
-            documentationUnitId);
+    Path expectedFilePath = Paths.get("src/test/resources/testdata/reduced_ldml.xml");
+    String expected = Files.readString(expectedFilePath, StandardCharsets.UTF_8);
 
     // Act
     CaseLawLdml ldml = subject.transformToLdml(testDocumentUnit);
@@ -245,7 +120,16 @@ class DecisionReducedLdmlTransformerTest {
     Assertions.assertNotNull(ldml);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     Assertions.assertTrue(fileContent.isPresent());
-    Assertions.assertEquals(expected, fileContent.get());
+
+    Diff diff =
+        DiffBuilder.compare(expected)
+            .withTest(fileContent.get())
+            .withDifferenceEvaluator(ignoreIdAttributeEvaluator)
+            .ignoreWhitespace()
+            .checkForIdentical()
+            .build();
+
+    Assertions.assertFalse(diff.hasDifferences(), diff::toString);
   }
 
   private static void createTestDocumentationUnit() {
@@ -622,7 +506,14 @@ class DecisionReducedLdmlTransformerTest {
             "'headline' (Titelzeile)",
             """
                 <akn:header>
-                   <akn:p>headline test</akn:p>
+                   <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">fileNumber test</akn:docNumber>
+                   </akn:p>
+                   <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
+                   </akn:p>
+                   <akn:p>Gericht: <akn:courtType refersTo="#ag-aachen">courtLabel test</akn:courtType>
+                   </akn:p>
+                   <akn:p>Dokumenttyp: <akn:docType ris:domainTerm="Dokumenttyp">documentType test</akn:docType>
+                   </akn:p>
                 </akn:header>
                """));
   }
@@ -746,4 +637,18 @@ class DecisionReducedLdmlTransformerTest {
                </ris:deviatingDocumentNumbers>
             """));
   }
+
+  DifferenceEvaluator ignoreIdAttributeEvaluator =
+      (comparison, outcome) -> {
+        if (outcome == ComparisonResult.DIFFERENT
+            && comparison.getType() == ComparisonType.ATTR_VALUE
+            && ("/akomaNtoso[1]/judgment[1]/meta[1]/identification[1]/FRBRWork[1]/FRBRalias[1]/@value"
+                    .equals(comparison.getControlDetails().getXPath())
+                || "/akomaNtoso[1]/judgment[1]/meta[1]/identification[1]/FRBRWork[1]/FRBRalias[1]/@value"
+                    .equals(comparison.getTestDetails().getXPath()))) {
+          return ComparisonResult.EQUAL;
+        }
+
+        return outcome;
+      };
 }
