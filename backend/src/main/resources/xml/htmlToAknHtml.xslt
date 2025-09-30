@@ -185,7 +185,7 @@
     </xsl:template>
 
     <xsl:template name="borderNumberTemplate">
-        <akn:hcontainer  name="randnummer">
+        <akn:hcontainer eId="randnummer-{number}"  name="Randnummer">
             <xsl:apply-templates select="@* | node()"/>
         </akn:hcontainer>
     </xsl:template>
@@ -208,9 +208,9 @@
 
     <xsl:template name="borderNumberLinkTemplate">
         <!--Any other existing attributes for border-number-link will be lost -->
-        <akn:a class="border-number-link" href="{concat('#border-number-link-',@nr)}">
+        <akn:ref class="border-number-link" href="{concat('#randnummer-',@nr)}">
             <xsl:apply-templates/>
-        </akn:a>
+        </akn:ref>
     </xsl:template>
 
     <!--Case Law team handover: akn doesn't support <pre>. Maybe something works better than adding foreign?
