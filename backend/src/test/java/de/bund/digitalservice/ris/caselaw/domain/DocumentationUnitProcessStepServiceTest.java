@@ -253,11 +253,64 @@ class DocumentationUnitProcessStepServiceTest {
         .getProcessStepsForDocumentationOffice(nonExistentOfficeId);
   }
 
-  // --- Tests for getAllProcessStepsForDocOffice ---
+  @Test
+  @DisplayName("getAllProcessStepsForDocOffice - Should return all steps")
+  void getAllProcessStepsForDocOffice_shouldReturnAllSteps()
+      throws DocumentationOfficeNotExistsException {
+    // Arrange
+    List<ProcessStep> officeSteps =
+        Arrays.asList(processStepNeu, processStepErsterfassung, processStepQsFormal);
+    when(documentationOfficeService.getProcessStepsForDocumentationOffice(docOfficeId))
+        .thenReturn(officeSteps);
+
+    // Act
+    List<ProcessStep> result = service.getAllProcessStepsForDocOffice(docOfficeId);
+
+    // Assert
+    assertThat(result)
+        .hasSize(3)
+        .containsExactly(processStepNeu, processStepErsterfassung, processStepQsFormal);
+    verify(documentationOfficeService, times(1)).getProcessStepsForDocumentationOffice(docOfficeId);
+  }
 
   @Test
-  @DisplayName("getAllProcessStepsForDocOffice - Should return all steps but 'Neu' for office")
-  void getAllProcessStepsForDocOffice_shouldReturnAssignableSteps()
+  @DisplayName(
+      "getAllProcessStepsForDocOffice - Should throw DocumentationOfficeNotExistsException if office not found")
+  void
+      getAllProcessStepsForDocOffice_shouldThrowDocumentationOfficeNotExistsException_ifOfficeNotFound()
+          throws DocumentationOfficeNotExistsException {
+    // Arrange
+    UUID nonExistentOfficeId = UUID.randomUUID();
+    when(documentationOfficeService.getProcessStepsForDocumentationOffice(nonExistentOfficeId))
+        .thenThrow(new DocumentationOfficeNotExistsException("Office not found for process steps"));
+
+    // Act & Assert
+    assertThatThrownBy(() -> service.getAllProcessStepsForDocOffice(nonExistentOfficeId))
+        .isInstanceOf(DocumentationOfficeNotExistsException.class)
+        .hasMessageContaining("Office not found for process steps");
+    verify(documentationOfficeService, times(1))
+        .getProcessStepsForDocumentationOffice(nonExistentOfficeId);
+  }
+
+  @Test
+  @DisplayName("getAllProcessStepsForDocOffice - Should return empty list if office has no steps")
+  void getAllProcessStepsForDocOffice_shouldReturnEmptyList_ifNoSteps()
+      throws DocumentationOfficeNotExistsException {
+    // Arrange
+    when(documentationOfficeService.getProcessStepsForDocumentationOffice(docOfficeId))
+        .thenReturn(List.of());
+
+    // Act
+    List<ProcessStep> result = service.getAllProcessStepsForDocOffice(docOfficeId);
+
+    // Assert
+    assertThat(result).isEmpty();
+    verify(documentationOfficeService, times(1)).getProcessStepsForDocumentationOffice(docOfficeId);
+  }
+
+  @Test
+  @DisplayName("getAssignableProcessStepsForDocOffice - Should return all steps except 'Neu'")
+  void getAssignableProcessStepsForDocOffice_shouldExcludeNeuStep()
       throws DocumentationOfficeNotExistsException {
     // Arrange
     List<ProcessStep> officeSteps =
@@ -269,42 +322,11 @@ class DocumentationUnitProcessStepServiceTest {
     List<ProcessStep> result = service.getAssignableProcessStepsForDocOffice(docOfficeId);
 
     // Assert
-    assertThat(result).hasSize(2).containsExactly(processStepErsterfassung, processStepQsFormal);
+    // Total steps (3) - "Neu" (1) = 2 assignable steps
+    assertThat(result)
+        .hasSize(2)
+        .containsExactly(processStepErsterfassung, processStepQsFormal)
+        .doesNotContain(processStepNeu);
     verify(documentationOfficeService, times(1)).getProcessStepsForDocumentationOffice(docOfficeId);
-  }
-
-  @Test
-  @DisplayName("getAllProcessStepsForDocOffice - Should return empty list if office has no steps")
-  void getAssignableProcessStepsForDocOffice_shouldReturnEmptyList_ifNoSteps()
-      throws DocumentationOfficeNotExistsException {
-    // Arrange
-    when(documentationOfficeService.getProcessStepsForDocumentationOffice(docOfficeId))
-        .thenReturn(List.of());
-
-    // Act
-    List<ProcessStep> result = service.getAssignableProcessStepsForDocOffice(docOfficeId);
-
-    // Assert
-    assertThat(result).isEmpty();
-    verify(documentationOfficeService, times(1)).getProcessStepsForDocumentationOffice(docOfficeId);
-  }
-
-  @Test
-  @DisplayName(
-      "getAllProcessStepsForDocOffice - Should throw DocumentationOfficeNotExistsException if office not found")
-  void
-      getAssignableProcessStepsForDocOffice_shouldThrowDocumentationOfficeNotExistsException_ifOfficeNotFound()
-          throws DocumentationOfficeNotExistsException {
-    // Arrange
-    UUID nonExistentOfficeId = UUID.randomUUID();
-    when(documentationOfficeService.getProcessStepsForDocumentationOffice(nonExistentOfficeId))
-        .thenThrow(new DocumentationOfficeNotExistsException("Office not found for process steps"));
-
-    // Act & Assert
-    assertThatThrownBy(() -> service.getAssignableProcessStepsForDocOffice(nonExistentOfficeId))
-        .isInstanceOf(DocumentationOfficeNotExistsException.class)
-        .hasMessageContaining("Office not found for process steps");
-    verify(documentationOfficeService, times(1))
-        .getProcessStepsForDocumentationOffice(nonExistentOfficeId);
   }
 }

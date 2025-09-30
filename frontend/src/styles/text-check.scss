@@ -1,13 +1,13 @@
 text-check {
   text-decoration: underline;
   text-decoration-color: #cd5038;
-  text-decoration-skip-ink: none;
   text-decoration-style: wavy;
   text-decoration-thickness: 12%;
+  text-underline-offset: 2px;
   transition: background-color 0.25s ease-in-out;
 
   &:hover {
-    background: rgba($color: #f5dcd7, $alpha: 20%);
+    background: rgba($color: #f5dcd7, $alpha: 100%);
   }
 
   &[ignored="true"] {
@@ -15,7 +15,7 @@ text-check {
     text-decoration: none;
 
     &:hover {
-      background: rgba($color: #cce4f0, $alpha: 20%) !important;
+      background: rgba($color: #cce4f0, $alpha: 100%) !important;
     }
   }
 }

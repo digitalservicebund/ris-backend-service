@@ -18,7 +18,7 @@ plugins {
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
-    id("io.freefair.lombok") version "8.14.2"
+    id("io.freefair.lombok") version "9.0.0"
     id("org.flywaydb.flyway") version "11.13.2"
     id("io.sentry.jvm.gradle") version "5.12.0"
 }

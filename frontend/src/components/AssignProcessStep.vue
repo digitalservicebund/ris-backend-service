@@ -67,7 +67,7 @@ function validate() {
     validationStore.remove("nextProcessStep")
     return true
   } else {
-    validationStore.add("Pflichtfeld nicht befüllt", "nextProcessStep")
+    validationStore.add("Wählen Sie einen Schritt", "nextProcessStep")
     return false
   }
 }
@@ -86,13 +86,14 @@ async function assignProcessStep(): Promise<void> {
       })
     } else {
       nextUser.value = undefined
+      nextProcessStep.value = undefined
     }
   }
 }
 
-// The logic you want to run every time the dialog is shown
 const fetchData = async () => {
-  const processStepsResponse = await processStepService.getProcessSteps()
+  // 💡 Call with 'true' to get only assignable steps: ?assignableOnly=true
+  const processStepsResponse = await processStepService.getProcessSteps(true)
   if (processStepsResponse.error) {
     fetchProcessStepsErrors.value?.push(processStepsResponse.error)
   } else {

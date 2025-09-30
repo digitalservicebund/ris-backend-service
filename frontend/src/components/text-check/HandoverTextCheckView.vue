@@ -122,9 +122,9 @@ onBeforeMount(async () => {
             </div>
           </div>
           <Button
-            aria-label="Rechtschreibfehler prüfen"
+            aria-label="Rubriken bearbeiten"
             class="w-fit"
-            label="Rechtschreibfehler prüfen"
+            label="Rubriken bearbeiten"
             severity="secondary"
             size="small"
             @click="navigateToTextCheckSummaryInCategories"

@@ -178,8 +178,9 @@ describe("documentUnitService", () => {
       expect(response).toEqual({
         data: "error",
         error: {
-          description: "Laden Sie die Seite neu.",
-          title: "Die Dokumentationseinheit konnte nicht zugewiesen werden.",
+          description: "Versuchen Sie es erneut.",
+          title:
+            "Die Dokumentationseinheit(en) konnten nicht weitergegeben werden.",
         },
         status: 400,
       })
