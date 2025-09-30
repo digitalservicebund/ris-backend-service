@@ -26,10 +26,7 @@ const service: ProcessStepService = {
    * Defaults to false if not provided.
    */
   async getProcessSteps(assignableOnly: boolean = false) {
-    let url = "caselaw/processsteps"
-    if (assignableOnly) {
-      url += "?assignableOnly=true"
-    }
+    const url = "caselaw/processsteps?assignableOnly=" + assignableOnly
 
     const response = await httpClient.get<ProcessStep[]>(url)
     if (response.status >= 300 || response.error) {
