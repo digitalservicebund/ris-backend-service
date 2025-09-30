@@ -33,7 +33,7 @@ public interface DatabaseDocumentationUnitRepository
 
   @Query(
       value =
-          """
+"""
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   WHERE documentationUnit.scheduledPublicationDateTime <= CURRENT_TIMESTAMP
 """)
@@ -57,7 +57,7 @@ public interface DatabaseDocumentationUnitRepository
 
   @Query(
       value =
-          """
+"""
 SELECT d.documentNumber FROM DocumentationUnitDTO d
   WHERE d.portalPublicationStatus = 'PUBLISHED'
             """)
