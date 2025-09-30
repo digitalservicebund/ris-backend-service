@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Objects;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -77,23 +76,52 @@ public abstract class DecisionCommonLdmlTransformer
         .build();
   }
 
-  private JaxbHtml buildHeader(Decision decision) throws ValidationException {
+  protected abstract JaxbHtml buildHeader(Decision decision) throws ValidationException;
+
+  protected String buildCommonHeader(Decision decision) throws ValidationException {
     validateCoreData(decision);
     var coreData = decision.coreData();
-    String fallbackTitle =
-        "<p>"
-            + coreData.court().label()
-            + ", "
-            + DateUtils.toFormattedDateString(coreData.decisionDate())
-            + ", "
-            + coreData.fileNumbers().getFirst()
-            + "</p>";
-    String title =
-        ObjectUtils.defaultIfNull(
-            nullSafeGet(decision.shortTexts(), ShortTexts::headline), fallbackTitle);
 
-    validateNotNull(title, "Title missing");
-    return JaxbHtml.build(htmlTransformer.htmlStringToObjectList(title));
+    StringBuilder builder = new StringBuilder();
+
+    // Aktenzeichen
+    if (coreData.fileNumbers() != null && !coreData.fileNumbers().isEmpty()) {
+      builder
+          .append("<p>Aktenzeichen: <akn:docNumber refersTo=\"#aktenzeichen\">")
+          .append(coreData.fileNumbers().getFirst())
+          .append("</akn:docNumber></p>");
+    }
+
+    // Entscheidungsdatum
+    if (coreData.decisionDate() != null) {
+      builder
+          .append("<p>Entscheidungsdatum: <akn:docDate refersTo=\"#entscheidungsdatum\" date=\"")
+          .append(DateUtils.toDateString(coreData.decisionDate()))
+          .append("\">")
+          .append(DateUtils.toFormattedDateString(coreData.decisionDate()))
+          .append("</akn:docDate></p>");
+    }
+
+    // Gericht
+    if (coreData.court() != null) {
+      builder
+          .append("<p>Gericht: <akn:courtType refersTo=\"#ag-aachen\">")
+          .append(coreData.court().label())
+          .append("</akn:courtType></p>");
+    }
+
+    // Dokumenttyp
+    if (decision.coreData().documentType().label() != null) {
+      builder
+          .append("<p>")
+          .append("Dokumenttyp: ")
+          .append("<akn:docType ris:domainTerm=\"Dokumenttyp\">")
+          .append(decision.coreData().documentType().label())
+          .append("</akn:docType>")
+          .append("</p>");
+    }
+
+    return builder.toString();
   }
 
   protected abstract Meta buildMeta(Decision decision) throws ValidationException;

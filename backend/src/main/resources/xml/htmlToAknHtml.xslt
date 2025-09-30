@@ -325,7 +325,8 @@
     </xsl:template>
 
     <!--Identity transformation for known cases-->
-    <xsl:template match="akn:akomaNtoso|akn:judgment|akn:judgmentBody|akn:meta|akn:header|akn:introduction
+    <xsl:template match="akn:akomaNtoso|akn:judgment|akn:judgmentBody|akn:meta|akn:header|akn:docNumber|akn:docDate
+    |akn:courtType|akn:docTitle|akn:shortTitle|akn:docType|akn:introduction
     |akn:identification|akn:classification|akn:proprietary|akn:block|akn:keyword|akn:background
     |akn:decision|akn:motivation|akn:opinion|akn:embeddedStructure|akn:subFlow
     |akn:FRBRWork|akn:FRBRExpression|akn:FRBRManifestation
@@ -337,8 +338,8 @@
     |ris:deviatingFileNumber|ris:deviatingDocumentNumbers|ris:deviatingDocumentNumber|ris:legalForces|ris:legalForce
     |ris:yearOfDispute|ris:deviatingCourts|ris:deviatingCourt|ris:deviatingDates|ris:deviatingDate
     |ris:deviatingEclis|ris:deviatingEcli|ris:inputTypes|ris:inputType|ris:foreignLanguageVersions|ris:foreignLanguageVersion|ris:evfs
-    |ris:definitions|ris:definition|@ris:definedTerm|@ris:definingBorderNumber
-    |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@value|@date|@href|@language|@class|@colspan|@rowspan
+    |ris:definitions|ris:definition|@ris:definedTerm|@ris:definingBorderNumber|@ris:domainTerm
+    |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
     |@style|@alt|@height|@width|@src|@title|@xml:space|@border">
 
         <xsl:copy>
@@ -350,6 +351,10 @@
         <xsl:copy>
             <xsl:apply-templates select="."/>
         </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="@ris:domainTerm">
+        <xsl:copy/>
     </xsl:template>
 
     <!--Fail fast strategy for unknown cases (add something that will fail xsd for sure)-->
