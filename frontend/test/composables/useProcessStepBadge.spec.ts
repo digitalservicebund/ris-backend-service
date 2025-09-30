@@ -27,7 +27,7 @@ describe("useProcessStepBadge", () => {
     { name: "Wiedervorlage", bg: "bg-yellow-200", border: "border-yellow-900" },
     { name: "Fertig", bg: "bg-green-300", border: "border-green-800" },
     { name: "Fundstelle", bg: "bg-blue-100", border: "border-blue-800" },
-    { name: "Unknown Step", bg: "bg-white", border: "border-gray-800" },
+    { name: "Unknown Step", bg: "white", border: "black" },
   ]
 
   it.each(testCases)(
