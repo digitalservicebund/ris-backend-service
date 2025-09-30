@@ -174,7 +174,7 @@
                     </akn:embeddedStructure>
                 </akn:block>
             </akn:introduction>
-            <akn:background>
+            <akn:background ris:domainTerm="Tatbestand">
                 <akn:p>caseFacts test</akn:p>
             </akn:background>
             <akn:decision>
