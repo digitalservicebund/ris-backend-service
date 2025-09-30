@@ -259,6 +259,11 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
           von: "BGH (BGH testUser)",
           was: "Schritt geändert: Ersterfassung → QS formal",
         },
+        { von: "BGH (BGH testUser)", was: "Person gesetzt: BGH testUser" },
+        {
+          von: "BGH (BGH testUser)",
+          was: "Schritt gesetzt: Ersterfassung",
+        },
         { von: "BGH (BGH testUser)", was: "Dokeinheit angelegt" },
       ]
 
@@ -321,6 +326,11 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
         {
           von: "BGH",
           was: "Schritt geändert: Ersterfassung → QS formal",
+        },
+        { von: "BGH", was: "Person geändert" },
+        {
+          von: "BGH",
+          was: "Schritt gesetzt: Ersterfassung",
         },
         { von: "BGH", was: "Dokeinheit angelegt" },
       ]
