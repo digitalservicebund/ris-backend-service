@@ -196,9 +196,9 @@ class NeurisTextCheckService implements TextCheckService {
   ): void => {
     const matches = this.store.matches.get(this.category)
 
-    matches?.forEach((match) => {
+    for (const match of matches ?? []) {
       this.updateIgnoredMark(match, state, dispatch)
-    })
+    }
   }
 
   /**
@@ -261,7 +261,7 @@ class NeurisTextCheckService implements TextCheckService {
 
   addIgnoredWordToMatches = (ignoredTextCheckWord: IgnoredTextCheckWord) => {
     for (const matchList of this.store.matches.values()) {
-      matchList.forEach((match) => {
+      for (const match of matchList) {
         if (match.word === ignoredTextCheckWord.word) {
           match.ignoredTextCheckWords ??= []
 
@@ -276,7 +276,7 @@ class NeurisTextCheckService implements TextCheckService {
             match.ignoredTextCheckWords.push(ignoredTextCheckWord)
           }
         }
-      })
+      }
     }
   }
 
@@ -285,7 +285,7 @@ class NeurisTextCheckService implements TextCheckService {
     ignoredType: DocumentationType,
   ) => {
     for (const matchList of this.store.matches.values()) {
-      matchList.forEach((match) => {
+      for (const match of matchList) {
         if (match.word === word) {
           if (match.ignoredTextCheckWords) {
             match.ignoredTextCheckWords = match.ignoredTextCheckWords.filter(
@@ -294,7 +294,7 @@ class NeurisTextCheckService implements TextCheckService {
             )
           }
         }
-      })
+      }
     }
   }
 
