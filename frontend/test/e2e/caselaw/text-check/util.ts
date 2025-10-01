@@ -30,5 +30,5 @@ export async function getMarkId(tag: Locator): Promise<string | null> {
 }
 
 // see text-check.scss for the expected values
-export const ignoredColorStyle = "2px solid rgb(38, 167, 242)"
-export const textMistakeColor = "2px solid rgb(232, 106, 105)"
+export const ignoredColorStyle = "2px solid rgb(102, 173, 211)"
+export const textMistakeColor = "rgb(205, 80, 56)"

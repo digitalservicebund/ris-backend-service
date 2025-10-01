@@ -101,7 +101,15 @@ test.describe(
           const count = await checks.count()
           for (let i = 0; i < count; i++) {
             await expect(checks.nth(i)).toHaveCSS(
-              "border-bottom",
+              "text-decoration-line",
+              "underline",
+            )
+            await expect(checks.nth(i)).toHaveCSS(
+              "text-decoration-style",
+              "wavy",
+            )
+            await expect(checks.nth(i)).toHaveCSS(
+              "text-decoration-color",
               textMistakeColor,
             )
           }
