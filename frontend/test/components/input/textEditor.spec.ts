@@ -117,14 +117,14 @@ describe("text editor", async () => {
    * The purpose of this test is to ensure that all expected buttons are
    * rendered. Having this test helps us to ensure that we do not accidentally
    * remove any of them.
-   * Unfortunately, the logic of the button bar is very complex and dependents on
+   * Unfortunately is the logic of the button bar very complex and dependents on
    * the current width of the editor element. Thereby it is very hard, or rather
    * impossible to test this end-to-end as it depends on the surrounding layout.
    * Thereby this is rather an integration test, as the button list is
    * a configuration of the component. The logic of the button bar and how it
    * collapses for certain widths, is a logic for itself that gets tested
-   * separately.
-   * The test should be continuously improved to verify that all buttons exist.
+   * separetly.
+   * The test should be continuosly improved to very that all buttons exist.
    */
   it("shows all necessary editor buttons", async () => {
     await renderComponent({

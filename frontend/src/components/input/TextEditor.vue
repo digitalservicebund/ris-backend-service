@@ -43,7 +43,6 @@ import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { Match } from "@/types/textCheck"
 
 interface Props {
@@ -70,8 +69,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   updateValue: [newValue: string]
 }>()
-
-const store = useDocumentUnitStore()
 
 const textCheckService = new NeurisTextCheckService(props.category)
 
@@ -202,7 +199,11 @@ const shouldShowBubbleMenu = (): boolean => {
  * Adds word to doc level ignore and closes the modal
  */
 async function addIgnoredWord(word: string) {
-  await textCheckService.ignoreWord(word)
+  const success = await textCheckService.ignoreWord(word)
+  if (success) {
+    editor.commands.toggleMatchIgnoredStatus(selectedMatch.value.id, true)
+  }
+
   editor.commands.setSelectedMatch()
 }
 
@@ -221,7 +222,10 @@ const acceptSuggestion = (suggestion: string) => {
  * @param word
  */
 const removeIgnoredWord = async (word: string) => {
-  await textCheckService.removeIgnoredWord(word)
+  const success = await textCheckService.removeIgnoredWord(word)
+  if (success) {
+    editor.commands.toggleMatchIgnoredStatus(selectedMatch.value.id, false)
+  }
   editor.commands.setSelectedMatch()
 }
 
@@ -229,7 +233,10 @@ const removeIgnoredWord = async (word: string) => {
  * Adds word to globally ignore and closes the modal
  */
 async function addGloballyIgnoredWord(word: string) {
-  await textCheckService.ignoreWordGlobally(word)
+  const success = await textCheckService.ignoreWordGlobally(word)
+  if (success) {
+    editor.commands.toggleMatchIgnoredStatus(selectedMatch.value.id, true)
+  }
   editor.commands.setSelectedMatch()
 }
 
@@ -238,14 +245,12 @@ async function addGloballyIgnoredWord(word: string) {
  * @param word
  */
 const removeGloballyIgnoredWord = async (word: string) => {
-  await textCheckService.removeGloballyIgnoredWord(word)
+  const success = await textCheckService.removeGloballyIgnoredWord(word)
+  if (success) {
+    editor.commands.toggleMatchIgnoredStatus(selectedMatch.value.id, false)
+  }
   editor.commands.setSelectedMatch()
 }
-
-/**
- * Currently selected match to show in modal
- */
-const selectedMatch = computed(() => textCheckService.selectedMatch.value)
 
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 
@@ -295,16 +300,7 @@ watch(
   },
 )
 
-/*
-To detected changes in the matche ignores
- */
-watch(
-  () => store.matches.get(props.category),
-  () => {
-    editor.commands.updatedMatchesInText()
-  },
-  { deep: true },
-)
+const selectedMatch = computed(() => textCheckService.selectedMatch.value)
 
 onMounted(async () => {
   const editorContainer = document.querySelector(".editor")
