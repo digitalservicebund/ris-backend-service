@@ -17,7 +17,6 @@ import { DuplicateRelationStatus } from "@/domain/managementData"
 import publishDocumentationUnitService from "@/services/publishDocumentationUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-const isPortalPublicationEnabled = useFeatureToggle("neuris.portal-publication")
 const hasPlausibilityCheckPassed = ref(false)
 const textCheckAllToggle = useFeatureToggle("neuris.text-check-publication")
 
@@ -43,10 +42,7 @@ const publicationWarnings = computed(() => {
 })
 
 const isPublishable = computed(
-  () =>
-    hasPlausibilityCheckPassed.value &&
-    !!preview.value?.success &&
-    isPortalPublicationEnabled.value,
+  () => hasPlausibilityCheckPassed.value && !!preview.value?.success,
 )
 const preview = ref<LdmlPreview>()
 const previewError = ref()

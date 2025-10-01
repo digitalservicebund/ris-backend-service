@@ -1,6 +1,5 @@
 import { computed, Ref } from "vue"
 import { LocationQuery } from "vue-router"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useInternalUser } from "@/composables/useInternalUser"
 import MenuItem from "@/domain/menuItem"
 
@@ -14,9 +13,6 @@ export function useCaseLawMenuItems(
   }
 
   const isInternalUser = useInternalUser()
-  const isPortalPublicationEnabled = useFeatureToggle(
-    "neuris.portal-publication",
-  )
 
   return computed(() => [
     {
@@ -104,16 +100,12 @@ export function useCaseLawMenuItems(
         name: "caselaw-documentUnit-documentNumber-handover",
       },
     },
-    ...(isPortalPublicationEnabled.value
-      ? [
-          {
-            label: "Veröffentlichen",
-            route: {
-              ...baseRoute,
-              name: "caselaw-documentUnit-documentNumber-publication",
-            },
-          },
-        ]
-      : []),
+    {
+      label: "Veröffentlichen",
+      route: {
+        ...baseRoute,
+        name: "caselaw-documentUnit-documentNumber-publication",
+      },
+    },
   ])
 }
