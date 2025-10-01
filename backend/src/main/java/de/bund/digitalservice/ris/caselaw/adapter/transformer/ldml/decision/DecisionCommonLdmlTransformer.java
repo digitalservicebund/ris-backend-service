@@ -105,18 +105,18 @@ public abstract class DecisionCommonLdmlTransformer
     // Gericht
     if (coreData.court() != null) {
       builder
-          .append("<p>Gericht: <akn:courtType refersTo=\"#ag-aachen\">")
+          .append("<p>Gericht: <akn:courtType refersTo=\"#gericht\">")
           .append(coreData.court().label())
           .append("</akn:courtType></p>");
     }
 
     // Dokumenttyp
-    if (decision.coreData().documentType().label() != null) {
+    if (coreData.documentType().label() != null) {
       builder
           .append("<p>")
           .append("Dokumenttyp: ")
-          .append("<akn:docType ris:domainTerm=\"Dokumenttyp\">")
-          .append(decision.coreData().documentType().label())
+          .append("<akn:docType refersTo=\"#dokumenttyp\">")
+          .append(coreData.documentType().label())
           .append("</akn:docType>")
           .append("</p>");
     }

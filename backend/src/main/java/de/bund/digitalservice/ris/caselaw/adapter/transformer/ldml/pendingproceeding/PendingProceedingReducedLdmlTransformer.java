@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproceeding;
 
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
@@ -31,5 +32,11 @@ public class PendingProceedingReducedLdmlTransformer
 
   private RisMeta buildRisMeta(PendingProceeding pendingProceeding) {
     return buildCommonRisMeta(pendingProceeding).build();
+  }
+
+  @Override
+  protected JaxbHtml buildHeader(PendingProceeding pendingProceeding) throws ValidationException {
+    return JaxbHtml.build(
+        htmlTransformer.htmlStringToObjectList(buildCommonHeader(pendingProceeding)));
   }
 }

@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknKeyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Classification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Definition;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.DocumentType;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
@@ -122,7 +123,11 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       }
 
       builder
-          .documentType(coreData.documentType().label())
+          .documentType(
+              DocumentType.builder()
+                  .eId("dokumenttyp")
+                  .value(coreData.documentType().label())
+                  .build())
           .courtLocation(nullSafeGet(coreData.court(), Court::location))
           .courtType(nullSafeGet(coreData.court(), Court::type))
           .judicialBody(nullIfEmpty(coreData.appraisalBody()))
@@ -181,8 +186,6 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
   @Override
   protected JaxbHtml buildHeader(Decision decision) throws ValidationException {
-    validateCoreData(decision);
-
     StringBuilder builder = new StringBuilder();
 
     builder.append(buildCommonHeader(decision));

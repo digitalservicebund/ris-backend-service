@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0" xmlns:ris="http://example.com/0.1/"
+<?xml version="1.0" encoding="utf-8"?>
+<akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0"
+                xmlns:ris="http://example.com/0.1/"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/os/part2-specs/schemas/akomantoso30.xsd">
     <akn:judgment name="attributsemantik-noch-undefiniert">
@@ -29,15 +30,8 @@
                     <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
                 </akn:FRBRManifestation>
             </akn:identification>
-            <akn:classification source="attributsemantik-noch-undefiniert">
-                <akn:keyword dictionary="attributsemantik-noch-undefiniert" showAs="attributsemantik-noch-undefiniert"
-                             value="keyword test"/>
-            </akn:classification>
             <akn:proprietary source="attributsemantik-noch-undefiniert">
                 <ris:meta>
-                    <ris:decisionNames>
-                        <ris:decisionName>decisionName test</ris:decisionName>
-                    </ris:decisionNames>
                     <ris:previousDecisions>
                         <ris:previousDecision date="2020-01-01">
                             <ris:documentNumber>previous decision document number 1</ris:documentNumber>
@@ -65,42 +59,13 @@
                     <ris:fileNumbers>
                         <ris:fileNumber>fileNumber test</ris:fileNumber>
                     </ris:fileNumbers>
-                    <ris:documentType>documentType test</ris:documentType>
+                    <ris:documentType akn:eId="dokumenttyp">documentType test</ris:documentType>
                     <ris:courtLocation>courtLocation test</ris:courtLocation>
                     <ris:courtType>courtType test</ris:courtType>
                     <ris:legalForces>
                         <ris:legalForce>legalForce test</ris:legalForce>
                     </ris:legalForces>
-                    <ris:legalEffect>ja</ris:legalEffect>
-                    <ris:fieldOfLaws>
-                        <ris:fieldOfLaw>fieldOfLaw test</ris:fieldOfLaw>
-                    </ris:fieldOfLaws>
                     <ris:judicialBody>appraisalBody test</ris:judicialBody>
-                    <ris:deviatingCourts>
-                        <ris:deviatingCourt>deviating court</ris:deviatingCourt>
-                    </ris:deviatingCourts>
-                    <ris:deviatingDates>
-                        <ris:deviatingDate>2010-05-12</ris:deviatingDate>
-                    </ris:deviatingDates>
-                    <ris:deviatingDocumentNumbers>
-                        <ris:deviatingDocumentNumber>deviating documentNumber</ris:deviatingDocumentNumber>
-                    </ris:deviatingDocumentNumbers>
-                    <ris:deviatingEclis>
-                        <ris:deviatingEcli>deviating ecli test</ris:deviatingEcli>
-                    </ris:deviatingEclis>
-                    <ris:deviatingFileNumbers>
-                        <ris:deviatingFileNumber>deviating fileNumber</ris:deviatingFileNumber>
-                    </ris:deviatingFileNumbers>
-                    <ris:publicationStatus>PUBLISHED</ris:publicationStatus>
-                    <ris:error>false</ris:error>
-                    <ris:documentationOffice>documentationOffice test</ris:documentationOffice>
-                    <ris:procedures>
-                        <ris:procedure>previous procedure test</ris:procedure>
-                    </ris:procedures>
-                    <ris:inputTypes>
-                        <ris:inputType>E-Mail</ris:inputType>
-                        <ris:inputType>Papier</ris:inputType>
-                    </ris:inputTypes>
                     <ris:foreignLanguageVersions>
                         <ris:foreignLanguageVersion>
                             <akn:FRBRlanguage language="eng"/>
@@ -112,40 +77,17 @@
                                              showAs="Französisch"/>
                         </ris:foreignLanguageVersion>
                     </ris:foreignLanguageVersions>
-                    <ris:definitions>
-                        <ris:definition ris:definedTerm="indirekte Steuern" ris:definingBorderNumber="2"/>
-                        <ris:definition ris:definedTerm="Sachgesamtheit"/>
-                    </ris:definitions>
-                    <ris:evfs>evsf test</ris:evfs>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>
         <akn:header>
-            <akn:p>
-                Aktenzeichen:
-                <akn:docNumber refersTo="#aktenzeichen">fileNumber test</akn:docNumber>
+            <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">fileNumber test</akn:docNumber>
             </akn:p>
-            <akn:p>
-                Entscheidungsdatum:
-                <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
+            <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
             </akn:p>
-            <akn:p>
-                Gericht:
-                <akn:courtType refersTo="#ag-aachen">courtLabel test</akn:courtType>
+            <akn:p>Gericht: <akn:courtType refersTo="#gericht">courtLabel test</akn:courtType>
             </akn:p>
-            <akn:p>
-                Dokumenttyp:
-                <akn:docType ris:domainTerm="Dokumenttyp">documentType test</akn:docType>
-            </akn:p>
-            <akn:p>Entscheidungsname:
-                <akn:docTitle refersTo="#entscheidungsname">decisionName test</akn:docTitle>
-            </akn:p>
-            <akn:p>Titelzeile:
-                <akn:shortTitle refersTo="#titelzeile">
-                    <akn:embeddedStructure>
-                        <akn:p>headline test</akn:p>
-                    </akn:embeddedStructure>
-                </akn:shortTitle>
+            <akn:p>Dokumenttyp: <akn:docType refersTo="#dokumenttyp">documentType test</akn:docType>
             </akn:p>
         </akn:header>
         <akn:judgmentBody>
@@ -153,16 +95,6 @@
                 <akn:p>guidingPrinciple test</akn:p>
             </akn:motivation>
             <akn:introduction>
-                <akn:block name="Orientierungssatz">
-                    <akn:embeddedStructure>
-                        <akn:p>headNote test</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
-                <akn:block name="Sonstiger Orientierungssatz">
-                    <akn:embeddedStructure>
-                        <akn:p>otherHeadNote test</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
                 <akn:block name="Gliederung">
                     <akn:embeddedStructure>
                         <akn:p>outline test</akn:p>

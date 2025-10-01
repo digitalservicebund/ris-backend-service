@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -54,10 +55,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.xmlunit.builder.DiffBuilder;
-import org.xmlunit.diff.ComparisonResult;
-import org.xmlunit.diff.ComparisonType;
 import org.xmlunit.diff.Diff;
-import org.xmlunit.diff.DifferenceEvaluator;
 
 @ExtendWith(MockitoExtension.class)
 class DecisionReducedLdmlTransformerTest {
@@ -110,7 +108,7 @@ class DecisionReducedLdmlTransformerTest {
   @Test
   void testEntireLdml() throws Exception {
     // Arrange
-    Path expectedFilePath = Paths.get("src/test/resources/testdata/reduced_ldml.xml");
+    Path expectedFilePath = Paths.get("src/test/resources/testdata/decision_reduced_ldml.xml");
     String expected = Files.readString(expectedFilePath, StandardCharsets.UTF_8);
 
     // Act
@@ -124,12 +122,16 @@ class DecisionReducedLdmlTransformerTest {
     Diff diff =
         DiffBuilder.compare(expected)
             .withTest(fileContent.get())
-            .withDifferenceEvaluator(ignoreIdAttributeEvaluator)
+            .withDifferenceEvaluator(TestUtils.ignoreIdAttributeEvaluator)
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
 
-    Assertions.assertFalse(diff.hasDifferences(), diff::toString);
+    if (diff.hasDifferences()) {
+      StringBuilder differences = new StringBuilder();
+      diff.getDifferences().forEach(d -> differences.append(d.toString()).append("\n"));
+      Assertions.fail("XMLs differ:\n" + differences.toString());
+    }
   }
 
   private static void createTestDocumentationUnit() {
@@ -350,7 +352,7 @@ class DecisionReducedLdmlTransformerTest {
         Arguments.of(
             "'documentType' (Dokumenttyp)",
             """
-                <ris:documentType>documentType test</ris:documentType>
+                <ris:documentType akn:eId="dokumenttyp">documentType test</ris:documentType>
                """),
         Arguments.of(
             "'ecli'",
@@ -510,9 +512,9 @@ class DecisionReducedLdmlTransformerTest {
                    </akn:p>
                    <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
                    </akn:p>
-                   <akn:p>Gericht: <akn:courtType refersTo="#ag-aachen">courtLabel test</akn:courtType>
+                   <akn:p>Gericht: <akn:courtType refersTo="#gericht">courtLabel test</akn:courtType>
                    </akn:p>
-                   <akn:p>Dokumenttyp: <akn:docType ris:domainTerm="Dokumenttyp">documentType test</akn:docType>
+                   <akn:p>Dokumenttyp: <akn:docType refersTo="#dokumenttyp">documentType test</akn:docType>
                    </akn:p>
                 </akn:header>
                """));
@@ -637,18 +639,4 @@ class DecisionReducedLdmlTransformerTest {
                </ris:deviatingDocumentNumbers>
             """));
   }
-
-  DifferenceEvaluator ignoreIdAttributeEvaluator =
-      (comparison, outcome) -> {
-        if (outcome == ComparisonResult.DIFFERENT
-            && comparison.getType() == ComparisonType.ATTR_VALUE
-            && ("/akomaNtoso[1]/judgment[1]/meta[1]/identification[1]/FRBRWork[1]/FRBRalias[1]/@value"
-                    .equals(comparison.getControlDetails().getXPath())
-                || "/akomaNtoso[1]/judgment[1]/meta[1]/identification[1]/FRBRWork[1]/FRBRalias[1]/@value"
-                    .equals(comparison.getTestDetails().getXPath()))) {
-          return ComparisonResult.EQUAL;
-        }
-
-        return outcome;
-      };
 }

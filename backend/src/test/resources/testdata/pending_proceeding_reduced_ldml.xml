@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0"
+                xmlns:ris="http://example.com/0.1/"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/os/part2-specs/schemas/akomantoso30.xsd">
+    <akn:judgment name="attributsemantik-noch-undefiniert">
+        <akn:meta>
+            <akn:identification source="attributsemantik-noch-undefiniert">
+                <akn:FRBRWork>
+                    <akn:FRBRthis value="YYTestDoc0013"/>
+                    <akn:FRBRuri value="YYTestDoc0013"/>
+                    <akn:FRBRalias name="uebergreifende-id" value="%s"/>
+                    <akn:FRBRdate date="2020-01-01" name="Mitteilungsdatum"/>
+                    <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
+                    <akn:FRBRcountry value="de"/>
+                </akn:FRBRWork>
+                <akn:FRBRExpression>
+                    <akn:FRBRthis value="YYTestDoc0013/dokument"/>
+                    <akn:FRBRuri value="YYTestDoc0013/dokument"/>
+                    <akn:FRBRdate date="2020-01-01" name="Mitteilungsdatum"/>
+                    <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
+                    <akn:FRBRlanguage language="deu"/>
+                </akn:FRBRExpression>
+                <akn:FRBRManifestation>
+                    <akn:FRBRthis value="YYTestDoc0013/dokument.xml"/>
+                    <akn:FRBRuri value="YYTestDoc0013/dokument.xml"/>
+                    <akn:FRBRdate date="2020-01-01" name="Mitteilungsdatum"/>
+                    <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
+                </akn:FRBRManifestation>
+            </akn:identification>
+            <akn:proprietary source="attributsemantik-noch-undefiniert">
+                <ris:meta>
+                    <ris:previousDecisions>
+                        <ris:previousDecision date="2020-01-01">
+                            <ris:documentNumber>previous decision document number 1</ris:documentNumber>
+                            <ris:fileNumber>previous decision file number</ris:fileNumber>
+                            <ris:courtType>previous decision court type</ris:courtType>
+                        </ris:previousDecision>
+                        <ris:previousDecision date="2020-01-01">
+                            <ris:documentNumber>previous decision document number 2</ris:documentNumber>
+                            <ris:fileNumber>previous decision file number</ris:fileNumber>
+                            <ris:courtType>previous decision court type</ris:courtType>
+                        </ris:previousDecision>
+                    </ris:previousDecisions>
+                    <ris:fileNumbers>
+                        <ris:fileNumber>Aktenzeichen</ris:fileNumber>
+                    </ris:fileNumbers>
+                    <ris:documentType akn:eId="dokumenttyp">Anhängiges Verfahren</ris:documentType>
+                    <ris:courtLocation>Gerichtsort</ris:courtLocation>
+                    <ris:courtType>Gerichtstyp</ris:courtType>
+                    <ris:legalForces>
+                        <ris:legalForce>legalForce test</ris:legalForce>
+                    </ris:legalForces>
+                </ris:meta>
+            </akn:proprietary>
+        </akn:meta>
+        <akn:header>
+            <akn:p>Aktenzeichen:
+                <akn:docNumber refersTo="#aktenzeichen">Aktenzeichen</akn:docNumber>
+            </akn:p>
+            <akn:p>Entscheidungsdatum:
+                <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
+            </akn:p>
+            <akn:p>Gericht:
+                <akn:courtType refersTo="#gericht">Gerichtstyp Gerichtsort</akn:courtType>
+            </akn:p>
+            <akn:p>Dokumenttyp:
+                <akn:docType refersTo="#dokumenttyp">Anhängiges Verfahren</akn:docType>
+            </akn:p>
+        </akn:header>
+        <akn:judgmentBody>
+            <akn:motivation>
+                <akn:p alternativeTo="textWrapper">Rechtsfrage</akn:p>
+            </akn:motivation>
+            <akn:introduction>
+                <akn:block name="Rechtsmittelführer">
+                    <akn:embeddedStructure>
+                        <akn:p alternativeTo="textWrapper">Rechtsmittelführer</akn:p>
+                    </akn:embeddedStructure>
+                </akn:block>
+                <akn:block name="Rechtsmittelzulassung">
+                    <akn:embeddedStructure>
+                        <akn:p alternativeTo="textWrapper">Rechtsmittelzulassung</akn:p>
+                    </akn:embeddedStructure>
+                </akn:block>
+            </akn:introduction>
+        </akn:judgmentBody>
+    </akn:judgment>
+</akn:akomaNtoso>

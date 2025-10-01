@@ -340,7 +340,7 @@
     |ris:deviatingEclis|ris:deviatingEcli|ris:inputTypes|ris:inputType|ris:foreignLanguageVersions|ris:foreignLanguageVersion|ris:evfs
     |ris:definitions|ris:definition|@ris:definedTerm|@ris:definingBorderNumber|@ris:domainTerm
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
-    |@style|@alt|@height|@width|@src|@title|@xml:space|@border">
+    |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId">
 
         <xsl:copy>
             <xsl:apply-templates select="@* | node()"/>
@@ -353,7 +353,7 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="@ris:domainTerm">
+    <xsl:template match="@akn:eId">
         <xsl:copy/>
     </xsl:template>
 

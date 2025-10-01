@@ -6,6 +6,7 @@ import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGe
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknKeyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Classification;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
@@ -85,5 +86,25 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
                 nullSafeGet(lastStatus, Status::publicationStatus), PublicationStatus::toString))
         .error(lastStatus != null && lastStatus.withError())
         .build();
+  }
+
+  @Override
+  protected JaxbHtml buildHeader(PendingProceeding pendingProceeding) throws ValidationException {
+    StringBuilder builder = new StringBuilder();
+
+    builder.append(buildCommonHeader(pendingProceeding));
+
+    // Titelzeile
+    if (pendingProceeding.shortTexts().headline() != null) {
+      builder.append("<p>Titelzeile: ");
+      builder
+          .append("<akn:shortTitle refersTo=\"#titelzeile\">")
+          .append("<akn:embeddedStructure>")
+          .append(pendingProceeding.shortTexts().headline())
+          .append("</akn:embeddedStructure>")
+          .append("</akn:shortTitle></p>");
+    }
+
+    return JaxbHtml.build(htmlTransformer.htmlStringToObjectList(builder.toString()));
   }
 }
