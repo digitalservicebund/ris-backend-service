@@ -18,7 +18,7 @@ const props = defineProps<{
 
 const responseError = ref<ResponseError | undefined>()
 
-const loading = ref()
+const loading = ref(true)
 const totalTextCheckErrors = ref(0)
 const store = useDocumentUnitStore()
 
