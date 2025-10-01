@@ -16,9 +16,4 @@ public class DocumentType {
 
   @XmlAttribute(namespace = CaseLawLdml.AKN_NS, name = "eId")
   private String eId;
-
-  public void DocumentType(String value, String eId) {
-    this.value = value;
-    this.eId = eId;
-  }
 }

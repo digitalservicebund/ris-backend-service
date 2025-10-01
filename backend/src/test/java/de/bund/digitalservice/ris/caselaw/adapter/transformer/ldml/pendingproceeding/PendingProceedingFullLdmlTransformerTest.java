@@ -134,8 +134,8 @@ class PendingProceedingFullLdmlTransformerTest {
           <akn:header>
             <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">Aktenzeichen</akn:docNumber></akn:p>
             <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01"refersTo="#entscheidungsdatum">01.01.2020</akn:docDate></akn:p>
-            <akn:p>Gericht:<akn:courtType refersTo="#gericht">GerichtstypGerichtsort</akn:courtType></akn:p>
-            <akn:p>Dokumenttyp:<akn:doc Type refersTo="#dokumenttyp">AnhängigesVerfahren</akn:docType></akn:p>
+            <akn:p>Gericht:<akn:courtType refersTo="#gericht">Gerichtstyp Gerichtsort</akn:courtType></akn:p>
+            <akn:p>Dokumenttyp:<akn:doc Type refersTo="#dokumenttyp">Anhängiges Verfahren</akn:docType></akn:p>
             <akn:p>Titelzeile:<akn:shortTitle refersTo="#titelzeile">
               <akn:embeddedStructure>
                 <akn:p alternativeTo="textWrapper">Hello</akn:p><akn:p>paragraph</akn:p><akn:p alternativeTo="textWrapper">world!</akn:p>

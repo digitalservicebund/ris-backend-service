@@ -182,7 +182,6 @@ public abstract class DecisionCommonLdmlTransformer
     JudgmentBody.JudgmentBodyBuilder builder = JudgmentBody.builder();
 
     var shortTexts = decision.shortTexts();
-    var longTexts = decision.longTexts();
 
     builder
         // set guidingPrinciple/Leitsatz
