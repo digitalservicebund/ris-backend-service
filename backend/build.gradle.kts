@@ -12,7 +12,7 @@ plugins {
     jacoco
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.diffplug.spotless") version "7.2.1"
+    id("com.diffplug.spotless") version "8.0.0"
     id("org.sonarqube") version "6.3.1.5724"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.adarshr.test-logger") version "4.0.0"
@@ -142,7 +142,7 @@ sonar {
         property("sonar.host.url", "https://sonarcloud.io")
         property(
             "sonar.coverage.exclusions",
-            "**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/PostgresDocumentationUnitSearchRepositoryImpl.java,**/*Exception.java"
+            "**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/*Exception.java"
         )
         property("sonar.sources", "src/main/java")
     }
@@ -179,7 +179,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.34.5"))
+    implementation(platform("software.amazon.awssdk:bom:2.34.7"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -203,9 +203,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.98")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.99")
     // for local development:
-    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.98.jar"))
+    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.99.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.20.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
@@ -249,7 +249,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.29.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.30.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

@@ -234,16 +234,26 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
     var user = User.builder().documentationOffice(buildDSDocOffice()).build();
     var logs = documentationUnitHistoryLogService.getHistoryLogs(decision.uuid(), user);
-    assertThat(logs).hasSize(3);
+    assertThat(logs).hasSize(5);
     assertThat(logs)
         .map(HistoryLog::eventType)
         .containsExactly(
-            HistoryLogEventType.UPDATE, HistoryLogEventType.PROCEDURE, HistoryLogEventType.CREATE);
-    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser", "testUser");
-    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+            HistoryLogEventType.UPDATE,
+            HistoryLogEventType.PROCEDURE,
+            HistoryLogEventType.PROCESS_STEP_USER,
+            HistoryLogEventType.PROCESS_STEP,
+            HistoryLogEventType.CREATE);
+    assertThat(logs)
+        .map(HistoryLog::createdBy)
+        .containsExactly("testUser", "testUser", "testUser", "testUser", "testUser");
+    assertThat(logs)
+        .map(HistoryLog::documentationOffice)
+        .containsExactly("DS", "DS", "DS", "DS", "DS");
     assertThat(logs.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
     assertThat(logs.get(1).description()).isEqualTo("Vorgang gesetzt: Vorgang1");
-    assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
+    assertThat(logs.get(2).description()).isEqualTo("Person gesetzt: testUser");
+    assertThat(logs.get(3).description()).isEqualTo("Schritt gesetzt: Ersterfassung");
+    assertThat(logs.get(4).description()).isEqualTo("Dokeinheit angelegt");
 
     var procedure2AsNode =
         objectMapper.convertValue(Procedure.builder().label("Vorgang2").build(), JsonNode.class);
@@ -262,22 +272,28 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
     // Existing update event will be updated
     var logs2 = documentationUnitHistoryLogService.getHistoryLogs(decision.uuid(), user);
-    assertThat(logs2).hasSize(4);
+    assertThat(logs2).hasSize(6);
     assertThat(logs2)
         .map(HistoryLog::eventType)
         .containsExactly(
             HistoryLogEventType.UPDATE,
             HistoryLogEventType.PROCEDURE,
             HistoryLogEventType.PROCEDURE,
+            HistoryLogEventType.PROCESS_STEP_USER,
+            HistoryLogEventType.PROCESS_STEP,
             HistoryLogEventType.CREATE);
     assertThat(logs2)
         .map(HistoryLog::createdBy)
-        .containsExactly("testUser", "testUser", "testUser", "testUser");
-    assertThat(logs2).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS", "DS");
+        .containsExactly("testUser", "testUser", "testUser", "testUser", "testUser", "testUser");
+    assertThat(logs2)
+        .map(HistoryLog::documentationOffice)
+        .containsExactly("DS", "DS", "DS", "DS", "DS", "DS");
     assertThat(logs2.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
     assertThat(logs2.get(1).description()).isEqualTo("Vorgang geändert: Vorgang1 → Vorgang2");
     assertThat(logs2.get(2).description()).isEqualTo("Vorgang gesetzt: Vorgang1");
-    assertThat(logs2.get(3).description()).isEqualTo("Dokeinheit angelegt");
+    assertThat(logs2.get(3).description()).isEqualTo("Person gesetzt: testUser");
+    assertThat(logs2.get(4).description()).isEqualTo("Schritt gesetzt: Ersterfassung");
+    assertThat(logs2.get(5).description()).isEqualTo("Dokeinheit angelegt");
   }
 
   @Test
@@ -304,18 +320,26 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
     var user = User.builder().documentationOffice(buildDSDocOffice()).build();
     var logs = documentationUnitHistoryLogService.getHistoryLogs(pendingProceeding.uuid(), user);
-    assertThat(logs).hasSize(3);
+    assertThat(logs).hasSize(5);
     assertThat(logs)
         .map(HistoryLog::eventType)
         .containsExactly(
             HistoryLogEventType.RESOLVE_PENDING_PROCEEDING,
             HistoryLogEventType.UPDATE,
+            HistoryLogEventType.PROCESS_STEP_USER,
+            HistoryLogEventType.PROCESS_STEP,
             HistoryLogEventType.CREATE);
-    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser", "testUser");
-    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+    assertThat(logs)
+        .map(HistoryLog::createdBy)
+        .containsExactly("testUser", "testUser", "testUser", "testUser", "testUser");
+    assertThat(logs)
+        .map(HistoryLog::documentationOffice)
+        .containsExactly("DS", "DS", "DS", "DS", "DS");
     assertThat(logs.get(0).description()).isEqualTo("Verfahren als \"Erledigt\" markiert");
     assertThat(logs.get(1).description()).isEqualTo("Dokeinheit bearbeitet");
-    assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
+    assertThat(logs.get(2).description()).isEqualTo("Person gesetzt: testUser");
+    assertThat(logs.get(3).description()).isEqualTo("Schritt gesetzt: Ersterfassung");
+    assertThat(logs.get(4).description()).isEqualTo("Dokeinheit angelegt");
   }
 
   @Test
@@ -344,19 +368,27 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
     var user = User.builder().documentationOffice(buildDSDocOffice()).build();
     var logs = documentationUnitHistoryLogService.getHistoryLogs(decision.uuid(), user);
-    assertThat(logs).hasSize(3);
+    assertThat(logs).hasSize(5);
     assertThat(logs)
         .map(HistoryLog::eventType)
         .containsExactly(
             HistoryLogEventType.UPDATE,
             HistoryLogEventType.SCHEDULED_PUBLICATION,
+            HistoryLogEventType.PROCESS_STEP_USER,
+            HistoryLogEventType.PROCESS_STEP,
             HistoryLogEventType.CREATE);
-    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser", "testUser");
-    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+    assertThat(logs)
+        .map(HistoryLog::createdBy)
+        .containsExactly("testUser", "testUser", "testUser", "testUser", "testUser");
+    assertThat(logs)
+        .map(HistoryLog::documentationOffice)
+        .containsExactly("DS", "DS", "DS", "DS", "DS");
     assertThat(logs.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
     assertThat(logs.get(1).description())
         .isEqualTo("Abgabe terminiert für den 01.01.2011 um 12:11 Uhr");
-    assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
+    assertThat(logs.get(2).description()).isEqualTo("Person gesetzt: testUser");
+    assertThat(logs.get(3).description()).isEqualTo("Schritt gesetzt: Ersterfassung");
+    assertThat(logs.get(4).description()).isEqualTo("Dokeinheit angelegt");
   }
 
   @Test
@@ -389,18 +421,26 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
     var user = User.builder().documentationOffice(buildDSDocOffice()).build();
     var logs = documentationUnitHistoryLogService.getHistoryLogs(decision.uuid(), user);
-    assertThat(logs).hasSize(3);
+    assertThat(logs).hasSize(5);
     assertThat(logs)
         .map(HistoryLog::eventType)
         .containsExactly(
             HistoryLogEventType.UPDATE,
             HistoryLogEventType.SCHEDULED_PUBLICATION,
+            HistoryLogEventType.PROCESS_STEP_USER,
+            HistoryLogEventType.PROCESS_STEP,
             HistoryLogEventType.CREATE);
-    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser", "testUser");
-    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+    assertThat(logs)
+        .map(HistoryLog::createdBy)
+        .containsExactly("testUser", "testUser", "testUser", "testUser", "testUser");
+    assertThat(logs)
+        .map(HistoryLog::documentationOffice)
+        .containsExactly("DS", "DS", "DS", "DS", "DS");
     assertThat(logs.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
     assertThat(logs.get(1).description()).isEqualTo("Terminierte Abgabe gelöscht");
-    assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
+    assertThat(logs.get(2).description()).isEqualTo("Person gesetzt: testUser");
+    assertThat(logs.get(3).description()).isEqualTo("Schritt gesetzt: Ersterfassung");
+    assertThat(logs.get(4).description()).isEqualTo("Dokeinheit angelegt");
   }
 
   @Nested
@@ -4613,22 +4653,28 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
       var user = User.builder().documentationOffice(buildDSDocOffice()).build();
       var logs = documentationUnitHistoryLogService.getHistoryLogs(decision.uuid(), user);
-      assertThat(logs).hasSize(3);
+      assertThat(logs).hasSize(5);
       assertThat(logs)
           .map(HistoryLog::eventType)
           .containsExactly(
               HistoryLogEventType.PROCESS_STEP_USER,
               HistoryLogEventType.PROCESS_STEP,
+              HistoryLogEventType.PROCESS_STEP_USER,
+              HistoryLogEventType.PROCESS_STEP,
               HistoryLogEventType.CREATE);
       assertThat(logs)
           .map(HistoryLog::createdBy)
-          .containsExactly("testUser", "testUser", "testUser");
-      assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+          .containsExactly("testUser", "testUser", "testUser", "testUser", "testUser");
+      assertThat(logs)
+          .map(HistoryLog::documentationOffice)
+          .containsExactly("DS", "DS", "DS", "DS", "DS");
       // because no user was set in the patch, the initial user is removed
       assertThat(logs.get(0).description()).isEqualTo("Person entfernt: testUser");
       assertThat(logs.get(1).description())
           .isEqualTo("Schritt geändert: Ersterfassung → Fachdokumentation");
-      assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
+      assertThat(logs.get(2).description()).isEqualTo("Person gesetzt: testUser");
+      assertThat(logs.get(3).description()).isEqualTo("Schritt gesetzt: Ersterfassung");
+      assertThat(logs.get(4).description()).isEqualTo("Dokeinheit angelegt");
     }
 
     @Test
@@ -4710,21 +4756,27 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
       var user = User.builder().documentationOffice(buildDSDocOffice()).build();
       var logs = documentationUnitHistoryLogService.getHistoryLogs(decision.uuid(), user);
-      assertThat(logs).hasSize(3);
+      assertThat(logs).hasSize(5);
       assertThat(logs)
           .map(HistoryLog::eventType)
           .containsExactly(
               HistoryLogEventType.PROCESS_STEP_USER,
               HistoryLogEventType.PROCESS_STEP,
+              HistoryLogEventType.PROCESS_STEP_USER,
+              HistoryLogEventType.PROCESS_STEP,
               HistoryLogEventType.CREATE);
       assertThat(logs)
           .map(HistoryLog::createdBy)
-          .containsExactly("testUser", "testUser", "testUser");
-      assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+          .containsExactly("testUser", "testUser", "testUser", "testUser", "testUser");
+      assertThat(logs)
+          .map(HistoryLog::documentationOffice)
+          .containsExactly("DS", "DS", "DS", "DS", "DS");
       assertThat(logs.get(0).description()).isEqualTo("Person geändert: testUser → Test User 2");
       assertThat(logs.get(1).description())
           .isEqualTo("Schritt geändert: Ersterfassung → Fachdokumentation");
-      assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
+      assertThat(logs.get(2).description()).isEqualTo("Person gesetzt: testUser");
+      assertThat(logs.get(3).description()).isEqualTo("Schritt gesetzt: Ersterfassung");
+      assertThat(logs.get(4).description()).isEqualTo("Dokeinheit angelegt");
     }
 
     @Test
@@ -4802,21 +4854,27 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
       var user = User.builder().documentationOffice(buildDSDocOffice()).build();
       var logs = documentationUnitHistoryLogService.getHistoryLogs(decision.uuid(), user);
-      assertThat(logs).hasSize(3);
+      assertThat(logs).hasSize(5);
       assertThat(logs)
           .map(HistoryLog::eventType)
           .containsExactly(
               HistoryLogEventType.PROCESS_STEP_USER,
               HistoryLogEventType.PROCESS_STEP,
+              HistoryLogEventType.PROCESS_STEP_USER,
+              HistoryLogEventType.PROCESS_STEP,
               HistoryLogEventType.CREATE);
       assertThat(logs)
           .map(HistoryLog::createdBy)
-          .containsExactly("testUser", "testUser", "testUser");
-      assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+          .containsExactly("testUser", "testUser", "testUser", "testUser", "testUser");
+      assertThat(logs)
+          .map(HistoryLog::documentationOffice)
+          .containsExactly("DS", "DS", "DS", "DS", "DS");
       assertThat(logs.get(0).description()).isEqualTo("Person entfernt: testUser");
       assertThat(logs.get(1).description())
           .isEqualTo("Schritt geändert: Ersterfassung → Fachdokumentation");
-      assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
+      assertThat(logs.get(2).description()).isEqualTo("Person gesetzt: testUser");
+      assertThat(logs.get(3).description()).isEqualTo("Schritt gesetzt: Ersterfassung");
+      assertThat(logs.get(4).description()).isEqualTo("Dokeinheit angelegt");
     }
 
     @Test
@@ -4917,17 +4975,25 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       var visibleUser = User.builder().documentationOffice(buildDSDocOffice()).build();
       var logs = documentationUnitHistoryLogService.getHistoryLogs(decision.uuid(), visibleUser);
 
-      assertThat(logs).hasSize(2);
+      assertThat(logs).hasSize(4);
       assertThat(logs)
           .map(HistoryLog::eventType)
-          .containsExactly(HistoryLogEventType.PROCESS_STEP_USER, HistoryLogEventType.CREATE);
+          .containsExactly(
+              HistoryLogEventType.PROCESS_STEP_USER,
+              HistoryLogEventType.PROCESS_STEP_USER,
+              HistoryLogEventType.PROCESS_STEP,
+              HistoryLogEventType.CREATE);
 
-      assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser");
-      assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS");
+      assertThat(logs)
+          .map(HistoryLog::createdBy)
+          .containsExactly("testUser", "testUser", "testUser", "testUser");
+      assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS", "DS");
 
       // Person removed -> no step change
       assertThat(logs.get(0).description()).isEqualTo("Person entfernt: testUser");
-      assertThat(logs.get(1).description()).isEqualTo("Dokeinheit angelegt");
+      assertThat(logs.get(1).description()).isEqualTo("Person gesetzt: testUser");
+      assertThat(logs.get(2).description()).isEqualTo("Schritt gesetzt: Ersterfassung");
+      assertThat(logs.get(3).description()).isEqualTo("Dokeinheit angelegt");
     }
   }
 

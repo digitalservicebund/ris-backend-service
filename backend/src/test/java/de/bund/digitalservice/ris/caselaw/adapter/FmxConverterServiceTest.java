@@ -114,7 +114,7 @@ class FmxConverterServiceTest {
   }
 
   private String xml =
-      """
+"""
 <?xml version="1.0" encoding="UTF-8"?>
 <JUDGMENT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="http://formex.publications.europa.eu/schema/formex-05.58-20161101.xd">
