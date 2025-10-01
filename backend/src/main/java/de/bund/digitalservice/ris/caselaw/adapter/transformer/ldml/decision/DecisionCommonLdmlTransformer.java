@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
-import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validate;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNotNull;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
@@ -23,7 +22,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JudgmentBody;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Opinions;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RelatedDecision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
@@ -32,9 +30,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
-import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
-import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +38,7 @@ import java.util.Objects;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Abstract base class for transforming decisions into LDML case law format. Provides common
@@ -77,52 +74,6 @@ public abstract class DecisionCommonLdmlTransformer
   }
 
   protected abstract JaxbHtml buildHeader(Decision decision) throws ValidationException;
-
-  protected String buildCommonHeader(Decision decision) throws ValidationException {
-    validateCoreData(decision);
-    var coreData = decision.coreData();
-
-    StringBuilder builder = new StringBuilder();
-
-    // Aktenzeichen
-    if (coreData.fileNumbers() != null && !coreData.fileNumbers().isEmpty()) {
-      builder
-          .append("<p>Aktenzeichen: <akn:docNumber refersTo=\"#aktenzeichen\">")
-          .append(coreData.fileNumbers().getFirst())
-          .append("</akn:docNumber></p>");
-    }
-
-    // Entscheidungsdatum
-    if (coreData.decisionDate() != null) {
-      builder
-          .append("<p>Entscheidungsdatum: <akn:docDate refersTo=\"#entscheidungsdatum\" date=\"")
-          .append(DateUtils.toDateString(coreData.decisionDate()))
-          .append("\">")
-          .append(DateUtils.toFormattedDateString(coreData.decisionDate()))
-          .append("</akn:docDate></p>");
-    }
-
-    // Gericht
-    if (coreData.court() != null) {
-      builder
-          .append("<p>Gericht: <akn:courtType refersTo=\"#gericht\">")
-          .append(coreData.court().label())
-          .append("</akn:courtType></p>");
-    }
-
-    // Dokumenttyp
-    if (coreData.documentType().label() != null) {
-      builder
-          .append("<p>")
-          .append("Dokumenttyp: ")
-          .append("<akn:docType refersTo=\"#dokumenttyp\">")
-          .append(coreData.documentType().label())
-          .append("</akn:docType>")
-          .append("</p>");
-    }
-
-    return builder.toString();
-  }
 
   protected abstract Meta buildMeta(Decision decision) throws ValidationException;
 
@@ -255,22 +206,6 @@ public abstract class DecisionCommonLdmlTransformer
     return null;
   }
 
-  protected List<RelatedDecision> buildRelatedDecisions(
-      List<? extends RelatedDocumentationUnit> relatedDecisions) {
-    List<RelatedDecision> previousDecision = new ArrayList<>();
-    for (RelatedDocumentationUnit current : relatedDecisions) {
-      RelatedDecision decision =
-          RelatedDecision.builder()
-              .date(DateUtils.toDateString(current.getDecisionDate()))
-              .documentNumber(current.getDocumentNumber())
-              .fileNumber(current.getFileNumber())
-              .courtType(nullSafeGet(current.getCourt(), Court::type))
-              .build();
-      previousDecision.add(decision);
-    }
-    return previousDecision;
-  }
-
   protected Identification buildIdentification(Decision decision) throws ValidationException {
     validateNotNull(decision.documentNumber(), "Unique identifier missing");
     validateNotNull(decision.uuid(), "Caselaw UUID missing");
@@ -318,6 +253,11 @@ public abstract class DecisionCommonLdmlTransformer
         .build();
   }
 
+  @NotNull
+  private static FrbrAuthor getFrbrAuthor() {
+    return new FrbrAuthor();
+  }
+
   protected List<FrbrAlias> generateAliases(Decision decision) {
     List<FrbrAlias> aliases = new ArrayList<>();
 
@@ -339,20 +279,5 @@ public abstract class DecisionCommonLdmlTransformer
       return null;
     }
     return input;
-  }
-
-  protected void validateCoreData(Decision decision) throws ValidationException {
-    if (decision.coreData() != null) {
-      validateNotNull(decision.coreData().court(), "Court missing");
-      if (decision.coreData().court() != null) {
-        validateNotNull(decision.coreData().court().type(), "CourtType missing");
-        validateNotNull(decision.coreData().court().type(), "CourtLabel missing");
-      }
-      validateNotNull(decision.coreData().documentType(), "DocumentType missing");
-      validate(!decision.coreData().fileNumbers().isEmpty(), "FileNumber missing");
-      validateNotNull(decision.coreData().decisionDate(), "DecisionDate missing");
-    } else {
-      throw new ValidationException("Core data is null");
-    }
   }
 }

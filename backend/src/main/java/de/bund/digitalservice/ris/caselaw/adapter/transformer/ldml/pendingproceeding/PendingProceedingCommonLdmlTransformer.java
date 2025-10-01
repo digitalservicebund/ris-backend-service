@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproce
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
-import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validate;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNotNull;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
@@ -21,7 +20,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JudgmentBody;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RelatedDecision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
@@ -30,10 +28,8 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
-import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -75,53 +71,6 @@ public abstract class PendingProceedingCommonLdmlTransformer
 
   protected abstract JaxbHtml buildHeader(PendingProceeding pendingProceeding)
       throws ValidationException;
-
-  protected String buildCommonHeader(PendingProceeding pendingProceeding)
-      throws ValidationException {
-    validateCoreData(pendingProceeding);
-    var coreData = pendingProceeding.coreData();
-
-    StringBuilder builder = new StringBuilder();
-
-    // Aktenzeichen
-    if (coreData.fileNumbers() != null && !coreData.fileNumbers().isEmpty()) {
-      builder
-          .append("<p>Aktenzeichen: <akn:docNumber refersTo=\"#aktenzeichen\">")
-          .append(coreData.fileNumbers().getFirst())
-          .append("</akn:docNumber></p>");
-    }
-
-    // Entscheidungsdatum
-    if (coreData.decisionDate() != null) {
-      builder
-          .append("<p>Entscheidungsdatum: <akn:docDate refersTo=\"#entscheidungsdatum\" date=\"")
-          .append(DateUtils.toDateString(coreData.decisionDate()))
-          .append("\">")
-          .append(DateUtils.toFormattedDateString(coreData.decisionDate()))
-          .append("</akn:docDate></p>");
-    }
-
-    // Gericht
-    if (coreData.court() != null) {
-      builder
-          .append("<p>Gericht: <akn:courtType refersTo=\"#gericht\">")
-          .append(coreData.court().label())
-          .append("</akn:courtType></p>");
-    }
-
-    // Dokumenttyp
-    if (coreData.documentType().label() != null) {
-      builder
-          .append("<p>")
-          .append("Dokumenttyp: ")
-          .append("<akn:docType refersTo=\"#dokumenttyp\">")
-          .append(coreData.documentType().label())
-          .append("</akn:docType>")
-          .append("</p>");
-    }
-
-    return builder.toString();
-  }
 
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(PendingProceeding pendingProceeding) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
@@ -227,22 +176,6 @@ public abstract class PendingProceedingCommonLdmlTransformer
     return null;
   }
 
-  protected List<RelatedDecision> buildRelatedDecisions(
-      List<? extends RelatedDocumentationUnit> relatedDecisions) {
-    List<RelatedDecision> previousDecision = new ArrayList<>();
-    for (RelatedDocumentationUnit current : relatedDecisions) {
-      RelatedDecision pendingProceeding =
-          RelatedDecision.builder()
-              .date(DateUtils.toDateString(current.getDecisionDate()))
-              .documentNumber(current.getDocumentNumber())
-              .fileNumber(current.getFileNumber())
-              .courtType(nullSafeGet(current.getCourt(), Court::type))
-              .build();
-      previousDecision.add(pendingProceeding);
-    }
-    return previousDecision;
-  }
-
   protected Identification buildIdentification(PendingProceeding pendingProceeding)
       throws ValidationException {
     validateNotNull(pendingProceeding.documentNumber(), "Unique identifier missing");
@@ -291,20 +224,6 @@ public abstract class PendingProceedingCommonLdmlTransformer
 
   protected List<FrbrAlias> generateAliases(PendingProceeding pendingProceeding) {
     return List.of(new FrbrAlias("uebergreifende-id", pendingProceeding.uuid().toString()));
-  }
-
-  protected void validateCoreData(PendingProceeding pendingProceeding) throws ValidationException {
-    if (pendingProceeding.coreData() != null) {
-      validateNotNull(pendingProceeding.coreData().court(), "Court missing");
-      if (pendingProceeding.coreData().court() != null) {
-        validateNotNull(pendingProceeding.coreData().court().type(), "CourtType missing");
-        validateNotNull(pendingProceeding.coreData().court().type(), "CourtLabel missing");
-      }
-      validateNotNull(pendingProceeding.coreData().documentType(), "DocumentType missing");
-      validate(!pendingProceeding.coreData().fileNumbers().isEmpty(), "FileNumber missing");
-    } else {
-      throw new ValidationException("Core data is null");
-    }
   }
 
   protected abstract Meta buildMeta(PendingProceeding pendingProceeding) throws ValidationException;
