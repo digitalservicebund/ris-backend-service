@@ -5042,7 +5042,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
             "label": "LG Detmold",
             "revoked": null,
             "jurisdictionType": "",
-            "region": "NW",
+            "regions": ["NW"],
             "responsibleDocOffice": null
           }
         }

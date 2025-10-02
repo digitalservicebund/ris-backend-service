@@ -44,9 +44,9 @@ public interface DatabaseCourtRepository extends JpaRepository<CourtDTO, UUID> {
                         FROM
                           incremental_migration.court
                       )
-                      SELECT DISTINCT ON (court_with_label.id)
-                        court_with_label.*,
-                        court_with_label,
+                      SELECT
+                        *,
+                        label,
                         CASE
                           WHEN label LIKE UPPER(:searchStr || '%') THEN 1
                           WHEN label LIKE UPPER('% ' || :searchStr || '%') THEN 2
@@ -55,11 +55,9 @@ public interface DatabaseCourtRepository extends JpaRepository<CourtDTO, UUID> {
                         END AS weight
                       FROM
                         court_with_label
-                        LEFT JOIN incremental_migration.court_region AS region ON court_with_label.id = region.court_id
                       WHERE
                         label LIKE UPPER('%' || :searchStr || '%')
                       ORDER BY
-                        court_with_label.id,
                         weight,
                         label
                       LIMIT :size
