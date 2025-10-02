@@ -24,6 +24,7 @@ class AuthIntegrationTest extends BaseIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().name()).isEqualTo("testUser");
+              assertThat(response.getResponseBody().email()).isEqualTo("test@test.com");
               assertThat(response.getResponseBody().documentationOffice().abbreviation())
                   .isEqualTo("DS");
             });
