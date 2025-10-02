@@ -646,7 +646,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
                 .isSuperiorCourt(true)
                 .isForeignCourt(false)
                 .jurisId(new Random().nextInt())
-                .region(region)
+                .regions(List.of(region))
                 .build());
 
     DocumentationUnitDTO dto =
@@ -676,7 +676,8 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().coreData().court().region()).isEqualTo("DEU");
+              assertThat(response.getResponseBody().coreData().court().regions().get(0))
+                  .isEqualTo("DEU");
             });
   }
 

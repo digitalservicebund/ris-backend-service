@@ -201,6 +201,30 @@ test.describe("court", () => {
     await expect(page.getByLabel("Region", { exact: true })).toHaveValue("")
   })
 
+  test(
+    "setting a court with multiple regions displays all regions",
+    { tag: ["@RISDEV-3081"] },
+    async ({ page, documentNumber }) => {
+      await navigateToCategories(page, documentNumber)
+
+      await page.getByLabel("Gericht", { exact: true }).fill("LSG Celle-Bremen")
+      await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+      await page.getByText("LSG Celle-Bremen").click()
+      await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+        "LSG Celle-Bremen",
+      )
+
+      await save(page)
+
+      await expect(page.getByText("Region")).toBeVisible()
+
+      // region was set by the backend based on state database table
+      await expect(page.getByLabel("Region", { exact: true })).toHaveValue(
+        "BR, ND",
+      )
+    },
+  )
+
   test("that setting a special court sets legal effect to yes, but it can be changed afterwards", async ({
     page,
     documentNumber,
