@@ -2,21 +2,14 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
-import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNotNull;
 
-import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.DocumentRef;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.ForeignLanguageVersion;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrAlias;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrAuthor;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrCountry;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrDate;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrElement;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrLanguage;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Identification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JudgmentBody;
@@ -26,14 +19,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import jakarta.xml.bind.ValidationException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -67,6 +57,7 @@ public abstract class DecisionCommonLdmlTransformer
 
   private Judgment buildJudgment(Decision decision) throws ValidationException {
     return Judgment.builder()
+        .name(decision.coreData().documentType().label())
         .header(buildHeader(decision))
         .meta(buildMeta(decision))
         .judgmentBody(buildJudgmentBody(decision))
@@ -206,72 +197,9 @@ public abstract class DecisionCommonLdmlTransformer
     return null;
   }
 
-  protected Identification buildIdentification(Decision decision) throws ValidationException {
-    validateNotNull(decision.documentNumber(), "Unique identifier missing");
-    validateNotNull(decision.uuid(), "Caselaw UUID missing");
-    validateNotNull(
-        nullSafeGet(decision.coreData(), CoreData::decisionDate), "DecisionDate missing");
-
-    // Case law handover: When we always have an ecli, use that instead for the uniqueId
-    String uniqueId = decision.documentNumber();
-    FrbrDate frbrDate =
-        new FrbrDate(
-            DateUtils.toDateString(nullSafeGet(decision.coreData(), CoreData::decisionDate)),
-            "entscheidungsdatum");
-    FrbrAuthor frbrAuthor = new FrbrAuthor();
-
-    List<FrbrAlias> aliases = generateAliases(decision);
-
-    FrbrElement work =
-        FrbrElement.builder()
-            .frbrAlias(aliases)
-            .frbrDate(frbrDate)
-            .frbrAuthor(frbrAuthor)
-            .frbrCountry(new FrbrCountry())
-            .build()
-            .withFrbrThisAndUri(uniqueId);
-
-    FrbrElement expression =
-        FrbrElement.builder()
-            .frbrDate(frbrDate)
-            .frbrAuthor(frbrAuthor)
-            .frbrLanguage(new FrbrLanguage("deu"))
-            .build()
-            .withFrbrThisAndUri(uniqueId + "/dokument");
-
-    FrbrElement manifestation =
-        FrbrElement.builder()
-            .frbrDate(frbrDate)
-            .frbrAuthor(frbrAuthor)
-            .build()
-            .withFrbrThisAndUri(uniqueId + "/dokument.xml");
-
-    return Identification.builder()
-        .frbrWork(work)
-        .frbrExpression(expression)
-        .frbrManifestation(manifestation)
-        .build();
-  }
-
   @NotNull
   private static FrbrAuthor getFrbrAuthor() {
     return new FrbrAuthor();
-  }
-
-  protected List<FrbrAlias> generateAliases(Decision decision) {
-    List<FrbrAlias> aliases = new ArrayList<>();
-
-    aliases.add(new FrbrAlias("uebergreifende-id", decision.uuid().toString()));
-
-    if (decision.coreData() != null && decision.coreData().ecli() != null) {
-      aliases.add(new FrbrAlias("ecli", decision.coreData().ecli()));
-    }
-
-    if (decision.coreData() != null && decision.coreData().celexNumber() != null) {
-      aliases.add(new FrbrAlias("celex", decision.coreData().celexNumber()));
-    }
-
-    return aliases;
   }
 
   protected String nullIfEmpty(String input) {

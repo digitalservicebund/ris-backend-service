@@ -327,8 +327,8 @@
     <!--Identity transformation for known cases-->
     <xsl:template match="akn:akomaNtoso|akn:judgment|akn:judgmentBody|akn:meta|akn:header|akn:docNumber|akn:docDate
     |akn:courtType|akn:docTitle|akn:shortTitle|akn:docType|akn:introduction
-    |akn:identification|akn:classification|akn:proprietary|akn:block|akn:keyword|akn:background
-    |akn:decision|akn:motivation|akn:opinion|akn:embeddedStructure|akn:subFlow
+    |akn:identification|akn:references|akn:TLCOrganization|akn:TLCPerson|akn:TLCLocation|akn:classification|akn:proprietary|akn:block
+    |akn:keyword|akn:background|akn:decision|akn:motivation|akn:opinion|akn:embeddedStructure|akn:subFlow
     |akn:FRBRWork|akn:FRBRExpression|akn:FRBRManifestation
     |akn:FRBRthis|akn:FRBRuri|akn:FRBRalias|akn:FRBRdate|akn:FRBRauthor|akn:FRBRcountry|akn:FRBRlanguage|akn:documentRef
     |ris:meta|ris:fileNumbers|ris:fileNumber|ris:documentType|ris:courtLocation|ris:courtType|ris:legalEffect
@@ -340,7 +340,7 @@
     |ris:deviatingEclis|ris:deviatingEcli|ris:inputTypes|ris:inputType|ris:foreignLanguageVersions|ris:foreignLanguageVersion|ris:evfs
     |ris:definitions|ris:definition|@ris:definedTerm|@ris:definingBorderNumber|@ris:domainTerm
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
-    |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId">
+    |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId|@akn:eId">
 
         <xsl:copy>
             <xsl:apply-templates select="@* | node()"/>
@@ -351,10 +351,6 @@
         <xsl:copy>
             <xsl:apply-templates select="."/>
         </xsl:copy>
-    </xsl:template>
-
-    <xsl:template match="@akn:eId">
-        <xsl:copy/>
     </xsl:template>
 
     <!--Fail fast strategy for unknown cases (add something that will fail xsd for sure)-->

@@ -82,9 +82,9 @@ class PendingProceedingReducedLdmlTransformerTest {
                 CoreData.builder()
                     .court(
                         Court.builder()
-                            .type("Gerichtstyp")
-                            .location("Gerichtsort")
-                            .label("Gerichtstyp Gerichtsort")
+                            .type("courType")
+                            .location("courtLocation")
+                            .label("courtType courtLocation")
                             .build())
                     .documentType(DocumentType.builder().label("Anhängiges Verfahren").build())
                     .fileNumbers(List.of("Aktenzeichen"))
@@ -113,7 +113,7 @@ class PendingProceedingReducedLdmlTransformerTest {
         <akn:header>
             <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">Aktenzeichen</akn:docNumber></akn:p>
             <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01"refersTo="#entscheidungsdatum">01.01.2020</akn:docDate></akn:p>
-            <akn:p>Gericht:<akn:courtType refersTo="#gericht">Gerichtstyp Gerichtsort</akn:courtType></akn:p>
+            <akn:p>Gericht:<akn:courtType refersTo="#gericht">courtType courtLocation</akn:courtType></akn:p>
             <akn:p>Dokumenttyp:<akn:doc Type refersTo="#dokumenttyp">Anhängiges Verfahren</akn:docType></akn:p>
           </akn:header>
        """;
@@ -202,9 +202,9 @@ class PendingProceedingReducedLdmlTransformerTest {
             CoreData.builder()
                 .court(
                     Court.builder()
-                        .type("Gerichtstyp")
-                        .location("Gerichtsort")
-                        .label("Gerichtstyp Gerichtsort")
+                        .type("courtType")
+                        .location("courtLocation")
+                        .label("courtType courtLocation")
                         .build())
                 .documentType(DocumentType.builder().label("Anhängiges Verfahren").build())
                 .fileNumbers(List.of("Aktenzeichen"))
