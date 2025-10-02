@@ -319,9 +319,10 @@ public class PortalPublicationService {
     boolean statusUnchanged = newStatus.equals(documentationUnit.portalPublicationStatus());
     boolean isPublishAction = newStatus.equals(PortalPublicationStatus.PUBLISHED);
 
-    if (statusUnchanged && isPublishAction) {
+    if (isPublishAction) {
       documentationUnitRepository.savePublicationDateTime(documentationUnit.uuid());
-    } else if (!statusUnchanged) {
+    }
+    if (!statusUnchanged) {
       documentationUnitRepository.updatePortalPublicationStatus(
           documentationUnit.uuid(), newStatus);
     }

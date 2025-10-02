@@ -1,3 +1,4 @@
+import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { beforeAll } from "vitest"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
@@ -16,6 +17,7 @@ function renderComponent(shortTexts: ShortTexts) {
       validBorderNumbers: [],
     },
     global: {
+      plugins: [createTestingPinia()],
       provide: {
         [previewLayoutInjectionKey as symbol]: "wide",
       },

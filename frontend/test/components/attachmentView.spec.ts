@@ -1,3 +1,4 @@
+import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import AttachmentView from "@/components/AttachmentView.vue"
 import attachmentService from "@/services/attachmentService"
@@ -19,6 +20,9 @@ describe("attachments are shown in side panel", () => {
         documentUnitUuid: "123",
         s3Path: "foo-path",
         format: "docx",
+      },
+      global: {
+        plugins: [createTestingPinia()],
       },
     })
 

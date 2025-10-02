@@ -1106,7 +1106,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     var oldStatus = documentationUnitDTO.getPortalPublicationStatus();
 
     setLastUpdated(null, documentationUnitDTO);
-    setPublicationDateTime(documentationUnitDTO);
 
     historyLogService.saveHistoryLog(
         documentationUnitId,

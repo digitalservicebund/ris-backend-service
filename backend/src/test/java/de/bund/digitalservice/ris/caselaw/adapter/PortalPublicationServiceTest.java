@@ -245,8 +245,7 @@ class PortalPublicationServiceTest {
         verify(documentationUnitRepository)
             .updatePortalPublicationStatus(
                 testDocumentUnit.uuid(), PortalPublicationStatus.PUBLISHED);
-        verify(documentationUnitRepository, never())
-            .savePublicationDateTime(testDocumentUnit.uuid());
+        verify(documentationUnitRepository).savePublicationDateTime(testDocumentUnit.uuid());
       }
 
       @Test
@@ -334,7 +333,7 @@ class PortalPublicationServiceTest {
                 "Dokeinheit im Portal veröffentlicht");
         verify(documentationUnitRepository)
             .updatePortalPublicationStatus(docUnit.uuid(), PortalPublicationStatus.PUBLISHED);
-        verify(documentationUnitRepository, never()).savePublicationDateTime(docUnit.uuid());
+        verify(documentationUnitRepository).savePublicationDateTime(docUnit.uuid());
       }
 
       @Test
@@ -495,6 +494,8 @@ class PortalPublicationServiceTest {
         verify(documentationUnitRepository)
             .updatePortalPublicationStatus(
                 testDocumentUnit.uuid(), PortalPublicationStatus.WITHDRAWN);
+        verify(documentationUnitRepository, never())
+            .savePublicationDateTime(testDocumentUnit.uuid());
       }
 
       @Test
@@ -509,6 +510,8 @@ class PortalPublicationServiceTest {
         verify(documentationUnitRepository, never())
             .updatePortalPublicationStatus(
                 testDocumentUnit.uuid(), PortalPublicationStatus.WITHDRAWN);
+        verify(documentationUnitRepository, never())
+            .savePublicationDateTime(testDocumentUnit.uuid());
       }
     }
 
