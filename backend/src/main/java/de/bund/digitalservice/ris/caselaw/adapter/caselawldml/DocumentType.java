@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.caselawldml;
 
 import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlValue;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,11 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Builder
-public class Proprietary {
-  @Builder.Default
-  @XmlAttribute(name = "source")
-  private String source = CaseLawLdml.RIS_REF;
+public class DocumentType {
+  @XmlValue private String value;
 
-  @XmlElement(name = "meta", namespace = CaseLawLdml.RIS_NS)
-  private RisMeta meta;
+  @XmlAttribute(namespace = CaseLawLdml.AKN_NS, name = "eId")
+  private String eId;
 }

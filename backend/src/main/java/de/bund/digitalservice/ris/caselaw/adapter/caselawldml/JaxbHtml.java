@@ -10,8 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Getter
 @Setter
@@ -20,13 +18,11 @@ import org.apache.logging.log4j.Logger;
 @XmlRootElement
 public class JaxbHtml {
 
-  private static final Logger logger = LogManager.getLogger(JaxbHtml.class);
-
-  //  private static final Templates removeNameSpacesXslt =
-  //      XmlUtilService.getTemplates("caselawhandover/shared/removeNameSpaces.xslt");
-
   @XmlAttribute(name = "name")
   private String name;
+
+  @XmlAttribute(namespace = CaseLawLdml.RIS_NS, name = "domainTerm")
+  private String domainTerm;
 
   @XmlAnyElement @XmlMixed private List<Object> html;
 

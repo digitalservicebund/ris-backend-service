@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknKeyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Classification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Definition;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.DocumentType;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
@@ -61,6 +62,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
     return builder
         .identification(buildIdentification(decision))
+        .references(buildReferences(decision))
         .proprietary(Proprietary.builder().meta(buildRisMeta(decision)).build())
         .build();
   }
@@ -122,7 +124,11 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       }
 
       builder
-          .documentType(coreData.documentType().label())
+          .documentType(
+              DocumentType.builder()
+                  .eId("dokumenttyp")
+                  .value(coreData.documentType().label())
+                  .build())
           .courtLocation(nullSafeGet(coreData.court(), Court::location))
           .courtType(nullSafeGet(coreData.court(), Court::type))
           .judicialBody(nullIfEmpty(coreData.appraisalBody()))
@@ -177,5 +183,34 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                   JaxbHtml.build(htmlTransformer.htmlStringToObjectList(tenor))));
     }
     return null;
+  }
+
+  @Override
+  protected JaxbHtml buildHeader(Decision decision) throws ValidationException {
+    StringBuilder builder = new StringBuilder();
+
+    builder.append(buildCommonHeader(decision));
+
+    // Entscheidungsname
+    if (decision.shortTexts().decisionName() != null) {
+      builder
+          .append("<p>Entscheidungsname: ")
+          .append("<akn:docTitle refersTo=\"#entscheidungsname\">")
+          .append(decision.shortTexts().decisionName())
+          .append("</akn:docTitle></p>");
+    }
+
+    // Titelzeile
+    if (decision.shortTexts().headline() != null) {
+      builder.append("<p>Titelzeile: ");
+      builder
+          .append("<akn:shortTitle refersTo=\"#titelzeile\">")
+          .append("<akn:embeddedStructure>")
+          .append(decision.shortTexts().headline())
+          .append("</akn:embeddedStructure>")
+          .append("</akn:shortTitle></p>");
+    }
+
+    return JaxbHtml.build(htmlTransformer.htmlStringToObjectList(builder.toString()));
   }
 }
