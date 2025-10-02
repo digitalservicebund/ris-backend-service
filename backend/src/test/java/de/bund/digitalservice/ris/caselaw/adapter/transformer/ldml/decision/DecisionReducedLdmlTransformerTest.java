@@ -168,18 +168,16 @@ class DecisionReducedLdmlTransformerTest {
                     .ecli("ecli test")
                     .celexNumber("celex test")
                     .documentationOffice(
-                        DocumentationOffice.builder()
-                            .abbreviation("documentationOffice test")
-                            .build())
+                        DocumentationOffice.builder().abbreviation("documentationOffice").build())
                     .creatingDocOffice(
                         DocumentationOffice.builder()
-                            .abbreviation("creatingDocumentationOffice test")
+                            .abbreviation("creatingDocumentationOffice")
                             .build())
                     .court(
                         Court.builder()
                             .label("courtLabel test")
-                            .type("courtType test")
-                            .location("courtLocation test")
+                            .type("courtType")
+                            .location("courtLocation")
                             .region("region test")
                             .build())
                     .source(
@@ -196,12 +194,10 @@ class DecisionReducedLdmlTransformerTest {
                     .procedure(Procedure.builder().label("procedure test").build())
                     .previousProcedures(List.of("previous procedure test"))
                     .documentationOffice(
-                        DocumentationOffice.builder()
-                            .abbreviation("documentationOffice test")
-                            .build())
+                        DocumentationOffice.builder().abbreviation("documentationOffice").build())
                     .creatingDocOffice(
                         DocumentationOffice.builder()
-                            .abbreviation("documentationOffice test")
+                            .abbreviation("creatingDocumentationOffice")
                             .build())
                     .previousProcedures(List.of("previous procedure test"))
                     .procedure(Procedure.builder().label("procedure test").build())
@@ -227,8 +223,12 @@ class DecisionReducedLdmlTransformerTest {
                     .participatingJudges(
                         List.of(
                             ParticipatingJudge.builder()
-                                .name("participating judge test")
-                                .referencedOpinions("referenced opinions test")
+                                .name("Dr. Phil. Max Mustermann")
+                                .referencedOpinions("referenced opinions test 1")
+                                .build(),
+                            ParticipatingJudge.builder()
+                                .name("Richterin Maxima Mustermann")
+                                .referencedOpinions("referenced opinions test 2")
                                 .build()))
                     .build())
             .shortTexts(
@@ -341,13 +341,13 @@ class DecisionReducedLdmlTransformerTest {
         Arguments.of(
             "'court' (Gericht)",
             """
-                <ris:courtLocation>courtLocation test</ris:courtLocation>
-                <ris:courtType>courtType test</ris:courtType>
+                <ris:courtLocation>courtLocation</ris:courtLocation>
+                <ris:courtType>courtType</ris:courtType>
                """),
         Arguments.of(
             "'decisionDate' (Entscheidungsdatum)",
             """
-                <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
+                <akn:FRBRdate date="2020-01-01" name="Entscheidungsdatum"/>
                """),
         Arguments.of(
             "'documentType' (Dokumenttyp)",
@@ -357,7 +357,7 @@ class DecisionReducedLdmlTransformerTest {
         Arguments.of(
             "'ecli'",
             """
-               <akn:FRBRalias name="ecli" value="ecli test"/>
+               <akn:FRBRalias name="ECLI" value="ecli test"/>
                """),
         Arguments.of(
             "'fileNumber' (Aktenzeichen)",
@@ -491,7 +491,7 @@ class DecisionReducedLdmlTransformerTest {
         //               <akn:introduction>
         //                  <akn:block name="Mitwirkende Richter">
         //                     <akn:embeddedStructure>
-        //                        <akn:p>participating judge test</akn:p>
+        //                        <akn:p>Dr. Phil. Max Mustermann</akn:p>
         //                     </akn:embeddedStructure>
         //                  </akn:block>
         //               </akn:introduction>
@@ -586,12 +586,12 @@ class DecisionReducedLdmlTransformerTest {
         Arguments.of(
             "'documentationOffice' (Dokumentationsstelle)",
             """
-            <ris:documentationOffice>documentationOffice test</ris:documentationOffice>
+            <ris:documentationOffice>documentationOffice</ris:documentationOffice>
             """),
         Arguments.of(
             "'creatingDocumentationOffice' (erstellende Dokumentationsstelle)",
             """
-            documentationOffice test
+            creatingDocumentationOffice
             """),
         Arguments.of(
             "'status' (Veröffentlichungsstatus)",

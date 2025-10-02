@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class Proprietary {
   @Builder.Default
   @XmlAttribute(name = "source")
-  private String name = "attributsemantik-noch-undefiniert";
+  private String source = CaseLawLdml.RIS_REF;
 
   @XmlElement(name = "meta", namespace = CaseLawLdml.RIS_NS)
   private RisMeta meta;

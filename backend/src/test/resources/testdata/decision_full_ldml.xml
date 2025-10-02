@@ -1,39 +1,63 @@
-<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0" xmlns:ris="http://example.com/0.1/"
+<?xml version="1.0" encoding="utf-8"?>
+<akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0"
+                xmlns:ris="http://example.com/0.1/"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/os/part2-specs/schemas/akomantoso30.xsd">
-    <akn:judgment name="attributsemantik-noch-undefiniert">
+    <akn:judgment name="documentType test">
         <akn:meta>
-            <akn:identification source="attributsemantik-noch-undefiniert">
+            <akn:identification source="#ris">
                 <akn:FRBRWork>
                     <akn:FRBRthis value="YYTestDoc0013"/>
                     <akn:FRBRuri value="YYTestDoc0013"/>
-                    <akn:FRBRalias name="uebergreifende-id" value="8d722ea0-7861-4969-8614-52b5994ea5ae"/>
-                    <akn:FRBRalias name="ecli" value="ecli test"/>
-                    <akn:FRBRalias name="celex" value="celex test"/>
-                    <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
-                    <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
+                    <akn:FRBRalias name="Übergreifende ID" value="00e0b2ba-7a20-4a04-891d-b4ecd6e20ad2"/>
+                    <akn:FRBRalias name="Dokumentnummer" value="YYTestDoc0013"/>
+                    <akn:FRBRalias name="ECLI" value="ecli test"/>
+                    <akn:FRBRalias name="CELEX-Nummer" value="celex test"/>
+                    <akn:FRBRalias name="Aktenzeichen" value="fileNumber test"/>
+                    <akn:FRBRdate date="2020-01-01" name="Entscheidungsdatum"/>
+                    <akn:FRBRauthor href="#courttype-courtlocation"/>
                     <akn:FRBRcountry value="de"/>
                 </akn:FRBRWork>
                 <akn:FRBRExpression>
                     <akn:FRBRthis value="YYTestDoc0013/dokument"/>
                     <akn:FRBRuri value="YYTestDoc0013/dokument"/>
-                    <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
-                    <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
+                    <akn:FRBRdate date="2020-01-01" name="Entscheidungsdatum"/>
+                    <akn:FRBRauthor href="#courttype-courtlocation"/>
                     <akn:FRBRlanguage language="deu"/>
                 </akn:FRBRExpression>
                 <akn:FRBRManifestation>
                     <akn:FRBRthis value="YYTestDoc0013/dokument.xml"/>
                     <akn:FRBRuri value="YYTestDoc0013/dokument.xml"/>
-                    <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
-                    <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
+                    <akn:FRBRdate date="2025-10-02" name="XML Transformation"/>
+                    <akn:FRBRauthor href="#documentationoffice-dokumentationsstelle"/>
                 </akn:FRBRManifestation>
             </akn:identification>
-            <akn:classification source="attributsemantik-noch-undefiniert">
-                <akn:keyword dictionary="attributsemantik-noch-undefiniert" showAs="attributsemantik-noch-undefiniert"
+            <akn:classification source="#ris">
+                <akn:keyword ris:domainTerm="Schlagwort"
+                             dictionary=""
+                             showAs="keyword test"
                              value="keyword test"/>
             </akn:classification>
-            <akn:proprietary source="attributsemantik-noch-undefiniert">
+            <akn:references source="#ris">
+                <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
+                <akn:TLCOrganization eId="documentationoffice-dokumentationsstelle"
+                                     href=""
+                                     showAs="documentationOffice"/>
+                <akn:TLCOrganization eId="courttype-courtlocation"
+                                     href=""
+                                     showAs="courtLabel test"/>
+                <akn:TLCOrganization eId="spruchkoerper"
+                                     href=""
+                                     showAs="appraisalBody test"/>
+                <akn:TLCPerson eId="dr-phil-max-mustermann"
+                               href=""
+                               showAs="Dr. Phil. Max Mustermann"/>
+                <akn:TLCPerson eId="richterin-maxima-mustermann"
+                               href=""
+                               showAs="Richterin Maxima Mustermann"/>
+                <akn:TLCLocation eId="gerichtsort" href="" showAs="courtLocation"/>
+            </akn:references>
+            <akn:proprietary source="#ris">
                 <ris:meta>
                     <ris:decisionNames>
                         <ris:decisionName>decisionName test</ris:decisionName>
@@ -66,8 +90,8 @@
                         <ris:fileNumber>fileNumber test</ris:fileNumber>
                     </ris:fileNumbers>
                     <ris:documentType akn:eId="dokumenttyp">documentType test</ris:documentType>
-                    <ris:courtLocation>courtLocation test</ris:courtLocation>
-                    <ris:courtType>courtType test</ris:courtType>
+                    <ris:courtLocation>courtLocation</ris:courtLocation>
+                    <ris:courtType>courtType</ris:courtType>
                     <ris:legalForces>
                         <ris:legalForce>legalForce test</ris:legalForce>
                     </ris:legalForces>
@@ -93,7 +117,7 @@
                     </ris:deviatingFileNumbers>
                     <ris:publicationStatus>PUBLISHED</ris:publicationStatus>
                     <ris:error>false</ris:error>
-                    <ris:documentationOffice>documentationOffice test</ris:documentationOffice>
+                    <ris:documentationOffice>documentationOffice</ris:documentationOffice>
                     <ris:procedures>
                         <ris:procedure>previous procedure test</ris:procedure>
                     </ris:procedures>
@@ -121,20 +145,16 @@
             </akn:proprietary>
         </akn:meta>
         <akn:header>
-            <akn:p>
-                Aktenzeichen:
+            <akn:p>Aktenzeichen:
                 <akn:docNumber refersTo="#aktenzeichen">fileNumber test</akn:docNumber>
             </akn:p>
-            <akn:p>
-                Entscheidungsdatum:
+            <akn:p>Entscheidungsdatum:
                 <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
             </akn:p>
-            <akn:p>
-                Gericht:
+            <akn:p>Gericht:
                 <akn:courtType refersTo="#gericht">courtLabel test</akn:courtType>
             </akn:p>
-            <akn:p>
-                Dokumenttyp:
+            <akn:p>Dokumenttyp:
                 <akn:docType refersTo="#dokumenttyp">documentType test</akn:docType>
             </akn:p>
             <akn:p>Entscheidungsname:

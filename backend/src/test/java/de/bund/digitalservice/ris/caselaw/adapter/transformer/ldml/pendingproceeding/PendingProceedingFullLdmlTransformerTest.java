@@ -82,9 +82,9 @@ class PendingProceedingFullLdmlTransformerTest {
                 CoreData.builder()
                     .court(
                         Court.builder()
-                            .type("Gerichtstyp")
-                            .location("Gerichtsort")
-                            .label("Gerichtstyp Gerichtsort")
+                            .type("courtType")
+                            .location("courtLocation")
+                            .label("courtType courtLocation")
                             .build())
                     .documentType(DocumentType.builder().label("Anhängiges Verfahren").build())
                     .fileNumbers(List.of("Aktenzeichen"))
@@ -134,7 +134,7 @@ class PendingProceedingFullLdmlTransformerTest {
           <akn:header>
             <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">Aktenzeichen</akn:docNumber></akn:p>
             <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01"refersTo="#entscheidungsdatum">01.01.2020</akn:docDate></akn:p>
-            <akn:p>Gericht:<akn:courtType refersTo="#gericht">Gerichtstyp Gerichtsort</akn:courtType></akn:p>
+            <akn:p>Gericht:<akn:courtType refersTo="#gericht">courtType courtLocation</akn:courtType></akn:p>
             <akn:p>Dokumenttyp:<akn:doc Type refersTo="#dokumenttyp">Anhängiges Verfahren</akn:docType></akn:p>
             <akn:p>Titelzeile:<akn:shortTitle refersTo="#titelzeile">
               <akn:embeddedStructure>
@@ -167,12 +167,21 @@ class PendingProceedingFullLdmlTransformerTest {
   void testTransform_keywords() {
     String expected =
         """
-                                <akn:keyworddictionary="attributsemantik-noch-undefiniert"showAs="attributsemantik-noch-undefiniert"value="keyword1"/>
-                                """;
+       <akn:keyword ris:domainTerm="Schlagwort"
+           dictionary=""
+           showAs="keyword 1"
+           value="keyword 1"/>
+       <akn:keyword ris:domainTerm="Schlagwort"
+           dictionary=""
+           showAs="Keyword 2"
+           value="Keyword 2"/>
+       """;
     PendingProceeding otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
             .contentRelatedIndexing(
-                ContentRelatedIndexing.builder().keywords(List.of("keyword 1")).build())
+                ContentRelatedIndexing.builder()
+                    .keywords(List.of("keyword 1", "Keyword 2"))
+                    .build())
             .build();
 
     CaseLawLdml ldml = transformer.transformToLdml(otherLongTextCaseLaw);
@@ -235,9 +244,9 @@ class PendingProceedingFullLdmlTransformerTest {
             CoreData.builder()
                 .court(
                     Court.builder()
-                        .type("Gerichtstyp")
-                        .location("Gerichtsort")
-                        .label("Gerichtstyp Gerichtsort")
+                        .type("courtType")
+                        .location("courtLocation")
+                        .label("courtType courtLocation")
                         .build())
                 .documentType(DocumentType.builder().label("Anhängiges Verfahren").build())
                 .fileNumbers(List.of("Aktenzeichen"))

@@ -12,11 +12,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Builder
-public class Classification {
+public class References {
   @Builder.Default
   @XmlAttribute(name = "source")
   private String source = CaseLawLdml.RIS_REF;
 
-  @XmlElement(name = "keyword", namespace = CaseLawLdml.AKN_NS)
-  private List<AknKeyword> keyword;
+  @XmlElement(name = "TLCOrganization", namespace = CaseLawLdml.AKN_NS)
+  List<TlcElement> tlcOrganizations;
+
+  @XmlElement(name = "TLCPerson", namespace = CaseLawLdml.AKN_NS)
+  List<TlcElement> tlcPersons;
+
+  @XmlElement(name = "TLCLocation", namespace = CaseLawLdml.AKN_NS)
+  List<TlcElement> tlcLocations;
 }

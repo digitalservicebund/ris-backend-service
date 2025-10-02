@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class Judgment {
   @Builder.Default
   @XmlAttribute(name = "name")
-  private String name = "attributsemantik-noch-undefiniert";
+  private String name = "";
 
   @XmlElement(name = "meta", namespace = CaseLawLdml.AKN_NS)
   private Meta meta;

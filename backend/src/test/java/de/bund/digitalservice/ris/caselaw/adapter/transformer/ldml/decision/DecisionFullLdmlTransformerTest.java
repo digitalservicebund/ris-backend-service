@@ -388,12 +388,15 @@ class DecisionFullLdmlTransformerTest {
   void testTransform_keywords() {
     String expected =
         """
-                                <akn:keyworddictionary="attributsemantik-noch-undefiniert"showAs="attributsemantik-noch-undefiniert"value="keyword1"/>
-                                """;
+      <akn:keyword ris:domainTerm="Schlagwort" dictionary="" showAs="keyword 1" value="keyword 1"/>
+      <akn:keyword ris:domainTerm="Schlagwort" dictionary="" showAs="Keyword 2" value="Keyword 2"/>
+    """;
     Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
             .contentRelatedIndexing(
-                ContentRelatedIndexing.builder().keywords(List.of("keyword 1")).build())
+                ContentRelatedIndexing.builder()
+                    .keywords(List.of("keyword 1", "Keyword 2"))
+                    .build())
             .build();
 
     CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
@@ -509,7 +512,7 @@ class DecisionFullLdmlTransformerTest {
                 .ecli("ecli test")
                 .celexNumber("celex test")
                 .documentationOffice(
-                    DocumentationOffice.builder().abbreviation("documentationOffice test").build())
+                    DocumentationOffice.builder().abbreviation("documentationOffice").build())
                 .creatingDocOffice(
                     DocumentationOffice.builder()
                         .abbreviation("creatingDocumentationOffice test")
@@ -517,8 +520,8 @@ class DecisionFullLdmlTransformerTest {
                 .court(
                     Court.builder()
                         .label("courtLabel test")
-                        .type("courtType test")
-                        .location("courtLocation test")
+                        .type("courtType")
+                        .location("courtLocation")
                         .region("region test")
                         .build())
                 .source(
@@ -535,9 +538,11 @@ class DecisionFullLdmlTransformerTest {
                 .procedure(Procedure.builder().label("procedure test").build())
                 .previousProcedures(List.of("previous procedure test"))
                 .documentationOffice(
-                    DocumentationOffice.builder().abbreviation("documentationOffice test").build())
+                    DocumentationOffice.builder().abbreviation("documentationOffice").build())
                 .creatingDocOffice(
-                    DocumentationOffice.builder().abbreviation("documentationOffice test").build())
+                    DocumentationOffice.builder()
+                        .abbreviation("creatingDocumentationOffice")
+                        .build())
                 .previousProcedures(List.of("previous procedure test"))
                 .procedure(Procedure.builder().label("procedure test").build())
                 .deviatingEclis(List.of("deviating ecli test"))
@@ -562,8 +567,12 @@ class DecisionFullLdmlTransformerTest {
                 .participatingJudges(
                     List.of(
                         ParticipatingJudge.builder()
-                            .name("participating judge test")
-                            .referencedOpinions("referenced opinions test")
+                            .name("Dr. Phil. Max Mustermann")
+                            .referencedOpinions("referenced opinions test 1")
+                            .build(),
+                        ParticipatingJudge.builder()
+                            .name("Richterin Maxima Mustermann")
+                            .referencedOpinions("referenced opinions test 2")
                             .build()))
                 .build())
         .shortTexts(
