@@ -68,10 +68,19 @@ public class DatabaseUserService extends UserService {
    */
   @Override
   public User getUser(OidcUser oidcUser) {
-    return userRepository
-        .findByExternalId(UserTransformer.getOidcUserId(oidcUser))
-        .orElseGet(
-            () -> userRepository.saveOrUpdate(keycloakUserService.getUser(oidcUser)).orElse(null));
+    User user =
+        userRepository
+            .findByExternalId(UserTransformer.getOidcUserId(oidcUser))
+            .orElseGet(
+                () ->
+                    userRepository
+                        .saveOrUpdate(keycloakUserService.getUser(oidcUser))
+                        .orElse(null));
+    /* The email address is currently needed for the scheduled publication. It is not yet part of the user table,
+    so we add it via the oidc user here, so that the /auth/me endpoint returns the email address.
+    In the future, this should be removed again and either the email address added to the user table
+    or the need for email addresses / notifications replaced */
+    return user != null ? user.toBuilder().email(oidcUser.getEmail()).build() : null;
   }
 
   /**
