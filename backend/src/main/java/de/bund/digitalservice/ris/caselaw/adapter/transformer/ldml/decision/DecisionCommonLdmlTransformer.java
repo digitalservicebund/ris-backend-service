@@ -54,12 +54,15 @@ public abstract class DecisionCommonLdmlTransformer
   }
 
   private Judgment buildJudgment(Decision decision) throws ValidationException {
-    return Judgment.builder()
-        .name(decision.coreData().documentType().label())
-        .header(buildHeader(decision))
-        .meta(buildMeta(decision))
-        .judgmentBody(buildJudgmentBody(decision))
-        .build();
+    var judgmentBuilder =
+        Judgment.builder()
+            .header(buildHeader(decision))
+            .meta(buildMeta(decision))
+            .judgmentBody(buildJudgmentBody(decision));
+    if (decision.coreData() != null && decision.coreData().documentType() != null) {
+      judgmentBuilder.name(decision.coreData().documentType().label());
+    }
+    return judgmentBuilder.build();
   }
 
   protected abstract JaxbHtml buildHeader(Decision decision) throws ValidationException;
