@@ -334,4 +334,14 @@ describe("Core Data", () => {
     expect(inputField).toHaveValue("62023CJ0538")
     expect(inputField).toHaveAttribute("readonly")
   })
+
+  test("should not show decision-specific date attributes for pending proceeding", async () => {
+    renderComponent({ kind: Kind.PENDING_PROCEEDING })
+    expect(
+      screen.queryByLabelText("Datum der mündlichen Verhandlung"),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Zustellung an Verkündungs statt"),
+    ).not.toBeInTheDocument()
+  })
 })

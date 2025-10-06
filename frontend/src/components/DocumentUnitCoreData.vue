@@ -233,9 +233,8 @@ onBeforeUnmount(() => {
         </template>
       </NestedComponent>
     </div>
-    <div :class="layoutClass">
+    <div v-if="!isPendingProceeding" :class="layoutClass">
       <InputField
-        v-if="!isPendingProceeding"
         id="hasDeliveryDate"
         v-slot="{ id }"
         :label="coreDataLabels.hasDeliveryDate"
