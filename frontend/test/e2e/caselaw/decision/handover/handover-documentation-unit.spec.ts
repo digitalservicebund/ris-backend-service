@@ -540,15 +540,12 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
         const tenorEditor = page.getByTestId("Tenor")
         await clearTextField(page, tenorEditor)
         await tenorEditor.locator("div").fill("Text mit Feler")
-
-        await navigateToHandover(page, decision.createdDecision.documentNumber!)
-
-        await expect(
-          handover.getByLabel("Rechtschreibprüfung").getByLabel("Ladestatus"),
-          "Text check might take longer then expected",
-        ).toBeHidden({
-          timeout: 20_000,
-        })
+        await navigateToHandover(
+          page,
+          decision.createdDecision.documentNumber!,
+          undefined,
+          { navigationBy: "click" },
+        )
 
         await expect(
           page.getByText("Es wurden Rechtschreibfehler identifiziert"),

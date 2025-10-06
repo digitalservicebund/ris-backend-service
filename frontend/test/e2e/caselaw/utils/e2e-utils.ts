@@ -219,9 +219,14 @@ export const navigateToHandover = async (
   options?: {
     skipAssert?: boolean
   },
+  { navigationBy }: { navigationBy: "click" | "url" } = { navigationBy: "url" },
 ) => {
   await test.step("Navigate to 'Übergabe an jDV'", async () => {
-    await page.goto(`/caselaw/documentunit/${documentNumber}/handover`)
+    if (navigationBy === "url") {
+      await page.goto(`/caselaw/documentunit/${documentNumber}/handover`)
+    } else {
+      await page.getByTestId("Übergabe an jDV").click()
+    }
     if (options?.skipAssert) return
     await expect(page.locator("h1:has-text('Übergabe an jDV')")).toBeVisible({
       timeout: 15000, // for backend warm up
