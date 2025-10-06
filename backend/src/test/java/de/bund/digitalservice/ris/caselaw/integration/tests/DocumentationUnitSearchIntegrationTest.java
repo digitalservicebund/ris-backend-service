@@ -18,6 +18,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserGroupDTO;
@@ -489,12 +490,29 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
   void test_searchByExactDecisionDate_shouldFilterAndReturnDescendingOrder() {
     List<LocalDate> decisionDates =
         Arrays.asList(
-            LocalDate.of(2022, 1, 1), LocalDate.of(2022, 1, 2), LocalDate.of(2022, 1, 3), null);
+            // This will match because of the deviating date, although the main date does not match
+            LocalDate.of(2022, 1, 1),
+            // This will match because of the oral hearing date, although the main date does not
+            // match
+            LocalDate.of(2022, 1, 1),
+            // This will match directly
+            LocalDate.of(2022, 1, 2),
+            // This does not match
+            LocalDate.of(2022, 1, 3),
+            // null does not match
+            null);
 
     List<DeviatingDateDTO> deviatingDecisionDates =
         Arrays.asList(
             DeviatingDateDTO.builder().value(LocalDate.of(2022, 1, 1)).rank(1L).build(),
+            // This date will match the condition
             DeviatingDateDTO.builder().value(LocalDate.of(2022, 1, 2)).rank(2L).build());
+
+    List<OralHearingDateDTO> oralHearingDates =
+        Arrays.asList(
+            OralHearingDateDTO.builder().value(LocalDate.of(2022, 1, 1)).rank(1L).build(),
+            // This date will match the condition
+            OralHearingDateDTO.builder().value(LocalDate.of(2022, 1, 2)).rank(2L).build());
 
     var index = 0;
 
@@ -505,6 +523,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
               .documentNumber(RandomStringUtils.randomAlphabetic(13))
               .date(date)
               .deviatingDates(index == 0 ? deviatingDecisionDates : List.of())
+              .oralHearingDates(index == 1 ? oralHearingDates : List.of())
               .documentationOffice(docOfficeDTO));
       index++;
     }
@@ -524,14 +543,16 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
     assertThat(responseBody)
         .extracting("decisionDate")
         .containsExactly(
-            // 1.1.2022 is included because of its deviating date 2.1.2022
-            LocalDate.of(2022, 1, 2), LocalDate.of(2022, 1, 1));
+            // 1.1.2022 is included twice because of its deviating date 2.1.2022 and oral hearing
+            // date 2.1.2022
+            LocalDate.of(2022, 1, 2), LocalDate.of(2022, 1, 1), LocalDate.of(2022, 1, 1));
   }
 
   @Test
   void test_searchByDecisionDateRange_shouldFilterAndReturnDescendingOrder() {
     List<LocalDate> decisionDates =
         Arrays.asList(
+            null,
             null,
             LocalDate.of(2022, 1, 1),
             LocalDate.of(2022, 1, 2),
@@ -543,6 +564,11 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
             DeviatingDateDTO.builder().value(LocalDate.of(2022, 1, 1)).rank(1L).build(),
             DeviatingDateDTO.builder().value(LocalDate.of(2022, 1, 2)).rank(2L).build());
 
+    List<OralHearingDateDTO> oralHearingDates =
+        Arrays.asList(
+            OralHearingDateDTO.builder().value(LocalDate.of(2022, 1, 1)).rank(1L).build(),
+            OralHearingDateDTO.builder().value(LocalDate.of(2022, 1, 2)).rank(2L).build());
+
     var index = 0;
 
     for (LocalDate date : decisionDates) {
@@ -552,6 +578,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
               .documentNumber(RandomStringUtils.randomAlphabetic(13))
               .date(date)
               .deviatingDates(index == 0 ? deviatingDecisionDates : List.of())
+              .oralHearingDates(index == 1 ? oralHearingDates : List.of())
               .documentationOffice(docOfficeDTO));
       index++;
     }
@@ -572,8 +599,8 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
     assertThat(responseBody)
         .extracting("decisionDate")
         .containsExactly(
-            // null is included because of its deviating date
-            LocalDate.of(2022, 1, 3), LocalDate.of(2022, 1, 2), null);
+            // null is included twice because of 1) its deviating date and 2) its oral hearing date
+            LocalDate.of(2022, 1, 3), LocalDate.of(2022, 1, 2), null, null);
   }
 
   @Test
