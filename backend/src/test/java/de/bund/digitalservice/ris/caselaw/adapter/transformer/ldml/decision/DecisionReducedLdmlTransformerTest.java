@@ -122,7 +122,7 @@ class DecisionReducedLdmlTransformerTest {
     Diff diff =
         DiffBuilder.compare(expected)
             .withTest(fileContent.get())
-            .withDifferenceEvaluator(TestUtils.ignoreIdAttributeEvaluator)
+            .withDifferenceEvaluator(TestUtils.ignoreAttributeEvaluator)
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
@@ -178,7 +178,7 @@ class DecisionReducedLdmlTransformerTest {
                             .label("courtLabel test")
                             .type("courtType")
                             .location("courtLocation")
-                            .region("region test")
+                            .region("NW")
                             .build())
                     .source(
                         Source.builder()

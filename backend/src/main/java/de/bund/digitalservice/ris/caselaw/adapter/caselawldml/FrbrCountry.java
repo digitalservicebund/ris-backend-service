@@ -7,5 +7,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class FrbrCountry {
-  @XmlAttribute private String value = "de";
+  @XmlAttribute private String value;
+
+  public FrbrCountry(String value) {
+    this.value = value;
+  }
 }

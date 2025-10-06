@@ -13,7 +13,7 @@
                     <akn:FRBRalias name="Aktenzeichen" value="Aktenzeichen"/>
                     <akn:FRBRdate date="2020-01-01" name="Mitteilungsdatum"/>
                     <akn:FRBRauthor href="#courttype-courtlocation"/>
-                    <akn:FRBRcountry value="de"/>
+                    <akn:FRBRcountry value="deu"/>
                 </akn:FRBRWork>
                 <akn:FRBRExpression>
                     <akn:FRBRthis value="YYTestDoc0013/dokument"/>

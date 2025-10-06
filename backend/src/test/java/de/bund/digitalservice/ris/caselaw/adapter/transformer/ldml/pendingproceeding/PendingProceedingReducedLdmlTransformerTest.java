@@ -171,7 +171,7 @@ class PendingProceedingReducedLdmlTransformerTest {
     Diff diff =
         DiffBuilder.compare(expected)
             .withTest(fileContent.get())
-            .withDifferenceEvaluator(TestUtils.ignoreIdAttributeEvaluator)
+            .withDifferenceEvaluator(TestUtils.ignoreAttributeEvaluator)
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
@@ -205,6 +205,7 @@ class PendingProceedingReducedLdmlTransformerTest {
                         .type("courtType")
                         .location("courtLocation")
                         .label("courtType courtLocation")
+                        .region("NW")
                         .build())
                 .documentType(DocumentType.builder().label("Anhängiges Verfahren").build())
                 .fileNumbers(List.of("Aktenzeichen"))

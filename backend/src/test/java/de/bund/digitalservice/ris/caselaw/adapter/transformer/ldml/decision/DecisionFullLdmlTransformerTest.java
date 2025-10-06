@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -49,6 +50,7 @@ import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilderFactory;
 import net.sf.saxon.TransformerFactoryImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -468,7 +470,79 @@ class DecisionFullLdmlTransformerTest {
     Diff diff =
         DiffBuilder.compare(expected)
             .withTest(fileContent.get())
-            .withDifferenceEvaluator(TestUtils.ignoreIdAttributeEvaluator)
+            .withDifferenceEvaluator(TestUtils.ignoreAttributeEvaluator)
+            .ignoreWhitespace()
+            .checkForIdentical()
+            .build();
+
+    if (diff.hasDifferences()) {
+      StringBuilder differences = new StringBuilder();
+      diff.getDifferences().forEach(d -> differences.append(d.toString()).append("\n"));
+      Assertions.fail("XMLs differ:\n" + differences);
+    }
+  }
+
+  @Test
+  void testMinimalLdml_withMandatoryFields_shouldThrowMissingJudgmentBody() {
+    // Arrange
+    var documentationUnit =
+        Decision.builder()
+            .uuid(UUID.randomUUID())
+            .coreData(
+                CoreData.builder()
+                    .court(Court.builder().type("AG").location("Aachen").label("AG Aachen").build())
+                    .documentType(
+                        DocumentType.builder().label("testDocumentTypeAbbreviation").build())
+                    .fileNumbers(List.of("testFileNumber"))
+                    .decisionDate(LocalDate.of(2020, 1, 1))
+                    .build())
+            .documentNumber("testDocumentNumber")
+            .build();
+
+    // Act + Assert
+    AssertionsForClassTypes.assertThatThrownBy(() -> subject.transformToLdml(documentationUnit))
+        .isInstanceOf(LdmlTransformationException.class)
+        .hasMessageContaining("Missing judgment body.");
+  }
+
+  @Test
+  void testMinimalLdml_withMandatoryFieldsAndLongText() throws IOException {
+    // Arrange
+    var documentationUnit =
+        Decision.builder()
+            .uuid(UUID.randomUUID())
+            .coreData(
+                CoreData.builder()
+                    .court(
+                        Court.builder()
+                            .type("Tribunal Administratif")
+                            .location("Nantes")
+                            .label("Tribunal Administratif Nantes")
+                            .region("FRA")
+                            .build())
+                    .documentType(
+                        DocumentType.builder().label("testDocumentTypeAbbreviation").build())
+                    .fileNumbers(List.of("testFileNumber"))
+                    .decisionDate(LocalDate.of(2020, 1, 1))
+                    .build())
+            .documentNumber("testDocumentNumber")
+            .longTexts(LongTexts.builder().caseFacts("<p>Example content 1</p>").build())
+            .build();
+    Path expectedFilePath = Paths.get("src/test/resources/testdata/decision_minimal_ldml.xml");
+    String expected = Files.readString(expectedFilePath, StandardCharsets.UTF_8);
+
+    // Act
+    CaseLawLdml ldml = subject.transformToLdml(documentationUnit);
+
+    // Assert
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+    Assertions.assertTrue(fileContent.isPresent());
+
+    Diff diff =
+        DiffBuilder.compare(expected)
+            .withTest(fileContent.get())
+            .withDifferenceEvaluator(TestUtils.ignoreAttributeEvaluator)
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
@@ -522,7 +596,7 @@ class DecisionFullLdmlTransformerTest {
                         .label("courtLabel test")
                         .type("courtType")
                         .location("courtLocation")
-                        .region("region test")
+                        .region("NW")
                         .build())
                 .source(
                     Source.builder()

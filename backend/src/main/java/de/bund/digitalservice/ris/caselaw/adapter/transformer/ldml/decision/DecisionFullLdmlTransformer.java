@@ -191,24 +191,26 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
     builder.append(buildCommonHeader(decision));
 
-    // Entscheidungsname
-    if (decision.shortTexts().decisionName() != null) {
-      builder
-          .append("<p>Entscheidungsname: ")
-          .append("<akn:docTitle refersTo=\"#entscheidungsname\">")
-          .append(decision.shortTexts().decisionName())
-          .append("</akn:docTitle></p>");
-    }
+    if (decision.shortTexts() != null) {
+      // Entscheidungsname
+      if (decision.shortTexts().decisionName() != null) {
+        builder
+            .append("<p>Entscheidungsname: ")
+            .append("<akn:docTitle refersTo=\"#entscheidungsname\">")
+            .append(decision.shortTexts().decisionName())
+            .append("</akn:docTitle></p>");
+      }
 
-    // Titelzeile
-    if (decision.shortTexts().headline() != null) {
-      builder.append("<p>Titelzeile: ");
-      builder
-          .append("<akn:shortTitle refersTo=\"#titelzeile\">")
-          .append("<akn:embeddedStructure>")
-          .append(decision.shortTexts().headline())
-          .append("</akn:embeddedStructure>")
-          .append("</akn:shortTitle></p>");
+      // Titelzeile
+      if (decision.shortTexts().headline() != null) {
+        builder.append("<p>Titelzeile: ");
+        builder
+            .append("<akn:shortTitle refersTo=\"#titelzeile\">")
+            .append("<akn:embeddedStructure>")
+            .append(decision.shortTexts().headline())
+            .append("</akn:embeddedStructure>")
+            .append("</akn:shortTitle></p>");
+      }
     }
 
     return JaxbHtml.build(htmlTransformer.htmlStringToObjectList(builder.toString()));

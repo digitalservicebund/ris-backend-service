@@ -6,9 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Getter
-public class AknKeyword {
-  @XmlAttribute(name = "domainTerm", namespace = CaseLawLdml.RIS_NS)
-  private String domainTerm;
+public class AknKeyword extends BaseLdml {
 
   @XmlAttribute(name = "dictionary")
   private String dictionary;
@@ -21,7 +19,7 @@ public class AknKeyword {
 
   public AknKeyword(String value) {
     this.domainTerm = "Schlagwort";
-    this.dictionary = "";
+    this.dictionary = ""; // Is empty as we don't use a "Wertetabelle" for Keywords
     this.showAs = value;
     this.value = value;
   }

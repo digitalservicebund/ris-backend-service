@@ -8,7 +8,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.DocumentRef;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.ForeignLanguageVersion;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrAuthor;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrLanguage;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
@@ -28,7 +27,6 @@ import java.util.Objects;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Abstract base class for transforming decisions into LDML case law format. Provides common
@@ -195,11 +193,6 @@ public abstract class DecisionCommonLdmlTransformer
               Opinions.build(htmlTransformer.htmlStringToObjectList(dissentingOpinion)));
     }
     return null;
-  }
-
-  @NotNull
-  private static FrbrAuthor getFrbrAuthor() {
-    return new FrbrAuthor();
   }
 
   protected String nullIfEmpty(String input) {

@@ -27,8 +27,13 @@ import jakarta.xml.bind.ValidationException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
+  Set<String> GERMAN_STATES =
+      Set.of(
+          "BW", "BY", "BE", "BB", "HB", "HH", "HE", "MV", "NI", "NW", "RP", "SL", "SN", "ST", "SH",
+          "TH");
 
   CaseLawLdml transformToLdml(T documentationUnit);
 
@@ -58,14 +63,21 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
 
     List<FrbrAlias> aliases = generateAliases(documentationUnit);
 
-    FrbrElement work =
+    var elementBuilder =
         FrbrElement.builder()
             .frbrAlias(aliases)
             .frbrDate(frbrDecisionDate)
-            .frbrAuthor(workExpressionAuthor)
-            .frbrCountry(new FrbrCountry())
-            .build()
-            .withFrbrThisAndUri(uniqueId);
+            .frbrAuthor(workExpressionAuthor);
+
+    if (documentationUnit.coreData() != null
+        && documentationUnit.coreData().court() != null
+        && documentationUnit.coreData().court().region() != null) {
+      elementBuilder.frbrCountry(
+          // The schmema says ISO 3166-1 Alpha-2 code, but we only have Alpha-3 available (for now)
+          new FrbrCountry(getCountry(documentationUnit.coreData().court().region())));
+    }
+
+    FrbrElement work = elementBuilder.build().withFrbrThisAndUri(uniqueId);
 
     FrbrElement expression =
         FrbrElement.builder()
@@ -89,7 +101,14 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
         .build();
   }
 
-  private static String getDateName(DocumentationUnit documentationUnit) {
+  private String getCountry(String region) {
+    if (GERMAN_STATES.contains(region.toUpperCase())) {
+      return "deu";
+    }
+    return region.toLowerCase();
+  }
+
+  private String getDateName(DocumentationUnit documentationUnit) {
     if (documentationUnit instanceof Decision) {
       return "Entscheidungsdatum";
     }
@@ -207,7 +226,8 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     List<TlcElement> tlcPersons = new ArrayList<>();
     List<TlcElement> tlcLocations = new ArrayList<>();
 
-    TlcElement ds = new TlcElement("ris", "", "Rechtsinformationssystem des Bundes");
+    TlcElement ds =
+        new TlcElement(CaseLawLdml.RIS, "", CaseLawLdml.RECHTSINFORMATIONSSYSTEM_DES_BUNDES);
     tlcOrganizations.add(ds);
 
     if (documentationUnit.coreData() != null
@@ -247,6 +267,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
   private void transformParticipatingJudges(
       DocumentationUnit documentationUnit, List<TlcElement> tlcPersons) {
     if (documentationUnit instanceof Decision decision
+        && decision.longTexts() != null
         && !decision.longTexts().participatingJudges().isEmpty()) {
       decision
           .longTexts()
@@ -272,7 +293,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     return toKebabCase(documentationOffice.abbreviation()) + "-dokumentationsstelle";
   }
 
-  private static String toKebabCase(String input) {
+  private String toKebabCase(String input) {
     if (input == null) return null;
 
     // Remove all non-letters

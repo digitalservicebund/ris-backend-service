@@ -16,13 +16,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @XmlRootElement
-public class JaxbHtml {
+public class JaxbHtml extends BaseLdml {
 
   @XmlAttribute(name = "name")
   private String name;
-
-  @XmlAttribute(namespace = CaseLawLdml.RIS_NS, name = "domainTerm")
-  private String domainTerm;
 
   @XmlAnyElement @XmlMixed private List<Object> html;
 
