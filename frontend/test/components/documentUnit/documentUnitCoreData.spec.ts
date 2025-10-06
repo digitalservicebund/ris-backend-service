@@ -151,7 +151,7 @@ describe("Core Data", () => {
     )
     await user.type(input, "02.02.2022{enter}")
 
-    expect(model.value.deviatingDecisionDates).toEqual(["2022-02-02"])
+    expect(model.value.oralHearingDates).toEqual(["2022-02-02"])
   })
 
   test("renders year of dispute", async () => {
