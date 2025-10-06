@@ -1694,6 +1694,24 @@ class DecisionTransformerTest {
   }
 
   @Test
+  void testTransformToDTO_withOralHearingDates_shouldAdd() {
+    Decision decision =
+        generateSimpleDocumentationUnitBuilder()
+            .coreData(
+                generateSimpleCoreDataBuilder()
+                    .oralHearingDates(List.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 2)))
+                    .build())
+            .build();
+
+    DecisionDTO decisionDTO =
+        DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+    assertThat(decisionDTO.getOralHearingDates())
+        .extracting("value")
+        .containsExactly(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 2));
+  }
+
+  @Test
   void testTransformToDTO_withoutDeviatingDocumentNumbers_shouldNotAdd() {
     Decision decision =
         generateSimpleDocumentationUnitBuilder()
