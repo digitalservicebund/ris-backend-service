@@ -280,7 +280,7 @@ class DecisionFullLdmlTransformerTest {
   void testTransform_borderNumber() {
     String expected =
         """
-        <akn:hcontainer eId="randnummer-1" name="Randnummer">
+        <akn:hcontainer ris:domainTerm="Randnummer" eId="randnummer-1" name="Randnummer">
            <akn:num>1</akn:num>
            <akn:content>
              <akn:p>Lorem ipsum</akn:p>
@@ -318,7 +318,7 @@ class DecisionFullLdmlTransformerTest {
         """
         <akn:p>Übertragungsleistungssteuerungsverfahren</akn:p>
         <akn:p>
-          This is my guiding principle<akn:ref class="border-number-link" href="#randnummer-70">70</akn:ref>
+          This is my guiding principle<akn:ref ris:domainTerm="Randnummernverlinkung" class="border-number-link" href="#randnummer-70">70</akn:ref>
         </akn:p>
         """;
     Decision decision =

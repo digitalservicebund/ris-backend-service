@@ -185,7 +185,7 @@
     </xsl:template>
 
     <xsl:template name="borderNumberTemplate">
-        <akn:hcontainer eId="randnummer-{number}"  name="Randnummer">
+        <akn:hcontainer ris:domainTerm="Randnummer" eId="randnummer-{number}"  name="Randnummer">
             <xsl:apply-templates select="@* | node()"/>
         </akn:hcontainer>
     </xsl:template>
@@ -208,7 +208,7 @@
 
     <xsl:template name="borderNumberLinkTemplate">
         <!--Any other existing attributes for border-number-link will be lost -->
-        <akn:ref class="border-number-link" href="{concat('#randnummer-',@nr)}">
+        <akn:ref ris:domainTerm="Randnummernverlinkung" class="border-number-link" href="{concat('#randnummer-',@nr)}">
             <xsl:apply-templates/>
         </akn:ref>
     </xsl:template>
