@@ -26,6 +26,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -211,7 +212,7 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @Builder.Default
   private List<ParticipatingJudgeDTO> participatingJudges = new ArrayList<>();
 
-  /* Definition */
+  /** Definition */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
@@ -228,7 +229,7 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @Builder.Default
   private Set<DuplicateRelationDTO> duplicateRelations2 = new HashSet<>();
 
-  // Fremdsprachige Fassung
+  /** Fremdsprachige Fassung */
   @OneToMany(
       mappedBy = "documentationUnit",
       cascade = CascadeType.ALL,
@@ -237,6 +238,18 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   @Builder.Default
   private List<ForeignLanguageVersionDTO> foreignLanguageVersions = new ArrayList<>();
+
+  /** Zustellung an Verkündungs statt: If true documentation_unit.date column = Verkündungsdatum */
+  @Column(name = "has_delivery_date")
+  @Accessors(fluent = true)
+  private boolean hasDeliveryDate;
+
+  /** Datum mündliche Verhandlung */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @Builder.Default
+  @OrderBy("rank")
+  private List<OralHearingDateDTO> oralHearingDates = new ArrayList<>();
 
   @Override
   @SuppressWarnings("java:S2097") // Class type check is not recognized by Sonar

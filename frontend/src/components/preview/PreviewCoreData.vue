@@ -6,7 +6,7 @@ import FlexItem from "@/components/FlexItem.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
-import { CoreData } from "@/domain/coreData"
+import { CoreData, coreDataLabels } from "@/domain/coreData"
 
 import { Kind } from "@/domain/documentationUnitKind"
 
@@ -73,6 +73,16 @@ const sourceValue = computed(() =>
       <PreviewCategory>Abweichendes {{ dateLabel }}</PreviewCategory>
       <PreviewContent>
         <div v-for="item in coreData.deviatingDecisionDates" :key="item">
+          {{ dayjs(item).format("DD.MM.YYYY") }}
+        </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow
+      v-if="coreData.oralHearingDates && coreData.oralHearingDates.length > 0"
+    >
+      <PreviewCategory>{{ coreDataLabels.oralHearingDates }}</PreviewCategory>
+      <PreviewContent>
+        <div v-for="item in coreData.oralHearingDates" :key="item">
           {{ dayjs(item).format("DD.MM.YYYY") }}
         </div>
       </PreviewContent>

@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ForeignLanguageVe
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
@@ -33,6 +34,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Source;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -86,6 +88,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       builder
           .judicialBody(StringUtils.normalizeSpace(coreData.appraisalBody()))
           .date(coreData.decisionDate())
+          .hasDeliveryDate(coreData.hasDeliveryDate())
           .celexNumber(coreData.celexNumber())
           .documentType(
               coreData.documentType() != null
@@ -107,6 +110,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       addDeviatingDecisionDates(builder, coreData);
       addDeviatingFileNumbers(builder, coreData, currentDto);
       addSource(currentDto, builder, updatedDomainObject);
+      addOralHearingDates(builder, coreData);
 
     } else {
       builder
@@ -477,6 +481,22 @@ public class DecisionTransformer extends DocumentableTransformer {
     builder.deviatingEclis(deviatingEcliDTOs);
   }
 
+  static void addOralHearingDates(DecisionDTO.DecisionDTOBuilder<?, ?> builder, CoreData coreData) {
+    if (coreData.oralHearingDates() == null) {
+      return;
+    }
+
+    List<OralHearingDateDTO> oralHearingDateDTOs = new ArrayList<>();
+    List<LocalDate> oralHearingDates = coreData.oralHearingDates();
+
+    for (int i = 0; i < oralHearingDates.size(); i++) {
+      oralHearingDateDTOs.add(
+          OralHearingDateDTO.builder().value(oralHearingDates.get(i)).rank(i + 1L).build());
+    }
+
+    builder.oralHearingDates(oralHearingDateDTOs);
+  }
+
   private static void addInputTypes(DecisionDTOBuilder<?, ?> builder, CoreData coreData) {
     if (coreData.inputTypes() == null) {
       return;
@@ -635,7 +655,12 @@ public class DecisionTransformer extends DocumentableTransformer {
         .creatingDocOffice(
             DocumentationOfficeTransformer.transformToDomain(
                 decisionDTO.getCreatingDocumentationOffice()))
-        .source(getSource(decisionDTO));
+        .source(getSource(decisionDTO))
+        .hasDeliveryDate(decisionDTO.hasDeliveryDate())
+        .oralHearingDates(
+            Optional.ofNullable(decisionDTO.getOralHearingDates())
+                .map(d -> d.stream().map(OralHearingDateDTO::getValue).toList())
+                .orElse(null));
 
     addInputTypesToDomain(decisionDTO, coreDataBuilder);
     addLeadingDecisionNormReferencesToDomain(decisionDTO, coreDataBuilder);

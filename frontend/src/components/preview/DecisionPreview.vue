@@ -50,7 +50,11 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     </p>
     <PreviewCoreData
       :core-data="decision.coreData"
-      date-label="Entscheidungsdatum"
+      :date-label="
+        decision.coreData.hasDeliveryDate
+          ? 'Datum der Zustellung an Verkündungs statt'
+          : 'Entscheidungsdatum'
+      "
       :kind="Kind.DECISION"
     />
     <PreviewNote :note="decision.note" />

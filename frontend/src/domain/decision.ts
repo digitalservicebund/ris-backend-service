@@ -241,18 +241,18 @@ export class Decision {
   }
 
   get missingRequiredFields() {
-    return Decision.requiredFields.filter((field) =>
-      this.isEmpty(this.coreData[field]),
-    )
+    const dynamicRequiredFields: (keyof CoreData)[] = this.coreData
+      .hasDeliveryDate
+      ? ["oralHearingDates"]
+      : []
+    const requiredFields = [
+      ...Decision.requiredFields,
+      ...dynamicRequiredFields,
+    ]
+    return requiredFields.filter((field) => this.isEmpty(this.coreData[field]))
   }
 
-  public static isRequiredField(fieldName: string) {
-    return Decision.requiredFields.some(
-      (requiredfieldName) => requiredfieldName === fieldName,
-    )
-  }
-
-  public isEmpty(value: CoreData[(typeof Decision.requiredFields)[number]]) {
+  public isEmpty(value: CoreData[keyof CoreData]) {
     if (value === undefined || !value) {
       return true
     }

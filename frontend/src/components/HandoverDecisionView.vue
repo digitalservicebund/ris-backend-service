@@ -29,7 +29,6 @@ import { DuplicateRelationStatus } from "@/domain/managementData"
 import PreviousDecision, {
   previousDecisionFieldLabels,
 } from "@/domain/previousDecision"
-import { fieldLabels } from "@/fields/caselaw"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -147,7 +146,7 @@ function handoverDocumentUnit() {
 
 //Required Core Data fields
 const missingCoreDataFields = ref(
-  decision.value!.missingRequiredFields.map((field) => fieldLabels[field]),
+  decision.value!.missingRequiredFields.map((field) => coreDataLabels[field]),
 )
 
 const pendingDuplicates = ref(
@@ -165,6 +164,10 @@ const fieldsWithoutJdvExport = computed<string[]>(() => {
     fieldLabels.push(contentRelatedIndexingLabels.foreignLanguageVersions)
   if (decision.value?.coreData?.celexNumber)
     fieldLabels.push(coreDataLabels.celexNumber)
+  if (decision.value?.coreData?.hasDeliveryDate)
+    fieldLabels.push(coreDataLabels.hasDeliveryDate)
+  if (decision.value?.coreData?.oralHearingDates?.length)
+    fieldLabels.push(coreDataLabels.oralHearingDates)
   return fieldLabels
 })
 

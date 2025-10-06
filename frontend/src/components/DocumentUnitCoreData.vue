@@ -42,6 +42,7 @@ const validationStore =
       "decisionDate",
       "yearsOfDispute",
       "deviatingDecisionDates",
+      "oralHearingDates",
       "source",
     ][number]
   >()
@@ -230,6 +231,43 @@ onBeforeUnmount(() => {
           </InputField>
         </template>
       </NestedComponent>
+    </div>
+    <div :class="layoutClass">
+      <InputField
+        v-if="!isPendingProceeding"
+        id="hasDeliveryDate"
+        v-slot="{ id }"
+        :label="coreDataLabels.hasDeliveryDate"
+        label-class="ris-label1-regular"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <Checkbox
+          v-model="coreDataModel.hasDeliveryDate"
+          :aria-label="coreDataLabels.hasDeliveryDate"
+          binary
+          data-testid="has-delivery-date"
+          :input-id="id"
+          size="large"
+        />
+      </InputField>
+      <InputField
+        id="oralHearingDates"
+        v-slot="slotProps"
+        :label="
+          coreDataLabels.oralHearingDates +
+          (coreDataModel.hasDeliveryDate ? ' *' : '')
+        "
+        :validation-error="validationStore.getByField('oralHearingDates')"
+      >
+        <ChipsDateInput
+          id="oralHearingDates"
+          v-model="coreDataModel.oralHearingDates"
+          aria-label="Datum der mündlichen Verhandlung"
+          :has-error="slotProps.hasError"
+          @focus="validationStore.remove('oralHearingDates')"
+          @update:validation-error="slotProps.updateValidationError"
+        />
+      </InputField>
     </div>
     <div :class="layoutClass">
       <InputField
