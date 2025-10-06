@@ -76,7 +76,8 @@ public class ScheduledPublicationService {
       String email = docUnit.managementData().scheduledByEmail();
       String subject = "Terminierte Abgabe fehlgeschlagen: " + docNumber;
       String body =
-          ("""
+          (
+"""
 Die Terminierte Abgabe von Dokument %s konnte nicht erfolgen.
 Bitte beheben Sie den Fehler und wiederholen Sie die Abgabe manuell.
 Technischer Fehler: %s""")

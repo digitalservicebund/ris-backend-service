@@ -6,6 +6,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitT
 import de.bund.digitalservice.ris.caselaw.domain.Attachment2Html;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
+import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcessStepRequest;
+import de.bund.digitalservice.ris.caselaw.domain.BulkDocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -79,6 +81,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class DocumentationUnitController {
   private final DocumentationUnitService service;
+  private final BulkDocumentationUnitService abstractService;
   private final UserService userService;
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
@@ -91,6 +94,7 @@ public class DocumentationUnitController {
 
   public DocumentationUnitController(
       DocumentationUnitService service,
+      BulkDocumentationUnitService abstractService,
       UserService userService,
       AttachmentService attachmentService,
       ConverterService converterService,
@@ -110,6 +114,7 @@ public class DocumentationUnitController {
         documentationUnitDocxMetadataInitializationService;
     this.duplicateCheckService = duplicateCheckService;
     this.eurLexSOAPSearchService = eurLexSOAPSearchService;
+    this.abstractService = abstractService;
   }
 
   /**
@@ -669,6 +674,23 @@ public class DocumentationUnitController {
     try {
       User user = userService.getUser(oidcUser);
       service.bulkAssignProcedure(body.getDocumentationUnitIds(), body.getProcedureLabel(), user);
+      return ResponseEntity.ok().build();
+    } catch (DocumentationUnitNotExistsException e) {
+      return ResponseEntity.notFound().build();
+    } catch (BadRequestException e) {
+      return ResponseEntity.badRequest().build();
+    }
+  }
+
+  @PatchMapping(value = "/bulk-assign-process-step")
+  @PreAuthorize("@userHasBulkWriteAccess.apply(#body.getDocumentationUnitIds())")
+  public ResponseEntity<Void> bulkAssignProcessStep(
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @RequestBody @Valid BulkAssignProcessStepRequest body) {
+    try {
+      User user = userService.getUser(oidcUser);
+      abstractService.bulkAssignProcessStep(
+          body.getDocumentationUnitIds(), body.getDocumentationUnitProcessStep(), user);
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {
       return ResponseEntity.notFound().build();

@@ -1,12 +1,11 @@
 <script setup lang="ts" generic="TDocument">
 import dayjs from "dayjs"
-import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
 import Dialog from "primevue/dialog"
 import Select from "primevue/select"
-import { computed, Ref, ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import { InfoStatus } from "./enumInfoStatus"
 import AssigneeBadge from "@/components/AssigneeBadge.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
@@ -14,6 +13,7 @@ import IconBadge from "@/components/IconBadge.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import { useProcessStepBadge } from "@/composables/useProcessStepBadge"
+import { useValidationStore } from "@/composables/useValidationStore"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
 import ProcessStep from "@/domain/processStep"
@@ -21,87 +21,101 @@ import { User } from "@/domain/user"
 import ComboboxItemService from "@/services/comboboxItemService"
 import { ResponseError } from "@/services/httpClient"
 import processStepService from "@/services/processStepService"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-const emit = defineEmits<{
-  onProcessStepUpdated: []
-  onCancelled: []
+const props = defineProps<{
+  documentationUnit?: DocumentationUnit
+  handleAssignProcessStep: (
+    documentationUnitProcessStep: DocumentationUnitProcessStep,
+  ) => Promise<ResponseError | undefined>
 }>()
+
+type ProcessStepField = ["nextProcessStep", "processStepPerson"][number]
+const validationStore = useValidationStore<ProcessStepField>()
 
 const visible = defineModel<boolean>("visible", {
   default: false,
   type: Boolean,
 })
 
-const store = useDocumentUnitStore()
-const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentationUnit>
-}
-
 const processSteps = ref<ProcessStep[]>()
 const nextProcessStep = ref<ProcessStep>()
-const errors = ref<ResponseError[]>([])
-const nextProcessStepUser = ref<User>()
+const nextUser = ref<User>()
+// erros from fetching the process steps
+const fetchProcessStepsErrors = ref<ResponseError[]>([])
+// input error
+const hasNoProcessStepSelectedError = ref(false)
 
 /**
  * Data restructuring from user props to combobox item.
  */
 const selectedUser = computed({
   get: () =>
-    nextProcessStepUser.value
+    nextUser.value
       ? {
-          label:
-            nextProcessStepUser.value.initials ||
-            nextProcessStepUser.value.email ||
-            "",
-          value: nextProcessStepUser.value,
+          label: nextUser.value.initials || nextUser.value.email || "",
+          value: nextUser.value,
         }
       : undefined,
   set: (newValue) => {
-    nextProcessStepUser.value = { ...newValue } as User
+    nextUser.value = { ...newValue } as User
   },
 })
 
-async function updateProcessStep(): Promise<void> {
+function validate() {
+  validationStore.reset()
   if (nextProcessStep.value) {
-    documentUnit.value!.currentDocumentationUnitProcessStep = {
-      processStep: nextProcessStep.value,
-      user: nextProcessStepUser.value,
-    }
-    const response = await store.updateDocumentUnit()
-    if (response.error) {
-      errors.value?.push({
-        title: "Die Dokumentationseinheit konnte nicht weitergegeben werden.",
-        description: "Versuchen Sie es erneut.",
+    validationStore.remove("nextProcessStep")
+    return true
+  } else {
+    validationStore.add("Wählen Sie einen Schritt", "nextProcessStep")
+    return false
+  }
+}
+
+async function assignProcessStep(): Promise<void> {
+  if (validate()) {
+    const error = await props.handleAssignProcessStep({
+      processStep: nextProcessStep.value!,
+      user: nextUser.value,
+    })
+
+    if (error) {
+      fetchProcessStepsErrors.value?.push({
+        title: error.title,
+        description: error.description,
       })
     } else {
-      emit("onProcessStepUpdated")
-      nextProcessStepUser.value = undefined
+      nextUser.value = undefined
+      nextProcessStep.value = undefined
     }
   }
 }
 
-// The logic you want to run every time the dialog is shown
 const fetchData = async () => {
-  const processStepsResponse = await processStepService.getProcessSteps()
+  // 💡 Call with 'true' to get only assignable steps: ?assignableOnly=true
+  const processStepsResponse = await processStepService.getProcessSteps(true)
   if (processStepsResponse.error) {
-    errors.value?.push(processStepsResponse.error)
+    fetchProcessStepsErrors.value?.push(processStepsResponse.error)
   } else {
     processSteps.value = processStepsResponse.data
   }
 
-  const nextProcessStepResponse = await processStepService.getNextProcessStep(
-    documentUnit.value.uuid,
-  )
-  if (nextProcessStepResponse.error) {
-    errors.value?.push(nextProcessStepResponse.error)
-  } else {
-    nextProcessStep.value = nextProcessStepResponse.data
+  // documentationUnit not given when multi edit, and therefor no next processstep
+  if (props.documentationUnit) {
+    const nextProcessStepResponse = await processStepService.getNextProcessStep(
+      props.documentationUnit.uuid,
+    )
+    if (nextProcessStepResponse.error) {
+      fetchProcessStepsErrors.value?.push(nextProcessStepResponse.error)
+    } else {
+      nextProcessStep.value = nextProcessStepResponse.data
+    }
   }
 }
 
 function rowClass(data: DocumentationUnitProcessStep): string {
-  return data.id !== documentUnit.value.processSteps?.at(0)?.id
+  return props.documentationUnit &&
+    data.id !== props.documentationUnit.processSteps?.at(0)?.id
     ? "bg-gray-100"
     : ""
 }
@@ -110,9 +124,10 @@ watch(
   visible,
   async (newValue) => {
     if (newValue === true) {
-      errors.value = []
+      fetchProcessStepsErrors.value = []
       await fetchData()
     }
+    validationStore.reset()
   },
   { immediate: true },
 )
@@ -128,9 +143,12 @@ watch(
     modal
   >
     <div class="flex w-full flex-col pt-32">
-      <div v-if="errors.length > 0" class="mb-48 flex flex-col">
+      <div
+        v-if="fetchProcessStepsErrors.length > 0"
+        class="mb-48 flex flex-col"
+      >
         <InfoModal
-          v-for="(error, index) in errors"
+          v-for="(error, index) in fetchProcessStepsErrors"
           :key="index"
           :class="index !== 0 ? 'mt-16' : ''"
           data-testid="service-error"
@@ -142,13 +160,22 @@ watch(
 
       <div class="flex gap-32">
         <div class="flex-1">
-          <InputField id="nextProcessStep" label="Neuer Schritt">
+          <InputField
+            id="nextProcessStep"
+            v-slot="slotProps"
+            label="Neuer Schritt"
+            :validation-error="validationStore.getByField('nextProcessStep')"
+          >
             <Select
               v-model="nextProcessStep"
               aria-label="Neuer Schritt"
               class="w-full"
+              :has-error="hasNoProcessStepSelectedError"
+              :invalid="slotProps.hasError"
               option-label="name"
               :options="processSteps"
+              @blur="validate"
+              @focus="validationStore.remove('nextProcessStep')"
             ></Select>
           </InputField>
         </div>
@@ -169,25 +196,26 @@ watch(
       >
         <Button
           aria-label="Weitergeben"
-          :disabled="!nextProcessStep"
           label="Weitergeben"
           severity="primary"
           size="small"
-          @click="updateProcessStep"
+          @click="assignProcessStep"
         ></Button>
         <Button
           aria-label="Abbrechen"
           label="Abbrechen"
           severity="secondary"
           size="small"
-          @click="$emit('onCancelled')"
+          @click="visible = false"
         ></Button>
       </div>
 
+      <!-- history not visible for multi edit -->
       <DataTable
+        v-if="props.documentationUnit"
         class="overflow-x-scroll pt-32"
         :row-class="rowClass"
-        :value="documentUnit.processSteps"
+        :value="props.documentationUnit.processSteps"
       >
         <Column field="createdAt" header="Datum">
           <template #body="{ data: item }">

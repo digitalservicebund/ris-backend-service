@@ -33,12 +33,12 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@a7ab372554b6eb1a8eb25e7d9aec1cc9f3ea1a76
+        uses: actions/setup-java@ead9eaa3cfe0b0fc2fa749519ae09c3d4f4080b0
         with:
           java-version: "21.0"
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
+        uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1 # v4.4.4
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Run backend tests
@@ -73,12 +73,12 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@a7ab372554b6eb1a8eb25e7d9aec1cc9f3ea1a76
+        uses: actions/setup-java@ead9eaa3cfe0b0fc2fa749519ae09c3d4f4080b0
         with:
           java-version: "21.0"
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
+        uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1 # v4.4.4
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Build backend image
@@ -160,7 +160,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Set up JDK
-        uses: actions/setup-java@a7ab372554b6eb1a8eb25e7d9aec1cc9f3ea1a76
+        uses: actions/setup-java@ead9eaa3cfe0b0fc2fa749519ae09c3d4f4080b0
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -339,7 +339,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@bdf14dc17331d6af6f3653e7ca655ee4a136baa5
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -349,7 +349,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@074636bf86584fb361059563d092a9cfb6560f80
+        uses: sigstore/cosign-installer@d7543c93d881b35a8faa02e8e3605f69b7a1ce62
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - id: set-version
@@ -387,7 +387,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@bdf14dc17331d6af6f3653e7ca655ee4a136baa5
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -397,7 +397,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@074636bf86584fb361059563d092a9cfb6560f80
+        uses: sigstore/cosign-installer@d7543c93d881b35a8faa02e8e3605f69b7a1ce62
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - id: set-version
@@ -423,7 +423,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@cd899cc96227b82170571cad1c3d6378d8cba678
+      - uses: chainguard-dev/actions/setup-gitsign@6f4f4de7549514e7b659741b30f6476f245600dd
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -574,7 +574,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@cd899cc96227b82170571cad1c3d6378d8cba678
+      - uses: chainguard-dev/actions/setup-gitsign@6f4f4de7549514e7b659741b30f6476f245600dd
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -616,7 +616,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@cd899cc96227b82170571cad1c3d6378d8cba678
+      - uses: chainguard-dev/actions/setup-gitsign@6f4f4de7549514e7b659741b30f6476f245600dd
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -670,13 +670,13 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@a7ab372554b6eb1a8eb25e7d9aec1cc9f3ea1a76
+        uses: actions/setup-java@ead9eaa3cfe0b0fc2fa749519ae09c3d4f4080b0
         with:
           java-version: "21.0"
           distribution: "temurin"
           cache: gradle
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
+        uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1 # v4.4.4
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Migrate database for Entity–relationship model
@@ -707,7 +707,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Set up JDK
-        uses: actions/setup-java@a7ab372554b6eb1a8eb25e7d9aec1cc9f3ea1a76
+        uses: actions/setup-java@ead9eaa3cfe0b0fc2fa749519ae09c3d4f4080b0
         with:
           java-version: "21.0"
           distribution: "temurin"

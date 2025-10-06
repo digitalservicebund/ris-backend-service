@@ -6,6 +6,7 @@ import InfoModal from "@/components/InfoModal.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import PortalPublicationStatusBadge from "@/components/publication/PortalPublicationStatusBadge.vue"
 import UatTestPortalInfo from "@/components/publication/UatTestPortalInfo.vue"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { Decision } from "@/domain/decision"
 import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
 import { ResponseError } from "@/services/httpClient"
@@ -24,6 +25,9 @@ const store = useDocumentUnitStore()
 const { documentUnit: decision } = storeToRefs(store) as {
   documentUnit: Ref<Decision>
 }
+
+const isPortalPublicationEnabled = useFeatureToggle("neuris.portal-publication")
+
 const session = useSessionStore()
 const linkToPortal = computed(
   () => session.env?.portalUrl + "/case-law/" + decision.value.documentNumber,
@@ -149,6 +153,12 @@ const lastPublishedAt = computed(() => {
       :description="docUnitPublicationError.description"
       :title="docUnitPublicationError.title"
     />
+    <InfoModal
+      v-if="!isPortalPublicationEnabled"
+      aria-label="Portal-Veröffentlichung deaktiviert"
+      description="Auf Produktion ist die manuelle Portal-Veröffentlichung deaktiviert. Sie können veröffentlichte Dokumentationseinheiten jedoch manuell zurückziehen. Beachten Sie, dass die Dokumentationseinheit durch die jDV-Delta-Migration erneut automatisiert veröffentlicht werden kann."
+      title="Portal-Veröffentlichung deaktiviert"
+    />
     <div class="flex flex-row gap-24">
       <PopupModal
         v-if="showPublicationWarningModal"
@@ -162,7 +172,12 @@ const lastPublishedAt = computed(() => {
       />
       <Button
         aria-label="Veröffentlichen"
-        :disabled="!props.isPublishable || isWithdrawing || isPublishing"
+        :disabled="
+          !props.isPublishable ||
+          isWithdrawing ||
+          isPublishing ||
+          !isPortalPublicationEnabled
+        "
         label="Veröffentlichen"
         :loading="isPublishing"
         size="small"

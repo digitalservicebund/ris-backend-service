@@ -48,7 +48,6 @@ neuris:
 languagetool:
   url: http://localhost:8181/v2/check
   language: de-DE
-  enabled: false
 
 eurlex:
 #  username: ${EURLEX_USERNAME}

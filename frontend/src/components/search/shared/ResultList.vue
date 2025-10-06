@@ -3,22 +3,21 @@ import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjsTimezone from "dayjs/plugin/timezone"
 import dayjsUtc from "dayjs/plugin/utc"
-
 import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
 import { computed, ref, onMounted, onUnmounted } from "vue"
-
 import AssigneeBadge from "@/components/AssigneeBadge.vue"
+import BulkAssignProcessStep from "@/components/BulkAssignProcessStep.vue"
 import CurrentAndPreviousProcessStepBadge from "@/components/CurrentAndPreviousProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
+import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
-
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { PublicationState } from "@/domain/publicationStatus"
-
+import featureToggleService from "@/services/featureToggleService"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
 import IconError from "~icons/ic/baseline-error"
 import IconSubject from "~icons/ic/baseline-subject"
@@ -50,7 +49,6 @@ const isDecision = computed(() => props.kind === Kind.DECISION)
 const entries = computed(() => props.pageEntries?.content || [])
 
 // --- START: sticky header logic ---
-
 const tableWrapper = ref<HTMLElement | null>(null)
 const isSticky = ref(false)
 
@@ -64,9 +62,18 @@ const handleScroll = () => {
 const stickyHeaderPT = computed(() => {
   return isSticky.value
     ? {
-        thead: {
+        header: {
           class:
-            "sticky top-0 bg-white shadow-[0_1px_0_var(--color-blue-300)] z-999",
+            "sticky top-0 bg-white z-999 shadow-[0_1px_0_var(--color-blue-300)]",
+        },
+        // the error messages are placed within the header template slot, so the thead nees to be positioned like
+        // top-[height of error message component]
+        thead: {
+          class: "sticky bg-white z-999 shadow-[0_1px_0_var(--color-blue-300)]",
+          style: {
+            // Conditionally set the 'top' value based on the error message
+            top: selectionErrorMessage.value ? "60px" : "0",
+          },
         },
         tablecontainer: {
           style: {
@@ -74,9 +81,12 @@ const stickyHeaderPT = computed(() => {
           },
         },
       }
-    : {}
+    : {
+        thead: {
+          class: "bg-white z-999",
+        },
+      }
 })
-
 // --- END: sticky header logic ---
 
 const attachmentText = (listEntry: DocumentUnitListEntry) =>
@@ -132,12 +142,46 @@ defineSlots<{
   "empty-state-content"?: (props: Record<string, never>) => unknown
 }>()
 
-onMounted(() => {
-  window.addEventListener("scroll", handleScroll)
+const multiEditActive = ref()
+
+// multi edit
+const selectedDocumentationUnits = ref<DocumentUnitListEntry[]>([])
+const selectionErrorMessage = ref<string | undefined>(undefined)
+const selectionErrorDocUnitIds = ref<string[]>([])
+function updateSelectionErrors(
+  error: string | undefined,
+  docUnitIds: string[],
+) {
+  selectionErrorMessage.value = error
+  selectionErrorDocUnitIds.value = docUnitIds
+}
+
+function reloadList() {
+  selectedDocumentationUnits.value = []
+  emit("updatePage", 0)
+}
+function resetErrorMessages() {
+  selectionErrorMessage.value = undefined
+  selectionErrorDocUnitIds.value = []
+}
+
+const rowStyleClass = (rowData: DocumentUnitListEntry) => {
+  if (selectionErrorDocUnitIds.value.includes(rowData.uuid!)) {
+    return "bg-red-200"
+  }
+
+  return ""
+}
+
+onMounted(async () => {
+  globalThis.addEventListener("scroll", handleScroll)
+  multiEditActive.value = (
+    await featureToggleService.isEnabled("neuris.multi-edit")
+  ).data
 })
 
 onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll)
+  globalThis.removeEventListener("scroll", handleScroll)
 })
 </script>
 
@@ -149,7 +193,40 @@ onUnmounted(() => {
       :page="pageEntries"
       @update-page="emit('updatePage', $event)"
     >
-      <DataTable :loading="loading" :pt="stickyHeaderPT" :value="entries">
+      <DataTable
+        v-model:selection="selectedDocumentationUnits"
+        :loading="loading"
+        :pt="stickyHeaderPT"
+        :row-class="rowStyleClass"
+        :value="entries"
+      >
+        <template #header>
+          <InputErrorMessages
+            v-if="selectionErrorMessage"
+            class="p-16"
+            data-testId="selection-errors"
+            :error-message="selectionErrorMessage"
+          />
+        </template>
+        <Column
+          v-if="multiEditActive && isDecision"
+          header-style="width: 3rem"
+          :pt="{
+            pcRowCheckbox: {
+              input: {
+                style: `${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
+                onClick: () => resetErrorMessages(),
+              },
+            },
+            pcHeaderCheckbox: {
+              input: {
+                style: `${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
+                onClick: () => resetErrorMessages(),
+              },
+            },
+          }"
+          selection-mode="multiple"
+        />
         <Column field="documentNumber" header="Dokumentnummer">
           <template #body="{ data: item }">
             <div class="flex flex-row items-center gap-8">
@@ -342,7 +419,13 @@ onUnmounted(() => {
         </Column>
         <Column field="actions">
           <template #header>
-            <span class="sr-only">Aktionen</span>
+            <BulkAssignProcessStep
+              v-if="multiEditActive && isDecision"
+              :documentation-units="selectedDocumentationUnits"
+              @process-step-assigned="reloadList"
+              @update-selection-errors="updateSelectionErrors"
+            ></BulkAssignProcessStep>
+            <span v-else class="sr-only">Aktionen</span>
           </template>
           <template #body="{ data: item }">
             <div class="flex flex-row justify-end -space-x-2">

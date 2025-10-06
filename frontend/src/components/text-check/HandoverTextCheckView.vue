@@ -7,6 +7,7 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import router from "@/router"
 import { ResponseError } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconCheck from "~icons/ic/baseline-check"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
@@ -17,8 +18,10 @@ const props = defineProps<{
 
 const responseError = ref<ResponseError | undefined>()
 
-const loading = ref()
+const loading = ref(true)
 const totalTextCheckErrors = ref(0)
+const store = useDocumentUnitStore()
+
 const textCategories = ref<string[] | undefined>()
 
 async function navigateToTextCheckSummaryInCategories() {
@@ -59,6 +62,7 @@ const textCategoriesRouter = (category: string) => ({
 })
 
 onBeforeMount(async () => {
+  await store.updateDocumentUnit()
   await checkAll(props.documentId)
 })
 </script>
@@ -118,9 +122,9 @@ onBeforeMount(async () => {
             </div>
           </div>
           <Button
-            aria-label="Rechtschreibfehler prüfen"
+            aria-label="Rubriken bearbeiten"
             class="w-fit"
-            label="Rechtschreibfehler prüfen"
+            label="Rubriken bearbeiten"
             severity="secondary"
             size="small"
             @click="navigateToTextCheckSummaryInCategories"

@@ -33,12 +33,15 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcessStepRequest;
+import de.bund.digitalservice.ris.caselaw.domain.BulkDocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
@@ -54,6 +57,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LdmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
+import de.bund.digitalservice.ris.caselaw.domain.ProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
@@ -81,6 +85,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
+import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
@@ -107,6 +112,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class DocumentationUnitControllerTest {
   @Autowired private RisWebTestClient risWebClient;
   @MockitoBean private DocumentationUnitService service;
+  @MockitoBean private BulkDocumentationUnitService abstractService;
   @MockitoBean private DocumentationUnitDocxMetadataInitializationService docUnitAttachmentService;
   @MockitoBean private HandoverService handoverService;
   @MockitoBean private PortalPublicationService portalPublicationService;
@@ -124,7 +130,13 @@ class DocumentationUnitControllerTest {
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;
-  @MockitoBean private Function<UUID, Boolean> userHasWriteAccess;
+
+  @MockitoBean(name = "userHasWriteAccess")
+  private Function<UUID, Boolean> userHasWriteAccess;
+
+  @MockitoBean(name = "userHasBulkWriteAccess")
+  private Function<List<UUID>, Boolean> userHasBulkWriteAccess;
+
   @MockitoBean private XmlUtilService xmlUtilService;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
@@ -1475,6 +1487,121 @@ class DocumentationUnitControllerTest {
 
         // once by the AuthService and once by the controller asking the service
         verify(service, times(1)).getImageBytes("ABCD202200001", "bild.abc");
+      }
+    }
+
+    @Nested
+    class BulkAssignProcessStep {
+      private final UUID documentationUnitId1 = UUID.randomUUID();
+      private final UUID documentationUnitId2 = UUID.randomUUID();
+      private final List<UUID> documentationUnitIds =
+          List.of(documentationUnitId1, documentationUnitId2);
+
+      private final DocumentationUnitProcessStep processStep =
+          DocumentationUnitProcessStep.builder()
+              .processStep(ProcessStep.builder().uuid(UUID.randomUUID()).name("NewStep").build())
+              .user(User.builder().id(UUID.randomUUID()).firstName("Test").lastName("User").build())
+              .build();
+
+      @Test
+      void testBulkAssignProcessStep_withValidRequest_shouldSucceed() throws Exception {
+        doReturn(user).when(userService).getUser(any(OidcUser.class));
+        BulkAssignProcessStepRequest requestBody =
+            new BulkAssignProcessStepRequest(processStep, documentationUnitIds);
+
+        risWebClient
+            .withDefaultLogin()
+            .patch()
+            .uri("/api/v1/caselaw/documentunits/bulk-assign-process-step")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+            .exchange()
+            .expectStatus()
+            .isOk();
+
+        verify(userService, times(1)).getUser(any(OidcUser.class));
+        verify(abstractService, times(1))
+            .bulkAssignProcessStep(documentationUnitIds, processStep, user);
+      }
+
+      @Test
+      void testBulkAssignProcessStep_withDocumentationUnitNotExistsException_shouldReturnNotFound()
+          throws Exception {
+        BulkAssignProcessStepRequest requestBody =
+            new BulkAssignProcessStepRequest(processStep, documentationUnitIds);
+
+        doThrow(DocumentationUnitNotExistsException.class)
+            .when(abstractService)
+            .bulkAssignProcessStep(any(), any(), any());
+
+        risWebClient
+            .withDefaultLogin()
+            .patch()
+            .uri("/api/v1/caselaw/documentunits/bulk-assign-process-step")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+            .exchange()
+            .expectStatus()
+            .isNotFound();
+      }
+
+      @Test
+      void testBulkAssignProcessStep_withBadRequestException_shouldReturnBadRequest()
+          throws Exception {
+        BulkAssignProcessStepRequest requestBody =
+            new BulkAssignProcessStepRequest(processStep, documentationUnitIds);
+
+        doThrow(BadRequestException.class)
+            .when(abstractService)
+            .bulkAssignProcessStep(any(), any(), any());
+
+        risWebClient
+            .withDefaultLogin()
+            .patch()
+            .uri("/api/v1/caselaw/documentunits/bulk-assign-process-step")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
+      }
+
+      @Test
+      void testBulkAssignProcessStep_withForbiddenAccess_shouldReturnForbidden() throws Exception {
+        BulkAssignProcessStepRequest requestBody =
+            new BulkAssignProcessStepRequest(processStep, documentationUnitIds);
+
+        when(userHasBulkWriteAccess.apply(any())).thenReturn(false);
+
+        risWebClient
+            .withDefaultLogin()
+            .patch()
+            .uri("/api/v1/caselaw/documentunits/bulk-assign-process-step")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+            .exchange()
+            .expectStatus()
+            .isForbidden();
+
+        verify(abstractService, never()).bulkAssignProcessStep(any(), any(), any());
+      }
+
+      @Test
+      void testBulkAssignProcessStep_withInvalidBody_shouldReturnBadRequest() throws Exception {
+        BulkAssignProcessStepRequest requestBody =
+            new BulkAssignProcessStepRequest(processStep, null);
+
+        risWebClient
+            .withDefaultLogin()
+            .patch()
+            .uri("/api/v1/caselaw/documentunits/bulk-assign-process-step")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
+
+        verify(abstractService, never()).bulkAssignProcessStep(any(), any(), any());
       }
     }
   }

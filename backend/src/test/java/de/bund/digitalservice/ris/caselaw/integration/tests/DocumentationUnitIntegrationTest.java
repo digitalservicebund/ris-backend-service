@@ -5,7 +5,6 @@ import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLIS
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -53,8 +52,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexResultRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcessStepTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
+import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcessStepRequest;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
@@ -98,7 +100,6 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -209,13 +210,21 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     User user = User.builder().documentationOffice(docOffice).build();
     var historyLogs = historyLogRepository.findByDocumentationUnitId(list.getFirst().getId(), user);
-    assertThat(historyLogs).hasSize(1);
-    assertThat(historyLogs.getFirst().eventType()).isEqualTo(HistoryLogEventType.CREATE);
-    assertThat(historyLogs.getFirst().documentationOffice()).isEqualTo("DS");
-    assertThat(historyLogs.getFirst().description()).isEqualTo("Dokeinheit angelegt");
-    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("testUser");
-    assertThat(historyLogs.getFirst().createdAt())
-        .isCloseTo(Instant.now(), within(5, ChronoUnit.SECONDS));
+
+    assertThat(historyLogs).hasSize(3);
+    assertThat(historyLogs)
+        .map(HistoryLog::eventType)
+        .containsExactly(
+            HistoryLogEventType.PROCESS_STEP_USER,
+            HistoryLogEventType.PROCESS_STEP,
+            HistoryLogEventType.CREATE);
+    assertThat(historyLogs)
+        .map(HistoryLog::createdBy)
+        .containsExactly("testUser", "testUser", "testUser");
+    assertThat(historyLogs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+    assertThat(historyLogs.get(0).description()).isEqualTo("Person gesetzt: testUser");
+    assertThat(historyLogs.get(1).description()).isEqualTo("Schritt gesetzt: Ersterfassung");
+    assertThat(historyLogs.get(2).description()).isEqualTo("Dokeinheit angelegt");
   }
 
   @Test
@@ -1778,7 +1787,46 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  void testGenerateNewDocumentationUnit_isExternalHandover_shouldWriteHistoryLog() {
+  void testGenerateNewDocumentationUnit_shouldWriteHistoryLogs_forProcessSteps() {
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("DS", "XXREYYYY*****"));
+
+    Decision createdDocUnit =
+        risWebTestClient
+            .withDefaultLogin()
+            .put()
+            .uri("/api/v1/caselaw/documentunits/new")
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isCreated()
+            .expectBody(Decision.class)
+            .returnResult()
+            .getResponseBody();
+    User user = User.builder().documentationOffice(docOffice).build();
+    var logs = historyLogService.getHistoryLogs(createdDocUnit.uuid(), user);
+
+    assertThat(logs).hasSize(3);
+
+    // event types
+    assertThat(logs)
+        .map(HistoryLog::eventType)
+        .containsExactly(
+            HistoryLogEventType.PROCESS_STEP_USER,
+            HistoryLogEventType.PROCESS_STEP,
+            HistoryLogEventType.CREATE);
+
+    // description
+    assertThat(logs.get(0).description()).isEqualTo("Person gesetzt: testUser");
+    assertThat(logs.get(1).description()).isEqualTo("Schritt gesetzt: Ersterfassung");
+    assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
+
+    // creator user -> same docoffice is allowed to see user
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser", "testUser");
+  }
+
+  @Test
+  void testGenerateNewDocumentationUnit_isExternalHandover_shouldWriteHistoryLogs() {
     DocumentationOfficeDTO creatingDocumentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation("BGH");
 
@@ -1824,13 +1872,24 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     User user = User.builder().documentationOffice(creatingDocumentationOffice).build();
     var logs = historyLogService.getHistoryLogs(createdDocUnit.uuid(), user);
-    assertThat(logs).hasSize(2);
+
+    assertThat(logs).hasSize(3);
+
+    // event type -> for external handover no initial user is set and therefore no log
     assertThat(logs)
         .map(HistoryLog::eventType)
-        .containsExactly(HistoryLogEventType.EXTERNAL_HANDOVER, HistoryLogEventType.CREATE);
-    // As DS User I am not able to see the user from BGH docoffice, who created the docunit
-    assertThat(logs).map(HistoryLog::createdBy).containsExactly(null, null);
+        .containsExactly(
+            HistoryLogEventType.EXTERNAL_HANDOVER,
+            HistoryLogEventType.PROCESS_STEP,
+            HistoryLogEventType.CREATE);
+    // description
     assertThat(logs.getFirst().description()).isEqualTo("Fremdanalage angelegt für BGH");
+    assertThat(logs.get(1).description()).isEqualTo("Schritt gesetzt: Neu");
+    assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
+
+    // creator user -> as DS User I am not able to see the user from BGH docoffice, who created the
+    // docunit
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly(null, null, null);
   }
 
   @Test
@@ -2032,6 +2091,172 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     }
   }
 
+  @Nested
+  class BulkAssignProcessStep {
+    private UserDTO userDTO;
+
+    @BeforeEach
+    void setupBulkTests() {
+      userDTO =
+          databaseUserRepository.save(
+              UserDTO.builder()
+                  .externalId(oidcLoggedInUserId)
+                  .documentationOffice(documentationOffice)
+                  .firstName("Krümel")
+                  .lastName("Monster")
+                  .build());
+    }
+
+    @Test
+    @Transactional
+    void shouldAssignProcessStepToMultipleDocUnits() {
+      // Arrange
+      DocumentationUnitProcessStepDTO initialProcessStep1 =
+          DocumentationUnitProcessStepDTO.builder()
+              .processStep(ersterfassungProcessStep)
+              .user(userDTO)
+              .createdAt(LocalDateTime.now())
+              .build();
+
+      DocumentationUnitProcessStepDTO initialProcessStep2 =
+          DocumentationUnitProcessStepDTO.builder()
+              .processStep(ersterfassungProcessStep)
+              .user(userDTO)
+              .createdAt(LocalDateTime.now())
+              .build();
+
+      var decisionBuilder1 =
+          DecisionDTO.builder()
+              .documentNumber("DOCNUMBER_001")
+              .documentationOffice(documentationOffice)
+              .currentProcessStep(initialProcessStep1) // Link parent to child
+              .processSteps(new ArrayList<>(List.of(initialProcessStep1)));
+
+      var decisionBuilder2 =
+          DecisionDTO.builder()
+              .documentNumber("DOCNUMBER_002")
+              .documentationOffice(documentationOffice)
+              .currentProcessStep(initialProcessStep2) // Link parent to child
+              .processSteps(new ArrayList<>(List.of(initialProcessStep2)));
+
+      DocumentationUnitDTO docUnit1 =
+          EntityBuilderTestUtil.createAndSaveDecision(repository, decisionBuilder1);
+      DocumentationUnitDTO docUnit2 =
+          EntityBuilderTestUtil.createAndSaveDecision(repository, decisionBuilder2);
+
+      List<UUID> docUnitIds = List.of(docUnit1.getId(), docUnit2.getId());
+
+      DocumentationUnitProcessStep newProcessStep =
+          DocumentationUnitProcessStep.builder()
+              .processStep(ProcessStepTransformer.toDomain(neuProcessStep))
+              .user(UserTransformer.transformToDomain(userDTO))
+              .build();
+
+      // Act
+      risWebTestClient
+          .withDefaultLogin(oidcLoggedInUserId)
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/bulk-assign-process-step")
+          .bodyValue(new BulkAssignProcessStepRequest(newProcessStep, docUnitIds))
+          .exchange()
+          .expectStatus()
+          .isOk();
+
+      // Assert
+      var updatedDocUnits = repository.findAll();
+      assertThat(updatedDocUnits).hasSize(2);
+
+      assertThat(updatedDocUnits)
+          .extracting(unit -> unit.getCurrentProcessStep().getProcessStep().getId())
+          .containsOnly(neuProcessStep.getId());
+
+      assertThat(updatedDocUnits)
+          .extracting(unit -> unit.getCurrentProcessStep().getUser().getId())
+          .containsOnly(userDTO.getId());
+    }
+
+    @Test
+    @Transactional
+    void shouldRollbackIfOneUpdateFails() {
+      TestTransaction.flagForCommit();
+      TestTransaction.end();
+      // Arrange
+      DocumentationUnitDTO docUnit1 =
+          EntityBuilderTestUtil.createAndSaveDecision(
+              repository,
+              DecisionDTO.builder()
+                  .documentNumber("DOCNUMBER_001")
+                  .documentationOffice(documentationOffice));
+      DocumentationUnitDTO docUnit2 =
+          EntityBuilderTestUtil.createAndSaveDecision(
+              repository,
+              DecisionDTO.builder()
+                  .documentNumber("DOCNUMBER_002")
+                  .documentationOffice(documentationOffice));
+      DocumentationUnitDTO pendingProceeding =
+          repository.save(
+              PendingProceedingDTO.builder()
+                  .documentNumber("DOCNUMBER_003")
+                  .documentationOffice(documentationOffice)
+                  .build());
+
+      var docUnitIds = List.of(docUnit1.getId(), docUnit2.getId(), pendingProceeding.getId());
+
+      DocumentationUnitProcessStep newProcessStep =
+          DocumentationUnitProcessStep.builder()
+              .processStep(ProcessStepTransformer.toDomain(neuProcessStep))
+              .user(UserTransformer.transformToDomain(userDTO))
+              .build();
+
+      // will return BadRequestException because process steps can not be assigned to
+      // pendingProceeding
+      risWebTestClient
+          .withDefaultLogin(oidcLoggedInUserId)
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/bulk-assign-process-step")
+          .bodyValue(new BulkAssignProcessStepRequest(newProcessStep, docUnitIds))
+          .exchange()
+          .expectStatus()
+          .isBadRequest();
+
+      TestTransaction.start();
+      // Assert that no changes were committed due to the rollback
+      var updatedDocUnits = repository.findAll();
+      assertThat(updatedDocUnits).hasSize(3);
+
+      assertThat(updatedDocUnits)
+          .extracting(unit -> unit.getCurrentProcessStep())
+          .map(processStep -> processStep != null ? processStep.getProcessStep().getId() : null)
+          .containsExactlyInAnyOrder(null, null, null);
+      TestTransaction.end();
+    }
+
+    @Test
+    @Transactional
+    void shouldRejectRequestForDocUnitFromOtherDocOffice() {
+      // Arrange
+      var bghDocOffice = documentationOfficeRepository.findByAbbreviation("BGH");
+      var docUnit = EntityBuilderTestUtil.createAndSaveDecision(repository, bghDocOffice);
+      var docUnitIds = List.of(docUnit.getId());
+
+      DocumentationUnitProcessStep newProcessStep =
+          DocumentationUnitProcessStep.builder()
+              .processStep(ProcessStepTransformer.toDomain(neuProcessStep))
+              .user(UserTransformer.transformToDomain(userDTO))
+              .build();
+
+      // Act & Assert
+      risWebTestClient
+          .withDefaultLogin(oidcLoggedInUserId)
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/bulk-assign-process-step")
+          .bodyValue(new BulkAssignProcessStepRequest(newProcessStep, docUnitIds))
+          .exchange()
+          .expectStatus()
+          .isForbidden();
+    }
+  }
+
   @Test
   void assignDocumentationOffice_withoutRights_shouldBeForbidden() {
     // Arrange
@@ -2200,7 +2425,8 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
   @Transactional
   @Test
-  void assignDocumentationOffice_withProcessStep_shouldAddProcessStepNeu() {
+  void
+      assignDocumentationOffice_withProcessStep_shouldEmptyPreviousProcessStepsAndAddProcessStepNeu() {
     // Arrange
     var bghDocOffice = documentationOfficeRepository.findByAbbreviation("BGH");
     var decisionBuilder =
@@ -2242,12 +2468,10 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
               assertThat(response.getResponseBody())
                   .isEqualTo("The documentation office [BGH] has been successfully assigned.");
               var docUnit = repository.findById(documentationUnit.getId());
-              assertThat(docUnit.get().getProcessSteps()).size().isEqualTo(2);
+              assertThat(docUnit.get().getProcessSteps()).size().isEqualTo(1);
               assertThat(docUnit.get().getCurrentProcessStep().getProcessStep())
                   .isEqualTo(neuProcessStep);
-              assertThat(docUnit.get().getProcessSteps().get(0).getProcessStep())
-                  .isEqualTo(ersterfassungProcessStep);
-              assertThat(docUnit.get().getProcessSteps().get(1).getProcessStep())
+              assertThat(docUnit.get().getProcessSteps().getFirst().getProcessStep())
                   .isEqualTo(neuProcessStep);
             });
   }

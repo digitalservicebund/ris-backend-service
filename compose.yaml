@@ -75,6 +75,7 @@ services:
       postgres14: { condition: service_healthy }
       redis: { condition: service_healthy }
       initialization: { condition: service_completed_successfully }
+      languagetool: { condition: service_healthy }
     ports:
       - 8080:8080
     healthcheck:
@@ -153,7 +154,7 @@ services:
       timeout: 3s
 
   redis:
-    image: cgr.dev/chainguard/redis@sha256:43183b13ef8a99c404f24ba1e3b818e44d1a2acdc6e911e4e36259699b41efd2
+    image: cgr.dev/chainguard/redis@sha256:d4c4beb12c41d77daf75c61616d0a6fe5de4c2ac96587e03c8b11c8d860adb0a
     extra_hosts:
       - localhost:host-gateway
     container_name: redis
@@ -178,7 +179,7 @@ services:
       timeout: 5s
 
   languagetool:
-    image: ghcr.io/digitalservicebund/neuris-languagetool:36cb18a1fc0faaadbe1a9bf0d9adc9257566e087
+    image: ghcr.io/digitalservicebund/neuris-languagetool:0f9d1a878a6dc356cb4e89ee880257cd74e8a7c3
     extra_hosts:
       - localhost:host-gateway
     ports:

@@ -5,6 +5,7 @@ import { ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import {
+  DocumentationType,
   IgnoredTextCheckWord,
   Match,
   TextCheckCategoryResponse,
@@ -14,9 +15,16 @@ import {
 
 class NeurisTextCheckService implements TextCheckService {
   loading = ref(false)
-  matches: Match[] = []
   selectedMatch = ref()
   responseError = ref()
+
+  category: string // text editor label category where matches are stored
+
+  private readonly store = useDocumentUnitStore()
+
+  constructor(category: string) {
+    this.category = category
+  }
 
   public static readonly isTextCheckTagSelected = (editor: Editor): boolean => {
     const { selection } = editor.state
@@ -57,28 +65,35 @@ class NeurisTextCheckService implements TextCheckService {
   /**
    * Performs a spell check on a given {@link category}. The documentation unit is saved beforehand
    * @param editor
-   * @param category
    */
-  checkCategory = async (editor: Editor, category?: string) => {
+  checkCategory = async (editor: Editor) => {
     this.loading.value = true
     this.responseError.value = undefined
 
-    const store = useDocumentUnitStore()
-
-    if (store.documentUnit?.uuid == undefined) {
+    if (
+      this.store.documentUnit?.uuid == undefined ||
+      this.category == undefined
+    ) {
       return
     }
-    await store.updateDocumentUnit()
+    await this.store.updateDocumentUnit()
 
     const languageToolCheckResponse: ServiceResponse<TextCheckCategoryResponse> =
       await languageToolService.checkCategory(
-        store.documentUnit?.uuid,
-        category,
+        this.store.documentUnit?.uuid,
+        this.category,
       )
 
     if (languageToolCheckResponse.status == 200) {
-      this.matches = languageToolCheckResponse.data!.matches
-      editor.commands.setContent(languageToolCheckResponse.data!.htmlText, true)
+      this.store.matches.set(
+        this.category,
+        languageToolCheckResponse.data!.matches,
+      )
+      editor.commands.setContent(
+        languageToolCheckResponse.data!.htmlText,
+        true,
+        { preserveWhitespace: "full" },
+      )
     } else if (languageToolCheckResponse.error) {
       this.responseError.value = languageToolCheckResponse.error
     }
@@ -98,86 +113,92 @@ class NeurisTextCheckService implements TextCheckService {
     text: string,
     state: EditorState,
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    dispatch: ((args?: any) => any) | undefined,
+    dispatch?: (tr: any) => void,
   ) => {
-    const { tr } = state
-
+    const { tr, schema } = state
     state.doc.descendants((node, pos) => {
       if (
         node.isText &&
-        node.marks.some(
-          (mark) =>
-            mark.type.name === TextCheckTagName &&
-            mark.attrs.id === matchId.toString(),
-        )
+        NeurisTextCheckService.findTextCheckMark(node, matchId)
       ) {
-        const textCheckMark = node.marks.find(
-          (mark) =>
-            mark.type.name === TextCheckTagName &&
-            mark.attrs.id === matchId.toString(),
-        )
-
-        if (textCheckMark) {
-          tr.delete(pos, pos + node.nodeSize).insert(
-            pos,
-            state.schema.text(text),
-          )
-
-          if (dispatch) {
-            dispatch(tr)
-          }
-        }
+        tr.replaceWith(pos, pos + node.nodeSize, schema.text(text))
       }
-
-      this.clearSelectedMatch()
     })
+    dispatch?.(tr)
+    this.clearSelectedMatch()
   }
 
   /**
-   * Updates the ignored status of a match by id
-   * @param matchId match id to update status to
-   * @param isIgnored the new status
+   * Updates the ignored status in text by match
+   * @param match
    * @param state
    * @param dispatch
    */
-  toggleMatchIgnoredStatus = (
-    matchId: number,
-    isIgnored: boolean,
+  updateIgnoredMark = (
+    match: Match,
     state: EditorState,
-    dispatch: ((args?: any) => any) | undefined,
-  ): void => {
+    dispatch?: (tr: any) => void,
+  ) => {
+    if (!match) return
     const { tr, schema } = state
 
     state.doc.descendants((node, pos) => {
-      if (
-        node.isText &&
-        node.marks.some(
-          (mark) =>
-            mark.type.name === TextCheckTagName &&
-            mark.attrs.id === matchId.toString(),
-        )
-      ) {
-        const updatedMarks = node.marks.map((mark) => {
-          if (
-            mark.type.name === TextCheckTagName &&
-            mark.attrs.id === matchId.toString()
-          ) {
-            return mark.type.create({
-              ...mark.attrs,
-              ignored: isIgnored,
-            })
-          }
-          return mark
-        })
+      const mark = NeurisTextCheckService.findTextCheckMark(node, match.id)
+      if (!mark) return
 
-        const updatedText = schema.text(node.text ?? "", updatedMarks)
-        tr.replaceWith(pos, pos + node.nodeSize, updatedText)
+      const nextIgnoredStatus = NeurisTextCheckService.isMatchedIgnored(match)
+      // if there is no ignored it means, false
+      const prevIgnoredStatus = mark.attrs.ignored ?? false
+
+      // Only update if the ignore value changed
+      if (prevIgnoredStatus !== nextIgnoredStatus) {
+        const updatedMarks = node.marks.map((m) =>
+          m === mark
+            ? mark.type.create({
+                ...mark.attrs,
+                ignored: nextIgnoredStatus,
+              })
+            : m,
+        )
+
+        tr.replaceWith(
+          pos,
+          pos + node.nodeSize,
+          schema.text(node.text ?? "", updatedMarks),
+        )
       }
     })
 
-    if (dispatch) {
-      dispatch(tr)
+    if (tr.docChanged) {
+      dispatch?.(tr)
     }
+  }
+
+  private static isMatchedIgnored(match: Match) {
+    return (match.ignoredTextCheckWords?.length ?? 0) > 0
+  }
+
+  private static findTextCheckMark(node: any, matchId?: number) {
+    return node.marks?.find(
+      (mark: any) =>
+        mark.type.name === TextCheckTagName &&
+        (matchId === undefined || mark.attrs.id === matchId.toString()),
+    )
+  }
+  /**
+   * Updates the ignored status of a match by id
+   * @param state
+   * @param dispatch
+   */
+  updatedMatchesInText = (
+    state: EditorState,
+    dispatch: ((args?: any) => any) | undefined,
+  ): void => {
+    const matches = this.store.matches.get(this.category)
+
+    matches?.forEach((match) => {
+      this.updateIgnoredMark(match, state, dispatch)
+    })
   }
 
   /**
@@ -185,8 +206,10 @@ class NeurisTextCheckService implements TextCheckService {
    * @param matchId
    */
   selectMatch = (matchId?: number) => {
-    if (matchId) {
-      const selectedMatch = this.matches.find((match) => match.id === matchId)
+    if (matchId && this.category) {
+      const matches = this.store.matches.get(this.category) ?? []
+      const selectedMatch = matches.find((match) => match.id === matchId)
+
       if (selectedMatch) {
         this.selectedMatch.value = selectedMatch
         return
@@ -200,17 +223,17 @@ class NeurisTextCheckService implements TextCheckService {
   }
 
   ignoreWord = async (word: string): Promise<boolean> => {
-    const store = useDocumentUnitStore()
-
-    if (store.documentUnit?.uuid) {
+    if (this.store.documentUnit?.uuid) {
       const response: ServiceResponse<IgnoredTextCheckWord> =
-        await languageToolService.addLocalIgnore(store.documentUnit?.uuid, word)
+        await languageToolService.addLocalIgnore(
+          this.store.documentUnit?.uuid,
+          word,
+        )
 
       if (response.status >= 300) {
         this.responseError.value = response.error
-      } else {
-        this.selectedMatch.value.ignoredTextCheckWords ??= []
-        this.selectedMatch.value.ignoredTextCheckWords.push(response.data)
+      } else if (response.data) {
+        this.addIgnoredWordToMatches(response.data)
         return true
       }
     }
@@ -218,12 +241,10 @@ class NeurisTextCheckService implements TextCheckService {
   }
 
   removeIgnoredWord = async (word: string): Promise<boolean> => {
-    const store = useDocumentUnitStore()
-
-    if (store.documentUnit?.uuid) {
+    if (this.store.documentUnit?.uuid) {
       const response: ServiceResponse<void> =
         await languageToolService.removeLocalIgnore(
-          store.documentUnit?.uuid,
+          this.store.documentUnit?.uuid,
           word,
         )
 
@@ -231,14 +252,50 @@ class NeurisTextCheckService implements TextCheckService {
         this.responseError.value = response.error
         return false
       } else {
-        this.selectedMatch.value.ignoredTextCheckWords = (
-          this.selectedMatch.value
-            .ignoredTextCheckWords as IgnoredTextCheckWord[]
-        ).filter(({ type }) => type !== "documentation_unit")
+        this.removeIgnoredWordFromMatches(word, "documentation_unit")
         return true
       }
     }
     return false
+  }
+
+  addIgnoredWordToMatches = (ignoredTextCheckWord: IgnoredTextCheckWord) => {
+    for (const matchList of this.store.matches.values()) {
+      matchList.forEach((match) => {
+        if (match.word === ignoredTextCheckWord.word) {
+          match.ignoredTextCheckWords ??= []
+
+          const alreadyIgnored = match.ignoredTextCheckWords.some(
+            (ignored) =>
+              ignored.id === ignoredTextCheckWord.id ||
+              (ignored.type === ignoredTextCheckWord.type &&
+                ignored.word === ignoredTextCheckWord.word),
+          )
+
+          if (!alreadyIgnored) {
+            match.ignoredTextCheckWords.push(ignoredTextCheckWord)
+          }
+        }
+      })
+    }
+  }
+
+  removeIgnoredWordFromMatches = (
+    word: string,
+    ignoredType: DocumentationType,
+  ) => {
+    for (const matchList of this.store.matches.values()) {
+      matchList.forEach((match) => {
+        if (match.word === word) {
+          if (match.ignoredTextCheckWords) {
+            match.ignoredTextCheckWords = match.ignoredTextCheckWords.filter(
+              (ignored) =>
+                !(ignored.type === ignoredType && ignored.word === word),
+            )
+          }
+        }
+      })
+    }
   }
 
   ignoreWordGlobally = async (word: string): Promise<boolean> => {
@@ -247,10 +304,8 @@ class NeurisTextCheckService implements TextCheckService {
 
     if (response.status >= 300) {
       this.responseError.value = response.error
-    } else {
-      this.selectedMatch.value.ignoredTextCheckWords ??= []
-      this.selectedMatch.value.ignoredTextCheckWords.push(response.data)
-      return true
+    } else if (response.data) {
+      this.addIgnoredWordToMatches(response.data)
     }
     return false
   }
@@ -261,11 +316,8 @@ class NeurisTextCheckService implements TextCheckService {
 
     if (response.status >= 300) {
       this.responseError.value = response.error
-    } else {
-      this.selectedMatch.value.ignoredTextCheckWords = (
-        this.selectedMatch.value.ignoredTextCheckWords as IgnoredTextCheckWord[]
-      ).filter(({ type }) => type !== "global")
-      return true
+    } else if (response.status == 200) {
+      this.removeIgnoredWordFromMatches(word, "global")
     }
     return false
   }

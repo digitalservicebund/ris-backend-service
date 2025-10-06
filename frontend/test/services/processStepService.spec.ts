@@ -1,12 +1,9 @@
-import { vi } from "vitest" // Adjust the path as needed
+import { vi } from "vitest"
 import ProcessStep from "@/domain/processStep"
 import errorMessages from "@/i18n/errors.json"
 import httpClient from "@/services/httpClient"
 import service from "@/services/processStepService"
 
-// Import the mocked httpClient after vi.mock
-
-// Mock the entire httpClient module
 vi.mock("@/services/httpClient", () => ({
   default: {
     get: vi.fn(),
@@ -16,18 +13,22 @@ vi.mock("@/services/httpClient", () => ({
 
 describe("ProcessStepService", () => {
   afterEach(() => {
-    // Clear all mocks after each test to ensure isolation
     vi.clearAllMocks()
   })
+
+  const mockProcessSteps: ProcessStep[] = [
+    { uuid: "uuid1", name: "Step A", abbreviation: "A" },
+  ]
+
+  const mockNextProcessStep: ProcessStep = {
+    uuid: "testProcessStepUuid456",
+    name: "Next Step",
+    abbreviation: "NS",
+  }
 
   // --- getNextProcessStep Tests ---
   describe("getNextProcessStep", () => {
     it("should return the next process step on successful API call", async () => {
-      const mockNextProcessStep: ProcessStep = {
-        uuid: "testProcessStepUuid456",
-        name: "Next Step",
-        abbreviation: "NS",
-      }
       vi.mocked(httpClient).get.mockResolvedValueOnce({
         status: 200,
         data: mockNextProcessStep,
@@ -71,27 +72,46 @@ describe("ProcessStepService", () => {
     })
   })
 
-  // --- getNextProcessStep Tests ---
-  describe("getProcessSteps", () => {
-    it("should return a list of process step on successful API call", async () => {
-      const mockNextProcessStep: ProcessStep = {
-        uuid: "testProcessStepUuid456",
-        name: "Next Step",
-        abbreviation: "NS",
-      }
-      vi.mocked(httpClient).get.mockResolvedValueOnce({
-        status: 200,
-        data: mockNextProcessStep,
-      })
+  // --- getProcessSteps Tests ---
+  describe("getProcessSteps URL Construction and Success Handling", () => {
+    const testCases = [
+      {
+        description:
+          "should call the API with '?assignableOnly=false' when parameter is omitted (default)",
+        assignableOnlyArg: undefined,
+        expectedUrl: "caselaw/processsteps?assignableOnly=false",
+      },
+      {
+        description:
+          "should call the API with '?assignableOnly=true' when parameter is true",
+        assignableOnlyArg: true,
+        expectedUrl: "caselaw/processsteps?assignableOnly=true",
+      },
+      {
+        description:
+          "should call the API with '?assignableOnly=false' when parameter is false (explicit call)",
+        assignableOnlyArg: false,
+        expectedUrl: "caselaw/processsteps?assignableOnly=false",
+      },
+    ]
 
-      const result = await service.getProcessSteps()
+    it.each(testCases)(
+      "$description",
+      async ({ assignableOnlyArg, expectedUrl }) => {
+        vi.mocked(httpClient).get.mockResolvedValueOnce({
+          status: 200,
+          data: mockProcessSteps,
+        })
 
-      expect(httpClient.get).toHaveBeenCalledWith("caselaw/processsteps")
-      expect(result.data).toEqual(mockNextProcessStep)
-      expect(result.error).toBeUndefined()
-    })
+        const result = await service.getProcessSteps(assignableOnlyArg)
 
-    it("should return an error if the API call for getProcessSteps fails with status >= 300", async () => {
+        expect(httpClient.get).toHaveBeenCalledWith(expectedUrl)
+        expect(result.data).toEqual(mockProcessSteps)
+        expect(result.error).toBeUndefined()
+      },
+    )
+
+    it("should return an error and undefined data if API call fails with status >= 300 (error handling)", async () => {
       vi.mocked(httpClient).get.mockResolvedValueOnce({
         status: 500,
         error: { title: "Server Error" },
@@ -105,7 +125,7 @@ describe("ProcessStepService", () => {
       )
     })
 
-    it("should return an error if the API call for getProcessSteps has an error property", async () => {
+    it("should return an error and undefined data if the API call has an error property", async () => {
       vi.mocked(httpClient).get.mockResolvedValueOnce({
         status: 200,
         error: { title: "Network Error" },

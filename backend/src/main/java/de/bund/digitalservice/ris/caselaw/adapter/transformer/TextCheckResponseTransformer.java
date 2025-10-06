@@ -60,12 +60,11 @@ public class TextCheckResponseTransformer {
   }
 
   public static List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match>
-      transformToListOfDomainMatches(
-          de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolResponse response) {
+      transformToListOfDomainMatches(List<Match> languageToolMatches) {
     List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches = new ArrayList<>();
 
-    for (int i = 0; i < response.getMatches().size(); i++) {
-      Match match = response.getMatches().get(i);
+    for (int i = 0; i < languageToolMatches.size(); i++) {
+      Match match = languageToolMatches.get(i);
       MatchBuilder matchBuilder =
           de.bund.digitalservice.ris.caselaw.domain.textcheck.Match.builder()
               .id(i + 1) // start from 1

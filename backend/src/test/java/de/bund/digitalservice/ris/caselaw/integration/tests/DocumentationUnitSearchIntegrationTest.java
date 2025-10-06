@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
@@ -482,6 +483,97 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
             LocalDateTime.of(2022, 1, 23, 19, 5),
             LocalDateTime.of(2022, 1, 23, 10, 5),
             LocalDateTime.of(2022, 1, 23, 9, 5));
+  }
+
+  @Test
+  void test_searchByExactDecisionDate_shouldFilterAndReturnDescendingOrder() {
+    List<LocalDate> decisionDates =
+        Arrays.asList(
+            LocalDate.of(2022, 1, 1), LocalDate.of(2022, 1, 2), LocalDate.of(2022, 1, 3), null);
+
+    List<DeviatingDateDTO> deviatingDecisionDates =
+        Arrays.asList(
+            DeviatingDateDTO.builder().value(LocalDate.of(2022, 1, 1)).rank(1L).build(),
+            DeviatingDateDTO.builder().value(LocalDate.of(2022, 1, 2)).rank(2L).build());
+
+    var index = 0;
+
+    for (LocalDate date : decisionDates) {
+      EntityBuilderTestUtil.createAndSaveDecision(
+          repository,
+          DecisionDTO.builder()
+              .documentNumber(RandomStringUtils.randomAlphabetic(13))
+              .date(date)
+              .deviatingDates(index == 0 ? deviatingDecisionDates : List.of())
+              .documentationOffice(docOfficeDTO));
+      index++;
+    }
+
+    Slice<DocumentationUnitListItem> responseBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10&decisionDate=2022-01-02")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+
+    assertThat(responseBody)
+        .extracting("decisionDate")
+        .containsExactly(
+            // 1.1.2022 is included because of its deviating date 2.1.2022
+            LocalDate.of(2022, 1, 2), LocalDate.of(2022, 1, 1));
+  }
+
+  @Test
+  void test_searchByDecisionDateRange_shouldFilterAndReturnDescendingOrder() {
+    List<LocalDate> decisionDates =
+        Arrays.asList(
+            null,
+            LocalDate.of(2022, 1, 1),
+            LocalDate.of(2022, 1, 2),
+            LocalDate.of(2022, 1, 3),
+            LocalDate.of(2022, 1, 4));
+
+    List<DeviatingDateDTO> deviatingDecisionDates =
+        Arrays.asList(
+            DeviatingDateDTO.builder().value(LocalDate.of(2022, 1, 1)).rank(1L).build(),
+            DeviatingDateDTO.builder().value(LocalDate.of(2022, 1, 2)).rank(2L).build());
+
+    var index = 0;
+
+    for (LocalDate date : decisionDates) {
+      EntityBuilderTestUtil.createAndSaveDecision(
+          repository,
+          DecisionDTO.builder()
+              .documentNumber(RandomStringUtils.randomAlphabetic(13))
+              .date(date)
+              .deviatingDates(index == 0 ? deviatingDecisionDates : List.of())
+              .documentationOffice(docOfficeDTO));
+      index++;
+    }
+
+    Slice<DocumentationUnitListItem> responseBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri(
+                "/api/v1/caselaw/documentunits/search?pg=0&sz=10&decisionDate=2022-01-02&decisionDateEnd=2022-01-03")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+
+    assertThat(responseBody)
+        .extracting("decisionDate")
+        .containsExactly(
+            // null is included because of its deviating date
+            LocalDate.of(2022, 1, 3), LocalDate.of(2022, 1, 2), null);
   }
 
   @Test

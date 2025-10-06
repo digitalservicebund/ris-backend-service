@@ -16,9 +16,15 @@ import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import ProcessStep from "@/domain/processStep"
 import errorMessages from "@/i18n/errors.json"
 import documentUnitService from "@/services/documentUnitService"
+import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
+
+const addToastMock = vi.fn()
+vi.mock("primevue/usetoast", () => ({
+  useToast: () => ({ add: addToastMock }),
+}))
 
 const server = setupServer(
   http.get("/api/v1/caselaw/courts", () => {
@@ -34,6 +40,9 @@ const server = setupServer(
       { uuid: "a", abbreviation: "A", name: "Step A" },
       { uuid: "b", abbreviation: "B", name: "Step B" },
     ] as ProcessStep[])
+  }),
+  http.get("/api/v1/feature-toggles/neuris.multi-edit", () => {
+    return HttpResponse.json(true)
   }),
 )
 
@@ -83,6 +92,10 @@ describe("Decision Search", () => {
     config.global.stubs = {
       InputMask: InputText,
     }
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
     vi.resetAllMocks()
   })
 

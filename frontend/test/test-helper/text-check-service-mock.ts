@@ -48,7 +48,16 @@ function generateMatch(id?: number): Match {
     },
     ignoreForIncompleteSentence: false,
     contextForSureMatch: 0,
-    ignoredTextCheckWords: [],
+    ignoredTextCheckWords: [
+      {
+        word: "Rechtshcreibfehler",
+        type: "documentation_unit",
+      },
+      {
+        word: "Rechtshcreibfehler",
+        type: "global",
+      },
+    ],
   }
 }
 

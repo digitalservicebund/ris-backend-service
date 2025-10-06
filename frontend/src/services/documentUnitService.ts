@@ -5,6 +5,7 @@ import httpClient, {
 import { Page } from "@/components/Pagination.vue"
 import { Decision } from "@/domain/decision"
 import { DocumentationUnit } from "@/domain/documentationUnit"
+import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { EurlexParameters } from "@/domain/eurlex"
 import { DuplicateRelationStatus } from "@/domain/managementData"
@@ -42,6 +43,11 @@ interface DocumentUnitService {
 
   bulkAssignProcedure(
     procedureLabel: string,
+    documentationUnitIds: string[],
+  ): Promise<ServiceResponse<unknown>>
+
+  bulkAssignProcessStep(
+    documentationUnitProcessStep: DocumentationUnitProcessStep,
     documentationUnitIds: string[],
   ): Promise<ServiceResponse<unknown>>
 
@@ -227,6 +233,27 @@ const service: DocumentUnitService = {
       response.error = {
         title: errorMessages.BULK_PROCEDURE_ASSIGNMENT_FAILED.title,
       }
+    }
+    return response
+  },
+
+  async bulkAssignProcessStep(
+    documentationUnitProcessStep: DocumentationUnitProcessStep,
+    documentationUnitIds: string[],
+  ): Promise<ServiceResponse<unknown>> {
+    const response = await httpClient.patch<
+      {
+        documentationUnitIds: string[]
+        documentationUnitProcessStep: DocumentationUnitProcessStep
+      },
+      unknown
+    >(
+      `caselaw/documentunits/bulk-assign-process-step`,
+      {},
+      { documentationUnitProcessStep, documentationUnitIds },
+    )
+    if (response.status >= 300) {
+      response.error = errorMessages.BULK_ASSIGN_PROCESS_STEP_FAILED
     }
     return response
   },

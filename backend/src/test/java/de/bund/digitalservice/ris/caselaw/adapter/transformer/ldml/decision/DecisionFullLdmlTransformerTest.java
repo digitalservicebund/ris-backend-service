@@ -419,7 +419,7 @@ class DecisionFullLdmlTransformerTest {
     var documentationUnit = getEntireDocumentationUnit();
     var expected =
         String.format(
-            """
+"""
 <?xml version="1.0" encoding="utf-8"?>
 <akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/WD17"
                 xmlns:ris="http://example.com/0.1/"

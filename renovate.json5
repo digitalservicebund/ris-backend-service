@@ -40,6 +40,11 @@
       // later versions have a bug that reports false positives
     },
     {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["postgres"],
+      "allowedVersions": "14-alpine"
+    },
+    {
       "groupName": "all-frontend-non-major-dependencies",
       "matchPaths": [
         "frontend/**"

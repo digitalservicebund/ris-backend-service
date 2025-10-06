@@ -902,7 +902,7 @@ export async function expectHistoryCount(page: Page, count: number) {
 export async function expectHistoryLogRow(
   page: Page,
   index: number,
-  // createdBy: string,
+  createdBy: string,
   description: string,
 ) {
   const historyRow = page
@@ -911,13 +911,12 @@ export async function expectHistoryLogRow(
     // Header has index 0
     .nth(index + 1)
   const createdAtCell = historyRow.getByRole("cell").nth(0)
-  // const createdByCell = historyRow.getByRole("cell").nth(1)
+  const createdByCell = historyRow.getByRole("cell").nth(1)
   const descriptionCell = historyRow.getByRole("cell").nth(2)
   await expect(createdAtCell).toHaveText(
     /^\d{2}\.\d{2}\.\d{4} um \d{2}:\d{2} Uhr$/,
   )
-  // Todo: uncomment again when user data caching is done
-  // await expect(createdByCell).toHaveText(createdBy)
+  await expect(createdByCell).toHaveText(createdBy)
   await expect(descriptionCell).toHaveText(description)
 }
 
@@ -1080,13 +1079,13 @@ export async function checkContentOfDecisionResultRow(
   listRow: Locator,
   expectedItem: Decision,
 ) {
-  const docNumberCell = listRow.getByRole("cell").nth(0)
-  const courtCell = listRow.getByRole("cell").nth(1)
-  const decisionDateCell = listRow.getByRole("cell").nth(2)
-  const fileNumberCell = listRow.getByRole("cell").nth(3)
-  const appraisalBodyCell = listRow.getByRole("cell").nth(4)
-  const documentTypCell = listRow.getByRole("cell").nth(5)
-  const statusCell = listRow.getByRole("cell").nth(6)
+  const docNumberCell = listRow.getByRole("cell").nth(1)
+  const courtCell = listRow.getByRole("cell").nth(2)
+  const decisionDateCell = listRow.getByRole("cell").nth(3)
+  const fileNumberCell = listRow.getByRole("cell").nth(4)
+  const appraisalBodyCell = listRow.getByRole("cell").nth(5)
+  const documentTypCell = listRow.getByRole("cell").nth(6)
+  const statusCell = listRow.getByRole("cell").nth(7)
 
   await test.step("Fehler", async () => {
     if (expectedItem.status?.withError) {
@@ -1142,4 +1141,27 @@ export async function checkContentOfDecisionResultRow(
       listRow.getByLabel("Dokumentationseinheit ansehen"),
     ).toBeEnabled()
   })
+}
+
+export async function selectUser(
+  page: Page,
+  searchTerm: string,
+  expectedUser: string,
+) {
+  const dialog = page.getByRole("dialog")
+
+  await expect(dialog).toBeVisible()
+
+  await expect(dialog.getByText("Neue Person")).toBeVisible()
+  await page.getByLabel("Neue Person", { exact: true }).fill(searchTerm)
+  await expect(page.getByTestId("combobox-spinner")).toBeVisible()
+  await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+
+  await expect(dialog.getByText(expectedUser)).toBeVisible()
+
+  const firstItem = dialog
+    .getByRole("button", { name: "dropdown-option" })
+    .first()
+  await expect(firstItem).toContainText(expectedUser)
+  await firstItem.click()
 }

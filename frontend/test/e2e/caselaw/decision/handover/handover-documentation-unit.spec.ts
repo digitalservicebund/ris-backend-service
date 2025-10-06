@@ -6,6 +6,7 @@ import {
   updateDocumentationUnit,
 } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import {
+  clearTextField,
   fillActiveCitationInputs,
   fillCombobox,
   fillEnsuingDecisionInputs,
@@ -16,6 +17,12 @@ import {
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("ensuring the handover of documentunits works as expected", () => {
+  test.use({
+    decisionToBeCreated: {
+      longTexts: { tenor: "<p>Text mit Fehler</p>" },
+    },
+  })
+
   test("handover page shows all possible missing required fields when no fields filled", async ({
     page,
     documentNumber,
@@ -504,41 +511,54 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
   )
 
   test(
-    "handover shows text check mistakes",
+    "error count should correctly show number of errors",
     {
-      tag: ["@RISDEV-254", "@RISDEV-6245"],
+      tag: ["@RISDEV-254", "@RISDEV-6245", "@RISDEV-9094"],
     },
-    async ({ page, prefilledDocumentUnit, request, baseURL }) => {
-      // eslint-disable-next-line playwright/no-skipped-test
-      test.skip(
-        baseURL === "http://127.0.0.1",
-        "Skipping this test on local execution, as there is no languagetool running",
-      )
+    async ({ page, decision }) => {
+      await navigateToHandover(page, decision.createdDecision.documentNumber!)
+      const handover = page.getByLabel("Rechtschreibprüfung")
 
-      await test.step("Befülle Langtexte und Kurztexte mit texts", async () => {
-        const text =
-          "<p>Das Wort hat einen Flerher, und Testgnorierteswort soll nicht als Fehler mitgezählt werden.</p>"
+      await test.step("Validate document has no errors", async () => {
+        await expect(
+          handover.getByLabel("Rechtschreibprüfung").getByLabel("Ladestatus"),
+          "Text check might take longer then expected",
+        ).toBeHidden({
+          timeout: 20_000,
+        })
 
-        const documentationUnit = {
-          ...prefilledDocumentUnit,
-          shortTexts: {
-            headline: undefined,
-            guidingPrinciple: undefined,
-            headnote: undefined,
-            otherHeadnote: text,
-          },
-          longTexts: {
-            tenor: text,
-            caseFacts: undefined,
-            decisionReasons: undefined,
-            otherLongText: undefined,
-            dissentingOpinion: undefined,
-          },
-        } as Decision
-        await updateDocumentationUnit(page, documentationUnit, request)
+        await expect(
+          page.getByText("Es wurden keine Rechtschreibfehler identifiziert"),
+        ).toBeVisible()
       })
 
-      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+      await test.step("Validate document has text check errors", async () => {
+        await navigateToCategories(
+          page,
+          decision.createdDecision.documentNumber!,
+        )
+        const tenorEditor = page.getByTestId("Tenor")
+        await clearTextField(page, tenorEditor)
+        await tenorEditor.locator("div").fill("Text mit Feler")
+
+        await navigateToHandover(page, decision.createdDecision.documentNumber!)
+
+        await expect(
+          handover.getByLabel("Rechtschreibprüfung").getByLabel("Ladestatus"),
+          "Text check might take longer then expected",
+        ).toBeHidden({
+          timeout: 20_000,
+        })
+
+        await expect(
+          page.getByText("Es wurden Rechtschreibfehler identifiziert"),
+        ).toBeVisible()
+
+        await page.getByTestId("total-text-check-errors-container").isVisible()
+        await expect(page.getByTestId("total-text-check-errors")).toHaveText(
+          "1",
+        )
+      })
 
       await test.step("Validate errors are counted", async () => {
         const handover = page.getByLabel("Rechtschreibprüfung")
@@ -556,7 +576,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
 
         await page.getByTestId("total-text-check-errors-container").isVisible()
         await expect(page.getByTestId("total-text-check-errors")).toHaveText(
-          "2",
+          "1",
         )
       })
     },
