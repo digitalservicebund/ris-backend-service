@@ -54,8 +54,6 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     </p>
     <PreviewCoreData
       :core-data="pendingProceeding.coreData"
-      date-label="Mitteilungsdatum"
-      is-pending-proceeding
       :kind="Kind.PENDING_PROCEEDING"
     />
     <PreviewCaselawReferences

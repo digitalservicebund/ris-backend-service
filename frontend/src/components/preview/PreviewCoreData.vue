@@ -12,7 +12,6 @@ import { Kind } from "@/domain/documentationUnitKind"
 
 const props = defineProps<{
   coreData: CoreData
-  dateLabel: string
   kind: Kind
 }>()
 
@@ -22,6 +21,12 @@ const sourceValue = computed(() =>
     ? (props.coreData.source.value ?? props.coreData.source.sourceRawValue)
     : undefined,
 )
+const dateLabel = computed(() => {
+  const decisionDateLabel = props.coreData.hasDeliveryDate
+    ? "Datum der Zustellung an Verkündungs statt"
+    : "Entscheidungsdatum"
+  return isPendingProceeding ? "Mitteilungsdatum" : decisionDateLabel
+})
 </script>
 
 <template>
