@@ -225,6 +225,7 @@ onBeforeUnmount(() => {
               v-model="coreDataModel.deviatingDecisionDates"
               aria-label="Abweichendes Entscheidungsdatum"
               :has-error="slotProps.hasError"
+              test-id="deviating-decision-dates"
               @focus="validationStore.remove('deviatingDecisionDates')"
               @update:validation-error="slotProps.updateValidationError"
             />
@@ -264,6 +265,7 @@ onBeforeUnmount(() => {
           v-model="coreDataModel.oralHearingDates"
           aria-label="Datum der mündlichen Verhandlung"
           :has-error="slotProps.hasError"
+          test-id="oral-hearing-dates"
           @focus="validationStore.remove('oralHearingDates')"
           @update:validation-error="slotProps.updateValidationError"
         />

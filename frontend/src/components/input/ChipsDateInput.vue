@@ -11,6 +11,7 @@ interface Props {
   ariaLabel: string
   hasError?: boolean
   readOnly?: boolean
+  testId?: string
 }
 const props = defineProps<Props>()
 
@@ -84,7 +85,7 @@ dayjs.extend(customParseFormat)
     :id="id"
     v-model="chips"
     :aria-label="ariaLabel"
-    data-testid="deviating-decision-dates"
+    :data-testid="testId"
     :has-error="hasError"
     maska="##.##.####"
     :read-only="readOnly"

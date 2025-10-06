@@ -1869,6 +1869,7 @@ class DecisionTransformerTest {
     return CoreData.builder()
         .documentationOffice(DocumentationOffice.builder().abbreviation("doc office").build())
         .deviatingDocumentNumbers(Collections.emptyList())
+        .oralHearingDates(Collections.emptyList())
         .fileNumbers(Collections.emptyList())
         .deviatingFileNumbers(Collections.emptyList())
         .deviatingCourts(Collections.emptyList())
