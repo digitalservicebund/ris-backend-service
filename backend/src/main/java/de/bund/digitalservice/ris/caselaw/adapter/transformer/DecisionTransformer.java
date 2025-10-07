@@ -481,7 +481,7 @@ public class DecisionTransformer extends DocumentableTransformer {
     builder.deviatingEclis(deviatingEcliDTOs);
   }
 
-  static void addOralHearingDates(DecisionDTO.DecisionDTOBuilder<?, ?> builder, CoreData coreData) {
+  static void addOralHearingDates(DecisionDTOBuilder<?, ?> builder, CoreData coreData) {
     if (coreData.oralHearingDates() == null) {
       return;
     }
