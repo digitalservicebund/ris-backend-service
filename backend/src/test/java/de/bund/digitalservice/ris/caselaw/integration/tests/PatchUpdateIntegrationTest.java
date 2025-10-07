@@ -5165,7 +5165,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       DecisionDTO result = (DecisionDTO) repository.findById(docUnitDTO.getId()).get();
 
       // Assert
-      assertThat(result.getDecisionNames().get(0).getValue()).isEqualTo("decisionName");
+      assertThat(result.getDecisionNames().get(0).getValue()).isEqualTo("decisionNames");
       assertThat(result.getHeadline()).isEqualTo("newHeadline");
       assertThat(result.getGuidingPrinciple()).isNull();
       TestTransaction.end();
@@ -5228,9 +5228,9 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
     @NotNull
     private static List<JsonPatchOperation> getAllowedOperations() {
-      JsonNode decisionName = new TextNode("decisionName");
+      JsonNode decisionName = new TextNode("decisionNames");
       JsonNode newHeadline = new TextNode("newHeadline");
-      String firstAllowedPath = "/shortTexts/decisionName";
+      String firstAllowedPath = "/shortTexts/decisionNames";
       String secondAllowedPath = "/shortTexts/headline";
       String thirdAllowedPath = "/shortTexts/guidingPrinciple";
       return List.of(
@@ -5241,9 +5241,9 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
     @NotNull
     private static List<JsonPatchOperation> getAtLeastOneProhibitedOperation() {
-      JsonNode decisionName = new TextNode("decisionName");
+      JsonNode decisionName = new TextNode("decisionNames");
       JsonNode newHeadline = new TextNode("newHeadline");
-      String firstAllowedPath = "/shortTexts/decisionName";
+      String firstAllowedPath = "/shortTexts/decisionNames";
       String secondAllowedPath = "/shortTexts/headline";
       String prohibitedPath = "/coreData/court";
       return List.of(

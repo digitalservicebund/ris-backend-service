@@ -25,7 +25,7 @@ export enum InboxStatus {
 }
 
 export type ShortTexts = {
-  decisionName?: string
+  decisionNames?: [string]
   headline?: string
   guidingPrinciple?: string
   headnote?: string
@@ -34,7 +34,7 @@ export type ShortTexts = {
 export const shortTextLabels: {
   [shortTextKey in keyof Required<ShortTexts>]: string
 } = {
-  decisionName: "Entscheidungsname",
+  decisionNames: "Entscheidungsname",
   headline: "Titelzeile",
   guidingPrinciple: "Leitsatz",
   headnote: "Orientierungssatz",

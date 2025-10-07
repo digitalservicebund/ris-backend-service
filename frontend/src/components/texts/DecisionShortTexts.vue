@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import { Component, Ref, computed } from "vue"
+import ChipsInput from "@/components/input/ChipsInput.vue"
+import InputField from "@/components/input/InputField.vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
-import TextInputCategory from "@/components/texts/TextInputCategory.vue"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
 import { Decision, shortTextLabels } from "@/domain/decision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -17,10 +18,9 @@ const { documentUnit: decision } = storeToRefs(store) as {
   documentUnit: Ref<Decision | undefined>
 }
 const decisionName = computed({
-  get: () => decision.value?.shortTexts.decisionName,
+  get: () => decision.value?.shortTexts.decisionNames,
   set: (newValue) => {
-    decision.value!.shortTexts.decisionName =
-      TextEditorUtil.getEditorContentIfPresent(newValue)
+    decision.value!.shortTexts.decisionNames = newValue
   },
 })
 
@@ -85,14 +85,14 @@ const otherHeadnote = computed({
   <div aria-label="Kurztexte">
     <h2 class="ris-label1-bold mb-16">Kurztexte</h2>
     <div class="flex flex-col gap-24">
-      <TextInputCategory
-        id="decisionName"
-        v-model="decisionName"
-        :data-testid="shortTextLabels.decisionName"
-        editable
-        :label="shortTextLabels.decisionName"
-        :should-show-button="!decision?.shortTexts?.decisionName?.length"
-      />
+      <InputField id="fileNumber" :label="shortTextLabels.decisionNames">
+        <ChipsInput
+          id="decisionName"
+          v-model="decisionName"
+          :aria-label="shortTextLabels.decisionNames"
+          :data-testid="shortTextLabels.decisionNames"
+        ></ChipsInput>
+      </InputField>
 
       <TextEditorCategory
         id="headline"

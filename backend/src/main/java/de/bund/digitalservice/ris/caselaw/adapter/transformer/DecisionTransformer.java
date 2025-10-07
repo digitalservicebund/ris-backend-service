@@ -249,17 +249,14 @@ public class DecisionTransformer extends DocumentableTransformer {
     ShortTexts shortTexts = updatedDomainObject.shortTexts();
 
     builder
+        .decisionNames(
+            Optional.ofNullable(shortTexts.decisionNames()).orElse(List.of()).stream()
+                .map(decisionName -> DecisionNameDTO.builder().value(decisionName).build())
+                .toList())
         .guidingPrinciple(shortTexts.guidingPrinciple())
         .headnote(shortTexts.headnote())
         .otherHeadnote(shortTexts.otherHeadnote())
         .headline(shortTexts.headline());
-
-    var currentDecisionNames = currentDto.getDecisionNames();
-    currentDecisionNames.clear();
-    if (shortTexts.decisionName() != null) {
-      currentDecisionNames.add(DecisionNameDTO.builder().value(shortTexts.decisionName()).build());
-    }
-    builder.decisionNames(currentDto.getDecisionNames());
   }
 
   private static void addActiveCitations(
@@ -608,14 +605,8 @@ public class DecisionTransformer extends DocumentableTransformer {
   private static ShortTexts buildShortTexts(DecisionDTO decisionDTO) {
     return ShortTexts.builder()
         .headline(decisionDTO.getHeadline())
-        // TODO multiple decisionNames
-        .decisionName(
-            (decisionDTO.getDecisionNames() == null || decisionDTO.getDecisionNames().isEmpty())
-                ? null
-                : decisionDTO.getDecisionNames().stream()
-                    .findFirst()
-                    .map(DecisionNameDTO::getValue)
-                    .orElse(null))
+        .decisionNames(
+            decisionDTO.getDecisionNames().stream().map(DecisionNameDTO::getValue).toList())
         .guidingPrinciple(decisionDTO.getGuidingPrinciple())
         .headnote(decisionDTO.getHeadnote())
         .otherHeadnote(decisionDTO.getOtherHeadnote())

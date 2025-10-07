@@ -130,9 +130,9 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
               nullSafeGet(coreData.documentationOffice(), DocumentationOffice::abbreviation));
     }
 
-    var decisionName = nullSafeGet(decision.shortTexts(), ShortTexts::decisionName);
-    if (StringUtils.isNotEmpty(decisionName)) {
-      builder.decisionName(List.of(decisionName));
+    var decisionNames = nullSafeGet(decision.shortTexts(), ShortTexts::decisionNames);
+    if (decisionNames != null && !decisionNames.isEmpty()) {
+      builder.decisionName(decisionNames);
     }
 
     Status lastStatus = decision.status();

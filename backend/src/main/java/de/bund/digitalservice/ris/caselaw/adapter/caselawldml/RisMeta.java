@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class RisMeta {
   @XmlElementWrapper(name = "decisionNames", namespace = CaseLawLdml.RIS_NS)
-  @XmlElement(name = "decisionName", namespace = CaseLawLdml.RIS_NS)
+  @XmlElement(name = "decisionNames", namespace = CaseLawLdml.RIS_NS)
   private List<String> decisionName;
 
   @XmlElementWrapper(name = "previousDecisions", namespace = CaseLawLdml.RIS_NS)
