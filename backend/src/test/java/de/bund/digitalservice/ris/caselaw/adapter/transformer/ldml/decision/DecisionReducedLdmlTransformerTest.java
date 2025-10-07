@@ -294,7 +294,7 @@ class DecisionReducedLdmlTransformerTest {
                             .label("courtLabel test")
                             .type("courtType test")
                             .location("courtLocation test")
-                            .region("region test")
+                            .regions(List.of("region test"))
                             .build())
                     .source(
                         Source.builder()

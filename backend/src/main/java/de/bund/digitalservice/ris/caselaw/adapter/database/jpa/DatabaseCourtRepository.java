@@ -55,7 +55,6 @@ public interface DatabaseCourtRepository extends JpaRepository<CourtDTO, UUID> {
                         END AS weight
                       FROM
                         court_with_label
-                        LEFT JOIN incremental_migration.court_region AS region ON court_with_label.id = region.court_id
                       WHERE
                         label LIKE UPPER('%' || :searchStr || '%')
                       ORDER BY
