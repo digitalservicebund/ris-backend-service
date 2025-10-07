@@ -1,6 +1,10 @@
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
-import { navigateToCategories, save } from "~/e2e/caselaw/utils/e2e-utils"
+import {
+  fillCombobox,
+  navigateToCategories,
+  save,
+} from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("court", () => {
   test("input value in court field, press enter and reload", async ({
@@ -207,12 +211,7 @@ test.describe("court", () => {
     async ({ page, documentNumber }) => {
       await navigateToCategories(page, documentNumber)
 
-      await page.getByLabel("Gericht", { exact: true }).fill("LSG Celle-Bremen")
-      await expect(page.getByTestId("combobox-spinner")).toBeHidden()
-      await page.getByText("LSG Celle-Bremen").click()
-      await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
-        "LSG Celle-Bremen",
-      )
+      await fillCombobox(page, "Gericht", "LSG Celle-Bremen")
 
       await save(page)
 

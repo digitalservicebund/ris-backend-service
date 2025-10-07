@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -58,7 +59,7 @@ public class CourtDTO {
       schema = "incremental_migration",
       joinColumns = @JoinColumn(name = "court_id"),
       inverseJoinColumns = @JoinColumn(name = "region_id"))
-  private List<RegionDTO> regions;
+  private List<RegionDTO> regions = new ArrayList<>();
 
   @ManyToOne
   @JoinColumn(name = "jurisdiction_type_id")
