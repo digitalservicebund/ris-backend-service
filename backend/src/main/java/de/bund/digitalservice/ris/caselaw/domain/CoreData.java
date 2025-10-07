@@ -24,6 +24,9 @@ public record CoreData(
     @UniqueElements List<String> deviatingEclis,
     String appraisalBody,
     @PastOrPresent LocalDate decisionDate,
+    // If hasDeliveryDate is true, then decisionDate is actually a deliveryDate
+    boolean hasDeliveryDate,
+    @UniqueElements List<LocalDate> oralHearingDates,
     @UniqueElements List<LocalDate> deviatingDecisionDates,
     String legalEffect,
     List<String> inputTypes,

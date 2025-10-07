@@ -33,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ParticipatingJudgeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
@@ -845,7 +846,9 @@ class DecisionTransformerTest {
     String documentNumber = "DOCNUMBER1234";
 
     LocalDate decisionDate = LocalDate.of(2024, 5, 10);
-    LocalDate deviatingDecisionDate = LocalDate.of(2024, 5, 10);
+    LocalDate deviatingDecisionDate = LocalDate.of(2025, 6, 13);
+    LocalDate oralHearingDate = LocalDate.of(2023, 2, 3);
+    boolean hasDeliveryDate = true;
     String celexNumber = "CELEX-XYZ";
     String ecli = "ECLI:DE:BVerfG:2024:051024u100124";
     String deviatingEcli = "ECLI:DE:BVerfG:2024:051024u100125";
@@ -861,6 +864,7 @@ class DecisionTransformerTest {
             .documentNumber(documentNumber)
             .version(1L)
             .date(decisionDate)
+            .hasDeliveryDate(hasDeliveryDate)
             .documentType(DocumentTypeDTO.builder().id(documentTypeId).abbreviation("Urt").build())
             .court(CourtDTO.builder().id(courtId).type("BVerfG").build())
             .celexNumber(celexNumber)
@@ -876,6 +880,8 @@ class DecisionTransformerTest {
                     DeviatingFileNumberDTO.builder().rank(0L).value(deviatingFileNumber).build()))
             .deviatingDates(
                 List.of(DeviatingDateDTO.builder().rank(0L).value(deviatingDecisionDate).build()))
+            .oralHearingDates(
+                List.of(OralHearingDateDTO.builder().rank(0L).value(oralHearingDate).build()))
             .deviatingCourts(
                 List.of(
                     de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO
@@ -927,12 +933,14 @@ class DecisionTransformerTest {
     assertThat(coreData.celexNumber()).isEqualTo(celexNumber);
     assertThat(coreData.appraisalBody()).isEqualTo(judicialBody);
     assertThat(coreData.decisionDate()).isEqualTo(decisionDate);
+    assertThat(coreData.hasDeliveryDate()).isEqualTo(hasDeliveryDate);
     assertThat(coreData.documentType().jurisShortcut()).isEqualTo("Urt");
     assertThat(coreData.court().label()).isEqualTo("BVerfG");
     assertThat(coreData.fileNumbers().getFirst()).isEqualTo(fileNumber);
     assertThat(coreData.deviatingFileNumbers().getFirst()).isEqualTo(deviatingFileNumber);
     assertThat(coreData.deviatingCourts().getFirst()).isEqualTo(courtLabel);
     assertThat(coreData.deviatingDecisionDates().getFirst()).isEqualTo(deviatingDecisionDate);
+    assertThat(coreData.oralHearingDates().getFirst()).isEqualTo(oralHearingDate);
     assertThat(coreData.documentationOffice()).isNotNull();
     assertThat(coreData.documentationOffice().id()).isEqualTo(docOfficeId);
     assertThat(coreData.documentationOffice().abbreviation()).isEqualTo("DS");
@@ -1643,6 +1651,22 @@ class DecisionTransformerTest {
   }
 
   @Test
+  void testTransformToDomain_withOralHearingDates_shouldAdd() {
+    DecisionDTO decisionDTO =
+        generateSimpleDTOBuilder()
+            .oralHearingDates(
+                List.of(
+                    OralHearingDateDTO.builder().value(LocalDate.of(2020, 1, 1)).rank(1L).build(),
+                    OralHearingDateDTO.builder().value(LocalDate.of(2022, 2, 2)).rank(2L).build()))
+            .build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.coreData().oralHearingDates())
+        .containsExactly(LocalDate.of(2020, 1, 1), LocalDate.of(2022, 2, 2));
+  }
+
+  @Test
   void testTransformToDomain_withoutDeviatingDocumentNumbers_shouldNotAdd() {
     DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
 
@@ -1667,6 +1691,24 @@ class DecisionTransformerTest {
     assertThat(decisionDTO.getDeviatingDocumentNumbers())
         .extracting("value")
         .containsExactly("XXRE123456789", "XXRE234567890");
+  }
+
+  @Test
+  void testTransformToDTO_withOralHearingDates_shouldAdd() {
+    Decision decision =
+        generateSimpleDocumentationUnitBuilder()
+            .coreData(
+                generateSimpleCoreDataBuilder()
+                    .oralHearingDates(List.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 2)))
+                    .build())
+            .build();
+
+    DecisionDTO decisionDTO =
+        DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+    assertThat(decisionDTO.getOralHearingDates())
+        .extracting("value")
+        .containsExactly(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 2));
   }
 
   @Test
@@ -1869,6 +1911,7 @@ class DecisionTransformerTest {
     return CoreData.builder()
         .documentationOffice(DocumentationOffice.builder().abbreviation("doc office").build())
         .deviatingDocumentNumbers(Collections.emptyList())
+        .oralHearingDates(Collections.emptyList())
         .fileNumbers(Collections.emptyList())
         .deviatingFileNumbers(Collections.emptyList())
         .deviatingCourts(Collections.emptyList())

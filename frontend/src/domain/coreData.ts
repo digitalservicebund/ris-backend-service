@@ -19,6 +19,8 @@ export type CoreData = {
   deviatingEclis?: string[]
   appraisalBody?: string
   decisionDate?: string
+  hasDeliveryDate?: boolean
+  oralHearingDates?: string[]
   deviatingDecisionDates?: string[]
   legalEffect?: string
   inputTypes?: string[]
@@ -31,9 +33,32 @@ export type CoreData = {
   resolutionDate?: string
 }
 
-// Should be "keyof Required<CoreData>" to ensure all fields are included
 export const coreDataLabels: {
-  [coreDataKeyKey in keyof Required<Pick<CoreData, "celexNumber">>]: string
+  [coreDataKeyKey in keyof Required<CoreData>]: string
 } = {
   celexNumber: "CELEX-Nummer",
+  hasDeliveryDate: "Zustellung an Verkündungs statt",
+  oralHearingDates: "Datum der mündlichen Verhandlung",
+  court: "Gericht",
+  deviatingCourts: "Fehlerhaftes Gericht",
+  fileNumbers: "Aktenzeichen",
+  deviatingFileNumbers: "Abweichendes Aktenzeichen",
+  deviatingDocumentNumbers: "Abweichende Dokumentnummer",
+  decisionDate: "Entscheidungsdatum",
+  appraisalBody: "Spruchkörper",
+  creatingDocOffice: "Erstellende Dokumentationsstelle",
+  ecli: "ECLI",
+  documentationOffice: "Dokumentationsstelle",
+  inputTypes: "Eingangsart",
+  isResolved: "Erledigt",
+  yearsOfDispute: "Streitjahr",
+  resolutionDate: "Erledigungsmitteilung",
+  source: "Quelle",
+  deviatingDecisionDates: "Abweichendes Entscheidungsdatum",
+  documentType: "Dokumenttyp",
+  deviatingEclis: "Abweichender ECLI",
+  procedure: "Vorgang",
+  previousProcedures: "Vorgang Historie",
+  legalEffect: "Rechtskraft",
+  leadingDecisionNormReferences: "BGH Nachschlagewerk",
 }

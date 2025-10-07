@@ -9,7 +9,6 @@ function renderComponent(coreData: CoreData, kind?: Kind) {
   return render(PreviewCoreData, {
     props: {
       coreData: coreData,
-      dateLabel: "Entscheidungsdatum",
       kind: kind ?? Kind.DECISION,
     },
     global: {
@@ -35,6 +34,7 @@ describe("preview core data", () => {
       deviatingFileNumbers: ["cde-456"],
       decisionDate: "2023-12-12",
       deviatingDecisionDates: ["2022-12-12"],
+      oralHearingDates: ["2011-11-11", "2022-12-12"],
       appraisalBody: "1 Senat",
       documentType: {
         jurisShortcut: "Bes",
@@ -66,6 +66,9 @@ describe("preview core data", () => {
     expect(await screen.findByText("Entscheidungsdatum")).toBeInTheDocument()
     expect(
       await screen.findByText("Abweichendes Entscheidungsdatum"),
+    ).toBeInTheDocument()
+    expect(
+      await screen.findByText("Datum der mündlichen Verhandlung"),
     ).toBeInTheDocument()
     expect(await screen.findByText("Spruchkörper")).toBeInTheDocument()
     expect(await screen.findByText("Dokumenttyp")).toBeInTheDocument()
@@ -116,12 +119,27 @@ describe("preview core data", () => {
     expect(await screen.findByText("Erledigungsmitteilung")).toBeInTheDocument()
   })
 
+  test("renders 'Datum der Auslieferung an Verkündung statt'", async () => {
+    renderComponent({
+      hasDeliveryDate: true,
+      decisionDate: "2025-06-12",
+    })
+
+    expect(
+      await screen.findByText("Datum der Zustellung an Verkündungs statt", {
+        exact: true,
+      }),
+    ).toBeInTheDocument()
+    expect(await screen.findByText("12.06.2025")).toBeInTheDocument()
+  })
+
   test("do not render empty list", async () => {
     renderComponent({
       deviatingCourts: [],
       fileNumbers: [],
       deviatingFileNumbers: [],
       deviatingDecisionDates: [],
+      oralHearingDates: [],
       deviatingEclis: [],
       deviatingDocumentNumbers: [],
       previousProcedures: [],
@@ -137,6 +155,9 @@ describe("preview core data", () => {
     ).not.toBeInTheDocument()
     expect(
       screen.queryByText("Abweichendes Entscheidungsdatum"),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Datum der mündlichen Verhandlung"),
     ).not.toBeInTheDocument()
     expect(screen.queryByText("Abweichender ECLI")).not.toBeInTheDocument()
     expect(
@@ -283,6 +304,32 @@ describe("preview core data", () => {
         "Aktenzeichen",
         "Abweichendes Aktenzeichen",
         "Entscheidungsdatum",
+        "Spruchkörper",
+        "Dokumenttyp",
+        "Abweichende Dokumentnummer",
+        "CELEX-Nummer",
+        "ECLI",
+        "Abweichender ECLI",
+        "Vorgang",
+        "Vorgangshistorie",
+        "Rechtskraft",
+        "Region",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
+      ],
+    ],
+    [
+      "Datum der mündlichen Verhandlung",
+      { oralHearingDates: ["2014-12-12"] },
+      [
+        "Gericht",
+        "Fehlerhaftes Gericht",
+        "Aktenzeichen",
+        "Abweichendes Aktenzeichen",
+        "Entscheidungsdatum",
+        "Abweichendes Entscheidungsdatum",
         "Spruchkörper",
         "Dokumenttyp",
         "Abweichende Dokumentnummer",

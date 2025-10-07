@@ -6,6 +6,7 @@ import HandoverDecisionView from "@/components/HandoverDecisionView.vue"
 import { Decision } from "@/domain/decision"
 import { Env } from "@/domain/env"
 import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
+import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
 import LegalForce from "@/domain/legalForce"
 import { DuplicateRelationStatus } from "@/domain/managementData"
 import NormReference from "@/domain/normReference"
@@ -478,6 +479,9 @@ describe("HandoverDocumentationUnitView:", () => {
           documentNumber: "foo",
           coreData: {
             fileNumbers: ["foo"],
+            oralHearingDates: ["2022-02-01"],
+            hasDeliveryDate: true,
+            celexNumber: "celexNumber",
             court: {
               type: "type",
               location: "location",
@@ -490,7 +494,10 @@ describe("HandoverDocumentationUnitView:", () => {
               label: "category",
             },
           },
-          contentRelatedIndexing: { evsf: "X 00 00" },
+          contentRelatedIndexing: {
+            evsf: "X 00 00",
+            foreignLanguageVersions: [new ForeignLanguageVersion()],
+          },
           longTexts: { decisionReasons: "decisionReasons" },
           managementData: {
             duplicateRelations: [],
@@ -506,6 +513,12 @@ describe("HandoverDocumentationUnitView:", () => {
         ),
       ).toBeInTheDocument()
       expect(screen.getByText("E-VSF")).toBeInTheDocument()
+      expect(
+        screen.getByText("Zustellung an Verkündungs statt"),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText("Datum der mündlichen Verhandlung"),
+      ).toBeInTheDocument()
       const handoverButton = screen.getByRole("button", {
         name: "Dokumentationseinheit an jDV übergeben",
       })
