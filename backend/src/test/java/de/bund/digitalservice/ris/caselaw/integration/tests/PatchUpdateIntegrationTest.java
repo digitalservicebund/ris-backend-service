@@ -122,7 +122,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
         courtRepository
             .save(
                 CourtDTO.builder()
-                    .regions(List.of(region1DTO))
+                    .region(region1DTO)
                     .type("LG")
                     .location("Detmold")
                     .isForeignCourt(false)
@@ -134,7 +134,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
         courtRepository
             .save(
                 CourtDTO.builder()
-                    .regions(List.of(region2DTO))
+                    .region(region2DTO)
                     .type("SG")
                     .location("Fulda")
                     .isForeignCourt(false)
@@ -2124,7 +2124,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                   .label("LG Detmold")
                   .id(court1Id)
                   .jurisdictionType("")
-                  .regions(List.of("NW"))
+                  .region("NW")
                   .build(),
               JsonNode.class);
       List<JsonPatchOperation> operationsUser1 =
@@ -2262,7 +2262,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                   .location("Detmold")
                   .label("LG Detmold")
                   .jurisdictionType("")
-                  .regions(List.of("NW"))
+                  .region("NW")
                   .id(court1Id)
                   .build(),
               JsonNode.class);
@@ -2475,7 +2475,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                   .location("Detmold")
                   .label("LG Detmold")
                   .jurisdictionType("")
-                  .regions(List.of("NW"))
+                  .region("NW")
                   .id(court1Id)
                   .build(),
               JsonNode.class);
@@ -5108,7 +5108,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
             "label": "LG Detmold",
             "revoked": null,
             "jurisdictionType": "",
-            "regions": ["NW"],
+            "region": "NW",
             "responsibleDocOffice": null
           }
         }

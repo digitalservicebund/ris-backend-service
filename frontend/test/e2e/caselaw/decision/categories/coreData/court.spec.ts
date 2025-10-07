@@ -1,10 +1,6 @@
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
-import {
-  fillCombobox,
-  navigateToCategories,
-  save,
-} from "~/e2e/caselaw/utils/e2e-utils"
+import { navigateToCategories, save } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("court", () => {
   test("input value in court field, press enter and reload", async ({
@@ -204,25 +200,6 @@ test.describe("court", () => {
     // region was cleared by the backend
     await expect(page.getByLabel("Region", { exact: true })).toHaveValue("")
   })
-
-  test(
-    "setting a court with multiple regions displays all regions",
-    { tag: ["@RISDEV-3081"] },
-    async ({ page, documentNumber }) => {
-      await navigateToCategories(page, documentNumber)
-
-      await fillCombobox(page, "Gericht", "LSG Celle-Bremen")
-
-      await save(page)
-
-      await expect(page.getByText("Region")).toBeVisible()
-
-      // region was set by the backend based on state database table
-      await expect(page.getByLabel("Region", { exact: true })).toHaveValue(
-        "BR, ND",
-      )
-    },
-  )
 
   test("that setting a special court sets legal effect to yes, but it can be changed afterwards", async ({
     page,

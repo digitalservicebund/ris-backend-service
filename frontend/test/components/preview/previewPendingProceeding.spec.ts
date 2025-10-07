@@ -31,7 +31,7 @@ function renderComponent() {
                       court: {
                         label: "BVerfG",
                         jurisdictionType: "Verfassungsgerichtsbarkeit",
-                        regions: ["DEU"],
+                        region: "DEU",
                       },
                       leadingDecisionNormReferences: [
                         "NSW WEG $ 14 (BGH-intern)",

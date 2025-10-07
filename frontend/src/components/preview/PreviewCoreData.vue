@@ -187,11 +187,9 @@ const dateLabel = computed(() => {
         {{ coreData.court.jurisdictionType }}
       </PreviewContent>
     </PreviewRow>
-    <PreviewRow
-      v-if="coreData.court?.regions && coreData.court?.regions.length > 0"
-    >
+    <PreviewRow v-if="coreData.court?.region">
       <PreviewCategory>Region</PreviewCategory>
-      <PreviewContent>{{ coreData.court.regions.join(", ") }}</PreviewContent>
+      <PreviewContent>{{ coreData.court.region }}</PreviewContent>
     </PreviewRow>
     <PreviewRow
       v-if="

@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Limit;
@@ -19,7 +18,6 @@ public class PostgresCourtRepositoryImpl implements CourtRepository {
   }
 
   @Override
-  @Transactional
   public List<Court> findBySearchStr(String searchString, Integer size) {
     return repository.findBySearchStr(searchString, size).stream()
         .map(CourtTransformer::transformToDomain)
@@ -27,7 +25,6 @@ public class PostgresCourtRepositoryImpl implements CourtRepository {
   }
 
   @Override
-  @Transactional
   public Optional<Court> findByTypeAndLocation(String type, String location) {
     if (type == null) {
       return Optional.empty();
@@ -41,7 +38,6 @@ public class PostgresCourtRepositoryImpl implements CourtRepository {
   }
 
   @Override
-  @Transactional
   public Optional<Court> findUniqueBySearchString(String searchString) {
     List<CourtDTO> foundCourts = repository.findByExactSearchString(searchString);
 
@@ -52,7 +48,6 @@ public class PostgresCourtRepositoryImpl implements CourtRepository {
   }
 
   @Override
-  @Transactional
   public List<Court> findAllByOrderByTypeAscLocationAsc(Integer size) {
     return repository.findByOrderByTypeAscLocationAsc(Limit.of(size)).stream()
         .map(CourtTransformer::transformToDomain)

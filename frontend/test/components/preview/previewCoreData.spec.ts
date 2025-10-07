@@ -25,7 +25,7 @@ describe("preview core data", () => {
       court: {
         label: "BVerfG",
         jurisdictionType: "Verfassungsgerichtsbarkeit",
-        regions: ["DEU", "BY"],
+        region: "DEU",
       },
       leadingDecisionNormReferences: ["NSW WEG $ 14 (BGH-intern)"],
       deviatingCourts: ["BGH"],
@@ -94,7 +94,7 @@ describe("preview core data", () => {
       await screen.findByText("Verfassungsgerichtsbarkeit"),
     ).toBeInTheDocument()
     expect(await screen.findByText("Region")).toBeInTheDocument()
-    expect(await screen.findByText("DEU, BY")).toBeInTheDocument()
+    expect(await screen.findByText("DEU")).toBeInTheDocument()
     expect(
       screen.queryByText("Erledigung", { exact: true }),
     ).not.toBeInTheDocument()
@@ -577,7 +577,7 @@ describe("preview core data", () => {
     ],
     [
       "Region",
-      { court: { label: "foo", regions: ["BRD"] } },
+      { court: { label: "foo", region: "BRD" } },
       [
         "Fehlerhaftes Gericht",
         "Aktenzeichen",

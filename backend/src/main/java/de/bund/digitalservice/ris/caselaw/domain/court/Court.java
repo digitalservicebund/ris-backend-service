@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain.court;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -13,5 +12,5 @@ public record Court(
     String label,
     String revoked,
     String jurisdictionType,
-    List<String> regions,
+    String region,
     DocumentationOffice responsibleDocOffice) {}

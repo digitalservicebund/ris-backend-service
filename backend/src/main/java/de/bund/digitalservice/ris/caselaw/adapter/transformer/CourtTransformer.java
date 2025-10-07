@@ -1,9 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,10 +28,7 @@ public class CourtTransformer {
                 courtDTO.getJurisdictionType() != null
                     ? courtDTO.getJurisdictionType().getLabel()
                     : "")
-            .regions(
-                courtDTO.getRegions() != null
-                    ? courtDTO.getRegions().stream().map(RegionDTO::getCode).toList()
-                    : List.of())
+            .region(courtDTO.getRegion() != null ? courtDTO.getRegion().getCode() : "")
             .revoked(revoked);
 
     if (Boolean.TRUE.equals(courtDTO.isSuperiorCourt())) {
