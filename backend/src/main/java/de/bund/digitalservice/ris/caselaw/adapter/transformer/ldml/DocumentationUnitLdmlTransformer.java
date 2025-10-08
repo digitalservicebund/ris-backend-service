@@ -71,10 +71,12 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
 
     if (documentationUnit.coreData() != null
         && documentationUnit.coreData().court() != null
-        && documentationUnit.coreData().court().region() != null) {
+        && documentationUnit.coreData().court().regions() != null
+        && !documentationUnit.coreData().court().regions().isEmpty()) {
       elementBuilder.frbrCountry(
           // The schmema says ISO 3166-1 Alpha-2 code, but we only have Alpha-3 available (for now)
-          new FrbrCountry(getCountry(documentationUnit.coreData().court().region())));
+          // (We have only more then one region for a handful of german courts)
+          new FrbrCountry(getCountry(documentationUnit.coreData().court().regions().get(0))));
     }
 
     FrbrElement work = elementBuilder.build().withFrbrThisAndUri(uniqueId);

@@ -99,6 +99,61 @@ describe("Core Data", () => {
     expect(model.value.deviatingDecisionDates).toEqual(["2022-02-02"])
   })
 
+  test("makes oral hearing date required when hasDeliveryDate is checked", async () => {
+    const documentUnit = new Decision("1", {
+      documentNumber: "ABCD2022000001",
+    })
+
+    const { user } = renderComponent({
+      initialModelValue: documentUnit.coreData,
+    })
+    expect(
+      await screen.findByText("Datum der mündlichen Verhandlung", {
+        exact: true,
+      }),
+    ).toBeVisible()
+
+    await user.click(
+      await screen.findByLabelText("Zustellung an Verkündungs statt"),
+    )
+
+    expect(
+      await screen.findByText("Datum der mündlichen Verhandlung *", {
+        exact: true,
+      }),
+    ).toBeVisible()
+  })
+
+  test("renders oral hearing date", async () => {
+    const documentUnit = new Decision("1", {
+      coreData: {
+        oralHearingDates: ["2022-02-01", "2023-03-01"],
+      },
+      documentNumber: "ABCD2022000001",
+    })
+
+    renderComponent({ initialModelValue: documentUnit.coreData })
+    expect(await screen.findByTestId("oral-hearing-dates")).toBeVisible()
+
+    const chipList = screen.getAllByRole("listitem")
+    expect(chipList.length).toBe(2)
+    expect(chipList[0]).toHaveTextContent("01.02.2022")
+    expect(chipList[1]).toHaveTextContent("01.03.2023")
+  })
+
+  test("updates oral hearing date", async () => {
+    const { user, model } = renderComponent({
+      initialModelValue: { oralHearingDates: [] },
+    })
+
+    const input = await screen.findByLabelText(
+      "Datum der mündlichen Verhandlung",
+    )
+    await user.type(input, "02.02.2022{enter}")
+
+    expect(model.value.oralHearingDates).toEqual(["2022-02-02"])
+  })
+
   test("renders year of dispute", async () => {
     const documentUnit = new Decision("1", {
       coreData: {
@@ -278,5 +333,15 @@ describe("Core Data", () => {
     const inputField = await screen.findByLabelText("CELEX-Nummer")
     expect(inputField).toHaveValue("62023CJ0538")
     expect(inputField).toHaveAttribute("readonly")
+  })
+
+  test("should not show decision-specific date attributes for pending proceeding", async () => {
+    renderComponent({ kind: Kind.PENDING_PROCEEDING })
+    expect(
+      screen.queryByLabelText("Datum der mündlichen Verhandlung"),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Zustellung an Verkündungs statt"),
+    ).not.toBeInTheDocument()
   })
 })

@@ -228,7 +228,32 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       deviatingDateSubquery.where(deviatingDateCondition);
       Predicate deviatingDatePredicate = cb.exists(deviatingDateSubquery);
 
-      Predicate datePredicate = cb.or(decisionDatePredicate, deviatingDatePredicate);
+      Subquery<OralHearingDateDTO> hearingDateSubquery = cq.subquery(OralHearingDateDTO.class);
+      Root<DecisionDTO> hearingDateSubRoot =
+          cb.treat(hearingDateSubquery.correlate(root), DecisionDTO.class);
+
+      Join<DecisionDTO, OralHearingDateDTO> hearingDateJoin =
+          hearingDateSubRoot.join(DecisionDTO_.oralHearingDates);
+
+      hearingDateSubquery.select(hearingDateJoin);
+
+      Predicate hearingDateCondition;
+      if (parameters.decisionDateEnd.isPresent()) {
+        hearingDateCondition =
+            cb.between(
+                hearingDateJoin.get(OralHearingDateDTO_.value),
+                parameters.decisionDate.get(),
+                parameters.decisionDateEnd.get());
+      } else {
+        hearingDateCondition =
+            cb.equal(hearingDateJoin.get(OralHearingDateDTO_.value), parameters.decisionDate.get());
+      }
+
+      hearingDateSubquery.where(hearingDateCondition);
+      Predicate hearingDatePredicate = cb.exists(hearingDateSubquery);
+
+      Predicate datePredicate =
+          cb.or(decisionDatePredicate, deviatingDatePredicate, hearingDatePredicate);
       predicates.add(datePredicate);
     }
     return predicates;

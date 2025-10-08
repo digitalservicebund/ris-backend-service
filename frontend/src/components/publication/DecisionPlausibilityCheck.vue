@@ -4,12 +4,12 @@ import Button from "primevue/button"
 import { computed, Ref, watch } from "vue"
 import { RouterLink, useRouter } from "vue-router"
 import { useScroll } from "@/composables/useScroll"
+import { coreDataLabels } from "@/domain/coreData"
 import {
   contentRelatedIndexingLabels,
   Decision,
   longTextLabels,
 } from "@/domain/decision"
-import { fieldLabels } from "@/fields/caselaw"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconCheck from "~icons/ic/baseline-check"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
@@ -97,7 +97,7 @@ const categoriesWithMissingData = computed<CategoryWithMissingData[]>(() => {
 const missingCoreDataFields = computed(() =>
   decision.value.missingRequiredFields.map((field) => ({
     field,
-    label: fieldLabels[field],
+    label: coreDataLabels[field],
   })),
 )
 

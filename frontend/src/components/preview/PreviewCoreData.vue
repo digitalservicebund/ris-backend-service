@@ -6,13 +6,12 @@ import FlexItem from "@/components/FlexItem.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
-import { CoreData } from "@/domain/coreData"
+import { CoreData, coreDataLabels } from "@/domain/coreData"
 
 import { Kind } from "@/domain/documentationUnitKind"
 
 const props = defineProps<{
   coreData: CoreData
-  dateLabel: string
   kind: Kind
 }>()
 
@@ -22,6 +21,12 @@ const sourceValue = computed(() =>
     ? (props.coreData.source.value ?? props.coreData.source.sourceRawValue)
     : undefined,
 )
+const dateLabel = computed(() => {
+  const decisionDateLabel = props.coreData.hasDeliveryDate
+    ? "Datum der Zustellung an Verkündungs statt"
+    : "Entscheidungsdatum"
+  return isPendingProceeding ? "Mitteilungsdatum" : decisionDateLabel
+})
 </script>
 
 <template>
@@ -73,6 +78,16 @@ const sourceValue = computed(() =>
       <PreviewCategory>Abweichendes {{ dateLabel }}</PreviewCategory>
       <PreviewContent>
         <div v-for="item in coreData.deviatingDecisionDates" :key="item">
+          {{ dayjs(item).format("DD.MM.YYYY") }}
+        </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow
+      v-if="coreData.oralHearingDates && coreData.oralHearingDates.length > 0"
+    >
+      <PreviewCategory>{{ coreDataLabels.oralHearingDates }}</PreviewCategory>
+      <PreviewContent>
+        <div v-for="item in coreData.oralHearingDates" :key="item">
           {{ dayjs(item).format("DD.MM.YYYY") }}
         </div>
       </PreviewContent>
@@ -172,9 +187,11 @@ const sourceValue = computed(() =>
         {{ coreData.court.jurisdictionType }}
       </PreviewContent>
     </PreviewRow>
-    <PreviewRow v-if="coreData.court?.region">
+    <PreviewRow
+      v-if="coreData.court?.regions && coreData.court?.regions.length > 0"
+    >
       <PreviewCategory>Region</PreviewCategory>
-      <PreviewContent>{{ coreData.court.region }}</PreviewContent>
+      <PreviewContent>{{ coreData.court.regions.join(", ") }}</PreviewContent>
     </PreviewRow>
     <PreviewRow
       v-if="

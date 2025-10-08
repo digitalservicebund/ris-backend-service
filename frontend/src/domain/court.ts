@@ -6,6 +6,6 @@ export type Court = {
   label: string
   revoked?: string
   jurisdictionType?: string
-  region?: string
+  regions?: string[]
   responsibleDocOffice?: DocumentationOffice
 }

@@ -239,13 +239,18 @@ export const navigateToPublication = async (
   documentNumber: string,
   options?: {
     type?: "pending-proceeding" | "documentunit"
+    navigationBy?: "click" | "url"
   },
 ) => {
   await test.step("Navigate to 'Veröffentlichen'", async () => {
-    const documentType = options?.type ?? "documentunit"
-    const baseUrl = `/caselaw/${documentType}/${documentNumber}/publication`
-    await getRequest(baseUrl, page)
-    await expect(page.getByTestId("title").first()).toHaveText("Prüfen")
+    if (options?.navigationBy === "click") {
+      await page.getByTestId("Veröffentlichen").click()
+    } else {
+      const documentType = options?.type ?? "documentunit"
+      const baseUrl = `/caselaw/${documentType}/${documentNumber}/publication`
+      await getRequest(baseUrl, page)
+      await expect(page.getByTestId("title").first()).toHaveText("Prüfen")
+    }
   })
 }
 

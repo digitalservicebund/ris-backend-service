@@ -6,10 +6,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -50,13 +53,13 @@ public class CourtDTO {
   @Column(name = "juris_id")
   private int jurisId;
 
-  @ManyToOne
+  @ManyToMany
   @JoinTable(
       name = "court_region",
       schema = "incremental_migration",
       joinColumns = @JoinColumn(name = "court_id"),
       inverseJoinColumns = @JoinColumn(name = "region_id"))
-  private RegionDTO region;
+  private List<RegionDTO> regions = new ArrayList<>();
 
   @ManyToOne
   @JoinColumn(name = "jurisdiction_type_id")

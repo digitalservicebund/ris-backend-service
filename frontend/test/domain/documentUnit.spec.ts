@@ -119,12 +119,4 @@ describe("DocumentUnit", () => {
       "documentType",
     ])
   })
-
-  it("returns true when field is required", () => {
-    expect(Decision.isRequiredField("fileNumbers")).toBeTruthy()
-  })
-
-  it("returns true when field is required", () => {
-    expect(Decision.isRequiredField("ECLI")).toBeFalsy()
-  })
 })

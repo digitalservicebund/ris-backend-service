@@ -518,7 +518,7 @@ class DecisionFullLdmlTransformerTest {
                             .type("Tribunal Administratif")
                             .location("Nantes")
                             .label("Tribunal Administratif Nantes")
-                            .region("FRA")
+                            .regions(List.of("FRA"))
                             .build())
                     .documentType(
                         DocumentType.builder().label("testDocumentTypeAbbreviation").build())
@@ -596,7 +596,7 @@ class DecisionFullLdmlTransformerTest {
                         .label("courtLabel test")
                         .type("courtType")
                         .location("courtLocation")
-                        .region("NW")
+                        .regions(List.of("NW"))
                         .build())
                 .source(
                     Source.builder()

@@ -247,7 +247,7 @@ class PendingProceedingFullLdmlTransformerTest {
                         .type("courtType")
                         .location("courtLocation")
                         .label("courtType courtLocation")
-                        .region("NW")
+                        .regions(List.of("NW"))
                         .build())
                 .documentType(DocumentType.builder().label("Anhängiges Verfahren").build())
                 .fileNumbers(List.of("Aktenzeichen"))

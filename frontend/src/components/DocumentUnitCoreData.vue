@@ -42,6 +42,7 @@ const validationStore =
       "decisionDate",
       "yearsOfDispute",
       "deviatingDecisionDates",
+      "oralHearingDates",
       "source",
     ][number]
   >()
@@ -72,7 +73,9 @@ const jurisdictionType = computed(() =>
 )
 
 const region = computed(() =>
-  coreDataModel.value.court ? coreDataModel.value.court.region : "",
+  coreDataModel.value.court
+    ? coreDataModel.value.court.regions?.join(", ")
+    : "",
 )
 
 const sourceItems: DropdownItem[] = [
@@ -224,12 +227,50 @@ onBeforeUnmount(() => {
               v-model="coreDataModel.deviatingDecisionDates"
               aria-label="Abweichendes Entscheidungsdatum"
               :has-error="slotProps.hasError"
+              test-id="deviating-decision-dates"
               @focus="validationStore.remove('deviatingDecisionDates')"
               @update:validation-error="slotProps.updateValidationError"
             />
           </InputField>
         </template>
       </NestedComponent>
+    </div>
+    <div v-if="!isPendingProceeding" :class="layoutClass">
+      <InputField
+        id="hasDeliveryDate"
+        v-slot="{ id }"
+        :label="coreDataLabels.hasDeliveryDate"
+        label-class="ris-label1-regular"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <Checkbox
+          v-model="coreDataModel.hasDeliveryDate"
+          :aria-label="coreDataLabels.hasDeliveryDate"
+          binary
+          data-testid="has-delivery-date"
+          :input-id="id"
+          size="large"
+        />
+      </InputField>
+      <InputField
+        id="oralHearingDates"
+        v-slot="slotProps"
+        :label="
+          coreDataLabels.oralHearingDates +
+          (coreDataModel.hasDeliveryDate ? ' *' : '')
+        "
+        :validation-error="validationStore.getByField('oralHearingDates')"
+      >
+        <ChipsDateInput
+          id="oralHearingDates"
+          v-model="coreDataModel.oralHearingDates"
+          aria-label="Datum der mündlichen Verhandlung"
+          :has-error="slotProps.hasError"
+          test-id="oral-hearing-dates"
+          @focus="validationStore.remove('oralHearingDates')"
+          @update:validation-error="slotProps.updateValidationError"
+        />
+      </InputField>
     </div>
     <div :class="layoutClass">
       <InputField

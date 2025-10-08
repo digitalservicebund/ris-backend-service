@@ -109,6 +109,7 @@ test.describe(
           await navigateToManagementData(
             page,
             prefilledPendingProceeding.documentNumber,
+            { type: "pending-proceeding" },
           )
 
           await page
@@ -128,6 +129,7 @@ test.describe(
           await navigateToPublication(
             page,
             prefilledPendingProceeding.documentNumber,
+            { type: "pending-proceeding" },
           )
         })
 
