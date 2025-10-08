@@ -73,7 +73,9 @@ const jurisdictionType = computed(() =>
 )
 
 const region = computed(() =>
-  coreDataModel.value.court ? coreDataModel.value.court.region : "",
+  coreDataModel.value.court
+    ? coreDataModel.value.court.regions?.join(", ")
+    : "",
 )
 
 const sourceItems: DropdownItem[] = [
