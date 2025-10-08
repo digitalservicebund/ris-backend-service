@@ -1,14 +1,13 @@
 <script lang="ts" setup>
-import { computed } from "vue"
 import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
-import ReplacementBar from "@/components/text-check/ReplacementBar.vue"
-import { Match, Replacement } from "@/types/textCheck"
+import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
   match: Match
 }>()
 
 const emit = defineEmits<{
+  "ignore-once:toggle": [offset: number, length: number]
   "word:remove": [value: string]
   "word:add": [word: string]
   "globalWord:remove": [value: string]
@@ -16,9 +15,9 @@ const emit = defineEmits<{
   "word:replace": [value: string]
 }>()
 
-function acceptSuggestion(replacement: string) {
-  emit("word:replace", replacement)
-}
+// function acceptSuggestion(replacement: string) {
+//   emit("word:replace", replacement)
+// }
 
 function addIgnoredWord(word: string) {
   emit("word:add", word)
@@ -36,16 +35,21 @@ function removeGloballyIgnoredWord(word: string) {
   emit("globalWord:remove", word)
 }
 
-function getValues(replacements: Replacement[]) {
-  return replacements.flatMap((replacement) => replacement.value)
+function ignoreOnceToggle(offset: number, length: number) {
+  emit("ignore-once:toggle", offset, length)
 }
 
-const isMatchIgnored = computed(() => {
-  return (
-    Array.isArray(props.match.ignoredTextCheckWords) &&
-    props.match.ignoredTextCheckWords.length > 0
-  )
-})
+// TODO: this was causing linter issues, so I disabled it for now
+// function getValues(replacements: Replacement[]) {
+//   return replacements.flatMap((replacement) => replacement.value)
+// }
+//
+// const isMatchIgnored = computed(() => {
+//   return (
+//     Array.isArray(props.match.ignoredTextCheckWords) &&
+//     props.match.ignoredTextCheckWords.length > 0
+//   )
+// })
 </script>
 
 <template>
@@ -63,17 +67,19 @@ const isMatchIgnored = computed(() => {
       :match="match"
       @globally-ignored-word:add="addIgnoredWordGlobally"
       @globally-ignored-word:remove="removeGloballyIgnoredWord(match.word)"
+      @ignore-once:toggle="ignoreOnceToggle(match.offset, match.length)"
+      @ignored-word:add="addIgnoredWord(match.word)"
       @ignored-word:remove="removeIgnoredWord(match.word)"
     />
 
-    <p v-if="!isMatchIgnored">{{ match.shortMessage || match.message }}</p>
+    <!--    <p v-if="!isMatchIgnored">{{ match.shortMessage || match.message }}</p>-->
 
-    <ReplacementBar
-      v-if="!isMatchIgnored"
-      replacement-mode="single"
-      :replacements="getValues(match.replacements)"
-      @ignored-word:add="addIgnoredWord(match.word)"
-      @suggestion:update="acceptSuggestion"
-    />
+    <!--    <ReplacementBar-->
+    <!--      v-if="!isMatchIgnored"-->
+    <!--      replacement-mode="single"-->
+    <!--      :replacements="getValues(match.replacements)"-->
+    <!--      @ignored-word:add="addIgnoredWord(match.word)"-->
+    <!--      @suggestion:update="acceptSuggestion"-->
+    <!--    />-->
   </div>
 </template>
