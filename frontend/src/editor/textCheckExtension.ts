@@ -1,6 +1,7 @@
 import { Extension } from "@tiptap/core"
 import { Plugin, PluginKey, Transaction, EditorState } from "prosemirror-state"
 import {
+  IgnoreOnceWord,
   TextCheckExtensionOptions,
   TextCheckService,
   TextCheckTagName,
@@ -11,6 +12,7 @@ declare module "@tiptap/core" {
     textCheckExtension: {
       textCheck: () => ReturnType
       setSelectedMatch: (matchId?: number) => ReturnType
+      setSelectedIgnoreOnce: (ignoreOnceWord: IgnoreOnceWord) => ReturnType
       handleMatchSelection: () => ReturnType
       acceptMatch: (matchId: number, text: string) => ReturnType
       updatedMatchesInText: () => ReturnType
@@ -53,6 +55,13 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
 
         return true
       },
+
+      // possibly not needed to be selected?
+      // setSelectedIgnoreOnce: (ignoreOnceWord: IgnoreOnceWord) => () => {
+      //   const service = this.options.service as TextCheckService
+      //   service.selectIgnore
+      //   return true
+      // },
 
       acceptMatch:
         (matchId: number, text: string) =>

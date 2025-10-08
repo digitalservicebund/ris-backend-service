@@ -1,0 +1,8 @@
+ignore-once {
+  border-bottom: 2px solid #66add3;
+  text-decoration: none;
+
+  &:hover {
+    background: rgba($color: #cce4f0, $alpha: 100%) !important;
+  }
+}

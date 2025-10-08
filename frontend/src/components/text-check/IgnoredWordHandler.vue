@@ -17,10 +17,15 @@ const emit = defineEmits<{
   "ignored-word:remove": [void]
   "globally-ignored-word:remove": [void]
   "globally-ignored-word:add": [void]
+  "ignore-once:toggle": [number, number]
 }>()
 
 function addIgnoredWord() {
   emit("ignored-word:add")
+}
+
+function ignoreOnceToggle() {
+  emit("ignore-once:toggle", props.match.offset, props.match.length)
 }
 
 async function removeWord() {
@@ -55,6 +60,9 @@ const matchIsIgnoredInDocument = computed(() => {
     (ignoredWord) => ignoredWord.type === "documentation_unit",
   )
 })
+
+// TODO: implement this
+// const matchIsIgnoredLocally = computed(() => {})
 </script>
 
 <template>
