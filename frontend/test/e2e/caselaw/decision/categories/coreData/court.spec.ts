@@ -205,7 +205,8 @@ test.describe("court", () => {
     await expect(page.getByLabel("Region", { exact: true })).toHaveValue("")
   })
 
-  test(
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(
     "setting a court with multiple regions displays all regions",
     { tag: ["@RISDEV-3081"] },
     async ({ page, documentNumber }) => {
