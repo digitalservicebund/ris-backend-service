@@ -205,8 +205,7 @@ test.describe("court", () => {
     await expect(page.getByLabel("Region", { exact: true })).toHaveValue("")
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip(
+  test(
     "setting a court with multiple regions displays all regions",
     { tag: ["@RISDEV-3081"] },
     async ({ page, documentNumber }) => {
@@ -220,7 +219,7 @@ test.describe("court", () => {
 
       // region was set by the backend based on state database table
       await expect(page.getByLabel("Region", { exact: true })).toHaveValue(
-        "BR, ND",
+        "ND, BR",
       )
     },
   )
