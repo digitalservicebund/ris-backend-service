@@ -110,13 +110,9 @@ class PendingProceedingFullLdmlTransformerTest {
   void shouldBeFulfilled() {
     String expected =
         """
-      <akn:decision>
-        <akn:blockname="Erledigungsmitteilung">
-          <akn:embeddedStructure>
-            <akn:palternativeTo="textWrapper">Erledigungsmitteilung</akn:p>
-          </akn:embeddedStructure>
-        </akn:block>
-      </akn:decision>
+     <akn:decision ris:domainTerm="Erledigungsvermerk">
+        <akn:p alternativeTo="textWrapper">Erledigungsmitteilung</akn:p>
+     </akn:decision>
      """;
     CaseLawLdml ldml = transformer.transformToLdml(testDocumentUnit);
     assertThat(ldml).isNotNull();
@@ -268,7 +264,7 @@ class PendingProceedingFullLdmlTransformerTest {
                 .legalIssue("Rechtsfrage")
                 .appellant("Rechtsmittelführer")
                 .admissionOfAppeal("Rechtsmittelzulassung")
-                .resolutionNote(null)
+                .resolutionNote("<p>Erledigungsvermerk</p>")
                 .build())
         .contentRelatedIndexing(
             ContentRelatedIndexing.builder()

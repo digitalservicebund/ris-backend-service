@@ -225,7 +225,7 @@ class PendingProceedingReducedLdmlTransformerTest {
                 .legalIssue("Rechtsfrage")
                 .appellant("Rechtsmittelführer")
                 .admissionOfAppeal("Rechtsmittelzulassung")
-                .resolutionNote(null)
+                .resolutionNote("<p>Erledigungsvermerk</p>")
                 .build())
         .contentRelatedIndexing(
             ContentRelatedIndexing.builder()

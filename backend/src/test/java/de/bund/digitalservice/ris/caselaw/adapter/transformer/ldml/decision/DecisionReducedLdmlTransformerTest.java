@@ -424,14 +424,14 @@ class DecisionReducedLdmlTransformerTest {
         Arguments.of(
             "'dissentingOpinion' (Abweichende Meinung)",
             """
-                   <akn:block name="Abweichende Meinung">
-                      <akn:opinion>
-                         <akn:embeddedStructure>
-                            <akn:p>dissenting test</akn:p>
-                         </akn:embeddedStructure>
-                      </akn:opinion>
-                   </akn:block>
-                   """),
+              <akn:motivation ris:domainTerm="Abweichende Meinung">
+                  <akn:p>dissenting test</akn:p>
+                  <akn:block name="Mitwirkende Richter">
+                      <akn:opinion type="dissenting" ris:domainTerm="Art der Mitwirkung" by="#dr-phil-max-mustermann">referenced opinions test 1</akn:opinion>
+                      <akn:opinion type="dissenting" ris:domainTerm="Art der Mitwirkung" by="#richterin-maxima-mustermann">referenced opinions test 2</akn:opinion>
+                  </akn:block>
+              </akn:motivation>
+              """),
         Arguments.of(
             "'caseFacts' (Tatbestand)",
             """
@@ -442,68 +442,45 @@ class DecisionReducedLdmlTransformerTest {
         Arguments.of(
             "'decisionGrounds/decisionReasons' (Entscheidungsgründe)",
             """
-              <akn:block name="Entscheidungsgründe">
-                 <akn:embeddedStructure>
-                    <akn:p>decisionGrounds test</akn:p>
-                 </akn:embeddedStructure>
-              </akn:block>
-               """),
+            <akn:motivation ris:domainTerm="Entscheidungsgründe">
+                <akn:p>decisionGrounds test</akn:p>
+            </akn:motivation>
+            """),
         Arguments.of(
             "'grounds/reasons' (Gründe)",
             """
-              <akn:block name="Gründe">
-                 <akn:embeddedStructure>
-                    <akn:p>grounds test</akn:p>
-                 </akn:embeddedStructure>
-              </akn:block>
-               """),
+            <akn:motivation ris:domainTerm="Gründe">
+                <akn:p>grounds test</akn:p>
+            </akn:motivation>
+            """),
         Arguments.of(
             "'otherLongText' (Sonstiger Langtext)",
             """
-               <akn:block name="Sonstiger Langtext">
-                 <akn:embeddedStructure>
-                    <akn:p>otherLongText test</akn:p>
-                 </akn:embeddedStructure>
-               </akn:block>
-               """),
+            <akn:motivation ris:domainTerm="Sonstiger Langtext">
+                <akn:p>otherLongText test</akn:p>
+            </akn:motivation>
+            """),
         Arguments.of(
             "'tenor' (Tenor)",
             """
-               <akn:block name="Tenor">
-                   <akn:embeddedStructure>
-                      <akn:p>tenor test</akn:p>
-                   </akn:embeddedStructure>
-                </akn:block>
-               """),
+            <akn:decision ris:domainTerm="Tenor">
+                <akn:p>tenor test</akn:p>
+            </akn:decision>
+            """),
         Arguments.of(
             "'outline' (Gliederung)'",
             """
-                <akn:block name="Gliederung">
-                    <akn:embeddedStructure>
-                        <akn:p>outline test</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
-                """),
-        // Fixme: should be included -->
-        //        Arguments.of(
-        //            "'participatingJudges' (Mitwirkende Richter)",
-        //            """
-        //               <akn:introduction>
-        //                  <akn:block name="Mitwirkende Richter">
-        //                     <akn:embeddedStructure>
-        //                        <akn:p>Dr. Phil. Max Mustermann</akn:p>
-        //                     </akn:embeddedStructure>
-        //                  </akn:block>
-        //               </akn:introduction>
-        //               """),
-        // ShortTexts/Kurztexte -->
+            <akn:introduction ris:domainTerm="Gliederung">
+                <akn:p>outline test</akn:p>
+            </akn:introduction>
+            """),
         Arguments.of(
             "'guidingPrinciple' (Leitsatz)",
             """
-               <akn:motivation>
-                 <akn:p>guidingPrinciple test</akn:p>
-               </akn:motivation>
-               """),
+            <akn:introduction ris:domainTerm="Leitsatz">
+                <akn:p>guidingPrinciple test</akn:p>
+            </akn:introduction>
+            """),
         Arguments.of(
             "'headline' (Titelzeile)",
             """

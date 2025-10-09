@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.caselawldml;
+package de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification;
 
 import jakarta.xml.bind.annotation.XmlAttribute;
 import lombok.AllArgsConstructor;

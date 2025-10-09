@@ -1,6 +1,9 @@
-package de.bund.digitalservice.ris.caselaw.adapter.caselawldml;
+package de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody;
 
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import jakarta.xml.bind.annotation.XmlElement;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,14 +15,14 @@ import lombok.NoArgsConstructor;
 @Builder
 public class JudgmentBody {
   @XmlElement(name = "motivation", namespace = CaseLawLdml.AKN_NS)
-  private JaxbHtml motivation;
+  private List<Motivation> motivations;
 
   @XmlElement(name = "introduction", namespace = CaseLawLdml.AKN_NS)
-  private AknMultipleBlock introduction;
+  private List<Introduction> introductions;
 
   @XmlElement(name = "background", namespace = CaseLawLdml.AKN_NS)
   private JaxbHtml background;
 
   @XmlElement(name = "decision", namespace = CaseLawLdml.AKN_NS)
-  private AknMultipleBlock decision;
+  private JaxbHtml decision;
 }

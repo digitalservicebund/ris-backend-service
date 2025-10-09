@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0"
-                xmlns:ris="http://example.com/0.1/"
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0" xmlns:ris="http://example.com/0.1/"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/os/part2-specs/schemas/akomantoso30.xsd">
     <akn:judgment name="documentType test">
@@ -9,7 +8,7 @@
                 <akn:FRBRWork>
                     <akn:FRBRthis value="YYTestDoc0013"/>
                     <akn:FRBRuri value="YYTestDoc0013"/>
-                    <akn:FRBRalias name="Übergreifende ID" value="00e0b2ba-7a20-4a04-891d-b4ecd6e20ad2"/>
+                    <akn:FRBRalias name="Übergreifende ID" value="5706fd85-94fe-4ee9-8c50-31aff10fc29a"/>
                     <akn:FRBRalias name="Dokumentnummer" value="YYTestDoc0013"/>
                     <akn:FRBRalias name="ECLI" value="ecli test"/>
                     <akn:FRBRalias name="CELEX-Nummer" value="celex test"/>
@@ -19,42 +18,30 @@
                     <akn:FRBRcountry value="deu"/>
                 </akn:FRBRWork>
                 <akn:FRBRExpression>
-                    <akn:FRBRthis value="YYTestDoc0013/dokument"/>
-                    <akn:FRBRuri value="YYTestDoc0013/dokument"/>
+                    <akn:FRBRthis value="YYTestDoc0013"/>
+                    <akn:FRBRuri value="YYTestDoc0013"/>
                     <akn:FRBRdate date="2020-01-01" name="Entscheidungsdatum"/>
                     <akn:FRBRauthor href="#courttype-courtlocation"/>
                     <akn:FRBRlanguage language="deu"/>
                 </akn:FRBRExpression>
                 <akn:FRBRManifestation>
-                    <akn:FRBRthis value="YYTestDoc0013/dokument.xml"/>
-                    <akn:FRBRuri value="YYTestDoc0013/dokument.xml"/>
-                    <akn:FRBRdate date="2025-10-02" name="XML Transformation"/>
+                    <akn:FRBRthis value="YYTestDoc0013.xml"/>
+                    <akn:FRBRuri value="YYTestDoc0013.xml"/>
+                    <akn:FRBRdate date="2025-10-09" name="XML Transformation"/>
                     <akn:FRBRauthor href="#documentationoffice-dokumentationsstelle"/>
                 </akn:FRBRManifestation>
             </akn:identification>
             <akn:classification source="#ris">
-                <akn:keyword ris:domainTerm="Schlagwort"
-                             dictionary=""
-                             showAs="keyword test"
-                             value="keyword test"/>
+                <akn:keyword dictionary="" ris:domainTerm="Schlagwort" showAs="keyword test" value="keyword test"/>
             </akn:classification>
             <akn:references source="#ris">
                 <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
-                <akn:TLCOrganization eId="documentationoffice-dokumentationsstelle"
-                                     href=""
+                <akn:TLCOrganization eId="documentationoffice-dokumentationsstelle" href=""
                                      showAs="documentationOffice"/>
-                <akn:TLCOrganization eId="courttype-courtlocation"
-                                     href=""
-                                     showAs="courtLabel test"/>
-                <akn:TLCOrganization eId="spruchkoerper"
-                                     href=""
-                                     showAs="appraisalBody test"/>
-                <akn:TLCPerson eId="dr-phil-max-mustermann"
-                               href=""
-                               showAs="Dr. Phil. Max Mustermann"/>
-                <akn:TLCPerson eId="richterin-maxima-mustermann"
-                               href=""
-                               showAs="Richterin Maxima Mustermann"/>
+                <akn:TLCOrganization eId="courttype-courtlocation" href="" showAs="courtLabel test"/>
+                <akn:TLCOrganization eId="spruchkoerper" href="" showAs="appraisalBody test"/>
+                <akn:TLCPerson eId="dr-phil-max-mustermann" href="" showAs="Dr. Phil. Max Mustermann"/>
+                <akn:TLCPerson eId="richterin-maxima-mustermann" href="" showAs="Richterin Maxima Mustermann"/>
                 <akn:TLCLocation eId="gerichtsort" href="" showAs="courtLocation"/>
             </akn:references>
             <akn:proprietary source="#ris">
@@ -145,16 +132,20 @@
             </akn:proprietary>
         </akn:meta>
         <akn:header>
-            <akn:p>Aktenzeichen:
+            <akn:p>
+                Aktenzeichen:
                 <akn:docNumber refersTo="#aktenzeichen">fileNumber test</akn:docNumber>
             </akn:p>
-            <akn:p>Entscheidungsdatum:
+            <akn:p>
+                Entscheidungsdatum:
                 <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
             </akn:p>
-            <akn:p>Gericht:
+            <akn:p>
+                Gericht:
                 <akn:courtType refersTo="#gericht">courtLabel test</akn:courtType>
             </akn:p>
-            <akn:p>Dokumenttyp:
+            <akn:p>
+                Dokumenttyp:
                 <akn:docType refersTo="#dokumenttyp">documentType test</akn:docType>
             </akn:p>
             <akn:p>Entscheidungsname:
@@ -169,57 +160,33 @@
             </akn:p>
         </akn:header>
         <akn:judgmentBody>
-            <akn:motivation>
-                <akn:p>guidingPrinciple test</akn:p>
+            <akn:motivation ris:domainTerm="Gründe">
+                <akn:p>grounds test</akn:p>
             </akn:motivation>
-            <akn:introduction>
-                <akn:block name="Orientierungssatz">
-                    <akn:embeddedStructure>
-                        <akn:p>headNote test</akn:p>
-                    </akn:embeddedStructure>
+            <akn:motivation ris:domainTerm="Entscheidungsgründe">
+                <akn:p>decisionGrounds test</akn:p>
+            </akn:motivation>
+            <akn:motivation ris:domainTerm="Sonstiger Langtext">
+                <akn:p>otherLongText test</akn:p>
+            </akn:motivation>
+            <akn:motivation ris:domainTerm="Abweichende Meinung">
+                <akn:p>dissenting test</akn:p>
+                <akn:block name="Mitwirkende Richter">
+                    <akn:opinion by="#dr-phil-max-mustermann" ris:domainTerm="Art der Mitwirkung" type="dissenting">referenced opinions test 1</akn:opinion>
+                    <akn:opinion by="#richterin-maxima-mustermann" ris:domainTerm="Art der Mitwirkung" type="dissenting">referenced opinions test 2</akn:opinion>
                 </akn:block>
-                <akn:block name="Sonstiger Orientierungssatz">
-                    <akn:embeddedStructure>
-                        <akn:p>otherHeadNote test</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
-                <akn:block name="Gliederung">
-                    <akn:embeddedStructure>
-                        <akn:p>outline test</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
-                <akn:block name="Tenor">
-                    <akn:embeddedStructure>
-                        <akn:p>tenor test</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
+            </akn:motivation>
+            <akn:introduction ris:domainTerm="Leitsatz">
+                <akn:p>guidingPrinciple test</akn:p>
+            </akn:introduction>
+            <akn:introduction ris:domainTerm="Gliederung">
+                <akn:p>outline test</akn:p>
             </akn:introduction>
             <akn:background ris:domainTerm="Tatbestand">
                 <akn:p>caseFacts test</akn:p>
             </akn:background>
-            <akn:decision>
-                <akn:block name="Entscheidungsgründe">
-                    <akn:embeddedStructure>
-                        <akn:p>decisionGrounds test</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
-                <akn:block name="Gründe">
-                    <akn:embeddedStructure>
-                        <akn:p>grounds test</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
-                <akn:block name="Sonstiger Langtext">
-                    <akn:embeddedStructure>
-                        <akn:p>otherLongText test</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
-                <akn:block name="Abweichende Meinung">
-                    <akn:opinion>
-                        <akn:embeddedStructure>
-                            <akn:p>dissenting test</akn:p>
-                        </akn:embeddedStructure>
-                    </akn:opinion>
-                </akn:block>
+            <akn:decision ris:domainTerm="Tenor">
+                <akn:p>tenor test</akn:p>
             </akn:decision>
         </akn:judgmentBody>
     </akn:judgment>

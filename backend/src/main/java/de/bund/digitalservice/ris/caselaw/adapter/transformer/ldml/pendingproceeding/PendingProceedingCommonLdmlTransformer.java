@@ -3,15 +3,16 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproce
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
 
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.DocumentType;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JudgmentBody;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Introduction;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.JudgmentBody;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Motivation;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentType;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransformer;
@@ -20,6 +21,8 @@ import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +62,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
         .build();
   }
 
-  protected abstract JaxbHtml buildHeader(PendingProceeding pendingProceeding)
+  protected abstract Header buildHeader(PendingProceeding pendingProceeding)
       throws ValidationException;
 
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(PendingProceeding pendingProceeding) {
@@ -108,60 +111,80 @@ public abstract class PendingProceedingCommonLdmlTransformer
 
     JudgmentBody.JudgmentBodyBuilder builder = JudgmentBody.builder();
 
-    var shortTexts = pendingProceeding.shortTexts();
-
     builder
-        .motivation(
-            JaxbHtml.build(
-                htmlTransformer.htmlStringToObjectList(
-                    nullSafeGet(shortTexts, PendingProceedingShortTexts::legalIssue))))
-        .introduction(buildIntroduction(pendingProceeding))
+        .motivations(buildMotivations(pendingProceeding))
+        .introductions(buildIntroductions(pendingProceeding))
         .background(null)
         .decision(buildDecision(pendingProceeding));
 
     var judgmentBody = builder.build();
 
-    if (judgmentBody.getIntroduction() == null
+    if (judgmentBody.getIntroductions().isEmpty()
         && judgmentBody.getBackground() == null
         && judgmentBody.getDecision() == null
-        && judgmentBody.getMotivation() == null) {
+        && judgmentBody.getMotivations() == null) {
       throw new ValidationException("Empty judgment body");
     }
 
     return judgmentBody;
   }
 
-  private AknMultipleBlock buildIntroduction(PendingProceeding pendingProceeding) {
+  protected List<Introduction> buildIntroductions(PendingProceeding pendingProceeding) {
+    List<Introduction> introductions = new ArrayList<>();
+
     var shortTexts = pendingProceeding.shortTexts();
 
-    var admissionOfAppeal = nullSafeGet(shortTexts, PendingProceedingShortTexts::admissionOfAppeal);
-    var appellant = nullSafeGet(shortTexts, PendingProceedingShortTexts::appellant);
-
-    if (StringUtils.isNotEmpty(admissionOfAppeal) && StringUtils.isNotEmpty(appellant)) {
-      return new AknMultipleBlock()
-          .withBlock(
-              AknEmbeddedStructureInBlock.Appellant.NAME,
-              AknEmbeddedStructureInBlock.Appellant.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(appellant))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.AdmissionOfAppeal.NAME,
-              AknEmbeddedStructureInBlock.AdmissionOfAppeal.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(admissionOfAppeal))));
+    // Rechtsmittelführer
+    if (shortTexts != null && shortTexts.appellant() != null) {
+      var introduction =
+          Introduction.builder()
+              .content(htmlTransformer.htmlStringToObjectList(shortTexts.appellant()))
+              .build();
+      introduction.setDomainTerm("Rechtsmittelführer");
+      introductions.add(introduction);
     }
-    return null;
+
+    // Rechtsmittelzulassung
+    if (shortTexts != null && shortTexts.admissionOfAppeal() != null) {
+      var introduction =
+          Introduction.builder()
+              .content(htmlTransformer.htmlStringToObjectList(shortTexts.admissionOfAppeal()))
+              .build();
+      introduction.setDomainTerm("Rechtsmittelzulassung");
+      introductions.add(introduction);
+    }
+    return introductions;
   }
 
-  private AknMultipleBlock buildDecision(PendingProceeding pendingProceeding) {
+  private List<Motivation> buildMotivations(PendingProceeding pendingProceeding) {
+    List<Motivation> motivations = new ArrayList<>();
+    var shortTexts = pendingProceeding.shortTexts();
+
+    // Rechtsfrage
+    if (shortTexts != null) {
+      var legalIssue = shortTexts.legalIssue();
+      if (legalIssue != null) {
+        var motivation =
+            Motivation.builder()
+                .content(htmlTransformer.htmlStringToObjectList(shortTexts.legalIssue()))
+                .build();
+        motivation.setDomainTerm("Rechtsfrage");
+        motivations.add(motivation);
+      }
+    }
+    return motivations;
+  }
+
+  private JaxbHtml buildDecision(PendingProceeding pendingProceeding) {
     var shortTexts = pendingProceeding.shortTexts();
 
     var resolutionNote = nullSafeGet(shortTexts, PendingProceedingShortTexts::resolutionNote);
 
     if (StringUtils.isNotEmpty(resolutionNote)) {
-      return new AknMultipleBlock()
-          .withBlock(
-              AknEmbeddedStructureInBlock.ResolutionNote.NAME,
-              AknEmbeddedStructureInBlock.ResolutionNote.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(resolutionNote))));
+      var resolutionNoteHtml =
+          JaxbHtml.build(htmlTransformer.htmlStringToObjectList(resolutionNote));
+      resolutionNoteHtml.setDomainTerm("Erledigungsvermerk");
+      return resolutionNoteHtml;
     }
     return null;
   }

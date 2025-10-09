@@ -1,11 +1,14 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproceeding;
 
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import jakarta.xml.bind.ValidationException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,8 +39,9 @@ public class PendingProceedingReducedLdmlTransformer
   }
 
   @Override
-  protected JaxbHtml buildHeader(PendingProceeding pendingProceeding) throws ValidationException {
-    return JaxbHtml.build(
-        htmlTransformer.htmlStringToObjectList(buildCommonHeader(pendingProceeding)));
+  protected Header buildHeader(PendingProceeding pendingProceeding) throws ValidationException {
+    List<Paragraph> paragraphs = new ArrayList<>();
+    paragraphs = buildCommonHeader(pendingProceeding, paragraphs);
+    return Header.builder().paragraphs(paragraphs).build();
   }
 }

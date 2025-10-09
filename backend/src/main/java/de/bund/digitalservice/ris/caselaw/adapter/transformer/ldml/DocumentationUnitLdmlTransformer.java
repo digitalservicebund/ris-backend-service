@@ -6,16 +6,23 @@ import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNo
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrAlias;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrAuthor;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrCountry;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrDate;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrElement;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrLanguage;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Identification;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.References;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RelatedDecision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.TlcElement;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.CourtType;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.DocDate;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.DocNumber;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.DocType;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.EmbeddedStructure;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.ShortTitle;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrAlias;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrAuthor;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrCountry;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrDate;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrElement;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrLanguage;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.Identification;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.references.References;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -75,8 +82,8 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
         && !documentationUnit.coreData().court().regions().isEmpty()) {
       elementBuilder.frbrCountry(
           // The schmema says ISO 3166-1 Alpha-2 code, but we only have Alpha-3 available (for now)
-          // (We have only more then one region for a handful of german courts)
-          new FrbrCountry(getCountry(documentationUnit.coreData().court().regions().get(0))));
+          // (We have only two regions for a handful of german courts)
+          new FrbrCountry(getCountry(documentationUnit.coreData().court().regions().getFirst())));
     }
 
     FrbrElement work = elementBuilder.build().withFrbrThisAndUri(uniqueId);
@@ -87,14 +94,14 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
             .frbrAuthor(workExpressionAuthor)
             .frbrLanguage(new FrbrLanguage("deu"))
             .build()
-            .withFrbrThisAndUri(uniqueId + "/dokument");
+            .withFrbrThisAndUri(uniqueId);
 
     FrbrElement manifestation =
         FrbrElement.builder()
             .frbrDate(frbrPublicationDate)
             .frbrAuthor(manifestationAuthor)
             .build()
-            .withFrbrThisAndUri(uniqueId + "/dokument.xml");
+            .withFrbrThisAndUri(uniqueId + ".xml");
 
     return Identification.builder()
         .frbrWork(work)
@@ -103,92 +110,64 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
         .build();
   }
 
-  private String getCountry(String region) {
-    if (GERMAN_STATES.contains(region.toUpperCase())) {
-      return "deu";
-    }
-    return region.toLowerCase();
-  }
-
-  private String getDateName(DocumentationUnit documentationUnit) {
-    if (documentationUnit instanceof Decision) {
-      return "Entscheidungsdatum";
-    }
-    if (documentationUnit instanceof PendingProceeding) {
-      return "Mitteilungsdatum";
-    }
-    return "";
-  }
-
-  private List<FrbrAlias> generateAliases(DocumentationUnit documentationUnit) {
-    List<FrbrAlias> aliases = new ArrayList<>();
-
-    aliases.add(new FrbrAlias("Übergreifende ID", documentationUnit.uuid().toString()));
-    aliases.add(new FrbrAlias("Dokumentnummer", documentationUnit.documentNumber()));
-
-    if (documentationUnit.coreData() != null && documentationUnit.coreData().ecli() != null) {
-      aliases.add(new FrbrAlias("ECLI", documentationUnit.coreData().ecli()));
-    }
-
-    if (documentationUnit.coreData() != null
-        && documentationUnit.coreData().celexNumber() != null) {
-      aliases.add(new FrbrAlias("CELEX-Nummer", documentationUnit.coreData().celexNumber()));
-    }
-
-    if (documentationUnit.coreData() != null
-        && documentationUnit.coreData().fileNumbers() != null) {
-      documentationUnit
-          .coreData()
-          .fileNumbers()
-          .forEach(fileNumber -> aliases.add(new FrbrAlias("Aktenzeichen", fileNumber)));
-    }
-    return aliases;
-  }
-
-  default String buildCommonHeader(DocumentationUnit documentationUnit) throws ValidationException {
+  default List<Paragraph> buildCommonHeader(
+      DocumentationUnit documentationUnit, List<Paragraph> paragraphs) throws ValidationException {
     validateCoreData(documentationUnit);
     var coreData = documentationUnit.coreData();
 
-    StringBuilder builder = new StringBuilder();
-
     // Aktenzeichen
     if (coreData.fileNumbers() != null && !coreData.fileNumbers().isEmpty()) {
-      builder
-          .append("<p>Aktenzeichen: <akn:docNumber refersTo=\"#aktenzeichen\">")
-          .append(coreData.fileNumbers().getFirst())
-          .append("</akn:docNumber></p>");
+      Paragraph fileNumberParagraph = Paragraph.builder().content(new ArrayList<>()).build();
+      fileNumberParagraph.getContent().add("Aktenzeichen: ");
+      fileNumberParagraph
+          .getContent()
+          .add(
+              DocNumber.builder()
+                  .refersTo("#aktenzeichen")
+                  .content(coreData.fileNumbers().getFirst())
+                  .build());
+      paragraphs.add(fileNumberParagraph);
     }
 
     // Entscheidungsdatum
     if (coreData.decisionDate() != null) {
-      builder
-          .append("<p>Entscheidungsdatum: <akn:docDate refersTo=\"#entscheidungsdatum\" date=\"")
-          .append(DateUtils.toDateString(coreData.decisionDate()))
-          .append("\">")
-          .append(DateUtils.toFormattedDateString(coreData.decisionDate()))
-          .append("</akn:docDate></p>");
+      Paragraph decisionDateParagraph = Paragraph.builder().content(new ArrayList<>()).build();
+      decisionDateParagraph.getContent().add("Entscheidungsdatum: ");
+      decisionDateParagraph
+          .getContent()
+          .add(
+              DocDate.builder()
+                  .date(DateUtils.toDateString(coreData.decisionDate()))
+                  .refersTo("#entscheidungsdatum")
+                  .content(DateUtils.toFormattedDateString(coreData.decisionDate()))
+                  .build());
+      paragraphs.add(decisionDateParagraph);
     }
 
     // Gericht
     if (coreData.court() != null) {
-      builder
-          .append("<p>Gericht: <akn:courtType refersTo=\"#gericht\">")
-          .append(coreData.court().label())
-          .append("</akn:courtType></p>");
+      Paragraph courtParagraph = Paragraph.builder().content(new ArrayList<>()).build();
+      courtParagraph.getContent().add("Gericht: ");
+      courtParagraph
+          .getContent()
+          .add(CourtType.builder().refersTo("#gericht").content(coreData.court().label()).build());
+      paragraphs.add(courtParagraph);
     }
 
     // Dokumenttyp
     if (coreData.documentType().label() != null) {
-      builder
-          .append("<p>")
-          .append("Dokumenttyp: ")
-          .append("<akn:docType refersTo=\"#dokumenttyp\">")
-          .append(coreData.documentType().label())
-          .append("</akn:docType>")
-          .append("</p>");
+      Paragraph documentTypeParagraph = Paragraph.builder().content(new ArrayList<>()).build();
+      documentTypeParagraph.getContent().add("Dokumenttyp: ");
+      var docType =
+          DocType.builder()
+              .refersTo("#dokumenttyp")
+              .content(coreData.documentType().label())
+              .build();
+      documentTypeParagraph.getContent().add(docType);
+      paragraphs.add(documentTypeParagraph);
     }
 
-    return builder.toString();
+    return paragraphs;
   }
 
   default void validateCoreData(DocumentationUnit documentationUnit) throws ValidationException {
@@ -266,6 +245,36 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
         .build();
   }
 
+  default void buildHeadline(
+      List<Paragraph> paragraphs, String headline, HtmlTransformer htmlTransformer) {
+    if (headline != null) {
+      Paragraph headlineParagraph = Paragraph.builder().content(new ArrayList<>()).build();
+      headlineParagraph.getContent().add("Titelzeile: ");
+      headlineParagraph
+          .getContent()
+          .add(
+              ShortTitle.builder()
+                  .refersTo("#titelzeile")
+                  .content(
+                      EmbeddedStructure.builder()
+                          .content(htmlTransformer.htmlStringToObjectList(headline))
+                          .build())
+                  .build());
+      paragraphs.add(headlineParagraph);
+    }
+  }
+
+  private String getCourtEid(Court court) {
+    return toKebabCase(court.type() + " " + court.location());
+  }
+
+  private String getDocOfficeEid(DocumentationOffice documentationOffice) {
+    if (documentationOffice == null) {
+      return "dokumentationsstelle";
+    }
+    return toKebabCase(documentationOffice.abbreviation()) + "-dokumentationsstelle";
+  }
+
   private void transformParticipatingJudges(
       DocumentationUnit documentationUnit, List<TlcElement> tlcPersons) {
     if (documentationUnit instanceof Decision decision
@@ -284,28 +293,59 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     }
   }
 
-  default String getCourtEid(Court court) {
-    return toKebabCase(court.type() + " " + court.location());
-  }
-
-  default String getDocOfficeEid(DocumentationOffice documentationOffice) {
-    if (documentationOffice == null) {
-      return "dokumentationsstelle";
-    }
-    return toKebabCase(documentationOffice.abbreviation()) + "-dokumentationsstelle";
-  }
-
-  private String toKebabCase(String input) {
+  default String toKebabCase(String input) {
     if (input == null) return null;
+    String lower = input.toLowerCase();
+    String replaced = lower.replace("ä", "ae").replace("ö", "oe").replace("ü", "ue");
 
     // Remove all non-letters
-    String cleaned = input.replaceAll("[^\\p{L}\\s]+", "");
+    String cleaned = replaced.replaceAll("[^\\p{L}\\s]+", "");
 
-    cleaned = cleaned.toLowerCase();
-
-    // Replace whitespace with hyphen
+    // Replace whitespace with hyphen and trim
     cleaned = cleaned.trim().replaceAll("\\s+", "-");
 
     return cleaned;
+  }
+
+  private String getCountry(String region) {
+    if (GERMAN_STATES.contains(region.toUpperCase())) {
+      return "deu";
+    }
+    return region.toLowerCase();
+  }
+
+  private String getDateName(DocumentationUnit documentationUnit) {
+    if (documentationUnit instanceof Decision) {
+      return "Entscheidungsdatum";
+    }
+    if (documentationUnit instanceof PendingProceeding) {
+      return "Mitteilungsdatum";
+    }
+    return "";
+  }
+
+  private List<FrbrAlias> generateAliases(DocumentationUnit documentationUnit) {
+    List<FrbrAlias> aliases = new ArrayList<>();
+
+    aliases.add(new FrbrAlias("Übergreifende ID", documentationUnit.uuid().toString()));
+    aliases.add(new FrbrAlias("Dokumentnummer", documentationUnit.documentNumber()));
+
+    if (documentationUnit.coreData() != null && documentationUnit.coreData().ecli() != null) {
+      aliases.add(new FrbrAlias("ECLI", documentationUnit.coreData().ecli()));
+    }
+
+    if (documentationUnit.coreData() != null
+        && documentationUnit.coreData().celexNumber() != null) {
+      aliases.add(new FrbrAlias("CELEX-Nummer", documentationUnit.coreData().celexNumber()));
+    }
+
+    if (documentationUnit.coreData() != null
+        && documentationUnit.coreData().fileNumbers() != null) {
+      documentationUnit
+          .coreData()
+          .fileNumbers()
+          .forEach(fileNumber -> aliases.add(new FrbrAlias("Aktenzeichen", fileNumber)));
+    }
+    return aliases;
   }
 }

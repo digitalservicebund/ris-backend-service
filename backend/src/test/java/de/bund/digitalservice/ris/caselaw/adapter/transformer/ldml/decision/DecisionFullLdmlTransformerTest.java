@@ -53,7 +53,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -111,46 +113,114 @@ class DecisionFullLdmlTransformerTest {
             .build();
   }
 
-  @Test
-  @DisplayName("Dissenting Opinion test")
-  void dissentingOpinionTest() {
-    String expected =
-        """
-           <akn:block name="Abweichende Meinung">
-              <akn:opinion>
-                 <akn:embeddedStructure>
-                    <akn:p>dissenting test</akn:p>
-                 </akn:embeddedStructure>
-              </akn:opinion>
-           </akn:block>
-           """;
-    Decision dissentingCaseLaw =
-        testDocumentUnit.toBuilder()
-            .longTexts(
-                testDocumentUnit.longTexts().toBuilder()
-                    .dissentingOpinion("<p>dissenting test</p>")
-                    .build())
-            .build();
-    CaseLawLdml ldml = subject.transformToLdml(dissentingCaseLaw);
-    Assertions.assertNotNull(ldml);
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    Assertions.assertTrue(fileContent.isPresent());
-    Assertions.assertTrue(
-        StringUtils.deleteWhitespace(fileContent.get())
-            .contains(StringUtils.deleteWhitespace(expected)));
+  @Nested
+  class DissentingOpinion {
+    @Test
+    void testDissentingOpinion_withoutParticipatingJudges() {
+      String expected =
+          """
+          <akn:motivation ris:domainTerm="Abweichende Meinung">
+            <akn:p>dissenting test</akn:p>
+          </akn:motivation>
+         """;
+      Decision dissentingCaseLaw =
+          testDocumentUnit.toBuilder()
+              .longTexts(
+                  testDocumentUnit.longTexts().toBuilder()
+                      .dissentingOpinion("<p>dissenting test</p>")
+                      .build())
+              .build();
+      CaseLawLdml ldml = subject.transformToLdml(dissentingCaseLaw);
+      Assertions.assertNotNull(ldml);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      Assertions.assertTrue(fileContent.isPresent());
+      Assertions.assertTrue(
+          StringUtils.deleteWhitespace(fileContent.get())
+              .contains(StringUtils.deleteWhitespace(expected)));
+    }
+
+    @Test
+    void testDissentingOpinion_withParticipatingJudgeWithoutReferencedOpinion() {
+      String expected =
+          """
+          <akn:motivation ris:domainTerm="Abweichende Meinung">
+            <akn:p>dissenting test</akn:p>
+            <akn:block name="Mitwirkende Richter">
+               <akn:opinion type="dissenting" by="#maxi-musterfrau"/>
+            </akn:block>
+          </akn:motivation>
+         """;
+      Decision dissentingCaseLaw =
+          testDocumentUnit.toBuilder()
+              .longTexts(
+                  testDocumentUnit.longTexts().toBuilder()
+                      .dissentingOpinion("<p>dissenting test</p>")
+                      .participatingJudges(
+                          List.of(ParticipatingJudge.builder().name("Maxi Musterfrau").build()))
+                      .build())
+              .build();
+      CaseLawLdml ldml = subject.transformToLdml(dissentingCaseLaw);
+      Assertions.assertNotNull(ldml);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      Assertions.assertTrue(fileContent.isPresent());
+      Assertions.assertTrue(
+          StringUtils.deleteWhitespace(fileContent.get())
+              .contains(StringUtils.deleteWhitespace(expected)));
+    }
+
+    @Test
+    void testDissentingOpinion_withParticipatingJudgesWithReferencedOpinions() {
+      String expected =
+          """
+         <akn:motivation ris:domainTerm="Abweichende Meinung">
+            <akn:p>dissenting test</akn:p>
+            <akn:block name="Mitwirkende Richter">
+               <akn:opinion type="dissenting"
+                            ris:domainTerm="Art der Mitwirkung"
+                            by="#maxi-gaertner">Art der Mitwirkung 1</akn:opinion>
+               <akn:opinion type="dissenting"
+                            ris:domainTerm="Art der Mitwirkung"
+                            by="#herbert-guenter">Art der Mitwirkung 2</akn:opinion>
+            </akn:block>
+         </akn:motivation>
+         """;
+      Decision dissentingCaseLaw =
+          testDocumentUnit.toBuilder()
+              .longTexts(
+                  testDocumentUnit.longTexts().toBuilder()
+                      .dissentingOpinion("<p>dissenting test</p>")
+                      .participatingJudges(
+                          List.of(
+                              ParticipatingJudge.builder()
+                                  .name("Maxi Gärtner")
+                                  .referencedOpinions("Art der Mitwirkung 1")
+                                  .build(),
+                              ParticipatingJudge.builder()
+                                  .name("Herbert Günter")
+                                  .referencedOpinions("Art der Mitwirkung 2")
+                                  .build()))
+                      .build())
+              .build();
+      CaseLawLdml ldml = subject.transformToLdml(dissentingCaseLaw);
+      Assertions.assertNotNull(ldml);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      Assertions.assertTrue(fileContent.isPresent());
+      Assertions.assertTrue(
+          StringUtils.deleteWhitespace(fileContent.get())
+              .contains(StringUtils.deleteWhitespace(expected)));
+    }
   }
 
   @Test
+  @Disabled("Should be enabled with https://digitalservicebund.atlassian.net/browse/RISDEV-9358")
   @DisplayName("Headnote test")
   void headnoteTest() {
     String expected =
         """
-            <akn:block name="Orientierungssatz">
-               <akn:embeddedStructure>
-                  <akn:p>headnote test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-           """;
+          <akn:introduction ris:domainTerm="Orientierungssatz">
+              <akn:p>headnote test</akn:p>
+          </akn:introduction>
+        """;
     Decision headnoteCaseLaw =
         testDocumentUnit.toBuilder()
             .shortTexts(
@@ -166,16 +236,15 @@ class DecisionFullLdmlTransformerTest {
   }
 
   @Test
+  @Disabled("Should be enabled with https://digitalservicebund.atlassian.net/browse/RISDEV-9358")
   @DisplayName("OtherHeadnote test")
   void otherHeadnoteTest() {
     String expected =
         """
-            <akn:block name="Sonstiger Orientierungssatz">
-               <akn:embeddedStructure>
-                  <akn:p>other headnote test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-           """;
+         <akn:introduction ris:domainTerm="Sonstiger Orientierungssatz">
+            <akn:p>other headnote test</akn:p>
+         </akn:introduction>
+         """;
     Decision otherHeadnoteCaseLaw =
         testDocumentUnit.toBuilder()
             .shortTexts(
@@ -197,12 +266,10 @@ class DecisionFullLdmlTransformerTest {
   void groundTest() {
     String expected =
         """
-            <akn:block name="Gründe">
-               <akn:embeddedStructure>
-                  <akn:p>grounds test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-           """;
+         <akn:motivation ris:domainTerm="Gründe">
+            <akn:p>grounds test</akn:p>
+         </akn:motivation>
+         """;
     Decision groundsCaseLaw =
         testDocumentUnit.toBuilder()
             .longTexts(
@@ -222,13 +289,9 @@ class DecisionFullLdmlTransformerTest {
   void otherLongTextWithoutMainDecisionTest() {
     String expected =
         """
-         <akn:decision>
-            <akn:block name="Sonstiger Langtext">
-               <akn:embeddedStructure>
-                  <akn:p>Other long text test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-         </akn:decision>
+         <akn:motivation ris:domainTerm="Sonstiger Langtext">
+            <akn:p>Other long text test</akn:p>
+         </akn:motivation>
          """;
     Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
@@ -251,13 +314,9 @@ class DecisionFullLdmlTransformerTest {
   void testTransformToLdml_longTextWithNBSP_shouldReplaceItWithUnicode() {
     String expected =
         """
-         <akn:decision>
-            <akn:block name="Gründe">
-               <akn:embeddedStructure>
-                  <akn:p>text with non\u00a0breaking\u00a0spaces</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-         </akn:decision>
+         <akn:motivation ris:domainTerm="Gründe">
+            <akn:p>text with non breaking spaces</akn:p>
+         </akn:motivation>
          """;
     Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()

@@ -4,20 +4,19 @@ import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNot
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknKeyword;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Classification;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Definition;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.DocumentType;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.DocTitle;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Classification;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Keyword;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Definition;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentType;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
@@ -25,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import jakarta.xml.bind.ValidationException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -51,10 +51,10 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
     Meta.MetaBuilder builder = Meta.builder();
 
-    List<AknKeyword> keywords =
+    List<Keyword> keywords =
         decision.contentRelatedIndexing() == null
             ? Collections.emptyList()
-            : decision.contentRelatedIndexing().keywords().stream().map(AknKeyword::new).toList();
+            : decision.contentRelatedIndexing().keywords().stream().map(Keyword::new).toList();
 
     if (!keywords.isEmpty()) {
       builder.classification(Classification.builder().keyword(keywords).build());
@@ -152,67 +152,31 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
   }
 
   @Override
-  protected AknMultipleBlock buildIntroduction(Decision decision) {
+  protected Header buildHeader(Decision decision) throws ValidationException {
+    List<Paragraph> paragraphs = new ArrayList<>();
+
+    paragraphs = buildCommonHeader(decision, paragraphs);
     var shortTexts = decision.shortTexts();
 
-    var headnote = nullSafeGet(shortTexts, ShortTexts::headnote);
-    var otherHeadnote = nullSafeGet(shortTexts, ShortTexts::otherHeadnote);
-    var outline = nullSafeGet(decision.longTexts(), LongTexts::outline);
-    var tenor = nullSafeGet(decision.longTexts(), LongTexts::tenor);
-
-    if (StringUtils.isNotEmpty(headnote)
-        || StringUtils.isNotEmpty(otherHeadnote)
-        || StringUtils.isNotEmpty(outline)
-        || StringUtils.isNotEmpty(tenor)) {
-      return new AknMultipleBlock()
-          .withBlock(
-              AknEmbeddedStructureInBlock.HeadNote.NAME,
-              AknEmbeddedStructureInBlock.HeadNote.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(headnote))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.OtherHeadNote.NAME,
-              AknEmbeddedStructureInBlock.OtherHeadNote.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(otherHeadnote))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.Outline.NAME,
-              AknEmbeddedStructureInBlock.Outline.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(outline))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.Tenor.NAME,
-              AknEmbeddedStructureInBlock.Tenor.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(tenor))));
-    }
-    return null;
-  }
-
-  @Override
-  protected JaxbHtml buildHeader(Decision decision) throws ValidationException {
-    StringBuilder builder = new StringBuilder();
-
-    builder.append(buildCommonHeader(decision));
-
-    if (decision.shortTexts() != null) {
+    if (shortTexts != null) {
       // Entscheidungsname
       if (decision.shortTexts().decisionName() != null) {
-        builder
-            .append("<p>Entscheidungsname: ")
-            .append("<akn:docTitle refersTo=\"#entscheidungsname\">")
-            .append(decision.shortTexts().decisionName())
-            .append("</akn:docTitle></p>");
+        Paragraph decisionNameParagraph = Paragraph.builder().content(new ArrayList<>()).build();
+        decisionNameParagraph.getContent().add("Entscheidungsname: ");
+        decisionNameParagraph
+            .getContent()
+            .add(
+                DocTitle.builder()
+                    .refersTo("#entscheidungsname")
+                    .content(shortTexts.decisionName())
+                    .build());
+        paragraphs.add(decisionNameParagraph);
       }
 
       // Titelzeile
-      if (decision.shortTexts().headline() != null) {
-        builder.append("<p>Titelzeile: ");
-        builder
-            .append("<akn:shortTitle refersTo=\"#titelzeile\">")
-            .append("<akn:embeddedStructure>")
-            .append(decision.shortTexts().headline())
-            .append("</akn:embeddedStructure>")
-            .append("</akn:shortTitle></p>");
-      }
+      buildHeadline(paragraphs, shortTexts.headline(), htmlTransformer);
     }
 
-    return JaxbHtml.build(htmlTransformer.htmlStringToObjectList(builder.toString()));
+    return Header.builder().paragraphs(paragraphs).build();
   }
 }

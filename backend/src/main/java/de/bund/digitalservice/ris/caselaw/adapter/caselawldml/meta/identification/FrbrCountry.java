@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.caselawldml;
+package de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification;
 
 import jakarta.xml.bind.annotation.XmlAttribute;
 import lombok.Getter;
@@ -6,12 +6,10 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Getter
-public class FrbrAlias {
-  @XmlAttribute private String name;
+public class FrbrCountry {
   @XmlAttribute private String value;
 
-  public FrbrAlias(String name, String value) {
-    this.name = name;
+  public FrbrCountry(String value) {
     this.value = value;
   }
 }

@@ -4,18 +4,20 @@ import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNot
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknKeyword;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Classification;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Classification;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Keyword;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import jakarta.xml.bind.ValidationException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -35,11 +37,11 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
 
     Meta.MetaBuilder builder = Meta.builder();
 
-    List<AknKeyword> keywords =
+    List<Keyword> keywords =
         pendingProceeding.contentRelatedIndexing() == null
             ? Collections.emptyList()
             : pendingProceeding.contentRelatedIndexing().keywords().stream()
-                .map(AknKeyword::new)
+                .map(Keyword::new)
                 .toList();
 
     if (!keywords.isEmpty()) {
@@ -90,22 +92,16 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
   }
 
   @Override
-  protected JaxbHtml buildHeader(PendingProceeding pendingProceeding) throws ValidationException {
-    StringBuilder builder = new StringBuilder();
+  protected Header buildHeader(PendingProceeding pendingProceeding) throws ValidationException {
+    List<Paragraph> paragraphs = new ArrayList<>();
 
-    builder.append(buildCommonHeader(pendingProceeding));
+    paragraphs = buildCommonHeader(pendingProceeding, paragraphs);
+    var shortTexts = pendingProceeding.shortTexts();
 
-    // Titelzeile
-    if (pendingProceeding.shortTexts().headline() != null) {
-      builder.append("<p>Titelzeile: ");
-      builder
-          .append("<akn:shortTitle refersTo=\"#titelzeile\">")
-          .append("<akn:embeddedStructure>")
-          .append(pendingProceeding.shortTexts().headline())
-          .append("</akn:embeddedStructure>")
-          .append("</akn:shortTitle></p>");
+    if (shortTexts != null) {
+      buildHeadline(paragraphs, shortTexts.headline(), htmlTransformer);
     }
 
-    return JaxbHtml.build(htmlTransformer.htmlStringToObjectList(builder.toString()));
+    return Header.builder().paragraphs(paragraphs).build();
   }
 }

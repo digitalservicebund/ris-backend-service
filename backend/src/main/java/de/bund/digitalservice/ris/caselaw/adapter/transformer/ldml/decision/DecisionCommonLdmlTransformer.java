@@ -3,26 +3,29 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
 
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.DocumentRef;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.ForeignLanguageVersion;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrLanguage;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JudgmentBody;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Opinions;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Block;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Introduction;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.JudgmentBody;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Motivation;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Opinion;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrLanguage;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentRef;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.ForeignLanguageVersion;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
-import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import jakarta.xml.bind.ValidationException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -65,11 +68,9 @@ public abstract class DecisionCommonLdmlTransformer
     return judgmentBuilder.build();
   }
 
-  protected abstract JaxbHtml buildHeader(Decision decision) throws ValidationException;
+  protected abstract Header buildHeader(Decision decision) throws ValidationException;
 
   protected abstract Meta buildMeta(Decision decision) throws ValidationException;
-
-  protected abstract AknMultipleBlock buildIntroduction(Decision decision);
 
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(Decision decision) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
@@ -124,76 +125,172 @@ public abstract class DecisionCommonLdmlTransformer
 
     JudgmentBody.JudgmentBodyBuilder builder = JudgmentBody.builder();
 
-    var shortTexts = decision.shortTexts();
-
     builder
-        // set guidingPrinciple/Leitsatz
-        .motivation(
-            JaxbHtml.build(
-                htmlTransformer.htmlStringToObjectList(
-                    nullSafeGet(shortTexts, ShortTexts::guidingPrinciple))))
-        // set headnote/Orientierungssatz, "other headnote"/"Sonstiger Orientierungssatz",
-        // Outline/Gliederung, Tenor/Tenor
-        .introduction(buildIntroduction(decision))
-        // set caseFacts/Tatbestand
+        .motivations(buildMotivations(decision))
+        .introductions(buildIntroductions(decision))
         .background(buildBackground(decision))
-        // set decisionReasons/Entscheidungsgründe, reasons/Gründe, otherLongText/"Sonstiger,
-        // dissentingOpinion/"Abweichende Meinung"
-        // Langtext"
         .decision(buildDecision(decision));
 
     var judgmentBody = builder.build();
 
-    if (judgmentBody.getIntroduction() == null
+    if (judgmentBody.getIntroductions().isEmpty()
         && judgmentBody.getBackground() == null
         && judgmentBody.getDecision() == null
-        && judgmentBody.getMotivation() == null) {
+        && judgmentBody.getMotivations().isEmpty()) {
       throw new ValidationException("Empty judgment body");
     }
 
     return judgmentBody;
   }
 
+  protected List<Introduction> buildIntroductions(Decision decision) {
+    List<Introduction> introductions = new ArrayList<>();
+
+    var longTexts = decision.longTexts();
+    var shortTexts = decision.shortTexts();
+
+    // Leitsatz
+    if (shortTexts != null && shortTexts.guidingPrinciple() != null) {
+      var introduction =
+          Introduction.builder()
+              .content(htmlTransformer.htmlStringToObjectList(shortTexts.guidingPrinciple()))
+              .build();
+      introduction.setDomainTerm("Leitsatz");
+      introductions.add(introduction);
+    }
+
+    // Gliederung
+    if (longTexts != null && longTexts.outline() != null) {
+      var introduction =
+          Introduction.builder()
+              .content(htmlTransformer.htmlStringToObjectList(longTexts.outline()))
+              .build();
+      introduction.setDomainTerm("Gliederung");
+      introductions.add(introduction);
+    }
+    return introductions;
+  }
+
+  private List<Motivation> buildMotivations(Decision decision) {
+    List<Motivation> motivations = new ArrayList<>();
+
+    var longTexts = decision.longTexts();
+    if (longTexts != null) {
+      // Gründe
+      var reasons = longTexts.reasons();
+      if (reasons != null) {
+        var motivation =
+            Motivation.builder()
+                .content(htmlTransformer.htmlStringToObjectList(longTexts.reasons()))
+                .build();
+        motivation.setDomainTerm("Gründe");
+        motivations.add(motivation);
+      }
+
+      // Entscheidungsgründe
+      var decisionReasons = longTexts.decisionReasons();
+      if (decisionReasons != null) {
+        var motivation =
+            Motivation.builder()
+                .content(htmlTransformer.htmlStringToObjectList(longTexts.decisionReasons()))
+                .build();
+        motivation.setDomainTerm("Entscheidungsgründe");
+        motivations.add(motivation);
+      }
+
+      // Sonstiger Langtext
+      var otherLongTexts = longTexts.otherLongText();
+      if (otherLongTexts != null) {
+        var motivation =
+            Motivation.builder()
+                .content(htmlTransformer.htmlStringToObjectList(longTexts.otherLongText()))
+                .build();
+        motivation.setDomainTerm("Sonstiger Langtext");
+        motivations.add(motivation);
+      }
+
+      // Abweichende Meinung + Mitwirkende Richter
+      var dissentingOpinion = longTexts.dissentingOpinion();
+      if (dissentingOpinion != null) {
+        var motivation = buildDissentingOpinion(decision);
+        if (motivation != null) {
+          motivation.setDomainTerm("Abweichende Meinung");
+          motivations.add(motivation);
+        }
+      }
+    }
+    return motivations;
+  }
+
+  private Motivation buildDissentingOpinion(Decision decision) {
+    var longTexts = decision.longTexts();
+    if (longTexts == null) {
+      return null;
+    }
+
+    String dissentingOpinion = longTexts.dissentingOpinion();
+    var participatingJudges = longTexts.participatingJudges();
+
+    List<Opinion> opinions = new ArrayList<>();
+
+    if (participatingJudges != null && !participatingJudges.isEmpty()) {
+      for (var judge : participatingJudges) {
+        String byAttribute = "#" + toKebabCase(judge.name());
+        Opinion opinion;
+        if (judge.referencedOpinions() != null) {
+          opinion =
+              new Opinion(
+                  "dissenting", "Art der Mitwirkung", byAttribute, judge.referencedOpinions());
+        } else {
+          opinion = new Opinion("dissenting", null, byAttribute, null);
+        }
+        opinions.add(opinion);
+      }
+    }
+
+    Block block = null;
+    if (!opinions.isEmpty()) {
+      block = new Block("Mitwirkende Richter", opinions);
+    }
+
+    List<Object> content = new ArrayList<>();
+    if (dissentingOpinion != null && !dissentingOpinion.isBlank()) {
+      content.addAll(htmlTransformer.htmlStringToObjectList(dissentingOpinion));
+    }
+
+    if (block != null) {
+      content.add(block);
+    }
+
+    Motivation motivation = new Motivation();
+    motivation.setDomainTerm("Abweichende Meinung");
+    motivation.setContent(content);
+
+    return motivation;
+  }
+
   private JaxbHtml buildBackground(Decision decision) {
     var longTexts = decision.longTexts();
+
     var caseFacts = nullSafeGet(longTexts, LongTexts::caseFacts);
 
     if (StringUtils.isNotEmpty(caseFacts)) {
-      JaxbHtml backgroundHtml = JaxbHtml.build(htmlTransformer.htmlStringToObjectList(caseFacts));
-      backgroundHtml.setDomainTerm("Tatbestand");
-      return backgroundHtml;
+      JaxbHtml html = JaxbHtml.build(htmlTransformer.htmlStringToObjectList(caseFacts));
+      html.setDomainTerm("Tatbestand");
+      return html;
     }
     return null;
   }
 
-  private AknMultipleBlock buildDecision(Decision decision) {
+  private JaxbHtml buildDecision(Decision decision) {
     var longTexts = decision.longTexts();
 
-    var decisionReasons = nullSafeGet(longTexts, LongTexts::decisionReasons);
-    var reasons = nullSafeGet(longTexts, LongTexts::reasons);
-    var otherLongText = nullSafeGet(longTexts, LongTexts::otherLongText);
-    var dissentingOpinion = nullSafeGet(longTexts, LongTexts::dissentingOpinion);
+    var tenor = nullSafeGet(longTexts, LongTexts::tenor);
 
-    if (StringUtils.isNotEmpty(decisionReasons)
-        || StringUtils.isNotEmpty(reasons)
-        || StringUtils.isNotEmpty(otherLongText)
-        || StringUtils.isNotEmpty(dissentingOpinion)) {
-      return new AknMultipleBlock()
-          .withBlock(
-              AknEmbeddedStructureInBlock.DecisionReasons.NAME,
-              AknEmbeddedStructureInBlock.DecisionReasons.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(decisionReasons))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.Reasons.NAME,
-              AknEmbeddedStructureInBlock.Reasons.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(reasons))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.OtherLongText.NAME,
-              AknEmbeddedStructureInBlock.OtherLongText.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(otherLongText))))
-          .withBlock(
-              Opinions.NAME,
-              Opinions.build(htmlTransformer.htmlStringToObjectList(dissentingOpinion)));
+    if (StringUtils.isNotEmpty(tenor)) {
+      var tenorHtml = JaxbHtml.build(htmlTransformer.htmlStringToObjectList(tenor));
+      tenorHtml.setDomainTerm("Tenor");
+      return tenorHtml;
     }
     return null;
   }

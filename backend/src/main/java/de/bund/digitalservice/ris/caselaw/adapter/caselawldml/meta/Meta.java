@@ -1,5 +1,9 @@
-package de.bund.digitalservice.ris.caselaw.adapter.caselawldml;
+package de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta;
 
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.Identification;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.references.References;
 import jakarta.xml.bind.annotation.XmlElement;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

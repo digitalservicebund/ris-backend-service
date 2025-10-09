@@ -16,15 +16,15 @@
                     <akn:FRBRcountry value="deu"/>
                 </akn:FRBRWork>
                 <akn:FRBRExpression>
-                    <akn:FRBRthis value="YYTestDoc0013/dokument"/>
-                    <akn:FRBRuri value="YYTestDoc0013/dokument"/>
+                    <akn:FRBRthis value="YYTestDoc0013"/>
+                    <akn:FRBRuri value="YYTestDoc0013"/>
                     <akn:FRBRdate date="2020-01-01" name="Mitteilungsdatum"/>
                     <akn:FRBRauthor href="#courttype-courtlocation"/>
                     <akn:FRBRlanguage language="deu"/>
                 </akn:FRBRExpression>
                 <akn:FRBRManifestation>
-                    <akn:FRBRthis value="YYTestDoc0013/dokument.xml"/>
-                    <akn:FRBRuri value="YYTestDoc0013/dokument.xml"/>
+                    <akn:FRBRthis value="YYTestDoc0013.xml"/>
+                    <akn:FRBRuri value="YYTestDoc0013.xml"/>
                     <akn:FRBRdate date="2025-10-02" name="XML Transformation"/>
                     <akn:FRBRauthor href="#bfh-dokumentationsstelle"/>
                 </akn:FRBRManifestation>
@@ -109,21 +109,18 @@
             </akn:p>
         </akn:header>
         <akn:judgmentBody>
-            <akn:motivation>
+            <akn:motivation ris:domainTerm="Rechtsfrage">
                 <akn:p alternativeTo="textWrapper">Rechtsfrage</akn:p>
             </akn:motivation>
-            <akn:introduction>
-                <akn:block name="Rechtsmittelführer">
-                    <akn:embeddedStructure>
-                        <akn:p alternativeTo="textWrapper">Rechtsmittelführer</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
-                <akn:block name="Rechtsmittelzulassung">
-                    <akn:embeddedStructure>
-                        <akn:p alternativeTo="textWrapper">Rechtsmittelzulassung</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
+            <akn:introduction ris:domainTerm="Rechtsmittelführer">
+                <akn:p alternativeTo="textWrapper">Rechtsmittelführer</akn:p>
             </akn:introduction>
+            <akn:introduction ris:domainTerm="Rechtsmittelzulassung">
+                <akn:p alternativeTo="textWrapper">Rechtsmittelzulassung</akn:p>
+            </akn:introduction>
+            <akn:decision ris:domainTerm="Erledigungsvermerk">
+                <akn:p>Erledigungsvermerk</akn:p>
+            </akn:decision>
         </akn:judgmentBody>
     </akn:judgment>
 </akn:akomaNtoso>

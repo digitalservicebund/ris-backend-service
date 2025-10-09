@@ -3,20 +3,19 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
 
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.DocumentType;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentType;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
-import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Transformer for converting decisions to the reduced LDML format. Currently, the public Prototype
@@ -63,28 +62,11 @@ public class DecisionReducedLdmlTransformer extends DecisionCommonLdmlTransforme
   }
 
   @Override
-  protected AknMultipleBlock buildIntroduction(Decision decision) {
-    var longTexts = decision.longTexts();
+  protected Header buildHeader(Decision decision) throws ValidationException {
+    List<Paragraph> paragraphs = new ArrayList<>();
 
-    var outline = nullSafeGet(longTexts, LongTexts::outline);
-    var tenor = nullSafeGet(longTexts, LongTexts::tenor);
+    paragraphs = buildCommonHeader(decision, paragraphs);
 
-    if (StringUtils.isNotEmpty(outline) || StringUtils.isNotEmpty(tenor)) {
-      return new AknMultipleBlock()
-          .withBlock(
-              AknEmbeddedStructureInBlock.Outline.NAME,
-              AknEmbeddedStructureInBlock.Outline.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(outline))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.Tenor.NAME,
-              AknEmbeddedStructureInBlock.Tenor.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(tenor))));
-    }
-    return null;
-  }
-
-  @Override
-  protected JaxbHtml buildHeader(Decision decision) throws ValidationException {
-    return JaxbHtml.build(htmlTransformer.htmlStringToObjectList(buildCommonHeader(decision)));
+    return Header.builder().paragraphs(paragraphs).build();
   }
 }

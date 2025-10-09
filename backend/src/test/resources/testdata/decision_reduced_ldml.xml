@@ -19,15 +19,15 @@
                     <akn:FRBRcountry value="deu"/>
                 </akn:FRBRWork>
                 <akn:FRBRExpression>
-                    <akn:FRBRthis value="YYTestDoc0013/dokument"/>
-                    <akn:FRBRuri value="YYTestDoc0013/dokument"/>
+                    <akn:FRBRthis value="YYTestDoc0013"/>
+                    <akn:FRBRuri value="YYTestDoc0013"/>
                     <akn:FRBRdate date="2020-01-01" name="Entscheidungsdatum"/>
                     <akn:FRBRauthor href="#courttype-courtlocation"/>
                     <akn:FRBRlanguage language="deu"/>
                 </akn:FRBRExpression>
                 <akn:FRBRManifestation>
-                    <akn:FRBRthis value="YYTestDoc0013/dokument.xml"/>
-                    <akn:FRBRuri value="YYTestDoc0013/dokument.xml"/>
+                    <akn:FRBRthis value="YYTestDoc0013.xml"/>
+                    <akn:FRBRuri value="YYTestDoc0013.xml"/>
                     <akn:FRBRdate date="2025-10-02" name="XML Transformation"/>
                     <akn:FRBRauthor href="#documentationoffice-dokumentationsstelle"/>
                 </akn:FRBRManifestation>
@@ -112,47 +112,33 @@
             </akn:p>
         </akn:header>
         <akn:judgmentBody>
-            <akn:motivation>
-                <akn:p>guidingPrinciple test</akn:p>
+            <akn:motivation ris:domainTerm="Gründe">
+                <akn:p>grounds test</akn:p>
             </akn:motivation>
-            <akn:introduction>
-                <akn:block name="Gliederung">
-                    <akn:embeddedStructure>
-                        <akn:p>outline test</akn:p>
-                    </akn:embeddedStructure>
+            <akn:motivation ris:domainTerm="Entscheidungsgründe">
+                <akn:p>decisionGrounds test</akn:p>
+            </akn:motivation>
+            <akn:motivation ris:domainTerm="Sonstiger Langtext">
+                <akn:p>otherLongText test</akn:p>
+            </akn:motivation>
+            <akn:motivation ris:domainTerm="Abweichende Meinung">
+                <akn:p>dissenting test</akn:p>
+                <akn:block name="Mitwirkende Richter">
+                    <akn:opinion by="#dr-phil-max-mustermann" ris:domainTerm="Art der Mitwirkung" type="dissenting">referenced opinions test 1</akn:opinion>
+                    <akn:opinion by="#richterin-maxima-mustermann" ris:domainTerm="Art der Mitwirkung" type="dissenting">referenced opinions test 2</akn:opinion>
                 </akn:block>
-                <akn:block name="Tenor">
-                    <akn:embeddedStructure>
-                        <akn:p>tenor test</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
+            </akn:motivation>
+            <akn:introduction ris:domainTerm="Leitsatz">
+                <akn:p>guidingPrinciple test</akn:p>
+            </akn:introduction>
+            <akn:introduction ris:domainTerm="Gliederung">
+                <akn:p>outline test</akn:p>
             </akn:introduction>
             <akn:background ris:domainTerm="Tatbestand">
                 <akn:p>caseFacts test</akn:p>
             </akn:background>
-            <akn:decision>
-                <akn:block name="Entscheidungsgründe">
-                    <akn:embeddedStructure>
-                        <akn:p>decisionGrounds test</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
-                <akn:block name="Gründe">
-                    <akn:embeddedStructure>
-                        <akn:p>grounds test</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
-                <akn:block name="Sonstiger Langtext">
-                    <akn:embeddedStructure>
-                        <akn:p>otherLongText test</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
-                <akn:block name="Abweichende Meinung">
-                    <akn:opinion>
-                        <akn:embeddedStructure>
-                            <akn:p>dissenting test</akn:p>
-                        </akn:embeddedStructure>
-                    </akn:opinion>
-                </akn:block>
+            <akn:decision ris:domainTerm="Tenor">
+                <akn:p>tenor test</akn:p>
             </akn:decision>
         </akn:judgmentBody>
     </akn:judgment>
