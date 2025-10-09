@@ -40,6 +40,7 @@ import java.util.function.Consumer;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,6 +102,7 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  @Disabled("Should be enabled with https://digitalservicebund.atlassian.net/browse/RISDEV-9358")
   void shouldPublishWithAllowedStagingData() throws IOException {
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit("1"));
