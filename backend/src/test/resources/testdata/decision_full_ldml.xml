@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0" xmlns:ris="http://example.com/0.1/"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/os/part2-specs/schemas/akomantoso30.xsd">
+    <akn:judgment name="documentType test">
+        <akn:meta>
+            <akn:identification source="#ris">
+                <akn:FRBRWork>
+                    <akn:FRBRthis value="YYTestDoc0013"/>
+                    <akn:FRBRuri value="YYTestDoc0013"/>
+                    <akn:FRBRalias name="Übergreifende ID" value="5706fd85-94fe-4ee9-8c50-31aff10fc29a"/>
+                    <akn:FRBRalias name="Dokumentnummer" value="YYTestDoc0013"/>
+                    <akn:FRBRalias name="ECLI" value="ecli test"/>
+                    <akn:FRBRalias name="CELEX-Nummer" value="celex test"/>
+                    <akn:FRBRalias name="Aktenzeichen" value="fileNumber test"/>
+                    <akn:FRBRdate date="2020-01-01" name="Entscheidungsdatum"/>
+                    <akn:FRBRauthor href="#courttype-courtlocation"/>
+                    <akn:FRBRcountry value="deu"/>
+                </akn:FRBRWork>
+                <akn:FRBRExpression>
+                    <akn:FRBRthis value="YYTestDoc0013"/>
+                    <akn:FRBRuri value="YYTestDoc0013"/>
+                    <akn:FRBRdate date="2020-01-01" name="Entscheidungsdatum"/>
+                    <akn:FRBRauthor href="#courttype-courtlocation"/>
+                    <akn:FRBRlanguage language="deu"/>
+                </akn:FRBRExpression>
+                <akn:FRBRManifestation>
+                    <akn:FRBRthis value="YYTestDoc0013.xml"/>
+                    <akn:FRBRuri value="YYTestDoc0013.xml"/>
+                    <akn:FRBRdate date="2025-10-09" name="XML Transformation"/>
+                    <akn:FRBRauthor href="#documentationoffice-dokumentationsstelle"/>
+                </akn:FRBRManifestation>
+            </akn:identification>
+            <akn:classification source="#ris">
+                <akn:keyword dictionary="" ris:domainTerm="Schlagwort" showAs="keyword test" value="keyword test"/>
+            </akn:classification>
+            <akn:references source="#ris">
+                <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
+                <akn:TLCOrganization eId="documentationoffice-dokumentationsstelle" href=""
+                                     showAs="documentationOffice"/>
+                <akn:TLCOrganization eId="courttype-courtlocation" href="" showAs="courtLabel test"/>
+                <akn:TLCOrganization eId="spruchkoerper" href="" showAs="appraisalBody test"/>
+                <akn:TLCPerson eId="dr-phil-max-mustermann" href="" showAs="Dr. Phil. Max Mustermann"/>
+                <akn:TLCPerson eId="richterin-maxima-mustermann" href="" showAs="Richterin Maxima Mustermann"/>
+                <akn:TLCLocation eId="gerichtsort" href="" showAs="courtLocation"/>
+            </akn:references>
+            <akn:proprietary source="#ris">
+                <ris:meta>
+                    <ris:decisionNames>
+                        <ris:decisionName>decisionName test</ris:decisionName>
+                    </ris:decisionNames>
+                    <ris:previousDecisions>
+                        <ris:previousDecision date="2020-01-01">
+                            <ris:documentNumber>previous decision document number 1</ris:documentNumber>
+                            <ris:fileNumber>previous decision file number</ris:fileNumber>
+                            <ris:courtType>previous decision court type</ris:courtType>
+                        </ris:previousDecision>
+                        <ris:previousDecision date="2020-01-01">
+                            <ris:documentNumber>previous decision document number 2</ris:documentNumber>
+                            <ris:fileNumber>previous decision file number</ris:fileNumber>
+                            <ris:courtType>previous decision court type</ris:courtType>
+                        </ris:previousDecision>
+                    </ris:previousDecisions>
+                    <ris:ensuingDecisions>
+                        <ris:ensuingDecision date="2022-10-01">
+                            <ris:documentNumber>ensuing decision document number 1</ris:documentNumber>
+                            <ris:fileNumber>ensuing decision file number</ris:fileNumber>
+                            <ris:courtType>ensuing decision court type</ris:courtType>
+                        </ris:ensuingDecision>
+                        <ris:ensuingDecision date="2022-10-01">
+                            <ris:documentNumber>previous decision document number 2</ris:documentNumber>
+                            <ris:fileNumber>ensuing decision file number</ris:fileNumber>
+                            <ris:courtType>ensuing decision court type</ris:courtType>
+                        </ris:ensuingDecision>
+                    </ris:ensuingDecisions>
+                    <ris:fileNumbers>
+                        <ris:fileNumber>fileNumber test</ris:fileNumber>
+                    </ris:fileNumbers>
+                    <ris:documentType akn:eId="dokumenttyp">documentType test</ris:documentType>
+                    <ris:courtLocation>courtLocation</ris:courtLocation>
+                    <ris:courtType>courtType</ris:courtType>
+                    <ris:legalForces>
+                        <ris:legalForce>legalForce test</ris:legalForce>
+                    </ris:legalForces>
+                    <ris:legalEffect>ja</ris:legalEffect>
+                    <ris:fieldOfLaws>
+                        <ris:fieldOfLaw>fieldOfLaw test</ris:fieldOfLaw>
+                    </ris:fieldOfLaws>
+                    <ris:judicialBody>appraisalBody test</ris:judicialBody>
+                    <ris:deviatingCourts>
+                        <ris:deviatingCourt>deviating court</ris:deviatingCourt>
+                    </ris:deviatingCourts>
+                    <ris:deviatingDates>
+                        <ris:deviatingDate>2010-05-12</ris:deviatingDate>
+                    </ris:deviatingDates>
+                    <ris:deviatingDocumentNumbers>
+                        <ris:deviatingDocumentNumber>deviating documentNumber</ris:deviatingDocumentNumber>
+                    </ris:deviatingDocumentNumbers>
+                    <ris:deviatingEclis>
+                        <ris:deviatingEcli>deviating ecli test</ris:deviatingEcli>
+                    </ris:deviatingEclis>
+                    <ris:deviatingFileNumbers>
+                        <ris:deviatingFileNumber>deviating fileNumber</ris:deviatingFileNumber>
+                    </ris:deviatingFileNumbers>
+                    <ris:publicationStatus>PUBLISHED</ris:publicationStatus>
+                    <ris:error>false</ris:error>
+                    <ris:documentationOffice>documentationOffice</ris:documentationOffice>
+                    <ris:procedures>
+                        <ris:procedure>previous procedure test</ris:procedure>
+                    </ris:procedures>
+                    <ris:inputTypes>
+                        <ris:inputType>E-Mail</ris:inputType>
+                        <ris:inputType>Papier</ris:inputType>
+                    </ris:inputTypes>
+                    <ris:foreignLanguageVersions>
+                        <ris:foreignLanguageVersion>
+                            <akn:FRBRlanguage language="eng"/>
+                            <akn:documentRef href="https://ihre-url-zur-englischen-übersetzung" showAs="Englisch"/>
+                        </ris:foreignLanguageVersion>
+                        <ris:foreignLanguageVersion>
+                            <akn:FRBRlanguage language="fra"/>
+                            <akn:documentRef href="https://ihre-url-zur-französischen-übersetzung"
+                                             showAs="Französisch"/>
+                        </ris:foreignLanguageVersion>
+                    </ris:foreignLanguageVersions>
+                    <ris:definitions>
+                        <ris:definition ris:definedTerm="indirekte Steuern" ris:definingBorderNumber="2"/>
+                        <ris:definition ris:definedTerm="Sachgesamtheit"/>
+                    </ris:definitions>
+                    <ris:evfs>evsf test</ris:evfs>
+                </ris:meta>
+            </akn:proprietary>
+        </akn:meta>
+        <akn:header>
+            <akn:p>
+                Aktenzeichen:
+                <akn:docNumber refersTo="#aktenzeichen">fileNumber test</akn:docNumber>
+            </akn:p>
+            <akn:p>
+                Entscheidungsdatum:
+                <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
+            </akn:p>
+            <akn:p>
+                Gericht:
+                <akn:courtType refersTo="#gericht">courtLabel test</akn:courtType>
+            </akn:p>
+            <akn:p>
+                Dokumenttyp:
+                <akn:docType refersTo="#dokumenttyp">documentType test</akn:docType>
+            </akn:p>
+            <akn:p>Entscheidungsname:
+                <akn:docTitle refersTo="#entscheidungsname">decisionName test</akn:docTitle>
+            </akn:p>
+            <akn:p>Titelzeile:
+                <akn:shortTitle refersTo="#titelzeile">
+                    <akn:embeddedStructure>
+                        <akn:p>headline test</akn:p>
+                    </akn:embeddedStructure>
+                </akn:shortTitle>
+            </akn:p>
+        </akn:header>
+        <akn:judgmentBody>
+            <akn:motivation ris:domainTerm="Gründe">
+                <akn:p>grounds test</akn:p>
+            </akn:motivation>
+            <akn:motivation ris:domainTerm="Entscheidungsgründe">
+                <akn:p>decisionGrounds test</akn:p>
+            </akn:motivation>
+            <akn:motivation ris:domainTerm="Sonstiger Langtext">
+                <akn:p>otherLongText test</akn:p>
+            </akn:motivation>
+            <akn:motivation ris:domainTerm="Abweichende Meinung">
+                <akn:p>dissenting test</akn:p>
+                <akn:block name="Mitwirkende Richter">
+                    <akn:opinion by="#dr-phil-max-mustermann" ris:domainTerm="Art der Mitwirkung" type="dissenting">referenced opinions test 1</akn:opinion>
+                    <akn:opinion by="#richterin-maxima-mustermann" ris:domainTerm="Art der Mitwirkung" type="dissenting">referenced opinions test 2</akn:opinion>
+                </akn:block>
+            </akn:motivation>
+            <akn:introduction ris:domainTerm="Leitsatz">
+                <akn:p>guidingPrinciple test</akn:p>
+            </akn:introduction>
+            <akn:introduction ris:domainTerm="Gliederung">
+                <akn:p>outline test</akn:p>
+            </akn:introduction>
+            <akn:background ris:domainTerm="Tatbestand">
+                <akn:p>caseFacts test</akn:p>
+            </akn:background>
+            <akn:decision ris:domainTerm="Tenor">
+                <akn:p>tenor test</akn:p>
+            </akn:decision>
+        </akn:judgmentBody>
+    </akn:judgment>
+</akn:akomaNtoso>

@@ -1,8 +1,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/WD17"
+                xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0"
                 xmlns:ris="http://example.com/0.1/"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/WD17 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/csprd02/part2-specs/schemas/akomantoso30.xsd">
+                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/os/part2-specs/schemas/akomantoso30.xsd">
     <xsl:output indent="yes" method="xml" encoding="utf-8"/>
     <xsl:strip-space elements="*"/>
 
@@ -185,7 +185,7 @@
     </xsl:template>
 
     <xsl:template name="borderNumberTemplate">
-        <akn:hcontainer  name="randnummer">
+        <akn:hcontainer ris:domainTerm="Randnummer" eId="randnummer-{number}"  name="Randnummer">
             <xsl:apply-templates select="@* | node()"/>
         </akn:hcontainer>
     </xsl:template>
@@ -208,9 +208,9 @@
 
     <xsl:template name="borderNumberLinkTemplate">
         <!--Any other existing attributes for border-number-link will be lost -->
-        <akn:a class="border-number-link" href="{concat('#border-number-link-',@nr)}">
+        <akn:ref ris:domainTerm="Randnummernverlinkung" class="border-number-link" href="{concat('#randnummer-',@nr)}">
             <xsl:apply-templates/>
-        </akn:a>
+        </akn:ref>
     </xsl:template>
 
     <!--Case Law team handover: akn doesn't support <pre>. Maybe something works better than adding foreign?
@@ -325,10 +325,11 @@
     </xsl:template>
 
     <!--Identity transformation for known cases-->
-    <xsl:template match="akn:akomaNtoso|akn:judgment|akn:judgmentBody|akn:meta|akn:header|akn:introduction
-    |akn:identification|akn:classification|akn:proprietary|akn:block|akn:keyword|akn:background
-    |akn:decision|akn:motivation|akn:opinion|akn:embeddedStructure|akn:subFlow
-    |akn:FRBRWork|akn:FRBRExpression|akn:FRBRManifestation
+    <xsl:template match="akn:akomaNtoso|akn:judgment|akn:judgmentBody|akn:meta|akn:header|akn:docNumber|akn:docDate
+    |akn:courtType|akn:docTitle|akn:shortTitle|akn:docType|akn:introduction
+    |akn:identification|akn:references|akn:TLCOrganization|akn:TLCPerson|akn:TLCLocation|akn:classification|akn:proprietary|akn:block
+    |akn:keyword|akn:background|akn:decision|akn:motivation|akn:opinion|akn:embeddedStructure|akn:subFlow
+    |akn:FRBRWork|akn:FRBRExpression|akn:FRBRManifestation|akn:p
     |akn:FRBRthis|akn:FRBRuri|akn:FRBRalias|akn:FRBRdate|akn:FRBRauthor|akn:FRBRcountry|akn:FRBRlanguage|akn:documentRef
     |ris:meta|ris:fileNumbers|ris:fileNumber|ris:documentType|ris:courtLocation|ris:courtType|ris:legalEffect
     |ris:fieldOfLaws|ris:fieldOfLaw|ris:judicialBody|ris:publicationStatus|ris:error|ris:documentationOffice
@@ -337,9 +338,9 @@
     |ris:deviatingFileNumber|ris:deviatingDocumentNumbers|ris:deviatingDocumentNumber|ris:legalForces|ris:legalForce
     |ris:yearOfDispute|ris:deviatingCourts|ris:deviatingCourt|ris:deviatingDates|ris:deviatingDate
     |ris:deviatingEclis|ris:deviatingEcli|ris:inputTypes|ris:inputType|ris:foreignLanguageVersions|ris:foreignLanguageVersion|ris:evfs
-    |ris:definitions|ris:definition|@ris:definedTerm|@ris:definingBorderNumber
-    |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@value|@date|@href|@language|@class|@colspan|@rowspan
-    |@style|@alt|@height|@width|@src|@title|@xml:space|@border">
+    |ris:definitions|ris:definition|@ris:definedTerm|@ris:definingBorderNumber|@ris:domainTerm
+    |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
+    |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId|@akn:eId|@type|@by">
 
         <xsl:copy>
             <xsl:apply-templates select="@* | node()"/>
