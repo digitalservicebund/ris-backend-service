@@ -62,18 +62,6 @@ describe("TextCheckModal", () => {
     expect(screen.getByText(baseMatch.message)).toBeInTheDocument()
   })
 
-  it("emits 'word:replace' event when a suggestion is updated in ReplacementBar", async () => {
-    const { emitted, user } = renderComponent(baseMatch)
-    await user.click(screen.getByText("suggestion1"))
-    expect(emitted()["word:replace"]).toEqual([["suggestion1"]])
-  })
-
-  it("emits 'word:add' event when ignore button is clicked", async () => {
-    const { emitted, user } = renderComponent(baseMatch)
-    await user.click(screen.getByText("Ignorieren"))
-    expect(emitted()["word:add"]).toEqual([["testword"]])
-  })
-
   it("emits 'word:remove' event when word is ignored locally and remove ignored word button is clicked ", async () => {
     const { emitted, user } = renderComponent({
       ...baseMatch,
@@ -95,7 +83,7 @@ describe("TextCheckModal", () => {
       screen.queryByText("Aus globalem Wörterbuch entfernen"),
     ).not.toBeInTheDocument()
 
-    await user.click(screen.getByText("Nicht ignorieren"))
+    await user.click(screen.getByText("Nicht in Dokeinheit ignorieren"))
     expect(emitted()["word:remove"]).toEqual([["testword"]])
   })
 

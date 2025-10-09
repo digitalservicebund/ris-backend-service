@@ -28,11 +28,4 @@ describe("Match replacement bar single and multiple test", () => {
     await user.click(acceptButton)
     expect(emitted()["suggestion:update"]).toEqual([["Rechtschreibfehler"]])
   })
-
-  it("accept replacement emits ignore", async () => {
-    const { emitted, user } = renderComponent()
-    const ignoreButton = screen.getByTestId("ignored-word-add-button")
-    await user.click(ignoreButton)
-    expect(emitted()["ignored-word:add"]).toHaveLength(1)
-  })
 })

@@ -7,15 +7,10 @@ defineProps<{
 
 const emit = defineEmits<{
   "suggestion:update": [value: string]
-  "ignored-word:add": [void]
 }>()
 
 function acceptSuggestion(replacement: string) {
   emit("suggestion:update", replacement)
-}
-
-function addIgnoredWord() {
-  emit("ignored-word:add")
 }
 </script>
 
@@ -30,13 +25,5 @@ function addIgnoredWord() {
         @click="acceptSuggestion(replacement)"
       ></Button>
     </div>
-    <Button
-      aria-label="Vorschlag ignorieren"
-      data-testid="ignored-word-add-button"
-      label="Ignorieren"
-      severity="secondary"
-      size="small"
-      @click="addIgnoredWord"
-    />
   </div>
 </template>
