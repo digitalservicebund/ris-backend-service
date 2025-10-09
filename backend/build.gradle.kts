@@ -19,8 +19,8 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.0.0"
-    id("org.flywaydb.flyway") version "11.13.2"
-    id("io.sentry.jvm.gradle") version "5.12.0"
+    id("org.flywaydb.flyway") version "11.14.0"
+    id("io.sentry.jvm.gradle") version "5.12.1"
 }
 
 group = "de.bund.digitalservice"
@@ -179,11 +179,11 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.34.8"))
+    implementation(platform("software.amazon.awssdk:bom:2.35.2"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
-    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.5")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.6")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
@@ -192,7 +192,7 @@ dependencies {
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.5")
     implementation("org.eclipse.angus:angus-mail:2.0.5")
-    implementation("com.icegreen:greenmail:2.1.6")
+    implementation("com.icegreen:greenmail:2.1.7")
 
     // package served by private repo, requires authentication:
     implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.40") {
@@ -229,10 +229,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.13.2"
+    val flywayCore = "org.flywaydb:flyway-core:11.14.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.13.2")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.14.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -249,7 +249,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.30.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.32.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
