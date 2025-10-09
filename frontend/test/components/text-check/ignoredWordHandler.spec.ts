@@ -49,7 +49,7 @@ describe("IgnoredWordHandler", () => {
 
     expect(screen.getByText("In Dokeinheit ignorieren")).toBeInTheDocument()
     await user.click(screen.getByText("In Dokeinheit ignorieren"))
-    expect(emitted()["word:add"])
+    expect(emitted()["ignored-word:add"]).toBeTruthy()
   })
 
   it("does not render any button when ignoredTextCheckWords is undefined", async () => {
