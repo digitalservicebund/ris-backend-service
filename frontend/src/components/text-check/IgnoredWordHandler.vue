@@ -61,7 +61,7 @@ const matchIsIgnoredInDocument = computed(() => {
   <div class="flex flex-grow flex-col" data-testid="ignored-word-handler">
     <div v-if="matchIsIgnoredJDV">Von jDV ignoriert</div>
 
-    <div class="flex flex-grow flex-col gap-4">
+    <div class="flex flex-grow flex-col items-start gap-4">
       <Button
         v-if="
           textCheckGlobal &&
@@ -71,9 +71,9 @@ const matchIsIgnoredInDocument = computed(() => {
         "
         aria-label="Vorschlag ignorieren"
         data-testid="ignored-word-add-button"
-        label="Ignorieren"
-        severity="secondary"
+        label="In Dokeinheit ignorieren"
         size="small"
+        text
         @click="addIgnoredWord"
       >
         <template #icon>
@@ -88,12 +88,10 @@ const matchIsIgnoredInDocument = computed(() => {
           !matchIsIgnoredGlobally
         "
         aria-label="Wort nicht ignorieren"
-        button-type="tertiary"
         data-testid="ignored-word-remove-button"
-        icon="IconDescription"
-        label="Nicht ignorieren"
-        severity="secondary"
+        label="Nicht in Dokeinheit ignorieren"
         size="small"
+        text
         @click="removeWord"
       >
         <template #icon>
