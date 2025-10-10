@@ -96,18 +96,18 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
           let modified = false
           const tr = newState.tr
           newState.doc.descendants((node: Node | undefined, pos: number) => {
-            if (!node?.isText) return true // continue for non-text nodes
-            if (node?.text === undefined) return false
+            if (!node?.isText) return true
+            if (node?.text === undefined) return true
             const marks = node.marks.filter((mark) => mark.type === markType)
-            if (marks.length === 0) return false
+            if (marks.length === 0) return true
 
             const oldNode = oldState.doc.nodeAt(pos)
-            if (!oldNode?.isText) return false
+            if (!oldNode?.isText) return true
             if (oldNode.text !== node.text) {
               tr.removeMark(pos, pos + node.text.length, markType)
               modified = true
             }
-            return false // stop for text nodes
+            return true
           })
           return modified ? tr : null
         },
