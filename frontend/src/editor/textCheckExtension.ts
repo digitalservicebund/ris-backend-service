@@ -1,6 +1,5 @@
 import { Extension } from "@tiptap/core"
-import { Node } from "prosemirror-model"
-import { Plugin, Transaction, EditorState } from "prosemirror-state"
+import { Plugin, PluginKey, Transaction, EditorState } from "prosemirror-state"
 import {
   TextCheckExtensionOptions,
   TextCheckService,
@@ -81,35 +80,46 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
   addProseMirrorPlugins() {
     return [
       new Plugin({
+        key: new PluginKey("textCheckExtension"),
         appendTransaction: (
           transactions: readonly Transaction[],
-          oldState: EditorState,
+          _oldState: EditorState,
           newState: EditorState,
         ) => {
-          if (!transactions.some((tr: Transaction) => tr.docChanged))
-            return null
-
           const { schema } = newState
           const markType = schema.marks[TextCheckTagName]
+
           if (!markType) return null
 
-          let modified = false
-          const tr = newState.tr
-          newState.doc.descendants((node: Node | undefined, pos: number) => {
-            if (!node?.isText) return true // continue for non-text nodes
-            if (node?.text === undefined) return false
-            const marks = node.marks.filter((mark) => mark.type === markType)
-            if (marks.length === 0) return false
+          const isDocumentChanged = transactions.some(
+            (transaction) => transaction.docChanged,
+          )
+          if (!isDocumentChanged) {
+            return null
+          }
 
-            const oldNode = oldState.doc.nodeAt(pos)
-            if (!oldNode?.isText) return false
-            if (oldNode.text !== node.text) {
-              tr.removeMark(pos, pos + node.text.length, markType)
-              modified = true
-            }
-            return false // stop for text nodes
+          let modified = false
+          const newStateTransaction = newState.tr
+
+          transactions.forEach((transaction) => {
+            const { from, to } = transaction.selection
+
+            newState.doc.nodesBetween(from - 1, to + 1, (node, pos) => {
+              if (!node.isText) return
+              const hasMark = markType.isInSet(node.marks)
+
+              if (hasMark) {
+                newStateTransaction.removeMark(
+                  pos,
+                  pos + node.nodeSize,
+                  markType,
+                )
+                modified = true
+              }
+            })
           })
-          return modified ? tr : null
+
+          return modified ? newStateTransaction : null
         },
       }),
     ]
