@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0"
+                xmlns:ris="http://example.com/0.1/"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/os/part2-specs/schemas/akomantoso30.xsd">
+    <akn:judgment name="Anhängiges Verfahren">
+        <akn:meta>
+            <akn:identification source="#ris">
+                <akn:FRBRWork>
+                    <akn:FRBRthis value="YYTestDoc0013"/>
+                    <akn:FRBRuri value="YYTestDoc0013"/>
+                    <akn:FRBRalias name="Übergreifende ID" value="8ea9d41a-9768-462b-b79f-f7147f61df52"/>
+                    <akn:FRBRalias name="Dokumentnummer" value="YYTestDoc0013"/>
+                    <akn:FRBRalias name="Aktenzeichen" value="Aktenzeichen"/>
+                    <akn:FRBRdate date="2020-01-01" name="Mitteilungsdatum"/>
+                    <akn:FRBRauthor href="#courttype-courtlocation"/>
+                    <akn:FRBRcountry value="deu"/>
+                </akn:FRBRWork>
+                <akn:FRBRExpression>
+                    <akn:FRBRthis value="YYTestDoc0013"/>
+                    <akn:FRBRuri value="YYTestDoc0013"/>
+                    <akn:FRBRdate date="2020-01-01" name="Mitteilungsdatum"/>
+                    <akn:FRBRauthor href="#courttype-courtlocation"/>
+                    <akn:FRBRlanguage language="deu"/>
+                </akn:FRBRExpression>
+                <akn:FRBRManifestation>
+                    <akn:FRBRthis value="YYTestDoc0013.xml"/>
+                    <akn:FRBRuri value="YYTestDoc0013.xml"/>
+                    <akn:FRBRdate date="2025-10-02" name="XML Transformation"/>
+                    <akn:FRBRauthor href="#bfh-dokumentationsstelle"/>
+                </akn:FRBRManifestation>
+            </akn:identification>
+            <akn:references source="#ris">
+                <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
+                <akn:TLCOrganization eId="bfh-dokumentationsstelle" href="" showAs="BFH"/>
+                <akn:TLCOrganization eId="courttype-courtlocation"
+                                     href=""
+                                     showAs="courtType courtLocation"/>
+                <akn:TLCLocation eId="gerichtsort" href="" showAs="courtLocation"/>
+            </akn:references>
+            <akn:proprietary source="#ris">
+                <ris:meta>
+                    <ris:previousDecisions>
+                        <ris:previousDecision date="2020-01-01">
+                            <ris:documentNumber>previous decision document number 1</ris:documentNumber>
+                            <ris:fileNumber>previous decision file number</ris:fileNumber>
+                            <ris:courtType>previous decision court type</ris:courtType>
+                        </ris:previousDecision>
+                        <ris:previousDecision date="2020-01-01">
+                            <ris:documentNumber>previous decision document number 2</ris:documentNumber>
+                            <ris:fileNumber>previous decision file number</ris:fileNumber>
+                            <ris:courtType>previous decision court type</ris:courtType>
+                        </ris:previousDecision>
+                    </ris:previousDecisions>
+                    <ris:fileNumbers>
+                        <ris:fileNumber>Aktenzeichen</ris:fileNumber>
+                    </ris:fileNumbers>
+                    <ris:documentType akn:eId="dokumenttyp">Anhängiges Verfahren</ris:documentType>
+                    <ris:courtLocation>courtLocation</ris:courtLocation>
+                    <ris:courtType>courtType</ris:courtType>
+                    <ris:legalForces>
+                        <ris:legalForce>legalForce test</ris:legalForce>
+                    </ris:legalForces>
+                </ris:meta>
+            </akn:proprietary>
+        </akn:meta>
+        <akn:header>
+            <akn:p>Aktenzeichen:
+                <akn:docNumber refersTo="#aktenzeichen">Aktenzeichen</akn:docNumber>
+            </akn:p>
+            <akn:p>Entscheidungsdatum:
+                <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
+            </akn:p>
+            <akn:p>Gericht:
+                <akn:courtType refersTo="#gericht">courtType courtLocation</akn:courtType>
+            </akn:p>
+            <akn:p>Dokumenttyp:
+                <akn:docType refersTo="#dokumenttyp">Anhängiges Verfahren</akn:docType>
+            </akn:p>
+        </akn:header>
+        <akn:judgmentBody>
+            <akn:motivation ris:domainTerm="Rechtsfrage">
+                <akn:p alternativeTo="textWrapper">Rechtsfrage</akn:p>
+            </akn:motivation>
+            <akn:introduction ris:domainTerm="Rechtsmittelführer">
+                <akn:p alternativeTo="textWrapper">Rechtsmittelführer</akn:p>
+            </akn:introduction>
+            <akn:introduction ris:domainTerm="Rechtsmittelzulassung">
+                <akn:p alternativeTo="textWrapper">Rechtsmittelzulassung</akn:p>
+            </akn:introduction>
+            <akn:decision ris:domainTerm="Erledigungsvermerk">
+                <akn:p>Erledigungsvermerk</akn:p>
+            </akn:decision>
+        </akn:judgmentBody>
+    </akn:judgment>
+</akn:akomaNtoso>
