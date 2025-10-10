@@ -1,5 +1,10 @@
 import { Extension } from "@tiptap/core"
-import { TextCheckExtensionOptions, TextCheckService } from "@/types/textCheck"
+import { Plugin, PluginKey, Transaction, EditorState } from "prosemirror-state"
+import {
+  TextCheckExtensionOptions,
+  TextCheckService,
+  TextCheckTagName,
+} from "@/types/textCheck"
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -70,5 +75,53 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
           return true
         },
     }
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("textCheckExtension"),
+        appendTransaction: (
+          transactions: readonly Transaction[],
+          _oldState: EditorState,
+          newState: EditorState,
+        ) => {
+          const { schema } = newState
+          const markType = schema.marks[TextCheckTagName]
+
+          if (!markType) return null
+
+          const isDocumentChanged = transactions.some(
+            (transaction) => transaction.docChanged,
+          )
+          if (!isDocumentChanged) {
+            return null
+          }
+
+          let modified = false
+          const newStateTransaction = newState.tr
+
+          transactions.forEach((transaction) => {
+            const { from, to } = transaction.selection
+
+            newState.doc.nodesBetween(from - 1, to + 1, (node, pos) => {
+              if (!node.isText) return
+              const hasMark = markType.isInSet(node.marks)
+
+              if (hasMark) {
+                newStateTransaction.removeMark(
+                  pos,
+                  pos + node.nodeSize,
+                  markType,
+                )
+                modified = true
+              }
+            })
+          })
+
+          return modified ? newStateTransaction : null
+        },
+      }),
+    ]
   },
 })
