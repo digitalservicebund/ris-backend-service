@@ -193,7 +193,7 @@ const handleImport = async (key: keyof typeof allLabels) => {
     case "activeCitations":
       importActiveCitations()
       break
-    case "decisionName":
+    case "decisionNames":
     case "headline":
     case "guidingPrinciple":
     case "headnote":

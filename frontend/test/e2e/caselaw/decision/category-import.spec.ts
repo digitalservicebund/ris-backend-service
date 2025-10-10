@@ -860,12 +860,12 @@ test.describe("category import", () => {
         )
 
         await expect(
-          page.getByLabel("Entscheidungsname übernehmen"),
+          page.getByLabel("Entscheidungsnamen übernehmen"),
         ).toBeVisible()
-        await page.getByLabel("Entscheidungsname übernehmen").click()
+        await page.getByLabel("Entscheidungsnamen übernehmen").click()
         await expect(
-          page.getByRole("textbox", { name: "Entscheidungsname" }),
-        ).toHaveValue("Test Entscheidungsname")
+          page.getByRole("textbox", { name: "Entscheidungsnamen" }),
+        ).toHaveValue("Test Entscheidungsnamen")
       })
 
       await test.step("show success badge", async () => {
@@ -876,7 +876,7 @@ test.describe("category import", () => {
         await expect(
           page
             .getByLabel("Kurztexte")
-            .getByText("Entscheidungsname", { exact: true }),
+            .getByText("Entscheidungsnamen", { exact: true }),
         ).toBeInViewport()
       })
     },

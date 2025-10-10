@@ -28,7 +28,7 @@ function renderComponent(shortTexts: ShortTexts) {
 describe("preview short texts", () => {
   test("renders all short texts", async () => {
     renderComponent({
-      decisionName: "decision name",
+      decisionNames: ["decision name"],
       headline: "headline",
       guidingPrinciple: "guiding principle",
       headnote: "headnote",
@@ -47,7 +47,7 @@ describe("preview short texts", () => {
   it.each([
     [
       "Entscheidungsname",
-      { decisionName: "decisionName" },
+      { decisionNames: ["decisionName"] },
       [
         "Titelzeile",
         "Leitsatz",

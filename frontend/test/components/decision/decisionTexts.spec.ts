@@ -113,10 +113,10 @@ describe("Texts", () => {
     expect(screen.getByRole("button", { name: "Gliederung" })).toBeVisible()
   })
 
-  test("renders all text categories as text fields", async () => {
+  test("renders all text categories when filled", async () => {
     await renderComponent(
       {
-        decisionName: "decision name",
+        decisionNames: ["decision name"],
         headline: "headline",
         guidingPrinciple: "guiding principle",
         headnote: "headnote",
@@ -164,7 +164,7 @@ describe("Texts", () => {
     expect(screen.getByLabelText("Gliederung Button Leiste")).toBeVisible()
   }, 10000)
 
-  test.skip("renders all tiptap text editors with ref and text check button", async () => {
+  test("renders all tiptap text editors with ref and text check button", async () => {
     const { textEditorRefs } = await renderComponent(
       {
         headline: "headline",
@@ -183,7 +183,7 @@ describe("Texts", () => {
       },
     )
 
-    const excludeLabels = ["decisionName", "participatingJudges"]
+    const excludeLabels = ["decisionNames", "participatingJudges"]
 
     Object.keys({ ...shortTextLabels, ...longTextLabels })
       .filter((category) => !excludeLabels.includes(category))

@@ -249,14 +249,22 @@ public class DecisionTransformer extends DocumentableTransformer {
     ShortTexts shortTexts = updatedDomainObject.shortTexts();
 
     builder
-        .decisionNames(
-            Optional.ofNullable(shortTexts.decisionNames()).orElse(List.of()).stream()
-                .map(decisionName -> DecisionNameDTO.builder().value(decisionName).build())
-                .toList())
         .guidingPrinciple(shortTexts.guidingPrinciple())
         .headnote(shortTexts.headnote())
         .otherHeadnote(shortTexts.otherHeadnote())
         .headline(shortTexts.headline());
+
+    var decisionNames = shortTexts.decisionNames();
+    if (decisionNames != null && !decisionNames.isEmpty()) {
+      List<DecisionNameDTO> decisionNameDTOs = new ArrayList<>();
+      for (int i = 0; i < decisionNames.size(); i++) {
+        decisionNameDTOs.add(
+            DecisionNameDTO.builder().value(decisionNames.get(i)).rank(i + 1).build());
+      }
+      builder.decisionNames(decisionNameDTOs);
+    } else {
+      builder.decisionNames(Collections.emptyList());
+    }
   }
 
   private static void addActiveCitations(
