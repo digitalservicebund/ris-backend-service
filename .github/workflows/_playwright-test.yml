@@ -126,7 +126,7 @@ jobs:
             curl -X POST ${{ secrets.PERFORMANCE_METRICS_ENDPOINT }} \
                   -H "xc-token: ${{ secrets.E2E_TEST_METRICS_TOKEN }}" \
                   -H "Content-Type: application/json" \
-                  -d "{\"title\": \"${title}\", \"average_duration_ms\": \"${average_duration}\", \"max_duration_ms\": \"${max_duration}\", \"expected_duration_ms\": \"${expected}\", \"githubRunId\": \"${{ github.run_id }}\"}"
+                  -d "{\"title\": \"${title}\", \"average_duration_ms\": \"${average_duration}\", \"max_duration_ms\": \"${max_duration}\", \"expected_duration_ms\": \"${expected}\", \"run_id\": \"${{ github.run_id }}\"}"
           done
         working-directory: ./frontend
       - name: Upload json reports
