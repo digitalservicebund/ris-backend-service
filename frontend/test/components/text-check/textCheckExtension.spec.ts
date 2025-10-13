@@ -62,6 +62,8 @@ describe("TextCheckExtension", () => {
     expect(textNode).toBeTruthy()
     if (!textNode) throw new Error("textNode is null")
     expect(textNode.marks.length).toBe(0)
+
+    editor.destroy()
   })
 
   it("removes textCheckMark when character is deleted from marked word", () => {
@@ -99,6 +101,8 @@ describe("TextCheckExtension", () => {
     const para = editor.state.doc.firstChild
     const textNode = para?.firstChild
     expect(textNode?.marks.length).toBe(0)
+
+    editor.destroy()
   })
 
   it("does not affect other marked words when editing one", () => {
@@ -159,5 +163,7 @@ describe("TextCheckExtension", () => {
         expect(node.marks.length).toBe(1)
       }
     })
+
+    editor.destroy()
   })
 })
