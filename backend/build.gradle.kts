@@ -50,7 +50,7 @@ sourceSets {
 }
 
 jacoco {
-    toolVersion = "0.8.13"
+    toolVersion = "0.8.14"
 }
 
 lombok {
@@ -179,7 +179,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.35.4"))
+    implementation(platform("software.amazon.awssdk:bom:2.35.5"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -249,7 +249,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.32.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.33.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
