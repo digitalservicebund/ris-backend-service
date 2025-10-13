@@ -98,9 +98,14 @@ const hasContent = (key: keyof typeof allLabels): boolean => {
       const object = sourceDocumentUnit.value[key]
       return Array.isArray(object) && object.length > 0
     } else if (key in sourceDocumentUnit.value.shortTexts) {
-      return !!sourceDocumentUnit.value.shortTexts[
-        key as keyof typeof sourceDocumentUnit.value.shortTexts
-      ]
+      const sourceShortText =
+        sourceDocumentUnit.value.shortTexts[
+          key as keyof typeof sourceDocumentUnit.value.shortTexts
+        ]
+      return (
+        !!sourceShortText &&
+        (!Array.isArray(sourceShortText) || sourceShortText.length > 0)
+      )
     } else if (key in sourceDocumentUnit.value.longTexts) {
       const sourceLongText =
         sourceDocumentUnit.value.longTexts[
@@ -137,9 +142,15 @@ const isImportable = (key: keyof typeof allLabels): boolean => {
     isDecision(sourceDocumentUnit.value)
   )
     if (key in sourceDocumentUnit.value.shortTexts) {
-      return !targetDocumentUnit.value!.shortTexts[
-        key as keyof typeof sourceDocumentUnit.value.shortTexts
-      ]
+      const targetShortText =
+        targetDocumentUnit.value!.shortTexts[
+          key as keyof typeof sourceDocumentUnit.value.shortTexts
+        ]
+      const isEmptyText =
+        typeof targetShortText === "string" && targetShortText.trim().length > 0
+      const isEmptyArray =
+        Array.isArray(targetShortText) && targetShortText.length > 0
+      return !isEmptyText && !isEmptyArray
     } else if (key in sourceDocumentUnit.value.longTexts) {
       const targetLongText =
         targetDocumentUnit.value!.longTexts[
@@ -194,6 +205,8 @@ const handleImport = async (key: keyof typeof allLabels) => {
       importActiveCitations()
       break
     case "decisionNames":
+      importDecisionNames()
+      break
     case "headline":
     case "guidingPrinciple":
     case "headnote":
@@ -434,17 +447,35 @@ function importParticipatingJudges() {
   }
 }
 
-function importShortTexts(key: string) {
-  if (isDecision(targetDocumentUnit.value)) {
-    const source =
-      sourceDocumentUnit.value?.shortTexts[
-        key as keyof typeof sourceDocumentUnit.value.shortTexts
-      ]
+function importDecisionNames() {
+  if (
+    isDecision(targetDocumentUnit.value) &&
+    isDecision(sourceDocumentUnit.value)
+  ) {
+    const source = sourceDocumentUnit.value?.shortTexts["decisionNames"]
+    if (!source) return
+    //source.forEach((judge) => (judge.id = undefined))
+
+    targetDocumentUnit.value!.shortTexts["decisionNames"] = [...source]
+  }
+}
+
+// By narrowing the type of key to exclude "decisionNames", TypeScript no longer considers the possibility of assigning a non-string value to documentUnit.value.shortTexts[key].
+type ShortTextKeys =
+  | "headline"
+  | "guidingPrinciple"
+  | "headnote"
+  | "otherHeadnote"
+
+function importShortTexts(key: ShortTextKeys) {
+  if (
+    isDecision(targetDocumentUnit.value) &&
+    isDecision(sourceDocumentUnit.value)
+  ) {
+    const source = sourceDocumentUnit.value?.shortTexts[key]
 
     if (targetDocumentUnit.value)
-      targetDocumentUnit.value.shortTexts[
-        key as keyof typeof targetDocumentUnit.value.shortTexts
-      ] = source
+      targetDocumentUnit.value.shortTexts[key] = source
   }
 }
 
