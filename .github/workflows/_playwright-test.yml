@@ -105,7 +105,7 @@ jobs:
             ./frontend/test-results/**/*.png
             ./frontend/test-results/**/trace.zip
       - name: Send failed tests to metrics endpoint
-        if: always()
+        if: ${{inputs.project != 'queries' }}
         run: |
           jq -r '[.suites[] | .specs[]?, .suites[]?.specs[]? | select(.tests[].status != "skipped" and .tests[].status != "expected") | [.title, .file, .tests[].status]  ] | unique[] | @tsv' test-results.json | while IFS=$'\t' read -r  test_title test_file test_status
           do
@@ -113,6 +113,16 @@ jobs:
                   -H "xc-token: ${{ secrets.E2E_TEST_METRICS_TOKEN }}" \
                   -H "Content-Type: application/json" \
                   -d "{\"test\": \"${test_title}\", \"file\": \"${test_file}\", \"status\": \"${test_status}\", \"githubRunId\": \"${{ github.run_id }}\", \"browser\": \"${{ inputs.project }}\"}"
+          done
+      - name: Send performance tests to metrics endpoint
+        if: ${{inputs.project == 'queries' }}
+        run: |
+          jq -r '[.suites[] | .specs[]?, .suites[]?.specs[]? | select(.tests[].status != "skipped" and .tests[].status != "expected") | [.title, .file, .tests[].status]  ] | unique[] | @tsv' test-results.json | while IFS=$'\t' read -r  test_title test_file test_status
+          do
+            curl -X POST ${{ secrets.PERFORMANCE_METRICS_ENDPOINT }} \
+                  -H "xc-token: ${{ secrets.E2E_TEST_METRICS_TOKEN }}" \
+                  -H "Content-Type: application/json" \
+                  -d "{\"title\": \"${title}\", \"average_duration_ms\": \"${average_duration}\", \"max_duration_ms\": \"${max_duration}\", \"expected_duration_ms\": \"${expected}\", \"githubRunId\": \"${{ github.run_id }}\"}"
           done
         working-directory: ./frontend
       - name: Upload json reports
