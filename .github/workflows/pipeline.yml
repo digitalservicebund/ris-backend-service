@@ -463,7 +463,11 @@ jobs:
     secrets: inherit
 
   query-performance-tests:
-    if: ${{ always() }}
+    if: ${{ github.ref == 'refs/heads/main' }}
+    concurrency:
+      group: deploy-staging
+      cancel-in-progress: true
+    needs: [ e2e-tests ]
     uses: ./.github/workflows/_playwright-test.yml
     with:
       project: "queries"
