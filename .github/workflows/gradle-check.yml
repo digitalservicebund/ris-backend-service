@@ -1,4 +1,4 @@
-name: Pipeline
+name: Gradle check
 
 on:
   # Allow to run this workflow manually
