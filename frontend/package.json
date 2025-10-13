@@ -15,7 +15,7 @@
     "test:unit:watch": "vitest watch",
     "test:e2e": "playwright test test/e2e",
     "test:a11y": "playwright test --project=a11y",
-    "test:queries": "PLAYWRIGHT_JSON_OUTPUT_NAME=./test-results.json playwright test --project=queries --reporter=json,./test/queries/queries_log_reporter.ts --workers 1",
+    "test:queries": "playwright test --project=queries --reporter=./test/queries/queries_log_reporter.ts --workers 1",
     "coverage": "vitest run --coverage",
     "check": "npm run style:fix && npm test && npm run test:e2e -- --project='chromium' --retries=1 && npm run test:a11y",
     "dev": "vite --host",
