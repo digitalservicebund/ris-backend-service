@@ -117,8 +117,12 @@ jobs:
       - name: Send performance tests to metrics endpoint
         if: ${{inputs.project == 'queries' }}
         run: |
-          jq -r '[.suites[] | .specs[]?, .suites[]?.specs[]? | select(.tests[].status != "skipped" and .tests[].status != "expected") | [.title, .file, .tests[].status]  ] | unique[] | @tsv' test-results.json | while IFS=$'\t' read -r  test_title test_file test_status
+          jq -c '.[]' test-results.json | while read -r item
           do
+            title=$(echo "$item" | jq -r '.title')
+            average_duration=$(echo "$item" | jq -r '.average_duration')
+            max_duration=$(echo "$item" | jq -r '.max_duration')
+            expected=$(echo "$item" | jq -r '.expected')
             curl -X POST ${{ secrets.PERFORMANCE_METRICS_ENDPOINT }} \
                   -H "xc-token: ${{ secrets.E2E_TEST_METRICS_TOKEN }}" \
                   -H "Content-Type: application/json" \
