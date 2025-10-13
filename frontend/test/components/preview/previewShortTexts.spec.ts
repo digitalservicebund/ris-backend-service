@@ -35,7 +35,7 @@ describe("preview short texts", () => {
       otherHeadnote: "other headnote",
     })
 
-    expect(await screen.findByText("Entscheidungsname")).toBeInTheDocument()
+    expect(await screen.findByText("Entscheidungsnamen")).toBeInTheDocument()
     expect(await screen.findByText("Titelzeile")).toBeInTheDocument()
     expect(await screen.findByText("Leitsatz")).toBeInTheDocument()
     expect(await screen.findByText("Orientierungssatz")).toBeInTheDocument()
@@ -46,7 +46,7 @@ describe("preview short texts", () => {
 
   it.each([
     [
-      "Entscheidungsname",
+      "Entscheidungsnamen",
       { decisionNames: ["decisionName"] },
       [
         "Titelzeile",

@@ -607,7 +607,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             appraisalBody: "1. Senat, 2. Kammer",
           },
           shortTexts: {
-            decisionName: ["Test Entscheidungsname"],
+            decisionNames: ["Test Entscheidungsname"],
             headnote: "Test Orientierungssatz",
             guidingPrinciple: "Test Leitsatz",
             headline: "Test Titelzeile",

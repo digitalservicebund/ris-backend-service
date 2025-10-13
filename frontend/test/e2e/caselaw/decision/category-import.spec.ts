@@ -864,8 +864,10 @@ test.describe("category import", () => {
         ).toBeVisible()
         await page.getByLabel("Entscheidungsnamen übernehmen").click()
         await expect(
-          page.getByRole("textbox", { name: "Entscheidungsnamen" }),
-        ).toHaveValue("Test Entscheidungsnamen")
+          page
+            .getByTestId("chips-input-wrapper_decisionNames")
+            .getByText("Test Entscheidungsname"),
+        ).toBeVisible()
       })
 
       await test.step("show success badge", async () => {
