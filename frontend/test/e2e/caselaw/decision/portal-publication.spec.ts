@@ -153,7 +153,7 @@ test.describe(
           await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
             const portalPage = await page.context().newPage()
             await portalPage.goto(
-              `https://ris-portal.dev.ds4g.net/api/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
+              `https://ris-portal.dev.ds4g.net/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
             )
 
             await loginToPortal(portalPage)
@@ -222,7 +222,7 @@ test.describe(
           await test.step("Die Entscheidung ist nicht mehr per Portal-API abrufbar", async () => {
             const portalPage = await page.context().newPage()
             await portalPage.goto(
-              `https://ris-portal.dev.ds4g.net/api/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
+              `https://ris-portal.dev.ds4g.net/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
             )
             // eslint-disable-next-line playwright/no-conditional-expect
             await expect(

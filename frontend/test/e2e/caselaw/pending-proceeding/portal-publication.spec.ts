@@ -91,7 +91,7 @@ test.describe(
           await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
             const portalPage = await page.context().newPage()
             await portalPage.goto(
-              `https://ris-portal.dev.ds4g.net/api/v1/case-law/${prefilledPendingProceeding.documentNumber}.html`,
+              `https://ris-portal.dev.ds4g.net/v1/case-law/${prefilledPendingProceeding.documentNumber}.html`,
             )
 
             await loginToPortal(portalPage)
