@@ -3,10 +3,10 @@ import Button from "primevue/button"
 import { computed } from "vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { Match } from "@/types/textCheck"
-import IconDescription from "~icons/ic/baseline-description"
+import IconAutoStoriesVariant from "~icons/material-symbols/auto-stories"
+import IconAutoStoriesOffVariant from "~icons/material-symbols/auto-stories-off"
+import IconDescription from "~icons/material-symbols/description"
 import IconSpellCheck from "~icons/material-symbols/spellcheck"
-import IconBookOpenPageVariant from "~icons/mdi/book-open-page-variant"
-import IconBookOpenVariant from "~icons/mdi/book-open-variant"
 
 const props = defineProps<{
   match: Match
@@ -109,7 +109,7 @@ const matchIsIgnoredInDocument = computed(() => {
         @click="removeWordGlobally"
       >
         <template #icon>
-          <IconBookOpenPageVariant />
+          <IconAutoStoriesOffVariant />
         </template>
       </Button>
 
@@ -121,7 +121,7 @@ const matchIsIgnoredInDocument = computed(() => {
         @click="addIgnoredWordGlobally"
       >
         <template #icon>
-          <IconBookOpenVariant />
+          <IconAutoStoriesVariant />
         </template>
       </Button>
     </div>
