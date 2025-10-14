@@ -13,6 +13,12 @@ export interface Context {
   length: number
 }
 
+export interface IgnoreOnceWord {
+  word: string
+  offset: number
+  length: number
+}
+
 export interface Type {
   typeName: string
 }
@@ -88,6 +94,7 @@ export interface TextCheckService {
   loading: Ref<boolean>
   selectedMatch: Ref<Match | undefined>
   responseError: Ref<ResponseError | undefined>
+  selectedIgnoreOnce: Ref<IgnoreOnceWord | undefined>
 
   checkCategory(editor: Editor, category?: string): Promise<void>
 

@@ -28,10 +28,6 @@ function ignoreOnceToggle() {
   emit("ignore-once:toggle", props.match.offset, props.match.length)
 }
 
-// function addIgnoredWord() {
-//   emit("ignored-word:add", props.match.word)
-// }
-
 async function removeWord() {
   emit("ignored-word:remove", props.match.word)
 }
