@@ -149,7 +149,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "1.21.3"
+    val testContainersVersion = "2.0.0"
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
