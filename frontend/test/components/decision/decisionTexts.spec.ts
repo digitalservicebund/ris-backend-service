@@ -85,7 +85,7 @@ describe("Texts", () => {
   test("renders all text categories as buttons", async () => {
     await renderComponent()
     expect(
-      screen.getByRole("button", { name: "Entscheidungsname" }),
+      screen.getByRole("button", { name: "Entscheidungsnamen" }),
     ).toBeVisible()
     expect(screen.getByRole("button", { name: "Titelzeile" })).toBeVisible()
     expect(screen.getByRole("button", { name: "Leitsatz" })).toBeVisible()
@@ -138,7 +138,7 @@ describe("Texts", () => {
       },
     )
     expect(
-      screen.getByRole("textbox", { name: "Entscheidungsname" }),
+      screen.getByRole("textbox", { name: "Entscheidungsnamen" }),
     ).toBeVisible()
     expect(screen.getByLabelText("Titelzeile Button Leiste")).toBeVisible()
     expect(screen.getByLabelText("Leitsatz Button Leiste")).toBeVisible()

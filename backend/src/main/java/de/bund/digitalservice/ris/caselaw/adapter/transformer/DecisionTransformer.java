@@ -155,7 +155,7 @@ public class DecisionTransformer extends DocumentableTransformer {
     }
 
     if (updatedDomainObject.shortTexts() != null) {
-      addShortTexts(updatedDomainObject, builder, currentDto);
+      addShortTexts(updatedDomainObject, builder);
     } else {
       currentDto.getDecisionNames().clear();
       builder
@@ -245,7 +245,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   }
 
   private static void addShortTexts(
-      Decision updatedDomainObject, DecisionDTOBuilder<?, ?> builder, DecisionDTO currentDto) {
+      Decision updatedDomainObject, DecisionDTOBuilder<?, ?> builder) {
     ShortTexts shortTexts = updatedDomainObject.shortTexts();
 
     builder
