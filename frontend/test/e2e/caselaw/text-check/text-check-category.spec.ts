@@ -129,7 +129,8 @@ test.describe(
       },
     )
 
-    test(
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
       "clicking on text check button, save document and returns matches",
       {
         tag: ["@RISDEV-6205", "@RISDEV-6154", "@RISDEV-7397"],

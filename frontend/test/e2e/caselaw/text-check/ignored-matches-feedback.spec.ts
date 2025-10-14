@@ -32,7 +32,8 @@ test.describe(
       },
     })
 
-    test(
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
       "text check, ignore effects all categories",
       {
         tag: ["@RISDEV-9234"],

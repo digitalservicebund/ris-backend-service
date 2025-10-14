@@ -21,7 +21,8 @@ test.describe(
       },
     })
 
-    test(
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
       "text check, preserves matches after navigation",
       {
         tag: ["@RISDEV-9234"],

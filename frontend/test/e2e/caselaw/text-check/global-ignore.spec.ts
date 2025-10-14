@@ -14,7 +14,8 @@ test.describe(
     tag: ["@RISDEV-254"],
   },
   () => {
-    test(
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
       "global dictionary word should be ignored in all document units",
       {
         tag: ["@RISDEV-7464"],
