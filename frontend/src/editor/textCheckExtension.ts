@@ -104,6 +104,7 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
           transactions.forEach((transaction) => {
             const { from, to } = transaction.selection
             let oldNodeText: string | undefined = ""
+            if (!oldNodeText) return
             oldState.doc.nodesBetween(from - 1, to + 1, (node) => {
               oldNodeText = node.text
             })
