@@ -113,9 +113,19 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
               oldState.doc.nodeSize - newState.doc.nodeSize,
             )
             if (testSizeDifference > 1) return
-            oldState.doc.nodesBetween(from - 1, to + 1, (node) => {
-              oldNodeText = node.text
-            })
+
+            // Check if we can query the old state with from and to
+            // if not skip it altogether.
+            const min = 0
+            const max = oldState.doc.content.size
+            const safeFrom = Math.max(min, from - 1)
+            const safeTo = Math.min(max, to + 1)
+
+            if (safeFrom <= safeTo) {
+              oldState.doc.nodesBetween(safeFrom, safeTo, (node) => {
+                oldNodeText = node.text
+              })
+            }
 
             newState.doc.nodesBetween(from - 1, to + 1, (node, pos) => {
               if (!node.isText) return
