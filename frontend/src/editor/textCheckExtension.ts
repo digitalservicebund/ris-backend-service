@@ -109,14 +109,12 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
             })
 
             newState.doc.nodesBetween(from - 1, to + 1, (node, pos) => {
-              console.log("Nodes between - node {} pos: {}", node, pos)
               if (!node.isText) return
               if (node.text == oldNodeText) return
 
               const hasMark = markType.isInSet(node.marks)
 
               if (hasMark) {
-                console.log("Has mark: {}", hasMark)
                 newStateTransaction.removeMark(
                   pos,
                   pos + node.nodeSize,
