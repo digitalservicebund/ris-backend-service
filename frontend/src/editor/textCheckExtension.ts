@@ -104,7 +104,15 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
           transactions.forEach((transaction) => {
             const { from, to } = transaction.selection
             let oldNodeText: string | undefined = ""
-            if (!oldNodeText) return
+
+            if (!oldState?.doc) return
+
+            // If the difference between newState and oldState is greater than 1 char, then it is
+            // not user typing text and this plugin should not care about it.
+            const testSizeDifference = Math.abs(
+              oldState.doc.nodeSize - newState.doc.nodeSize,
+            )
+            if (testSizeDifference > 1) return
             oldState.doc.nodesBetween(from - 1, to + 1, (node) => {
               oldNodeText = node.text
             })
