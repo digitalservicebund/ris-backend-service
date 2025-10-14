@@ -26,7 +26,7 @@ npx playwright install chrome firefox
 ## Icons
 
 All icons in
-the [Google Material](https://icon-sets.iconify.design/ic), [Material Symbol](https://icon-sets.iconify.design/material-symbols)
+the [Google Material](https://icon-sets.iconify.design/ic), [Material Symbol](https://icon-sets.iconify.design/material-symbols/)
 and [Material Design Icons](https://icon-sets.iconify.design/mdi/) sets can be used.
 
 To make the icon available in your code, select the icon, choose "Unplugin Icons" as component and copy-paste the import
