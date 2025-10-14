@@ -183,7 +183,10 @@ describe("CategoryImport", () => {
       screen.getByLabelText("Entscheidungsnamen übernehmen"),
     )
 
-    expect(store.documentUnit?.shortTexts.decisionNames).toEqual(["foo", "bar"])
+    expect((store.documentUnit as Decision)?.shortTexts.decisionNames).toEqual([
+      "foo",
+      "bar",
+    ])
   })
 
   it("should import a string (headline) from short texts", async () => {
