@@ -179,7 +179,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.35.7"))
+    implementation(platform("software.amazon.awssdk:bom:2.35.5"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -214,12 +214,12 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.15.5")
-    implementation("io.micrometer:micrometer-core:1.15.5")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.15.4")
+    implementation("io.micrometer:micrometer-core:1.15.4")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
-    implementation("io.getunleash:unleash-client-java:11.1.1")
+    implementation("io.getunleash:unleash-client-java:11.1.0")
     implementation("org.apache.commons:commons-text:1.14.0")
     implementation("org.jsoup:jsoup:1.21.2")
 
@@ -227,7 +227,7 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.10.0")
 
     // CVE-2023-3635
-    implementation("com.squareup.okio:okio-jvm:3.16.2")
+    implementation("com.squareup.okio:okio-jvm:3.16.1")
 
     val flywayCore = "org.flywaydb:flyway-core:11.14.0"
     implementation(flywayCore)
@@ -240,7 +240,7 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.20.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.7.12")
+    testImplementation("io.projectreactor:reactor-test:3.7.11")
     testImplementation("org.springframework.security:spring-security-test:6.5.5")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
