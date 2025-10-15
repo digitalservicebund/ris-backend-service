@@ -108,7 +108,6 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -123,6 +122,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
 @Sql(scripts = {"classpath:courts_init.sql"})
 @Sql(
@@ -811,7 +811,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     for (int i = 0; i < 21; i++) {
       var randomDocNumber =
-          i == 0 ? documentNumberToExclude : RandomStringUtils.insecure().nextAlphanumeric(10);
+          i == 0 ? documentNumberToExclude : RandomStringUtils.random(10, true, true);
       CourtDTO court =
           databaseCourtRepository.save(
               CourtDTO.builder()
@@ -1558,7 +1558,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         DecisionDTO.builder()
             .documentationOffice(documentOffice)
             .creatingDocumentationOffice(creatingDocOffice)
-            .documentNumber("XX" + RandomStringUtils.insecure().nextAlphanumeric(11))
+            .documentNumber("XX" + RandomStringUtils.randomAlphanumeric(11))
             .date(decisionDate)
             .documentationOffice(documentOffice)
             .fileNumbers(

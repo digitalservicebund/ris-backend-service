@@ -39,11 +39,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
 class PreviousDecisionIntegrationTest extends BaseIntegrationTest {
 
@@ -482,7 +482,7 @@ class PreviousDecisionIntegrationTest extends BaseIntegrationTest {
         repository,
         DecisionDTO.builder()
             .documentationOffice(documentOffice)
-            .documentNumber("XX" + RandomStringUtils.insecure().nextAlphabetic(11))
+            .documentNumber("XX" + RandomStringUtils.randomAlphanumeric(11))
             .court(testCourt)
             .date(decisionDate)
             .documentType(documentTypeDTO)
