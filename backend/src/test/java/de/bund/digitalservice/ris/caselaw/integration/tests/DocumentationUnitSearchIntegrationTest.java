@@ -285,7 +285,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
       EntityBuilderTestUtil.createAndSaveDecision(
           repository,
           DecisionDTO.builder()
-              .documentNumber(RandomStringUtils.randomAlphabetic(13).toUpperCase())
+              .documentNumber(RandomStringUtils.insecure().nextAlphanumeric(13).toUpperCase())
               .date(date)
               .documentationOffice(docOfficeDTO));
     }
@@ -335,7 +335,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
       EntityBuilderTestUtil.createAndSaveDecision(
           repository,
           DecisionDTO.builder()
-              .documentNumber(RandomStringUtils.randomAlphabetic(13))
+              .documentNumber(RandomStringUtils.insecure().nextAlphanumeric(13))
               .scheduledPublicationDateTime(date)
               .documentationOffice(docOfficeDTO));
     }
@@ -381,7 +381,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
       EntityBuilderTestUtil.createAndSaveDecision(
           repository,
           DecisionDTO.builder()
-              .documentNumber(RandomStringUtils.randomAlphabetic(13))
+              .documentNumber(RandomStringUtils.insecure().nextAlphanumeric(13))
               .scheduledPublicationDateTime(date)
               .documentationOffice(docOfficeDTO));
     }
@@ -435,7 +435,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
       EntityBuilderTestUtil.createAndSaveDecision(
           repository,
           DecisionDTO.builder()
-              .documentNumber(RandomStringUtils.randomAlphabetic(13))
+              .documentNumber(RandomStringUtils.insecure().nextAlphanumeric(13))
               .lastHandoverDateTime(date)
               .scheduledPublicationDateTime(scheduledPublicationDates.get(index))
               .documentationOffice(docOfficeDTO));
@@ -520,7 +520,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
       EntityBuilderTestUtil.createAndSaveDecision(
           repository,
           DecisionDTO.builder()
-              .documentNumber(RandomStringUtils.randomAlphabetic(13))
+              .documentNumber(RandomStringUtils.insecure().nextAlphanumeric(13))
               .date(date)
               .deviatingDates(index == 0 ? deviatingDecisionDates : List.of())
               .oralHearingDates(index == 1 ? oralHearingDates : List.of())
@@ -575,7 +575,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
       EntityBuilderTestUtil.createAndSaveDecision(
           repository,
           DecisionDTO.builder()
-              .documentNumber(RandomStringUtils.randomAlphabetic(13))
+              .documentNumber(RandomStringUtils.insecure().nextAlphanumeric(13))
               .date(date)
               .deviatingDates(index == 0 ? deviatingDecisionDates : List.of())
               .oralHearingDates(index == 1 ? oralHearingDates : List.of())

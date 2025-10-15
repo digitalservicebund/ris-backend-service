@@ -811,7 +811,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     for (int i = 0; i < 21; i++) {
       var randomDocNumber =
-          i == 0 ? documentNumberToExclude : RandomStringUtils.random(10, true, true);
+          i == 0 ? documentNumberToExclude : RandomStringUtils.insecure().nextAlphanumeric(10);
       CourtDTO court =
           databaseCourtRepository.save(
               CourtDTO.builder()
@@ -1558,7 +1558,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         DecisionDTO.builder()
             .documentationOffice(documentOffice)
             .creatingDocumentationOffice(creatingDocOffice)
-            .documentNumber("XX" + RandomStringUtils.randomAlphanumeric(11))
+            .documentNumber("XX" + RandomStringUtils.insecure().nextAlphanumeric(11))
             .date(decisionDate)
             .documentationOffice(documentOffice)
             .fileNumbers(

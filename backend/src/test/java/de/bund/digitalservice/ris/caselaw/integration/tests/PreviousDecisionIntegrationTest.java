@@ -482,7 +482,7 @@ class PreviousDecisionIntegrationTest extends BaseIntegrationTest {
         repository,
         DecisionDTO.builder()
             .documentationOffice(documentOffice)
-            .documentNumber("XX" + RandomStringUtils.randomAlphanumeric(11))
+            .documentNumber("XX" + RandomStringUtils.insecure().nextAlphabetic(11))
             .court(testCourt)
             .date(decisionDate)
             .documentType(documentTypeDTO)
