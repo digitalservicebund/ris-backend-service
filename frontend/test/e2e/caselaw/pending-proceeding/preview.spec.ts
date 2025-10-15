@@ -80,7 +80,7 @@ test.describe("preview pending proceeding", () => {
         }),
       ).toBeVisible()
       await expect(
-        pageWithBfhUser.getByText("RegionDEU, BY", { exact: true }),
+        pageWithBfhUser.getByText("RegionDEU", { exact: true }),
       ).toBeVisible()
       await expect(
         pageWithBfhUser.getByText(

@@ -90,7 +90,7 @@ test.describe("edit pending proceeding", () => {
         const jurisdictionType = page.getByLabel("Region", {
           exact: true,
         })
-        await expect(jurisdictionType).toHaveValue("DEU, BY")
+        await expect(jurisdictionType).toHaveValue("DEU")
         await expect(jurisdictionType).toHaveAttribute("readonly", "")
       })
 
