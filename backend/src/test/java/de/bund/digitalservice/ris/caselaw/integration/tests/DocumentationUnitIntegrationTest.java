@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtRegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDeletedDocumentationIdsRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
@@ -636,18 +637,20 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testSetRegionForCourt() {
-    RegionDTO region = regionRepository.save(RegionDTO.builder().code("DEU").build());
+    RegionDTO region = RegionDTO.builder().code("DEU").build();
 
     CourtDTO bghCourt =
-        databaseCourtRepository.save(
-            CourtDTO.builder()
-                .type("BGH")
-                .location("Karlsruhe")
-                .isSuperiorCourt(true)
-                .isForeignCourt(false)
-                .jurisId(new Random().nextInt())
-                .regions(List.of(region))
-                .build());
+        CourtDTO.builder()
+            .type("BGH")
+            .location("Karlsruhe")
+            .isSuperiorCourt(true)
+            .isForeignCourt(false)
+            .jurisId(new Random().nextInt())
+            .build();
+
+    CourtRegionDTO courtRegion = CourtRegionDTO.builder().region(region).court(bghCourt).build();
+    bghCourt.setRegions(List.of(courtRegion));
+    databaseCourtRepository.save(bghCourt);
 
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSaveDecision(
