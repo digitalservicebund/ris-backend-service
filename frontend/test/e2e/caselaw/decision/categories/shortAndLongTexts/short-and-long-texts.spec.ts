@@ -7,67 +7,36 @@ import {
   navigateToCategories,
   navigateToHandover,
   navigateToPreview,
-  navigateToPublication,
   save,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("short and long texts", () => {
   test(
-    "decision name",
+    "decision name should update",
     {
-      tag: ["@RISDEV-4733", "@RISDEV-3080"],
+      annotation: {
+        type: "issue",
+        description:
+          "https://digitalservicebund.atlassian.net/browse/RISDEV-4733",
+      },
+      tag: ["@RISDEV-4733"],
     },
-    async ({ page, prefilledDocumentUnit }) => {
-      await navigateToCategories(page, prefilledDocumentUnit.documentNumber, {
+    async ({ page, documentNumber }) => {
+      await navigateToCategories(page, documentNumber, {
         category: DocumentUnitCategoriesEnum.TEXTS,
       })
-
-      const decisionNameInput = page.getByLabel("Entscheidungsnamen", {
-        exact: true,
-      })
-      const decisionNameChips = page.getByTestId(
-        "chips-input-wrapper_decisionNames",
-      )
-
-      await test.step("multiple decision names can be added", async () => {
-        await clickCategoryButton("Entscheidungsnamen", page)
-
-        await decisionNameInput.fill("Sehhilfen")
-        await page.keyboard.press("Enter")
-        await decisionNameInput.fill("Augenoptiker")
-        await page.keyboard.press("Enter")
-        await save(page)
-
-        await expect(decisionNameChips.getByText("Sehhilfen")).toBeVisible()
-        await expect(decisionNameChips.getByText("Augenoptiker")).toBeVisible()
-      })
-
-      await test.step("decision names are visible in preview", async () => {
-        await navigateToPreview(page, prefilledDocumentUnit.documentNumber)
-
-        await expect(
-          page.getByText("EntscheidungsnamenSehhilfen, Augenoptiker"),
-        ).toBeVisible()
-      })
-
-      await test.step("decision names are visible in LDML preview", async () => {
-        await navigateToPublication(page, prefilledDocumentUnit.documentNumber)
-
-        await page.getByText("LDML Vorschau").click()
-
-        await expect(page.getByText("Sehhilfen")).toBeVisible()
-        await expect(page.getByText("Augenoptiker")).toBeVisible()
-      })
-
-      await test.step("decision names can be removed", async () => {
-        await navigateToCategories(page, prefilledDocumentUnit.documentNumber, {
-          category: DocumentUnitCategoriesEnum.TEXTS,
-        })
-        await decisionNameInput.click()
-        await page.keyboard.press("ArrowLeft")
-        await page.keyboard.press("Enter")
-        await expect(decisionNameChips.getByText("Augenoptiker")).toBeHidden()
-      })
+      await clickCategoryButton("Entscheidungsname", page)
+      const inputText = "Family-Karte"
+      await page
+        .getByLabel("Entscheidungsname", { exact: true })
+        .fill(inputText)
+      await expect(
+        page.getByLabel("Entscheidungsname", { exact: true }),
+      ).toHaveValue(inputText)
+      await save(page)
+      await expect(
+        page.getByLabel("Entscheidungsname", { exact: true }),
+      ).toHaveValue(inputText)
     },
   )
 

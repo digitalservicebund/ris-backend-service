@@ -57,7 +57,7 @@ class JurisXmlExporterWrapperIntegrationTest {
             .leadingDecisionNormReferences(List.of("BGB §1"))
             .build();
 
-    ShortTexts texts = ShortTexts.builder().decisionNames(List.of("decisionName")).build();
+    ShortTexts texts = ShortTexts.builder().decisionName("decisionName").build();
     LongTexts longTexts = LongTexts.builder().tenor("tenor").build();
 
     List<PreviousDecision> previousDecisions =

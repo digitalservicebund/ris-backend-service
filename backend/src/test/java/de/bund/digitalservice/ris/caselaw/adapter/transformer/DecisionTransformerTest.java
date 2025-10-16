@@ -1876,7 +1876,7 @@ class DecisionTransformerTest {
         .portalPublicationStatus(PortalPublicationStatus.UNPUBLISHED)
         .previousDecisions(Collections.emptyList())
         .ensuingDecisions(Collections.emptyList())
-        .shortTexts(ShortTexts.builder().decisionNames(Collections.emptyList()).build())
+        .shortTexts(ShortTexts.builder().build())
         .longTexts(LongTexts.builder().build())
         .managementData(
             ManagementData.builder()

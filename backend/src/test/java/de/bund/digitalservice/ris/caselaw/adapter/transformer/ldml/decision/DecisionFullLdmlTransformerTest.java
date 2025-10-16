@@ -460,7 +460,7 @@ class DecisionFullLdmlTransformerTest {
          <akn:proprietary source="attributsemantik-noch-undefiniert">
             <ris:meta>
                <ris:decisionNames>
-                  <ris:decisionName>decisionNames test</ris:decisionName>
+                  <ris:decisionName>decisionName test</ris:decisionName>
                </ris:decisionNames>
                <ris:previousDecisions>
                   <ris:previousDecision date="2020-01-01">
@@ -708,7 +708,7 @@ class DecisionFullLdmlTransformerTest {
             ShortTexts.builder()
                 .guidingPrinciple("<p>guidingPrinciple test</p>")
                 .headline("<p>headline test</p>")
-                .decisionNames(List.of("decisionNames test"))
+                .decisionName("decisionName test")
                 .headnote("<p>headNote test</p>")
                 .otherHeadnote("<p>otherHeadNote test</p>")
                 .build())

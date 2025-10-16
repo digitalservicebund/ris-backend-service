@@ -12,12 +12,7 @@ import InputField from "@/components/input/InputField.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ActiveCitation from "@/domain/activeCitation"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
-import {
-  allLabels,
-  contentRelatedIndexingLabels,
-  LongTexts,
-  ShortTexts,
-} from "@/domain/decision"
+import { allLabels, contentRelatedIndexingLabels } from "@/domain/decision"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import NormReference from "@/domain/normReference"
 import ParticipatingJudge from "@/domain/participatingJudge"
@@ -103,14 +98,9 @@ const hasContent = (key: keyof typeof allLabels): boolean => {
       const object = sourceDocumentUnit.value[key]
       return Array.isArray(object) && object.length > 0
     } else if (key in sourceDocumentUnit.value.shortTexts) {
-      const sourceShortText =
-        sourceDocumentUnit.value.shortTexts[
-          key as keyof typeof sourceDocumentUnit.value.shortTexts
-        ]
-      return (
-        !!sourceShortText &&
-        (!Array.isArray(sourceShortText) || sourceShortText.length > 0)
-      )
+      return !!sourceDocumentUnit.value.shortTexts[
+        key as keyof typeof sourceDocumentUnit.value.shortTexts
+      ]
     } else if (key in sourceDocumentUnit.value.longTexts) {
       const sourceLongText =
         sourceDocumentUnit.value.longTexts[
@@ -147,15 +137,9 @@ const isImportable = (key: keyof typeof allLabels): boolean => {
     isDecision(sourceDocumentUnit.value)
   )
     if (key in sourceDocumentUnit.value.shortTexts) {
-      const targetShortText =
-        targetDocumentUnit.value!.shortTexts[
-          key as keyof typeof sourceDocumentUnit.value.shortTexts
-        ]
-      const isEmptyText =
-        typeof targetShortText === "string" && targetShortText.trim().length > 0
-      const isEmptyArray =
-        Array.isArray(targetShortText) && targetShortText.length > 0
-      return !isEmptyText && !isEmptyArray
+      return !targetDocumentUnit.value!.shortTexts[
+        key as keyof typeof sourceDocumentUnit.value.shortTexts
+      ]
     } else if (key in sourceDocumentUnit.value.longTexts) {
       const targetLongText =
         targetDocumentUnit.value!.longTexts[
@@ -209,9 +193,7 @@ const handleImport = async (key: keyof typeof allLabels) => {
     case "activeCitations":
       importActiveCitations()
       break
-    case "decisionNames":
-      importDecisionNames()
-      break
+    case "decisionName":
     case "headline":
     case "guidingPrinciple":
     case "headnote":
@@ -452,30 +434,17 @@ function importParticipatingJudges() {
   }
 }
 
-function importDecisionNames() {
-  if (
-    isDecision(targetDocumentUnit.value) &&
-    isDecision(sourceDocumentUnit.value)
-  ) {
-    const source = sourceDocumentUnit.value?.shortTexts["decisionNames"]
-    if (!source) return
-
-    targetDocumentUnit.value!.shortTexts["decisionNames"] = [...source]
-  }
-}
-
-// By narrowing the type of key to exclude "decisionNames", TypeScript no longer considers the possibility of assigning a non-string value to documentUnit.value.shortTexts[key].
-type ShortTextStringKeys = keyof Omit<ShortTexts, "decisionNames">
-
-function importShortTexts(key: ShortTextStringKeys) {
-  if (
-    isDecision(targetDocumentUnit.value) &&
-    isDecision(sourceDocumentUnit.value)
-  ) {
-    const source = sourceDocumentUnit.value?.shortTexts[key]
+function importShortTexts(key: string) {
+  if (isDecision(targetDocumentUnit.value)) {
+    const source =
+      sourceDocumentUnit.value?.shortTexts[
+        key as keyof typeof sourceDocumentUnit.value.shortTexts
+      ]
 
     if (targetDocumentUnit.value)
-      targetDocumentUnit.value.shortTexts[key] = source
+      targetDocumentUnit.value.shortTexts[
+        key as keyof typeof targetDocumentUnit.value.shortTexts
+      ] = source
   }
 }
 
@@ -503,9 +472,16 @@ function importContextRelatedIndexing<
 }
 
 // By narrowing the type of key to exclude "participatingJudges", TypeScript no longer considers the possibility of assigning a non-string value to documentUnit.value.longTexts[key].
-type LongTextStringKeys = keyof Omit<LongTexts, "participatingJudges">
+type StringKeys =
+  | "tenor"
+  | "reasons"
+  | "caseFacts"
+  | "decisionReasons"
+  | "dissentingOpinion"
+  | "otherLongText"
+  | "outline"
 
-function importLongTexts(key: LongTextStringKeys) {
+function importLongTexts(key: StringKeys) {
   if (
     isDecision(targetDocumentUnit.value) &&
     isDecision(sourceDocumentUnit.value)

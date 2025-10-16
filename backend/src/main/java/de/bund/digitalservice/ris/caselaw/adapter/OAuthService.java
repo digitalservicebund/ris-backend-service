@@ -82,7 +82,7 @@ public class OAuthService implements AuthService {
           "/contentRelatedIndexing/dismissalTypes",
           "/contentRelatedIndexing/collectiveAgreements",
           "/contentRelatedIndexing/hasLegislativeMandate",
-          "/shortTexts/decisionNames",
+          "/shortTexts/decisionName",
           "/shortTexts/headline",
           "/shortTexts/guidingPrinciple",
           "/shortTexts/headnote",

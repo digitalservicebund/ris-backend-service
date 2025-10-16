@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +27,4 @@ public class DecisionNameDTO {
   @Column(nullable = false)
   @NotBlank
   private String value;
-
-  @Column @NotNull private Integer rank;
 }

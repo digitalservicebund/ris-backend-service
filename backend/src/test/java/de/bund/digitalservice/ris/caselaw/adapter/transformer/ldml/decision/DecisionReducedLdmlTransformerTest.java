@@ -349,7 +349,7 @@ class DecisionReducedLdmlTransformerTest {
                 ShortTexts.builder()
                     .guidingPrinciple("<p>guidingPrinciple test</p>")
                     .headline("<p>headline test</p>")
-                    .decisionNames(List.of("decisionNames test"))
+                    .decisionName("decisionName test")
                     .headnote("<p>headNote test</p>")
                     .otherHeadnote("<p>otherHeadNote test</p>")
                     .build())
@@ -631,7 +631,7 @@ class DecisionReducedLdmlTransformerTest {
             "'decisionNames' (Entscheidungsnamen)",
             """
             <ris:decisionNames>
-               <ris:decisionNames>decisionNames test</ris:decisionNames>
+               <ris:decisionName>decisionName test</ris:decisionName>
             </ris:decisionNames>
                """),
         Arguments.of(

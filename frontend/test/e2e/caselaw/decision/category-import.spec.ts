@@ -860,14 +860,12 @@ test.describe("category import", () => {
         )
 
         await expect(
-          page.getByLabel("Entscheidungsnamen übernehmen"),
+          page.getByLabel("Entscheidungsname übernehmen"),
         ).toBeVisible()
-        await page.getByLabel("Entscheidungsnamen übernehmen").click()
+        await page.getByLabel("Entscheidungsname übernehmen").click()
         await expect(
-          page
-            .getByTestId("chips-input-wrapper_decisionNames")
-            .getByText("Test Entscheidungsname"),
-        ).toBeVisible()
+          page.getByRole("textbox", { name: "Entscheidungsname" }),
+        ).toHaveValue("Test Entscheidungsname")
       })
 
       await test.step("show success badge", async () => {
@@ -878,7 +876,7 @@ test.describe("category import", () => {
         await expect(
           page
             .getByLabel("Kurztexte")
-            .getByText("Entscheidungsnamen", { exact: true }),
+            .getByText("Entscheidungsname", { exact: true }),
         ).toBeInViewport()
       })
     },

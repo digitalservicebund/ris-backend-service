@@ -185,7 +185,7 @@ class XmlExporterTest {
 
   private ShortTexts generateShortTexts() {
     return ShortTexts.builder()
-        .decisionNames(List.of("decision name"))
+        .decisionName("decision name")
         .headline("headline")
         .guidingPrinciple("guiding principle")
         .headnote("headnote")

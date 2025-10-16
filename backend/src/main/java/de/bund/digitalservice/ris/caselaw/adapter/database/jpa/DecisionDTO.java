@@ -55,7 +55,6 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
-  @OrderBy("rank")
   private List<DecisionNameDTO> decisionNames = new ArrayList<>();
 
   @Column(name = "celex")

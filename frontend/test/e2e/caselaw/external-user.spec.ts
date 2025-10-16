@@ -167,10 +167,10 @@ test.describe(
         )
         await assignUserGroupToProcedure(page, procedureName)
 
-        await test.step("Assigned external user can edit and save Entscheidungsnamen", async () => {
-          await clickCategoryButton("Entscheidungsnamen", pageWithExternalUser)
+        await test.step("Assigned external user can edit and save Entscheidungsname", async () => {
+          await clickCategoryButton("Entscheidungsname", pageWithExternalUser)
           await pageWithExternalUser
-            .getByLabel("Entscheidungsnamen")
+            .getByLabel("Entscheidungsname")
             .fill("ein Name")
           await save(pageWithExternalUser)
         })

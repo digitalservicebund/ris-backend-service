@@ -4,16 +4,16 @@ import { caselawTest as test } from "../../fixtures"
 import {
   assignUserGroupToProcedure,
   clickCategoryButton,
-  createPendingHandoverDecisionForBGH,
-  expectHistoryCount,
-  expectHistoryLogRow,
   navigateToAttachments,
   navigateToCategories,
   navigateToHandover,
   navigateToInbox,
   navigateToManagementData,
+  createPendingHandoverDecisionForBGH,
   save,
   uploadTestfile,
+  expectHistoryCount,
+  expectHistoryLogRow,
 } from "../../utils/e2e-utils"
 import {
   deleteAllProcedures,
@@ -153,7 +153,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
 
     await test.step("Externe Person ändert Entscheidungsname", async () => {
       await navigateToCategories(pageWithExternalUser, documentNumber)
-      await clickCategoryButton("Entscheidungsnamen", pageWithExternalUser)
+      await clickCategoryButton("Entscheidungsname", pageWithExternalUser)
       await pageWithExternalUser
         .getByLabel("Entscheidungsname")
         .fill("ein Name")

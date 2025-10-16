@@ -28,14 +28,14 @@ function renderComponent(shortTexts: ShortTexts) {
 describe("preview short texts", () => {
   test("renders all short texts", async () => {
     renderComponent({
-      decisionNames: ["decision name"],
+      decisionName: "decision name",
       headline: "headline",
       guidingPrinciple: "guiding principle",
       headnote: "headnote",
       otherHeadnote: "other headnote",
     })
 
-    expect(await screen.findByText("Entscheidungsnamen")).toBeInTheDocument()
+    expect(await screen.findByText("Entscheidungsname")).toBeInTheDocument()
     expect(await screen.findByText("Titelzeile")).toBeInTheDocument()
     expect(await screen.findByText("Leitsatz")).toBeInTheDocument()
     expect(await screen.findByText("Orientierungssatz")).toBeInTheDocument()
@@ -46,8 +46,8 @@ describe("preview short texts", () => {
 
   it.each([
     [
-      "Entscheidungsnamen",
-      { decisionNames: ["decisionName"] },
+      "Entscheidungsname",
+      { decisionName: "decisionName" },
       [
         "Titelzeile",
         "Leitsatz",
