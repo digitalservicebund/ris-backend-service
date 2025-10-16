@@ -460,7 +460,7 @@ class DecisionFullLdmlTransformerTest {
          <akn:proprietary source="attributsemantik-noch-undefiniert">
             <ris:meta>
                <ris:decisionNames>
-                  <ris:decisionNames>decisionNames test</ris:decisionNames>
+                  <ris:decisionName>decisionNames test</ris:decisionName>
                </ris:decisionNames>
                <ris:previousDecisions>
                   <ris:previousDecision date="2020-01-01">
