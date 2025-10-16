@@ -18,6 +18,7 @@ import com.gravity9.jsonpatch.JsonPatchOperation;
 import com.gravity9.jsonpatch.RemoveOperation;
 import com.gravity9.jsonpatch.ReplaceOperation;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtRegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitPatchRepository;
@@ -107,41 +108,34 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    RegionDTO region1DTO =
-        regionRepository.save(
-            RegionDTO.builder()
-                .code("NW")
-                .longText("Nordrhein-Westfalen")
-                .applicability(true)
-                .build());
-    region1Id = region1DTO.getId();
-    RegionDTO region2DTO =
-        regionRepository.save(
-            RegionDTO.builder().code("HE").longText("Hessen").applicability(true).build());
-    court1Id =
-        courtRepository
-            .save(
-                CourtDTO.builder()
-                    .regions(List.of(region1DTO))
-                    .type("LG")
-                    .location("Detmold")
-                    .isForeignCourt(false)
-                    .isSuperiorCourt(false)
-                    .jurisId(0)
-                    .build())
-            .getId();
-    court2Id =
-        courtRepository
-            .save(
-                CourtDTO.builder()
-                    .regions(List.of(region2DTO))
-                    .type("SG")
-                    .location("Fulda")
-                    .isForeignCourt(false)
-                    .isSuperiorCourt(false)
-                    .jurisId(1)
-                    .build())
-            .getId();
+    RegionDTO region1 =
+        RegionDTO.builder().code("NW").longText("Nordrhein-Westfalen").applicability(true).build();
+    CourtDTO court1 =
+        CourtDTO.builder()
+            .type("LG")
+            .location("Detmold")
+            .isForeignCourt(false)
+            .isSuperiorCourt(false)
+            .jurisId(0)
+            .build();
+    CourtRegionDTO courtRegion1 = CourtRegionDTO.builder().court(court1).region(region1).build();
+    court1.setRegions(List.of(courtRegion1));
+    court1Id = courtRepository.save(court1).getId();
+    region1Id = regionRepository.findAll().get(0).getId();
+
+    RegionDTO region2 =
+        RegionDTO.builder().code("HE").longText("Hessen").applicability(true).build();
+    CourtDTO court2 =
+        CourtDTO.builder()
+            .type("SG")
+            .location("Fulda")
+            .isForeignCourt(false)
+            .isSuperiorCourt(false)
+            .jurisId(1)
+            .build();
+    CourtRegionDTO courtRegion2 = CourtRegionDTO.builder().court(court2).region(region2).build();
+    court2.setRegions(List.of(courtRegion2));
+    court2Id = courtRepository.save(court2).getId();
 
     userDbId2 =
         databaseUserRepository

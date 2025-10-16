@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.EXTERNAL_HANDOVER_PENDING;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtRegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
@@ -58,14 +59,18 @@ public class EntityBuilderTestUtil {
   }
 
   public static CourtDTO createTestCourtDTO() {
-    return CourtDTO.builder()
-        .id(UUID.fromString("4e254f62-ce83-43fa-86c5-ecd9caa1d610"))
-        .type("BGH")
-        .location("Berlin")
-        .jurisdictionType(JurisdictionTypeDTO.builder().build())
-        .regions(List.of(RegionDTO.builder().code("BE").build()))
-        .jurisId(0)
-        .build();
+    var court =
+        CourtDTO.builder()
+            .id(UUID.fromString("4e254f62-ce83-43fa-86c5-ecd9caa1d610"))
+            .type("BGH")
+            .location("Berlin")
+            .jurisdictionType(JurisdictionTypeDTO.builder().build())
+            .jurisId(0)
+            .build();
+    var region = RegionDTO.builder().code("BE").build();
+    var courtRegion = CourtRegionDTO.builder().court(court).region(region).build();
+    court.setRegions(List.of(courtRegion));
+    return court;
   }
 
   public static FileNumberDTO createTestFileNumberDTO() {
