@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -53,6 +54,7 @@ public class CourtDTO {
   private int jurisId;
 
   @OneToMany(mappedBy = "court", orphanRemoval = true, cascade = CascadeType.ALL)
+  @OrderBy("rank")
   private List<CourtRegionDTO> regions;
 
   @ManyToOne
