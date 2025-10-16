@@ -47,9 +47,4 @@ class CourtRegionId implements Serializable {
   private UUID courtId;
 
   private UUID regionId;
-
-  public CourtRegionId(UUID courtId, UUID regionId) {
-    this.courtId = courtId;
-    this.regionId = regionId;
-  }
 }
