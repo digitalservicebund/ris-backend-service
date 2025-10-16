@@ -141,8 +141,8 @@ const hasContent = (key: keyof typeof allLabels): boolean => {
   return false
 }
 
+// typescript:S3776
 const isImportable = (key: keyof typeof allLabels): boolean => {
-  //NOSONAR
   if (
     isDecision(targetDocumentUnit.value) &&
     isDecision(sourceDocumentUnit.value)
