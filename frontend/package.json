@@ -35,7 +35,7 @@
     "@digitalservicebund/ris-ui": "^3.14.1",
     "@guardian/prosemirror-invisibles": "^3.1.1",
     "@sentry/integrations": "^7.114.0",
-    "@sentry/vue": "^10.19.0",
+    "@sentry/vue": "^10.20.0",
     "@tailwindcss/postcss": "^4.1.14",
     "@tiptap/extension-blockquote": "^2.26.3",
     "@tiptap/extension-bold": "^2.26.3",
@@ -75,7 +75,7 @@
     "resize-observer-polyfill": "^1.5.1",
     "tippy.js": "^6.3.7",
     "vue": "^3.5.22",
-    "vue-router": "4.6.0",
+    "vue-router": "4.6.2",
     "vue-tsc": "3.1.1"
   },
   "devDependencies": {
@@ -114,7 +114,7 @@
     "eslint-plugin-playwright": "^2.2.2",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-testing-library": "7.6.3",
-    "eslint-plugin-vue": "^10.5.0",
+    "eslint-plugin-vue": "^10.5.1",
     "eslint-plugin-vue-scoped-css": "^2.12.0",
     "eslint-plugin-vuejs-accessibility": "^2.4.1",
     "globals": "^16.4.0",
