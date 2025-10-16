@@ -65,27 +65,30 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         .build();
   }
 
+  @SuppressWarnings("java:S3776")
   private RisMeta buildRisMeta(Decision decision) {
     var builder = buildCommonRisMeta(decision);
 
     var contentRelatedIndexing = decision.contentRelatedIndexing();
-    if (contentRelatedIndexing != null && contentRelatedIndexing.fieldsOfLaw() != null) {
-      applyIfNotEmpty(
-          contentRelatedIndexing.fieldsOfLaw().stream().map(FieldOfLaw::text).toList(),
-          builder::fieldOfLaw);
-    }
+    if (contentRelatedIndexing != null) {
+      if (contentRelatedIndexing.fieldsOfLaw() != null) {
+        applyIfNotEmpty(
+            contentRelatedIndexing.fieldsOfLaw().stream().map(FieldOfLaw::text).toList(),
+            builder::fieldOfLaw);
+      }
 
-    if (contentRelatedIndexing != null && contentRelatedIndexing.definitions() != null) {
-      applyIfNotEmpty(
-          contentRelatedIndexing.definitions().stream()
-              .map(
-                  definition ->
-                      Definition.builder()
-                          .definedTerm(definition.definedTerm())
-                          .definingBorderNumber(definition.definingBorderNumber())
-                          .build())
-              .toList(),
-          builder::definitions);
+      if (contentRelatedIndexing.definitions() != null) {
+        applyIfNotEmpty(
+            contentRelatedIndexing.definitions().stream()
+                .map(
+                    definition ->
+                        Definition.builder()
+                            .definedTerm(definition.definedTerm())
+                            .definingBorderNumber(definition.definingBorderNumber())
+                            .build())
+                .toList(),
+            builder::definitions);
+      }
     }
 
     Optional.ofNullable(contentRelatedIndexing)
@@ -130,9 +133,9 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
               nullSafeGet(coreData.documentationOffice(), DocumentationOffice::abbreviation));
     }
 
-    var decisionName = nullSafeGet(decision.shortTexts(), ShortTexts::decisionName);
-    if (StringUtils.isNotEmpty(decisionName)) {
-      builder.decisionName(List.of(decisionName));
+    var decisionNames = nullSafeGet(decision.shortTexts(), ShortTexts::decisionNames);
+    if (decisionNames != null) {
+      applyIfNotEmpty(decisionNames, builder::decisionName);
     }
 
     Status lastStatus = decision.status();

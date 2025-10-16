@@ -338,7 +338,7 @@ describe("borderNumberService", () => {
         },
         shortTexts: {
           headline: `${borderNumberLink(1)}${borderNumberLink(2)}`,
-          decisionName: `${borderNumberLink(3)}${borderNumberLink(4)}`,
+          guidingPrinciple: `${borderNumberLink(3)}${borderNumberLink(4)}`,
         },
       })
       const validationResult = borderNumberService.validateBorderNumberLinks()
@@ -353,7 +353,7 @@ describe("borderNumberService", () => {
         },
         shortTexts: {
           headline: `${borderNumberLink(1)}${borderNumberLink(2)}`,
-          decisionName: `${borderNumberLink(2)}${borderNumberLink(2)}`,
+          guidingPrinciple: `${borderNumberLink(2)}${borderNumberLink(2)}`,
         },
       })
       const validationResult = borderNumberService.validateBorderNumberLinks()
@@ -441,8 +441,7 @@ describe("borderNumberService", () => {
         shortTexts: {
           headline: `${borderNumberLink(2)} Text ${borderNumberLink(2, { valid: false })}`,
           headnote: `${borderNumberLink(5)}${borderNumberLink(6)}`,
-          decisionName: `${borderNumberLink(2)}${borderNumberLink(5)}`,
-          guidingPrinciple: borderNumberLink(2),
+          guidingPrinciple: `${borderNumberLink(2)}${borderNumberLink(5)}`,
           otherHeadnote: borderNumberLink(2),
         },
         longTexts: {
@@ -463,12 +462,10 @@ describe("borderNumberService", () => {
       expect(store.documentUnit?.shortTexts.headnote).toEqual(
         `${borderNumberLink("entfernt", { valid: false })}${borderNumberLink(6)}`,
       )
-      expect(store.documentUnit?.shortTexts.decisionName).toEqual(
+      expect(store.documentUnit?.shortTexts.guidingPrinciple).toEqual(
         `${borderNumberLink("entfernt", { valid: false })}${borderNumberLink("entfernt", { valid: false })}`,
       )
-      expect(store.documentUnit?.shortTexts.guidingPrinciple).toEqual(
-        borderNumberLink("entfernt", { valid: false }),
-      )
+
       expect(store.documentUnit?.shortTexts.otherHeadnote).toEqual(
         borderNumberLink("entfernt", { valid: false }),
       )

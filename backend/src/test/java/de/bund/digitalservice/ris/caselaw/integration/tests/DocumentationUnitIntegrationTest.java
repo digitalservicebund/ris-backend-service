@@ -389,7 +389,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
                     .fileNumbers(List.of("AkteX"))
                     .documentationOffice(docOffice)
                     .build())
-            .shortTexts(ShortTexts.builder().decisionName("decisionName").build())
+            .shortTexts(ShortTexts.builder().decisionNames(List.of("decisionNames")).build())
             .build();
 
     risWebTestClient
