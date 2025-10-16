@@ -75,7 +75,7 @@
     "resize-observer-polyfill": "^1.5.1",
     "tippy.js": "^6.3.7",
     "vue": "^3.5.22",
-    "vue-router": "4.6.2",
+    "vue-router": "4.6.3",
     "vue-tsc": "3.1.1"
   },
   "devDependencies": {
@@ -84,7 +84,7 @@
     "@eslint/compat": "^1.4.0",
     "@eslint/js": "^9.37.0",
     "@iconify-json/ic": "^1.2.4",
-    "@iconify-json/material-symbols": "^1.2.41",
+    "@iconify-json/material-symbols": "^1.2.42",
     "@iconify-json/mdi": "^1.2.3",
     "@namics/stylelint-bem": "^10.1.0",
     "@pinia/testing": "^1.0.2",
