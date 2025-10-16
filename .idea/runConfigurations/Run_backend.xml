@@ -2,7 +2,7 @@
   <configuration default="false" name="Backend" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" value="local" />
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
-    <module name="de.bund.digitalservice.ris-backend-service.main" />
+    <module name="ris-backend-service.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="de.bund.digitalservice.ris.Application" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="true" />

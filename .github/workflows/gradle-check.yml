@@ -1,0 +1,40 @@
+name: Gradle check
+
+on:
+  # Allow to run this workflow manually
+  workflow_dispatch:
+
+jobs:
+  log-gradle-version-and-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Get Gradle version
+        working-directory: ./backend
+        run: |
+          echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
+      - name: Set up JDK
+        uses: actions/setup-java@ead9eaa3cfe0b0fc2fa749519ae09c3d4f4080b0
+        with:
+          java-version: "21.0"
+          distribution: "temurin"
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+      - name: Build system without tests
+        working-directory: ./backend
+        run: ./gradlew build --profile -x integrationTest -x test
+      - name: Write gradle version into info file
+        working-directory: ./backend
+        run: ./gradlew -v > ../gradle-info.txt
+      - name: Add separation line
+        run: echo ">--------------------------------------------<" >> gradle-info.txt
+      - name: Write project dependencies into info file
+        working-directory: ./backend
+        run: ./gradlew dependencies >> ../gradle-info.txt
+      - name: Upload gradle info file
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-info
+          path: gradle-info.txt

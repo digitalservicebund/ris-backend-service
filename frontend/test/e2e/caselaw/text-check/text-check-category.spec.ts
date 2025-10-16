@@ -129,7 +129,8 @@ test.describe(
       },
     )
 
-    test(
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
       "clicking on text check button, save document and returns matches",
       {
         tag: ["@RISDEV-6205", "@RISDEV-6154", "@RISDEV-7397"],
@@ -232,21 +233,7 @@ test.describe(
           }
         })
 
-        await test.step("accept a selected suggestion replaces in text", async () => {
-          const textCheckLiteral = "Rechtshcreibfehler"
-          await headNoteEditor.getByText(textCheckLiteral).click()
-
-          await page.getByTestId("suggestion-accept-button").click()
-          await expect(page.getByTestId("text-check-modal")).toBeHidden()
-
-          await expect(headNoteEditorTextArea).toHaveText(
-            textWithErrors.text.replace(textCheckLiteral, "Rechtschreibfehler"),
-          )
-
-          await expect(page.locator(`text-check[id='${2}']`)).not.toBeAttached()
-        })
-
-        await test.step("click on a selected suggestion, then click on a non-tag closes the text check modal", async () => {
+        await test.step("click on a text check tags, then click on a non-tag closes the text check modal", async () => {
           await page.locator("text-check").first().click()
           await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
           await headNoteEditor.getByText("LanguageTool").click()

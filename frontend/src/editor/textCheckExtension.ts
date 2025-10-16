@@ -1,5 +1,10 @@
 import { Extension } from "@tiptap/core"
-import { TextCheckExtensionOptions, TextCheckService } from "@/types/textCheck"
+import { Plugin, PluginKey, Transaction, EditorState } from "prosemirror-state"
+import {
+  TextCheckExtensionOptions,
+  TextCheckService,
+  TextCheckTagName,
+} from "@/types/textCheck"
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -70,5 +75,78 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
           return true
         },
     }
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("textCheckExtension"),
+        appendTransaction: (
+          transactions: readonly Transaction[],
+          oldState: EditorState,
+          newState: EditorState,
+        ) => {
+          const { schema } = newState
+          const markType = schema.marks[TextCheckTagName]
+
+          if (!markType) return null
+
+          const isDocumentChanged = transactions.some(
+            (transaction) => transaction.docChanged,
+          )
+          if (!isDocumentChanged) {
+            return null
+          }
+
+          let modified = false
+          const newStateTransaction = newState.tr
+
+          transactions.forEach((transaction) => {
+            const { from, to } = transaction.selection
+            let oldNodeText: string | undefined = ""
+
+            if (!oldState?.doc) return
+
+            // If the difference between newState and oldState is greater than 1 char, then it is
+            // not user typing text and this plugin should not care about it.
+            const testSizeDifference = Math.abs(
+              oldState.doc.nodeSize - newState.doc.nodeSize,
+            )
+            if (testSizeDifference > 1) return
+
+            // Check if we can query the old state with from and to
+            // if not skip it altogether.
+            const min = 0
+            const max = oldState.doc.content.size
+            const safeFrom = Math.max(min, from - 1)
+            const safeTo = Math.min(max, to + 1)
+
+            if (safeFrom <= safeTo) {
+              oldState.doc.nodesBetween(safeFrom, safeTo, (node) => {
+                oldNodeText = node.text
+              })
+            }
+
+            newState.doc.nodesBetween(from - 1, to + 1, (node, pos) => {
+              if (!node.isText) return
+              if (node.text == oldNodeText) return
+
+              const hasMark = markType.isInSet(node.marks)
+
+              if (hasMark) {
+                newStateTransaction.removeMark(
+                  pos,
+                  pos + node.nodeSize,
+                  markType,
+                )
+                modified = true
+              }
+            })
+          })
+
+          return modified ? newStateTransaction : null
+        },
+      }),
+    ]
   },
 })

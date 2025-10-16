@@ -75,7 +75,7 @@ jobs:
             exit 0
           fi
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
         with:
           sarif_file: "trivy-results.sarif"
@@ -95,7 +95,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@d7543c93d881b35a8faa02e8e3605f69b7a1ce62
+        uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -145,7 +145,7 @@ jobs:
             exit 0
           fi
       - name: Upload Trivy image scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
         with:
           sarif_file: "trivy-results.sarif"
@@ -170,7 +170,7 @@ jobs:
             exit 0
           fi
       - name: Upload Trivy file scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
         with:
           sarif_file: "trivy-results.sarif"
@@ -189,7 +189,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@d7543c93d881b35a8faa02e8e3605f69b7a1ce62
+        uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions

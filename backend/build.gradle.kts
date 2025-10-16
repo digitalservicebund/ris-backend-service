@@ -13,14 +13,14 @@ plugins {
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "8.0.0"
-    id("org.sonarqube") version "6.3.1.5724"
+    id("org.sonarqube") version "7.0.0.6105"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.0.0"
-    id("org.flywaydb.flyway") version "11.13.2"
-    id("io.sentry.jvm.gradle") version "5.12.0"
+    id("org.flywaydb.flyway") version "11.14.1"
+    id("io.sentry.jvm.gradle") version "5.12.1"
 }
 
 group = "de.bund.digitalservice"
@@ -50,7 +50,7 @@ sourceSets {
 }
 
 jacoco {
-    toolVersion = "0.8.13"
+    toolVersion = "0.8.14"
 }
 
 lombok {
@@ -149,7 +149,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "1.21.3"
+    val testContainersVersion = "2.0.0"
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -167,7 +167,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.32.1")
+    implementation("com.google.protobuf:protobuf-java:4.33.0")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.6.0")
@@ -179,11 +179,11 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.34.8"))
+    implementation(platform("software.amazon.awssdk:bom:2.35.8"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
-    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.5")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.6")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
@@ -192,7 +192,7 @@ dependencies {
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.5")
     implementation("org.eclipse.angus:angus-mail:2.0.5")
-    implementation("com.icegreen:greenmail:2.1.6")
+    implementation("com.icegreen:greenmail:2.1.7")
 
     // package served by private repo, requires authentication:
     implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.40") {
@@ -214,12 +214,12 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.15.4")
-    implementation("io.micrometer:micrometer-core:1.15.4")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.15.5")
+    implementation("io.micrometer:micrometer-core:1.15.5")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
-    implementation("io.getunleash:unleash-client-java:11.1.0")
+    implementation("io.getunleash:unleash-client-java:11.1.1")
     implementation("org.apache.commons:commons-text:1.14.0")
     implementation("org.jsoup:jsoup:1.21.2")
 
@@ -227,12 +227,12 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.10.0")
 
     // CVE-2023-3635
-    implementation("com.squareup.okio:okio-jvm:3.16.0")
+    implementation("com.squareup.okio:okio-jvm:3.16.2")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.13.2"
+    val flywayCore = "org.flywaydb:flyway-core:11.14.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.13.2")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.14.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -240,16 +240,16 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.20.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.7.11")
+    testImplementation("io.projectreactor:reactor-test:3.7.12")
     testImplementation("org.springframework.security:spring-security-test:6.5.5")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
-    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
-    testImplementation("org.testcontainers:postgresql:$testContainersVersion")
+    testImplementation("org.testcontainers:testcontainers-junit-jupiter:$testContainersVersion")
+    testImplementation("org.testcontainers:testcontainers-postgresql:$testContainersVersion")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.30.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.33.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

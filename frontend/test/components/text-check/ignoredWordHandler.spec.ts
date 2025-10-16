@@ -44,28 +44,40 @@ describe("IgnoredWordHandler", () => {
     contextForSureMatch: 1,
   }
 
+  it("emits add local ignore word event when 'In Dokeinheit ignorieren' button is clicked", async () => {
+    const { emitted, user } = await renderComponent(baseMatch)
+
+    expect(screen.getByText("In Dokeinheit ignorieren")).toBeInTheDocument()
+    await user.click(screen.getByText("In Dokeinheit ignorieren"))
+    expect(emitted()["ignored-word:add"]).toBeTruthy()
+  })
+
   it("does not render any button when ignoredTextCheckWords is undefined", async () => {
     await renderComponent({ ...baseMatch, ignoredTextCheckWords: undefined })
     expect(
       screen.queryByText("Aus globalem Wörterbuch entfernen"),
     ).not.toBeInTheDocument()
-    expect(screen.queryByText("Nicht Ignorieren")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Nicht in Dokeinheit ignorieren"),
+    ).not.toBeInTheDocument()
     expect(screen.queryByText("Von jDV ignoriert")).not.toBeInTheDocument()
   })
 
-  it("emits remove local ignore word event when 'Nicht ignorieren' button is clicked", async () => {
+  it("emits remove local ignore word event when 'Nicht in Dokeinheit ignorieren' button is clicked", async () => {
     const { emitted, user } = await renderComponent({
       ...baseMatch,
       ignoredTextCheckWords: [{ type: "documentation_unit", word: "testword" }],
     })
     // other options should not be rendered
-    expect(screen.getByText("Nicht ignorieren")).toBeInTheDocument()
+    expect(
+      screen.getByText("Nicht in Dokeinheit ignorieren"),
+    ).toBeInTheDocument()
     expect(
       screen.queryByText("Aus globalem Wörterbuch entfernen"),
     ).not.toBeInTheDocument()
     expect(screen.queryByText("Von jDV ignoriert")).not.toBeInTheDocument()
 
-    await user.click(screen.getByText("Nicht ignorieren"))
+    await user.click(screen.getByText("Nicht in Dokeinheit ignorieren"))
     expect(emitted()["ignored-word:remove"]).toEqual([["testword"]])
     expect(emitted()["globally-ignored-word:remove"]).toBeUndefined()
   })
@@ -79,7 +91,9 @@ describe("IgnoredWordHandler", () => {
     expect(
       screen.queryByText("Aus globalem Wörterbuch entfernen"),
     ).not.toBeInTheDocument()
-    expect(screen.queryByText("Nicht Ignorieren")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Nicht in Dokeinheit ignorieren"),
+    ).not.toBeInTheDocument()
   })
 
   test("emits remove global ignore word event when 'Aus globalem Wörterbuch entfernen' button is clicked", async () => {

@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: "22.20.0"
           # node-version-file: ./frontend/package.json
@@ -64,7 +64,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: "22.20.0"
           # node-version-file: ./frontend/package.json
@@ -112,7 +112,7 @@ jobs:
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: "22.20.0"
           # node-version-file: ./frontend/package.json
@@ -127,7 +127,7 @@ jobs:
           npm run coverage
         working-directory: ./frontend
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@ba6563cca79df854af1350ec3dc5881313ec2d3c
+        uses: SonarSource/sonarqube-scan-action@40f5b61913e891f9d316696628698051136015be
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
