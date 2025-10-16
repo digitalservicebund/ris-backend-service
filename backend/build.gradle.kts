@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.0.0"
-    id("org.flywaydb.flyway") version "11.14.0"
+    id("org.flywaydb.flyway") version "11.14.1"
     id("io.sentry.jvm.gradle") version "5.12.1"
 }
 
@@ -167,7 +167,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.32.1")
+    implementation("com.google.protobuf:protobuf-java:4.33.0")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.6.0")
@@ -179,7 +179,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.35.7"))
+    implementation(platform("software.amazon.awssdk:bom:2.35.8"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -229,10 +229,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.2")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.14.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.14.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.14.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.14.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
