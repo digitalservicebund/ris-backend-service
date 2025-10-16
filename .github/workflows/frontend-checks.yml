@@ -135,7 +135,7 @@ jobs:
           args: >
             -Dsonar.qualitygate.wait=true
       - name: Check SonarQube Quality Gate
-        uses: sonarsource/sonarqube-quality-gate-action@174f8360a05574d0a8fe9324af3c2f891ad33ddb
+        uses: sonarsource/sonarqube-quality-gate-action@95b1cc6c02a15c8ecc00c07b1c2a75ed61a14055
         with:
           scanMetadataReportFile: frontend/.scannerwork/report-task.txt
         timeout-minutes: 3
