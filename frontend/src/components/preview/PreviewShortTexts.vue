@@ -50,7 +50,7 @@ const otherHeadnote = computed(() =>
 </script>
 
 <template>
-  <PreviewRow v-if="decisionNames">
+  <PreviewRow v-if="decisionNames?.length">
     <PreviewCategory>{{ shortTextLabels.decisionNames }}</PreviewCategory>
     <PreviewContent>
       <TextEditor

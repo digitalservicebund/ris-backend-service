@@ -12,7 +12,12 @@ import InputField from "@/components/input/InputField.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ActiveCitation from "@/domain/activeCitation"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
-import { allLabels, contentRelatedIndexingLabels } from "@/domain/decision"
+import {
+  allLabels,
+  contentRelatedIndexingLabels,
+  LongTexts,
+  ShortTexts,
+} from "@/domain/decision"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import NormReference from "@/domain/normReference"
 import ParticipatingJudge from "@/domain/participatingJudge"
@@ -454,20 +459,15 @@ function importDecisionNames() {
   ) {
     const source = sourceDocumentUnit.value?.shortTexts["decisionNames"]
     if (!source) return
-    //source.forEach((judge) => (judge.id = undefined))
 
     targetDocumentUnit.value!.shortTexts["decisionNames"] = [...source]
   }
 }
 
 // By narrowing the type of key to exclude "decisionNames", TypeScript no longer considers the possibility of assigning a non-string value to documentUnit.value.shortTexts[key].
-type ShortTextKeys =
-  | "headline"
-  | "guidingPrinciple"
-  | "headnote"
-  | "otherHeadnote"
+type ShortTextStringKeys = keyof Omit<ShortTexts, "decisionNames">
 
-function importShortTexts(key: ShortTextKeys) {
+function importShortTexts(key: ShortTextStringKeys) {
   if (
     isDecision(targetDocumentUnit.value) &&
     isDecision(sourceDocumentUnit.value)
@@ -503,16 +503,9 @@ function importContextRelatedIndexing<
 }
 
 // By narrowing the type of key to exclude "participatingJudges", TypeScript no longer considers the possibility of assigning a non-string value to documentUnit.value.longTexts[key].
-type StringKeys =
-  | "tenor"
-  | "reasons"
-  | "caseFacts"
-  | "decisionReasons"
-  | "dissentingOpinion"
-  | "otherLongText"
-  | "outline"
+type LongTextStringKeys = keyof Omit<LongTexts, "participatingJudges">
 
-function importLongTexts(key: StringKeys) {
+function importLongTexts(key: LongTextStringKeys) {
   if (
     isDecision(targetDocumentUnit.value) &&
     isDecision(sourceDocumentUnit.value)
