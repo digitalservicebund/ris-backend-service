@@ -140,7 +140,8 @@ const hasContent = (key: keyof typeof allLabels): boolean => {
   }
   return false
 }
-//NOSONAR_BEGIN
+
+// sonarjs:S3776
 const isImportable = (key: keyof typeof allLabels): boolean => {
   if (
     isDecision(targetDocumentUnit.value) &&
@@ -187,7 +188,6 @@ const isImportable = (key: keyof typeof allLabels): boolean => {
     }
   return true
 }
-//NOSONAR_END
 
 // Handle import logic
 const handleImport = async (key: keyof typeof allLabels) => {
