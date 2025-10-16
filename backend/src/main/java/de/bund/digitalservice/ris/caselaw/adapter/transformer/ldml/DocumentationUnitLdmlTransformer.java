@@ -132,13 +132,13 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     // Entscheidungsdatum
     if (coreData.decisionDate() != null) {
       Paragraph decisionDateParagraph = Paragraph.builder().content(new ArrayList<>()).build();
-      decisionDateParagraph.getContent().add("Entscheidungsdatum: ");
+      decisionDateParagraph.getContent().add(getDateName(documentationUnit) + ": ");
       decisionDateParagraph
           .getContent()
           .add(
               DocDate.builder()
                   .date(DateUtils.toDateString(coreData.decisionDate()))
-                  .refersTo("#entscheidungsdatum")
+                  .refersTo("#" + toKebabCase(getDateName(documentationUnit)))
                   .content(DateUtils.toFormattedDateString(coreData.decisionDate()))
                   .build());
       paragraphs.add(decisionDateParagraph);
@@ -315,8 +315,12 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
   }
 
   private String getDateName(DocumentationUnit documentationUnit) {
-    if (documentationUnit instanceof Decision) {
-      return "Entscheidungsdatum";
+    if (documentationUnit instanceof Decision decision) {
+      if (decision.coreData().hasDeliveryDate()) {
+        return "Datum der Zustellung an Verkündungs statt";
+      } else {
+        return "Entscheidungsdatum";
+      }
     }
     if (documentationUnit instanceof PendingProceeding) {
       return "Mitteilungsdatum";

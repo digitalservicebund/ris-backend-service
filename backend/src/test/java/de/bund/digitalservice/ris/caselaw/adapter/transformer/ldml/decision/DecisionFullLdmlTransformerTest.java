@@ -469,6 +469,32 @@ class DecisionFullLdmlTransformerTest {
         .contains(StringUtils.deleteWhitespace(expected));
   }
 
+  @Test
+  @DisplayName("hasDeliveryDate")
+  void testTransform_hasDeliveryDate() {
+    String expectedHeader =
+"""
+  <akn:p>Datum der Zustellung an Verkündungs statt: <akn:docDate date="2020-01-01" refersTo="#datum-der-zustellung-an-verkuendungs-statt">01.01.2020</akn:docDate>
+  </akn:p>
+""";
+    String expectedFRBRdate =
+"""
+  <akn:FRBRdate date="2020-01-01" name="Datum der Zustellung an Verkündungs statt"/>
+""";
+    Decision deliveryDateCaseLaw =
+        testDocumentUnit.toBuilder()
+            .coreData(testDocumentUnit.coreData().toBuilder().hasDeliveryDate(true).build())
+            .build();
+    CaseLawLdml ldml = subject.transformToLdml(deliveryDateCaseLaw);
+
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+    assertThat(fileContent).isPresent();
+    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+        .contains(StringUtils.deleteWhitespace(expectedHeader))
+        .contains(StringUtils.deleteWhitespace(expectedFRBRdate));
+  }
+
   static Stream<Arguments> provideTagFormattingTestCases() {
     return Stream.of(
         // Image with closing tag should only keep last path part (/my/path/to/img.png -> image.png)
