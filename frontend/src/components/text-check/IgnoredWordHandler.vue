@@ -14,9 +14,9 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "ignored-word:add": [void]
-  "ignored-word:remove": [string]
-  "globally-ignored-word:remove": [string]
-  "globally-ignored-word:add": [string]
+  "ignored-word:remove": [void]
+  "globally-ignored-word:remove": [void]
+  "globally-ignored-word:add": [void]
 }>()
 
 function addIgnoredWord() {
@@ -24,16 +24,16 @@ function addIgnoredWord() {
 }
 
 async function removeWord() {
-  emit("ignored-word:remove", props.match.word)
+  emit("ignored-word:remove")
 }
 
 function addIgnoredWordGlobally() {
-  emit("ignored-word:remove", props.match.word)
-  emit("globally-ignored-word:add", props.match.word)
+  emit("ignored-word:remove")
+  emit("globally-ignored-word:add")
 }
 
 async function removeWordGlobally() {
-  emit("globally-ignored-word:remove", props.match.word)
+  emit("globally-ignored-word:remove")
 }
 
 const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
@@ -61,32 +61,9 @@ const matchIsIgnoredInDocument = computed(() => {
   <div class="flex flex-grow flex-col" data-testid="ignored-word-handler">
     <div v-if="matchIsIgnoredJDV">Von jDV ignoriert</div>
 
-    <div class="flex flex-grow flex-col items-start gap-4">
+    <div v-else class="flex flex-grow flex-col items-start gap-4">
       <Button
-        v-if="
-          textCheckGlobal &&
-          !matchIsIgnoredGlobally &&
-          !matchIsIgnoredInDocument &&
-          !matchIsIgnoredJDV
-        "
-        aria-label="Vorschlag ignorieren"
-        data-testid="ignored-word-add-button"
-        label="In Dokeinheit ignorieren"
-        size="small"
-        text
-        @click="addIgnoredWord"
-      >
-        <template #icon>
-          <IconDescription />
-        </template>
-      </Button>
-
-      <Button
-        v-if="
-          matchIsIgnoredInDocument &&
-          !matchIsIgnoredJDV &&
-          !matchIsIgnoredGlobally
-        "
+        v-if="!matchIsIgnoredGlobally && matchIsIgnoredInDocument"
         aria-label="Wort nicht ignorieren"
         data-testid="ignored-word-remove-button"
         label="Nicht in Dokeinheit ignorieren"
@@ -100,30 +77,51 @@ const matchIsIgnoredInDocument = computed(() => {
       </Button>
 
       <Button
-        v-if="textCheckGlobal && matchIsIgnoredGlobally && !matchIsIgnoredJDV"
-        aria-label="Wort aus globalem Wörterbuch entfernen"
-        data-testid="ignored-word-global-remove-button"
-        label="Aus globalem Wörterbuch entfernen"
+        v-else-if="!matchIsIgnoredGlobally && !matchIsIgnoredInDocument"
+        aria-label="Wort ignorieren"
+        data-testid="ignored-word-add-button"
+        label="In Dokeinheit ignorieren"
         size="small"
         text
-        @click="removeWordGlobally"
+        @click="addIgnoredWord"
       >
         <template #icon>
-          <IconAutoStoriesOffVariant />
+          <IconDescription />
         </template>
       </Button>
 
-      <Button
-        v-if="textCheckGlobal && !matchIsIgnoredGlobally"
-        label="Zum globalen Wörterbuch hinzufügen"
-        size="small"
-        text
-        @click="addIgnoredWordGlobally"
+      <!-- Todo: Remove the outer div, when removing feature toggle textCheckGlobal -->
+      <div
+        v-if="textCheckGlobal"
+        class="flex flex-grow flex-col items-start gap-4"
       >
-        <template #icon>
-          <IconAutoStoriesVariant />
-        </template>
-      </Button>
+        <Button
+          v-if="matchIsIgnoredGlobally"
+          aria-label="Wort aus globalem Wörterbuch entfernen"
+          data-testid="ignored-word-global-remove-button"
+          label="Aus globalem Wörterbuch entfernen"
+          size="small"
+          text
+          @click="removeWordGlobally"
+        >
+          <template #icon>
+            <IconAutoStoriesOffVariant />
+          </template>
+        </Button>
+
+        <Button
+          v-else
+          aria-label="Wort zu globalem Wörterbuch hinzufügen"
+          label="Zum globalen Wörterbuch hinzufügen"
+          size="small"
+          text
+          @click="addIgnoredWordGlobally"
+        >
+          <template #icon>
+            <IconAutoStoriesVariant />
+          </template>
+        </Button>
+      </div>
     </div>
   </div>
 </template>
