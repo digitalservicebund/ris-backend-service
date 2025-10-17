@@ -14,6 +14,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "ignored-word:add": [void]
+  "ignore-once:toggle": [number, number]
   "ignored-word:remove": [string]
   "globally-ignored-word:remove": [string]
   "globally-ignored-word:add": [string]
@@ -21,6 +22,10 @@ const emit = defineEmits<{
 
 function addIgnoredWord() {
   emit("ignored-word:add")
+}
+
+function ignoreOnceToggle() {
+  emit("ignore-once:toggle", props.match.offset, props.match.length)
 }
 
 async function removeWord() {
@@ -55,6 +60,9 @@ const matchIsIgnoredInDocument = computed(() => {
     (ignoredWord) => ignoredWord.type === "documentation_unit",
   )
 })
+
+// TODO: implement this
+// const matchIsIgnoredLocally = computed(() => {})
 </script>
 
 <template>
@@ -62,6 +70,24 @@ const matchIsIgnoredInDocument = computed(() => {
     <div v-if="matchIsIgnoredJDV">Von jDV ignoriert</div>
 
     <div class="flex flex-grow flex-col items-start gap-4">
+      <Button
+        v-if="
+          textCheckGlobal &&
+          !matchIsIgnoredInDocument &&
+          !matchIsIgnoredGlobally &&
+          !matchIsIgnoredJDV
+        "
+        aria-label="Wort ignorieren"
+        data-testid="ignore-once-button"
+        label="Ignorieren hier"
+        severity="secondary"
+        @click="ignoreOnceToggle"
+      >
+        <template #icon>
+          <IconDescription />
+        </template>
+      </Button>
+
       <Button
         v-if="
           textCheckGlobal &&

@@ -8,6 +8,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
+  "ignore-once:toggle": [offset: number, length: number]
   "word:remove": [value: string]
   "word:add": [word: string]
   "globalWord:remove": [value: string]
@@ -36,6 +37,21 @@ const isMatchIgnored = computed(() => {
     props.match.ignoredTextCheckWords.length > 0
   )
 })
+function ignoreOnceToggle(offset: number, length: number) {
+  emit("ignore-once:toggle", offset, length)
+}
+
+// TODO: this was causing linter issues, so I disabled it for now
+// function getValues(replacements: Replacement[]) {
+//   return replacements.flatMap((replacement) => replacement.value)
+// }
+//
+// const isMatchIgnored = computed(() => {
+//   return (
+//     Array.isArray(props.match.ignoredTextCheckWords) &&
+//     props.match.ignoredTextCheckWords.length > 0
+//   )
+// })
 </script>
 
 <template>
@@ -55,6 +71,7 @@ const isMatchIgnored = computed(() => {
       :match="match"
       @globally-ignored-word:add="addIgnoredWordGlobally"
       @globally-ignored-word:remove="removeGloballyIgnoredWord(match.word)"
+      @ignore-once:toggle="ignoreOnceToggle(match.offset, match.length)"
       @ignored-word:add="addIgnoredWord(match.word)"
       @ignored-word:remove="removeIgnoredWord(match.word)"
     />
