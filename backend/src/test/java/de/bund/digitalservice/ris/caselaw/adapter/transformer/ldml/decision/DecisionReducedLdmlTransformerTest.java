@@ -419,7 +419,7 @@ class DecisionReducedLdmlTransformerTest {
                      <ris:courtType>ensuing decision court type</ris:courtType>
                   </ris:ensuingDecision>
                </ris:ensuingDecisions>
-               """),
+              """),
         // LongTexts/Langtexte -->
         Arguments.of(
             "'dissentingOpinion' (Abweichende Meinung)",
@@ -427,8 +427,8 @@ class DecisionReducedLdmlTransformerTest {
               <akn:motivation ris:domainTerm="Abweichende Meinung">
                   <akn:p>dissenting test</akn:p>
                   <akn:block name="Mitwirkende Richter">
-                      <akn:opinion type="dissenting" ris:domainTerm="Art der Mitwirkung" by="#dr-phil-max-mustermann">referenced opinions test 1</akn:opinion>
-                      <akn:opinion type="dissenting" ris:domainTerm="Art der Mitwirkung" by="#richterin-maxima-mustermann">referenced opinions test 2</akn:opinion>
+                      <akn:opinion ris:domainTerm="Art der Mitwirkung" type="dissenting" by="#dr-phil-max-mustermann">referenced opinions test 1</akn:opinion>
+                      <akn:opinion ris:domainTerm="Art der Mitwirkung" type="dissenting" by="#richterin-maxima-mustermann">referenced opinions test 2</akn:opinion>
                   </akn:block>
               </akn:motivation>
               """),

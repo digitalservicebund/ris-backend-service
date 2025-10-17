@@ -146,7 +146,7 @@ class DecisionFullLdmlTransformerTest {
           <akn:motivation ris:domainTerm="Abweichende Meinung">
             <akn:p>dissenting test</akn:p>
             <akn:block name="Mitwirkende Richter">
-               <akn:opinion type="dissenting" by="#maxi-musterfrau"/>
+               <akn:opinion by="#maxi-musterfrau"/>
             </akn:block>
           </akn:motivation>
          """;
@@ -175,11 +175,11 @@ class DecisionFullLdmlTransformerTest {
          <akn:motivation ris:domainTerm="Abweichende Meinung">
             <akn:p>dissenting test</akn:p>
             <akn:block name="Mitwirkende Richter">
-               <akn:opinion type="dissenting"
-                            ris:domainTerm="Art der Mitwirkung"
+               <akn:opinion ris:domainTerm="Art der Mitwirkung"
+                            type="dissenting"
                             by="#maxi-gaertner">Art der Mitwirkung 1</akn:opinion>
-               <akn:opinion type="dissenting"
-                            ris:domainTerm="Art der Mitwirkung"
+               <akn:opinion ris:domainTerm="Art der Mitwirkung"
+                            type="dissenting"
                             by="#herbert-guenter">Art der Mitwirkung 2</akn:opinion>
             </akn:block>
          </akn:motivation>
@@ -189,6 +189,41 @@ class DecisionFullLdmlTransformerTest {
               .longTexts(
                   testDocumentUnit.longTexts().toBuilder()
                       .dissentingOpinion("<p>dissenting test</p>")
+                      .participatingJudges(
+                          List.of(
+                              ParticipatingJudge.builder()
+                                  .name("Maxi Gärtner")
+                                  .referencedOpinions("Art der Mitwirkung 1")
+                                  .build(),
+                              ParticipatingJudge.builder()
+                                  .name("Herbert Günter")
+                                  .referencedOpinions("Art der Mitwirkung 2")
+                                  .build()))
+                      .build())
+              .build();
+      CaseLawLdml ldml = subject.transformToLdml(dissentingCaseLaw);
+      Assertions.assertNotNull(ldml);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      Assertions.assertTrue(fileContent.isPresent());
+      Assertions.assertTrue(
+          StringUtils.deleteWhitespace(fileContent.get())
+              .contains(StringUtils.deleteWhitespace(expected)));
+    }
+
+    @Test
+    void testWithoutDissentingOpinionAndWithParticipatingJudges_shouldNotBuildDissentingOpinion() {
+      String expected =
+          """
+              <akn:judgmentBody>
+                <akn:background ris:domainTerm="Tatbestand">
+                   <akn:p>Example content 1</akn:p>
+                </akn:background>
+             </akn:judgmentBody>
+         """;
+      Decision dissentingCaseLaw =
+          testDocumentUnit.toBuilder()
+              .longTexts(
+                  testDocumentUnit.longTexts().toBuilder()
                       .participatingJudges(
                           List.of(
                               ParticipatingJudge.builder()

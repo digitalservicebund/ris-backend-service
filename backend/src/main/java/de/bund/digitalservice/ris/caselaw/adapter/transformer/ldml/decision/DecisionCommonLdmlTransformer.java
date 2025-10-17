@@ -221,10 +221,8 @@ public abstract class DecisionCommonLdmlTransformer
     // Abweichende Meinung + Mitwirkende Richter
     if (isNotBlank(dissentingOpinion)) {
       var motivation = buildDissentingOpinion(decision);
-      if (motivation != null) {
-        motivation.setDomainTerm("Abweichende Meinung");
-        motivations.add(motivation);
-      }
+      motivation.setDomainTerm("Abweichende Meinung");
+      motivations.add(motivation);
     }
     return motivations;
   }
@@ -242,10 +240,14 @@ public abstract class DecisionCommonLdmlTransformer
         Opinion opinion;
         if (judge.referencedOpinions() != null) {
           opinion =
-              new Opinion(
-                  "dissenting", "Art der Mitwirkung", byAttribute, judge.referencedOpinions());
+              Opinion.builder()
+                  .type("dissenting")
+                  .by(byAttribute)
+                  .content(judge.referencedOpinions())
+                  .build();
+          opinion.setDomainTerm("Art der Mitwirkung");
         } else {
-          opinion = new Opinion("dissenting", null, byAttribute, null);
+          opinion = Opinion.builder().by(byAttribute).build();
         }
         opinions.add(opinion);
       }
