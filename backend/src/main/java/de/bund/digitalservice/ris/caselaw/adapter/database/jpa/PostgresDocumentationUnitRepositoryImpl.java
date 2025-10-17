@@ -429,7 +429,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       Optional<CourtDTO> court =
           databaseCourtRepository.findById(documentationUnit.coreData().court().id());
       if (court.isPresent() && !court.get().getRegions().isEmpty()) {
-        documentationUnitDTO.getRegions().addAll(court.get().getRegions());
+        documentationUnitDTO
+            .getRegions()
+            .addAll(court.get().getRegions().stream().map(CourtRegionDTO::getRegion).toList());
       }
       // delete leading decision norm references if court is not BGH
       if (documentationUnit instanceof Decision decision

@@ -1,3 +1,4 @@
+import fs from "fs"
 import type {
   FullConfig,
   FullResult,
@@ -68,6 +69,7 @@ class QueriesReporter implements Reporter {
     const stats = this.resultsWithDuration.map(
       ({ test, result }) => getStats(test, result) || null,
     )
+    fs.writeFileSync("test-results.json", JSON.stringify(stats, null, 2))
     console.table(stats)
   }
 

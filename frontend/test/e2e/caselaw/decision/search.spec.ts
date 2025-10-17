@@ -214,6 +214,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
     },
     async ({ page, decisions }) => {
       const { fileNumberPrefix, createdDecisions } = decisions
+      const documentNumber = createdDecisions[0].documentNumber
       await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
       await page.getByLabel("Nur meine Dokstelle Filter").click()
 
@@ -230,9 +231,15 @@ test.describe("Große Suche nach Entscheidungen", () => {
         await expect(
           page.getByText(createdDecisions.length + " Ergebnisse gefunden"),
         ).toBeVisible()
-        await expect(
-          page.getByText(createdDecisions[0].documentNumber),
-        ).toBeVisible()
+        await expect(page.getByText(documentNumber)).toBeVisible()
+
+        const documentRow = page
+          .getByRole("row")
+          .filter({ hasText: documentNumber })
+
+        // Prozesschritt und User im Suchergebenis sichtbar
+        await expect(documentRow.getByText("Ersterfassung")).toBeVisible()
+        await expect(documentRow.getByText("ED")).toBeVisible()
       })
 
       await test.step(`Wähle Schritt 'Fertig'`, async () => {
@@ -258,9 +265,15 @@ test.describe("Große Suche nach Entscheidungen", () => {
         await expect(
           page.getByText(createdDecisions.length + " Ergebnisse gefunden"),
         ).toBeVisible()
-        await expect(
-          page.getByText(createdDecisions[0].documentNumber),
-        ).toBeVisible()
+        await expect(page.getByText(documentNumber)).toBeVisible()
+
+        const documentRow = page
+          .getByRole("row")
+          .filter({ hasText: documentNumber })
+
+        // Prozesschritt und User im Sucheregbenis sichtbar
+        await expect(documentRow.getByText("Ersterfassung")).toBeVisible()
+        await expect(documentRow.getByText("ED")).toBeVisible()
       })
 
       await test.step(`Weise einen neuen Prozesschritt ohne Person`, async () => {
@@ -298,6 +311,28 @@ test.describe("Große Suche nach Entscheidungen", () => {
         await expect(
           page.getByText(createdDecisions[0].documentNumber),
         ).toBeHidden()
+      })
+
+      await test.step(`Setze Schritt-Filter zurück und prüfe, dass das eben geänderte Suchergebnis nun neuen Prozesschritt und keine Person anzeigt`, async () => {
+        await page.getByLabel("Prozessschritt").click()
+        await page
+          .getByRole("option", { name: "Nicht ausgewählt", exact: true })
+          .click()
+        await page.getByLabel("Nur mir zugewiesen").click()
+        await expect(page.getByLabel("Nur mir zugewiesen")).not.toBeChecked()
+
+        await triggerSearch(page)
+        await expect(
+          page.getByText(createdDecisions.length + " Ergebnisse gefunden"),
+        ).toBeVisible()
+        await expect(page.getByText(documentNumber)).toBeVisible()
+
+        const documentRow = page
+          .getByRole("row")
+          .filter({ hasText: documentNumber })
+
+        await expect(documentRow.getByText("Fachdokumentation")).toBeVisible()
+        await expect(documentRow.getByText("ED")).toBeHidden()
       })
     },
   )

@@ -1,17 +1,17 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -53,13 +53,9 @@ public class CourtDTO {
   @Column(name = "juris_id")
   private int jurisId;
 
-  @ManyToMany
-  @JoinTable(
-      name = "court_region",
-      schema = "incremental_migration",
-      joinColumns = @JoinColumn(name = "court_id"),
-      inverseJoinColumns = @JoinColumn(name = "region_id"))
-  private List<RegionDTO> regions = new ArrayList<>();
+  @OneToMany(mappedBy = "court", orphanRemoval = true, cascade = CascadeType.ALL)
+  @OrderBy("rank")
+  private List<CourtRegionDTO> regions;
 
   @ManyToOne
   @JoinColumn(name = "jurisdiction_type_id")

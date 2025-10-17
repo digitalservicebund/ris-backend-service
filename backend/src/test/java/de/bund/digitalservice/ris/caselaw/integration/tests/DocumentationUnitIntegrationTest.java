@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtRegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDeletedDocumentationIdsRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
@@ -108,6 +109,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -122,7 +124,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
 @Sql(scripts = {"classpath:courts_init.sql"})
 @Sql(
@@ -636,18 +637,20 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testSetRegionForCourt() {
-    RegionDTO region = regionRepository.save(RegionDTO.builder().code("DEU").build());
+    RegionDTO region = RegionDTO.builder().code("DEU").build();
 
     CourtDTO bghCourt =
-        databaseCourtRepository.save(
-            CourtDTO.builder()
-                .type("BGH")
-                .location("Karlsruhe")
-                .isSuperiorCourt(true)
-                .isForeignCourt(false)
-                .jurisId(new Random().nextInt())
-                .regions(List.of(region))
-                .build());
+        CourtDTO.builder()
+            .type("BGH")
+            .location("Karlsruhe")
+            .isSuperiorCourt(true)
+            .isForeignCourt(false)
+            .jurisId(new Random().nextInt())
+            .build();
+
+    CourtRegionDTO courtRegion = CourtRegionDTO.builder().region(region).court(bghCourt).build();
+    bghCourt.setRegions(List.of(courtRegion));
+    databaseCourtRepository.save(bghCourt);
 
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSaveDecision(
@@ -811,7 +814,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     for (int i = 0; i < 21; i++) {
       var randomDocNumber =
-          i == 0 ? documentNumberToExclude : RandomStringUtils.random(10, true, true);
+          i == 0 ? documentNumberToExclude : RandomStringUtils.insecure().nextAlphanumeric(10);
       CourtDTO court =
           databaseCourtRepository.save(
               CourtDTO.builder()
@@ -1558,7 +1561,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         DecisionDTO.builder()
             .documentationOffice(documentOffice)
             .creatingDocumentationOffice(creatingDocOffice)
-            .documentNumber("XX" + RandomStringUtils.randomAlphanumeric(11))
+            .documentNumber("XX" + RandomStringUtils.insecure().nextAlphanumeric(11))
             .date(decisionDate)
             .documentationOffice(documentOffice)
             .fileNumbers(

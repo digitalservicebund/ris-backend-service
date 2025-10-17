@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtRegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.util.List;
@@ -32,7 +33,10 @@ public class CourtTransformer {
                     : "")
             .regions(
                 courtDTO.getRegions() != null
-                    ? courtDTO.getRegions().stream().map(RegionDTO::getCode).toList()
+                    ? courtDTO.getRegions().stream()
+                        .map(CourtRegionDTO::getRegion)
+                        .map(RegionDTO::getCode)
+                        .toList()
                     : List.of())
             .revoked(revoked);
 

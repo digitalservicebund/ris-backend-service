@@ -30,8 +30,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlMergeMode;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @Import({TestConfig.class})
@@ -60,8 +60,8 @@ import org.testcontainers.utility.DockerImageName;
     executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public abstract class BaseIntegrationTest {
 
-  static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql").withReuse(true);
+  static PostgreSQLContainer postgreSQLContainer =
+      new PostgreSQLContainer("postgres:14").withInitScript("init_db.sql").withReuse(true);
 
   static GenericContainer<?> redis =
       new GenericContainer<>(DockerImageName.parse("redis:7.0"))
