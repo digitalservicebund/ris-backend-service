@@ -61,7 +61,7 @@ const matchIsIgnoredInDocument = computed(() => {
   <div class="flex flex-grow flex-col" data-testid="ignored-word-handler">
     <div v-if="matchIsIgnoredJDV">Von jDV ignoriert</div>
 
-    <div v-else class="flex flex-grow flex-col items-start gap-4">
+    <div v-else class="flex flex-grow flex-col items-start gap-16">
       <Button
         v-if="!matchIsIgnoredGlobally && matchIsIgnoredInDocument"
         aria-label="Wort nicht ignorieren"
@@ -93,7 +93,7 @@ const matchIsIgnoredInDocument = computed(() => {
       <!-- Todo: Remove the outer div, when removing feature toggle textCheckGlobal -->
       <div
         v-if="textCheckGlobal"
-        class="flex flex-grow flex-col items-start gap-4"
+        class="flex flex-grow flex-col items-start gap-16"
       >
         <Button
           v-if="matchIsIgnoredGlobally"
