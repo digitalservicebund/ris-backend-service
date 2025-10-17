@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
@@ -23,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransform
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
@@ -122,7 +124,6 @@ public abstract class DecisionCommonLdmlTransformer
   }
 
   private JudgmentBody buildJudgmentBody(Decision decision) throws ValidationException {
-
     JudgmentBody.JudgmentBodyBuilder builder = JudgmentBody.builder();
 
     builder
@@ -148,9 +149,11 @@ public abstract class DecisionCommonLdmlTransformer
 
     var longTexts = decision.longTexts();
     var shortTexts = decision.shortTexts();
+    var guidingPrinciple = nullSafeGet(shortTexts, ShortTexts::guidingPrinciple);
+    var outline = nullSafeGet(longTexts, LongTexts::outline);
 
     // Leitsatz
-    if (shortTexts != null && shortTexts.guidingPrinciple() != null) {
+    if (isNotBlank(guidingPrinciple)) {
       var introduction =
           Introduction.builder()
               .content(htmlTransformer.htmlStringToObjectList(shortTexts.guidingPrinciple()))
@@ -160,7 +163,7 @@ public abstract class DecisionCommonLdmlTransformer
     }
 
     // Gliederung
-    if (longTexts != null && longTexts.outline() != null) {
+    if (isNotBlank(outline)) {
       var introduction =
           Introduction.builder()
               .content(htmlTransformer.htmlStringToObjectList(longTexts.outline()))
@@ -175,48 +178,47 @@ public abstract class DecisionCommonLdmlTransformer
     List<Motivation> motivations = new ArrayList<>();
 
     var longTexts = decision.longTexts();
-    if (longTexts != null) {
-      // Gründe
-      var reasons = longTexts.reasons();
-      if (reasons != null) {
-        var motivation =
-            Motivation.builder()
-                .content(htmlTransformer.htmlStringToObjectList(longTexts.reasons()))
-                .build();
-        motivation.setDomainTerm("Gründe");
-        motivations.add(motivation);
-      }
+    var reasons = nullSafeGet(longTexts, LongTexts::reasons);
+    var decisionReasons = nullSafeGet(longTexts, LongTexts::decisionReasons);
+    var otherLongTexts = nullSafeGet(longTexts, LongTexts::otherLongText);
+    var dissentingOpinion = nullSafeGet(longTexts, LongTexts::dissentingOpinion);
 
-      // Entscheidungsgründe
-      var decisionReasons = longTexts.decisionReasons();
-      if (decisionReasons != null) {
-        var motivation =
-            Motivation.builder()
-                .content(htmlTransformer.htmlStringToObjectList(longTexts.decisionReasons()))
-                .build();
-        motivation.setDomainTerm("Entscheidungsgründe");
-        motivations.add(motivation);
-      }
+    // Gründe
+    if (isNotBlank(reasons)) {
+      var motivation =
+          Motivation.builder()
+              .content(htmlTransformer.htmlStringToObjectList(longTexts.reasons()))
+              .build();
+      motivation.setDomainTerm("Gründe");
+      motivations.add(motivation);
+    }
 
-      // Sonstiger Langtext
-      var otherLongTexts = longTexts.otherLongText();
-      if (otherLongTexts != null) {
-        var motivation =
-            Motivation.builder()
-                .content(htmlTransformer.htmlStringToObjectList(longTexts.otherLongText()))
-                .build();
-        motivation.setDomainTerm("Sonstiger Langtext");
-        motivations.add(motivation);
-      }
+    // Entscheidungsgründe
+    if (isNotBlank(decisionReasons)) {
+      var motivation =
+          Motivation.builder()
+              .content(htmlTransformer.htmlStringToObjectList(longTexts.decisionReasons()))
+              .build();
+      motivation.setDomainTerm("Entscheidungsgründe");
+      motivations.add(motivation);
+    }
 
-      // Abweichende Meinung + Mitwirkende Richter
-      var dissentingOpinion = longTexts.dissentingOpinion();
-      if (dissentingOpinion != null) {
-        var motivation = buildDissentingOpinion(decision);
-        if (motivation != null) {
-          motivation.setDomainTerm("Abweichende Meinung");
-          motivations.add(motivation);
-        }
+    // Sonstiger Langtext
+    if (isNotBlank(otherLongTexts)) {
+      var motivation =
+          Motivation.builder()
+              .content(htmlTransformer.htmlStringToObjectList(longTexts.otherLongText()))
+              .build();
+      motivation.setDomainTerm("Sonstiger Langtext");
+      motivations.add(motivation);
+    }
+
+    // Abweichende Meinung + Mitwirkende Richter
+    if (isNotBlank(dissentingOpinion)) {
+      var motivation = buildDissentingOpinion(decision);
+      if (motivation != null) {
+        motivation.setDomainTerm("Abweichende Meinung");
+        motivations.add(motivation);
       }
     }
     return motivations;
@@ -224,12 +226,8 @@ public abstract class DecisionCommonLdmlTransformer
 
   private Motivation buildDissentingOpinion(Decision decision) {
     var longTexts = decision.longTexts();
-    if (longTexts == null) {
-      return null;
-    }
-
-    String dissentingOpinion = longTexts.dissentingOpinion();
-    var participatingJudges = longTexts.participatingJudges();
+    var dissentingOpinion = nullSafeGet(longTexts, LongTexts::dissentingOpinion);
+    var participatingJudges = nullSafeGet(longTexts, LongTexts::participatingJudges);
 
     List<Opinion> opinions = new ArrayList<>();
 
@@ -271,10 +269,9 @@ public abstract class DecisionCommonLdmlTransformer
 
   private JaxbHtml buildBackground(Decision decision) {
     var longTexts = decision.longTexts();
-
     var caseFacts = nullSafeGet(longTexts, LongTexts::caseFacts);
 
-    if (StringUtils.isNotEmpty(caseFacts)) {
+    if (isNotBlank(caseFacts)) {
       JaxbHtml html = JaxbHtml.build(htmlTransformer.htmlStringToObjectList(caseFacts));
       html.setDomainTerm("Tatbestand");
       return html;
@@ -284,10 +281,9 @@ public abstract class DecisionCommonLdmlTransformer
 
   private JaxbHtml buildDecision(Decision decision) {
     var longTexts = decision.longTexts();
-
     var tenor = nullSafeGet(longTexts, LongTexts::tenor);
 
-    if (StringUtils.isNotEmpty(tenor)) {
+    if (isNotBlank(tenor)) {
       var tenorHtml = JaxbHtml.build(htmlTransformer.htmlStringToObjectList(tenor));
       tenorHtml.setDomainTerm("Tenor");
       return tenorHtml;

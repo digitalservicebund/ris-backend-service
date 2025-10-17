@@ -247,21 +247,19 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
 
   default void buildHeadline(
       List<Paragraph> paragraphs, String headline, HtmlTransformer htmlTransformer) {
-    if (headline != null) {
-      Paragraph headlineParagraph = Paragraph.builder().content(new ArrayList<>()).build();
-      headlineParagraph.getContent().add("Titelzeile: ");
-      headlineParagraph
-          .getContent()
-          .add(
-              ShortTitle.builder()
-                  .refersTo("#titelzeile")
-                  .content(
-                      EmbeddedStructure.builder()
-                          .content(htmlTransformer.htmlStringToObjectList(headline))
-                          .build())
-                  .build());
-      paragraphs.add(headlineParagraph);
-    }
+    Paragraph headlineParagraph = Paragraph.builder().content(new ArrayList<>()).build();
+    headlineParagraph.getContent().add("Titelzeile: ");
+    headlineParagraph
+        .getContent()
+        .add(
+            ShortTitle.builder()
+                .refersTo("#titelzeile")
+                .content(
+                    EmbeddedStructure.builder()
+                        .content(htmlTransformer.htmlStringToObjectList(headline))
+                        .build())
+                .build());
+    paragraphs.add(headlineParagraph);
   }
 
   private String getCourtEid(Court court) {

@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproce
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
@@ -26,7 +27,6 @@ import java.util.List;
 import java.util.Objects;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Abstract base class for transforming pending proceedings into LDML case law format. Provides
@@ -131,11 +131,12 @@ public abstract class PendingProceedingCommonLdmlTransformer
 
   protected List<Introduction> buildIntroductions(PendingProceeding pendingProceeding) {
     List<Introduction> introductions = new ArrayList<>();
-
     var shortTexts = pendingProceeding.shortTexts();
+    var appellant = nullSafeGet(shortTexts, PendingProceedingShortTexts::appellant);
+    var admissionOfAppeal = nullSafeGet(shortTexts, PendingProceedingShortTexts::admissionOfAppeal);
 
     // Rechtsmittelführer
-    if (shortTexts != null && shortTexts.appellant() != null) {
+    if (isNotBlank(appellant)) {
       var introduction =
           Introduction.builder()
               .content(htmlTransformer.htmlStringToObjectList(shortTexts.appellant()))
@@ -145,7 +146,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
     }
 
     // Rechtsmittelzulassung
-    if (shortTexts != null && shortTexts.admissionOfAppeal() != null) {
+    if (isNotBlank(admissionOfAppeal)) {
       var introduction =
           Introduction.builder()
               .content(htmlTransformer.htmlStringToObjectList(shortTexts.admissionOfAppeal()))
@@ -159,28 +160,25 @@ public abstract class PendingProceedingCommonLdmlTransformer
   private List<Motivation> buildMotivations(PendingProceeding pendingProceeding) {
     List<Motivation> motivations = new ArrayList<>();
     var shortTexts = pendingProceeding.shortTexts();
+    var legalIssue = nullSafeGet(shortTexts, PendingProceedingShortTexts::legalIssue);
 
     // Rechtsfrage
-    if (shortTexts != null) {
-      var legalIssue = shortTexts.legalIssue();
-      if (legalIssue != null) {
-        var motivation =
-            Motivation.builder()
-                .content(htmlTransformer.htmlStringToObjectList(shortTexts.legalIssue()))
-                .build();
-        motivation.setDomainTerm("Rechtsfrage");
-        motivations.add(motivation);
-      }
+    if (isNotBlank(legalIssue)) {
+      var motivation =
+          Motivation.builder()
+              .content(htmlTransformer.htmlStringToObjectList(shortTexts.legalIssue()))
+              .build();
+      motivation.setDomainTerm("Rechtsfrage");
+      motivations.add(motivation);
     }
     return motivations;
   }
 
   private JaxbHtml buildDecision(PendingProceeding pendingProceeding) {
     var shortTexts = pendingProceeding.shortTexts();
-
     var resolutionNote = nullSafeGet(shortTexts, PendingProceedingShortTexts::resolutionNote);
 
-    if (StringUtils.isNotEmpty(resolutionNote)) {
+    if (isNotBlank(resolutionNote)) {
       var resolutionNoteHtml =
           JaxbHtml.build(htmlTransformer.htmlStringToObjectList(resolutionNote));
       resolutionNoteHtml.setDomainTerm("Erledigungsvermerk");

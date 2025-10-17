@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproce
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
@@ -13,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.P
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
@@ -97,9 +99,10 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
 
     paragraphs = buildCommonHeader(pendingProceeding, paragraphs);
     var shortTexts = pendingProceeding.shortTexts();
+    var headline = nullSafeGet(shortTexts, PendingProceedingShortTexts::headline);
 
-    if (shortTexts != null) {
-      buildHeadline(paragraphs, shortTexts.headline(), htmlTransformer);
+    if (isNotBlank(headline)) {
+      buildHeadline(paragraphs, headline, htmlTransformer);
     }
 
     return Header.builder().paragraphs(paragraphs).build();

@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.DocTitle;
@@ -31,7 +32,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Transformer for converting decisions to the full LDML format. Includes additional metadata like
@@ -137,7 +137,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     }
 
     var decisionName = nullSafeGet(decision.shortTexts(), ShortTexts::decisionName);
-    if (StringUtils.isNotEmpty(decisionName)) {
+    if (isNotBlank(decisionName)) {
       builder.decisionName(List.of(decisionName));
     }
 
@@ -157,24 +157,26 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
     paragraphs = buildCommonHeader(decision, paragraphs);
     var shortTexts = decision.shortTexts();
+    var decisionName = nullSafeGet(shortTexts, ShortTexts::decisionName);
+    var headline = nullSafeGet(shortTexts, ShortTexts::headline);
 
-    if (shortTexts != null) {
-      // Entscheidungsname
-      if (decision.shortTexts().decisionName() != null) {
-        Paragraph decisionNameParagraph = Paragraph.builder().content(new ArrayList<>()).build();
-        decisionNameParagraph.getContent().add("Entscheidungsname: ");
-        decisionNameParagraph
-            .getContent()
-            .add(
-                DocTitle.builder()
-                    .refersTo("#entscheidungsname")
-                    .content(shortTexts.decisionName())
-                    .build());
-        paragraphs.add(decisionNameParagraph);
-      }
+    // Entscheidungsname
+    if (isNotBlank(decisionName)) {
+      Paragraph decisionNameParagraph = Paragraph.builder().content(new ArrayList<>()).build();
+      decisionNameParagraph.getContent().add("Entscheidungsname: ");
+      decisionNameParagraph
+          .getContent()
+          .add(
+              DocTitle.builder()
+                  .refersTo("#entscheidungsname")
+                  .content(shortTexts.decisionName())
+                  .build());
+      paragraphs.add(decisionNameParagraph);
+    }
 
-      // Titelzeile
-      buildHeadline(paragraphs, shortTexts.headline(), htmlTransformer);
+    // Titelzeile
+    if (isNotBlank(headline)) {
+      buildHeadline(paragraphs, headline, htmlTransformer);
     }
 
     return Header.builder().paragraphs(paragraphs).build();
