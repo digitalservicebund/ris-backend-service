@@ -25,7 +25,7 @@ public class PendingProceedingReducedLdmlTransformer
     Meta.MetaBuilder builder = Meta.builder();
 
     return builder
-        .identification(buildIdentification(pendingProceeding))
+        .identification(buildIdentification(pendingProceeding, false))
         .references(buildReferences(pendingProceeding))
         .proprietary(Proprietary.builder().meta(buildRisMeta(pendingProceeding)).build())
         .build();

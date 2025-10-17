@@ -32,7 +32,7 @@ public class DecisionReducedLdmlTransformer extends DecisionCommonLdmlTransforme
     Meta.MetaBuilder builder = Meta.builder();
 
     return builder
-        .identification(buildIdentification(decision))
+        .identification(buildIdentification(decision, false))
         .references(buildReferences(decision))
         .proprietary(Proprietary.builder().meta(buildRisMeta(decision)).build())
         .build();

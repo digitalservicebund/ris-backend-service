@@ -12,7 +12,6 @@
                     <akn:FRBRalias name="Übergreifende ID" value="7f922a3a-0377-4c78-bce9-c945762e6da4"/>
                     <akn:FRBRalias name="Dokumentnummer" value="YYTestDoc0013"/>
                     <akn:FRBRalias name="ECLI" value="ecli test"/>
-                    <akn:FRBRalias name="CELEX-Nummer" value="celex test"/>
                     <akn:FRBRalias eId="aktenzeichen" name="Aktenzeichen" value="fileNumber test"/>
                     <akn:FRBRdate eId="entscheidungsdatum" date="2020-01-01" name="Entscheidungsdatum"/>
                     <akn:FRBRauthor href="#gericht"/>

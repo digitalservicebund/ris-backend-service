@@ -45,6 +45,11 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
   CaseLawLdml transformToLdml(T documentationUnit);
 
   default Identification buildIdentification(DocumentationUnit documentationUnit) {
+    return buildIdentification(documentationUnit, true);
+  }
+
+  default Identification buildIdentification(
+      DocumentationUnit documentationUnit, boolean isFullLdml) {
     String uniqueId = documentationUnit.documentNumber();
     FrbrDate frbrDecisionDate =
         new FrbrDate(
@@ -66,7 +71,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
                 + getDocOfficeEid(
                     nullSafeGet(documentationUnit.coreData(), CoreData::documentationOffice)));
 
-    List<FrbrAlias> aliases = generateAliases(documentationUnit);
+    List<FrbrAlias> aliases = generateAliases(documentationUnit, isFullLdml);
 
     var elementBuilder =
         FrbrElement.builder()
@@ -318,7 +323,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     return "";
   }
 
-  private List<FrbrAlias> generateAliases(DocumentationUnit documentationUnit) {
+  private List<FrbrAlias> generateAliases(DocumentationUnit documentationUnit, boolean isFullLdml) {
     List<FrbrAlias> aliases = new ArrayList<>();
 
     aliases.add(new FrbrAlias("Übergreifende ID", documentationUnit.uuid().toString()));
@@ -329,7 +334,8 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     }
 
     if (documentationUnit.coreData() != null
-        && documentationUnit.coreData().celexNumber() != null) {
+        && documentationUnit.coreData().celexNumber() != null
+        && isFullLdml) {
       aliases.add(new FrbrAlias("CELEX-Nummer", documentationUnit.coreData().celexNumber()));
     }
 
