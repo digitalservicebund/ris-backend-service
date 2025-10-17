@@ -80,7 +80,7 @@ describe("TextCheckModal", () => {
       screen.queryByText("Zum globalen Wörterbuch hinzufügen"),
     ).not.toBeInTheDocument()
     expect(
-      screen.queryByText("Aus globalem Wörterbuch entfernen"),
+      screen.queryByText("Aus Wörterbuch entfernen"),
     ).not.toBeInTheDocument()
 
     await user.click(screen.getByText("Nicht in Dokeinheit ignorieren"))
@@ -106,7 +106,7 @@ describe("TextCheckModal", () => {
       screen.queryByText("Zum globalen Wörterbuch hinzufügen"),
     ).not.toBeInTheDocument()
 
-    await user.click(screen.getByText("Aus globalem Wörterbuch entfernen"))
-    expect(emitted()["globalWord:remove"]).toEqual([["testword"]])
+    await user.click(screen.getByText("Aus Wörterbuch entfernen"))
+    expect(emitted()["globalWord:remove"]).toEqual([[]])
   })
 })
