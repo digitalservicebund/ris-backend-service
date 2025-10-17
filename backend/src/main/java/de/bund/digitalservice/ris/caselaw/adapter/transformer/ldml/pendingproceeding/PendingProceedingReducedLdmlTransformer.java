@@ -6,7 +6,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
-import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -22,9 +21,7 @@ public class PendingProceedingReducedLdmlTransformer
   }
 
   @Override
-  protected Meta buildMeta(PendingProceeding pendingProceeding) throws ValidationException {
-    validateCoreData(pendingProceeding);
-
+  protected Meta buildMeta(PendingProceeding pendingProceeding) {
     Meta.MetaBuilder builder = Meta.builder();
 
     return builder
@@ -39,7 +36,7 @@ public class PendingProceedingReducedLdmlTransformer
   }
 
   @Override
-  protected Header buildHeader(PendingProceeding pendingProceeding) throws ValidationException {
+  protected Header buildHeader(PendingProceeding pendingProceeding) {
     List<Paragraph> paragraphs = new ArrayList<>();
     paragraphs = buildCommonHeader(pendingProceeding, paragraphs);
     return Header.builder().paragraphs(paragraphs).build();

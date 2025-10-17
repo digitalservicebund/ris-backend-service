@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproce
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
+import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNotNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
@@ -44,6 +45,10 @@ public abstract class PendingProceedingCommonLdmlTransformer
 
   public CaseLawLdml transformToLdml(PendingProceeding pendingProceeding) {
     try {
+      validateCoreData(pendingProceeding);
+      validateNotNull(pendingProceeding.documentNumber(), "Unique identifier missing");
+      validateNotNull(pendingProceeding.uuid(), "Caselaw UUID missing");
+
       return CaseLawLdml.builder().judgment(buildJudgment(pendingProceeding)).build();
     } catch (ValidationException e) {
       if (e.getMessage().contains("Empty judgment body")) {
@@ -62,8 +67,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
         .build();
   }
 
-  protected abstract Header buildHeader(PendingProceeding pendingProceeding)
-      throws ValidationException;
+  protected abstract Header buildHeader(PendingProceeding pendingProceeding);
 
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(PendingProceeding pendingProceeding) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
@@ -108,7 +112,6 @@ public abstract class PendingProceedingCommonLdmlTransformer
 
   private JudgmentBody buildJudgmentBody(PendingProceeding pendingProceeding)
       throws ValidationException {
-
     JudgmentBody.JudgmentBodyBuilder builder = JudgmentBody.builder();
 
     builder
@@ -187,5 +190,5 @@ public abstract class PendingProceedingCommonLdmlTransformer
     return null;
   }
 
-  protected abstract Meta buildMeta(PendingProceeding pendingProceeding) throws ValidationException;
+  protected abstract Meta buildMeta(PendingProceeding pendingProceeding);
 }

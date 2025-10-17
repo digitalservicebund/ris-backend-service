@@ -24,7 +24,6 @@ import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
-import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,9 +45,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
   }
 
   @Override
-  protected Meta buildMeta(Decision decision) throws ValidationException {
-    validateCoreData(decision);
-
+  protected Meta buildMeta(Decision decision) {
     Meta.MetaBuilder builder = Meta.builder();
 
     List<Keyword> keywords =
@@ -152,7 +149,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
   }
 
   @Override
-  protected Header buildHeader(Decision decision) throws ValidationException {
+  protected Header buildHeader(Decision decision) {
     List<Paragraph> paragraphs = new ArrayList<>();
 
     paragraphs = buildCommonHeader(decision, paragraphs);

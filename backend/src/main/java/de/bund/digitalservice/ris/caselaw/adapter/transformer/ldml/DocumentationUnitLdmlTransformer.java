@@ -44,13 +44,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
 
   CaseLawLdml transformToLdml(T documentationUnit);
 
-  default Identification buildIdentification(DocumentationUnit documentationUnit)
-      throws ValidationException {
-    validateNotNull(documentationUnit.documentNumber(), "Unique identifier missing");
-    validateNotNull(documentationUnit.uuid(), "Caselaw UUID missing");
-    validateNotNull(
-        nullSafeGet(documentationUnit.coreData(), CoreData::decisionDate), "DecisionDate missing");
-
+  default Identification buildIdentification(DocumentationUnit documentationUnit) {
     String uniqueId = documentationUnit.documentNumber();
     FrbrDate frbrDecisionDate =
         new FrbrDate(
@@ -111,8 +105,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
   }
 
   default List<Paragraph> buildCommonHeader(
-      DocumentationUnit documentationUnit, List<Paragraph> paragraphs) throws ValidationException {
-    validateCoreData(documentationUnit);
+      DocumentationUnit documentationUnit, List<Paragraph> paragraphs) {
     var coreData = documentationUnit.coreData();
 
     // Aktenzeichen

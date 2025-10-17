@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
+import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNotNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
@@ -49,6 +50,10 @@ public abstract class DecisionCommonLdmlTransformer
 
   public CaseLawLdml transformToLdml(Decision decision) {
     try {
+      validateCoreData(decision);
+      validateNotNull(decision.documentNumber(), "Unique identifier missing");
+      validateNotNull(decision.uuid(), "Caselaw UUID missing");
+
       return CaseLawLdml.builder().judgment(buildJudgment(decision)).build();
     } catch (ValidationException e) {
       if (e.getMessage().contains("Empty judgment body")) {
@@ -70,9 +75,9 @@ public abstract class DecisionCommonLdmlTransformer
     return judgmentBuilder.build();
   }
 
-  protected abstract Header buildHeader(Decision decision) throws ValidationException;
+  protected abstract Header buildHeader(Decision decision);
 
-  protected abstract Meta buildMeta(Decision decision) throws ValidationException;
+  protected abstract Meta buildMeta(Decision decision);
 
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(Decision decision) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();

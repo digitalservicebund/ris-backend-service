@@ -11,7 +11,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.P
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
-import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,9 +28,7 @@ public class DecisionReducedLdmlTransformer extends DecisionCommonLdmlTransforme
   }
 
   @Override
-  protected Meta buildMeta(Decision decision) throws ValidationException {
-    validateCoreData(decision);
-
+  protected Meta buildMeta(Decision decision) {
     Meta.MetaBuilder builder = Meta.builder();
 
     return builder
@@ -62,7 +59,7 @@ public class DecisionReducedLdmlTransformer extends DecisionCommonLdmlTransforme
   }
 
   @Override
-  protected Header buildHeader(Decision decision) throws ValidationException {
+  protected Header buildHeader(Decision decision) {
     List<Paragraph> paragraphs = new ArrayList<>();
 
     paragraphs = buildCommonHeader(decision, paragraphs);

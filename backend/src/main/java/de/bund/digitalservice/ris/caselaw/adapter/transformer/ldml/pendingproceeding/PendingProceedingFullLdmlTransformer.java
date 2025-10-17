@@ -18,7 +18,6 @@ import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
-import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,9 +33,7 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
   }
 
   @Override
-  protected Meta buildMeta(PendingProceeding pendingProceeding) throws ValidationException {
-    validateCoreData(pendingProceeding);
-
+  protected Meta buildMeta(PendingProceeding pendingProceeding) {
     Meta.MetaBuilder builder = Meta.builder();
 
     List<Keyword> keywords =
@@ -94,7 +91,7 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
   }
 
   @Override
-  protected Header buildHeader(PendingProceeding pendingProceeding) throws ValidationException {
+  protected Header buildHeader(PendingProceeding pendingProceeding) {
     List<Paragraph> paragraphs = new ArrayList<>();
 
     paragraphs = buildCommonHeader(pendingProceeding, paragraphs);
