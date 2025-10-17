@@ -3,9 +3,9 @@ import Button from "primevue/button"
 import { computed } from "vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { Match } from "@/types/textCheck"
-import IconAutoStoriesVariant from "~icons/material-symbols/auto-stories"
-import IconAutoStoriesOffVariant from "~icons/material-symbols/auto-stories-off"
-import IconDescription from "~icons/material-symbols/description"
+import IconAutoStoriesOffVariant from "~icons/material-symbols/auto-stories-off-outline"
+import IconAutoStoriesVariant from "~icons/material-symbols/auto-stories-outline"
+import IconDescription from "~icons/material-symbols/description-outline"
 import IconSpellCheck from "~icons/material-symbols/spellcheck"
 
 const props = defineProps<{
@@ -58,48 +58,19 @@ const matchIsIgnoredInDocument = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-grow flex-col" data-testid="ignored-word-handler">
+  <div class="flex flex-col gap-16" data-testid="ignored-word-handler">
     <div v-if="matchIsIgnoredJDV">Von jDV ignoriert</div>
 
-    <div v-else class="flex flex-grow flex-col items-start gap-16">
-      <Button
-        v-if="!matchIsIgnoredGlobally && matchIsIgnoredInDocument"
-        aria-label="Wort nicht ignorieren"
-        data-testid="ignored-word-remove-button"
-        label="Nicht in Dokeinheit ignorieren"
-        size="small"
-        text
-        @click="removeWord"
-      >
-        <template #icon>
-          <IconSpellCheck />
-        </template>
-      </Button>
+    <template v-else>
+      <template v-if="matchIsIgnoredGlobally">
+        <div>im Wörterbuch / für alle Dokstellen ignoriert</div>
 
-      <Button
-        v-else-if="!matchIsIgnoredGlobally && !matchIsIgnoredInDocument"
-        aria-label="Wort ignorieren"
-        data-testid="ignored-word-add-button"
-        label="In Dokeinheit ignorieren"
-        size="small"
-        text
-        @click="addIgnoredWord"
-      >
-        <template #icon>
-          <IconDescription />
-        </template>
-      </Button>
-
-      <!-- Todo: Remove the outer div, when removing feature toggle textCheckGlobal -->
-      <div
-        v-if="textCheckGlobal"
-        class="flex flex-grow flex-col items-start gap-16"
-      >
         <Button
-          v-if="matchIsIgnoredGlobally"
-          aria-label="Wort aus globalem Wörterbuch entfernen"
+          v-if="textCheckGlobal"
+          aria-label="Wort aus Wörterbuch entfernen"
+          class="self-start"
           data-testid="ignored-word-global-remove-button"
-          label="Aus globalem Wörterbuch entfernen"
+          label="Aus Wörterbuch entfernen"
           size="small"
           text
           @click="removeWordGlobally"
@@ -108,11 +79,31 @@ const matchIsIgnoredInDocument = computed(() => {
             <IconAutoStoriesOffVariant />
           </template>
         </Button>
+      </template>
+
+      <template v-else-if="matchIsIgnoredInDocument">
+        <div>in dieser Dokumentationseinheit ignoriert</div>
 
         <Button
-          v-else
-          aria-label="Wort zu globalem Wörterbuch hinzufügen"
-          label="Zum globalen Wörterbuch hinzufügen"
+          aria-label="Nicht in Dokeinheit ignorieren"
+          class="self-start"
+          data-testid="ignored-word-remove-button"
+          label="Nicht in Dokeinheit ignorieren"
+          severity="secondary"
+          size="small"
+          @click="removeWord"
+        >
+          <template #icon>
+            <IconSpellCheck />
+          </template>
+        </Button>
+
+        <Button
+          v-if="textCheckGlobal"
+          aria-label="Zum Wörterbuch hinzufügen"
+          class="self-start"
+          data-testid="ignored-word-global-add-button"
+          label="Zum Wörterbuch hinzufügen"
           size="small"
           text
           @click="addIgnoredWordGlobally"
@@ -121,7 +112,38 @@ const matchIsIgnoredInDocument = computed(() => {
             <IconAutoStoriesVariant />
           </template>
         </Button>
-      </div>
-    </div>
+      </template>
+
+      <template v-else>
+        <Button
+          v-if="textCheckGlobal"
+          aria-label="In Dokeinheit ignorieren"
+          class="self-start"
+          data-testid="ignored-word-add-button"
+          label="In Dokeinheit ignorieren"
+          severity="secondary"
+          size="small"
+          @click="addIgnoredWord"
+        >
+          <template #icon>
+            <IconDescription />
+          </template>
+        </Button>
+
+        <Button
+          v-if="textCheckGlobal"
+          aria-label="Zum Wörterbuch hinzufügen"
+          data-testid="ignored-word-global-add-button"
+          label="Zum Wörterbuch hinzufügen"
+          size="small"
+          text
+          @click="addIgnoredWordGlobally"
+        >
+          <template #icon>
+            <IconAutoStoriesVariant />
+          </template>
+        </Button>
+      </template>
+    </template>
   </div>
 </template>
