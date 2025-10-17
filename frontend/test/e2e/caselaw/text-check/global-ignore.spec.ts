@@ -59,9 +59,7 @@ test.describe(
           await headNoteEditor.locator("text-check").first().click()
           await expect(page.getByTestId("text-check-modal")).toBeVisible()
 
-          await expect(
-            page.getByText("Aus globalem Wörterbuch entfernen"),
-          ).toBeHidden()
+          await expect(page.getByText("Aus Wörterbuch entfernen")).toBeHidden()
           await expect(
             page.getByText("Zu globalem Wörterbuch hinzufügen"),
           ).toBeHidden()
@@ -132,14 +130,12 @@ test.describe(
             .waitFor({ state: "visible" })
           await secondHeadNoteEditor.locator("text-check").first().click()
           await expect(
-            pageWithBghUser.getByText("Aus globalem Wörterbuch entfernen"),
+            pageWithBghUser.getByText("Aus Wörterbuch entfernen"),
           ).toBeVisible()
         })
 
         await test.step("remove word from global ignore", async () => {
-          await pageWithBghUser
-            .getByText("Aus globalem Wörterbuch entfernen")
-            .click()
+          await pageWithBghUser.getByText("Aus Wörterbuch entfernen").click()
         })
 
         await test.step("check text again in doc unit A and expect word not to be ignored globally", async () => {

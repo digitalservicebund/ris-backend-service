@@ -251,7 +251,7 @@ test.describe(
 
             const locator = page.getByTestId("ignored-word-handler")
             await expect(locator).toHaveText(
-              /.*(Von jDV ignoriert|Aus globalem Wörterbuch entfernen|Nicht ignorieren).*/i,
+              /.*(Von jDV ignoriert|Aus Wörterbuch entfernen|Nicht ignorieren).*/i,
             )
           }
         })
