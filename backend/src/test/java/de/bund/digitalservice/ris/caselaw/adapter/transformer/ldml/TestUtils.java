@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml;
 
+import java.time.LocalDate;
 import org.xmlunit.diff.ComparisonResult;
 import org.xmlunit.diff.ComparisonType;
 import org.xmlunit.diff.DifferenceEvaluator;
@@ -26,7 +27,9 @@ public class TestUtils {
                   .equals(controlXPath)
               || "/akomaNtoso[1]/judgment[1]/meta[1]/identification[1]/FRBRManifestation[1]/FRBRdate[1]/@date"
                   .equals(testXPath)) {
-            return ComparisonResult.EQUAL;
+            return LocalDate.now().toString().equals(comparison.getTestDetails().getValue())
+                ? ComparisonResult.EQUAL
+                : ComparisonResult.DIFFERENT;
           }
         }
 
