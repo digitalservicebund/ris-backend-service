@@ -2,19 +2,23 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproce
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknKeyword;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Classification;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Classification;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Keyword;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
-import jakarta.xml.bind.ValidationException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,16 +33,14 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
   }
 
   @Override
-  protected Meta buildMeta(PendingProceeding pendingProceeding) throws ValidationException {
-    validateCoreData(pendingProceeding);
-
+  protected Meta buildMeta(PendingProceeding pendingProceeding) {
     Meta.MetaBuilder builder = Meta.builder();
 
-    List<AknKeyword> keywords =
+    List<Keyword> keywords =
         pendingProceeding.contentRelatedIndexing() == null
             ? Collections.emptyList()
             : pendingProceeding.contentRelatedIndexing().keywords().stream()
-                .map(AknKeyword::new)
+                .map(Keyword::new)
                 .toList();
 
     if (!keywords.isEmpty()) {
@@ -47,6 +49,7 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
 
     return builder
         .identification(buildIdentification(pendingProceeding))
+        .references(buildReferences(pendingProceeding))
         .proprietary(Proprietary.builder().meta(buildRisMeta(pendingProceeding)).build())
         .build();
   }
@@ -85,5 +88,20 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
                 nullSafeGet(lastStatus, Status::publicationStatus), PublicationStatus::toString))
         .error(lastStatus != null && lastStatus.withError())
         .build();
+  }
+
+  @Override
+  protected Header buildHeader(PendingProceeding pendingProceeding) {
+    List<Paragraph> paragraphs = new ArrayList<>();
+
+    paragraphs = buildCommonHeader(pendingProceeding, paragraphs);
+    var shortTexts = pendingProceeding.shortTexts();
+    var headline = nullSafeGet(shortTexts, PendingProceedingShortTexts::headline);
+
+    if (isNotBlank(headline)) {
+      buildHeadline(paragraphs, headline, htmlTransformer);
+    }
+
+    return Header.builder().paragraphs(paragraphs).build();
   }
 }
