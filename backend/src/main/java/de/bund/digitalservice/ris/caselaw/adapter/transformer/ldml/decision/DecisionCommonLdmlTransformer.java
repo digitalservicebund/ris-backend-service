@@ -258,10 +258,8 @@ public abstract class DecisionCommonLdmlTransformer
       block = new Block("Mitwirkende Richter", opinions);
     }
 
-    List<Object> content = new ArrayList<>();
-    if (dissentingOpinion != null && !dissentingOpinion.isBlank()) {
-      content.addAll(htmlTransformer.htmlStringToObjectList(dissentingOpinion));
-    }
+    List<Object> content =
+        new ArrayList<>(htmlTransformer.htmlStringToObjectList(dissentingOpinion));
 
     if (block != null) {
       content.add(block);
