@@ -51,11 +51,15 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
             DateUtils.toDateString(
                 nullSafeGet(documentationUnit.coreData(), CoreData::decisionDate)),
             getDateName(documentationUnit));
+    FrbrDate frbrDecisionDateWithEid =
+        new FrbrDate(
+            DateUtils.toDateString(
+                nullSafeGet(documentationUnit.coreData(), CoreData::decisionDate)),
+            getDateName(documentationUnit));
+    frbrDecisionDateWithEid.setEid(toKebabCase(getDateName(documentationUnit)));
     FrbrDate frbrPublicationDate =
         new FrbrDate(DateUtils.toDateString(LocalDate.now()), "XML Transformation");
-    FrbrAuthor workExpressionAuthor =
-        new FrbrAuthor(
-            "#" + getCourtEid(nullSafeGet(documentationUnit.coreData(), CoreData::court)));
+    FrbrAuthor workExpressionAuthor = new FrbrAuthor("#gericht");
     FrbrAuthor manifestationAuthor =
         new FrbrAuthor(
             "#"
@@ -67,7 +71,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     var elementBuilder =
         FrbrElement.builder()
             .frbrAlias(aliases)
-            .frbrDate(frbrDecisionDate)
+            .frbrDate(frbrDecisionDateWithEid)
             .frbrAuthor(workExpressionAuthor);
 
     if (documentationUnit.coreData() != null
@@ -213,9 +217,8 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     }
 
     if (documentationUnit.coreData() != null && documentationUnit.coreData().court() != null) {
-      String courtEId = getCourtEid(documentationUnit.coreData().court());
       TlcElement tlcCourt =
-          new TlcElement(courtEId, "", documentationUnit.coreData().court().label());
+          new TlcElement("gericht", "", documentationUnit.coreData().court().label());
       tlcOrganizations.add(tlcCourt);
       TlcElement tlcCourtLocation =
           new TlcElement("gerichtsort", "", documentationUnit.coreData().court().location());
@@ -253,10 +256,6 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
                         .build())
                 .build());
     paragraphs.add(headlineParagraph);
-  }
-
-  private String getCourtEid(Court court) {
-    return toKebabCase(court.type() + " " + court.location());
   }
 
   private String getDocOfficeEid(DocumentationOffice documentationOffice) {
@@ -336,10 +335,18 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
 
     if (documentationUnit.coreData() != null
         && documentationUnit.coreData().fileNumbers() != null) {
-      documentationUnit
-          .coreData()
-          .fileNumbers()
-          .forEach(fileNumber -> aliases.add(new FrbrAlias("Aktenzeichen", fileNumber)));
+      List<String> fileNumbers = documentationUnit.coreData().fileNumbers();
+      boolean first = true;
+      for (String fileNumber : fileNumbers) {
+        if (fileNumber != null) {
+          var alias = new FrbrAlias("Aktenzeichen", fileNumber);
+          if (first) {
+            alias.setEid("aktenzeichen");
+            first = false;
+          }
+          aliases.add(alias);
+        }
+      }
     }
     return aliases;
   }

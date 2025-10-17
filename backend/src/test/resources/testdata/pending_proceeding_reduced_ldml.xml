@@ -11,16 +11,16 @@
                     <akn:FRBRuri value="YYTestDoc0013"/>
                     <akn:FRBRalias name="Übergreifende ID" value="8ea9d41a-9768-462b-b79f-f7147f61df52"/>
                     <akn:FRBRalias name="Dokumentnummer" value="YYTestDoc0013"/>
-                    <akn:FRBRalias name="Aktenzeichen" value="Aktenzeichen"/>
-                    <akn:FRBRdate date="2020-01-01" name="Mitteilungsdatum"/>
-                    <akn:FRBRauthor href="#courttype-courtlocation"/>
+                    <akn:FRBRalias eId="aktenzeichen" name="Aktenzeichen" value="Aktenzeichen"/>
+                    <akn:FRBRdate eId="mitteilungsdatum" date="2020-01-01" name="Mitteilungsdatum"/>
+                    <akn:FRBRauthor href="#gericht"/>
                     <akn:FRBRcountry value="deu"/>
                 </akn:FRBRWork>
                 <akn:FRBRExpression>
                     <akn:FRBRthis value="YYTestDoc0013"/>
                     <akn:FRBRuri value="YYTestDoc0013"/>
                     <akn:FRBRdate date="2020-01-01" name="Mitteilungsdatum"/>
-                    <akn:FRBRauthor href="#courttype-courtlocation"/>
+                    <akn:FRBRauthor href="#gericht"/>
                     <akn:FRBRlanguage language="deu"/>
                 </akn:FRBRExpression>
                 <akn:FRBRManifestation>
@@ -33,7 +33,7 @@
             <akn:references source="#ris">
                 <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
                 <akn:TLCOrganization eId="bfh-dokumentationsstelle" href="" showAs="BFH"/>
-                <akn:TLCOrganization eId="courttype-courtlocation"
+                <akn:TLCOrganization eId="gericht"
                                      href=""
                                      showAs="courtType courtLocation"/>
                 <akn:TLCLocation eId="gerichtsort" href="" showAs="courtLocation"/>

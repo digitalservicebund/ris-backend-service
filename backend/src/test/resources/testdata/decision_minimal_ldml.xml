@@ -10,16 +10,16 @@
                     <akn:FRBRuri value="testDocumentNumber"/>
                     <akn:FRBRalias name="Übergreifende ID" value="13dffd6f-45e8-447e-a35b-f119b1301579"/>
                     <akn:FRBRalias name="Dokumentnummer" value="testDocumentNumber"/>
-                    <akn:FRBRalias name="Aktenzeichen" value="testFileNumber"/>
-                    <akn:FRBRdate date="2020-01-01" name="Entscheidungsdatum"/>
-                    <akn:FRBRauthor href="#tribunal-administratif-nantes"/>
+                    <akn:FRBRalias eId="aktenzeichen" name="Aktenzeichen" value="testFileNumber"/>
+                    <akn:FRBRdate eId="entscheidungsdatum" date="2020-01-01" name="Entscheidungsdatum"/>
+                    <akn:FRBRauthor href="#gericht"/>
                     <akn:FRBRcountry value="fra"/>
                 </akn:FRBRWork>
                 <akn:FRBRExpression>
                     <akn:FRBRthis value="testDocumentNumber"/>
                     <akn:FRBRuri value="testDocumentNumber"/>
                     <akn:FRBRdate date="2020-01-01" name="Entscheidungsdatum"/>
-                    <akn:FRBRauthor href="#tribunal-administratif-nantes"/>
+                    <akn:FRBRauthor href="#gericht"/>
                     <akn:FRBRlanguage language="deu"/>
                 </akn:FRBRExpression>
                 <akn:FRBRManifestation>
@@ -31,7 +31,7 @@
             </akn:identification>
             <akn:references source="#ris">
                 <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
-                <akn:TLCOrganization eId="tribunal-administratif-nantes"
+                <akn:TLCOrganization eId="gericht"
                                      href=""
                                      showAs="Tribunal Administratif Nantes"/>
                 <akn:TLCLocation eId="gerichtsort" href="" showAs="Nantes"/>

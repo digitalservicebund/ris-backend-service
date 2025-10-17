@@ -12,16 +12,16 @@
                     <akn:FRBRalias name="Dokumentnummer" value="YYTestDoc0013"/>
                     <akn:FRBRalias name="ECLI" value="ecli test"/>
                     <akn:FRBRalias name="CELEX-Nummer" value="celex test"/>
-                    <akn:FRBRalias name="Aktenzeichen" value="fileNumber test"/>
-                    <akn:FRBRdate date="2020-01-01" name="Entscheidungsdatum"/>
-                    <akn:FRBRauthor href="#courttype-courtlocation"/>
+                    <akn:FRBRalias eId="aktenzeichen" name="Aktenzeichen" value="fileNumber test"/>
+                    <akn:FRBRdate eId="entscheidungsdatum" date="2020-01-01" name="Entscheidungsdatum"/>
+                    <akn:FRBRauthor href="#gericht"/>
                     <akn:FRBRcountry value="deu"/>
                 </akn:FRBRWork>
                 <akn:FRBRExpression>
                     <akn:FRBRthis value="YYTestDoc0013"/>
                     <akn:FRBRuri value="YYTestDoc0013"/>
                     <akn:FRBRdate date="2020-01-01" name="Entscheidungsdatum"/>
-                    <akn:FRBRauthor href="#courttype-courtlocation"/>
+                    <akn:FRBRauthor href="#gericht"/>
                     <akn:FRBRlanguage language="deu"/>
                 </akn:FRBRExpression>
                 <akn:FRBRManifestation>
@@ -38,7 +38,7 @@
                 <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
                 <akn:TLCOrganization eId="documentationoffice-dokumentationsstelle" href=""
                                      showAs="documentationOffice"/>
-                <akn:TLCOrganization eId="courttype-courtlocation" href="" showAs="courtLabel test"/>
+                <akn:TLCOrganization eId="gericht" href="" showAs="courtLabel test"/>
                 <akn:TLCOrganization eId="spruchkoerper" href="" showAs="appraisalBody test"/>
                 <akn:TLCPerson eId="dr-phil-max-mustermann" href="" showAs="Dr. Phil. Max Mustermann"/>
                 <akn:TLCPerson eId="richterin-maxima-mustermann" href="" showAs="Richterin Maxima Mustermann"/>
