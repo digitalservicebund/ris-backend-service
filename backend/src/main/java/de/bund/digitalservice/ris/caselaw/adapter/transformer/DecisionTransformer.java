@@ -155,7 +155,7 @@ public class DecisionTransformer extends DocumentableTransformer {
     }
 
     if (updatedDomainObject.shortTexts() != null) {
-      addShortTexts(updatedDomainObject, builder, currentDto);
+      addShortTexts(updatedDomainObject, builder);
     } else {
       currentDto.getDecisionNames().clear();
       builder
@@ -245,7 +245,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   }
 
   private static void addShortTexts(
-      Decision updatedDomainObject, DecisionDTOBuilder<?, ?> builder, DecisionDTO currentDto) {
+      Decision updatedDomainObject, DecisionDTOBuilder<?, ?> builder) {
     ShortTexts shortTexts = updatedDomainObject.shortTexts();
 
     builder
@@ -254,12 +254,17 @@ public class DecisionTransformer extends DocumentableTransformer {
         .otherHeadnote(shortTexts.otherHeadnote())
         .headline(shortTexts.headline());
 
-    var currentDecisionNames = currentDto.getDecisionNames();
-    currentDecisionNames.clear();
-    if (shortTexts.decisionName() != null) {
-      currentDecisionNames.add(DecisionNameDTO.builder().value(shortTexts.decisionName()).build());
+    var decisionNames = shortTexts.decisionNames();
+    if (decisionNames != null && !decisionNames.isEmpty()) {
+      List<DecisionNameDTO> decisionNameDTOs = new ArrayList<>();
+      for (int i = 0; i < decisionNames.size(); i++) {
+        decisionNameDTOs.add(
+            DecisionNameDTO.builder().value(decisionNames.get(i)).rank(i + 1).build());
+      }
+      builder.decisionNames(decisionNameDTOs);
+    } else {
+      builder.decisionNames(Collections.emptyList());
     }
-    builder.decisionNames(currentDto.getDecisionNames());
   }
 
   private static void addActiveCitations(
@@ -608,14 +613,8 @@ public class DecisionTransformer extends DocumentableTransformer {
   private static ShortTexts buildShortTexts(DecisionDTO decisionDTO) {
     return ShortTexts.builder()
         .headline(decisionDTO.getHeadline())
-        // TODO multiple decisionNames
-        .decisionName(
-            (decisionDTO.getDecisionNames() == null || decisionDTO.getDecisionNames().isEmpty())
-                ? null
-                : decisionDTO.getDecisionNames().stream()
-                    .findFirst()
-                    .map(DecisionNameDTO::getValue)
-                    .orElse(null))
+        .decisionNames(
+            decisionDTO.getDecisionNames().stream().map(DecisionNameDTO::getValue).toList())
         .guidingPrinciple(decisionDTO.getGuidingPrinciple())
         .headnote(decisionDTO.getHeadnote())
         .otherHeadnote(decisionDTO.getOtherHeadnote())
