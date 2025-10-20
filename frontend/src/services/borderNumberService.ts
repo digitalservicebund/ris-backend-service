@@ -205,8 +205,9 @@ function invalidateBorderNumberLinks(
   numbersToBeInvalidated: string[],
 ): void {
   const { participatingJudges, ...longTexts } = documentUnit.longTexts
+  const { decisionNames, ...shortTexts } = documentUnit.shortTexts
   const texts = [
-    ...getParsedDocumentPerCategory(documentUnit.shortTexts, "shortTexts"),
+    ...getParsedDocumentPerCategory(shortTexts, "shortTexts"),
     ...getParsedDocumentPerCategory(longTexts, "longTexts"),
   ]
 
