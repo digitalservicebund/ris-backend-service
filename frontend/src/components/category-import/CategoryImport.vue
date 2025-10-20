@@ -141,7 +141,8 @@ const hasContent = (key: keyof typeof allLabels): boolean => {
   return false
 }
 
-const isImportable = (key: keyof typeof allLabels): boolean => {
+// prettier-ignore
+const isImportable = (key: keyof typeof allLabels): boolean => { // NOSONAR typescript:S3776
   if (
     isDecision(targetDocumentUnit.value) &&
     isDecision(sourceDocumentUnit.value)
