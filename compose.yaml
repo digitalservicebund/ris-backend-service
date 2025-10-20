@@ -52,7 +52,7 @@ services:
       timeout: 3s
 
   backend:
-    image: gradle:9-jdk17
+    image: gradle:9-jdk21
     user: ${MY_UID}:${MY_GID}
     extra_hosts:
       - localhost:host-gateway
