@@ -16,6 +16,7 @@ async function renderComponent(match: Match) {
     ...render(IgnoredWordHandler, {
       props: {
         match: match,
+        ignoredLocally: false,
       },
     }),
   }

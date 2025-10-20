@@ -1,14 +1,19 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { Editor } from "@tiptap/vue-3"
+import { Selection } from "prosemirror-state"
+import { computed, ComputedRef } from "vue"
 import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
+import { IgnoreOnceTagName } from "@/editor/ignoreOnceMark"
 import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
   match: Match
+  selection: Selection
+  editor: Editor
 }>()
 
 const emit = defineEmits<{
-  "ignore-once:toggle": [offset: number, length: number]
+  "ignore-once:toggle": [offset: number]
   "word:remove": [value: string]
   "word:add": [word: string]
   "globalWord:remove": [value: string]
@@ -31,27 +36,22 @@ function removeGloballyIgnoredWord(word: string) {
   emit("globalWord:remove", word)
 }
 
-const isMatchIgnored = computed(() => {
-  return (
-    Array.isArray(props.match.ignoredTextCheckWords) &&
-    props.match.ignoredTextCheckWords.length > 0
-  )
+const isMatchIgnoredLocally: ComputedRef<boolean> = computed(() => {
+  const cursorLocation = props.editor?.state?.selection?.from
+  const activeNode = props.editor?.state?.doc?.nodeAt(cursorLocation)
+  if (activeNode && activeNode.marks) {
+    for (const mark of activeNode.marks) {
+      if (mark.type.name === IgnoreOnceTagName) {
+        return true
+      }
+    }
+  }
+  return false
 })
-function ignoreOnceToggle(offset: number, length: number) {
-  emit("ignore-once:toggle", offset, length)
-}
 
-// TODO: this was causing linter issues, so I disabled it for now
-// function getValues(replacements: Replacement[]) {
-//   return replacements.flatMap((replacement) => replacement.value)
-// }
-//
-// const isMatchIgnored = computed(() => {
-//   return (
-//     Array.isArray(props.match.ignoredTextCheckWords) &&
-//     props.match.ignoredTextCheckWords.length > 0
-//   )
-// })
+function ignoreOnceToggle(offset: number) {
+  emit("ignore-once:toggle", offset)
+}
 </script>
 
 <template>
@@ -65,13 +65,12 @@ function ignoreOnceToggle(offset: number, length: number) {
       </span>
     </div>
 
-    <p v-if="!isMatchIgnored">{{ match.shortMessage || match.message }}</p>
-
     <IgnoredWordHandler
+      :ignored-locally="isMatchIgnoredLocally"
       :match="match"
       @globally-ignored-word:add="addIgnoredWordGlobally"
       @globally-ignored-word:remove="removeGloballyIgnoredWord(match.word)"
-      @ignore-once:toggle="ignoreOnceToggle(match.offset, match.length)"
+      @ignore-once:toggle="ignoreOnceToggle(selection.from)"
       @ignored-word:add="addIgnoredWord(match.word)"
       @ignored-word:remove="removeIgnoredWord(match.word)"
     />

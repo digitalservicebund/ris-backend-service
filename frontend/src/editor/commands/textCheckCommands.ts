@@ -1,13 +1,13 @@
 import { Editor } from "@tiptap/core"
 import { EditorState } from "prosemirror-state"
 import { ref } from "vue"
+import { IgnoreOnceTagName } from "@/editor/ignoreOnceMark"
 import { ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import {
   DocumentationType,
   IgnoredTextCheckWord,
-  IgnoreOnceTagName,
   Match,
   TextCheckCategoryResponse,
   TextCheckService,

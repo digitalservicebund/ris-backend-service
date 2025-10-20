@@ -1,10 +1,12 @@
-import "@/styles/ignore-once.scss"
 import { Mark } from "@tiptap/vue-3"
-import { IgnoreOnceTagName } from "@/types/textCheck"
+
+export const IgnoreOnceTagName = "ignore-once"
 
 export const IgnoreOnceMark = Mark.create({
   name: IgnoreOnceTagName,
   priority: 1000,
+  inclusive: true,
+  excludes: "",
   group: "inline",
   parseHTML() {
     return [

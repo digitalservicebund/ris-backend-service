@@ -1,12 +1,35 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { Editor } from "@tiptap/vue-3"
+import { Selection } from "prosemirror-state"
 import TextCheckModal from "@/components/text-check/TextCheckModal.vue"
 import { Match } from "@/types/textCheck"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
 useFeatureToggleServiceMock()
 
-function renderComponent(match: Match) {
+function createDefaultSelection(): Selection {
+  return {} as unknown as Selection
+}
+
+function createDefaultEditor(): Editor {
+  const mockEditor = {
+    view: {},
+    state: {},
+    commands: {},
+    chain: () => ({
+      focus: () => ({}),
+    }),
+    isActive: () => false,
+    on: () => {},
+    off: () => {},
+    getAttributes: () => ({}),
+    // add other methods used by the component if tests fail at runtime
+  }
+  return mockEditor as unknown as Editor
+}
+
+function renderComponent(match: Match, selection: Selection, editor: Editor) {
   const user = userEvent.setup()
 
   return {
@@ -14,6 +37,8 @@ function renderComponent(match: Match) {
     ...render(TextCheckModal, {
       props: {
         match: match,
+        selection: selection,
+        editor: editor,
       },
     }),
   }
@@ -43,7 +68,7 @@ const baseMatch: Match = {
 
 describe("TextCheckModal", () => {
   test.skip("renders the word, message, replacements and options correctly when not ignored", () => {
-    renderComponent(baseMatch)
+    renderComponent(baseMatch, createDefaultSelection(), createDefaultEditor())
     expect(screen.getByTestId("text-check-modal")).toBeInTheDocument()
     expect(screen.getByTestId("text-check-modal-word")).toHaveTextContent(
       "testword",
@@ -57,22 +82,26 @@ describe("TextCheckModal", () => {
     ).toBeInTheDocument()
   })
 
-  it("renders the full message if shortMessage is not available", () => {
-    renderComponent({ ...baseMatch, shortMessage: "" })
-    expect(screen.getByText(baseMatch.message)).toBeInTheDocument()
+  it("renders the shortMessage", () => {
+    renderComponent(baseMatch, createDefaultSelection(), createDefaultEditor())
+    expect(screen.getByText(baseMatch.shortMessage)).toBeInTheDocument()
   })
 
   it("emits 'word:remove' event when word is ignored locally and remove ignored word button is clicked ", async () => {
-    const { emitted, user } = renderComponent({
-      ...baseMatch,
-      ignoredTextCheckWords: [
-        {
-          type: "documentation_unit",
-          word: "testword",
-          id: "1",
-        },
-      ],
-    })
+    const { emitted, user } = renderComponent(
+      {
+        ...baseMatch,
+        ignoredTextCheckWords: [
+          {
+            type: "documentation_unit",
+            word: "testword",
+            id: "1",
+          },
+        ],
+      },
+      createDefaultSelection(),
+      createDefaultEditor(),
+    )
 
     // don't render the other options
     expect(screen.queryByText("Ignorieren")).not.toBeInTheDocument()
@@ -88,16 +117,24 @@ describe("TextCheckModal", () => {
   })
 
   test.skip("emits 'globalWord:add' event when the 'Zum globalen Wörterbuch hinzufügen' button is clicked", async () => {
-    const { emitted, user } = renderComponent(baseMatch)
+    const { emitted, user } = renderComponent(
+      baseMatch,
+      createDefaultSelection(),
+      createDefaultEditor(),
+    )
     await user.click(screen.getByText("Zum globalen Wörterbuch hinzufügen"))
     expect(emitted()["globalWord:add"]).toEqual([["testword"]])
   })
 
   test.skip("emits 'globalWord:remove' event when remove global ignore button is clicked", async () => {
-    const { emitted, user } = renderComponent({
-      ...baseMatch,
-      ignoredTextCheckWords: [{ type: "global", word: "testword", id: "1" }],
-    })
+    const { emitted, user } = renderComponent(
+      {
+        ...baseMatch,
+        ignoredTextCheckWords: [{ type: "global", word: "testword", id: "1" }],
+      },
+      createDefaultSelection(),
+      createDefaultEditor(),
+    )
 
     // don't render the other options
     expect(screen.queryByText("Ignorieren")).not.toBeInTheDocument()

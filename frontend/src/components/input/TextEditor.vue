@@ -33,7 +33,7 @@ import { CustomBulletList } from "@/editor/bulletList"
 import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
 import { EventHandler } from "@/editor/EventHandler"
 import { FontSize } from "@/editor/fontSize"
-import { IgnoreOnceMark } from "@/editor/ignoreOnceMark"
+import { IgnoreOnceMark, IgnoreOnceTagName } from "@/editor/ignoreOnceMark"
 import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
 import { InvisibleCharacters } from "@/editor/invisibleCharacters"
@@ -45,7 +45,7 @@ import { TableStyle } from "@/editor/tableStyle"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { IgnoreOnceTagName, Match, TextCheckTagName } from "@/types/textCheck"
+import { Match, TextCheckTagName } from "@/types/textCheck"
 
 interface Props {
   value?: string
@@ -141,8 +141,8 @@ const editor: Editor = new Editor({
     Indent.configure({
       names: ["listItem", "paragraph"],
     }),
-    IgnoreOnceMark,
     TextCheckMark,
+    IgnoreOnceMark,
     TextCheckExtension.configure({
       service: textCheckService,
     }),
@@ -203,21 +203,27 @@ const shouldShowBubbleMenu = (): boolean => {
   }
 }
 
-function ignoreOnceToggle(offset: number, length: number) {
-  //TODO: this is ugly, fix it
-  console.log("ignoreOnceToggle offset length", offset, length)
-  const { state } = editor
-  let from = offset
-  let to = offset + length
+type TextCheckAttrs = {
+  id: string
+  type: string
+  ignored: boolean
+}
 
+const currentAttrs = ref<TextCheckAttrs>()
+function ignoreOnceToggle(offset: number) {
+  const { state } = editor
+  let from: number = offset
+  let to: number | null = null
   let markRange = { from: 0, to: 0 }
+
   state.doc.descendants((node, pos) => {
     if (node.isText) {
       node.marks.forEach((mark) => {
-        console.log("mark", mark)
         if (mark.type.name === TextCheckTagName) {
-          if (pos <= offset && pos + node.nodeSize >= offset) {
+          if (pos <= from && pos + node.nodeSize >= from) {
             markRange = { from: pos, to: pos + node.nodeSize }
+            currentAttrs.value = { ...(mark.attrs as TextCheckAttrs) }
+            currentAttrs.value.ignored = !currentAttrs.value.ignored
           }
         }
       })
@@ -227,14 +233,16 @@ function ignoreOnceToggle(offset: number, length: number) {
   if (markRange) {
     from = markRange.from
     to = markRange.to
+  } else {
+    return
   }
 
-  console.log("ignoreOnceToggle from to", from, to)
   editor
     .chain()
     .focus()
     .setTextSelection({ from, to })
     .unsetMark(TextCheckTagName)
+    .setMark(TextCheckTagName, { ...currentAttrs.value })
     .toggleMark(IgnoreOnceTagName)
     .run()
 }
@@ -245,16 +253,6 @@ function ignoreOnceToggle(offset: number, length: number) {
 async function addIgnoredWord(word: string) {
   await textCheckService.ignoreWord(word)
   editor.commands.setSelectedMatch()
-}
-
-/**
- * Replace and reset selected match
- * @param suggestion
- */
-const acceptSuggestion = (suggestion: string) => {
-  if (selectedMatch.value && selectedMatch.value?.id) {
-    editor.commands.acceptMatch(selectedMatch.value.id, suggestion)
-  }
 }
 
 /**
@@ -404,15 +402,14 @@ defineExpose({ jumpToMatch })
       >
         <TextCheckModal
           v-if="selectedMatch"
+          :editor="editor"
           :match="selectedMatch"
+          :selection="editor.state.selection"
           @global-word:add="addGloballyIgnoredWord"
           @global-word:remove="removeGloballyIgnoredWord"
-          @ignore-once:toggle="
-            ignoreOnceToggle(selectedMatch.offset, selectedMatch.length)
-          "
+          @ignore-once:toggle="ignoreOnceToggle"
           @word:add="addIgnoredWord"
           @word:remove="removeIgnoredWord"
-          @word:replace="acceptSuggestion"
         />
       </BubbleMenu>
     </div>

@@ -159,4 +159,3 @@ export interface TextCheckService {
 }
 
 export const TextCheckTagName = "textCheck"
-export const IgnoreOnceTagName = "ignore-once"
