@@ -1351,7 +1351,7 @@ class DocumentationUnitServiceTest {
         "/contentRelatedIndexing/dismissalGrounds",
         "/contentRelatedIndexing/collectiveAgreements",
         "/contentRelatedIndexing/hasLegislativeMandate",
-        "/shortTexts/decisionName",
+        "/shortTexts/decisionNames",
         "/shortTexts/headline",
         "/shortTexts/guidingPrinciple",
         "/shortTexts/headnote",
