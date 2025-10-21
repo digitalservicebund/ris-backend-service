@@ -6,6 +6,18 @@ function authenticateUser(user: {
   email: string
   password: string
 }) {
+  if (!user.email) {
+    throw new Error(
+      `Email for "${user.name}" is missing. Have you provided the correct environment variables?`,
+    )
+  }
+
+  if (!user.password) {
+    throw new Error(
+      `Password for "${user.name}" is missing. Have you provided the correct environment variables?`,
+    )
+  }
+
   setup(`authenticate ${user.name}`, async ({ page, browser }) => {
     const cookieFilePath = `test/e2e/caselaw/.auth/${user.name}.json`
     if (fs.existsSync(cookieFilePath)) {
