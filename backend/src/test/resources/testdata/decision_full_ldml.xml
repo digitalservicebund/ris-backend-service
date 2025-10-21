@@ -48,6 +48,7 @@
                 <ris:meta>
                     <ris:decisionNames>
                         <ris:decisionName>decisionName test</ris:decisionName>
+                        <ris:decisionName>decisionName2 test</ris:decisionName>
                     </ris:decisionNames>
                     <ris:previousDecisions>
                         <ris:previousDecision date="2020-01-01">
@@ -148,8 +149,9 @@
                 Dokumenttyp:
                 <akn:docType refersTo="#dokumenttyp">documentType test</akn:docType>
             </akn:p>
-            <akn:p>Entscheidungsname:
+            <akn:p>Entscheidungsnamen:
                 <akn:docTitle refersTo="#entscheidungsname">decisionName test</akn:docTitle>
+                <akn:docTitle refersTo="#entscheidungsname">decisionName2 test</akn:docTitle>
             </akn:p>
             <akn:p>Titelzeile:
                 <akn:shortTitle refersTo="#titelzeile">

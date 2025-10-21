@@ -449,7 +449,7 @@ class DecisionFullLdmlTransformerTest {
           <akn:p>Gericht: <akn:courtType refersTo="#gericht">AG Aachen</akn:courtType>
           </akn:p>
           <akn:p>Dokumenttyp: <akn:docType refersTo="#dokumenttyp">testDocumentTypeAbbreviation</akn:docType></akn:p>
-          <akn:p>Entscheidungsname:
+          <akn:p>Entscheidungsnamen:
           <akn:docTitle refersTo="#entscheidungsname">Entscheidungsname</akn:docTitle></akn:p>
           <akn:p>Titelzeile:
           <akn:shortTitle refersTo="#titelzeile">
@@ -465,7 +465,7 @@ class DecisionFullLdmlTransformerTest {
         testDocumentUnit.toBuilder()
             .shortTexts(
                 ShortTexts.builder()
-                    .decisionName("Entscheidungsname")
+                    .decisionNames(List.of("Entscheidungsname"))
                     .headline("Hello<p> paragraph</p> world!")
                     .build())
             .build();
@@ -773,7 +773,7 @@ class DecisionFullLdmlTransformerTest {
             ShortTexts.builder()
                 .guidingPrinciple("<p>guidingPrinciple test</p>")
                 .headline("<p>headline test</p>")
-                .decisionNames(List.of("decisionNames test"))
+                .decisionNames(List.of("decisionName test", "decisionName2 test"))
                 .headnote("<p>headNote test</p>")
                 .otherHeadnote("<p>otherHeadNote test</p>")
                 .build())

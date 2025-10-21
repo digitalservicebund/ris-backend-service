@@ -157,20 +157,24 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
     paragraphs = buildCommonHeader(decision, paragraphs);
     var shortTexts = decision.shortTexts();
-    var decisionName = nullSafeGet(shortTexts, ShortTexts::decisionName);
+    var decisionNames = nullSafeGet(shortTexts, ShortTexts::decisionNames);
     var headline = nullSafeGet(shortTexts, ShortTexts::headline);
 
     // Entscheidungsname
-    if (isNotBlank(decisionName)) {
+    if (decisionNames != null && !decisionNames.isEmpty()) {
       Paragraph decisionNameParagraph = Paragraph.builder().content(new ArrayList<>()).build();
-      decisionNameParagraph.getContent().add("Entscheidungsname: ");
-      decisionNameParagraph
-          .getContent()
-          .add(
-              DocTitle.builder()
-                  .refersTo("#entscheidungsname")
-                  .content(shortTexts.decisionName())
-                  .build());
+      decisionNameParagraph.getContent().add("Entscheidungsnamen: ");
+      shortTexts
+          .decisionNames()
+          .forEach(
+              decisionName ->
+                  decisionNameParagraph
+                      .getContent()
+                      .add(
+                          DocTitle.builder()
+                              .refersTo("#entscheidungsname")
+                              .content(decisionName)
+                              .build()));
       paragraphs.add(decisionNameParagraph);
     }
 
