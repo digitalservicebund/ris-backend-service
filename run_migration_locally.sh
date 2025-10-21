@@ -52,10 +52,7 @@ export SPRING_PROFILES_ACTIVE=dev
 # Build the ris-data-migration application into a jar
 ./gradlew :cli:bootJar
 
-# Build the ris-data-migration application into a jar
-java -jar cli/build/libs/ris-data-migration-cli.jar refdata seed
-
-# Import the static lookup tables into your new schema (see Confluence "Wertetabellen" to find out what is static and dynamic)
+# Import the lookup tables into your new schema
 java -jar cli/build/libs/ris-data-migration-cli.jar juris-table seed
 
 # Import the BGH Documentation Units
