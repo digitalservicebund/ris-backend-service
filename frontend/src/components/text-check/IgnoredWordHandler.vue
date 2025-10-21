@@ -19,7 +19,7 @@ const emit = defineEmits<{
   "ignored-word:remove": [void]
   "globally-ignored-word:remove": [void]
   "globally-ignored-word:add": [void]
-  "ignore-once:toggle": [number, number]
+  "ignore-once:toggle": [number]
 }>()
 
 function addIgnoredWord() {
@@ -28,20 +28,20 @@ function addIgnoredWord() {
 
 function addIgnoredWordWithCheck() {
   if (props.ignoredLocally) {
-    emit("ignore-once:toggle", props.match.offset, props.match.length)
+    emit("ignore-once:toggle", props.match.offset)
   }
   emit("ignored-word:add")
 }
 
 function addIgnoredWordGloballyWithCheck() {
   if (props.ignoredLocally) {
-    emit("ignore-once:toggle", props.match.offset, props.match.length)
+    emit("ignore-once:toggle", props.match.offset)
   }
   emit("globally-ignored-word:add")
 }
 
 function ignoreOnceToggle() {
-  emit("ignore-once:toggle", props.match.offset, props.match.length)
+  emit("ignore-once:toggle", props.match.offset)
 }
 
 async function removeWord() {

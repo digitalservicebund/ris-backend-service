@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { Editor } from "@tiptap/vue-3"
-import { Selection } from "prosemirror-state"
 import { computed, ComputedRef } from "vue"
 import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
 import { IgnoreOnceTagName } from "@/editor/ignoreOnceMark"
@@ -8,7 +7,6 @@ import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
   match: Match
-  selection: Selection
   editor: Editor
 }>()
 
@@ -70,7 +68,7 @@ function ignoreOnceToggle(offset: number) {
       :match="match"
       @globally-ignored-word:add="addIgnoredWordGlobally"
       @globally-ignored-word:remove="removeGloballyIgnoredWord(match.word)"
-      @ignore-once:toggle="ignoreOnceToggle(selection.from)"
+      @ignore-once:toggle="ignoreOnceToggle(editor.state.selection.from)"
       @ignored-word:add="addIgnoredWord(match.word)"
       @ignored-word:remove="removeIgnoredWord(match.word)"
     />
