@@ -127,20 +127,13 @@ To repeat files downloading, remove the `../ris-data-migration/juris-xml-data` d
    ./gradlew :cli:bootJar
    ```
 
-10. Import the static lookup tables into your new schema (see Confluence "Wertetabellen" to find out
-    what is static and dynamic)
-
-    ```bash
-    java -jar cli/build/libs/ris-data-migration-cli.jar refdata seed
-    ```
-
-11. Import the dynamic lookup tables
+10. Import the lookup tables
 
     ```bash
     java -jar cli/build/libs/ris-data-migration-cli.jar juris-table seed
     ```
 
-12. Import the BGH DocumentationUnits
+11. Import the BGH DocumentationUnits
 
     ```bash
     java -jar cli/build/libs/ris-data-migration-cli.jar juris-r migrate -p juris-xml-data/
