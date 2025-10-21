@@ -459,6 +459,39 @@ class TextCheckServiceTest {
   }
 
   @Test
+  void testCheckCategoryByHTML_withOnceIgnoredMatches() {
+    String htmlText = "<p>text text with <ignored-once>once ignored match</ignored-once></p>";
+    CategoryType categoryType = CategoryType.REASONS;
+
+    final String onceIgnoredWord = "once ignored match";
+    final String onceIgnoredWordWithTags = "<ignored-once>once ignored match</ignored-once>";
+
+    TextCheckService mockService = spy(textCheckService);
+    when(mockService.check(any(String.class)))
+        .thenReturn(
+            List.of(
+                Match.builder()
+                    .id(1)
+                    .word(onceIgnoredWord)
+                    .offset(18)
+                    .length(onceIgnoredWordWithTags.length())
+                    .rule(Rule.builder().issueType("misspelling").build())
+                    .ignoredTextCheckWords(List.of())
+                    .isIgnored(true)
+                    .build()));
+    when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
+        .thenCallRealMethod();
+
+    TextCheckCategoryResponse response = mockService.checkCategoryByHTML(htmlText, categoryType);
+
+    assertNotNull(response);
+    assertEquals(
+        "<p>text text with <text-check id=\"1\" type=\"misspelling\" ignored=\"true\"><ignored-once>once ignored match</ignored-once></text-check></p>",
+        response.htmlText());
+    assertEquals(1, response.matches().size());
+  }
+
+  @Test
   void testAddNoIndexTags_shouldReplaceTags() {
     var html = "<p>this and this be wrapped with no index</p>";
     var result = TextCheckService.addNoIndexTags(html, List.of("this"));
