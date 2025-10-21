@@ -107,8 +107,6 @@
                     <ris:deviatingFileNumbers>
                         <ris:deviatingFileNumber>deviating fileNumber</ris:deviatingFileNumber>
                     </ris:deviatingFileNumbers>
-                    <ris:publicationStatus>PUBLISHED</ris:publicationStatus>
-                    <ris:error>false</ris:error>
                     <ris:documentationOffice>documentationOffice</ris:documentationOffice>
                     <ris:procedures>
                         <ris:procedure>previous procedure test</ris:procedure>

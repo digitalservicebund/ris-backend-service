@@ -44,7 +44,6 @@
                     <ris:documentType akn:eId="dokumenttyp">testDocumentTypeAbbreviation</ris:documentType>
                     <ris:courtLocation>Nantes</ris:courtLocation>
                     <ris:courtType>Tribunal Administratif</ris:courtType>
-                    <ris:error>false</ris:error>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>

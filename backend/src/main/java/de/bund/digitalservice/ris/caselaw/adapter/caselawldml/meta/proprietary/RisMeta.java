@@ -81,12 +81,6 @@ public class RisMeta {
   @XmlElement(name = "deviatingFileNumber", namespace = CaseLawLdml.RIS_NS)
   private List<String> deviatingFileNumber;
 
-  @XmlElement(name = "publicationStatus", namespace = CaseLawLdml.RIS_NS)
-  private String publicationStatus;
-
-  @XmlElement(name = "error", namespace = CaseLawLdml.RIS_NS)
-  private Boolean error;
-
   @XmlElement(name = "documentationOffice", namespace = CaseLawLdml.RIS_NS)
   private String documentationOffice;
 

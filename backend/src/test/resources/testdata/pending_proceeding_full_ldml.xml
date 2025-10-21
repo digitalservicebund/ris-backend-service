@@ -81,8 +81,6 @@
                     <ris:deviatingFileNumbers>
                         <ris:deviatingFileNumber>Abweichendes Aktenzeichen</ris:deviatingFileNumber>
                     </ris:deviatingFileNumbers>
-                    <ris:publicationStatus>PUBLISHED</ris:publicationStatus>
-                    <ris:error>false</ris:error>
                     <ris:documentationOffice>BFH</ris:documentationOffice>
                 </ris:meta>
             </akn:proprietary>
