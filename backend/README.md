@@ -45,7 +45,7 @@ SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 The application uses Flyway for maintaining and versioning database migrations.
 
 Most of the caselaw database structure is setup through ris-data-migration repo -
-see [instructions here](../migration_schema_local_setup.md). This repo manages only norms tables and
+see [instructions here](../run_migration_locally.md). This repo manages only norms tables and
 those with data that does not exist in migrated documentation units (e.g. publication reports, .docx
 files).
 
