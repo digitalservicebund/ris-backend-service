@@ -49,24 +49,12 @@ see [instructions here](../migration_schema_local_setup.md). This repo manages o
 those with data that does not exist in migrated documentation units (e.g. publication reports, .docx
 files).
 
-In order to create a change in the database you should follow one of the two methods:
+In order to create a change in the database you should follow this method:
 
-1. If you want to create a migration using SQL:
-   - You should create a new sql file on the directory `src\main\resources\db\migration`.
-   - The file should be named in the following format: `Vx.x__teamname_create_table_xyz.sql`
-     where `x.x` is your migration version (make sure to pull first from the repository and see
-     what is the latest version otherwise migrations wouldn't work properly).
-2. If you want to create a migration using Java:
-   - You should create a new Java class on the directory `src\main\java\db\migration` that
-     extends `BaseJavaMigration` and implements the
-     method `void migrate(Context context) throws Exception`.
-   - The file should be named in the following format: `Vx_x__teamname_create_table_xyz.sql`
-     where `x_x` is your migration version (make sure to pull first from the repository and see
-     what is the latest version in the sql path and the java path otherwise migrations wouldn't
-     work properly).
-
-For both migration file names, the `teamname` can be replaced with: whether `caselaw` or `norms` and
-is normally followed by a descriptive name for the migration.
+- You should create a new sql file on the directory `src\main\resources\db-scripts\migration`.
+- The file should be named in the following format: `Vx.x__create_table_xyz.sql`
+  where `x.x` is your migration version (make sure to pull first from the repository and see
+  what is the latest version otherwise migrations wouldn't work properly).
 
 Flyway automatically detects new files and run migrations accordingly on sprint boot start.
 
