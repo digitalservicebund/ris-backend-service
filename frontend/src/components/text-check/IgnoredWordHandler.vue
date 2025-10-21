@@ -3,9 +3,9 @@ import Button from "primevue/button"
 import { computed } from "vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { Match } from "@/types/textCheck"
-import IconAutoStoriesVariant from "~icons/material-symbols/auto-stories"
-import IconAutoStoriesOffVariant from "~icons/material-symbols/auto-stories-off"
-import IconDescription from "~icons/material-symbols/description"
+import IconAutoStoriesOffVariant from "~icons/material-symbols/auto-stories-off-outline"
+import IconAutoStoriesVariant from "~icons/material-symbols/auto-stories-outline"
+import IconDescription from "~icons/material-symbols/description-outline"
 import IconSpellCheck from "~icons/material-symbols/spellcheck"
 
 const props = defineProps<{
@@ -14,9 +14,9 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "ignored-word:add": [void]
-  "ignored-word:remove": [string]
-  "globally-ignored-word:remove": [string]
-  "globally-ignored-word:add": [string]
+  "ignored-word:remove": [void]
+  "globally-ignored-word:remove": [void]
+  "globally-ignored-word:add": [void]
 }>()
 
 function addIgnoredWord() {
@@ -24,16 +24,16 @@ function addIgnoredWord() {
 }
 
 async function removeWord() {
-  emit("ignored-word:remove", props.match.word)
+  emit("ignored-word:remove")
 }
 
 function addIgnoredWordGlobally() {
-  emit("ignored-word:remove", props.match.word)
-  emit("globally-ignored-word:add", props.match.word)
+  emit("ignored-word:remove")
+  emit("globally-ignored-word:add")
 }
 
 async function removeWordGlobally() {
-  emit("globally-ignored-word:remove", props.match.word)
+  emit("globally-ignored-word:remove")
 }
 
 const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
@@ -58,72 +58,92 @@ const matchIsIgnoredInDocument = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-grow flex-col" data-testid="ignored-word-handler">
+  <div class="flex flex-col gap-16" data-testid="ignored-word-handler">
     <div v-if="matchIsIgnoredJDV">Von jDV ignoriert</div>
 
-    <div class="flex flex-grow flex-col items-start gap-4">
-      <Button
-        v-if="
-          textCheckGlobal &&
-          !matchIsIgnoredGlobally &&
-          !matchIsIgnoredInDocument &&
-          !matchIsIgnoredJDV
-        "
-        aria-label="Vorschlag ignorieren"
-        data-testid="ignored-word-add-button"
-        label="In Dokeinheit ignorieren"
-        size="small"
-        text
-        @click="addIgnoredWord"
-      >
-        <template #icon>
-          <IconDescription />
-        </template>
-      </Button>
+    <template v-else>
+      <template v-if="matchIsIgnoredGlobally">
+        <div>im Wörterbuch / für alle Dokstellen ignoriert</div>
 
-      <Button
-        v-if="
-          matchIsIgnoredInDocument &&
-          !matchIsIgnoredJDV &&
-          !matchIsIgnoredGlobally
-        "
-        aria-label="Wort nicht ignorieren"
-        data-testid="ignored-word-remove-button"
-        label="Nicht in Dokeinheit ignorieren"
-        size="small"
-        text
-        @click="removeWord"
-      >
-        <template #icon>
-          <IconSpellCheck />
-        </template>
-      </Button>
+        <Button
+          v-if="textCheckGlobal"
+          aria-label="Wort aus Wörterbuch entfernen"
+          class="self-start"
+          data-testid="ignored-word-global-remove-button"
+          label="Aus Wörterbuch entfernen"
+          size="small"
+          text
+          @click="removeWordGlobally"
+        >
+          <template #icon>
+            <IconAutoStoriesOffVariant />
+          </template>
+        </Button>
+      </template>
 
-      <Button
-        v-if="textCheckGlobal && matchIsIgnoredGlobally && !matchIsIgnoredJDV"
-        aria-label="Wort aus globalem Wörterbuch entfernen"
-        data-testid="ignored-word-global-remove-button"
-        label="Aus globalem Wörterbuch entfernen"
-        size="small"
-        text
-        @click="removeWordGlobally"
-      >
-        <template #icon>
-          <IconAutoStoriesOffVariant />
-        </template>
-      </Button>
+      <template v-else-if="matchIsIgnoredInDocument">
+        <div>in dieser Dokumentationseinheit ignoriert</div>
 
-      <Button
-        v-if="textCheckGlobal && !matchIsIgnoredGlobally"
-        label="Zum globalen Wörterbuch hinzufügen"
-        size="small"
-        text
-        @click="addIgnoredWordGlobally"
-      >
-        <template #icon>
-          <IconAutoStoriesVariant />
-        </template>
-      </Button>
-    </div>
+        <Button
+          aria-label="Nicht in Dokeinheit ignorieren"
+          class="self-start"
+          data-testid="ignored-word-remove-button"
+          label="Nicht in Dokeinheit ignorieren"
+          severity="secondary"
+          size="small"
+          @click="removeWord"
+        >
+          <template #icon>
+            <IconSpellCheck />
+          </template>
+        </Button>
+
+        <Button
+          v-if="textCheckGlobal"
+          aria-label="Zum Wörterbuch hinzufügen"
+          class="self-start"
+          data-testid="ignored-word-global-add-button"
+          label="Zum Wörterbuch hinzufügen"
+          size="small"
+          text
+          @click="addIgnoredWordGlobally"
+        >
+          <template #icon>
+            <IconAutoStoriesVariant />
+          </template>
+        </Button>
+      </template>
+
+      <template v-else>
+        <Button
+          v-if="textCheckGlobal"
+          aria-label="In Dokeinheit ignorieren"
+          class="self-start"
+          data-testid="ignored-word-add-button"
+          label="In Dokeinheit ignorieren"
+          severity="secondary"
+          size="small"
+          @click="addIgnoredWord"
+        >
+          <template #icon>
+            <IconDescription />
+          </template>
+        </Button>
+
+        <Button
+          v-if="textCheckGlobal"
+          aria-label="Zum Wörterbuch hinzufügen"
+          data-testid="ignored-word-global-add-button"
+          label="Zum Wörterbuch hinzufügen"
+          size="small"
+          text
+          @click="addIgnoredWordGlobally"
+        >
+          <template #icon>
+            <IconAutoStoriesVariant />
+          </template>
+        </Button>
+      </template>
+    </template>
   </div>
 </template>

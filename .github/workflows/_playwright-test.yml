@@ -114,6 +114,7 @@ jobs:
                   -H "Content-Type: application/json" \
                   -d "{\"test\": \"${test_title}\", \"file\": \"${test_file}\", \"status\": \"${test_status}\", \"githubRunId\": \"${{ github.run_id }}\", \"browser\": \"${{ inputs.project }}\"}"
           done
+        working-directory: ./frontend
       - name: Send performance tests to metrics endpoint
         if: ${{inputs.project == 'queries' }}
         run: |

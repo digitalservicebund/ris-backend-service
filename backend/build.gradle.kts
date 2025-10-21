@@ -149,7 +149,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "2.0.0"
+    val testContainersVersion = "2.0.1"
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -162,7 +162,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.5")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.6")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
 
@@ -179,7 +179,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.35.8"))
+    implementation(platform("software.amazon.awssdk:bom:2.35.10"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -195,7 +195,7 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.7")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.40") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.41") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
@@ -203,9 +203,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.102")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.103")
     // for local development:
-    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.99.jar"))
+//     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.103.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.20.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
@@ -241,7 +241,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.7.12")
-    testImplementation("org.springframework.security:spring-security-test:6.5.5")
+    testImplementation("org.springframework.security:spring-security-test:6.5.6")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter:$testContainersVersion")

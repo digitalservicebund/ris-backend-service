@@ -304,6 +304,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
         .fileNumbers(List.of(FileNumberDTO.builder().value("123").rank(0L).build()))
         .grounds("gruende test")
         .headnote("orientierungssatz test")
-        .decisionNames(List.of(DecisionNameDTO.builder().value("entscheidungsname test").build()));
+        .decisionNames(
+            List.of(DecisionNameDTO.builder().value("entscheidungsname test").rank(1).build()));
   }
 }

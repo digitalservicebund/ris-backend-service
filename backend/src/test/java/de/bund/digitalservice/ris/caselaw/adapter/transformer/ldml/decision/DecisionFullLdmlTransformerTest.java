@@ -773,7 +773,7 @@ class DecisionFullLdmlTransformerTest {
             ShortTexts.builder()
                 .guidingPrinciple("<p>guidingPrinciple test</p>")
                 .headline("<p>headline test</p>")
-                .decisionName("decisionName test")
+                .decisionNames(List.of("decisionNames test"))
                 .headnote("<p>headNote test</p>")
                 .otherHeadnote("<p>otherHeadNote test</p>")
                 .build())

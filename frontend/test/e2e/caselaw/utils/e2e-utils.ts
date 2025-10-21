@@ -1,5 +1,7 @@
+import fs from "fs"
 import { expect, JSHandle, Locator, Page, Request } from "@playwright/test"
 import dayjs from "dayjs"
+import { Browser } from "playwright"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import { Decision } from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
@@ -262,10 +264,43 @@ export const navigateToSettings = async (page: Page) => {
   })
 }
 
-export async function loginToPortal(portalPage: Page) {
-  await portalPage.fill("#username", process.env.E2E_TEST_USER as string)
-  await portalPage.fill("#password", process.env.E2E_TEST_PASSWORD as string)
-  await portalPage.locator("input#kc-login").click()
+export async function openInPortal(
+  browser: Browser,
+  documentNumber: string,
+): Promise<Page> {
+  const cookieFilePath = `test/e2e/caselaw/.auth/staging-portal-user.json`
+  let page: Page | undefined
+  if (fs.existsSync(cookieFilePath)) {
+    const context = await browser.newContext({
+      storageState: cookieFilePath,
+    })
+    page = await context.newPage()
+
+    const cookies = await context.cookies()
+    const sessionCookie = cookies.find(
+      (cookie) => cookie.name === "AUTH_SESSION_ID",
+    )
+
+    if (sessionCookie !== null) {
+      await page.goto(
+        `https://ris-portal.dev.ds4g.net/v1/case-law/${documentNumber}.html`,
+      )
+      return page
+    }
+  } else {
+    page = await browser.newPage()
+  }
+
+  await page.goto(
+    `https://ris-portal.dev.ds4g.net/auth?redirectTo=/v1/case-law/${documentNumber}.html`,
+  )
+
+  await page.fill("#username", process.env.E2E_TEST_USER as string)
+  await page.fill("#password", process.env.E2E_TEST_PASSWORD as string)
+  await page.locator("input#kc-login").click()
+
+  await page.context().storageState({ path: cookieFilePath })
+  return page
 }
 
 export const handoverDocumentationUnit = async (

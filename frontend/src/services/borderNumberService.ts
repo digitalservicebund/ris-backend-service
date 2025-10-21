@@ -3,7 +3,7 @@ import { Ref } from "vue"
 import { Decision, LongTexts, ShortTexts } from "@/domain/decision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-type ShortTextKeys = keyof ShortTexts
+type ShortTextKeys = keyof Omit<ShortTexts, "decisionNames">
 type LongTextKeys = keyof Omit<LongTexts, "participatingJudges">
 const orderedCategoriesWithBorderNumbers: LongTextKeys[] = [
   "reasons",
@@ -111,7 +111,9 @@ function updateBorderNumberLinks(
   documentUnit: Decision,
   updatedBorderNumbers: Map<string, number>,
 ) {
-  const shortTextNames = Object.keys(documentUnit.shortTexts) as ShortTextKeys[]
+  const shortTextNames = Object.keys(documentUnit.shortTexts).filter(
+    (key) => key !== "decisionNames",
+  ) as ShortTextKeys[]
   for (const shortTextName of shortTextNames) {
     const shortText = documentUnit.shortTexts[shortTextName]
     if (shortText) {
@@ -181,7 +183,9 @@ type ParsedDocumentPerCategory =
   | [group: "shortTexts", categoryName: ShortTextKeys, textXml: Document]
   | [group: "longTexts", categoryName: LongTextKeys, textXml: Document]
 function getParsedDocumentPerCategory(
-  texts: ShortTexts | Omit<LongTexts, "participatingJudges">,
+  texts:
+    | Omit<ShortTexts, "decisionNames">
+    | Omit<LongTexts, "participatingJudges">,
   group: "shortTexts" | "longTexts",
 ): ParsedDocumentPerCategory[] {
   return Object.entries(texts)
@@ -201,8 +205,9 @@ function invalidateBorderNumberLinks(
   numbersToBeInvalidated: string[],
 ): void {
   const { participatingJudges, ...longTexts } = documentUnit.longTexts
+  const { decisionNames, ...shortTexts } = documentUnit.shortTexts
   const texts = [
-    ...getParsedDocumentPerCategory(documentUnit.shortTexts, "shortTexts"),
+    ...getParsedDocumentPerCategory(shortTexts, "shortTexts"),
     ...getParsedDocumentPerCategory(longTexts, "longTexts"),
   ]
 

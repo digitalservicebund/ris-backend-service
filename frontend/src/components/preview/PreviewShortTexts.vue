@@ -12,13 +12,8 @@ const props = defineProps<{
   validBorderNumbers: string[]
 }>()
 
-const decisionName = computed(() =>
-  props.shortTexts.decisionName
-    ? useValidBorderNumberLinks(
-        props.shortTexts.decisionName,
-        props.validBorderNumbers,
-      )
-    : undefined,
+const decisionNames = computed(() =>
+  props.shortTexts.decisionNames ? props.shortTexts.decisionNames : undefined,
 )
 const headline = computed(() =>
   props.shortTexts.headline
@@ -55,15 +50,15 @@ const otherHeadnote = computed(() =>
 </script>
 
 <template>
-  <PreviewRow v-if="decisionName">
-    <PreviewCategory>{{ shortTextLabels.decisionName }}</PreviewCategory>
+  <PreviewRow v-if="decisionNames?.length">
+    <PreviewCategory>{{ shortTextLabels.decisionNames }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
         id="previewDecisionName"
-        :aria-label="shortTextLabels.decisionName"
+        :aria-label="shortTextLabels.decisionNames"
         field-size="max"
         preview
-        :value="decisionName"
+        :value="decisionNames.join(', ')"
       />
     </PreviewContent>
   </PreviewRow>

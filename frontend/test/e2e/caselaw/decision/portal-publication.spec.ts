@@ -2,7 +2,7 @@ import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   expectHistoryLogRow,
-  loginToPortal,
+  openInPortal,
   navigateToCategories,
   navigateToManagementData,
   navigateToPublication,
@@ -42,7 +42,7 @@ test.describe(
             coreData: {
               court: { label: "AG Aachen" },
               decisionDate: "2023-01-01",
-              fileNumbers: ["test-123"],
+              deviatingFileNumbers: ["e2e-test-123"],
               documentType: { label: "Beschluss", jurisShortcut: "Bes" },
             },
             shortTexts: {
@@ -53,7 +53,7 @@ test.describe(
             coreData: {
               court: { label: "AG Aachen" },
               decisionDate: "2023-01-01",
-              fileNumbers: ["test-123"],
+              deviatingFileNumbers: ["e2e-test-123"],
               documentType: { label: "Beschluss", jurisShortcut: "Bes" },
             },
           },
@@ -66,7 +66,7 @@ test.describe(
       {
         tag: ["@RISDEV-8456", "@RISDEV-8460"],
       },
-      async ({ page, prefilledDocumentUnit, baseURL }) => {
+      async ({ page, prefilledDocumentUnit, baseURL, browser }) => {
         await navigateToPublication(page, prefilledDocumentUnit.documentNumber)
 
         await test.step("Anzeige einer unveröffentlichten Entscheidung mit allen Checks und ohne Fehler", async () => {
@@ -151,12 +151,13 @@ test.describe(
         // eslint-disable-next-line playwright/no-conditional-in-test
         if (baseURL !== "http://127.0.0.1") {
           await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
-            const portalPage = await page.context().newPage()
-            await portalPage.goto(
-              `https://ris-portal.dev.ds4g.net/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
+            const portalPage = await openInPortal(
+              browser,
+              prefilledDocumentUnit.documentNumber,
             )
-
-            await loginToPortal(portalPage)
+            // await portalPage.goto(
+            //   `https://ris-portal.dev.ds4g.net/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
+            // )
 
             // eslint-disable-next-line playwright/no-conditional-expect
             await expect(
@@ -220,9 +221,9 @@ test.describe(
         // eslint-disable-next-line playwright/no-conditional-in-test
         if (baseURL !== "http://127.0.0.1") {
           await test.step("Die Entscheidung ist nicht mehr per Portal-API abrufbar", async () => {
-            const portalPage = await page.context().newPage()
-            await portalPage.goto(
-              `https://ris-portal.dev.ds4g.net/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
+            const portalPage = await openInPortal(
+              browser,
+              prefilledDocumentUnit.documentNumber,
             )
             // eslint-disable-next-line playwright/no-conditional-expect
             await expect(
