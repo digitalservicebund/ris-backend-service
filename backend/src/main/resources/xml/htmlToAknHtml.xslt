@@ -334,7 +334,7 @@
     |ris:meta|ris:fileNumbers|ris:fileNumber|ris:documentType|ris:courtLocation|ris:courtType|ris:legalEffect
     |ris:fieldOfLaws|ris:fieldOfLaw|ris:judicialBody|ris:publicationStatus|ris:error|ris:documentationOffice
     |ris:documentNumber|ris:previousDecisions|ris:previousDecision|ris:ensuingDecisions|ris:ensuingDecision
-    |ris:procedures|ris:procedure|ris:decisionNames|ris:decisionName|ris:deviatingFileNumbers
+    |ris:procedures|ris:procedure|ris:decisionNames|ris:decisionName|ris:deviatingFileNumbers|ris:datenDerMuendlichenVerhandlung|ris:datumDerMuendlichenVerhandlung
     |ris:deviatingFileNumber|ris:deviatingDocumentNumbers|ris:deviatingDocumentNumber|ris:legalForces|ris:legalForce
     |ris:yearOfDispute|ris:deviatingCourts|ris:deviatingCourt|ris:deviatingDates|ris:deviatingDate
     |ris:deviatingEclis|ris:deviatingEcli|ris:inputTypes|ris:inputType|ris:foreignLanguageVersions|ris:foreignLanguageVersion|ris:evfs

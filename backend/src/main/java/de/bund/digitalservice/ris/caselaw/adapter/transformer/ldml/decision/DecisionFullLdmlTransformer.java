@@ -101,6 +101,11 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
             coreData.deviatingDecisionDates().stream().map(DateUtils::toDateString).toList(),
             builder::deviatingDate);
       }
+      if (coreData.oralHearingDates() != null) {
+        applyIfNotEmpty(
+            coreData.oralHearingDates().stream().map(DateUtils::toDateString).toList(),
+            builder::oralHearingDate);
+      }
       applyIfNotEmpty(coreData.deviatingCourts(), builder::deviatingCourt);
       applyIfNotEmpty(coreData.deviatingEclis(), builder::deviatingEcli);
       applyIfNotEmpty(coreData.deviatingFileNumbers(), builder::deviatingFileNumber);

@@ -65,6 +65,10 @@ public class RisMeta {
   @XmlElement(name = "deviatingDate", namespace = CaseLawLdml.RIS_NS)
   private List<String> deviatingDate;
 
+  @XmlElementWrapper(name = "datenDerMuendlichenVerhandlung", namespace = CaseLawLdml.RIS_NS)
+  @XmlElement(name = "datumDerMuendlichenVerhandlung", namespace = CaseLawLdml.RIS_NS)
+  private List<String> oralHearingDate;
+
   @XmlElementWrapper(name = "deviatingDocumentNumbers", namespace = CaseLawLdml.RIS_NS)
   @XmlElement(name = "deviatingDocumentNumber", namespace = CaseLawLdml.RIS_NS)
   private List<String> deviatingDocumentNumber;

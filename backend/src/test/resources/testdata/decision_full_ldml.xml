@@ -94,6 +94,10 @@
                     <ris:deviatingDates>
                         <ris:deviatingDate>2010-05-12</ris:deviatingDate>
                     </ris:deviatingDates>
+                    <ris:datenDerMuendlichenVerhandlung>
+                        <ris:datumDerMuendlichenVerhandlung>2021-02-03</ris:datumDerMuendlichenVerhandlung>
+                        <ris:datumDerMuendlichenVerhandlung>2020-01-02</ris:datumDerMuendlichenVerhandlung>
+                    </ris:datenDerMuendlichenVerhandlung>
                     <ris:deviatingDocumentNumbers>
                         <ris:deviatingDocumentNumber>deviating documentNumber</ris:deviatingDocumentNumber>
                     </ris:deviatingDocumentNumbers>

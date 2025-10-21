@@ -585,7 +585,7 @@ class DecisionFullLdmlTransformerTest {
     // Assert
     Assertions.assertNotNull(ldml);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    Assertions.assertTrue(fileContent.isPresent());
+    assertThat(fileContent).isPresent();
 
     Diff diff =
         DiffBuilder.compare(expected)
@@ -598,6 +598,8 @@ class DecisionFullLdmlTransformerTest {
     if (diff.hasDifferences()) {
       StringBuilder differences = new StringBuilder();
       diff.getDifferences().forEach(d -> differences.append(d.toString()).append("\n"));
+      System.out.println("Transformed LDML:");
+      System.out.println(fileContent.get());
       Assertions.fail("XMLs differ:\n" + differences);
     }
   }
@@ -727,6 +729,7 @@ class DecisionFullLdmlTransformerTest {
                 .legalEffect("ja")
                 .fileNumbers(List.of("fileNumber test"))
                 .decisionDate(LocalDate.of(2020, 1, 1))
+                .oralHearingDates(List.of(LocalDate.of(2021, 2, 3), LocalDate.of(2020, 1, 2)))
                 .appraisalBody("appraisalBody test")
                 .inputTypes(List.of("E-Mail", "Papier"))
                 .procedure(Procedure.builder().label("procedure test").build())
