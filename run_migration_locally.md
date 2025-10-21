@@ -15,7 +15,7 @@ This instruction will allow engineers to setup their local environment with the 
    git clone git@github.com:digitalservicebund/ris-data-migration.git
    ```
 
-2. Follow the steps [here](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/) to get access to OTC buckets via command line. You can use the `AWS_` environment variables that you use for [neuris-infra](https://github.com/digitalservicebund/neuris-infra). Add them to your local `.env` file, that has been generated before (through `./run.sh env`):
+2. Follow the steps [here](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/) to get access to OTC buckets via command line. You can use the `AWS_` environment variables that you use for [neuris-infra](https://github.com/digitalservicebund/neuris-infra). Add them to your local `.env` file, that has been generated before (through `./run.sh init`):
 
    ```bash
    AWS_ACCESS_KEY_ID=YOUR_KEY_HERE
