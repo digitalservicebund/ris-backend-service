@@ -252,7 +252,7 @@ public class TextCheckService {
           newHtmlText
               .append(normalizedHtml, lastPosition.get(), match.offset())
               .append(
-                  "<text-check id=\"%s\" type=\"%s\" ignored=\"%s\">%s</text-check>"
+                  "<text-check id=\"%s\" type=\"%s\" ignored=\"%b\">%s</text-check>"
                       .formatted(
                           match.id(),
                           match.rule().issueType().toLowerCase(),
