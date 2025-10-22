@@ -492,6 +492,126 @@ class TextCheckServiceTest {
     assertEquals(1, response.matches().size());
   }
 
+  private static final UUID TEST_DOC_UNIT_ID = UUID.randomUUID();
+  private static final String MATCH_WORD = "misspelling";
+  private static final int MATCH_OFFSET = 5;
+
+  @Test
+  void testAddIgnoredTextChecksIndividually_IgnoredGloballyOnly() {
+    String originalHtml = "<p>text misspelling text</p>";
+    IgnoredTextCheckWord globallyIgnoredWord =
+        new IgnoredTextCheckWord(UUID.randomUUID(), IgnoredTextCheckType.GLOBAL, MATCH_WORD);
+    Match matchBeforeIgnoreLogic =
+        Match.builder()
+            .id(1)
+            .word(MATCH_WORD)
+            .offset(MATCH_OFFSET)
+            .length(MATCH_WORD.length())
+            .rule(Rule.builder().issueType("missspelling").build())
+            .isIgnored(false)
+            .build();
+
+    when(ignoredTextCheckWordRepository.findByDocumentationUnitIdOrByGlobalWords(
+            any(), any(UUID.class)))
+        .thenReturn(List.of(globallyIgnoredWord));
+
+    // ACT
+    List<Match> result =
+        textCheckService.addIgnoredTextChecksIndividually(
+            TEST_DOC_UNIT_ID, originalHtml, List.of(matchBeforeIgnoreLogic));
+
+    // ASSERT
+    Match resultMatch = result.getFirst();
+    assertThat(resultMatch.isIgnored()).isTrue();
+    assertThat(resultMatch.ignoredTextCheckWords()).hasSize(1);
+  }
+
+  @Test
+  void testAddIgnoredTextChecksIndividually_IgnoredInDocunitOnly() {
+    String originalHtml = "<p>text misspelling text</p>";
+    IgnoredTextCheckWord globallyIgnoredWord =
+        new IgnoredTextCheckWord(
+            UUID.randomUUID(), IgnoredTextCheckType.DOCUMENTATION_UNIT, MATCH_WORD);
+    Match matchBeforeIgnoreLogic =
+        Match.builder()
+            .id(1)
+            .word(MATCH_WORD)
+            .offset(MATCH_OFFSET)
+            .length(MATCH_WORD.length())
+            .rule(Rule.builder().issueType("missspelling").build())
+            .isIgnored(false)
+            .build();
+
+    when(ignoredTextCheckWordRepository.findByDocumentationUnitIdOrByGlobalWords(
+            any(), any(UUID.class)))
+        .thenReturn(List.of(globallyIgnoredWord));
+
+    // ACT
+    List<Match> result =
+        textCheckService.addIgnoredTextChecksIndividually(
+            TEST_DOC_UNIT_ID, originalHtml, List.of(matchBeforeIgnoreLogic));
+
+    // ASSERT
+    Match resultMatch = result.getFirst();
+    assertThat(resultMatch.isIgnored()).isTrue();
+    assertThat(resultMatch.ignoredTextCheckWords()).hasSize(1);
+  }
+
+  @Test
+  void testAddIgnoredTextChecksIndividually_IgnoredOnceOnly() {
+    // ARRANGE: HTML HAS <ignore-once> tag
+    String originalHtml = "<p>text <ignore-once>misspelling</ignore-once> text</p>";
+
+    when(ignoredTextCheckWordRepository.findByDocumentationUnitIdOrByGlobalWords(
+            any(), any(UUID.class)))
+        .thenReturn(List.of());
+
+    Match matchBeforeIgnoreLogic =
+        Match.builder()
+            .id(1)
+            .word(MATCH_WORD)
+            .offset(MATCH_OFFSET)
+            .length(MATCH_WORD.length())
+            .rule(Rule.builder().issueType("missspelling").build())
+            .isIgnored(false)
+            .build();
+
+    List<Match> result =
+        textCheckService.addIgnoredTextChecksIndividually(
+            TEST_DOC_UNIT_ID, originalHtml, List.of(matchBeforeIgnoreLogic));
+
+    Match resultMatch = result.getFirst();
+    assertThat(resultMatch.isIgnored()).isTrue();
+    assertThat(resultMatch.ignoredTextCheckWords()).isNullOrEmpty();
+  }
+
+  @Test
+  void testAddIgnoredTextChecksIndividually_IgnoredByNeither() {
+    String originalHtml = "<p>text misspelling text</p>";
+
+    when(ignoredTextCheckWordRepository.findByDocumentationUnitIdOrByGlobalWords(
+            any(), any(UUID.class)))
+        .thenReturn(List.of());
+
+    Match matchBeforeIgnoreLogic =
+        Match.builder()
+            .id(1)
+            .word(MATCH_WORD)
+            .offset(MATCH_OFFSET)
+            .length(MATCH_WORD.length())
+            .rule(Rule.builder().issueType("missspelling").build())
+            .isIgnored(false)
+            .build();
+
+    List<Match> result =
+        textCheckService.addIgnoredTextChecksIndividually(
+            TEST_DOC_UNIT_ID, originalHtml, List.of(matchBeforeIgnoreLogic));
+
+    Match resultMatch = result.getFirst();
+    assertThat(resultMatch.isIgnored()).isFalse();
+    assertThat(resultMatch.ignoredTextCheckWords()).isNullOrEmpty();
+  }
+
   @Test
   void testAddNoIndexTags_shouldReplaceTags() {
     var html = "<p>this and this be wrapped with no index</p>";
