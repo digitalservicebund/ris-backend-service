@@ -5,8 +5,6 @@ import { TextCheckTagName } from "@/types/textCheck"
 export const TextCheckMark = Mark.create({
   name: TextCheckTagName,
   priority: 1000,
-  inclusive: true,
-  excludes: "",
   group: "inline",
 
   parseHTML() {
@@ -21,7 +19,6 @@ export const TextCheckMark = Mark.create({
         type: HTMLAttributes.type,
         ignored: HTMLAttributes.ignored,
       },
-      0,
     ]
   },
 
