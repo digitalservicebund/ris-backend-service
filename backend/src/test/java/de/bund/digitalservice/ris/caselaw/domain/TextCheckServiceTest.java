@@ -445,6 +445,7 @@ class TextCheckServiceTest {
                     .length(ignoredWord.length())
                     .rule(Rule.builder().issueType("misspelling").build())
                     .ignoredTextCheckWords(List.of(ignoredTextCheckWord))
+                    .isIgnored(true)
                     .build()));
     when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
         .thenCallRealMethod();
