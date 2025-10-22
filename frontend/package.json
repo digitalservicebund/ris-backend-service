@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@braintree/sanitize-url": "^7.1.1",
-    "@digitalservicebund/ris-ui": "^3.14.1",
+    "@digitalservicebund/ris-ui": "^3.15.0",
     "@guardian/prosemirror-invisibles": "^3.1.1",
     "@sentry/integrations": "^7.114.0",
     "@sentry/vue": "^10.20.0",

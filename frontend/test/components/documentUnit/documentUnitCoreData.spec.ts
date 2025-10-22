@@ -2,6 +2,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
+import { InputText } from "primevue"
 import { beforeEach, expect } from "vitest"
 import { ref } from "vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
@@ -33,6 +34,9 @@ function renderComponent(props: RenderProps = {}) {
         "onUpdate:modelValue": (val: CoreData) => {
           model.value = val
         },
+      },
+      stubs: {
+        InputMask: InputText,
       },
     },
   })
