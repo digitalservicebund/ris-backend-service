@@ -2,35 +2,33 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknKeyword;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Classification;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Definition;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.DocTitle;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Classification;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Keyword;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Definition;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentType;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
-import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
-import jakarta.xml.bind.ValidationException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Transformer for converting decisions to the full LDML format. Includes additional metadata like
@@ -45,15 +43,13 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
   }
 
   @Override
-  protected Meta buildMeta(Decision decision) throws ValidationException {
-    validateCoreData(decision);
-
+  protected Meta buildMeta(Decision decision) {
     Meta.MetaBuilder builder = Meta.builder();
 
-    List<AknKeyword> keywords =
+    List<Keyword> keywords =
         decision.contentRelatedIndexing() == null
             ? Collections.emptyList()
-            : decision.contentRelatedIndexing().keywords().stream().map(AknKeyword::new).toList();
+            : decision.contentRelatedIndexing().keywords().stream().map(Keyword::new).toList();
 
     if (!keywords.isEmpty()) {
       builder.classification(Classification.builder().keyword(keywords).build());
@@ -61,6 +57,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
     return builder
         .identification(buildIdentification(decision))
+        .references(buildReferences(decision))
         .proprietary(Proprietary.builder().meta(buildRisMeta(decision)).build())
         .build();
   }
@@ -102,6 +99,11 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
             coreData.deviatingDecisionDates().stream().map(DateUtils::toDateString).toList(),
             builder::deviatingDate);
       }
+      if (coreData.oralHearingDates() != null) {
+        applyIfNotEmpty(
+            coreData.oralHearingDates().stream().map(DateUtils::toDateString).toList(),
+            builder::oralHearingDate);
+      }
       applyIfNotEmpty(coreData.deviatingCourts(), builder::deviatingCourt);
       applyIfNotEmpty(coreData.deviatingEclis(), builder::deviatingEcli);
       applyIfNotEmpty(coreData.deviatingFileNumbers(), builder::deviatingFileNumber);
@@ -125,7 +127,11 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       }
 
       builder
-          .documentType(coreData.documentType().label())
+          .documentType(
+              DocumentType.builder()
+                  .eId("dokumenttyp")
+                  .value(coreData.documentType().label())
+                  .build())
           .courtLocation(nullSafeGet(coreData.court(), Court::location))
           .courtType(nullSafeGet(coreData.court(), Court::type))
           .judicialBody(nullIfEmpty(coreData.appraisalBody()))
@@ -135,50 +141,44 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
     var decisionNames = nullSafeGet(decision.shortTexts(), ShortTexts::decisionNames);
     if (decisionNames != null) {
-      applyIfNotEmpty(decisionNames, builder::decisionName);
+      builder.decisionName(decisionNames);
     }
 
-    Status lastStatus = decision.status();
-
-    return builder
-        .publicationStatus(
-            nullSafeGet(
-                nullSafeGet(lastStatus, Status::publicationStatus), PublicationStatus::toString))
-        .error(lastStatus != null && lastStatus.withError())
-        .build();
+    return builder.build();
   }
 
   @Override
-  protected AknMultipleBlock buildIntroduction(Decision decision) {
+  protected Header buildHeader(Decision decision) {
+    List<Paragraph> paragraphs = new ArrayList<>();
+
+    paragraphs = buildCommonHeader(decision, paragraphs);
     var shortTexts = decision.shortTexts();
+    var decisionNames = nullSafeGet(shortTexts, ShortTexts::decisionNames);
+    var headline = nullSafeGet(shortTexts, ShortTexts::headline);
 
-    var headnote = nullSafeGet(shortTexts, ShortTexts::headnote);
-    var otherHeadnote = nullSafeGet(shortTexts, ShortTexts::otherHeadnote);
-    var outline = nullSafeGet(decision.longTexts(), LongTexts::outline);
-    var tenor = nullSafeGet(decision.longTexts(), LongTexts::tenor);
-
-    if (StringUtils.isNotEmpty(headnote)
-        || StringUtils.isNotEmpty(otherHeadnote)
-        || StringUtils.isNotEmpty(outline)
-        || StringUtils.isNotEmpty(tenor)) {
-      return new AknMultipleBlock()
-          .withBlock(
-              AknEmbeddedStructureInBlock.HeadNote.NAME,
-              AknEmbeddedStructureInBlock.HeadNote.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(headnote))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.OtherHeadNote.NAME,
-              AknEmbeddedStructureInBlock.OtherHeadNote.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(otherHeadnote))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.Outline.NAME,
-              AknEmbeddedStructureInBlock.Outline.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(outline))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.Tenor.NAME,
-              AknEmbeddedStructureInBlock.Tenor.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(tenor))));
+    // Entscheidungsname
+    if (decisionNames != null && !decisionNames.isEmpty()) {
+      Paragraph decisionNameParagraph = Paragraph.builder().content(new ArrayList<>()).build();
+      decisionNameParagraph.getContent().add("Entscheidungsnamen: ");
+      shortTexts
+          .decisionNames()
+          .forEach(
+              decisionName ->
+                  decisionNameParagraph
+                      .getContent()
+                      .add(
+                          DocTitle.builder()
+                              .refersTo("#entscheidungsname")
+                              .content(decisionName)
+                              .build()));
+      paragraphs.add(decisionNameParagraph);
     }
-    return null;
+
+    // Titelzeile
+    if (isNotBlank(headline)) {
+      buildHeadline(paragraphs, headline, htmlTransformer);
+    }
+
+    return Header.builder().paragraphs(paragraphs).build();
   }
 }
