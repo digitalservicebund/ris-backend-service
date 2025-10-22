@@ -23,11 +23,13 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResp
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -610,6 +612,32 @@ class TextCheckServiceTest {
     Match resultMatch = result.getFirst();
     assertThat(resultMatch.isIgnored()).isFalse();
     assertThat(resultMatch.ignoredTextCheckWords()).isNullOrEmpty();
+  }
+
+  @Test
+  void testIsWrappedByIgnoreOnceTag_NullChecksDirectly() throws Exception {
+    // ARRANGE: Set up the necessary objects for reflection
+    Document dummyDoc = Jsoup.parse("<p>test</p>");
+    Match dummyMatch = Match.builder().word("test").build();
+
+    // 1. Locate the private method using its name and argument types
+    Method method =
+        TextCheckService.class.getDeclaredMethod(
+            "isWrappedByIgnoreOnceTag", Document.class, Match.class);
+
+    // 2. Make the private method accessible
+    method.setAccessible(true);
+
+    // Test Case 1: originalDoc is null
+    boolean resultDocNull = (boolean) method.invoke(textCheckService, null, dummyMatch);
+    assertThat(resultDocNull).isFalse(); // Should cover originalDoc == null
+
+    // Test Case 2: match is null
+    boolean resultMatchNull = (boolean) method.invoke(textCheckService, dummyDoc, null);
+    assertThat(resultMatchNull).isFalse(); // Should cover match == null
+
+    // Clean up
+    method.setAccessible(false);
   }
 
   @Test
