@@ -194,10 +194,7 @@ const buttonsDisabled = computed(
  */
 const shouldShowBubbleMenu = (): boolean => {
   if (editor) {
-    return (
-      NeurisTextCheckService.isTextCheckTagSelected(editor) ||
-      NeurisTextCheckService.isIgnoreOnceTagSelected(editor)
-    )
+    return NeurisTextCheckService.isTextCheckTagSelected(editor)
   } else {
     return false
   }

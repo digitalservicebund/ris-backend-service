@@ -39,19 +39,6 @@ class NeurisTextCheckService implements TextCheckService {
     return false
   }
 
-  public static readonly isIgnoreOnceTagSelected = (
-    editor: Editor,
-  ): boolean => {
-    const { selection } = editor.state
-    const node = editor.state.doc.nodeAt(selection.from)
-
-    if (node?.marks) {
-      return node.marks.some((mark) => mark.type.name === IgnoreOnceTagName)
-    }
-
-    return false
-  }
-
   /**
    * Function to update the selected match by text check tags, will reset selected state if not a text check tag
    * @param state
