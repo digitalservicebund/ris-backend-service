@@ -15,8 +15,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.R
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
-import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,14 +78,7 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
           nullSafeGet(coreData.documentationOffice(), DocumentationOffice::abbreviation));
     }
 
-    Status lastStatus = pendingProceeding.status();
-
-    return builder
-        .publicationStatus(
-            nullSafeGet(
-                nullSafeGet(lastStatus, Status::publicationStatus), PublicationStatus::toString))
-        .error(lastStatus != null && lastStatus.withError())
-        .build();
+    return builder.build();
   }
 
   @Override

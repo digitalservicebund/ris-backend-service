@@ -571,11 +571,6 @@ class DecisionReducedLdmlTransformerTest {
             creatingDocumentationOffice
             """),
         Arguments.of(
-            "'status' (Veröffentlichungsstatus)",
-            """
-                 <ris:publicationStatus>PUBLISHED</ris:publicationStatus>
-                """),
-        Arguments.of(
             "'activeCitations' (Aktivzitierung)",
             """
                  citation test
