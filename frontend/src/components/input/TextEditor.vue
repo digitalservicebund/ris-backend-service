@@ -234,6 +234,8 @@ function ignoreOnceToggle(offset: number) {
     return
   }
 
+  textCheckService.localIgnoreToggleHappened()
+
   editor
     .chain()
     .focus()
