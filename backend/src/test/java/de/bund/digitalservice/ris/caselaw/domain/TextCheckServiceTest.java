@@ -23,11 +23,13 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResp
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -445,6 +447,7 @@ class TextCheckServiceTest {
                     .length(ignoredWord.length())
                     .rule(Rule.builder().issueType("misspelling").build())
                     .ignoredTextCheckWords(List.of(ignoredTextCheckWord))
+                    .isIgnored(true)
                     .build()));
     when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
         .thenCallRealMethod();
@@ -456,6 +459,185 @@ class TextCheckServiceTest {
         "<p>text text with <text-check id=\"1\" type=\"misspelling\" ignored=\"true\">ignored match</text-check></p>",
         response.htmlText());
     assertEquals(1, response.matches().size());
+  }
+
+  @Test
+  void testCheckCategoryByHTML_withOnceIgnoredMatches() {
+    String htmlText = "<p>text text with <ignored-once>once ignored match</ignored-once></p>";
+    CategoryType categoryType = CategoryType.REASONS;
+
+    final String onceIgnoredWord = "once ignored match";
+    final String onceIgnoredWordWithTags = "<ignored-once>once ignored match</ignored-once>";
+
+    TextCheckService mockService = spy(textCheckService);
+    when(mockService.check(any(String.class)))
+        .thenReturn(
+            List.of(
+                Match.builder()
+                    .id(1)
+                    .word(onceIgnoredWord)
+                    .offset(18)
+                    .length(onceIgnoredWordWithTags.length())
+                    .rule(Rule.builder().issueType("misspelling").build())
+                    .ignoredTextCheckWords(List.of())
+                    .isIgnored(true)
+                    .build()));
+    when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
+        .thenCallRealMethod();
+
+    TextCheckCategoryResponse response = mockService.checkCategoryByHTML(htmlText, categoryType);
+
+    assertNotNull(response);
+    assertEquals(
+        "<p>text text with <text-check id=\"1\" type=\"misspelling\" ignored=\"true\"><ignored-once>once ignored match</ignored-once></text-check></p>",
+        response.htmlText());
+    assertEquals(1, response.matches().size());
+  }
+
+  private static final UUID TEST_DOC_UNIT_ID = UUID.randomUUID();
+  private static final String MATCH_WORD = "misspelling";
+  private static final int MATCH_OFFSET = 5;
+
+  @Test
+  void testAddIgnoredTextChecksIndividually_IgnoredGloballyOnly() {
+    String originalHtml = "<p>text misspelling text</p>";
+    IgnoredTextCheckWord globallyIgnoredWord =
+        new IgnoredTextCheckWord(UUID.randomUUID(), IgnoredTextCheckType.GLOBAL, MATCH_WORD);
+    Match matchBeforeIgnoreLogic =
+        Match.builder()
+            .id(1)
+            .word(MATCH_WORD)
+            .offset(MATCH_OFFSET)
+            .length(MATCH_WORD.length())
+            .rule(Rule.builder().issueType("missspelling").build())
+            .isIgnored(false)
+            .build();
+
+    when(ignoredTextCheckWordRepository.findByDocumentationUnitIdOrByGlobalWords(
+            any(), any(UUID.class)))
+        .thenReturn(List.of(globallyIgnoredWord));
+
+    // ACT
+    List<Match> result =
+        textCheckService.addIgnoredTextChecksIndividually(
+            TEST_DOC_UNIT_ID, originalHtml, List.of(matchBeforeIgnoreLogic));
+
+    // ASSERT
+    Match resultMatch = result.getFirst();
+    assertThat(resultMatch.isIgnored()).isTrue();
+    assertThat(resultMatch.ignoredTextCheckWords()).hasSize(1);
+  }
+
+  @Test
+  void testAddIgnoredTextChecksIndividually_IgnoredInDocunitOnly() {
+    String originalHtml = "<p>text misspelling text</p>";
+    IgnoredTextCheckWord globallyIgnoredWord =
+        new IgnoredTextCheckWord(
+            UUID.randomUUID(), IgnoredTextCheckType.DOCUMENTATION_UNIT, MATCH_WORD);
+    Match matchBeforeIgnoreLogic =
+        Match.builder()
+            .id(1)
+            .word(MATCH_WORD)
+            .offset(MATCH_OFFSET)
+            .length(MATCH_WORD.length())
+            .rule(Rule.builder().issueType("missspelling").build())
+            .isIgnored(false)
+            .build();
+
+    when(ignoredTextCheckWordRepository.findByDocumentationUnitIdOrByGlobalWords(
+            any(), any(UUID.class)))
+        .thenReturn(List.of(globallyIgnoredWord));
+
+    // ACT
+    List<Match> result =
+        textCheckService.addIgnoredTextChecksIndividually(
+            TEST_DOC_UNIT_ID, originalHtml, List.of(matchBeforeIgnoreLogic));
+
+    // ASSERT
+    Match resultMatch = result.getFirst();
+    assertThat(resultMatch.isIgnored()).isTrue();
+    assertThat(resultMatch.ignoredTextCheckWords()).hasSize(1);
+  }
+
+  @Test
+  void testAddIgnoredTextChecksIndividually_IgnoredOnceOnly() {
+    // ARRANGE: HTML HAS <ignore-once> tag
+    String originalHtml = "<p>text <ignore-once>misspelling</ignore-once> text</p>";
+
+    when(ignoredTextCheckWordRepository.findByDocumentationUnitIdOrByGlobalWords(
+            any(), any(UUID.class)))
+        .thenReturn(List.of());
+
+    Match matchBeforeIgnoreLogic =
+        Match.builder()
+            .id(1)
+            .word(MATCH_WORD)
+            .offset(MATCH_OFFSET)
+            .length(MATCH_WORD.length())
+            .rule(Rule.builder().issueType("missspelling").build())
+            .isIgnored(false)
+            .build();
+
+    List<Match> result =
+        textCheckService.addIgnoredTextChecksIndividually(
+            TEST_DOC_UNIT_ID, originalHtml, List.of(matchBeforeIgnoreLogic));
+
+    Match resultMatch = result.getFirst();
+    assertThat(resultMatch.isIgnored()).isTrue();
+    assertThat(resultMatch.ignoredTextCheckWords()).isNullOrEmpty();
+  }
+
+  @Test
+  void testAddIgnoredTextChecksIndividually_IgnoredByNeither() {
+    String originalHtml = "<p>text misspelling text</p>";
+
+    when(ignoredTextCheckWordRepository.findByDocumentationUnitIdOrByGlobalWords(
+            any(), any(UUID.class)))
+        .thenReturn(List.of());
+
+    Match matchBeforeIgnoreLogic =
+        Match.builder()
+            .id(1)
+            .word(MATCH_WORD)
+            .offset(MATCH_OFFSET)
+            .length(MATCH_WORD.length())
+            .rule(Rule.builder().issueType("missspelling").build())
+            .isIgnored(false)
+            .build();
+
+    List<Match> result =
+        textCheckService.addIgnoredTextChecksIndividually(
+            TEST_DOC_UNIT_ID, originalHtml, List.of(matchBeforeIgnoreLogic));
+
+    Match resultMatch = result.getFirst();
+    assertThat(resultMatch.isIgnored()).isFalse();
+    assertThat(resultMatch.ignoredTextCheckWords()).isNullOrEmpty();
+  }
+
+  @Test
+  void testIsWrappedByIgnoreOnceTag_NullChecksDirectly() throws Exception {
+    // ARRANGE: Set up the necessary objects for reflection
+    Document dummyDoc = Jsoup.parse("<p>test</p>");
+    Match dummyMatch = Match.builder().word("test").build();
+
+    // 1. Locate the private method using its name and argument types
+    Method method =
+        TextCheckService.class.getDeclaredMethod(
+            "isWrappedByIgnoreOnceTag", Document.class, Match.class);
+
+    // 2. Make the private method accessible
+    method.setAccessible(true);
+
+    // Test Case 1: originalDoc is null
+    boolean resultDocNull = (boolean) method.invoke(textCheckService, null, dummyMatch);
+    assertThat(resultDocNull).isFalse(); // Should cover originalDoc == null
+
+    // Test Case 2: match is null
+    boolean resultMatchNull = (boolean) method.invoke(textCheckService, dummyDoc, null);
+    assertThat(resultMatchNull).isFalse(); // Should cover match == null
+
+    // Clean up
+    method.setAccessible(false);
   }
 
   @Test
