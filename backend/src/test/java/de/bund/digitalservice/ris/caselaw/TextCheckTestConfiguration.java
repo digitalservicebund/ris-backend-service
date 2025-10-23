@@ -7,12 +7,15 @@ import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
+@Profile("test")
 public class TextCheckTestConfiguration {
-
   @Bean
-  public TextCheckService textCheckMockService(
+  @Primary
+  public TextCheckService textCheckService(
       DocumentationUnitRepository documentationUnitRepository,
       IgnoredTextCheckWordRepository ignoredTextCheckWordRepository,
       FeatureToggleService featureToggleService) {
