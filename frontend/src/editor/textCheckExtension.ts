@@ -1,4 +1,5 @@
 import { Extension } from "@tiptap/core"
+import { removeTagsOnTypingPlugin } from "./removeTagsOnTyping"
 import { TextCheckExtensionOptions, TextCheckService } from "@/types/textCheck"
 
 declare module "@tiptap/core" {
@@ -70,5 +71,9 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
           return true
         },
     }
+  },
+
+  addProseMirrorPlugins() {
+    return [removeTagsOnTypingPlugin]
   },
 })
