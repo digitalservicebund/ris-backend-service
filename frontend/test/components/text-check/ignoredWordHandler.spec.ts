@@ -45,11 +45,13 @@ describe("IgnoredWordHandler", () => {
     contextForSureMatch: 1,
   }
 
-  it("emits add local ignore word event when 'In Dokeinheit ignorieren' button is clicked", async () => {
+  it("emits add local ignore word event when 'In Dokumentationseinheit ignorieren' button is clicked", async () => {
     const { emitted, user } = await renderComponent(baseMatch)
 
-    expect(screen.getByText("In Dokeinheit ignorieren")).toBeInTheDocument()
-    await user.click(screen.getByText("In Dokeinheit ignorieren"))
+    expect(
+      screen.getByText("In Dokumentationseinheit ignorieren"),
+    ).toBeInTheDocument()
+    await user.click(screen.getByText("In Dokumentationseinheit ignorieren"))
     expect(emitted()["ignored-word:add"]).toBeTruthy()
   })
 
@@ -59,26 +61,28 @@ describe("IgnoredWordHandler", () => {
       screen.queryByText("Aus Wörterbuch entfernen"),
     ).not.toBeInTheDocument()
     expect(
-      screen.queryByText("Nicht in Dokeinheit ignorieren"),
+      screen.queryByText("Nicht in Dokumentationseinheit ignorieren"),
     ).not.toBeInTheDocument()
     expect(screen.queryByText("Von jDV ignoriert")).not.toBeInTheDocument()
   })
 
-  it("emits remove local ignore word event when 'Nicht in Dokeinheit ignorieren' button is clicked", async () => {
+  it("emits remove local ignore word event when 'Nicht in Dokumentationseinheit ignorieren' button is clicked", async () => {
     const { emitted, user } = await renderComponent({
       ...baseMatch,
       ignoredTextCheckWords: [{ type: "documentation_unit", word: "testword" }],
     })
     // other options should not be rendered
     expect(
-      screen.getByText("Nicht in Dokeinheit ignorieren"),
+      screen.getByText("Nicht in Dokumentationseinheit ignorieren"),
     ).toBeInTheDocument()
     expect(
       screen.queryByText("Aus Wörterbuch entfernen"),
     ).not.toBeInTheDocument()
     expect(screen.queryByText("Von jDV ignoriert")).not.toBeInTheDocument()
 
-    await user.click(screen.getByText("Nicht in Dokeinheit ignorieren"))
+    await user.click(
+      screen.getByText("Nicht in Dokumentationseinheit ignorieren"),
+    )
     expect(emitted()["globally-ignored-word:remove"]).toBeUndefined()
   })
 
@@ -92,7 +96,7 @@ describe("IgnoredWordHandler", () => {
       screen.queryByText("Aus Wörterbuch entfernen"),
     ).not.toBeInTheDocument()
     expect(
-      screen.queryByText("Nicht in Dokeinheit ignorieren"),
+      screen.queryByText("Nicht in Dokumentationseinheit ignorieren"),
     ).not.toBeInTheDocument()
   })
 
@@ -118,10 +122,10 @@ describe("IgnoredWordHandler", () => {
     expect(emitted()["ignore-once:toggle"]).toEqual(expected)
   })
 
-  test("when ignoredLocally is true, 'In Dokeinheit ignorieren' emits ignore-once:toggle then ignored-word:add", async () => {
+  test("when ignoredLocally is true, 'In Dokumentationseinheit ignorieren' emits ignore-once:toggle then ignored-word:add", async () => {
     const { emitted, user } = await renderComponent(baseMatch, true)
 
-    await user.click(screen.getByText("In Dokeinheit ignorieren"))
+    await user.click(screen.getByText("In Dokumentationseinheit ignorieren"))
 
     expect(emitted()["ignore-once:toggle"]).toEqual([[baseMatch.offset]])
     expect(emitted()["ignored-word:add"]).toEqual([[]])
@@ -131,14 +135,16 @@ describe("IgnoredWordHandler", () => {
     await renderComponent(baseMatch, true)
 
     expect(screen.getByText("Hier nicht ignorieren")).toBeInTheDocument()
-    expect(screen.getByText("In Dokeinheit ignorieren")).toBeInTheDocument()
+    expect(
+      screen.getByText("In Dokumentationseinheit ignorieren"),
+    ).toBeInTheDocument()
     expect(screen.getByText("Zum Wörterbuch hinzufügen")).toBeInTheDocument()
   })
 
   test("when ignoredLocally is true, ignoring in document removes local ignore before ignoring in document", async () => {
     const { emitted, user } = await renderComponent(baseMatch, true)
 
-    await user.click(screen.getByText("In Dokeinheit ignorieren"))
+    await user.click(screen.getByText("In Dokumentationseinheit ignorieren"))
 
     expect(emitted()["ignore-once:toggle"]).toEqual([[baseMatch.offset]])
     expect(emitted()["ignored-word:add"]).toBeTruthy()
@@ -165,7 +171,7 @@ describe("IgnoredWordHandler", () => {
     )
 
     expect(
-      screen.getByText("Nicht in Dokeinheit ignorieren"),
+      screen.getByText("Nicht in Dokumentationseinheit ignorieren"),
     ).toBeInTheDocument()
     expect(screen.getByText("Zum Wörterbuch hinzufügen")).toBeInTheDocument()
 

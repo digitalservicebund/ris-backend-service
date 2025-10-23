@@ -106,10 +106,10 @@ const matchIsIgnoredInDocument = computed(() => {
         <div>in dieser Dokumentationseinheit ignoriert</div>
 
         <Button
-          aria-label="Nicht in Dokeinheit ignorieren"
+          aria-label="Nicht in Dokumentationseinheit ignorieren"
           class="self-start"
           data-testid="ignored-word-remove-button"
-          label="Nicht in Dokeinheit ignorieren"
+          label="Nicht in Dokumentationseinheit ignorieren"
           severity="secondary"
           size="small"
           @click="removeWord"
@@ -154,10 +154,10 @@ const matchIsIgnoredInDocument = computed(() => {
 
         <Button
           v-if="textCheckGlobal"
-          aria-label="In Dokeinheit ignorieren"
+          aria-label="In Dokumentationseinheit ignorieren"
           class="self-start"
           data-testid="ignored-word-add-button"
-          label="In Dokeinheit ignorieren"
+          label="In Dokumentationseinheit ignorieren"
           size="small"
           text
           @click="addIgnoredWordWithCheck"
@@ -202,10 +202,10 @@ const matchIsIgnoredInDocument = computed(() => {
 
         <Button
           v-if="textCheckGlobal"
-          aria-label="In Dokeinheit ignorieren"
+          aria-label="In Dokumentationseinheit ignorieren"
           class="self-start"
           data-testid="ignored-word-add-button"
-          label="In Dokeinheit ignorieren"
+          label="In Dokumentationseinheit ignorieren"
           severity="secondary"
           size="small"
           @click="addIgnoredWord"
@@ -218,6 +218,7 @@ const matchIsIgnoredInDocument = computed(() => {
         <Button
           v-if="textCheckGlobal"
           aria-label="Zum Wörterbuch hinzufügen"
+          class="self-start"
           data-testid="ignored-word-global-add-button"
           label="Zum Wörterbuch hinzufügen"
           size="small"
