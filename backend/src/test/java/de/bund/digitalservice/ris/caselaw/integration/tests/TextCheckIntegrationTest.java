@@ -193,12 +193,6 @@ class TextCheckIntegrationTest extends BaseIntegrationTest {
     final String expectedContentRegex =
         "<ignore-once><text-check id=\"\\d+\" type=\"misspelling\" ignored=\"true\">misspellinng</text-check></ignore-once>";
 
-    //  Change to this, when PR merged:
-    // https://github.com/digitalservicebund/ris-backend-service/pull/3343/files
-    //  final String expectedContentRegex =
-    //      "<text-check id=\"\\d+\" type=\"misspelling\"
-    // ignored=\"true\"><ignore-once>misspellinng</ignore-once></text-check>";
-
     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
     queryParams.add("category", "tenor");
 
