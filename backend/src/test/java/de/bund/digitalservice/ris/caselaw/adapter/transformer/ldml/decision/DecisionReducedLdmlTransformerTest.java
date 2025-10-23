@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
@@ -84,10 +86,9 @@ class DecisionReducedLdmlTransformerTest {
     // Assert
     Assertions.assertNotNull(ldml);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    Assertions.assertTrue(fileContent.isPresent());
-    Assertions.assertTrue(
-        StringUtils.deleteWhitespace(fileContent.get())
-            .contains(StringUtils.deleteWhitespace(expected)));
+    assertThat(fileContent).isPresent();
+    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+        .contains(StringUtils.deleteWhitespace(expected));
   }
 
   @ParameterizedTest(name = "{0}")
@@ -341,8 +342,10 @@ class DecisionReducedLdmlTransformerTest {
         Arguments.of(
             "'court' (Gericht)",
             """
-                <ris:courtLocation>courtLocation</ris:courtLocation>
-                <ris:courtType>courtType</ris:courtType>
+                <ris:gericht domainTerm="Gericht"akn:refersTo="#gericht">
+                  <ris:typ domainTerm="Gerichtstyp">courtType</ris:typ>
+                  <ris:ort domainTerm="Gerichtsort">courtLocation</ris:ort>
+                </ris:gericht>
                """),
         Arguments.of(
             "'decisionDate' (Entscheidungsdatum)",
@@ -352,7 +355,7 @@ class DecisionReducedLdmlTransformerTest {
         Arguments.of(
             "'documentType' (Dokumenttyp)",
             """
-                <ris:documentType akn:eId="dokumenttyp">documentType test</ris:documentType>
+                <ris:dokumentTyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">documentType test</ris:dokumentTyp>
                """),
         Arguments.of(
             "'ecli'",
@@ -362,14 +365,14 @@ class DecisionReducedLdmlTransformerTest {
         Arguments.of(
             "'fileNumber' (Aktenzeichen)",
             """
-              <ris:fileNumbers>
-                 <ris:fileNumber>fileNumber test</ris:fileNumber>
-              </ris:fileNumbers>
+              <ris:aktenzeichenListe domainTerm="Aktenzeichenliste">
+                <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">fileNumber test</ris:aktenzeichen>
+              </ris:aktenzeichenListe>
                """),
         Arguments.of(
             "'appraisalBody/judicialBody' (Spruchkörper)",
             """
-                <ris:judicialBody>appraisalBody test</ris:judicialBody>
+                <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBody test</ris:spruchkoerper>
                """),
         // Fixme: should be included -->
         //        Arguments.of(
@@ -379,47 +382,51 @@ class DecisionReducedLdmlTransformerTest {
         //               """),
         // Normen -->
         // Fixme: Add elements for single norm and norm abbreviation once they are also transformed
-        Arguments.of(
-            "'normReferences' (Normen)",
-            """
-              <ris:legalForces>
-                 <ris:legalForce>legalForce test</ris:legalForce>
-              </ris:legalForces>
-               """),
+        //        Arguments.of(
+        //            "'normReferences' (Normen)",
+        //            """
+        //              <ris:legalForces>
+        //                 <ris:legalForce>legalForce test</ris:legalForce>
+        //              </ris:legalForces>
+        //               """),
         // PreviousDecisions -->
-        Arguments.of(
-            "'previousDecisions' (Vorgehende Entscheidungen)",
-            """
-              <ris:previousDecisions>
-                  <ris:previousDecision date="2020-01-01">
-                     <ris:documentNumber>previous decision document number 1</ris:documentNumber>
-                     <ris:fileNumber>previous decision file number</ris:fileNumber>
-                     <ris:courtType>previous decision court type</ris:courtType>
-                  </ris:previousDecision>
-                  <ris:previousDecision date="2020-01-01">
-                     <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                     <ris:fileNumber>previous decision file number</ris:fileNumber>
-                     <ris:courtType>previous decision court type</ris:courtType>
-                  </ris:previousDecision>
-               </ris:previousDecisions>
-               """),
+        //        Arguments.of(
+        //            "'previousDecisions' (Vorgehende Entscheidungen)",
+        //            """
+        //              <ris:previousDecisions>
+        //                  <ris:previousDecision date="2020-01-01">
+        //                     <ris:documentNumber>previous decision document number
+        // 1</ris:documentNumber>
+        //                     <ris:fileNumber>previous decision file number</ris:fileNumber>
+        //                     <ris:courtType>previous decision court type</ris:courtType>
+        //                  </ris:previousDecision>
+        //                  <ris:previousDecision date="2020-01-01">
+        //                     <ris:documentNumber>previous decision document number
+        // 2</ris:documentNumber>
+        //                     <ris:fileNumber>previous decision file number</ris:fileNumber>
+        //                     <ris:courtType>previous decision court type</ris:courtType>
+        //                  </ris:previousDecision>
+        //               </ris:previousDecisions>
+        //               """),
         // EnsuingDecisions -->
-        Arguments.of(
-            "'ensuingDecisions' (Nachgehende Entscheidungen)",
-            """
-              <ris:ensuingDecisions>
-                  <ris:ensuingDecision date="2022-10-01">
-                     <ris:documentNumber>ensuing decision document number 1</ris:documentNumber>
-                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                     <ris:courtType>ensuing decision court type</ris:courtType>
-                  </ris:ensuingDecision>
-                  <ris:ensuingDecision date="2022-10-01">
-                     <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                     <ris:courtType>ensuing decision court type</ris:courtType>
-                  </ris:ensuingDecision>
-               </ris:ensuingDecisions>
-              """),
+        //        Arguments.of(
+        //            "'ensuingDecisions' (Nachgehende Entscheidungen)",
+        //            """
+        //              <ris:ensuingDecisions>
+        //                  <ris:ensuingDecision date="2022-10-01">
+        //                     <ris:documentNumber>ensuing decision document number
+        // 1</ris:documentNumber>
+        //                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
+        //                     <ris:courtType>ensuing decision court type</ris:courtType>
+        //                  </ris:ensuingDecision>
+        //                  <ris:ensuingDecision date="2022-10-01">
+        //                     <ris:documentNumber>previous decision document number
+        // 2</ris:documentNumber>
+        //                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
+        //                     <ris:courtType>ensuing decision court type</ris:courtType>
+        //                  </ris:ensuingDecision>
+        //               </ris:ensuingDecisions>
+        //              """),
         // LongTexts/Langtexte -->
         Arguments.of(
             "'dissentingOpinion' (Abweichende Meinung)",

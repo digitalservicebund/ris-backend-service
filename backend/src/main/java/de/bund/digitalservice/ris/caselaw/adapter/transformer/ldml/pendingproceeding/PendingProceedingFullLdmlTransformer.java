@@ -1,10 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproceeding;
 
-import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Classification;
@@ -12,10 +10,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Keyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,30 +50,7 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
 
   private RisMeta buildRisMeta(PendingProceeding pendingProceeding) {
     var builder = buildCommonRisMeta(pendingProceeding);
-
-    var contentRelatedIndexing = pendingProceeding.contentRelatedIndexing();
-    if (contentRelatedIndexing != null && contentRelatedIndexing.fieldsOfLaw() != null) {
-      applyIfNotEmpty(
-          contentRelatedIndexing.fieldsOfLaw().stream().map(FieldOfLaw::text).toList(),
-          builder::fieldOfLaw);
-    }
-
-    var coreData = pendingProceeding.coreData();
-    if (coreData != null) {
-      if (coreData.deviatingDecisionDates() != null) {
-        applyIfNotEmpty(
-            coreData.deviatingDecisionDates().stream().map(DateUtils::toDateString).toList(),
-            builder::deviatingDate);
-      }
-      applyIfNotEmpty(coreData.deviatingCourts(), builder::deviatingCourt);
-      applyIfNotEmpty(coreData.deviatingFileNumbers(), builder::deviatingFileNumber);
-      applyIfNotEmpty(coreData.deviatingDocumentNumbers(), builder::deviatingDocumentNumber);
-      applyIfNotEmpty(coreData.fileNumbers(), builder::fileNumbers);
-
-      builder.documentationOffice(
-          nullSafeGet(coreData.documentationOffice(), DocumentationOffice::abbreviation));
-    }
-
+    // Legacy flat fields removed (fieldOfLaw, deviating*, fileNumbers, documentationOffice)
     return builder.build();
   }
 
