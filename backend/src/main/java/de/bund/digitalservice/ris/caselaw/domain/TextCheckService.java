@@ -325,9 +325,18 @@ public class TextCheckService {
               boolean isIgnoredOnce = isWrappedByIgnoreOnceTag(originalDoc, match);
               boolean isIgnored = isGloballyOrDocunitIgnored || isIgnoredOnce;
 
+              // Adjusting offset and length for locally ignored words
+              // <ignore-once>word</ignore-once>
+              // <-----13---->    <------14---->   13 + 14 = 27
+              // as these matches and their tags need to be wrapped in <text-check> tags.
+              int effectiveOffset = isIgnoredOnce ? match.offset() - 13 : match.offset();
+              int effectiveLength = isIgnoredOnce ? match.length() + 27 : match.length();
+
               return match.toBuilder()
                   .ignoredTextCheckWords(ignoredWords)
                   .isIgnored(isIgnored)
+                  .offset(effectiveOffset)
+                  .length(effectiveLength)
                   .build();
             })
         .toList();
