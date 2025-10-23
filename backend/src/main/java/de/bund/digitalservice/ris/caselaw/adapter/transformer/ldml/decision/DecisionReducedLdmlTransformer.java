@@ -1,16 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
-import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
-import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
-
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentType;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
-import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -40,21 +35,6 @@ public class DecisionReducedLdmlTransformer extends DecisionCommonLdmlTransforme
 
   private RisMeta buildRisMeta(Decision decision) {
     var builder = buildCommonRisMeta(decision);
-
-    var coreData = decision.coreData();
-    if (coreData != null) {
-      applyIfNotEmpty(coreData.fileNumbers(), builder::fileNumbers);
-
-      builder
-          .documentType(
-              DocumentType.builder()
-                  .eId("dokumenttyp")
-                  .value(coreData.documentType().label())
-                  .build())
-          .courtLocation(nullSafeGet(coreData.court(), Court::location))
-          .courtType(nullSafeGet(coreData.court(), Court::type))
-          .judicialBody(nullIfEmpty(coreData.appraisalBody()));
-    }
     return builder.build();
   }
 

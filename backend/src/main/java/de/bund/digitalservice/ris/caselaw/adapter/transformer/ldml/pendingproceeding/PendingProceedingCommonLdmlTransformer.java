@@ -13,19 +13,16 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Intr
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.JudgmentBody;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Motivation;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentType;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DokumentTyp;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
-import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,33 +75,12 @@ public abstract class PendingProceedingCommonLdmlTransformer
     }
 
     var contentRelatedIndexing = pendingProceeding.contentRelatedIndexing();
-    if (contentRelatedIndexing != null && contentRelatedIndexing.norms() != null) {
-      applyIfNotEmpty(
-          contentRelatedIndexing.norms().stream()
-              .flatMap(normReference -> normReference.singleNorms().stream())
-              .filter(Objects::nonNull)
-              .map(
-                  singleNorm -> {
-                    var type = nullSafeGet(singleNorm.legalForce(), LegalForce::type);
-                    return type != null ? type.label() : null;
-                  })
-              .filter(Objects::nonNull)
-              .toList(),
-          builder::legalForce);
-    }
+    // Legacy legalForce mapping removed
 
     var coreData = pendingProceeding.coreData();
     if (coreData != null) {
-      applyIfNotEmpty(coreData.fileNumbers(), builder::fileNumbers);
-
-      builder
-          .documentType(
-              DocumentType.builder()
-                  .eId("dokumenttyp")
-                  .value(coreData.documentType().label())
-                  .build())
-          .courtLocation(nullSafeGet(coreData.court(), Court::location))
-          .courtType(nullSafeGet(coreData.court(), Court::type));
+      builder.dokumentTyp(
+          DokumentTyp.builder().eId("dokumenttyp").value(coreData.documentType().label()).build());
     }
 
     return builder;

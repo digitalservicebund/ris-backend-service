@@ -46,91 +46,69 @@
             </akn:references>
             <akn:proprietary source="#ris">
                 <ris:meta>
-                    <ris:decisionNames>
-                        <ris:decisionName>decisionName test</ris:decisionName>
-                        <ris:decisionName>decisionName2 test</ris:decisionName>
-                    </ris:decisionNames>
-                    <ris:previousDecisions>
-                        <ris:previousDecision date="2020-01-01">
-                            <ris:documentNumber>previous decision document number 1</ris:documentNumber>
-                            <ris:fileNumber>previous decision file number</ris:fileNumber>
-                            <ris:courtType>previous decision court type</ris:courtType>
-                        </ris:previousDecision>
-                        <ris:previousDecision date="2020-01-01">
-                            <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                            <ris:fileNumber>previous decision file number</ris:fileNumber>
-                            <ris:courtType>previous decision court type</ris:courtType>
-                        </ris:previousDecision>
-                    </ris:previousDecisions>
-                    <ris:ensuingDecisions>
-                        <ris:ensuingDecision date="2022-10-01">
-                            <ris:documentNumber>ensuing decision document number 1</ris:documentNumber>
-                            <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                            <ris:courtType>ensuing decision court type</ris:courtType>
-                        </ris:ensuingDecision>
-                        <ris:ensuingDecision date="2022-10-01">
-                            <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                            <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                            <ris:courtType>ensuing decision court type</ris:courtType>
-                        </ris:ensuingDecision>
-                    </ris:ensuingDecisions>
-                    <ris:fileNumbers>
-                        <ris:fileNumber>fileNumber test</ris:fileNumber>
-                    </ris:fileNumbers>
                     <ris:dokumentTyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">documentType test</ris:dokumentTyp>
-                    <ris:courtLocation>courtLocation</ris:courtLocation>
-                    <ris:courtType>courtType</ris:courtType>
-                    <ris:legalForces>
-                        <ris:legalForce>legalForce test</ris:legalForce>
-                    </ris:legalForces>
-                    <ris:legalEffect>ja</ris:legalEffect>
-                    <ris:fieldOfLaws>
-                        <ris:fieldOfLaw>fieldOfLaw test</ris:fieldOfLaw>
-                    </ris:fieldOfLaws>
-                    <ris:judicialBody>appraisalBody test</ris:judicialBody>
-                    <ris:deviatingCourts>
-                        <ris:deviatingCourt>deviating court</ris:deviatingCourt>
-                    </ris:deviatingCourts>
-                    <ris:deviatingDates>
-                        <ris:deviatingDate>2010-05-12</ris:deviatingDate>
-                    </ris:deviatingDates>
-                    <ris:datenDerMuendlichenVerhandlung>
-                        <ris:datumDerMuendlichenVerhandlung>2021-02-03</ris:datumDerMuendlichenVerhandlung>
-                        <ris:datumDerMuendlichenVerhandlung>2020-01-02</ris:datumDerMuendlichenVerhandlung>
-                    </ris:datenDerMuendlichenVerhandlung>
-                    <ris:deviatingDocumentNumbers>
-                        <ris:deviatingDocumentNumber>deviating documentNumber</ris:deviatingDocumentNumber>
-                    </ris:deviatingDocumentNumbers>
-                    <ris:deviatingEclis>
-                        <ris:deviatingEcli>deviating ecli test</ris:deviatingEcli>
-                    </ris:deviatingEclis>
-                    <ris:deviatingFileNumbers>
-                        <ris:deviatingFileNumber>deviating fileNumber</ris:deviatingFileNumber>
-                    </ris:deviatingFileNumbers>
-                    <ris:documentationOffice>documentationOffice</ris:documentationOffice>
-                    <ris:procedures>
-                        <ris:procedure>previous procedure test</ris:procedure>
-                    </ris:procedures>
-                    <ris:inputTypes>
-                        <ris:inputType>E-Mail</ris:inputType>
-                        <ris:inputType>Papier</ris:inputType>
-                    </ris:inputTypes>
-                    <ris:foreignLanguageVersions>
-                        <ris:foreignLanguageVersion>
+                    <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+                        <ris:typ domainTerm="Gerichtstyp">courtType</ris:typ>
+                        <ris:ort domainTerm="Gerichtsort">courtLocation</ris:ort>
+                    </ris:gericht>
+                    <ris:fehlerhafteGerichte domainTerm="Fehlerhafte Gerichte">
+                        <ris:fehlerhaftesGericht domainTerm="Fehlerhaftes Gericht">deviating court 1</ris:fehlerhaftesGericht>
+                        <ris:fehlerhaftesGericht domainTerm="Fehlerhaftes Gericht">deviating court 2</ris:fehlerhaftesGericht>
+                    </ris:fehlerhafteGerichte>
+                    <ris:regionen domainTerm="Regionen">
+                        <ris:region domainTerm="Region">NW</ris:region>
+                    </ris:regionen>
+                    <ris:dokumentationsstelle domainTerm="Dokumentationsstelle" akn:refersTo="#documentationoffice-dokumentationsstelle">documentationOffice</ris:dokumentationsstelle>
+                    <ris:aktenzeichenListe domainTerm="Aktenzeichenliste">
+                        <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">fileNumber test
+                        </ris:aktenzeichen>
+                        <ris:aktenzeichen domainTerm="Abweichendes Aktenzeichen" >deviating fileNumber
+                        </ris:aktenzeichen>
+                    </ris:aktenzeichenListe>
+                    <ris:abweichendeDaten domainTerm="Abweichende Daten">
+                        <ris:abweichendesDatum domainTerm="Abweichendes Datum">2010-05-12</ris:abweichendesDatum>
+                    </ris:abweichendeDaten>
+                    <ris:abweichendeDokumentnummern domainTerm="Abweichende Dokumentnummern">
+                        <ris:abweichendeDokumentnummer domainTerm="Abweichende Dokumentnummer">deviating documentNumber</ris:abweichendeDokumentnummer>
+                    </ris:abweichendeDokumentnummern>
+                    <ris:abweichendeEclis domainTerm="Abweichende ECLIs">
+                        <ris:abweichenderEcli domainTerm="Abweichender ECLI">deviating ecli test</ris:abweichenderEcli>
+                    </ris:abweichendeEclis>
+                    <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBody test
+                    </ris:spruchkoerper>
+                    <ris:sachgebiete domainTerm="Sachgebiete">
+                        <ris:sachgebiet domainTerm="Sachgebiet" notation="neu">fieldOfLaw test</ris:sachgebiet>
+                    </ris:sachgebiete>
+                    <ris:rechtskraft domainTerm="Rechtskraft">Ja</ris:rechtskraft>
+                    <ris:vorgaenge domainTerm="Vorgänge">
+                        <ris:vorgang domainTerm="Vorgang">procedure test</ris:vorgang>
+                        <ris:vorgang domainTerm="Vorgang">previous procedure test</ris:vorgang>
+                    </ris:vorgaenge>
+                    <ris:eingangsarten domainTerm="Eingangsarten">
+                        <ris:eingangsart domainTerm="Eingangsart">E-Mail</ris:eingangsart>
+                        <ris:eingangsart domainTerm="Eingangsart">Papier</ris:eingangsart>
+                    </ris:eingangsarten>
+                    <ris:definitionen ris:domainTerm="Definitionen">
+                        <ris:definition ris:domainTerm="Definition">
+                            <ris:definierterBegriff domainTerm="Definierter Begriff">indirekte Steuern</ris:definierterBegriff>
+                            <ris:definierendeRandnummer domainTerm="Definierende Randnummer" akn:refersTo="#randnummer-2">2</ris:definierendeRandnummer>
+                        </ris:definition>
+                        <ris:definition ris:domainTerm="Definition">
+                            <ris:definierterBegriff domainTerm="Definierter Begriff">Sachgesamtheit</ris:definierterBegriff>
+                        </ris:definition>
+                    </ris:definitionen>
+                    <ris:fremdsprachigeFassungen domainTerm="Fremdsprachige Fassungen">
+                        <ris:fremdsprachigeFassung domainTerm="Fremdsprachige Fassung">
                             <akn:FRBRlanguage language="eng"/>
                             <akn:documentRef href="https://ihre-url-zur-englischen-übersetzung" showAs="Englisch"/>
-                        </ris:foreignLanguageVersion>
-                        <ris:foreignLanguageVersion>
+                        </ris:fremdsprachigeFassung>
+                        <ris:fremdsprachigeFassung domainTerm="Fremdsprachige Fassung">
                             <akn:FRBRlanguage language="fra"/>
                             <akn:documentRef href="https://ihre-url-zur-französischen-übersetzung"
-                                             showAs="Französisch"/>
-                        </ris:foreignLanguageVersion>
-                    </ris:foreignLanguageVersions>
-                    <ris:definitions>
-                        <ris:definition ris:definedTerm="indirekte Steuern" ris:definingBorderNumber="2"/>
-                        <ris:definition ris:definedTerm="Sachgesamtheit"/>
-                    </ris:definitions>
-                    <ris:evfs>evsf test</ris:evfs>
+                                               showAs="Französisch"/>
+                        </ris:fremdsprachigeFassung>
+                    </ris:fremdsprachigeFassungen>
+                    <ris:evsf domainTerm="Elektronische Vorschriftensammlung Bundesfinanzverwaltung (E-VSF)">evsf test</ris:evsf>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>
@@ -176,8 +154,12 @@
             <akn:motivation ris:domainTerm="Abweichende Meinung">
                 <akn:p>dissenting test</akn:p>
                 <akn:block name="Mitwirkende Richter">
-                    <akn:opinion by="#dr-phil-max-mustermann" ris:domainTerm="Art der Mitwirkung" type="dissenting">referenced opinions test 1</akn:opinion>
-                    <akn:opinion by="#richterin-maxima-mustermann" ris:domainTerm="Art der Mitwirkung" type="dissenting">referenced opinions test 2</akn:opinion>
+                    <akn:opinion ris:domainTerm="Art der Mitwirkung"
+                                 type="dissenting"
+                                 by="#dr-phil-max-mustermann">referenced opinions test 1</akn:opinion>
+                    <akn:opinion ris:domainTerm="Art der Mitwirkung"
+                                 type="dissenting"
+                                 by="#richterin-maxima-mustermann">referenced opinions test 2</akn:opinion>
                 </akn:block>
             </akn:motivation>
             <akn:introduction ris:domainTerm="Leitsatz">

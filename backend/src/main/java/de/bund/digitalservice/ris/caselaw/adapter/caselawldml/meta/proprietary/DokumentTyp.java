@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Builder
-public class DocumentType {
+public class DokumentTyp {
   @XmlValue private String value;
 
   @Builder.Default

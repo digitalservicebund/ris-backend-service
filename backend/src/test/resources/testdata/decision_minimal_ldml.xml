@@ -38,12 +38,14 @@
             </akn:references>
             <akn:proprietary source="#ris">
                 <ris:meta>
-                    <ris:fileNumbers>
-                        <ris:fileNumber>testFileNumber</ris:fileNumber>
-                    </ris:fileNumbers>
                     <ris:dokumentTyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">testDocumentTypeAbbreviation</ris:dokumentTyp>
-                    <ris:courtLocation>Nantes</ris:courtLocation>
-                    <ris:courtType>Tribunal Administratif</ris:courtType>
+                    <ris:gericht akn:refersTo="#gericht" domainTerm="Gericht">
+                        <ris:typ domainTerm="Gerichtstyp">Tribunal Administratif</ris:typ>
+                        <ris:ort domainTerm="Gerichtsort">Nantes</ris:ort>
+                    </ris:gericht>
+                    <ris:aktenzeichenListe domainTerm="Aktenzeichenliste">
+                        <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">testFileNumber</ris:aktenzeichen>
+                    </ris:aktenzeichenListe>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>

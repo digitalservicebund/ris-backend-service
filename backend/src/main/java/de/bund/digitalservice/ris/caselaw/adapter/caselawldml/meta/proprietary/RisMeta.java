@@ -27,80 +27,54 @@ public class RisMeta {
   @XmlElement(name = "ensuingDecision", namespace = CaseLawLdml.RIS_NS)
   private List<RelatedDecision> ensuingDecision;
 
-  @XmlElementWrapper(name = "fileNumbers", namespace = CaseLawLdml.RIS_NS)
-  @XmlElement(name = "fileNumber", namespace = CaseLawLdml.RIS_NS)
-  private List<String> fileNumbers;
-
   @XmlElement(name = "dokumentTyp", namespace = CaseLawLdml.RIS_NS)
-  private DocumentType documentType;
+  private DokumentTyp dokumentTyp;
 
-  @XmlElement(name = "courtLocation", namespace = CaseLawLdml.RIS_NS)
-  private String courtLocation;
+  @XmlElement(name = "gericht", namespace = CaseLawLdml.RIS_NS)
+  private Gericht gericht;
 
-  @XmlElement(name = "courtType", namespace = CaseLawLdml.RIS_NS)
-  private String courtType;
+  @XmlElement(name = "fehlerhafteGerichte", namespace = CaseLawLdml.RIS_NS)
+  private FehlerhafteGerichte fehlerhafteGerichte;
 
-  @XmlElementWrapper(name = "legalForces", namespace = CaseLawLdml.RIS_NS)
-  @XmlElement(name = "legalForce", namespace = CaseLawLdml.RIS_NS)
-  private List<String> legalForce;
+  @XmlElement(name = "regionen", namespace = CaseLawLdml.RIS_NS)
+  private Regionen regionen;
 
-  @XmlElement(name = "legalEffect", namespace = CaseLawLdml.RIS_NS)
-  private String legalEffect;
+  @XmlElement(name = "dokumentationsstelle", namespace = CaseLawLdml.RIS_NS)
+  private Dokumentationsstelle dokumentationsstelle;
 
-  @XmlElementWrapper(name = "fieldOfLaws", namespace = CaseLawLdml.RIS_NS)
-  @XmlElement(name = "fieldOfLaw", namespace = CaseLawLdml.RIS_NS)
-  private List<String> fieldOfLaw;
+  @XmlElement(name = "aktenzeichenListe", namespace = CaseLawLdml.RIS_NS)
+  private AktenzeichenListe aktenzeichenListe;
 
-  @XmlElement(name = "yearOfDispute", namespace = CaseLawLdml.RIS_NS)
-  private String yearOfDispute;
+  @XmlElement(name = "abweichendeDaten", namespace = CaseLawLdml.RIS_NS)
+  private AbweichendeDaten abweichendeDaten;
 
-  @XmlElement(name = "judicialBody", namespace = CaseLawLdml.RIS_NS)
-  private String judicialBody;
+  @XmlElement(name = "abweichendeDokumentnummern", namespace = CaseLawLdml.RIS_NS)
+  private AbweichendeDokumentnummern abweichendeDokumentnummern;
 
-  @XmlElementWrapper(name = "deviatingCourts", namespace = CaseLawLdml.RIS_NS)
-  @XmlElement(name = "deviatingCourt", namespace = CaseLawLdml.RIS_NS)
-  private List<String> deviatingCourt;
+  @XmlElement(name = "abweichendeEclis", namespace = CaseLawLdml.RIS_NS)
+  private AbweichendeEclis abweichendeEclis;
 
-  @XmlElementWrapper(name = "deviatingDates", namespace = CaseLawLdml.RIS_NS)
-  @XmlElement(name = "deviatingDate", namespace = CaseLawLdml.RIS_NS)
-  private List<String> deviatingDate;
+  @XmlElement(name = "spruchkoerper", namespace = CaseLawLdml.RIS_NS)
+  private Spruchkoerper spruchkoerper;
 
-  @XmlElementWrapper(name = "datenDerMuendlichenVerhandlung", namespace = CaseLawLdml.RIS_NS)
-  @XmlElement(name = "datumDerMuendlichenVerhandlung", namespace = CaseLawLdml.RIS_NS)
-  private List<String> oralHearingDate;
+  @XmlElement(name = "sachgebiete", namespace = CaseLawLdml.RIS_NS)
+  private Sachgebiete sachgebiete;
 
-  @XmlElementWrapper(name = "deviatingDocumentNumbers", namespace = CaseLawLdml.RIS_NS)
-  @XmlElement(name = "deviatingDocumentNumber", namespace = CaseLawLdml.RIS_NS)
-  private List<String> deviatingDocumentNumber;
+  @XmlElement(name = "rechtskraft", namespace = CaseLawLdml.RIS_NS)
+  private Rechtskraft rechtskraft;
 
-  @XmlElementWrapper(name = "deviatingEclis", namespace = CaseLawLdml.RIS_NS)
-  @XmlElement(name = "deviatingEcli", namespace = CaseLawLdml.RIS_NS)
-  private List<String> deviatingEcli;
+  @XmlElement(name = "vorgaenge", namespace = CaseLawLdml.RIS_NS)
+  private Vorgaenge vorgaenge;
 
-  @XmlElementWrapper(name = "deviatingFileNumbers", namespace = CaseLawLdml.RIS_NS)
-  @XmlElement(name = "deviatingFileNumber", namespace = CaseLawLdml.RIS_NS)
-  private List<String> deviatingFileNumber;
+  @XmlElement(name = "eingangsarten", namespace = CaseLawLdml.RIS_NS)
+  private Eingangsarten eingangsarten;
 
-  @XmlElement(name = "documentationOffice", namespace = CaseLawLdml.RIS_NS)
-  private String documentationOffice;
+  @XmlElement(name = "definitionen", namespace = CaseLawLdml.RIS_NS)
+  private Definitionen definitionen;
 
-  @XmlElementWrapper(name = "procedures", namespace = CaseLawLdml.RIS_NS)
-  @XmlElement(name = "procedure", namespace = CaseLawLdml.RIS_NS)
-  private List<String> procedure;
+  @XmlElement(name = "fremdsprachigeFassungen", namespace = CaseLawLdml.RIS_NS)
+  private FremdsprachigeFassungen fremdsprachigeFassungen;
 
-  @XmlElementWrapper(name = "inputTypes", namespace = CaseLawLdml.RIS_NS)
-  @XmlElement(name = "inputType", namespace = CaseLawLdml.RIS_NS)
-  private List<String> inputTypes;
-
-  @XmlElementWrapper(name = "foreignLanguageVersions", namespace = CaseLawLdml.RIS_NS)
-  @XmlElement(name = "foreignLanguageVersion", namespace = CaseLawLdml.RIS_NS)
-  private List<ForeignLanguageVersion> foreignLanguageVersions;
-
-  @XmlElementWrapper(name = "definitions", namespace = CaseLawLdml.RIS_NS)
-  @XmlElement(name = "definition", namespace = CaseLawLdml.RIS_NS)
-  private List<Definition> definitions;
-
-  /** Elektronische Vorschriftensammlung Bundesfinanzverwaltung */
-  @XmlElement(name = "evfs", namespace = CaseLawLdml.RIS_NS)
-  private String evfs;
+  @XmlElement(name = "evsf", namespace = CaseLawLdml.RIS_NS)
+  private Evsf evsf;
 }
