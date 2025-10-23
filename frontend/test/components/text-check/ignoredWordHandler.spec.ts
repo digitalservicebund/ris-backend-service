@@ -7,7 +7,7 @@ import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServi
 
 useFeatureToggleServiceMock()
 
-async function renderComponent(match: Match) {
+async function renderComponent(match: Match, ignoredLocally = false) {
   const user = userEvent.setup()
 
   await flushPromises()
@@ -16,6 +16,7 @@ async function renderComponent(match: Match) {
     ...render(IgnoredWordHandler, {
       props: {
         match: match,
+        ignoredLocally: ignoredLocally,
       },
     }),
   }
@@ -107,5 +108,70 @@ describe("IgnoredWordHandler", () => {
 
     await user.click(screen.getByText("Aus Wörterbuch entfernen"))
     expect(emitted()["ignored-word:remove"]).toBeUndefined()
+  })
+
+  test("when ignoring locally check the emitted event and word location information", async () => {
+    const { emitted, user } = await renderComponent(baseMatch)
+    const expected = [[baseMatch.offset]]
+
+    await user.click(screen.getByText("Hier ignorieren"))
+    expect(emitted()["ignore-once:toggle"]).toEqual(expected)
+  })
+
+  test("when ignoredLocally is true, 'In Dokeinheit ignorieren' emits ignore-once:toggle then ignored-word:add", async () => {
+    const { emitted, user } = await renderComponent(baseMatch, true)
+
+    await user.click(screen.getByText("In Dokeinheit ignorieren"))
+
+    expect(emitted()["ignore-once:toggle"]).toEqual([[baseMatch.offset]])
+    expect(emitted()["ignored-word:add"]).toEqual([[]])
+  })
+
+  test("when ignored locally then unignore option is present", async () => {
+    await renderComponent(baseMatch, true)
+
+    expect(screen.getByText("Hier nicht ignorieren")).toBeInTheDocument()
+    expect(screen.getByText("In Dokeinheit ignorieren")).toBeInTheDocument()
+    expect(screen.getByText("Zum Wörterbuch hinzufügen")).toBeInTheDocument()
+  })
+
+  test("when ignoredLocally is true, ignoring in document removes local ignore before ignoring in document", async () => {
+    const { emitted, user } = await renderComponent(baseMatch, true)
+
+    await user.click(screen.getByText("In Dokeinheit ignorieren"))
+
+    expect(emitted()["ignore-once:toggle"]).toEqual([[baseMatch.offset]])
+    expect(emitted()["ignored-word:add"]).toBeTruthy()
+  })
+
+  test("when ignoredLocally is true, ignoring on global level removes local ignore before ignoring globally", async () => {
+    const { emitted, user } = await renderComponent(baseMatch, true)
+
+    await user.click(screen.getByText("Zum Wörterbuch hinzufügen"))
+
+    expect(emitted()["ignore-once:toggle"]).toEqual([[baseMatch.offset]])
+    expect(emitted()["globally-ignored-word:add"]).toBeTruthy()
+  })
+
+  test("when ignored in document, ignoring globally removes document ignore before ignoring globally", async () => {
+    const { emitted, user } = await renderComponent(
+      {
+        ...baseMatch,
+        ignoredTextCheckWords: [
+          { type: "documentation_unit", word: "testword" },
+        ],
+      },
+      false,
+    )
+
+    expect(
+      screen.getByText("Nicht in Dokeinheit ignorieren"),
+    ).toBeInTheDocument()
+    expect(screen.getByText("Zum Wörterbuch hinzufügen")).toBeInTheDocument()
+
+    await user.click(screen.getByText("Zum Wörterbuch hinzufügen"))
+
+    expect(emitted()["ignored-word:remove"]).toBeTruthy()
+    expect(emitted()["globally-ignored-word:add"]).toBeTruthy()
   })
 })

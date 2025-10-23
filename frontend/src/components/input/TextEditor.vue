@@ -33,6 +33,7 @@ import { CustomBulletList } from "@/editor/bulletList"
 import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
 import { EventHandler } from "@/editor/EventHandler"
 import { FontSize } from "@/editor/fontSize"
+import { IgnoreOnceMark, IgnoreOnceTagName } from "@/editor/ignoreOnceMark"
 import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
 import { InvisibleCharacters } from "@/editor/invisibleCharacters"
@@ -44,7 +45,7 @@ import { TableStyle } from "@/editor/tableStyle"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { Match } from "@/types/textCheck"
+import { Match, TextCheckTagName } from "@/types/textCheck"
 
 interface Props {
   value?: string
@@ -141,6 +142,7 @@ const editor: Editor = new Editor({
       names: ["listItem", "paragraph"],
     }),
     TextCheckMark,
+    IgnoreOnceMark,
     TextCheckExtension.configure({
       service: textCheckService,
     }),
@@ -198,22 +200,56 @@ const shouldShowBubbleMenu = (): boolean => {
   }
 }
 
+type TextCheckAttrs = {
+  id: string
+  type: string
+  ignored: boolean
+}
+
+const currentAttrs = ref<TextCheckAttrs>()
+function ignoreOnceToggle(offset: number) {
+  const { state } = editor
+  let from: number = offset
+  let to: number | null = null
+  let markRange = { from: 0, to: 0 }
+
+  state.doc.descendants((node, pos) => {
+    if (node.isText) {
+      node.marks.forEach((mark) => {
+        if (mark.type.name === TextCheckTagName) {
+          if (pos <= from && pos + node.nodeSize >= from) {
+            markRange = { from: pos, to: pos + node.nodeSize }
+            currentAttrs.value = { ...(mark.attrs as TextCheckAttrs) }
+            currentAttrs.value.ignored = !currentAttrs.value.ignored
+          }
+        }
+      })
+    }
+  })
+
+  if (markRange) {
+    from = markRange.from
+    to = markRange.to
+  } else {
+    return
+  }
+
+  editor
+    .chain()
+    .focus()
+    .setTextSelection({ from, to })
+    .unsetMark(TextCheckTagName)
+    .setMark(TextCheckTagName, { ...currentAttrs.value })
+    .toggleMark(IgnoreOnceTagName)
+    .run()
+}
+
 /**
  * Adds word to doc level ignore and closes the modal
  */
 async function addIgnoredWord(word: string) {
   await textCheckService.ignoreWord(word)
   editor.commands.setSelectedMatch()
-}
-
-/**
- * Replace and reset selected match
- * @param suggestion
- */
-const acceptSuggestion = (suggestion: string) => {
-  if (selectedMatch.value && selectedMatch.value?.id) {
-    editor.commands.acceptMatch(selectedMatch.value.id, suggestion)
-  }
 }
 
 /**
@@ -363,12 +399,14 @@ defineExpose({ jumpToMatch })
       >
         <TextCheckModal
           v-if="selectedMatch"
+          :editor="editor"
           :match="selectedMatch"
+          :selection="editor.state.selection"
           @global-word:add="addGloballyIgnoredWord"
           @global-word:remove="removeGloballyIgnoredWord"
+          @ignore-once:toggle="ignoreOnceToggle"
           @word:add="addIgnoredWord"
           @word:remove="removeIgnoredWord"
-          @word:replace="acceptSuggestion"
         />
       </BubbleMenu>
     </div>

@@ -6,10 +6,12 @@ import { Match } from "@/types/textCheck"
 import IconAutoStoriesOffVariant from "~icons/material-symbols/auto-stories-off-outline"
 import IconAutoStoriesVariant from "~icons/material-symbols/auto-stories-outline"
 import IconDescription from "~icons/material-symbols/description-outline"
+import IconSpaceBar from "~icons/material-symbols/space-bar"
 import IconSpellCheck from "~icons/material-symbols/spellcheck"
 
 const props = defineProps<{
   match: Match
+  ignoredLocally: boolean
 }>()
 
 const emit = defineEmits<{
@@ -17,10 +19,29 @@ const emit = defineEmits<{
   "ignored-word:remove": [void]
   "globally-ignored-word:remove": [void]
   "globally-ignored-word:add": [void]
+  "ignore-once:toggle": [number]
 }>()
 
 function addIgnoredWord() {
   emit("ignored-word:add")
+}
+
+function addIgnoredWordWithCheck() {
+  if (props.ignoredLocally) {
+    emit("ignore-once:toggle", props.match.offset)
+  }
+  emit("ignored-word:add")
+}
+
+function addIgnoredWordGloballyWithCheck() {
+  if (props.ignoredLocally) {
+    emit("ignore-once:toggle", props.match.offset)
+  }
+  emit("globally-ignored-word:add")
+}
+
+function ignoreOnceToggle() {
+  emit("ignore-once:toggle", props.match.offset)
 }
 
 async function removeWord() {
@@ -114,7 +135,71 @@ const matchIsIgnoredInDocument = computed(() => {
         </Button>
       </template>
 
+      <template v-else-if="ignoredLocally">
+        <div>an dieser Stelle ignoriert</div>
+
+        <Button
+          v-if="textCheckGlobal"
+          aria-label="Hier nicht ignorieren"
+          class="self-start"
+          data-testid="unignore-once-button"
+          label="Hier nicht ignorieren"
+          severity="secondary"
+          @click="ignoreOnceToggle"
+        >
+          <template #icon>
+            <IconSpellCheck />
+          </template>
+        </Button>
+
+        <Button
+          v-if="textCheckGlobal"
+          aria-label="In Dokeinheit ignorieren"
+          class="self-start"
+          data-testid="ignored-word-add-button"
+          label="In Dokeinheit ignorieren"
+          size="small"
+          text
+          @click="addIgnoredWordWithCheck"
+        >
+          <template #icon>
+            <IconDescription />
+          </template>
+        </Button>
+
+        <Button
+          v-if="textCheckGlobal"
+          aria-label="Zum Wörterbuch hinzufügen"
+          class="self-start"
+          data-testid="ignored-word-global-add-button"
+          label="Zum Wörterbuch hinzufügen"
+          size="small"
+          text
+          @click="addIgnoredWordGloballyWithCheck"
+        >
+          <template #icon>
+            <IconAutoStoriesVariant />
+          </template>
+        </Button>
+      </template>
+
       <template v-else>
+        <div>{{ match.shortMessage }}</div>
+
+        <Button
+          v-if="textCheckGlobal"
+          aria-label="Hier ignorieren"
+          class="self-start"
+          data-testid="ignore-once-button"
+          label="Hier ignorieren"
+          severity="secondary"
+          @click="ignoreOnceToggle"
+        >
+          <template #icon>
+            <IconSpaceBar />
+          </template>
+        </Button>
+
         <Button
           v-if="textCheckGlobal"
           aria-label="In Dokeinheit ignorieren"

@@ -1,6 +1,7 @@
 import { Editor } from "@tiptap/core"
 import { EditorState } from "prosemirror-state"
 import { ref } from "vue"
+import { IgnoreOnceTagName } from "@/editor/ignoreOnceMark"
 import { ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -17,6 +18,7 @@ class NeurisTextCheckService implements TextCheckService {
   loading = ref(false)
   selectedMatch = ref()
   responseError = ref()
+  selectedIgnoreOnce = ref()
 
   category: string // text editor label category where matches are stored
 
@@ -53,13 +55,29 @@ class NeurisTextCheckService implements TextCheckService {
       (mark) => mark.type.name === TextCheckTagName,
     )
 
+    const ignoreOnceMark = node.marks.find(
+      (mark) => mark.type.name === IgnoreOnceTagName,
+    )
+
     if (!textCheckMark) {
       this.clearSelectedMatch()
-      return false
     }
 
-    this.selectMatch(Number(textCheckMark.attrs.id))
-    return true
+    if (!ignoreOnceMark) {
+      this.clearIgnoreOnce()
+    }
+
+    if (textCheckMark) {
+      this.selectMatch(Number(textCheckMark.attrs.id))
+      return true
+    }
+
+    if (ignoreOnceMark) {
+      this.selectIgnoreOnce(state)
+      return true
+    }
+
+    return false
   }
 
   /**
@@ -218,8 +236,39 @@ class NeurisTextCheckService implements TextCheckService {
     this.clearSelectedMatch()
   }
 
+  selectIgnoreOnce = (state: EditorState): boolean => {
+    let found = false
+    state.doc.nodesBetween(
+      state.selection.from,
+      state.selection.from,
+      (parent, parentPos) => {
+        if (!parent.isTextblock) return true
+        parent.forEach((child, childOffset) => {
+          if (!child.isText) return
+          if (
+            child.marks.some((mark) => mark.type.name === IgnoreOnceTagName)
+          ) {
+            this.selectedIgnoreOnce.value = {
+              word: child.text ?? "",
+              offset: parentPos + childOffset,
+              length: child.text?.length ?? 0,
+            }
+            found = true
+          }
+        })
+        return false
+      },
+    )
+    if (!found) this.clearIgnoreOnce()
+    return found
+  }
+
   clearSelectedMatch = () => {
     this.selectedMatch.value = undefined
+  }
+
+  clearIgnoreOnce = () => {
+    this.selectedIgnoreOnce.value = undefined
   }
 
   ignoreWord = async (word: string): Promise<boolean> => {
