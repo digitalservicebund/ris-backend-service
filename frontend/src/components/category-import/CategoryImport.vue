@@ -132,11 +132,19 @@ const hasContent = (key: keyof typeof allLabels): boolean => {
         key as keyof typeof sourceDocumentUnit.value.contentRelatedIndexing
       ]
 
-    return (
-      (Array.isArray(object) && object.length > 0) ||
-      (typeof object === "string" && object.trim().length > 0) ||
-      (typeof object === "boolean" && object)
-    )
+    switch (typeof object) {
+      case "object":
+        if (Array.isArray(object)) {
+          return object.length > 0
+        }
+        return object != null
+      case "string":
+        return object.trim().length > 0
+      case "boolean":
+        return object
+      default:
+        return false
+    }
   }
   return false
 }
@@ -184,7 +192,9 @@ const isImportable = (key: keyof typeof allLabels): boolean => { // NOSONAR type
       const isEmptyArray =
         Array.isArray(targetCategory) && targetCategory.length > 0
       const isActiveFlag = typeof targetCategory === "boolean" && targetCategory
-      return !isEmptyText && !isEmptyArray && !isActiveFlag
+      const isNonNullObject = typeof targetCategory === "object" && targetCategory != null
+
+      return !isEmptyText && !isEmptyArray && !isActiveFlag && !isNonNullObject
     }
   return true
 }
@@ -227,6 +237,7 @@ const handleImport = async (key: keyof typeof allLabels) => {
     case "definitions":
     case "hasLegislativeMandate":
     case "foreignLanguageVersions":
+    case "appealAdmission":
       importContextRelatedIndexing(key)
       break
     case "tenor":
