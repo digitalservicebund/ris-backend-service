@@ -31,7 +31,7 @@ public class RisMeta {
   @XmlElement(name = "fileNumber", namespace = CaseLawLdml.RIS_NS)
   private List<String> fileNumbers;
 
-  @XmlElement(name = "documentType", namespace = CaseLawLdml.RIS_NS)
+  @XmlElement(name = "dokumentTyp", namespace = CaseLawLdml.RIS_NS)
   private DocumentType documentType;
 
   @XmlElement(name = "courtLocation", namespace = CaseLawLdml.RIS_NS)

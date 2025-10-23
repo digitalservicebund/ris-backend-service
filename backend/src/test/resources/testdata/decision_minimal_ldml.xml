@@ -41,7 +41,7 @@
                     <ris:fileNumbers>
                         <ris:fileNumber>testFileNumber</ris:fileNumber>
                     </ris:fileNumbers>
-                    <ris:documentType akn:eId="dokumenttyp">testDocumentTypeAbbreviation</ris:documentType>
+                    <ris:dokumentTyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">testDocumentTypeAbbreviation</ris:dokumentTyp>
                     <ris:courtLocation>Nantes</ris:courtLocation>
                     <ris:courtType>Tribunal Administratif</ris:courtType>
                 </ris:meta>

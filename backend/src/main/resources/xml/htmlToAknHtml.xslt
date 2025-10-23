@@ -333,7 +333,7 @@
     |akn:FRBRthis|akn:FRBRuri|akn:FRBRalias|akn:FRBRdate|akn:FRBRauthor|akn:FRBRcountry|akn:FRBRlanguage|akn:documentRef
     |ris:meta|ris:fileNumbers|ris:fileNumber|ris:documentType|ris:courtLocation|ris:courtType|ris:legalEffect
     |ris:fieldOfLaws|ris:fieldOfLaw|ris:judicialBody|ris:documentationOffice
-    |ris:documentNumber|ris:previousDecisions|ris:previousDecision|ris:ensuingDecisions|ris:ensuingDecision
+    |ris:documentNumber|ris:dokumentTyp|ris:previousDecisions|ris:previousDecision|ris:ensuingDecisions|ris:ensuingDecision
     |ris:procedures|ris:procedure|ris:decisionNames|ris:decisionName|ris:deviatingFileNumbers|ris:datenDerMuendlichenVerhandlung|ris:datumDerMuendlichenVerhandlung
     |ris:deviatingFileNumber|ris:deviatingDocumentNumbers|ris:deviatingDocumentNumber|ris:legalForces|ris:legalForce
     |ris:yearOfDispute|ris:deviatingCourts|ris:deviatingCourt|ris:deviatingDates|ris:deviatingDate

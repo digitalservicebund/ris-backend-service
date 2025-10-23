@@ -77,7 +77,7 @@
                     <ris:fileNumbers>
                         <ris:fileNumber>fileNumber test</ris:fileNumber>
                     </ris:fileNumbers>
-                    <ris:documentType akn:eId="dokumenttyp">documentType test</ris:documentType>
+                    <ris:dokumentTyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">documentType test</ris:dokumentTyp>
                     <ris:courtLocation>courtLocation</ris:courtLocation>
                     <ris:courtType>courtType</ris:courtType>
                     <ris:legalForces>
