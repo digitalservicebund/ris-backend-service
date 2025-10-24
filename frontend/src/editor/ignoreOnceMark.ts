@@ -4,10 +4,9 @@ export const IgnoreOnceTagName = "ignore-once"
 
 export const IgnoreOnceMark = Mark.create({
   name: IgnoreOnceTagName,
-  priority: 1000,
+  // todo: check if we need this?
+  priority: 1010,
   inclusive: true,
-  excludes: "",
-  group: "inline",
   parseHTML() {
     return [
       {

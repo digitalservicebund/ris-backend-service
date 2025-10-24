@@ -17,7 +17,6 @@ class NeurisTextCheckService implements TextCheckService {
   loading = ref(false)
   selectedMatch = ref()
   responseError = ref()
-  selectedIgnoreOnce = ref()
 
   category: string // text editor label category where matches are stored
 

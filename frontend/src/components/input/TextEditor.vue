@@ -141,8 +141,8 @@ const editor: Editor = new Editor({
     Indent.configure({
       names: ["listItem", "paragraph"],
     }),
-    TextCheckMark,
     IgnoreOnceMark,
+    TextCheckMark,
     TextCheckExtension.configure({
       service: textCheckService,
     }),
@@ -200,48 +200,42 @@ const shouldShowBubbleMenu = (): boolean => {
   }
 }
 
-type TextCheckAttrs = {
-  id: string
-  type: string
-  ignored: boolean
-}
-
-const currentAttrs = ref<TextCheckAttrs>()
 function ignoreOnceToggle(offset: number) {
   const { state } = editor
-  let from: number = offset
-  let to: number | null = null
+  let matchId: number | null = null
   let markRange = { from: 0, to: 0 }
 
+  // todo: use selectedMatch
   state.doc.descendants((node, pos) => {
     if (node.isText) {
       node.marks.forEach((mark) => {
         if (mark.type.name === TextCheckTagName) {
-          if (pos <= from && pos + node.nodeSize >= from) {
+          if (pos <= offset && pos + node.nodeSize >= offset) {
             markRange = { from: pos, to: pos + node.nodeSize }
-            currentAttrs.value = { ...(mark.attrs as TextCheckAttrs) }
-            currentAttrs.value.ignored = !currentAttrs.value.ignored
+            matchId = Number(mark.attrs.id)
           }
         }
       })
     }
   })
 
-  if (markRange) {
-    from = markRange.from
-    to = markRange.to
-  } else {
+  if (!matchId || (markRange.from === 0 && markRange.to === 0)) {
     return
   }
 
-  textCheckService.localIgnoreToggleHappened()
+  const matches = store.matches.get(props.category)
+  const matchToUpdate = matches?.find((m) => m.id === matchId)
+
+  if (!matchToUpdate) {
+    return
+  }
+
+  matchToUpdate.isIgnored = !matchToUpdate.isIgnored
 
   editor
     .chain()
     .focus()
-    .setTextSelection({ from, to })
-    .unsetMark(TextCheckTagName)
-    .setMark(TextCheckTagName, { ...currentAttrs.value })
+    .setTextSelection(markRange)
     .toggleMark(IgnoreOnceTagName)
     .run()
 }
@@ -335,7 +329,7 @@ watch(
 
 /*
 To detected changes in the matche ignores
- */
+*/
 watch(
   () => store.matches.get(props.category),
   () => {
