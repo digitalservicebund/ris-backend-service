@@ -7,4 +7,5 @@ export enum DocumentUnitCategoriesEnum {
   FIELDS_OF_LAW = "fieldsOfLaw",
   NORMS = "norms",
   ACTIVE_CITATIONS = "activeCitations",
+  APPEAL_ADMISSION = "appealAdmission",
 }
