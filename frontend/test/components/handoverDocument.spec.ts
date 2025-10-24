@@ -473,7 +473,7 @@ describe("HandoverDocumentationUnitView:", () => {
       ).toBeEnabled()
     })
 
-    it("should show a warning when unexportable field E-VSF is filled", async () => {
+    it("should show a warning for filled unexportable fields", async () => {
       renderComponent({
         documentUnit: new Decision("123", {
           documentNumber: "foo",
@@ -497,6 +497,9 @@ describe("HandoverDocumentationUnitView:", () => {
           contentRelatedIndexing: {
             evsf: "X 00 00",
             foreignLanguageVersions: [new ForeignLanguageVersion()],
+            appealAdmission: {
+              admitted: false,
+            },
           },
           longTexts: { decisionReasons: "decisionReasons" },
           managementData: {
@@ -519,6 +522,7 @@ describe("HandoverDocumentationUnitView:", () => {
       expect(
         screen.getByText("Datum der mündlichen Verhandlung"),
       ).toBeInTheDocument()
+      expect(screen.getByText("Rechtsmittelzulassung")).toBeInTheDocument()
       const handoverButton = screen.getByRole("button", {
         name: "Dokumentationseinheit an jDV übergeben",
       })
