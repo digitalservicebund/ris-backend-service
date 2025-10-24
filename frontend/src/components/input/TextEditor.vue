@@ -33,7 +33,7 @@ import { CustomBulletList } from "@/editor/bulletList"
 import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
 import { EventHandler } from "@/editor/EventHandler"
 import { FontSize } from "@/editor/fontSize"
-import { IgnoreOnceMark, IgnoreOnceTagName } from "@/editor/ignoreOnceMark"
+import { IgnoreOnceMark } from "@/editor/ignoreOnceMark"
 import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
 import { InvisibleCharacters } from "@/editor/invisibleCharacters"
@@ -45,7 +45,7 @@ import { TableStyle } from "@/editor/tableStyle"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { Match, TextCheckTagName } from "@/types/textCheck"
+import { Match } from "@/types/textCheck"
 
 interface Props {
   value?: string
@@ -141,8 +141,8 @@ const editor: Editor = new Editor({
     Indent.configure({
       names: ["listItem", "paragraph"],
     }),
-    TextCheckMark,
     IgnoreOnceMark,
+    TextCheckMark,
     TextCheckExtension.configure({
       service: textCheckService,
     }),
@@ -199,51 +199,12 @@ const shouldShowBubbleMenu = (): boolean => {
     return false
   }
 }
-
-type TextCheckAttrs = {
-  id: string
-  type: string
-  ignored: boolean
-}
-
-const currentAttrs = ref<TextCheckAttrs>()
-function ignoreOnceToggle(offset: number) {
-  const { state } = editor
-  let from: number = offset
-  let to: number | null = null
-  let markRange = { from: 0, to: 0 }
-
-  state.doc.descendants((node, pos) => {
-    if (node.isText) {
-      node.marks.forEach((mark) => {
-        if (mark.type.name === TextCheckTagName) {
-          if (pos <= from && pos + node.nodeSize >= from) {
-            markRange = { from: pos, to: pos + node.nodeSize }
-            currentAttrs.value = { ...(mark.attrs as TextCheckAttrs) }
-            currentAttrs.value.ignored = !currentAttrs.value.ignored
-          }
-        }
-      })
-    }
-  })
-
-  if (markRange) {
-    from = markRange.from
-    to = markRange.to
-  } else {
-    return
-  }
-
-  textCheckService.localIgnoreToggleHappened()
-
-  editor
-    .chain()
-    .focus()
-    .setTextSelection({ from, to })
-    .unsetMark(TextCheckTagName)
-    .setMark(TextCheckTagName, { ...currentAttrs.value })
-    .toggleMark(IgnoreOnceTagName)
-    .run()
+/**
+ * Toggles the <ignore-once> tags and closes the modal
+ */
+async function handleIgnoreOnce() {
+  textCheckService.toggleIgnoreOnce(editor)
+  editor.commands.setSelectedMatch()
 }
 
 /**
@@ -335,7 +296,7 @@ watch(
 
 /*
 To detected changes in the matche ignores
- */
+*/
 watch(
   () => store.matches.get(props.category),
   () => {
@@ -406,7 +367,7 @@ defineExpose({ jumpToMatch })
           :selection="editor.state.selection"
           @global-word:add="addGloballyIgnoredWord"
           @global-word:remove="removeGloballyIgnoredWord"
-          @ignore-once:toggle="ignoreOnceToggle"
+          @ignore-once:toggle="handleIgnoreOnce"
           @word:add="addIgnoredWord"
           @word:remove="removeIgnoredWord"
         />

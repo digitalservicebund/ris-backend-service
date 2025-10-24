@@ -1,53 +1,13 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import type { ChainedCommands } from "@tiptap/core"
-import { Editor } from "@tiptap/vue-3"
 import { mount } from "@vue/test-utils"
-import { EditorState } from "prosemirror-state"
-import type { EditorView } from "prosemirror-view"
 import TextCheckModal from "@/components/text-check/TextCheckModal.vue"
-import { IgnoreOnceTagName } from "@/editor/ignoreOnceMark"
 import { Match } from "@/types/textCheck"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
 useFeatureToggleServiceMock()
 
-function createEditorMock(overrides: Partial<Editor> = {}): Editor {
-  const docMock = {
-    nodeAt: vi.fn().mockReturnValue({
-      marks: [],
-    }),
-  }
-
-  const stateMock = {
-    selection: {
-      from: baseMatch.offset,
-      to: baseMatch.offset + baseMatch.length,
-    },
-    doc: docMock,
-  } as unknown as EditorState
-
-  const viewMock = {} as unknown as EditorView
-
-  const mockEditor: Partial<Editor> = {
-    view: viewMock,
-    state: stateMock,
-    commands: {} as never,
-    chain: vi.fn(() => ({
-      focus: vi.fn(),
-    })) as unknown as () => ChainedCommands,
-    isActive: vi.fn().mockReturnValue(false),
-    on: vi.fn(),
-    off: vi.fn(),
-    getAttributes: vi.fn().mockReturnValue({}),
-    // allow overrides for specific tests
-    ...overrides,
-  }
-
-  return mockEditor as unknown as Editor
-}
-
-function renderComponent(match: Match, editor: Editor) {
+function renderComponent(match: Match) {
   const user = userEvent.setup()
 
   const IgnoredWordHandlerStub = {
@@ -75,7 +35,6 @@ function renderComponent(match: Match, editor: Editor) {
     ...render(TextCheckModal, {
       props: {
         match: match,
-        editor: editor,
       },
       global: {
         stubs: {
@@ -111,23 +70,8 @@ const baseMatch: Match = {
 
 describe("TextCheckModal", () => {
   test("renders the word", () => {
-    // given
-    const editor = createEditorMock({
-      state: {
-        selection: {
-          from: 0,
-          to: 8,
-        },
-        doc: {
-          nodeAt: vi.fn().mockReturnValue({
-            marks: [],
-          }),
-        },
-      } as unknown as EditorState,
-    })
-
     // when
-    renderComponent(baseMatch, editor)
+    renderComponent(baseMatch)
 
     // then
     expect(screen.getByTestId("text-check-modal")).toBeInTheDocument()
@@ -137,19 +81,16 @@ describe("TextCheckModal", () => {
   })
 
   it("emits received from a subcomponent invoke the correct emmits to be emited by this component", async () => {
-    const { emitted, user } = renderComponent(
-      {
-        ...baseMatch,
-        ignoredTextCheckWords: [
-          {
-            type: "documentation_unit",
-            word: "testword",
-            id: "1",
-          },
-        ],
-      },
-      createEditorMock(),
-    )
+    const { emitted, user } = renderComponent({
+      ...baseMatch,
+      ignoredTextCheckWords: [
+        {
+          type: "documentation_unit",
+          word: "testword",
+          id: "1",
+        },
+      ],
+    })
     await user.click(screen.getByTestId("remove-btn"))
     expect(emitted()["word:remove"]).toEqual([["testword"]])
 
@@ -167,19 +108,8 @@ describe("TextCheckModal", () => {
   })
 
   it("passes true as ignoredLocally prop based on editor marks", () => {
-    const editor = createEditorMock({
-      state: {
-        selection: { from: 0, to: 8 },
-        doc: {
-          nodeAt: vi.fn().mockReturnValue({
-            marks: [{ type: { name: IgnoreOnceTagName } }],
-          }),
-        },
-      } as unknown as EditorState,
-    })
-
     const wrapper = mount(TextCheckModal, {
-      props: { match: baseMatch, editor },
+      props: { match: baseMatch },
       global: {
         stubs: {
           IgnoredWordHandler: true,
@@ -192,19 +122,8 @@ describe("TextCheckModal", () => {
   })
 
   it("passes false as ignoredLocally prop based on editor marks", () => {
-    const editor = createEditorMock({
-      state: {
-        selection: { from: 0, to: 8 },
-        doc: {
-          nodeAt: vi.fn().mockReturnValue({
-            marks: [],
-          }),
-        },
-      } as unknown as EditorState,
-    })
-
     const wrapper = mount(TextCheckModal, {
-      props: { match: baseMatch, editor },
+      props: { match: baseMatch },
       global: {
         stubs: {
           IgnoredWordHandler: true,
