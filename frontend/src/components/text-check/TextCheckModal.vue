@@ -1,16 +1,17 @@
 <script lang="ts" setup>
 import { Editor } from "@tiptap/vue-3"
-import { computed, ComputedRef } from "vue"
+import { computed } from "vue"
 import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
-import { IgnoreOnceTagName } from "@/editor/ignoreOnceMark"
 import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
   match: Match
+  // todo: get rid of editor
   editor: Editor
 }>()
 
 const emit = defineEmits<{
+  // todo: do not emit offset
   "ignore-once:toggle": [offset: number]
   "word:remove": [value: string]
   "word:add": [word: string]
@@ -34,18 +35,9 @@ function removeGloballyIgnoredWord(word: string) {
   emit("globalWord:remove", word)
 }
 
-const isMatchIgnoredLocally: ComputedRef<boolean> = computed(() => {
-  const cursorLocation = props.editor?.state?.selection?.from
-  const activeNode = props.editor?.state?.doc?.nodeAt(cursorLocation)
-  if (activeNode && activeNode.marks) {
-    for (const mark of activeNode.marks) {
-      if (mark.type.name === IgnoreOnceTagName) {
-        return true
-      }
-    }
-  }
-  return false
-})
+const isMatchIgnoredLocally = computed(
+  () => props.match?.isIgnoredOnce ?? false,
+)
 
 function ignoreOnceToggle(offset: number) {
   emit("ignore-once:toggle", offset)
