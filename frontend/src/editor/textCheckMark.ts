@@ -4,8 +4,6 @@ import { TextCheckTagName } from "@/types/textCheck"
 
 export const TextCheckMark = Mark.create({
   name: TextCheckTagName,
-  // todo: check if we need this?
-  priority: 1000,
   group: "inline",
 
   parseHTML() {

@@ -33,7 +33,7 @@ import { CustomBulletList } from "@/editor/bulletList"
 import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
 import { EventHandler } from "@/editor/EventHandler"
 import { FontSize } from "@/editor/fontSize"
-import { IgnoreOnceMark, IgnoreOnceTagName } from "@/editor/ignoreOnceMark"
+import { IgnoreOnceMark } from "@/editor/ignoreOnceMark"
 import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
 import { InvisibleCharacters } from "@/editor/invisibleCharacters"
@@ -45,7 +45,7 @@ import { TableStyle } from "@/editor/tableStyle"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { Match, TextCheckTagName } from "@/types/textCheck"
+import { Match } from "@/types/textCheck"
 
 interface Props {
   value?: string
@@ -199,50 +199,12 @@ const shouldShowBubbleMenu = (): boolean => {
     return false
   }
 }
-
-async function handleIgnoreOnce(offset: number) {
-  await ignoreOnceToggle(offset)
+/**
+ * Toggles the <ignore-once> tags and closes the modal
+ */
+async function handleIgnoreOnce() {
+  textCheckService.toggleIgnoreOnce(editor)
   editor.commands.setSelectedMatch()
-}
-
-function ignoreOnceToggle(offset: number) {
-  const { state } = editor
-  let matchId: number | null = null
-  let markRange = { from: 0, to: 0 }
-
-  // todo: use selectedMatch
-  state.doc.descendants((node, pos) => {
-    if (node.isText) {
-      node.marks.forEach((mark) => {
-        if (mark.type.name === TextCheckTagName) {
-          if (pos <= offset && pos + node.nodeSize >= offset) {
-            markRange = { from: pos, to: pos + node.nodeSize }
-            matchId = Number(mark.attrs.id)
-          }
-        }
-      })
-    }
-  })
-
-  if (!matchId || (markRange.from === 0 && markRange.to === 0)) {
-    return
-  }
-
-  const matches = store.matches.get(props.category)
-  const matchToUpdate = matches?.find((m) => m.id === matchId)
-
-  if (!matchToUpdate) {
-    return
-  }
-
-  matchToUpdate.isIgnoredOnce = !matchToUpdate.isIgnoredOnce
-
-  editor
-    .chain()
-    .focus()
-    .setTextSelection(markRange)
-    .toggleMark(IgnoreOnceTagName)
-    .run()
 }
 
 /**
