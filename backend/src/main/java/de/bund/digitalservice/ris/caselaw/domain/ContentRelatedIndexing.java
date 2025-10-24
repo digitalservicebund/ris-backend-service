@@ -5,7 +5,10 @@ import java.util.List;
 import lombok.Builder;
 
 /**
+ * DE: Inhaltliche Erschließung
+ *
  * @param evsf Elektronische Vorschriftensammlung Bundesfinanzverwaltung
+ * @param appealAdmission Rechtsmittelzulassung
  */
 @Builder(toBuilder = true)
 public record ContentRelatedIndexing(
@@ -20,4 +23,5 @@ public record ContentRelatedIndexing(
     List<Definition> definitions,
     List<ForeignLanguageVersion> foreignLanguageVersions,
     boolean hasLegislativeMandate,
-    String evsf) {}
+    String evsf,
+    AppealAdmission appealAdmission) {}
