@@ -230,7 +230,7 @@ function ignoreOnceToggle(offset: number) {
     return
   }
 
-  matchToUpdate.isIgnored = !matchToUpdate.isIgnored
+  matchToUpdate.isIgnoredOnce = !matchToUpdate.isIgnoredOnce
 
   editor
     .chain()

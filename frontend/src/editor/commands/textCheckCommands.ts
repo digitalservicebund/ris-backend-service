@@ -178,7 +178,7 @@ class NeurisTextCheckService implements TextCheckService {
   }
 
   private static isMatchedIgnored(match: Match) {
-    return (match.ignoredTextCheckWords?.length ?? 0) > 0 || match.isIgnored
+    return (match.ignoredTextCheckWords?.length ?? 0) > 0 || match.isIgnoredOnce
   }
 
   private static findTextCheckMark(node: any, matchId?: number) {
@@ -260,11 +260,6 @@ class NeurisTextCheckService implements TextCheckService {
       }
     }
     return false
-  }
-
-  localIgnoreToggleHappened = () => {
-    const match = this.selectedMatch.value
-    match.isIgnored = !match.isIgnored
   }
 
   addIgnoredWordToMatches = (ignoredTextCheckWord: IgnoredTextCheckWord) => {

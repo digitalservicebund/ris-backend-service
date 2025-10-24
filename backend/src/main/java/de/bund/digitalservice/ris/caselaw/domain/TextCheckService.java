@@ -256,7 +256,7 @@ public class TextCheckService {
                       .formatted(
                           match.id(),
                           match.rule().issueType().toLowerCase(),
-                          match.isIgnored(),
+                          match.isIgnoredOnce(),
                           normalizedHtml.substring(
                               match.offset(), match.offset() + match.length())));
           lastPosition.set(match.offset() + match.length());
@@ -321,13 +321,11 @@ public class TextCheckService {
             match -> {
               List<IgnoredTextCheckWord> ignoredWords =
                   groupedByWord.getOrDefault(match.word(), null);
-              boolean isGloballyOrDocunitIgnored = ignoredWords != null && !ignoredWords.isEmpty();
               boolean isIgnoredOnce = isWrappedByIgnoreOnceTag(originalDoc, match);
-              boolean isIgnored = isGloballyOrDocunitIgnored || isIgnoredOnce;
 
               return match.toBuilder()
                   .ignoredTextCheckWords(ignoredWords)
-                  .isIgnored(isIgnored)
+                  .isIgnoredOnce(isIgnoredOnce)
                   .build();
             })
         .toList();

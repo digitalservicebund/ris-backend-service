@@ -46,7 +46,7 @@ export interface Match {
   word: string
   category: string
   ignoredTextCheckWords?: IgnoredTextCheckWord[]
-  isIgnored?: boolean
+  isIgnoredOnce?: boolean
 }
 
 export interface TextCheckResponse {
@@ -109,8 +109,6 @@ export interface TextCheckService {
   ignoreWord(word: string): Promise<boolean>
 
   removeIgnoredWord(word: string): Promise<boolean>
-
-  localIgnoreToggleHappened(): void
 
   ignoreWordGlobally(word: string): Promise<boolean>
 

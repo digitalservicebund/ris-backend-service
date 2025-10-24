@@ -524,7 +524,7 @@ class TextCheckServiceTest {
 
     // ASSERT
     Match resultMatch = result.getFirst();
-    assertThat(resultMatch.isIgnored()).isTrue();
+    assertThat(resultMatch.isIgnoredOnce()).isTrue();
     assertThat(resultMatch.ignoredTextCheckWords()).hasSize(1);
   }
 
@@ -555,7 +555,7 @@ class TextCheckServiceTest {
 
     // ASSERT
     Match resultMatch = result.getFirst();
-    assertThat(resultMatch.isIgnored()).isTrue();
+    assertThat(resultMatch.isIgnoredOnce()).isTrue();
     assertThat(resultMatch.ignoredTextCheckWords()).hasSize(1);
   }
 
@@ -583,7 +583,7 @@ class TextCheckServiceTest {
             TEST_DOC_UNIT_ID, originalHtml, List.of(matchBeforeIgnoreLogic));
 
     Match resultMatch = result.getFirst();
-    assertThat(resultMatch.isIgnored()).isTrue();
+    assertThat(resultMatch.isIgnoredOnce()).isTrue();
     assertThat(resultMatch.ignoredTextCheckWords()).isNullOrEmpty();
   }
 
@@ -610,7 +610,7 @@ class TextCheckServiceTest {
             TEST_DOC_UNIT_ID, originalHtml, List.of(matchBeforeIgnoreLogic));
 
     Match resultMatch = result.getFirst();
-    assertThat(resultMatch.isIgnored()).isFalse();
+    assertThat(resultMatch.isIgnoredOnce()).isFalse();
     assertThat(resultMatch.ignoredTextCheckWords()).isNullOrEmpty();
   }
 

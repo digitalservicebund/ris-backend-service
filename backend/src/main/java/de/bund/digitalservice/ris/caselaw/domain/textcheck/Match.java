@@ -22,4 +22,4 @@ public record Match(
     boolean ignoreForIncompleteSentence,
     int contextForSureMatch,
     List<IgnoredTextCheckWord> ignoredTextCheckWords,
-    boolean isIgnored) {}
+    boolean isIgnoredOnce) {}
