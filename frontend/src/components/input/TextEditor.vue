@@ -200,6 +200,11 @@ const shouldShowBubbleMenu = (): boolean => {
   }
 }
 
+async function handleIgnoreOnce(offset: number) {
+  await ignoreOnceToggle(offset)
+  editor.commands.setSelectedMatch()
+}
+
 function ignoreOnceToggle(offset: number) {
   const { state } = editor
   let matchId: number | null = null
@@ -400,7 +405,7 @@ defineExpose({ jumpToMatch })
           :selection="editor.state.selection"
           @global-word:add="addGloballyIgnoredWord"
           @global-word:remove="removeGloballyIgnoredWord"
-          @ignore-once:toggle="ignoreOnceToggle"
+          @ignore-once:toggle="handleIgnoreOnce"
           @word:add="addIgnoredWord"
           @word:remove="removeIgnoredWord"
         />
