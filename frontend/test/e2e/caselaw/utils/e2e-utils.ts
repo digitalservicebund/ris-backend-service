@@ -578,6 +578,17 @@ export async function fillCombobox(
   await page.getByText(value, { exact: true }).click()
 }
 
+export async function fillSelect(
+  page: Page,
+  ariaLabel: string,
+  label = generateString(),
+) {
+  const dropdown = page.getByRole("combobox", { name: ariaLabel, exact: true })
+  await dropdown.click()
+  await page.getByRole("option", { name: label }).click()
+  await expect(dropdown).toHaveText(label)
+}
+
 export async function clearInput(page: Page, ariaLabel: string) {
   const input = page.getByLabel(ariaLabel, { exact: true })
   await input.clear()
