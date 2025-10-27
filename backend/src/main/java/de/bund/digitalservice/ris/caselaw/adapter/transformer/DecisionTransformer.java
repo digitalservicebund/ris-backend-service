@@ -147,6 +147,7 @@ public class DecisionTransformer extends DocumentableTransformer {
         builder.appealAdmitted(contentRelatedIndexing.appealAdmission().admitted());
         builder.appealAdmittedBy(contentRelatedIndexing.appealAdmission().by());
       }
+      builder.appeal(AppealTransformer.transformToDTO(currentDto, contentRelatedIndexing.appeal()));
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -747,6 +748,9 @@ public class DecisionTransformer extends DocumentableTransformer {
               .by(decisionDTO.getAppealAdmittedBy())
               .build());
     }
+
+    contentRelatedIndexingBuilder.appeal(
+        AppealTransformer.transformToDomain(decisionDTO.getAppeal()));
 
     return contentRelatedIndexingBuilder.build();
   }
