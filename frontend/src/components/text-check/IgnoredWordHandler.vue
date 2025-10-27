@@ -58,6 +58,7 @@ async function removeWordGlobally() {
 }
 
 const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
+const textCheckIgnoreOnce = useFeatureToggle("neuris.text-check-ignore-once")
 
 const matchIsIgnoredGlobally = computed(() => {
   return props.match.ignoredTextCheckWords?.some(
@@ -139,7 +140,7 @@ const matchIsIgnoredInDocument = computed(() => {
         <div>an dieser Stelle ignoriert</div>
 
         <Button
-          v-if="textCheckGlobal"
+          v-if="textCheckGlobal && textCheckIgnoreOnce"
           aria-label="Hier nicht ignorieren"
           class="self-start"
           data-testid="unignore-once-button"
@@ -187,7 +188,7 @@ const matchIsIgnoredInDocument = computed(() => {
         <div>{{ match.shortMessage }}</div>
 
         <Button
-          v-if="textCheckGlobal"
+          v-if="textCheckGlobal && textCheckIgnoreOnce"
           aria-label="Hier ignorieren"
           class="self-start"
           data-testid="ignore-once-button"
