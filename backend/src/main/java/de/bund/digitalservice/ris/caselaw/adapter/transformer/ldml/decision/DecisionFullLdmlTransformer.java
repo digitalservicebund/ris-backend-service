@@ -24,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.F
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FremdsprachigeFassungen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtskraft;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtsmittelzulassung;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Sachgebiete;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Vorgaenge;
@@ -119,6 +120,25 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       // EVSF
       Optional.ofNullable(contentRelatedIndexing.evsf())
           .ifPresent(value -> builder.evsf(Evsf.builder().value(value).build()));
+
+      // Rechtsmittelzulassung
+      Optional.ofNullable(contentRelatedIndexing.appealAdmission())
+          .ifPresent(
+              value -> {
+                var rechtsmittelzulassungBuilder =
+                    Rechtsmittelzulassung.builder()
+                        .rechtsmittelZugelassen(
+                            new Rechtsmittelzulassung.RechtsmittelZugelassen(value.admitted()));
+
+                Optional.ofNullable(value.by())
+                    .ifPresent(
+                        appealAdmitter ->
+                            rechtsmittelzulassungBuilder.rechtsmittelZugelassenDurch(
+                                new Rechtsmittelzulassung.RechtsmittelZugelassenDurch(
+                                    appealAdmitter.name())));
+
+                builder.rechtsmittelzulassung(rechtsmittelzulassungBuilder.build());
+              });
 
       // Fremdsprachige Fassungen
       if (contentRelatedIndexing.foreignLanguageVersions() != null
