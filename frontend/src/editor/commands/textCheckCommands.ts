@@ -72,6 +72,8 @@ class NeurisTextCheckService implements TextCheckService {
    */
   checkCategory = async (editor: Editor) => {
     this.loading.value = true
+    const oldEditableValue = editor.isEditable
+    editor.setEditable(false)
     this.responseError.value = undefined
 
     if (
@@ -103,6 +105,7 @@ class NeurisTextCheckService implements TextCheckService {
     }
 
     this.loading.value = false
+    editor.setEditable(oldEditableValue)
   }
 
   /**
