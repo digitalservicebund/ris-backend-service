@@ -258,6 +258,9 @@ const handleImport = async (key: keyof typeof allLabels) => {
     case "participatingJudges":
       importParticipatingJudges()
       break
+    case "appeal":
+      importAppeal()
+      break
     default: {
       // The never type ensures all keys are handled in the switch.
       const unimportableKey: never = key
@@ -518,6 +521,19 @@ function importContextRelatedIndexing<
 
   if (targetDocumentUnit.value)
     targetDocumentUnit.value.contentRelatedIndexing[key] = source
+}
+
+function importAppeal() {
+  if (
+    isDecision(targetDocumentUnit.value) &&
+    isDecision(sourceDocumentUnit.value)
+  ) {
+    const source = sourceDocumentUnit.value?.contentRelatedIndexing.appeal
+
+    if (targetDocumentUnit.value) {
+      targetDocumentUnit.value.contentRelatedIndexing.appeal = source
+    }
+  }
 }
 
 // By narrowing the type of key to exclude "participatingJudges", TypeScript no longer considers the possibility of assigning a non-string value to documentUnit.value.longTexts[key].

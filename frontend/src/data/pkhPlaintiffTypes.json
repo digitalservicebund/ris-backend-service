@@ -1,0 +1,7 @@
+{
+  "items": [
+    { "label": "Ja", "value": "Ja" },
+    { "label": "Nein", "value": "Nein" },
+    { "label": "Keine Angabe", "value": "Keine Angabe" }
+  ]
+}

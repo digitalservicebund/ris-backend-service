@@ -267,6 +267,10 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @JdbcType(PostgreSQLEnumJdbcType.class)
   private AppealAdmitter appealAdmittedBy;
 
+  /** Rechtsmittel */
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  private AppealDTO appeal;
+
   @Override
   @SuppressWarnings("java:S2097") // Class type check is not recognized by Sonar
   public final boolean equals(Object o) {
