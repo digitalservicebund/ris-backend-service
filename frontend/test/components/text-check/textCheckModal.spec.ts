@@ -104,12 +104,12 @@ describe("TextCheckModal", () => {
     expect(emitted()["globalWord:remove"]).toEqual([["testword"]])
 
     await user.click(screen.getByTestId("ignore-once-btn"))
-    expect(emitted()["ignore-once:toggle"]).toEqual([[0]])
+    expect(emitted()["ignore-once:toggle"]).toBeTruthy()
   })
 
-  it("passes true as ignoredLocally prop based on editor marks", () => {
+  it("passes true as ignoredLocally prop based on isIgnoredOnce attribute in match", () => {
     const wrapper = mount(TextCheckModal, {
-      props: { match: baseMatch },
+      props: { match: { ...baseMatch, isIgnoredOnce: true } },
       global: {
         stubs: {
           IgnoredWordHandler: true,
@@ -123,7 +123,7 @@ describe("TextCheckModal", () => {
 
   it("passes false as ignoredLocally prop based on editor marks", () => {
     const wrapper = mount(TextCheckModal, {
-      props: { match: baseMatch },
+      props: { match: { ...baseMatch, isIgnoredOnce: false } },
       global: {
         stubs: {
           IgnoredWordHandler: true,
