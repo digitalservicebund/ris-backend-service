@@ -27,7 +27,7 @@ const getAllQueryParamsFromUrl = (page: Page): string => {
 
 export const navigateToSearch = async (
   page: Page,
-  { navigationBy }: { navigationBy: "click" | "url" } = { navigationBy: "url" },
+  { navigationBy = "url" }: { navigationBy?: "click" | "url" } = {},
 ) => {
   await test.step("Navigate to 'Suche'", async () => {
     if (navigationBy === "url") {
@@ -47,7 +47,7 @@ export const navigateToSearch = async (
 
 export const navigateToInbox = async (
   page: Page,
-  { navigationBy }: { navigationBy: "click" | "url" } = { navigationBy: "url" },
+  { navigationBy = "url" }: { navigationBy?: "click" | "url" } = {},
 ) => {
   await test.step("Navigate to 'Eingang'", async () => {
     if (navigationBy === "url") {
@@ -80,6 +80,7 @@ export const navigateToCategories = async (
   options?: {
     category?: DocumentUnitCategoriesEnum
     skipAssert?: boolean
+    navigationBy?: "click" | "url"
     type?: "pending-proceeding" | "documentunit"
   },
 ) => {
@@ -90,7 +91,11 @@ export const navigateToCategories = async (
       `/caselaw/${documentType}/${documentNumber}/categories${queryParams}` +
       scrollToID(options?.category)
 
-    await page.goto(baseUrl)
+    if (options?.navigationBy === "click") {
+      await page.getByRole("link", { name: "Rubriken" }).click()
+    } else {
+      await page.goto(baseUrl)
+    }
 
     if (options?.skipAssert) return
 
@@ -218,10 +223,10 @@ export const navigateToManagementData = async (
 export const navigateToHandover = async (
   page: Page,
   documentNumber: string,
-  options?: {
-    skipAssert?: boolean
-  },
-  { navigationBy }: { navigationBy: "click" | "url" } = { navigationBy: "url" },
+  {
+    skipAssert,
+    navigationBy = "url",
+  }: { skipAssert?: boolean; navigationBy?: "click" | "url" } = {},
 ) => {
   await test.step("Navigate to 'Übergabe an jDV'", async () => {
     if (navigationBy === "url") {
@@ -229,7 +234,7 @@ export const navigateToHandover = async (
     } else {
       await page.getByTestId("Übergabe an jDV").click()
     }
-    if (options?.skipAssert) return
+    if (skipAssert) return
     await expect(page.locator("h1:has-text('Übergabe an jDV')")).toBeVisible({
       timeout: 15000, // for backend warm up
     })
@@ -355,7 +360,7 @@ export async function save(page: Page) {
       response.url().includes("/api/v1/caselaw/documentunits/") &&
       response.request().method() === "PATCH" &&
       response.status() === 200,
-    { timeout: 7_000 },
+    { timeout: 7000 },
   )
   await page.getByLabel("Speichern Button", { exact: true }).click()
   await saveRequest

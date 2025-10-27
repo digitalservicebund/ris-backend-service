@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SuppressWarnings("java:S6539") // Too many dependencies warning
 public class DocumentationUnitService {
 
+  public static final String DOCUMENT_NUMBER = "documentNumber";
   private final DocumentationUnitRepository repository;
   private final DocumentNumberService documentNumberService;
   private final DocumentTypeService documentTypeService;
@@ -110,14 +111,21 @@ public class DocumentationUnitService {
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit generateNewDocumentationUnit(
       User user, Optional<DocumentationUnitCreationParameters> parameters, Kind kind) {
+    DocumentationUnit newDocUnit;
     if (kind.equals(Kind.DECISION)) {
-      return generateNewDecision(user, parameters);
+      newDocUnit = generateNewDecision(user, parameters);
     } else if (kind.equals(Kind.PENDING_PROCEEDING)) {
-      return generateNewPendingProceeding(user, parameters);
+      newDocUnit = generateNewPendingProceeding(user, parameters);
     } else {
       throw new DocumentationUnitException(
           "DocumentationUnit is neither decision nor pending proceeding.");
     }
+    log.atInfo()
+        .addKeyValue("documentationNumber", newDocUnit.documentNumber())
+        .addKeyValue("id", newDocUnit.uuid())
+        .setMessage("New documentation unit created.")
+        .log();
+    return newDocUnit;
   }
 
   public Decision generateNewDecision(
@@ -566,12 +574,6 @@ public class DocumentationUnitService {
 
     DocumentationUnit docUnit = getByUuid(documentationUnitId);
 
-    log.atInfo()
-        .setMessage("Deleting doc unit...")
-        .addKeyValue("documentNumber", docUnit.documentNumber())
-        .addKeyValue("id", documentationUnitId)
-        .log();
-
     Map<RelatedDocumentationType, Long> relatedEntities =
         repository.getAllRelatedDocumentationUnitsByDocumentNumber(docUnit.documentNumber());
 
@@ -579,10 +581,12 @@ public class DocumentationUnitService {
         || relatedEntities.isEmpty()
         || relatedEntities.values().stream().mapToLong(Long::longValue).sum() == 0)) {
 
-      log.debug(
-          "Could not delete document unit {} cause of related entities: {}",
-          documentationUnitId,
-          relatedEntities);
+      log.atInfo()
+          .setMessage("Could not delete document unit because of related entities")
+          .addKeyValue(DOCUMENT_NUMBER, docUnit.documentNumber())
+          .addKeyValue("id", documentationUnitId)
+          .addKeyValue("relatedEntities", relatedEntities)
+          .log();
 
       throw new DocumentationUnitDeletionException(
           "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities);
@@ -591,14 +595,12 @@ public class DocumentationUnitService {
     if (PortalPublicationStatus.PUBLISHED.equals(docUnit.portalPublicationStatus())) {
       log.atInfo()
           .setMessage("Doc unit deletion was prohibited because it is published in the portal.")
-          .addKeyValue("documentNumber", docUnit.documentNumber())
-          .addKeyValue("docUnitId", documentationUnitId)
+          .addKeyValue(DOCUMENT_NUMBER, docUnit.documentNumber())
+          .addKeyValue("id", documentationUnitId)
           .log();
       throw new DocumentationUnitDeletionException(
           "Die Dokumentationseinheit konnte nicht gelöscht werden, da Sie im Portal veröffentlicht ist.\nSie muss zuerst zurückgezogen werden.");
     }
-
-    log.debug("Deleting DocumentationUnitDTO " + documentationUnitId);
 
     if (docUnit instanceof Decision decision
         && decision.attachments() != null
@@ -617,6 +619,12 @@ public class DocumentationUnitService {
       throw new DocumentationUnitDeletionException(
           "Could not delete documentation unit from database");
     }
+
+    log.atInfo()
+        .setMessage("Documentation unit deleted.")
+        .addKeyValue(DOCUMENT_NUMBER, docUnit.documentNumber())
+        .addKeyValue("id", documentationUnitId)
+        .log();
 
     return "Dokumentationseinheit gelöscht: " + documentationUnitId;
   }

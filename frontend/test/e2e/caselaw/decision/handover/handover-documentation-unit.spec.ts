@@ -543,7 +543,6 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
         await navigateToHandover(
           page,
           decision.createdDecision.documentNumber!,
-          undefined,
           { navigationBy: "click" },
         )
 
