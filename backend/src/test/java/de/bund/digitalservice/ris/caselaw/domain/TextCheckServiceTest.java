@@ -447,7 +447,7 @@ class TextCheckServiceTest {
                     .length(ignoredWord.length())
                     .rule(Rule.builder().issueType("misspelling").build())
                     .ignoredTextCheckWords(List.of(ignoredTextCheckWord))
-                    .isIgnored(true)
+                    .isIgnoredOnce(true)
                     .build()));
     when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
         .thenCallRealMethod();
@@ -480,7 +480,7 @@ class TextCheckServiceTest {
                     .length(onceIgnoredWordWithTags.length())
                     .rule(Rule.builder().issueType("misspelling").build())
                     .ignoredTextCheckWords(List.of())
-                    .isIgnored(true)
+                    .isIgnoredOnce(true)
                     .build()));
     when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
         .thenCallRealMethod();
@@ -510,7 +510,7 @@ class TextCheckServiceTest {
             .offset(MATCH_OFFSET)
             .length(MATCH_WORD.length())
             .rule(Rule.builder().issueType("missspelling").build())
-            .isIgnored(false)
+            .isIgnoredOnce(false)
             .build();
 
     when(ignoredTextCheckWordRepository.findByDocumentationUnitIdOrByGlobalWords(
@@ -524,7 +524,7 @@ class TextCheckServiceTest {
 
     // ASSERT
     Match resultMatch = result.getFirst();
-    assertThat(resultMatch.isIgnored()).isTrue();
+    assertThat(resultMatch.isIgnoredOnce()).isFalse();
     assertThat(resultMatch.ignoredTextCheckWords()).hasSize(1);
   }
 
@@ -541,7 +541,7 @@ class TextCheckServiceTest {
             .offset(MATCH_OFFSET)
             .length(MATCH_WORD.length())
             .rule(Rule.builder().issueType("missspelling").build())
-            .isIgnored(false)
+            .isIgnoredOnce(false)
             .build();
 
     when(ignoredTextCheckWordRepository.findByDocumentationUnitIdOrByGlobalWords(
@@ -555,7 +555,7 @@ class TextCheckServiceTest {
 
     // ASSERT
     Match resultMatch = result.getFirst();
-    assertThat(resultMatch.isIgnored()).isTrue();
+    assertThat(resultMatch.isIgnoredOnce()).isFalse();
     assertThat(resultMatch.ignoredTextCheckWords()).hasSize(1);
   }
 
@@ -575,7 +575,7 @@ class TextCheckServiceTest {
             .offset(MATCH_OFFSET)
             .length(MATCH_WORD.length())
             .rule(Rule.builder().issueType("missspelling").build())
-            .isIgnored(false)
+            .isIgnoredOnce(false)
             .build();
 
     List<Match> result =
@@ -583,7 +583,7 @@ class TextCheckServiceTest {
             TEST_DOC_UNIT_ID, originalHtml, List.of(matchBeforeIgnoreLogic));
 
     Match resultMatch = result.getFirst();
-    assertThat(resultMatch.isIgnored()).isTrue();
+    assertThat(resultMatch.isIgnoredOnce()).isTrue();
     assertThat(resultMatch.ignoredTextCheckWords()).isNullOrEmpty();
   }
 
@@ -602,7 +602,7 @@ class TextCheckServiceTest {
             .offset(MATCH_OFFSET)
             .length(MATCH_WORD.length())
             .rule(Rule.builder().issueType("missspelling").build())
-            .isIgnored(false)
+            .isIgnoredOnce(false)
             .build();
 
     List<Match> result =
@@ -610,7 +610,7 @@ class TextCheckServiceTest {
             TEST_DOC_UNIT_ID, originalHtml, List.of(matchBeforeIgnoreLogic));
 
     Match resultMatch = result.getFirst();
-    assertThat(resultMatch.isIgnored()).isFalse();
+    assertThat(resultMatch.isIgnoredOnce()).isFalse();
     assertThat(resultMatch.ignoredTextCheckWords()).isNullOrEmpty();
   }
 

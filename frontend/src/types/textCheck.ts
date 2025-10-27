@@ -13,12 +13,6 @@ export interface Context {
   length: number
 }
 
-export interface IgnoreOnceWord {
-  word: string
-  offset: number
-  length: number
-}
-
 export interface Type {
   typeName: string
 }
@@ -52,7 +46,7 @@ export interface Match {
   word: string
   category: string
   ignoredTextCheckWords?: IgnoredTextCheckWord[]
-  isIgnored?: boolean
+  isIgnoredOnce?: boolean
 }
 
 export interface TextCheckResponse {
@@ -95,7 +89,6 @@ export interface TextCheckService {
   loading: Ref<boolean>
   selectedMatch: Ref<Match | undefined>
   responseError: Ref<ResponseError | undefined>
-  selectedIgnoreOnce: Ref<IgnoreOnceWord | undefined>
 
   checkCategory(editor: Editor, category?: string): Promise<void>
 
@@ -116,8 +109,6 @@ export interface TextCheckService {
   ignoreWord(word: string): Promise<boolean>
 
   removeIgnoredWord(word: string): Promise<boolean>
-
-  localIgnoreToggleHappened(): void
 
   ignoreWordGlobally(word: string): Promise<boolean>
 

@@ -578,7 +578,7 @@ describe("check category service", () => {
       it("returns false when match has no ignored words", () => {
         const match = generateMatch()
         match.ignoredTextCheckWords = []
-        match.isIgnored = false
+        match.isIgnoredOnce = false
 
         expect(NeurisTextCheckService["isMatchedIgnored"](match)).toBe(false)
       })
@@ -586,7 +586,7 @@ describe("check category service", () => {
       it("returns true when match has no ignored words but locally ignored word", () => {
         const match = generateMatch()
         match.ignoredTextCheckWords = []
-        match.isIgnored = true
+        match.isIgnoredOnce = true
 
         expect(NeurisTextCheckService["isMatchedIgnored"](match)).toBe(true)
       })
@@ -594,7 +594,7 @@ describe("check category service", () => {
       it("returns false when ignoredTextCheckWords is undefined and no locally ignored words", () => {
         const match = generateMatch()
         match.ignoredTextCheckWords = undefined
-        match.isIgnored = false
+        match.isIgnoredOnce = false
 
         expect(NeurisTextCheckService["isMatchedIgnored"](match)).toBe(false)
       })

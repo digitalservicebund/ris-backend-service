@@ -1,6 +1,7 @@
 import { Editor } from "@tiptap/core"
 import { EditorState } from "prosemirror-state"
 import { ref } from "vue"
+import { IgnoreOnceTagName } from "@/editor/ignoreOnceMark"
 import { ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -17,7 +18,6 @@ class NeurisTextCheckService implements TextCheckService {
   loading = ref(false)
   selectedMatch = ref()
   responseError = ref()
-  selectedIgnoreOnce = ref()
 
   category: string // text editor label category where matches are stored
 
@@ -182,7 +182,7 @@ class NeurisTextCheckService implements TextCheckService {
   }
 
   private static isMatchedIgnored(match: Match) {
-    return (match.ignoredTextCheckWords?.length ?? 0) > 0 || match.isIgnored
+    return (match.ignoredTextCheckWords?.length ?? 0) > 0 || match.isIgnoredOnce
   }
 
   private static findTextCheckMark(node: any, matchId?: number) {
@@ -229,6 +229,71 @@ class NeurisTextCheckService implements TextCheckService {
     this.selectedMatch.value = undefined
   }
 
+  /**
+   * @doc Structural Toggle & Data Sync for Ignore Once.
+   * This function performs the structural change in the Tiptap editor and updates the store data.
+   * It uses the current editor selection position to find the associated TextCheckMark ID and its true ProseMirror range.
+   * @param editor The Tiptap Editor instance required to execute transactions.
+   */
+  public toggleIgnoreOnce(editor: Editor): boolean {
+    const { state } = editor
+    let matchId: number | null = null
+    let markRange = { from: 0, to: 0 }
+
+    const cursorPosition = state.selection.from
+
+    // We need DOM traversal here, because the selectedMatch's offset is not reliable to calculate the correct prosemirror range
+    let found = false
+    state.doc.descendants((node, pos) => {
+      if (node.isText) {
+        node.marks.forEach((mark) => {
+          if (mark.type.name === TextCheckTagName) {
+            // Check if the current cursor position is within the node's bounds
+            if (
+              pos <= cursorPosition &&
+              pos + node.nodeSize >= cursorPosition
+            ) {
+              markRange = { from: pos, to: pos + node.nodeSize }
+              matchId = Number(mark.attrs.id)
+              found = true
+            }
+          }
+        })
+      }
+      // Stop descending once the relevant block is found (or if we've passed it)
+      return !found
+    })
+
+    if (!found || !matchId) {
+      console.warn(
+        "Toggle ignore once abort: Could not find TextCheck Mark at selection.",
+        matchId,
+      )
+      return false
+    }
+
+    const matches = this.store.matches.get(this.category)
+    const matchToUpdate = matches?.find((m) => m.id === matchId)
+
+    if (!matchToUpdate) {
+      console.error(
+        `Toggle abort: Match with ID ${matchId} not found in store.`,
+      )
+      return false
+    }
+
+    matchToUpdate.isIgnoredOnce = !matchToUpdate.isIgnoredOnce
+
+    editor
+      .chain()
+      .focus()
+      .setTextSelection(markRange)
+      .toggleMark(IgnoreOnceTagName)
+      .run()
+
+    return true
+  }
+
   ignoreWord = async (word: string): Promise<boolean> => {
     if (this.store.documentUnit?.uuid) {
       const response: ServiceResponse<IgnoredTextCheckWord> =
@@ -264,11 +329,6 @@ class NeurisTextCheckService implements TextCheckService {
       }
     }
     return false
-  }
-
-  localIgnoreToggleHappened = () => {
-    const match = this.selectedMatch.value
-    match.isIgnored = !match.isIgnored
   }
 
   addIgnoredWordToMatches = (ignoredTextCheckWord: IgnoredTextCheckWord) => {
