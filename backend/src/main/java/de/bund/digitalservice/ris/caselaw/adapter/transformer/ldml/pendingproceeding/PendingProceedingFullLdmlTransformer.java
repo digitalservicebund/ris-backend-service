@@ -50,7 +50,6 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
 
   private RisMeta buildRisMeta(PendingProceeding pendingProceeding) {
     var builder = buildCommonRisMeta(pendingProceeding);
-    // Legacy flat fields removed (fieldOfLaw, deviating*, fileNumbers, documentationOffice)
     return builder.build();
   }
 
