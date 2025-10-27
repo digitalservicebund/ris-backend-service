@@ -167,5 +167,53 @@ describe("removeTagsOnTyping extension", () => {
     editor.destroy()
   })
 
-  it("given change or selection that should not remove custom tags ensure tags are left in place", () => {})
+  it("when text check inserts custom tags/marks into the document then those tags/marks should be preserved", () => {
+    const editor = new Editor({
+      extensions: [
+        Document,
+        Paragraph,
+        Text,
+        TextCheckMark,
+        TextCheckExtension,
+      ],
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "word",
+              },
+            ],
+          },
+        ],
+      },
+    })
+
+    // Verify initial state has no marks
+    const paraBeforeMarking = editor.state.doc.firstChild
+    const textNodeBeforeMarking = paraBeforeMarking?.firstChild
+    expect(textNodeBeforeMarking?.marks.length).toBe(0)
+
+    // Simulate text check adding marks without changing text content
+    const textCheckMark = editor.schema.marks[TextCheckMark.name]
+    const from = 1
+    const to = 5 // covers "word"
+
+    editor.commands.command(({ tr }) => {
+      tr.addMark(from, to, textCheckMark.create(textCheckMarkAttrs))
+      return true
+    })
+
+    // Verify marks were added and preserved (plugin should not remove them)
+    const paraAfterMarking = editor.state.doc.firstChild
+    const textNodeAfterMarking = paraAfterMarking?.firstChild
+    expect(textNodeAfterMarking?.marks.length).toBe(1)
+    expect(textNodeAfterMarking?.marks[0].type.name).toBe(TextCheckMark.name)
+    expect(editor.getText()).toBe("word")
+
+    editor.destroy()
+  })
 })
