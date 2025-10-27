@@ -57,7 +57,10 @@ describe("check category service", () => {
   describe("check category", () => {
     it("updates document unit before performing check", async () => {
       const mockEditor: Editor = {
-        commands: { setContent: vi.fn() },
+        commands: {
+          setContent: vi.fn(),
+        },
+        setEditable: vi.fn(),
       } as unknown as Editor
 
       const textCheckService = new NeurisTextCheckService(textCategory)
