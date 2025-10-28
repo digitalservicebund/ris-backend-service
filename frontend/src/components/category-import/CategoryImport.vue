@@ -187,14 +187,20 @@ const isImportable = (key: keyof typeof allLabels): boolean => { // NOSONAR type
           key as keyof typeof sourceDocumentUnit.value.contentRelatedIndexing
         ]
 
-      const isEmptyText =
-        typeof targetCategory === "string" && targetCategory.trim().length > 0
-      const isEmptyArray =
-        Array.isArray(targetCategory) && targetCategory.length > 0
-      const isActiveFlag = typeof targetCategory === "boolean" && targetCategory
-      const isNonNullObject = typeof targetCategory === "object" && targetCategory != null
+      switch (typeof targetCategory) {
+        case "string":
+          return targetCategory.trim().length === 0
+        case "boolean":
+          return !targetCategory
+        case "object":
+          if (Array.isArray(targetCategory)) {
+            return targetCategory.length === 0
+          }
 
-      return !isEmptyText && !isEmptyArray && !isActiveFlag && !isNonNullObject
+          return targetCategory == null
+      }
+
+      return true
     }
   return true
 }
