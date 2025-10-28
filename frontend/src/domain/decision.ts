@@ -134,26 +134,25 @@ export class Decision {
     }
     let coreDataField: keyof CoreData
     for (coreDataField in data.coreData) {
-      if (data.coreData && data.coreData[coreDataField] === null)
+      if (data.coreData?.[coreDataField] === null)
         delete data.coreData[coreDataField]
     }
     let shortTextsField: keyof ShortTexts
     for (shortTextsField in data.shortTexts) {
-      if (data.shortTexts && data.shortTexts[shortTextsField] === null)
+      if (data.shortTexts?.[shortTextsField] === null)
         delete data.shortTexts[shortTextsField]
     }
 
     let longTextsField: keyof LongTexts
     for (longTextsField in data.longTexts) {
-      if (data.longTexts && data.longTexts[longTextsField] === null)
+      if (data.longTexts?.[longTextsField] === null)
         delete data.longTexts[longTextsField]
     }
 
     let managementDataField: keyof ManagementData
     for (managementDataField in data.managementData) {
       if (
-        data.managementData &&
-        data.managementData[managementDataField] === null
+        data.managementData?.[managementDataField] === null
       )
         delete data.managementData[managementDataField]
     }

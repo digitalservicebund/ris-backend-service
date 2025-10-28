@@ -75,12 +75,12 @@ export default class PendingProceeding {
     }
     let coreDataField: keyof CoreData
     for (coreDataField in data.coreData) {
-      if (data.coreData && data.coreData[coreDataField] === null)
+      if (data.coreData?.[coreDataField] === null)
         delete data.coreData[coreDataField]
     }
     let shortTextsField: keyof PendingProceedingShortTexts
     for (shortTextsField in data.shortTexts) {
-      if (data.shortTexts && data.shortTexts[shortTextsField] === null)
+      if (data.shortTexts?.[shortTextsField] === null)
         delete data.shortTexts[shortTextsField]
     }
 
@@ -113,10 +113,7 @@ export default class PendingProceeding {
 
     let managementDataField: keyof ManagementData
     for (managementDataField in data.managementData) {
-      if (
-        data.managementData &&
-        data.managementData[managementDataField] === null
-      )
+      if (data.managementData?.[managementDataField] === null)
         delete data.managementData[managementDataField]
     }
 

@@ -21,7 +21,7 @@ const countNestedBlockquotes = (startNode: Node): number => {
   let count = 0
   let currentNode: Node | null = startNode
 
-  while (currentNode && currentNode.type.name === "blockquote") {
+  while (currentNode?.type.name === "blockquote") {
     count++
     currentNode = currentNode.firstChild
   }
