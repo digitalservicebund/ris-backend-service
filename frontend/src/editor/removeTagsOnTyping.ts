@@ -53,30 +53,39 @@ const removeTagsOnTypingPlugin = new Plugin({
         // because then I find the last text node correctly.
         realFrom = newState.doc.content.size - 2
         realTo = realFrom
+        console.log("HERE")
       } else if (
         newState.doc.content.size >= realFrom &&
         newState.doc.content.size >= realTo
       ) {
         // Normal case, all good
+        console.log("OK")
       } else if (
         newState.doc.content.size >= realFrom &&
         newState.doc.content.size <= realTo
       ) {
         // From is in the new document but to is not anymore.
+        console.log("WEIRD")
         realTo = realFrom
       } else if (
         newState.doc.content.size <= realFrom &&
         newState.doc.content.size >= realTo
       ) {
         // To is in the new document but from is not anymore.
+        console.log("SET")
         realFrom = realTo
       } else {
         // Both from and to are out of bounds, skip.
+        console.log("MATCH")
         return
       }
 
+      let nodeFound = false
+
       newState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
-        if (node.isText) {
+        console.log("NEW node", node, "at pos", pos, "with text", node.text)
+        if (node.isText && node.text !== " ") {
+          nodeFound = true
           newStateTransaction.removeMark(
             pos,
             pos + node.nodeSize,
@@ -90,6 +99,26 @@ const removeTagsOnTypingPlugin = new Plugin({
           modified = true
         }
       })
+
+      if (!nodeFound) {
+        oldState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
+          console.log("OLD node", node, "at pos", pos, "with text", node.text)
+          if (node.isText) {
+            nodeFound = true
+            newStateTransaction.removeMark(
+              pos,
+              pos + node.nodeSize,
+              newState.schema.marks[TextCheckTagName],
+            )
+            newStateTransaction.removeMark(
+              pos,
+              pos + node.nodeSize,
+              newState.schema.marks[IgnoreOnceTagName],
+            )
+            modified = true
+          }
+        })
+      }
     })
 
     return modified ? newStateTransaction : null
@@ -106,6 +135,8 @@ function findCorrectPosition(step: Step): { realFrom: number; realTo: number } {
   const deletedSize = stepTo - stepFrom
   const insertedSize = step.slice.size
 
+  console.log("Step details:", { stepFrom, stepTo, deletedSize, insertedSize })
+
   const realFrom = stepFrom
   let realTo = 0
   if (deletedSize === 0 && insertedSize > 0) {
@@ -114,6 +145,17 @@ function findCorrectPosition(step: Step): { realFrom: number; realTo: number } {
   } else if (deletedSize > 0 && insertedSize === 0) {
     // Deletion
     realTo = stepTo
+  } else if (deletedSize > 0 && insertedSize > 0 && realFrom !== 0) {
+    // Weird case of deletion + insertion
+    // Happens when replacing a selection
+    // that spans more words/nodes
+    // Why realFrom !== 0? Because when replacing from 0,
+    // it means we probably/hopefully ran language check
+    // and whole content is replaced.
+    // In that case we just want to let it slide!
+    realTo = stepTo - deletedSize + insertedSize
+    console.log("Weird case of deletion + insertion:", { realFrom })
+    console.log("Weird case of deletion + insertion:", { realTo })
   } else {
     // Replacement
     realTo = stepTo + insertedSize
@@ -128,7 +170,6 @@ function isDocumentChanged(
   newState: EditorState,
 ): boolean {
   const isChanged = transactions.some((transaction) => transaction.docChanged)
-  // console.log("isChanged:", isChanged)
 
   const sizeDiff = Math.abs(
     newState.doc.content.size - oldState.doc.content.size,

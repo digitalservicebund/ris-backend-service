@@ -274,4 +274,96 @@ describe("removeTagsOnTyping extension", () => {
 
     editor.destroy()
   })
+
+  it("when a selection has multiple word when deleting or replacing it with a character then remove marks in all nodes around this change", () => {
+    const editor = new Editor({
+      extensions: [
+        Document,
+        Paragraph,
+        Text,
+        TextCheckMark,
+        TextCheckExtension,
+      ],
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "wordss",
+              },
+            ],
+          },
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "asdasda",
+              },
+              {
+                type: "text",
+                text: " ",
+              },
+              {
+                type: "text",
+                text: "fdasdsd",
+              },
+            ],
+          },
+        ],
+      },
+    })
+
+    const textCheckMark = editor.schema.marks[TextCheckMark.name]
+
+    // Mark both words in the second paragraph
+    editor.commands.command(({ tr }) => {
+      tr.addMark(
+        8,
+        15,
+        textCheckMark.create({ ...textCheckMarkAttrs, id: "1" }),
+      )
+      tr.addMark(
+        16,
+        23,
+        textCheckMark.create({ ...textCheckMarkAttrs, id: "2" }),
+      )
+      return true
+    })
+
+    // Verify both words are marked
+    const secondPara = editor.state.doc.child(1)
+    let markedWordsCount = 0
+    secondPara.forEach((node) => {
+      if (node.marks.length > 0) {
+        markedWordsCount++
+      }
+    })
+    expect(markedWordsCount).toBe(2)
+    expect(editor.getText()).toBe("wordss\n\nasdasda fdasdsd")
+
+    // Select "da fd" which spans across both marked words and replace with "x"
+    // "asdas[da ]fd[asdsd]" -> "asdasxasdsd"
+    // "asdasda" starts at position 8, "da" is at offset 5, so position 13
+    // We want to replace "da fd" (5 chars), so from 13 to 18
+    editor.commands.insertContentAt({ from: 14, to: 19 }, "x")
+
+    expect(editor.getText()).toBe("wordss\n\nasdasxasdsd")
+
+    // Verify marks were removed from all affected text nodes
+    const secondParaAfter = editor.state.doc.child(1)
+    let markedWordsAfter = 0
+    secondParaAfter.forEach((node) => {
+      if (node.isText && node.marks.length > 0) {
+        markedWordsAfter++
+        console.log("Node still has marks:", node.text, node.marks)
+      }
+    })
+    expect(markedWordsAfter).toBe(0)
+
+    editor.destroy()
+  })
 })
