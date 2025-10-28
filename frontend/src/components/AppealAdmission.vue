@@ -18,8 +18,15 @@ const appealAdmitted = computed({
       return
     }
 
-    store.documentUnit!.contentRelatedIndexing.appealAdmission = {
-      admitted: newValue,
+    if (newValue) {
+      store.documentUnit!.contentRelatedIndexing.appealAdmission = {
+        ...store.documentUnit!.contentRelatedIndexing.appealAdmission,
+        admitted: newValue,
+      }
+    } else {
+      store.documentUnit!.contentRelatedIndexing.appealAdmission = {
+        admitted: false,
+      }
     }
   },
 })
