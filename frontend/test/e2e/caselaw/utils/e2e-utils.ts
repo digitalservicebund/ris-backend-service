@@ -581,12 +581,12 @@ export async function fillCombobox(
 export async function fillSelect(
   page: Page,
   ariaLabel: string,
-  label = generateString(),
+  optionLabel: string,
 ) {
   const dropdown = page.getByRole("combobox", { name: ariaLabel, exact: true })
   await dropdown.click()
-  await page.getByRole("option", { name: label }).click()
-  await expect(dropdown).toHaveText(label)
+  await page.getByRole("option", { name: optionLabel }).click()
+  await expect(dropdown).toHaveText(optionLabel)
 }
 
 export async function clearInput(page: Page, ariaLabel: string) {
