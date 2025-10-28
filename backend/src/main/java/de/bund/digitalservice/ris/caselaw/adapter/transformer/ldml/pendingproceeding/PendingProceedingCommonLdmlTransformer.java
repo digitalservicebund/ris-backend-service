@@ -24,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.Documentation
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +87,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
           DokumentTyp.builder().eId("dokumenttyp").value(coreData.documentType().label()).build());
 
       // Gericht (Gerichtstyp + Ort)
-      var court = coreData.court();
+      Court court = coreData.court();
       if (court != null) {
         builder.gericht(
             Gericht.builder()
@@ -110,7 +111,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
 
       // Dokumentationsstelle
       if (coreData.documentationOffice() != null) {
-        var docOffice = coreData.documentationOffice().abbreviation();
+        String docOffice = coreData.documentationOffice().abbreviation();
         builder.dokumentationsstelle(
             Dokumentationsstelle.builder()
                 .refersTo("#" + docOffice.toLowerCase() + "-dokumentationsstelle")

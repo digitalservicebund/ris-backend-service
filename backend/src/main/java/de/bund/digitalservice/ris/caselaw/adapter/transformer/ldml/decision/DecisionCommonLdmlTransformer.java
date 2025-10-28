@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransform
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +91,7 @@ public abstract class DecisionCommonLdmlTransformer
           DokumentTyp.builder().eId("dokumenttyp").value(coreData.documentType().label()).build());
 
       // Gericht (Gerichtstyp + Ort)
-      var court = coreData.court();
+      Court court = coreData.court();
       if (court != null) {
         builder.gericht(
             Gericht.builder()
@@ -114,7 +115,7 @@ public abstract class DecisionCommonLdmlTransformer
 
       // Dokumentationsstelle
       if (coreData.documentationOffice() != null) {
-        var docOffice = coreData.documentationOffice().abbreviation();
+        String docOffice = coreData.documentationOffice().abbreviation();
         builder.dokumentationsstelle(
             Dokumentationsstelle.builder()
                 .refersTo("#" + docOffice.toLowerCase() + "-dokumentationsstelle")
