@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class Evsf {
-  @Builder.Default
   @XmlAttribute(name = "domainTerm")
-  private String domainTerm = "Elektronische Vorschriftensammlung Bundesfinanzverwaltung (E-VSF)";
+  private static final String DOMAIN_TERM =
+      "Elektronische Vorschriftensammlung Bundesfinanzverwaltung (E-VSF)";
 
   @XmlValue private String value;
 }

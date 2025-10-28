@@ -15,9 +15,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class AbweichendeEclis {
-  @Builder.Default
   @XmlAttribute(name = "domainTerm")
-  private String domainTerm = "Abweichende ECLIs";
+  private static final String DOMAIN_TERM = "Abweichende ECLIs";
 
   @XmlElement(name = "abweichenderEcli", namespace = CaseLawLdml.RIS_NS)
   private List<AbweichenderEcli> eclis;
@@ -27,9 +26,8 @@ public class AbweichendeEclis {
   @Getter
   @Builder
   public static class AbweichenderEcli {
-    @Builder.Default
     @XmlAttribute(name = "domainTerm")
-    private String domainTerm = "Abweichender ECLI";
+    private static final String DOMAIN_TERM = "Abweichender ECLI";
 
     @XmlValue private String value;
   }

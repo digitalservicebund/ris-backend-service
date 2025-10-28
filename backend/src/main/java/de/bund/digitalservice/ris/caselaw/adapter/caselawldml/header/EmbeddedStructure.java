@@ -29,5 +29,6 @@ public class EmbeddedStructure {
   @XmlElementRefs({
     @XmlElementRef(name = "p", namespace = CaseLawLdml.AKN_NS, type = DocTitle.class)
   })
+  @Builder.Default
   private List<Object> content = new ArrayList<>();
 }

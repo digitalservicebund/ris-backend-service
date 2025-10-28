@@ -14,9 +14,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class Rechtsmittelzulassung {
-  @Builder.Default
   @XmlAttribute(name = "domainTerm")
-  private String domainTerm = "Rechtsmittelzulassung";
+  private static final String DOMAIN_TERM = "Rechtsmittelzulassung";
 
   @XmlElement(name = "rechtsmittelZugelassen", namespace = CaseLawLdml.RIS_NS)
   private RechtsmittelZugelassen rechtsmittelZugelassen;
@@ -27,28 +26,22 @@ public class Rechtsmittelzulassung {
   @NoArgsConstructor
   @AllArgsConstructor
   @Getter
+  @Builder
   public static class RechtsmittelZugelassen {
     @XmlAttribute(name = "domainTerm")
-    private String domainTerm = "Rechtsmittel zugelassen";
+    private static final String DOMAIN_TERM = "Rechtsmittel zugelassen";
 
     @XmlValue private boolean value;
-
-    public RechtsmittelZugelassen(boolean value) {
-      this.value = value;
-    }
   }
 
   @NoArgsConstructor
   @AllArgsConstructor
   @Getter
+  @Builder
   public static class RechtsmittelZugelassenDurch {
     @XmlAttribute(name = "domainTerm")
-    private String domainTerm = "Rechtsmittel zugelassen durch";
+    private static final String DOMAIN_TERM = "Rechtsmittel zugelassen durch";
 
     @XmlValue private String value;
-
-    public RechtsmittelZugelassenDurch(String value) {
-      this.value = value;
-    }
   }
 }

@@ -12,9 +12,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class Rechtskraft {
-  @Builder.Default
   @XmlAttribute(name = "domainTerm")
-  private String domainTerm = "Rechtskraft";
+  private static final String DOMAIN_TERM = "Rechtskraft";
 
   @XmlValue private String value;
 }

@@ -15,9 +15,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class Eingangsarten {
-  @Builder.Default
   @XmlAttribute(name = "domainTerm")
-  private String domainTerm = "Eingangsarten";
+  private static final String DOMAIN_TERM = "Eingangsarten";
 
   @SuppressWarnings("java:S1700")
   @XmlElement(name = "eingangsart", namespace = CaseLawLdml.RIS_NS)
@@ -28,9 +27,8 @@ public class Eingangsarten {
   @Getter
   @Builder
   public static class Eingangsart {
-    @Builder.Default
     @XmlAttribute(name = "domainTerm")
-    private String domainTerm = "Eingangsart";
+    private static final String DOMAIN_TERM = "Eingangsart";
 
     @XmlValue private String content;
   }

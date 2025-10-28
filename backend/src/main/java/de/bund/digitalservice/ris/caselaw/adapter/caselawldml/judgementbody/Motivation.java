@@ -28,5 +28,6 @@ public class Motivation extends BaseLdml {
     @XmlElementRef(name = "block", namespace = CaseLawLdml.AKN_NS, type = Block.class)
   })
   @XmlAnyElement(lax = true)
+  @Builder.Default
   private List<Object> content = new ArrayList<>();
 }

@@ -83,8 +83,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
     var coreData = pendingProceeding.coreData();
     if (coreData != null) {
       // Dokumenttyp
-      builder.dokumentTyp(
-          DokumentTyp.builder().eId("dokumenttyp").value(coreData.documentType().label()).build());
+      builder.dokumentTyp(DokumentTyp.builder().value(coreData.documentType().label()).build());
 
       // Gericht (Gerichtstyp + Ort)
       Court court = coreData.court();

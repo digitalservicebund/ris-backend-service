@@ -15,9 +15,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class FehlerhafteGerichte {
-  @Builder.Default
   @XmlAttribute(name = "domainTerm")
-  private String domainTerm = "Fehlerhafte Gerichte";
+  private static final String DOMAIN_TERM = "Fehlerhafte Gerichte";
 
   @SuppressWarnings("java:S1700")
   @XmlElement(name = "fehlerhaftesGericht", namespace = CaseLawLdml.RIS_NS)
@@ -28,9 +27,8 @@ public class FehlerhafteGerichte {
   @Getter
   @Builder
   public static class FehlerhaftesGericht {
-    @Builder.Default
     @XmlAttribute(name = "domainTerm")
-    private String domainTerm = "Fehlerhaftes Gericht";
+    private static final String DOMAIN_TERM = "Fehlerhaftes Gericht";
 
     @XmlValue private String value;
   }

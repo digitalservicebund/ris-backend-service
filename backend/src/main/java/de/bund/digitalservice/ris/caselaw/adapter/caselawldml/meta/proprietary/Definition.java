@@ -14,9 +14,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class Definition {
-  @Builder.Default
   @XmlAttribute(namespace = CaseLawLdml.RIS_NS, name = "domainTerm")
-  private String domainTerm = "Definition";
+  private static final String DOMAIN_TERM = "Definition";
 
   @XmlElement(name = "definierterBegriff", namespace = CaseLawLdml.RIS_NS)
   private DefinierterBegriff definierterBegriff;
@@ -29,9 +28,8 @@ public class Definition {
   @Getter
   @Builder
   public static class DefinierterBegriff {
-    @Builder.Default
     @XmlAttribute(name = "domainTerm")
-    private String domainTerm = "Definierter Begriff";
+    private static final String DOMAIN_TERM = "Definierter Begriff";
 
     @XmlValue private String value;
   }
@@ -41,9 +39,8 @@ public class Definition {
   @Getter
   @Builder
   public static class DefinierendeRandnummer {
-    @Builder.Default
     @XmlAttribute(name = "domainTerm")
-    private String domainTerm = "Definierende Randnummer";
+    private static final String DOMAIN_TERM = "Definierende Randnummer";
 
     @XmlAttribute(namespace = CaseLawLdml.AKN_NS, name = "refersTo")
     private String refersTo;

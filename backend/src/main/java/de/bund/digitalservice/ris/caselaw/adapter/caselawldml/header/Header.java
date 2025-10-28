@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 @XmlRootElement(name = "header", namespace = CaseLawLdml.AKN_NS)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Header {
+  @Builder.Default
   @XmlElement(name = "p", namespace = CaseLawLdml.AKN_NS)
   private List<Paragraph> paragraphs = new ArrayList<>();
 }

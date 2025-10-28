@@ -15,9 +15,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class AbweichendeDaten {
-  @Builder.Default
   @XmlAttribute(name = "domainTerm")
-  private String domainTerm = "Abweichende Daten";
+  private static final String DOMAIN_TERM = "Abweichende Daten";
 
   @XmlElement(name = "abweichendesDatum", namespace = CaseLawLdml.RIS_NS)
   private List<AbweichendesDatum> daten;
@@ -27,9 +26,8 @@ public class AbweichendeDaten {
   @Getter
   @Builder
   public static class AbweichendesDatum {
-    @Builder.Default
     @XmlAttribute(name = "domainTerm")
-    private String domainTerm = "Abweichendes Datum";
+    private static final String DOMAIN_TERM = "Abweichendes Datum";
 
     @XmlValue private String value;
   }

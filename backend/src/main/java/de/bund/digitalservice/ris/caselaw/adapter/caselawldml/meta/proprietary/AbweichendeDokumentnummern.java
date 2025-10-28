@@ -15,9 +15,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class AbweichendeDokumentnummern {
-  @Builder.Default
   @XmlAttribute(name = "domainTerm")
-  private String domainTerm = "Abweichende Dokumentnummern";
+  private static final String DOMAIN_TERM = "Abweichende Dokumentnummern";
 
   @XmlElement(name = "abweichendeDokumentnummer", namespace = CaseLawLdml.RIS_NS)
   private List<AbweichendeDokumentnummer> dokumentnummern;
@@ -27,9 +26,8 @@ public class AbweichendeDokumentnummern {
   @Getter
   @Builder
   public static class AbweichendeDokumentnummer {
-    @Builder.Default
     @XmlAttribute(name = "domainTerm")
-    private String domainTerm = "Abweichende Dokumentnummer";
+    private static final String DOMAIN_TERM = "Abweichende Dokumentnummer";
 
     @XmlValue private String value;
   }

@@ -13,9 +13,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class Spruchkoerper {
-  @Builder.Default
   @XmlAttribute(name = "domainTerm")
-  private String domainTerm = "Spruchkörper";
+  private static final String DOMAIN_TERM = "Spruchkörper";
 
   @XmlAttribute(namespace = CaseLawLdml.AKN_NS, name = "refersTo")
   private String refersTo;

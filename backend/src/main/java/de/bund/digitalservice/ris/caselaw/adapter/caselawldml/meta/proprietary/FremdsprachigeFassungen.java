@@ -15,9 +15,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class FremdsprachigeFassungen {
-  @Builder.Default
   @XmlAttribute(name = "domainTerm")
-  private String domainTerm = "Fremdsprachige Fassungen";
+  private static final String DOMAIN_TERM = "Fremdsprachige Fassungen";
 
   @SuppressWarnings("java:S1700")
   @XmlElement(name = "fremdsprachigeFassung", namespace = CaseLawLdml.RIS_NS)
@@ -28,9 +27,8 @@ public class FremdsprachigeFassungen {
   @Getter
   @Builder
   public static class FremdsprachigeFassung {
-    @Builder.Default
     @XmlAttribute(name = "domainTerm")
-    private String domainTerm = "Fremdsprachige Fassung";
+    private static final String DOMAIN_TERM = "Fremdsprachige Fassung";
 
     @XmlElement(name = "FRBRlanguage", namespace = CaseLawLdml.AKN_NS)
     private FrbrLanguage frbrLanguage;

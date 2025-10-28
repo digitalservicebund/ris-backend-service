@@ -14,9 +14,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class Definitionen {
-  @Builder.Default
   @XmlAttribute(namespace = CaseLawLdml.RIS_NS, name = "domainTerm")
-  private String domainTerm = "Definitionen";
+  private static final String DOMAIN_TERM = "Definitionen";
 
   @SuppressWarnings("java:S1700")
   @XmlElement(name = "definition", namespace = CaseLawLdml.RIS_NS)

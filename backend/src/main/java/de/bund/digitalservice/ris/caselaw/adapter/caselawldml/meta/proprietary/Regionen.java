@@ -15,9 +15,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class Regionen {
-  @Builder.Default
   @XmlAttribute(name = "domainTerm")
-  private String domainTerm = "Regionen";
+  private static final String DOMAIN_TERM = "Regionen";
 
   @SuppressWarnings("java:S1700")
   @XmlElement(name = "region", namespace = CaseLawLdml.RIS_NS)
@@ -28,9 +27,8 @@ public class Regionen {
   @Getter
   @Builder
   public static class Region {
-    @Builder.Default
     @XmlAttribute(name = "domainTerm")
-    private String domainTerm = "Region";
+    private static final String DOMAIN_TERM = "Region";
 
     @XmlValue private String value;
   }

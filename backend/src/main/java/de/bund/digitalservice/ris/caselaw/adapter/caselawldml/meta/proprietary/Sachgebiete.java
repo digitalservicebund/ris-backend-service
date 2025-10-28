@@ -15,9 +15,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class Sachgebiete {
-  @Builder.Default
   @XmlAttribute(name = "domainTerm")
-  private String domainTerm = "Sachgebiete";
+  private static final String DOMAIN_TERM = "Sachgebiete";
 
   @SuppressWarnings("java:S1700")
   @XmlElement(name = "sachgebiet", namespace = CaseLawLdml.RIS_NS)
@@ -28,9 +27,8 @@ public class Sachgebiete {
   @Getter
   @Builder
   public static class Sachgebiet {
-    @Builder.Default
     @XmlAttribute(name = "domainTerm")
-    private String domainTerm = "Sachgebiet";
+    private static final String DOMAIN_TERM = "Sachgebiet";
 
     @XmlAttribute(name = "notation")
     private String notation;

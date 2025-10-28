@@ -14,9 +14,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class Gericht {
-  @Builder.Default
   @XmlAttribute(name = "domainTerm")
-  private String domainTerm = "Gericht";
+  private static final String DOMAIN_TERM = "Gericht";
 
   @XmlAttribute(namespace = CaseLawLdml.AKN_NS, name = "refersTo")
   private String refersTo;
@@ -32,9 +31,8 @@ public class Gericht {
   @Getter
   @Builder
   public static class GerichtTyp {
-    @Builder.Default
     @XmlAttribute(name = "domainTerm")
-    private String domainTerm = "Gerichtstyp";
+    private static final String DOMAIN_TERM = "Gerichtstyp";
 
     @XmlValue private String value;
   }
@@ -44,9 +42,8 @@ public class Gericht {
   @Getter
   @Builder
   public static class GerichtOrt {
-    @Builder.Default
     @XmlAttribute(name = "domainTerm")
-    private String domainTerm = "Gerichtsort";
+    private static final String DOMAIN_TERM = "Gerichtsort";
 
     @XmlValue private String value;
   }
