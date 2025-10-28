@@ -191,7 +191,10 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                 .fehlerhafteGerichte(
                     coreData.deviatingCourts().stream()
                         .map(
-                            v -> FehlerhafteGerichte.FehlerhaftesGericht.builder().value(v).build())
+                            court ->
+                                FehlerhafteGerichte.FehlerhaftesGericht.builder()
+                                    .value(court)
+                                    .build())
                         .toList())
                 .build());
       }
@@ -202,9 +205,9 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                 .daten(
                     coreData.deviatingDecisionDates().stream()
                         .map(
-                            d ->
+                            date ->
                                 AbweichendeDaten.AbweichendesDatum.builder()
-                                    .value(DateUtils.toDateString(d))
+                                    .value(DateUtils.toDateString(date))
                                     .build())
                         .toList())
                 .build());
@@ -216,9 +219,9 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                 .dokumentnummern(
                     coreData.deviatingDocumentNumbers().stream()
                         .map(
-                            v ->
+                            docNumber ->
                                 AbweichendeDokumentnummern.AbweichendeDokumentnummer.builder()
-                                    .value(v)
+                                    .value(docNumber)
                                     .build())
                         .toList())
                 .build());
@@ -258,7 +261,9 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
             Eingangsarten.builder()
                 .eingangsarten(
                     coreData.inputTypes().stream()
-                        .map(v -> Eingangsarten.Eingangsart.builder().content(v).build())
+                        .map(
+                            eingangsart ->
+                                Eingangsarten.Eingangsart.builder().content(eingangsart).build())
                         .toList())
                 .build());
       }

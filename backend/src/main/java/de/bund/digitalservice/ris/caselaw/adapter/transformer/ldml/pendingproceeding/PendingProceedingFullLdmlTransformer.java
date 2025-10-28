@@ -102,7 +102,10 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
                 .fehlerhafteGerichte(
                     coreData.deviatingCourts().stream()
                         .map(
-                            v -> FehlerhafteGerichte.FehlerhaftesGericht.builder().value(v).build())
+                            court ->
+                                FehlerhafteGerichte.FehlerhaftesGericht.builder()
+                                    .value(court)
+                                    .build())
                         .toList())
                 .build());
       }
@@ -113,9 +116,9 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
                 .daten(
                     coreData.deviatingDecisionDates().stream()
                         .map(
-                            d ->
+                            date ->
                                 AbweichendeDaten.AbweichendesDatum.builder()
-                                    .value(DateUtils.toDateString(d))
+                                    .value(DateUtils.toDateString(date))
                                     .build())
                         .toList())
                 .build());
@@ -127,9 +130,9 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
                 .dokumentnummern(
                     coreData.deviatingDocumentNumbers().stream()
                         .map(
-                            v ->
+                            docNumber ->
                                 AbweichendeDokumentnummern.AbweichendeDokumentnummer.builder()
-                                    .value(v)
+                                    .value(docNumber)
                                     .build())
                         .toList())
                 .build());
