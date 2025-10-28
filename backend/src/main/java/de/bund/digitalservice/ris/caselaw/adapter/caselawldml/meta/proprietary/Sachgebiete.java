@@ -19,6 +19,7 @@ public class Sachgebiete {
   @XmlAttribute(name = "domainTerm")
   private String domainTerm = "Sachgebiete";
 
+  @SuppressWarnings("java:S1700")
   @XmlElement(name = "sachgebiet", namespace = CaseLawLdml.RIS_NS)
   private List<Sachgebiet> sachgebiete;
 

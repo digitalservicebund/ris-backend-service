@@ -19,6 +19,7 @@ public class Vorgaenge {
   @XmlAttribute(name = "domainTerm")
   private String domainTerm = "Vorgänge";
 
+  @SuppressWarnings("java:S1700")
   @XmlElement(name = "vorgang", namespace = CaseLawLdml.RIS_NS)
   private List<Vorgang> vorgaenge;
 

@@ -79,6 +79,7 @@ public abstract class DecisionCommonLdmlTransformer
 
   protected abstract Meta buildMeta(Decision decision);
 
+  @SuppressWarnings("java:S3776")
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(Decision decision) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
 

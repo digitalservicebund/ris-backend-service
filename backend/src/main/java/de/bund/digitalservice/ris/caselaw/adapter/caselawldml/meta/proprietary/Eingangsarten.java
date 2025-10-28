@@ -19,6 +19,7 @@ public class Eingangsarten {
   @XmlAttribute(name = "domainTerm")
   private String domainTerm = "Eingangsarten";
 
+  @SuppressWarnings("java:S1700")
   @XmlElement(name = "eingangsart", namespace = CaseLawLdml.RIS_NS)
   private List<Eingangsart> eingangsarten;
 

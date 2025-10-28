@@ -68,7 +68,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         .build();
   }
 
-  @SuppressWarnings("java:S3776")
+  @SuppressWarnings({"java:S6541", "java:S3776"})
   private RisMeta buildRisMeta(Decision decision) {
     var builder = buildCommonRisMeta(decision);
 

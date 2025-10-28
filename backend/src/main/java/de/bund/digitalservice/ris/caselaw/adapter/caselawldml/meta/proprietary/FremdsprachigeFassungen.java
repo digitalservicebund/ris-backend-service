@@ -19,6 +19,7 @@ public class FremdsprachigeFassungen {
   @XmlAttribute(name = "domainTerm")
   private String domainTerm = "Fremdsprachige Fassungen";
 
+  @SuppressWarnings("java:S1700")
   @XmlElement(name = "fremdsprachigeFassung", namespace = CaseLawLdml.RIS_NS)
   private List<FremdsprachigeFassung> fremdsprachigeFassungen;
 

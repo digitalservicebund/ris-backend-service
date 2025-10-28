@@ -18,6 +18,7 @@ public class Definitionen {
   @XmlAttribute(namespace = CaseLawLdml.RIS_NS, name = "domainTerm")
   private String domainTerm = "Definitionen";
 
+  @SuppressWarnings("java:S1700")
   @XmlElement(name = "definition", namespace = CaseLawLdml.RIS_NS)
   private List<Definition> definitionen;
 }

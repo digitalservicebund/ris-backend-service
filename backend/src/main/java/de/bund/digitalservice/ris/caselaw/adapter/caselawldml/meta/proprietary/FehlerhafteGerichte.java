@@ -19,6 +19,7 @@ public class FehlerhafteGerichte {
   @XmlAttribute(name = "domainTerm")
   private String domainTerm = "Fehlerhafte Gerichte";
 
+  @SuppressWarnings("java:S1700")
   @XmlElement(name = "fehlerhaftesGericht", namespace = CaseLawLdml.RIS_NS)
   private List<FehlerhaftesGericht> fehlerhafteGerichte;
 
