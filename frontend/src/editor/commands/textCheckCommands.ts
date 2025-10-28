@@ -235,7 +235,7 @@ class NeurisTextCheckService implements TextCheckService {
    * It uses the current editor selection position to find the associated TextCheckMark ID and its true ProseMirror range.
    * @param editor The Tiptap Editor instance required to execute transactions.
    */
-  public toggleIgnoreOnce(editor: Editor): boolean {
+  public async toggleIgnoreOnce(editor: Editor): Promise<boolean> {
     const { state } = editor
     let matchId: number | null = null
     let markRange = { from: 0, to: 0 }
