@@ -162,6 +162,8 @@ const fieldsWithoutJdvExport = computed<string[]>(() => {
     fieldLabels.push(contentRelatedIndexingLabels.evsf)
   if (decision.value?.contentRelatedIndexing?.foreignLanguageVersions?.length)
     fieldLabels.push(contentRelatedIndexingLabels.foreignLanguageVersions)
+  if (decision.value?.contentRelatedIndexing?.appealAdmission != null)
+    fieldLabels.push(contentRelatedIndexingLabels.appealAdmission)
   if (decision.value?.coreData?.celexNumber)
     fieldLabels.push(coreDataLabels.celexNumber)
   if (decision.value?.coreData?.hasDeliveryDate)

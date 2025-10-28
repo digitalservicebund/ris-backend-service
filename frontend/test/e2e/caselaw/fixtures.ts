@@ -4,6 +4,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import jsonPatch from "fast-json-patch"
 import { Page as Pagination } from "@/components/Pagination.vue"
+import { AppealAdmitter } from "@/domain/appealAdmitter"
 import { Decision } from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
@@ -657,6 +658,10 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             dismissalGrounds: ["Test Kündigungsgründe"],
             jobProfiles: ["Test Berufsbild"],
             hasLegislativeMandate: true,
+            appealAdmission: {
+              admitted: true,
+              by: AppealAdmitter.FG,
+            },
           },
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },

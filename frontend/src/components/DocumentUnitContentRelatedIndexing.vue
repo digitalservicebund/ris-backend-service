@@ -2,6 +2,7 @@
 import { storeToRefs } from "pinia"
 import { computed, Ref } from "vue"
 import ActiveCitations from "@/components/ActiveCitations.vue"
+import AppealAdmission from "@/components/AppealAdmission.vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import FieldsOfLaw from "@/components/field-of-law/FieldsOfLaw.vue"
@@ -23,6 +24,20 @@ const hasKeywords = computed(
     !!store.documentUnit?.contentRelatedIndexing?.keywords &&
     store.documentUnit?.contentRelatedIndexing?.keywords?.length > 0,
 )
+
+const isFinanceCourt = computed(
+  () =>
+    store.documentUnit?.coreData.court?.jurisdictionType ===
+    "Finanzgerichtsbarkeit",
+)
+
+const hasAppealAdmission = computed(
+  () => documentUnit.value?.contentRelatedIndexing.appealAdmission != null,
+)
+
+const shouldDisplayAppealAdmission = computed(
+  () => hasAppealAdmission.value || isFinanceCourt.value,
+)
 </script>
 
 <template>
@@ -41,6 +56,9 @@ const hasKeywords = computed(
     <ActiveCitations
       v-if="isDecision(documentUnit)"
       data-testid="activeCitations"
+    />
+    <AppealAdmission
+      v-if="isDecision(documentUnit) && shouldDisplayAppealAdmission"
     />
     <OtherCategories v-if="isDecision(documentUnit)" />
   </div>

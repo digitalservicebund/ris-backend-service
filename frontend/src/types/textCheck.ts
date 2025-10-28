@@ -46,6 +46,7 @@ export interface Match {
   word: string
   category: string
   ignoredTextCheckWords?: IgnoredTextCheckWord[]
+  isIgnoredOnce?: boolean
 }
 
 export interface TextCheckResponse {

@@ -41,6 +41,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
@@ -1161,6 +1163,36 @@ class DecisionTransformerTest {
   }
 
   @Test
+  void testTransformToDto_withAppealAdmitted_shouldAddAppealAdmitted() {
+    DecisionDTO currentDto = DecisionDTO.builder().build();
+
+    Decision updatedDomainObject =
+        Decision.builder()
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .appealAdmission(
+                        AppealAdmission.builder().admitted(true).by(AppealAdmitter.BFH).build())
+                    .build())
+            .build();
+
+    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+    assertThat(decisionDTO.getAppealAdmitted()).isTrue();
+    assertThat(decisionDTO.getAppealAdmittedBy()).isEqualTo(AppealAdmitter.BFH);
+  }
+
+  @Test
+  void testTransformToDto_withoutAppealAdmitted_shouldNotAddAppealAdmitted() {
+    DecisionDTO currentDto = DecisionDTO.builder().build();
+
+    Decision updatedDomainObject =
+        Decision.builder().contentRelatedIndexing(ContentRelatedIndexing.builder().build()).build();
+
+    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+    assertThat(decisionDTO.getAppealAdmitted()).isNull();
+    assertThat(decisionDTO.getAppealAdmittedBy()).isNull();
+  }
+
+  @Test
   void testTransformToDomain_withDocumentationUnitDTOIsNull_shouldReturnEmptyDocumentationUnit() {
 
     assertThatThrownBy(() -> DecisionTransformer.transformToDomain(null))
@@ -1869,6 +1901,30 @@ class DecisionTransformerTest {
         DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
 
     assertThat(decisionDTO.getCelexNumber()).isBlank();
+  }
+
+  @Test
+  void testTransformToDomain_withAppealAdmitted_shouldAddAppealAdmitted() {
+    DecisionDTO decisionDTO =
+        generateSimpleDTOBuilder()
+            .appealAdmitted(true)
+            .appealAdmittedBy(AppealAdmitter.BFH)
+            .build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().appealAdmission().admitted()).isTrue();
+    assertThat(decision.contentRelatedIndexing().appealAdmission().by())
+        .isEqualTo(AppealAdmitter.BFH);
+  }
+
+  @Test
+  void testTransformToDomain_withoutAppealAdmitted_shouldNotAddAppealAdmitted() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().appealAdmission()).isNull();
   }
 
   private Decision.DecisionBuilder generateSimpleDocumentationUnitBuilder() {

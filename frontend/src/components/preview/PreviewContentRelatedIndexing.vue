@@ -42,6 +42,10 @@ const hasActiveCitations = computed(() => {
   )
 })
 
+const hasAppealAdmission = computed(() => {
+  return props.contentRelatedIndexing.appealAdmission != null
+})
+
 const hasJobProfiles = computed(() => {
   return (
     props.contentRelatedIndexing.jobProfiles &&
@@ -151,6 +155,25 @@ const hasDefinitions = computed(() => {
           :key="activeCitation.id"
         >
           {{ activeCitation.renderSummary }}
+        </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasAppealAdmission">
+      <PreviewCategory>Rechtsmittelzulassung</PreviewCategory>
+      <PreviewContent>
+        <div>
+          <span
+            v-if="
+              props.contentRelatedIndexing.appealAdmission?.admitted === true
+            "
+          >
+            <span v-if="props.contentRelatedIndexing.appealAdmission.by"
+              >Ja, durch
+              {{ props.contentRelatedIndexing.appealAdmission.by }}</span
+            >
+            <span v-else>Ja</span>
+          </span>
+          <span v-else>Nein</span>
         </div>
       </PreviewContent>
     </PreviewRow>
