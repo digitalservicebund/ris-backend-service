@@ -52,15 +52,19 @@
                             <ris:courtType>previous decision court type</ris:courtType>
                         </ris:previousDecision>
                     </ris:previousDecisions>
-                    <ris:fileNumbers>
-                        <ris:fileNumber>Aktenzeichen</ris:fileNumber>
-                    </ris:fileNumbers>
-                    <ris:documentType akn:eId="dokumenttyp">Anhängiges Verfahren</ris:documentType>
-                    <ris:courtLocation>courtLocation</ris:courtLocation>
-                    <ris:courtType>courtType</ris:courtType>
-                    <ris:legalForces>
-                        <ris:legalForce>legalForce test</ris:legalForce>
-                    </ris:legalForces>
+                    <ris:dokumentTyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">Anhängiges Verfahren</ris:dokumentTyp>
+                    <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+                        <ris:typ domainTerm="Gerichtstyp">courtType</ris:typ>
+                        <ris:ort domainTerm="Gerichtsort">courtLocation</ris:ort>
+                    </ris:gericht>
+                    <ris:regionen domainTerm="Regionen">
+                        <ris:region domainTerm="Region">NW</ris:region>
+                    </ris:regionen>
+                    <ris:dokumentationsstelle domainTerm="Dokumentationsstelle"
+                                              akn:refersTo="#bfh-dokumentationsstelle">BFH</ris:dokumentationsstelle>
+                    <ris:aktenzeichenListe domainTerm="Aktenzeichenliste">
+                        <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">Aktenzeichen</ris:aktenzeichen>
+                    </ris:aktenzeichenListe>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>

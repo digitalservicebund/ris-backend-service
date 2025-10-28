@@ -13,7 +13,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Intr
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.JudgmentBody;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Motivation;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DokumentTyp;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumentationsstelle;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gericht;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Regionen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
@@ -66,6 +70,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
 
   protected abstract Header buildHeader(PendingProceeding pendingProceeding);
 
+  @SuppressWarnings("java:S3776")
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(PendingProceeding pendingProceeding) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
 
@@ -74,13 +79,62 @@ public abstract class PendingProceedingCommonLdmlTransformer
           buildRelatedDecisions(pendingProceeding.previousDecisions()), builder::previousDecision);
     }
 
-    var contentRelatedIndexing = pendingProceeding.contentRelatedIndexing();
-    // Legacy legalForce mapping removed
-
     var coreData = pendingProceeding.coreData();
     if (coreData != null) {
+      // Dokumenttyp
       builder.dokumentTyp(
           DokumentTyp.builder().eId("dokumenttyp").value(coreData.documentType().label()).build());
+
+      // Gericht (Gerichtstyp + Ort)
+      var court = coreData.court();
+      if (court != null) {
+        builder.gericht(
+            Gericht.builder()
+                .refersTo("#gericht")
+                .typ(Gericht.GerichtTyp.builder().value(court.type()).build())
+                .ort(Gericht.GerichtOrt.builder().value(court.location()).build())
+                .build());
+      }
+
+      // Regionen
+      List<Regionen.Region> regionen = new ArrayList<>();
+      if (coreData.court() != null && coreData.court().regions() != null) {
+        coreData
+            .court()
+            .regions()
+            .forEach(region -> regionen.add(Regionen.Region.builder().value(region).build()));
+      }
+      if (!regionen.isEmpty()) {
+        builder.regionen(Regionen.builder().regionen(regionen).build());
+      }
+
+      // Dokumentationsstelle
+      if (coreData.documentationOffice() != null) {
+        var docOffice = coreData.documentationOffice().abbreviation();
+        builder.dokumentationsstelle(
+            Dokumentationsstelle.builder()
+                .refersTo("#" + docOffice.toLowerCase() + "-dokumentationsstelle")
+                .value(docOffice)
+                .build());
+      }
+
+      // Aktenzeichenliste (incl. abweichende Aktenzeichen)
+      List<AktenzeichenListe.Aktenzeichen> aktenzeichenListe = new ArrayList<>();
+      if (coreData.fileNumbers() != null && !coreData.fileNumbers().isEmpty()) {
+        coreData
+            .fileNumbers()
+            .forEach(
+                fileNumber ->
+                    aktenzeichenListe.add(
+                        AktenzeichenListe.Aktenzeichen.builder()
+                            .refersTo("#aktenzeichen")
+                            .value(fileNumber)
+                            .build()));
+      }
+      if (!aktenzeichenListe.isEmpty()) {
+        builder.aktenzeichenListe(
+            AktenzeichenListe.builder().aktenzeichen(aktenzeichenListe).build());
+      }
     }
 
     return builder;

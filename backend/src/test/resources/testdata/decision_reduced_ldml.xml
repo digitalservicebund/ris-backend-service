@@ -53,6 +53,9 @@
                         <ris:typ domainTerm="Gerichtstyp">courtType</ris:typ>
                         <ris:ort domainTerm="Gerichtsort">courtLocation</ris:ort>
                     </ris:gericht>
+                    <ris:regionen domainTerm="Regionen">
+                       <ris:region domainTerm="Region">NW</ris:region>
+                    </ris:regionen>
                     <ris:dokumentationsstelle domainTerm="Dokumentationsstelle" akn:refersTo="#documentationoffice-dokumentationsstelle">documentationOffice</ris:dokumentationsstelle>
                     <ris:aktenzeichenListe domainTerm="Aktenzeichenliste">
                         <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">fileNumber test

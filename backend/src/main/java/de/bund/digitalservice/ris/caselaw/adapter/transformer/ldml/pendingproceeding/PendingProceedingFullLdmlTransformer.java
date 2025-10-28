@@ -3,13 +3,19 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproce
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Classification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Keyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDaten;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDokumentnummern;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FehlerhafteGerichte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Sachgebiete;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import java.util.ArrayList;
@@ -50,6 +56,87 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
 
   private RisMeta buildRisMeta(PendingProceeding pendingProceeding) {
     var builder = buildCommonRisMeta(pendingProceeding);
+
+    var contentRelatedIndexing = pendingProceeding.contentRelatedIndexing();
+    if (contentRelatedIndexing != null && contentRelatedIndexing.fieldsOfLaw() != null) {
+      Sachgebiete sachgebiete =
+          Sachgebiete.builder()
+              .sachgebiete(
+                  contentRelatedIndexing.fieldsOfLaw().stream()
+                      .map(
+                          sachgebiet ->
+                              Sachgebiete.Sachgebiet.builder()
+                                  .value(sachgebiet.text())
+                                  // FIXME: Notation is not yet part of the domain object
+                                  .notation("neu")
+                                  .build())
+                      .toList())
+              .build();
+      builder.sachgebiete(sachgebiete);
+    }
+
+    var coreData = pendingProceeding.coreData();
+    if (coreData != null) {
+
+      if (coreData.deviatingFileNumbers() != null) {
+        AktenzeichenListe aktenzeichenListe = builder.build().getAktenzeichenListe();
+        List<AktenzeichenListe.Aktenzeichen> aktenzeichen = aktenzeichenListe.getAktenzeichen();
+        if (aktenzeichen != null) {
+          coreData
+              .deviatingFileNumbers()
+              .forEach(
+                  fileNumber ->
+                      aktenzeichen.add(
+                          AktenzeichenListe.Aktenzeichen.builder()
+                              .domainTerm("Abweichendes Aktenzeichen")
+                              .value(fileNumber)
+                              .build()));
+          builder.aktenzeichenListe(
+              aktenzeichenListe.toBuilder().aktenzeichen(aktenzeichen).build());
+        }
+      }
+
+      // Fehlerhafte Gerichte
+      if (coreData.deviatingCourts() != null) {
+        builder.fehlerhafteGerichte(
+            FehlerhafteGerichte.builder()
+                .fehlerhafteGerichte(
+                    coreData.deviatingCourts().stream()
+                        .map(
+                            v -> FehlerhafteGerichte.FehlerhaftesGericht.builder().value(v).build())
+                        .toList())
+                .build());
+      }
+      // Abweichende Daten
+      if (coreData.deviatingDecisionDates() != null) {
+        builder.abweichendeDaten(
+            AbweichendeDaten.builder()
+                .daten(
+                    coreData.deviatingDecisionDates().stream()
+                        .map(
+                            d ->
+                                AbweichendeDaten.AbweichendesDatum.builder()
+                                    .value(DateUtils.toDateString(d))
+                                    .build())
+                        .toList())
+                .build());
+      }
+      // Abweichende Dokumentnummern
+      if (coreData.deviatingDocumentNumbers() != null) {
+        builder.abweichendeDokumentnummern(
+            AbweichendeDokumentnummern.builder()
+                .dokumentnummern(
+                    coreData.deviatingDocumentNumbers().stream()
+                        .map(
+                            v ->
+                                AbweichendeDokumentnummern.AbweichendeDokumentnummer.builder()
+                                    .value(v)
+                                    .build())
+                        .toList())
+                .build());
+      }
+    }
+
     return builder.build();
   }
 
