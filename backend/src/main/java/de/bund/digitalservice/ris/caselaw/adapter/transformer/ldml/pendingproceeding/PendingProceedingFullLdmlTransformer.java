@@ -67,8 +67,7 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
                           sachgebiet ->
                               Sachgebiete.Sachgebiet.builder()
                                   .value(sachgebiet.text())
-                                  // FIXME: Notation is not yet part of the domain object
-                                  .notation("neu")
+                                  .notation(sachgebiet.notation())
                                   .build())
                       .toList())
               .build();

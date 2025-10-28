@@ -85,8 +85,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                             sachgebiet ->
                                 Sachgebiete.Sachgebiet.builder()
                                     .value(sachgebiet.text())
-                                    // FIXME: Notation is not yet part of the domain object
-                                    .notation("neu")
+                                    .notation(sachgebiet.notation())
                                     .build())
                         .toList())
                 .build();

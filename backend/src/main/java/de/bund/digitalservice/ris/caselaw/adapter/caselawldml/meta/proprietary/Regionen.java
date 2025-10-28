@@ -19,6 +19,7 @@ public class Regionen {
   @XmlAttribute(name = "domainTerm")
   private String domainTerm = "Regionen";
 
+  @SuppressWarnings("java:S1700")
   @XmlElement(name = "region", namespace = CaseLawLdml.RIS_NS)
   private List<Region> regionen;
 
