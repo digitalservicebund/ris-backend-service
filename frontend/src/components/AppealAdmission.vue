@@ -69,8 +69,9 @@ const appealAdmittedBy = computed({
           />
         </InputField>
       </div>
-      <div v-if="appealAdmitted" class="basis-1/2">
+      <div class="basis-1/2">
         <InputField
+          v-if="appealAdmitted"
           id="appealAdmittedByInput"
           v-slot="{ id }"
           label="Rechtsmittel zugelassen durch"
