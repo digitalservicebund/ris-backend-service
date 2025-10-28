@@ -203,7 +203,7 @@ const shouldShowBubbleMenu = (): boolean => {
  * Toggles the <ignore-once> tags and closes the modal
  */
 async function handleIgnoreOnce() {
-  textCheckService.toggleIgnoreOnce(editor)
+  await textCheckService.toggleIgnoreOnce(editor)
   editor.commands.setSelectedMatch()
 }
 
