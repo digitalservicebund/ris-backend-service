@@ -105,7 +105,7 @@ describe("appeal admission", () => {
     expect(screen.getByRole("option", { name: "BFH" })).toBeInTheDocument()
   })
 
-  it("can correctly updates values", async () => {
+  it("can correctly update values", async () => {
     const { user } = renderComponent({
       admitted: false,
     })
