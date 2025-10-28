@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import { RisChipsInput } from "@digitalservicebund/ris-ui/components"
 import Checkbox from "primevue/checkbox"
 import InputText from "primevue/inputtext"
 import InputSelect from "primevue/select"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { DropdownItem } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
+import ChipsInput from "@/components/input/ChipsInput.vue"
+import ChipsYearInput from "@/components/input/ChipsYearInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import NestedComponent from "@/components/NestedComponents.vue"
@@ -17,7 +19,6 @@ import { Kind } from "@/domain/documentationUnitKind"
 import { pendingProceedingLabels } from "@/domain/pendingProceeding"
 import { SourceValue } from "@/domain/source"
 import ComboboxItemService from "@/services/comboboxItemService"
-import { parseIsoDateToLocal, parseLocalDateToIso } from "@/utils/dateUtil"
 
 const props = defineProps<{
   kind: Kind
@@ -135,30 +136,6 @@ const deviatingFileNumbers = computed({
   },
 })
 
-const deviatingDecisionDates = computed({
-  get: () =>
-    coreDataModel.value.deviatingDecisionDates
-      ?.map((date) => parseIsoDateToLocal(date))
-      .filter((date) => date !== null) || [],
-  set: (newValue) => {
-    coreDataModel.value.deviatingDecisionDates = newValue
-      .map((date) => parseLocalDateToIso(date))
-      .filter((date) => date !== null)
-  },
-})
-
-const oralHearingDates = computed({
-  get: () =>
-    coreDataModel.value.oralHearingDates
-      ?.map((date) => parseIsoDateToLocal(date))
-      .filter((date) => date !== null) || [],
-  set: (newValue) => {
-    coreDataModel.value.oralHearingDates = newValue
-      .map((date) => parseLocalDateToIso(date))
-      .filter((date) => date !== null)
-  },
-})
-
 const deviatingDocumentNumbers = computed({
   get: () => coreDataModel.value.deviatingDocumentNumbers ?? [],
   set: (newValue) => {
@@ -170,13 +147,6 @@ const deviatingEclis = computed({
   get: () => coreDataModel.value.deviatingEclis ?? [],
   set: (newValue) => {
     coreDataModel.value.deviatingEclis = newValue
-  },
-})
-
-const yearsOfDispute = computed({
-  get: () => coreDataModel.value.yearsOfDispute ?? [],
-  set: (newValue) => {
-    coreDataModel.value.yearsOfDispute = newValue
   },
 })
 
@@ -230,12 +200,17 @@ onBeforeUnmount(() => {
       </InputField>
       <!-- Child  -->
       <template #children>
-        <InputField id="deviatingCourt" label="Fehlerhaftes Gericht">
-          <RisChipsInput
-            id="deviatingCourt"
+        <InputField
+          id="deviatingCourts"
+          v-slot="slotProps"
+          label="Fehlerhaftes Gericht"
+        >
+          <ChipsInput
+            :id="slotProps.id"
             v-model="deviatingCourts"
             aria-label="Fehlerhaftes Gericht"
-          ></RisChipsInput>
+            data-testid="deviating-courts"
+          ></ChipsInput>
         </InputField>
       </template>
     </NestedComponent>
@@ -247,23 +222,30 @@ onBeforeUnmount(() => {
         class="w-full min-w-0"
         :is-open="!!coreDataModel.deviatingFileNumbers?.length"
       >
-        <InputField id="fileNumber" label="Aktenzeichen *">
-          <RisChipsInput
-            id="fileNumber"
+        <InputField
+          id="fileNumberInput"
+          v-slot="slotProps"
+          label="Aktenzeichen *"
+        >
+          <ChipsInput
+            :id="slotProps.id"
             v-model="fileNumbers"
             aria-label="Aktenzeichen"
+            data-testid="file-numbers"
           />
         </InputField>
         <!-- Child  -->
         <template #children>
           <InputField
-            id="deviatingFileNumber"
+            id="deviatingFileNumbers"
+            v-slot="slotProps"
             label="Abweichendes Aktenzeichen"
           >
-            <RisChipsInput
-              id="deviatingFileNumber"
+            <ChipsInput
+              :id="slotProps.id"
               v-model="deviatingFileNumbers"
               aria-label="Abweichendes Aktenzeichen"
+              data-testid="deviating-file-numbers"
             />
           </InputField>
         </template>
@@ -300,14 +282,12 @@ onBeforeUnmount(() => {
               validationStore.getByField('deviatingDecisionDates')
             "
           >
-            <RisChipsInput
+            <ChipsDateInput
               id="deviatingDecisionDates"
-              v-model="deviatingDecisionDates"
+              v-model="coreDataModel.deviatingDecisionDates"
               aria-label="Abweichendes Entscheidungsdatum"
               data-testid="deviating-decision-dates"
               :has-error="slotProps.hasError"
-              mask="99.99.9999"
-              placeholder="TT.MM.JJJJ"
               @focus="validationStore.remove('deviatingDecisionDates')"
               @update:validation-error="slotProps.updateValidationError"
             />
@@ -341,14 +321,12 @@ onBeforeUnmount(() => {
         "
         :validation-error="validationStore.getByField('oralHearingDates')"
       >
-        <RisChipsInput
+        <ChipsDateInput
           id="oralHearingDates"
-          v-model="oralHearingDates"
+          v-model="coreDataModel.oralHearingDates"
           aria-label="Datum der mündlichen Verhandlung"
-          data-testid="oral-hearing-dates"
           :has-error="slotProps.hasError"
-          mask="99.99.9999"
-          placeholder="TT.MM.JJJJ"
+          test-id="oral-hearing-dates"
           @focus="validationStore.remove('oralHearingDates')"
           @update:validation-error="slotProps.updateValidationError"
         />
@@ -404,12 +382,14 @@ onBeforeUnmount(() => {
     <div :class="layoutClass">
       <InputField
         id="deviatingDocumentNumbers"
+        v-slot="slotProps"
         label="Abweichende Dokumentnummer"
       >
-        <RisChipsInput
-          id="deviatingDocumentNumbers"
+        <ChipsInput
+          :id="slotProps.id"
           v-model="deviatingDocumentNumbers"
           aria-label="Abweichende Dokumentnummer"
+          data-testid="deviating-document-numbers"
         />
       </InputField>
 
@@ -452,11 +432,16 @@ onBeforeUnmount(() => {
         </InputField>
         <!-- Child  -->
         <template #children>
-          <InputField id="deviatingEclis" label="Abweichender ECLI">
-            <RisChipsInput
-              id="deviatingEclis"
+          <InputField
+            id="deviatingEclis"
+            v-slot="slotProps"
+            label="Abweichender ECLI"
+          >
+            <ChipsInput
+              :id="slotProps.id"
               v-model="deviatingEclis"
               aria-label="Abweichender ECLI"
+              data-testid="deviating-eclis"
             />
           </InputField>
         </template>
@@ -479,11 +464,16 @@ onBeforeUnmount(() => {
         </InputField>
         <!-- Child  -->
         <template #children>
-          <InputField id="previousProcedures" label="Vorgangshistorie">
-            <RisChipsInput
-              id="previousProcedures"
+          <InputField
+            id="previousProcedures"
+            v-slot="slotProps"
+            label="Vorgangshistorie"
+          >
+            <ChipsInput
+              :id="slotProps.id"
               v-model="descendingPreviousProcedures"
               aria-label="Vorgangshistorie"
+              data-testid="previous-procedures"
               read-only
             />
           </InputField>
@@ -511,14 +501,12 @@ onBeforeUnmount(() => {
         label="Streitjahr"
         :validation-error="validationStore.getByField('yearsOfDispute')"
       >
-        <RisChipsInput
+        <ChipsYearInput
           id="yearOfDispute"
-          v-model="yearsOfDispute"
+          v-model="coreDataModel.yearsOfDispute"
           aria-label="Streitjahr"
-          data-testid="year-of-dispute"
           :has-error="slotProps.hasError"
-          mask="9999"
-          placeholder="JJJJ"
+          test-id="year-of-dispute"
           @focus="validationStore.remove('yearsOfDispute')"
           @update:validation-error="slotProps.updateValidationError"
         />
@@ -543,12 +531,13 @@ onBeforeUnmount(() => {
           placeholder="Bitte auswählen"
         />
       </InputField>
-      <InputField id="inputTypes" label="Eingangsart">
+      <InputField id="inputTypes" v-slot="slotProps" label="Eingangsart">
         <div class="flex w-full flex-col">
-          <RisChipsInput
-            id="inputTypes"
+          <ChipsInput
+            :id="slotProps.id"
             v-model="inputTypes"
             aria-label="Eingangsart"
+            data-testid="input-types"
           />
           <div class="ris-label3-regular pt-4">
             Papier, BLK-DB-Schnittstelle, EUR-LEX-Schnittstelle, E-Mail
@@ -608,13 +597,15 @@ onBeforeUnmount(() => {
     >
       <InputField
         id="leadingDecisionNormReferences"
+        v-slot="slotProps"
         label="BGH Nachschlagewerk"
       >
-        <RisChipsInput
-          id="leadingDecisionNormReferences"
+        <ChipsInput
+          :id="slotProps.id"
           v-model="leadingDecisionNormReferences"
           aria-label="BGH Nachschlagewerk"
-        ></RisChipsInput>
+          data-testid="leading-decision-norm-references"
+        ></ChipsInput>
       </InputField>
     </div>
 

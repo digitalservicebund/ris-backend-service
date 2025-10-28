@@ -18,9 +18,7 @@ test.describe("deviating document numbers", () => {
       await navigateToCategories(page, documentNumber)
 
       await test.step("Enter deviating document numbers", async () => {
-        const inputField = page.getByLabel("Abweichende Dokumentnummer", {
-          exact: true,
-        })
+        const inputField = page.locator("#deviatingDocumentNumbers")
         await inputField.fill("XXRE111111111")
         await page.keyboard.press("Enter")
 
@@ -29,20 +27,13 @@ test.describe("deviating document numbers", () => {
       })
 
       await test.step("Check visibility of deviating document numbers", async () => {
-        const chipsLocator = page.getByTestId("chip")
-        const chips = await chipsLocator.all()
-        await expect(chipsLocator).toHaveCount(2)
-        await expect(chips[0].getByTestId("chip-value")).toHaveText(
-          "XXRE111111111",
-        )
-        await expect(chips[1].getByTestId("chip-value")).toHaveText(
-          "XXRE222222222",
-        )
+        await expect(page.getByText("XXRE111111111")).toBeVisible()
+        await expect(page.getByText("XXRE222222222")).toBeVisible()
       })
 
       await test.step("Delete deviating document number", async () => {
-        await expect(page.getByText("XXRE222222222")).toBeVisible()
-        await page.keyboard.press("ArrowLeft")
+        await page.locator("#deviatingDocumentNumbers").click()
+        await page.keyboard.press("Shift+Tab")
         await page.keyboard.press("Enter")
 
         await expect(page.getByText("XXRE222222222")).toBeHidden()

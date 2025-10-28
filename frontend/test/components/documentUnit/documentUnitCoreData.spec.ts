@@ -95,9 +95,7 @@ describe("Core Data", () => {
       screen.getByLabelText("Abweichendes Entscheidungsdatum anzeigen"),
     )
 
-    const input = await screen.findByLabelText(
-      "Abweichendes Entscheidungsdatum",
-    )
+    const input = await screen.findByTestId("deviating-decision-dates")
     await user.type(input, "02.02.2022{enter}")
 
     expect(model.value.deviatingDecisionDates).toEqual(["2022-02-02"])
@@ -150,9 +148,7 @@ describe("Core Data", () => {
       initialModelValue: { oralHearingDates: [] },
     })
 
-    const input = await screen.findByLabelText(
-      "Datum der mündlichen Verhandlung",
-    )
+    const input = await screen.findByTestId("oral-hearing-dates")
     await user.type(input, "02.02.2022{enter}")
 
     expect(model.value.oralHearingDates).toEqual(["2022-02-02"])
@@ -260,7 +256,7 @@ describe("Core Data", () => {
       initialModelValue: { inputTypes: [] },
     })
     expect(model.value.inputTypes?.length).toBe(0)
-    const input = screen.getByLabelText("Eingangsart")
+    const input = screen.getByTestId("input-types")
     await user.click(input)
 
     // Act
@@ -283,7 +279,7 @@ describe("Core Data", () => {
 
     renderComponent({ initialModelValue: documentUnit.coreData })
     expect(
-      await screen.findByLabelText("Abweichende Dokumentnummer"),
+      await screen.findByTestId("deviating-document-numbers"),
     ).toBeVisible()
 
     const chipList = screen.getAllByRole("listitem")
@@ -296,7 +292,7 @@ describe("Core Data", () => {
     const { user, model } = renderComponent({
       initialModelValue: { deviatingDocumentNumbers: [] },
     })
-    const input = await screen.findByLabelText("Abweichende Dokumentnummer")
+    const input = await screen.findByTestId("deviating-document-numbers")
     await user.type(input, "XXRE123456789{enter}")
 
     expect(model.value.deviatingDocumentNumbers).toEqual(["XXRE123456789"])

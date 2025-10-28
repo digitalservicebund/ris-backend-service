@@ -7,7 +7,7 @@ test.describe("core data", () => {
   test("core data change", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.getByLabel("Aktenzeichen", { exact: true }).fill("abc")
+    await page.locator("#fileNumberInput").fill("abc")
     await page.keyboard.press("Enter")
     await page.getByLabel("ECLI", { exact: true }).fill("abc123")
     await page.keyboard.press("Enter")
@@ -15,9 +15,7 @@ test.describe("core data", () => {
     await save(page)
 
     await page.reload()
-    await expect(page.getByLabel("Aktenzeichen", { exact: true })).toHaveValue(
-      "",
-    )
+    await expect(page.locator("#fileNumberInput")).toHaveValue("")
     await expect(page.getByLabel("ECLI", { exact: true })).toHaveValue("abc123")
   })
 
@@ -36,9 +34,9 @@ test.describe("core data", () => {
 
     await expect(page.getByText("Abweichender ECLI").first()).toBeVisible()
 
-    await page.getByLabel("Abweichender ECLI", { exact: true }).type("two")
+    await page.locator("#deviatingEclis").fill("two")
     await page.keyboard.press("Enter")
-    await page.getByLabel("Abweichender ECLI", { exact: true }).type("three")
+    await page.locator("#deviatingEclis").fill("three")
     await page.keyboard.press("Enter")
 
     await save(page)
@@ -61,10 +59,10 @@ test.describe("core data", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.getByLabel("Aktenzeichen", { exact: true }).type("one")
+    await page.locator("#fileNumberInput").fill("one")
     await page.keyboard.press("Enter")
 
-    await page.getByLabel("Aktenzeichen", { exact: true }).type("two")
+    await page.locator("#fileNumberInput").fill("two")
     await page.keyboard.press("Enter")
 
     await expect(page.getByText("one").first()).toBeVisible()
@@ -80,9 +78,7 @@ test.describe("core data", () => {
       page.getByText("Abweichendes Aktenzeichen").first(),
     ).toBeVisible()
 
-    await page
-      .getByLabel("Abweichendes Aktenzeichen", { exact: true })
-      .type("three")
+    await page.locator("#deviatingFileNumbers").fill("three")
     await page.keyboard.press("Enter")
 
     await save(page)
@@ -104,13 +100,13 @@ test.describe("core data", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.getByLabel("Aktenzeichen", { exact: true }).type("testone")
+    await page.locator("#fileNumberInput").fill("testone")
     await page.keyboard.press("Enter")
 
-    await page.getByLabel("Aktenzeichen", { exact: true }).type("testtwo")
+    await page.locator("#fileNumberInput").fill("testtwo")
     await page.keyboard.press("Enter")
 
-    await page.getByLabel("Aktenzeichen", { exact: true }).type("testthree")
+    await page.locator("#fileNumberInput").fill("testthree")
     await page.keyboard.press("Enter")
 
     await expect(page.getByText("testone").first()).toBeVisible()
@@ -118,8 +114,9 @@ test.describe("core data", () => {
     await expect(page.getByText("testthree").first()).toBeVisible()
 
     // Navigate back and delete on enter
-    await page.keyboard.press("ArrowLeft")
-    await page.keyboard.press("ArrowLeft")
+    await page.keyboard.press("Shift+Tab")
+    await page.keyboard.press("Shift+Tab")
+    await page.keyboard.press("Shift+Tab")
     await page.keyboard.press("Enter")
 
     await expect(page.getByText("testtwo").first()).toBeHidden()
@@ -128,24 +125,21 @@ test.describe("core data", () => {
     await page.keyboard.press("Tab")
     await page.keyboard.press("Tab")
 
-    await page.keyboard.down("Shift")
-    await page.keyboard.press("Tab")
-    await page.keyboard.up("Shift")
+    await page.keyboard.press("Shift+Tab")
+    await page.keyboard.press("Shift+Tab")
 
-    await page.keyboard.down("Shift")
-    await page.keyboard.press("Tab")
-    await page.keyboard.up("Shift")
-
-    await page.keyboard.press("ArrowLeft")
-
-    //Navigate back and delete on backspace
+    //Edit entry
+    await page.keyboard.press("Shift+Tab")
+    await page.keyboard.press("Enter")
+    await page.keyboard.type("test")
     await page.keyboard.press("Enter")
 
-    await expect(page.getByText("testone").first()).toBeHidden()
+    await expect(page.getByText("testthreetest").first()).toBeVisible()
     await save(page)
 
     await page.reload()
-    await expect(page.getByText("testthree").first()).toBeVisible()
+    await expect(page.getByText("testone").first()).toBeVisible()
+    await expect(page.getByText("testthreetest").first()).toBeVisible()
   })
 
   test("legal effect dropdown", async ({ page, documentNumber }) => {
@@ -299,7 +293,7 @@ test.describe("core data", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    const nswInput = page.getByLabel("BGH Nachschlagewerk", { exact: true })
+    const nswInput = page.locator("#leadingDecisionNormReferences")
     const CITATION = "1968, 249-252 (ST)"
     const nswChipTag = page.getByText(CITATION)
     await expect(nswInput).toBeHidden()
@@ -316,10 +310,7 @@ test.describe("core data", () => {
       "NSW Fundstelle is not visible for BGH",
     ).toBeVisible()
 
-    await page
-      .getByTestId("chips-input-wrapper_leadingDecisionNormReferences")
-      .getByLabel("Löschen")
-      .click()
+    await page.getByLabel(CITATION).getByLabel("Eintrag Löschen").click()
     await save(page)
 
     await expect(nswChipTag, "Citation was not deleted").toBeHidden()
@@ -408,19 +399,16 @@ test.describe("core data", () => {
         const court = pageWithExternalUser.getByLabel("Gericht", {
           exact: true,
         })
-        const deviatingCourt = pageWithExternalUser.getByTestId(
-          "chips-input-wrapper_deviatingCourt",
-        )
+        const deviatingCourt =
+          pageWithExternalUser.getByTestId("deviating-courts")
         await expect(court).toBeHidden()
         await expect(deviatingCourt).toBeHidden()
       })
 
       await test.step("Aktenzeichen und abweichendes Aktenzeichen sind nicht sichtbar", async () => {
-        const fileNumber = pageWithExternalUser.getByTestId(
-          "chips-input-wrapper_fileNumber",
-        )
+        const fileNumber = pageWithExternalUser.getByTestId("file-numbers")
         const deviatingFileNumber = pageWithExternalUser.getByTestId(
-          "chips-input-wrapper_deviatingFileNumber",
+          "deviating-file-numbers",
         )
         await expect(fileNumber).toBeHidden()
         await expect(deviatingFileNumber).toBeHidden()
@@ -432,7 +420,7 @@ test.describe("core data", () => {
           { exact: true },
         )
         const deviatingDecisionDate = pageWithExternalUser.getByTestId(
-          "chips-input-wrapper_deviatingDecisionDates",
+          "deviating-decision-dates",
         )
         await expect(decisionDate).toBeHidden()
         await expect(deviatingDecisionDate).toBeHidden()
@@ -471,9 +459,8 @@ test.describe("core data", () => {
 
       await test.step("ECLI und abweichender ECLI sind nicht sichtbar", async () => {
         const ecli = pageWithExternalUser.getByLabel("ECLI", { exact: true })
-        const deviatingEcli = pageWithExternalUser.getByTestId(
-          "chips-input-wrapper_deviatingEclis",
-        )
+        const deviatingEcli =
+          pageWithExternalUser.getByTestId("deviating-eclis")
         await expect(ecli).toBeHidden()
         await expect(deviatingEcli).toBeHidden()
       })
@@ -482,7 +469,11 @@ test.describe("core data", () => {
         const procedure = pageWithExternalUser.getByLabel("Vorgang", {
           exact: true,
         })
+        const previousProcedures = pageWithExternalUser.getByTestId(
+          "previous-procedures",
+        )
         await expect(procedure).toBeHidden()
+        await expect(previousProcedures).toBeHidden()
       })
 
       await test.step("Rechtskraft ist nicht sichtbar", async () => {
@@ -493,9 +484,8 @@ test.describe("core data", () => {
       })
 
       await test.step("Streitjahr ist nicht sichtbar", async () => {
-        const yearsOfDispute = pageWithExternalUser.getByTestId(
-          "chips-input-wrapper_yearOfDispute",
-        )
+        const yearsOfDispute =
+          pageWithExternalUser.getByTestId("year-of-dispute")
         await expect(yearsOfDispute).toBeHidden()
       })
 
@@ -507,9 +497,7 @@ test.describe("core data", () => {
       })
 
       await test.step("Eingangsart ist nicht sichtbar", async () => {
-        const inputTypes = pageWithExternalUser.getByTestId(
-          "chips-input-wrapper_inputTypes",
-        )
+        const inputTypes = pageWithExternalUser.getByTestId("input-types")
         await expect(inputTypes).toBeHidden()
       })
 
@@ -545,16 +533,14 @@ test.describe("core data", () => {
 
       await test.step("Gericht und Fehlerhaftes Gericht sind bearbeitbar", async () => {
         const court = page.getByLabel("Gericht", { exact: true })
-        const deviatingCourt = page.getByTestId("chips-input_deviatingCourt")
+        const deviatingCourt = page.locator("#deviatingCourts")
         await expect(court).toBeEditable()
         await expect(deviatingCourt).toBeEditable()
       })
 
       await test.step("Aktenzeichen und abweichendes Aktenzeichen sind bearbeitbar", async () => {
-        const fileNumber = page.getByTestId("chips-input_fileNumber")
-        const deviatingFileNumber = page.getByTestId(
-          "chips-input_deviatingFileNumber",
-        )
+        const fileNumber = page.locator("#fileNumberInput")
+        const deviatingFileNumber = page.locator("#deviatingFileNumbers")
         await expect(fileNumber).toBeEditable()
         await expect(deviatingFileNumber).toBeEditable()
       })
@@ -563,11 +549,11 @@ test.describe("core data", () => {
         const decisionDate = page.getByLabel("Entscheidungsdatum", {
           exact: true,
         })
-        const deviatingDecisionDate = page.getByTestId(
-          "chips-input_deviatingDecisionDates",
-        )
+        const deviatingDecisionDate = page.locator("#deviatingDecisionDates")
+        const oralHearingDate = page.locator("#oralHearingDates")
         await expect(decisionDate).toBeEditable()
         await expect(deviatingDecisionDate).toBeEditable()
+        await expect(oralHearingDate).toBeEditable()
       })
 
       await test.step("Spruchkörper ist bearbeitbar", async () => {
@@ -581,9 +567,8 @@ test.describe("core data", () => {
       })
 
       await test.step("Abweichende Dokumentnummer ist bearbeitbar", async () => {
-        const deviatingDocumentNumber = page.getByLabel(
-          "Abweichende Dokumentnummer",
-          { exact: true },
+        const deviatingDocumentNumber = page.locator(
+          "#deviatingDocumentNumbers",
         )
         await expect(deviatingDocumentNumber).toBeEditable()
       })
@@ -602,14 +587,16 @@ test.describe("core data", () => {
 
       await test.step("ECLI und abweichender ECLI sind bearbeitbar", async () => {
         const ecli = page.getByLabel("ECLI", { exact: true })
-        const deviatingEcli = page.getByTestId("chips-input_deviatingEclis")
+        const deviatingEcli = page.locator("#deviatingEclis")
         await expect(ecli).toBeEditable()
         await expect(deviatingEcli).toBeEditable()
       })
 
       await test.step("Vorgang ist bearbeitbar", async () => {
         const procedure = page.getByLabel("Vorgang", { exact: true })
+        const previousProcedures = page.locator("#previousProcedures")
         await expect(procedure).toBeEditable()
+        await expect(previousProcedures).toBeEditable()
       })
 
       await test.step("Rechtskraft ist bearbeitbar", async () => {
@@ -618,12 +605,12 @@ test.describe("core data", () => {
       })
 
       await test.step("Streitjahr ist bearbeitbar", async () => {
-        const yearsOfDispute = page.getByLabel("Streitjahr", { exact: true })
+        const yearsOfDispute = page.locator("#yearOfDispute")
         await expect(yearsOfDispute).toBeEditable()
       })
 
       await test.step("Eingangsart ist bearbeitbar", async () => {
-        const inputTypes = page.getByLabel("Eingangsart", { exact: true })
+        const inputTypes = page.locator("#inputTypes")
         await expect(inputTypes).toBeEditable()
       })
 
