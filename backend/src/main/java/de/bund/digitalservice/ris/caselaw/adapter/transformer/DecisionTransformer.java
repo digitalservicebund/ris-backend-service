@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -139,6 +140,13 @@ public class DecisionTransformer extends DocumentableTransformer {
       builder.hasLegislativeMandate(contentRelatedIndexing.hasLegislativeMandate());
       builder.evsf(contentRelatedIndexing.evsf());
       addForeignLanguageVersions(currentDto, builder, contentRelatedIndexing);
+      if (contentRelatedIndexing.appealAdmission() == null) {
+        builder.appealAdmitted(null);
+        builder.appealAdmittedBy(null);
+      } else {
+        builder.appealAdmitted(contentRelatedIndexing.appealAdmission().admitted());
+        builder.appealAdmittedBy(contentRelatedIndexing.appealAdmission().by());
+      }
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -730,6 +738,14 @@ public class DecisionTransformer extends DocumentableTransformer {
               .map(ForeignLanguageTransformer::transformToDomain)
               .toList();
       contentRelatedIndexingBuilder.foreignLanguageVersions(foreignLanguageVersions);
+    }
+
+    if (decisionDTO.getAppealAdmitted() != null) {
+      contentRelatedIndexingBuilder.appealAdmission(
+          AppealAdmission.builder()
+              .admitted(decisionDTO.getAppealAdmitted())
+              .by(decisionDTO.getAppealAdmittedBy())
+              .build());
     }
 
     return contentRelatedIndexingBuilder.build();

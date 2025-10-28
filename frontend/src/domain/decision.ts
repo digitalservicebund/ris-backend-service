@@ -77,6 +77,7 @@ export const contentRelatedIndexingLabels: {
   definitions: "Definition",
   hasLegislativeMandate: "Gesetzgebungsauftrag",
   foreignLanguageVersions: "Fremdsprachige Fassung",
+  appealAdmission: "Rechtsmittelzulassung",
 }
 export const allLabels = {
   caselawReferences: "Rechtsprechungsfundstellen",

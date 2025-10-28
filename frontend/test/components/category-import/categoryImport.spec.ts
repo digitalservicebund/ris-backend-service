@@ -5,6 +5,7 @@ import { setActivePinia } from "pinia"
 import { beforeEach, describe } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import CategoryImport from "@/components/category-import/CategoryImport.vue"
+import { AppealAdmitter } from "@/domain/appealAdmitter"
 import {
   allLabels,
   contentRelatedIndexingLabels,
@@ -150,6 +151,45 @@ describe("CategoryImport", () => {
     expect(definitions?.[0].id).toBeUndefined()
     expect(definitions?.[1].definedTerm).toEqual("term2")
     expect(definitions?.[1].id).toBeUndefined()
+  })
+
+  it("should import an object (Rechtsmittelzulassung) from content related indexing", async () => {
+    const target = new Decision("uuid", {
+      documentNumber: "XXRE123456789",
+      kind: Kind.DECISION,
+    })
+    const source = new Decision("456", {
+      kind: Kind.DECISION,
+      documentNumber: "TARGET3456789",
+      contentRelatedIndexing: {
+        appealAdmission: { admitted: true, by: AppealAdmitter.FG },
+      },
+    })
+    vi.spyOn(documentUnitService, "getByDocumentNumber").mockResolvedValueOnce({
+      status: 200,
+      data: source,
+    })
+    const store = mockSessionStore(target)
+
+    const { user } = renderComponent()
+
+    await user.type(
+      screen.getByLabelText("Dokumentnummer Eingabefeld"),
+      "TARGET3456789",
+    )
+
+    await fireEvent.click(
+      screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
+    )
+
+    await fireEvent.click(
+      screen.getByLabelText("Rechtsmittelzulassung übernehmen"),
+    )
+
+    expect(store.documentUnit?.contentRelatedIndexing.appealAdmission).toEqual({
+      admitted: true,
+      by: AppealAdmitter.FG,
+    })
   })
 
   it("should import a list (decision names) from short texts", async () => {

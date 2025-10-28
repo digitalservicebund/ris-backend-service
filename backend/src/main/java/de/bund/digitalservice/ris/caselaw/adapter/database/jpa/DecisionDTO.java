@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,6 +30,8 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.proxy.HibernateProxy;
 
 @Getter
@@ -251,6 +255,17 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @Builder.Default
   @OrderBy("rank")
   private List<OralHearingDateDTO> oralHearingDates = new ArrayList<>();
+
+  /** Rechtsmittel zugelassen */
+  @Column(name = "appeal_admitted")
+  @Nullable
+  private Boolean appealAdmitted;
+
+  /** Rechtsmittel zugelassen durch */
+  @Column(name = "appeal_admitted_by")
+  @Enumerated(EnumType.STRING)
+  @JdbcType(PostgreSQLEnumJdbcType.class)
+  private AppealAdmitter appealAdmittedBy;
 
   @Override
   @SuppressWarnings("java:S2097") // Class type check is not recognized by Sonar

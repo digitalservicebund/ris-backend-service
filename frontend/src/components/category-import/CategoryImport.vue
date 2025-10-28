@@ -132,11 +132,19 @@ const hasContent = (key: keyof typeof allLabels): boolean => {
         key as keyof typeof sourceDocumentUnit.value.contentRelatedIndexing
       ]
 
-    return (
-      (Array.isArray(object) && object.length > 0) ||
-      (typeof object === "string" && object.trim().length > 0) ||
-      (typeof object === "boolean" && object)
-    )
+    switch (typeof object) {
+      case "object":
+        if (Array.isArray(object)) {
+          return object.length > 0
+        }
+        return object != null
+      case "string":
+        return object.trim().length > 0
+      case "boolean":
+        return object
+      default:
+        return false
+    }
   }
   return false
 }
@@ -179,12 +187,20 @@ const isImportable = (key: keyof typeof allLabels): boolean => { // NOSONAR type
           key as keyof typeof sourceDocumentUnit.value.contentRelatedIndexing
         ]
 
-      const isEmptyText =
-        typeof targetCategory === "string" && targetCategory.trim().length > 0
-      const isEmptyArray =
-        Array.isArray(targetCategory) && targetCategory.length > 0
-      const isActiveFlag = typeof targetCategory === "boolean" && targetCategory
-      return !isEmptyText && !isEmptyArray && !isActiveFlag
+      switch (typeof targetCategory) {
+        case "string":
+          return targetCategory.trim().length === 0
+        case "boolean":
+          return !targetCategory
+        case "object":
+          if (Array.isArray(targetCategory)) {
+            return targetCategory.length === 0
+          }
+
+          return targetCategory == null
+      }
+
+      return true
     }
   return true
 }
@@ -227,6 +243,7 @@ const handleImport = async (key: keyof typeof allLabels) => {
     case "definitions":
     case "hasLegislativeMandate":
     case "foreignLanguageVersions":
+    case "appealAdmission":
       importContextRelatedIndexing(key)
       break
     case "tenor":
@@ -568,7 +585,7 @@ onMounted(() => {
         label="Dokumentnummer"
       >
         <InputText
-          id="categoryImporterDocumentNumber"
+          :id="slotProps.id"
           v-model="documentNumber"
           aria-label="Dokumentnummer Eingabefeld"
           fluid
