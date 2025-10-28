@@ -32,14 +32,19 @@ public class HtmlTransformer {
 
     html = html.replace("&nbsp;", "&#160;");
 
-    // Pre-process:
-    // HTML allows tags that are not closed. However, XML does not. That's why we do
-    // this string-manipulation based workaround of closing the img and br tag.
-    // Colgroup are style elements for columns in table and are not needed */
+    /* Pre-process:
+    HTML allows tags that are not closed. However, XML does not. That's why we do
+    this string-manipulation based workaround of closing the img and br tag.
+    Colgroup are style elements for columns in table and are not needed */
     html =
         html.replaceAll("(<img\\b[^>]*?)(?<!/)>", "$1/>")
             .replaceAll("<\\s*br\\s*>(?!\\s*<\\s*/\\s*br\\s*>)", "<br/>")
             .replaceAll("<colgroup[^>]*>.*?</colgroup>", "");
+
+    /* Pre-process:
+    Remove all ignore-once tags as they mark locally ignore text check issues that are irrelevant for the portal
+    */
+    html = html.replaceAll("<(/?)ignore-once>", "");
 
     try {
       String wrapped = "<wrapper>" + html + "</wrapper>";
