@@ -444,13 +444,11 @@ class DecisionFullLdmlTransformerTest {
   void testTransformToLdml_longTextWithIgnoreOnceTags_shouldRemoveTags() {
     String expected =
         """
-             <akn:decision>
-                <akn:block name="Entscheidungsgründe">
-                   <akn:embeddedStructure>
-                      <akn:p>text with ignored spell check issue</akn:p>
-                   </akn:embeddedStructure>
-                </akn:block>
-             </akn:decision>
+              <akn:judgmentBody>
+                 <akn:motivation ris:domainTerm="Entscheidungsgründe">
+                    <akn:p>text with ignored spell check issue</akn:p>
+                 </akn:motivation>
+              </akn:judgmentBody>
              """;
     Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
