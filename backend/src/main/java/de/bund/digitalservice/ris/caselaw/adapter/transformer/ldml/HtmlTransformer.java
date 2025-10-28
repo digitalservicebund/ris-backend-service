@@ -34,7 +34,7 @@ public class HtmlTransformer {
 
     /* Pre-process:
     HTML allows tags that are not closed. However, XML does not. That's why we do
-    this str ng-manipulation based workaround of closing the img and br tag.
+    this string-manipulation based workaround of closing the img and br tag.
     Colgroup are style elements for columns in table and are not needed */
     html =
         html.replaceAll("(<img\\b[^>]*?)(?<!/)>", "$1/>")
