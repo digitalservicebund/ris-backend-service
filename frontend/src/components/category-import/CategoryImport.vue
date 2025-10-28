@@ -585,7 +585,7 @@ onMounted(() => {
         label="Dokumentnummer"
       >
         <InputText
-          id="categoryImporterDocumentNumber"
+          :id="slotProps.id"
           v-model="documentNumber"
           aria-label="Dokumentnummer Eingabefeld"
           fluid
