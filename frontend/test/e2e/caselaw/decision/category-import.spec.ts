@@ -96,7 +96,7 @@ test.describe("category import", () => {
       await test.step("disable import for empty source categories", async () => {
         await navigateToCategoryImport(page, documentNumber)
         await searchForDocumentUnitToImport(page, documentNumber)
-        await expect(page.getByText("Quellrubrik leer")).toHaveCount(27) // total number of importable categories
+        await expect(page.getByText("Quellrubrik leer")).toHaveCount(28) // total number of importable categories
       })
     },
   )
@@ -117,7 +117,7 @@ test.describe("category import", () => {
           prefilledDocumentUnitWithTexts.documentNumber,
         )
 
-        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(20) // number of non-importable categories, if target category already filled
+        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(21) // number of non-importable categories, if target category already filled
       })
     },
   )
@@ -702,6 +702,48 @@ test.describe("category import", () => {
       ).toBeInViewport()
     })
   })
+
+  // Rechtsmittelzulassung
+  test(
+    "import rechtsmittelzulassung",
+    { tag: ["@RISDEV-8629"] },
+    async ({ page, documentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, documentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(
+          page.getByLabel("Rechtsmittelzulassung übernehmen"),
+        ).toBeVisible()
+        await page.getByLabel("Rechtsmittelzulassung übernehmen").click()
+
+        await expect(
+          page.getByRole("combobox", {
+            name: "Rechtsmittel zugelassen",
+            exact: true,
+          }),
+        ).toHaveText("Ja")
+        await expect(
+          page.getByRole("combobox", { name: "Rechtsmittel zugelassen durch" }),
+        ).toHaveText("FG")
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page
+            .getByLabel("Rechtsmittelzulassung")
+            .getByText("Rechtsmittel zugelassen", { exact: true }),
+        ).toBeInViewport()
+      })
+    },
+  )
 
   // Definition
   test(
