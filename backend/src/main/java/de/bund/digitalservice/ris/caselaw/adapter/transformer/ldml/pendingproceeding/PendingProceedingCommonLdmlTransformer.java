@@ -118,7 +118,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
                 .build());
       }
 
-      // Aktenzeichenliste (incl. abweichende Aktenzeichen)
+      // Aktenzeichenliste
       List<AktenzeichenListe.Aktenzeichen> aktenzeichenListe = new ArrayList<>();
       if (coreData.fileNumbers() != null && !coreData.fileNumbers().isEmpty()) {
         coreData

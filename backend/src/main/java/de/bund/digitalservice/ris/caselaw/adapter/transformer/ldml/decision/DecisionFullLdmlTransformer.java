@@ -166,6 +166,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     if (coreData != null) {
 
       if (coreData.deviatingFileNumbers() != null) {
+        // Aktenzeichenliste is already set in CommonTransformer
         AktenzeichenListe aktenzeichenListe = builder.build().getAktenzeichenListe();
         List<AktenzeichenListe.Aktenzeichen> aktenzeichen = aktenzeichenListe.getAktenzeichen();
         if (aktenzeichen != null) {
