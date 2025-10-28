@@ -57,7 +57,9 @@ const shouldDisplayAppealAdmission = computed(
       v-if="isDecision(documentUnit)"
       data-testid="activeCitations"
     />
-    <AppealAdmission v-if="shouldDisplayAppealAdmission" />
+    <AppealAdmission
+      v-if="isDecision(documentUnit) && shouldDisplayAppealAdmission"
+    />
     <OtherCategories v-if="isDecision(documentUnit)" />
   </div>
 </template>
