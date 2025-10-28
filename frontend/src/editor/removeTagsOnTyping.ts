@@ -34,17 +34,44 @@ const removeTagsOnTypingPlugin = new Plugin({
         return
       }
 
-      const { realFrom, realTo } = findCorrectPosition(transaction.steps[0])
+      let { realFrom, realTo } = findCorrectPosition(transaction.steps[0])
       // Safety check -------------------------------------------
       // When using backspace on the last row with no characters,
       // then realFrom and realTo can be out of bounds and their
       // use in fetching a node will cause error and prevent a
       // deletion or in this case row deletion.
-      if (
-        newState.doc.content.size < realFrom ||
-        newState.doc.content.size < realTo ||
-        (realFrom === 0 && realTo === 0)
+      if (realFrom === 0 && realTo === 0) {
+        return
+      } else if (
+        realFrom === newState.doc.content.size - 1 &&
+        newState.doc.content.size === realTo
       ) {
+        // Last character deletion is a tricky case
+        // because even though realFrom and realTo are valid and in range,
+        // they find a node before last that is not a text node.
+        // So I am forcing the position to be before last character
+        // because then I find the last text node correctly.
+        realFrom = newState.doc.content.size - 2
+        realTo = realFrom
+      } else if (
+        newState.doc.content.size >= realFrom &&
+        newState.doc.content.size >= realTo
+      ) {
+        // Normal case, all good
+      } else if (
+        newState.doc.content.size >= realFrom &&
+        newState.doc.content.size <= realTo
+      ) {
+        // From is in the new document but to is not anymore.
+        realTo = realFrom
+      } else if (
+        newState.doc.content.size <= realFrom &&
+        newState.doc.content.size >= realTo
+      ) {
+        // To is in the new document but from is not anymore.
+        realFrom = realTo
+      } else {
+        // Both from and to are out of bounds, skip.
         return
       }
 
@@ -101,12 +128,13 @@ function isDocumentChanged(
   newState: EditorState,
 ): boolean {
   const isChanged = transactions.some((transaction) => transaction.docChanged)
+  // console.log("isChanged:", isChanged)
 
   const sizeDiff = Math.abs(
     newState.doc.content.size - oldState.doc.content.size,
   )
 
-  return isChanged && sizeDiff > 0
+  return isChanged || sizeDiff > 0
 }
 
 function hasTextCheckMarksInDocument(state: EditorState): boolean {

@@ -200,7 +200,7 @@ describe("removeTagsOnTyping extension", () => {
     // Simulate text check adding marks without changing text content
     const textCheckMark = editor.schema.marks[TextCheckMark.name]
     const from = 1
-    const to = 5 // covers "word"
+    const to = 5
 
     editor.commands.command(({ tr }) => {
       tr.addMark(from, to, textCheckMark.create(textCheckMarkAttrs))
@@ -213,6 +213,64 @@ describe("removeTagsOnTyping extension", () => {
     expect(textNodeAfterMarking?.marks.length).toBe(1)
     expect(textNodeAfterMarking?.marks[0].type.name).toBe(TextCheckMark.name)
     expect(editor.getText()).toBe("word")
+
+    editor.destroy()
+  })
+
+  it("when the last character of the last word is deleted text check mark is also removed", () => {
+    const editor = new Editor({
+      extensions: [
+        Document,
+        Paragraph,
+        Text,
+        TextCheckMark,
+        TextCheckExtension,
+      ],
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "wordabc",
+              },
+            ],
+          },
+        ],
+      },
+    })
+
+    const textCheckMark = editor.schema.marks[TextCheckMark.name]
+    const from = 1
+    const to = 8
+
+    editor.commands.command(({ tr }) => {
+      tr.addMark(from, to, textCheckMark.create(textCheckMarkAttrs))
+      return true
+    })
+
+    // Verify marks were added
+    const paraBeforeDelete = editor.state.doc.firstChild
+    const textNodeBeforeDelete = paraBeforeDelete?.firstChild
+
+    expect(textNodeBeforeDelete?.marks.length).toBe(1)
+    expect(textNodeBeforeDelete?.marks[0].type.name).toBe(TextCheckMark.name)
+    expect(editor.getText()).toBe("wordabc")
+
+    // Delete the last character by positioning cursor at end and deleting back one char
+    const endPos = editor.state.doc.nodeSize - 2
+    editor.commands.setTextSelection(endPos)
+    editor.commands.deleteRange({ from: endPos - 2, to: endPos - 1 })
+
+    expect(editor.getText()).toBe("wordab")
+
+    // Verify the mark was removed after deletion
+    const paraAfterDelete = editor.state.doc.firstChild
+    const textNodeAfterDelete = paraAfterDelete?.firstChild
+
+    expect(textNodeAfterDelete?.marks.length).toBe(0)
 
     editor.destroy()
   })
