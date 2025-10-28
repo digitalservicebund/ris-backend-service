@@ -6,6 +6,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
@@ -307,6 +309,8 @@ class DecisionReducedLdmlTransformerTest {
                                 .build(),
                             Definition.builder().definedTerm("Sachgesamtheit").build()))
                     .evsf("evsf test")
+                    .appealAdmission(
+                        AppealAdmission.builder().admitted(true).by(AppealAdmitter.FG).build())
                     .build())
             .previousDecisions(List.of(previousDecision1, previousDecision2))
             .ensuingDecisions(List.of(ensuingDecision1, ensuingDecision2))

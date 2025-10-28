@@ -109,6 +109,10 @@
                         </ris:fremdsprachigeFassung>
                     </ris:fremdsprachigeFassungen>
                     <ris:evsf domainTerm="Elektronische Vorschriftensammlung Bundesfinanzverwaltung (E-VSF)">evsf test</ris:evsf>
+                    <ris:rechtsmittelzulassung domainTerm="Rechtsmittelzulassung">
+                        <ris:rechtsmittelZugelassen domainTerm="Rechtsmittel zugelassen">true</ris:rechtsmittelZugelassen>
+                        <ris:rechtsmittelZugelassenDurch domainTerm="Rechtsmittel zugelassen durch">FG</ris:rechtsmittelZugelassenDurch>
+                    </ris:rechtsmittelzulassung>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>

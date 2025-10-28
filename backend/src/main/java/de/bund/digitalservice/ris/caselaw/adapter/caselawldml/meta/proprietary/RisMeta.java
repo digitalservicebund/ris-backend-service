@@ -77,4 +77,7 @@ public class RisMeta {
 
   @XmlElement(name = "evsf", namespace = CaseLawLdml.RIS_NS)
   private Evsf evsf;
+
+  @XmlElement(name = "rechtsmittelzulassung", namespace = CaseLawLdml.RIS_NS)
+  private Rechtsmittelzulassung rechtsmittelzulassung;
 }
