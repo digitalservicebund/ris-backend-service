@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.Notation;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
@@ -790,7 +791,12 @@ class DecisionFullLdmlTransformerTest {
                             .citationType(CitationType.builder().label("citation test").build())
                             .build()))
                 .keywords(List.of("keyword test"))
-                .fieldsOfLaw(List.of(FieldOfLaw.builder().text("fieldOfLaw test").build()))
+                .fieldsOfLaw(
+                    List.of(
+                        FieldOfLaw.builder()
+                            .text("fieldOfLaw test")
+                            .notation(Notation.NEW.toString())
+                            .build()))
                 .norms(
                     List.of(
                         NormReference.builder()
