@@ -4,6 +4,7 @@ import { computed } from "vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import InputField from "@/components/input/InputField.vue"
 import { AppealAdmitter } from "@/domain/appealAdmitter"
+import { contentRelatedIndexingLabels } from "@/domain/decision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const store = useDocumentUnitStore()
@@ -40,12 +41,12 @@ const appealAdmittedBy = computed({
 </script>
 
 <template>
-  <div aria-label="Rechtsmittelzulassung">
+  <div :aria-label="contentRelatedIndexingLabels.appealAdmission">
     <h2
       :id="DocumentUnitCategoriesEnum.APPEAL_ADMISSION"
       class="ris-label1-bold mb-16"
     >
-      Rechtsmittelzulassung
+      {{ contentRelatedIndexingLabels.appealAdmission }}
     </h2>
     <div class="flex flex-row gap-24">
       <div class="basis-1/2">
