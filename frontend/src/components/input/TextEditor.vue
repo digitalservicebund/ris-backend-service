@@ -33,6 +33,7 @@ import { CustomBulletList } from "@/editor/bulletList"
 import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
 import { EventHandler } from "@/editor/EventHandler"
 import { FontSize } from "@/editor/fontSize"
+import { IgnoreOnceMark } from "@/editor/ignoreOnceMark"
 import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
 import { InvisibleCharacters } from "@/editor/invisibleCharacters"
@@ -140,6 +141,7 @@ const editor: Editor = new Editor({
     Indent.configure({
       names: ["listItem", "paragraph"],
     }),
+    IgnoreOnceMark,
     TextCheckMark,
     TextCheckExtension.configure({
       service: textCheckService,
@@ -197,6 +199,13 @@ const shouldShowBubbleMenu = (): boolean => {
     return false
   }
 }
+/**
+ * Toggles the <ignore-once> tags and closes the modal
+ */
+async function handleIgnoreOnce() {
+  await textCheckService.toggleIgnoreOnce(editor)
+  editor.commands.setSelectedMatch()
+}
 
 /**
  * Adds word to doc level ignore and closes the modal
@@ -204,16 +213,6 @@ const shouldShowBubbleMenu = (): boolean => {
 async function addIgnoredWord(word: string) {
   await textCheckService.ignoreWord(word)
   editor.commands.setSelectedMatch()
-}
-
-/**
- * Replace and reset selected match
- * @param suggestion
- */
-const acceptSuggestion = (suggestion: string) => {
-  if (selectedMatch.value && selectedMatch.value?.id) {
-    editor.commands.acceptMatch(selectedMatch.value.id, suggestion)
-  }
 }
 
 /**
@@ -297,7 +296,7 @@ watch(
 
 /*
 To detected changes in the matche ignores
- */
+*/
 watch(
   () => store.matches.get(props.category),
   () => {
@@ -363,12 +362,14 @@ defineExpose({ jumpToMatch })
       >
         <TextCheckModal
           v-if="selectedMatch"
+          :editor="editor"
           :match="selectedMatch"
+          :selection="editor.state.selection"
           @global-word:add="addGloballyIgnoredWord"
           @global-word:remove="removeGloballyIgnoredWord"
+          @ignore-once:toggle="handleIgnoreOnce"
           @word:add="addIgnoredWord"
           @word:remove="removeIgnoredWord"
-          @word:replace="acceptSuggestion"
         />
       </BubbleMenu>
     </div>

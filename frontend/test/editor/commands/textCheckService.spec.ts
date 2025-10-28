@@ -57,7 +57,10 @@ describe("check category service", () => {
   describe("check category", () => {
     it("updates document unit before performing check", async () => {
       const mockEditor: Editor = {
-        commands: { setContent: vi.fn() },
+        commands: {
+          setContent: vi.fn(),
+        },
+        setEditable: vi.fn(),
       } as unknown as Editor
 
       const textCheckService = new NeurisTextCheckService(textCategory)
@@ -575,13 +578,23 @@ describe("check category service", () => {
       it("returns false when match has no ignored words", () => {
         const match = generateMatch()
         match.ignoredTextCheckWords = []
+        match.isIgnoredOnce = false
 
         expect(NeurisTextCheckService["isMatchedIgnored"](match)).toBe(false)
       })
 
-      it("returns false when ignoredTextCheckWords is undefined", () => {
+      it("returns true when match has no ignored words but locally ignored word", () => {
+        const match = generateMatch()
+        match.ignoredTextCheckWords = []
+        match.isIgnoredOnce = true
+
+        expect(NeurisTextCheckService["isMatchedIgnored"](match)).toBe(true)
+      })
+
+      it("returns false when ignoredTextCheckWords is undefined and no locally ignored words", () => {
         const match = generateMatch()
         match.ignoredTextCheckWords = undefined
+        match.isIgnoredOnce = false
 
         expect(NeurisTextCheckService["isMatchedIgnored"](match)).toBe(false)
       })

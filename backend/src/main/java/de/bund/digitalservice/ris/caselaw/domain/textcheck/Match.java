@@ -21,4 +21,5 @@ public record Match(
     Rule rule,
     boolean ignoreForIncompleteSentence,
     int contextForSureMatch,
-    List<IgnoredTextCheckWord> ignoredTextCheckWords) {}
+    List<IgnoredTextCheckWord> ignoredTextCheckWords,
+    boolean isIgnoredOnce) {}

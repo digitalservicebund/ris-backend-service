@@ -152,9 +152,13 @@ onBeforeUnmount(() => {
       </InputField>
       <!-- Child  -->
       <template #children>
-        <InputField id="deviatingCourt" label="Fehlerhaftes Gericht">
+        <InputField
+          id="deviatingCourt"
+          v-slot="{ id }"
+          label="Fehlerhaftes Gericht"
+        >
           <ChipsInput
-            id="deviatingCourt"
+            :id="id"
             v-model="coreDataModel.deviatingCourts"
             aria-label="Fehlerhaftes Gericht"
           ></ChipsInput>
@@ -169,9 +173,9 @@ onBeforeUnmount(() => {
         class="w-full min-w-0"
         :is-open="!!coreDataModel.deviatingFileNumbers?.length"
       >
-        <InputField id="fileNumber" label="Aktenzeichen *">
+        <InputField id="fileNumber" v-slot="{ id }" label="Aktenzeichen *">
           <ChipsInput
-            id="fileNumber"
+            :id="id"
             v-model="coreDataModel.fileNumbers"
             aria-label="Aktenzeichen"
           ></ChipsInput>
@@ -180,10 +184,11 @@ onBeforeUnmount(() => {
         <template #children>
           <InputField
             id="deviatingFileNumber"
+            v-slot="{ id }"
             label="Abweichendes Aktenzeichen"
           >
             <ChipsInput
-              id="deviatingFileNumber"
+              :id="id"
               v-model="coreDataModel.deviatingFileNumbers"
               aria-label="Abweichendes Aktenzeichen"
             ></ChipsInput>
@@ -204,7 +209,7 @@ onBeforeUnmount(() => {
           :validation-error="validationStore.getByField('decisionDate')"
         >
           <DateInput
-            id="decisionDate"
+            :id="slotProps.id"
             v-model="coreDataModel.decisionDate"
             aria-label="Entscheidungsdatum"
             :has-error="slotProps.hasError"
@@ -223,7 +228,7 @@ onBeforeUnmount(() => {
             "
           >
             <ChipsDateInput
-              id="deviatingDecisionDates"
+              :id="slotProps.id"
               v-model="coreDataModel.deviatingDecisionDates"
               aria-label="Abweichendes Entscheidungsdatum"
               :has-error="slotProps.hasError"
@@ -262,7 +267,7 @@ onBeforeUnmount(() => {
         :validation-error="validationStore.getByField('oralHearingDates')"
       >
         <ChipsDateInput
-          id="oralHearingDates"
+          :id="slotProps.id"
           v-model="coreDataModel.oralHearingDates"
           aria-label="Datum der mündlichen Verhandlung"
           :has-error="slotProps.hasError"
@@ -280,7 +285,7 @@ onBeforeUnmount(() => {
         label="Spruchkörper"
       >
         <InputText
-          id="appraisalBody"
+          :id="slotProps.id"
           v-model="coreDataModel.appraisalBody"
           aria-label="Spruchkörper"
           fluid
@@ -296,7 +301,7 @@ onBeforeUnmount(() => {
         :label="pendingProceedingLabels.resolutionDate"
       >
         <DateInput
-          id="resolutionDate"
+          :id="slotProps.id"
           v-model="coreDataModel.resolutionDate"
           :aria-label="pendingProceedingLabels.resolutionDate"
           :has-error="slotProps.hasError"
@@ -307,11 +312,12 @@ onBeforeUnmount(() => {
       <InputField
         v-if="!isPendingProceeding"
         id="documentType"
+        v-slot="{ id }"
         class="flex-col"
         label="Dokumenttyp *"
       >
         <ComboboxInput
-          id="documentType"
+          :id="id"
           v-model="coreDataModel.documentType"
           aria-label="Dokumenttyp"
           :item-service="ComboboxItemService.getCaselawDocumentTypes"
@@ -322,10 +328,11 @@ onBeforeUnmount(() => {
     <div :class="layoutClass">
       <InputField
         id="deviatingDocumentNumbers"
+        v-slot="{ id }"
         label="Abweichende Dokumentnummer"
       >
         <ChipsInput
-          id="deviatingDocumentNumbers"
+          :id="id"
           v-model="coreDataModel.deviatingDocumentNumbers"
           aria-label="Abweichende Dokumentnummer"
         ></ChipsInput>
@@ -339,7 +346,7 @@ onBeforeUnmount(() => {
         :label="coreDataLabels.celexNumber"
       >
         <InputText
-          id="celex"
+          :id="slotProps.id"
           v-model="coreDataModel.celexNumber"
           aria-label="Celex-Nummer"
           fluid
@@ -370,9 +377,13 @@ onBeforeUnmount(() => {
         </InputField>
         <!-- Child  -->
         <template #children>
-          <InputField id="deviatingEclis" label="Abweichender ECLI">
+          <InputField
+            id="deviatingEclis"
+            v-slot="{ id }"
+            label="Abweichender ECLI"
+          >
             <ChipsInput
-              id="deviatingEclis"
+              :id="id"
               v-model="coreDataModel.deviatingEclis"
               aria-label="Abweichender ECLI"
             ></ChipsInput>
@@ -385,9 +396,14 @@ onBeforeUnmount(() => {
         class="w-full"
         :is-open="!!descendingPreviousProcedures?.length"
       >
-        <InputField id="procedure" class="flex-col" label="Vorgang">
+        <InputField
+          id="procedure"
+          v-slot="{ id }"
+          class="flex-col"
+          label="Vorgang"
+        >
           <ComboboxInput
-            id="procedure"
+            :id="id"
             v-model="coreDataModel.procedure"
             aria-label="Vorgang"
             :item-service="ComboboxItemService.getProcedures"
@@ -397,9 +413,13 @@ onBeforeUnmount(() => {
         </InputField>
         <!-- Child  -->
         <template #children>
-          <InputField id="previousProcedures" label="Vorgangshistorie">
+          <InputField
+            id="previousProcedures"
+            v-slot="{ id }"
+            label="Vorgangshistorie"
+          >
             <ChipsInput
-              id="previousProcedures"
+              :id="id"
               v-model="descendingPreviousProcedures"
               aria-label="Vorgangshistorie"
               read-only

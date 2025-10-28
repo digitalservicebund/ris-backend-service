@@ -241,6 +241,7 @@ public class TextCheckService {
     List<Match> modifiedMatches =
         addIgnoredTextChecksIndividually(
             documentationUnitId,
+            htmlText,
             matches.stream()
                 .map(match -> match.toBuilder().category(categoryType).build())
                 .map(this::limitReplacements)
@@ -255,10 +256,7 @@ public class TextCheckService {
                       .formatted(
                           match.id(),
                           match.rule().issueType().toLowerCase(),
-                          match.ignoredTextCheckWords() == null
-                                  || match.ignoredTextCheckWords().isEmpty()
-                              ? "false"
-                              : "true",
+                          match.isIgnoredOnce(),
                           normalizedHtml.substring(
                               match.offset(), match.offset() + match.length())));
           lastPosition.set(match.offset() + match.length());
@@ -301,7 +299,7 @@ public class TextCheckService {
   }
 
   public List<Match> addIgnoredTextChecksIndividually(
-      UUID documentationUnitId, List<Match> matches) {
+      UUID documentationUnitId, String originalHtml, List<Match> matches) {
     if (documentationUnitId == null || matches == null || matches.isEmpty()) {
       return matches;
     }
@@ -316,14 +314,49 @@ public class TextCheckService {
         globalAndDocumentationUnitIgnoredWords.stream()
             .collect(Collectors.groupingBy(IgnoredTextCheckWord::word));
 
+    Document originalDoc = Jsoup.parse(originalHtml);
+
     return matches.stream()
         .map(
             match -> {
               List<IgnoredTextCheckWord> ignoredWords =
                   groupedByWord.getOrDefault(match.word(), null);
-              return match.toBuilder().ignoredTextCheckWords(ignoredWords).build();
+              boolean isIgnoredOnce = isWrappedByIgnoreOnceTag(originalDoc, match);
+
+              return match.toBuilder()
+                  .ignoredTextCheckWords(ignoredWords)
+                  .isIgnoredOnce(isIgnoredOnce)
+                  .build();
             })
         .toList();
+  }
+
+  /**
+   * Checks if the text content of a Match object is contained within any <ignore-once> tag in the
+   * original HTML document.
+   */
+  private boolean isWrappedByIgnoreOnceTag(Document originalDoc, Match match) {
+    if (originalDoc == null || match == null) {
+      return false;
+    }
+
+    String word = match.word();
+
+    if (word == null || word.isEmpty()) {
+      return false;
+    }
+
+    org.jsoup.select.Elements ignoreElements = originalDoc.select("ignore-once");
+
+    for (Element ignoreElement : ignoreElements) {
+      String contentWithinIgnoreTag = ignoreElement.text();
+
+      if (contentWithinIgnoreTag.contains(word)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   protected record NoIndexNodeWrapperVisitor(String ignoredWord) implements NodeVisitor {

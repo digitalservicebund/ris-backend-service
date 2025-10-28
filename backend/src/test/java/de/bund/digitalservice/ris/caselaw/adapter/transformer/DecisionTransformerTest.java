@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealAdmitterDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
@@ -1178,7 +1177,7 @@ class DecisionTransformerTest {
 
     DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
     assertThat(decisionDTO.getAppealAdmitted()).isTrue();
-    assertThat(decisionDTO.getAppealAdmittedBy()).isEqualTo(AppealAdmitterDTO.BFH);
+    assertThat(decisionDTO.getAppealAdmittedBy()).isEqualTo(AppealAdmitter.BFH);
   }
 
   @Test
@@ -1909,7 +1908,7 @@ class DecisionTransformerTest {
     DecisionDTO decisionDTO =
         generateSimpleDTOBuilder()
             .appealAdmitted(true)
-            .appealAdmittedBy(AppealAdmitterDTO.BFH)
+            .appealAdmittedBy(AppealAdmitter.BFH)
             .build();
 
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);

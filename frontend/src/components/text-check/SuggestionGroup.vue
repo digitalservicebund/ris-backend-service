@@ -65,7 +65,7 @@ function updateCurrentIndex(index: number) {
       />
     </div>
 
-    <IgnoredWordHandler :match="selectedMatch" />
+    <IgnoredWordHandler :ignored-locally="false" :match="selectedMatch" />
     <div>
       {{ selectedMatch.message }}
     </div>

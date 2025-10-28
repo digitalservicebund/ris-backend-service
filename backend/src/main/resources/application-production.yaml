@@ -8,6 +8,10 @@ spring:
       host: redis
       username: redis
 
+logging:
+  level:
+    de.bund.digitalservice.ris.caselaw.config.CaselawRequestLoggingFilter: DEBUG
+
 sentry:
   dsn: ${SENTRY_DSN}
   environment: production

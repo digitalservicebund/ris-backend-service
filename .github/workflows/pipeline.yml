@@ -32,7 +32,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@ead9eaa3cfe0b0fc2fa749519ae09c3d4f4080b0
+        uses: actions/setup-java@de5a937a1dc73fbc1a67d7d1aa4bebc1082f3190
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -44,7 +44,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew build --profile -x integrationTest -x test
       - name: Upload build performance report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: performance-report
           path: backend/build/reports/profile/profile*.html
@@ -72,7 +72,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@ead9eaa3cfe0b0fc2fa749519ae09c3d4f4080b0
+        uses: actions/setup-java@de5a937a1dc73fbc1a67d7d1aa4bebc1082f3190
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -106,7 +106,7 @@ jobs:
           fi
       # Todo: Remove this step
       - name: Upload Trivy scan results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: "trivy-results-backend.sarif"
           path: "trivy-results.sarif"
@@ -128,7 +128,7 @@ jobs:
           format: "cosign-vuln"
           output: "vuln-backend.json"
       - name: Upload cosign vulnerability scan record
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: "vuln-backend.json"
           path: "vuln-backend.json"
@@ -159,7 +159,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Set up JDK
-        uses: actions/setup-java@ead9eaa3cfe0b0fc2fa749519ae09c3d4f4080b0
+        uses: actions/setup-java@de5a937a1dc73fbc1a67d7d1aa4bebc1082f3190
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -171,7 +171,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew checkLicense
       - name: Upload licence report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: licence-reports-backend
           retention-days: 3
@@ -201,7 +201,7 @@ jobs:
         run: npm run audit:licences
         working-directory: ./frontend
       - name: Upload licence report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: licence-reports-frontend
           retention-days: 3
@@ -289,7 +289,7 @@ jobs:
           format: "cosign-vuln"
           output: "vuln-frontend.json"
       - name: Upload cosign vulnerability scan record
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: "vuln-frontend.json"
           path: "vuln-frontend.json"
@@ -499,7 +499,7 @@ jobs:
           npm ci
         working-directory: ./frontend
       - name: Download blob reports from artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           path: ./frontend/all-blob-reports
           pattern: test-results-blob-*
@@ -518,7 +518,7 @@ jobs:
         run: npx playwright merge-reports --reporter html ./all-blob-reports
         working-directory: ./frontend
       - name: Upload html report to artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: html-test-report
           path: ./frontend/playwright-report
@@ -669,7 +669,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@ead9eaa3cfe0b0fc2fa749519ae09c3d4f4080b0
+        uses: actions/setup-java@de5a937a1dc73fbc1a67d7d1aa4bebc1082f3190
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -694,7 +694,7 @@ jobs:
           flags: --debug
           version: 0.9.0
       - name: Upload mermaid ER-diagram
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: erdiagram
           retention-days: 3
@@ -706,7 +706,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Set up JDK
-        uses: actions/setup-java@ead9eaa3cfe0b0fc2fa749519ae09c3d4f4080b0
+        uses: actions/setup-java@de5a937a1dc73fbc1a67d7d1aa4bebc1082f3190
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -718,7 +718,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew javadoc
       - name: Upload documentation
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: backend-code-documentation
           retention-days: 3
@@ -777,7 +777,7 @@ jobs:
       #     destinationDir: entity-relationship-diagrams/ris-backend-service
       # Licence reports
       - name: Licence reports - Download
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: licence-reports-*
           path: tmp/licence-reports/
@@ -794,7 +794,7 @@ jobs:
           destinationDir: licence-reports/backend/ris-backend-service
       # Performance report
       - name: Performance reports - Download
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: performance-report
           path: tmp/performance-reports/
@@ -806,7 +806,7 @@ jobs:
           destinationDir: performance-reports/ris-backend-service
       # Backend code documentation
       - name: Backend Code Documentation - Download
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: backend-code-documentation
           path: tmp/backend-code-documentation/
@@ -818,7 +818,7 @@ jobs:
           reportIsDirectory: true
       # e2e test report
       - name: E2E test reports - Download
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: html-test-report
           path: tmp/html-test-report/

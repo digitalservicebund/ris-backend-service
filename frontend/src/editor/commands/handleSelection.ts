@@ -16,12 +16,7 @@ export function handleSelection({ state, dispatch }: CommandProps): boolean {
   const parentNode = resolvedFrom.node(resolvedFrom.depth - 1)
   const isSelection = from !== to
 
-  if (
-    isSelection &&
-    parentNode &&
-    parentNode.type === borderNumberNodeType &&
-    dispatch
-  ) {
+  if (isSelection && parentNode?.type === borderNumberNodeType && dispatch) {
     const startOfBorderNumber = resolvedFrom.start(resolvedFrom.depth - 1)
 
     /**
