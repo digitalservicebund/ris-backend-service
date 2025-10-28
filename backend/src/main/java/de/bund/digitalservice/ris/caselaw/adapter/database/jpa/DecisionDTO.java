@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -264,7 +265,7 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @Column(name = "appeal_admitted_by")
   @Enumerated(EnumType.STRING)
   @JdbcType(PostgreSQLEnumJdbcType.class)
-  private AppealAdmitterDTO appealAdmittedBy;
+  private AppealAdmitter appealAdmittedBy;
 
   @Override
   @SuppressWarnings("java:S2097") // Class type check is not recognized by Sonar
