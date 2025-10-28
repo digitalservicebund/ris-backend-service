@@ -146,6 +146,7 @@ const matchIsIgnoredInDocument = computed(() => {
           data-testid="unignore-once-button"
           label="Hier nicht ignorieren"
           severity="secondary"
+          size="small"
           @click="ignoreOnceToggle"
         >
           <template #icon>
@@ -194,6 +195,7 @@ const matchIsIgnoredInDocument = computed(() => {
           data-testid="ignore-once-button"
           label="Hier ignorieren"
           severity="secondary"
+          size="small"
           @click="ignoreOnceToggle"
         >
           <template #icon>
