@@ -35,11 +35,13 @@ const removeTagsOnTypingPlugin = new Plugin({
       }
 
       let { realFrom, realTo } = findCorrectPosition(transaction.steps[0])
+      const { specialCase } = findCorrectPosition(transaction.steps[0])
       // Safety check -------------------------------------------
       // When using backspace on the last row with no characters,
       // then realFrom and realTo can be out of bounds and their
       // use in fetching a node will cause error and prevent a
       // deletion or in this case row deletion.
+      // console.log("Node size NEW:", newState.doc.content.size, " OLD:", oldState.doc.content.size)
       if (realFrom === 0 && realTo === 0) {
         return
       } else if (
@@ -80,31 +82,11 @@ const removeTagsOnTypingPlugin = new Plugin({
         return
       }
 
-      let nodeFound = false
-
-      newState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
-        // console.log("NEW node", node, "at pos", pos, "with text", node.text)
-        if (node.isText && node.text !== " ") {
-          nodeFound = true
-          newStateTransaction.removeMark(
-            pos,
-            pos + node.nodeSize,
-            newState.schema.marks[TextCheckTagName],
-          )
-          newStateTransaction.removeMark(
-            pos,
-            pos + node.nodeSize,
-            newState.schema.marks[IgnoreOnceTagName],
-          )
-          modified = true
-        }
-      })
-
-      if (!nodeFound) {
+      if (!specialCase) {
         oldState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
-          // console.log("OLD node", node, "at pos", pos, "with text", node.text)
+          // console.log("OLD node", node, "at pos", pos)
           if (node.isText) {
-            nodeFound = true
+            // console.log("Removing marks from OLD node", node, " at pos", pos, " with text", node.text)
             newStateTransaction.removeMark(
               pos,
               pos + node.nodeSize,
@@ -118,6 +100,47 @@ const removeTagsOnTypingPlugin = new Plugin({
             modified = true
           }
         })
+
+        newState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
+          // console.log("NEW node", node, "at pos", pos)
+          if (node.isText && node.text !== " ") {
+            // console.log("Removing marks from NEW node", node, " at pos", pos, " with text", node.text)
+            newStateTransaction.removeMark(
+              pos,
+              pos + node.nodeSize,
+              newState.schema.marks[TextCheckTagName],
+            )
+            newStateTransaction.removeMark(
+              pos,
+              pos + node.nodeSize,
+              newState.schema.marks[IgnoreOnceTagName],
+            )
+            modified = true
+          }
+        })
+      } else {
+        // Special case handling for deletion + insertion.
+        // It is expected to find a single node which is a paragraph
+        // containing leftover text nodes that need to be processed
+        // for removal of marks.
+        newState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
+          // console.log("CHILD node", node, "at pos", pos)
+          node.descendants((childNode, posInParent) => {
+            if (childNode.isText && childNode.text !== " ") {
+              newStateTransaction.removeMark(
+                pos + 1 + posInParent,
+                pos + 1 + posInParent + childNode.nodeSize,
+                newState.schema.marks[TextCheckTagName],
+              )
+              newStateTransaction.removeMark(
+                pos + posInParent,
+                pos + posInParent + childNode.nodeSize,
+                newState.schema.marks[IgnoreOnceTagName],
+              )
+              modified = true
+            }
+          })
+        })
       }
     })
 
@@ -125,19 +148,24 @@ const removeTagsOnTypingPlugin = new Plugin({
   },
 })
 
-function findCorrectPosition(step: Step): { realFrom: number; realTo: number } {
+function findCorrectPosition(step: Step): {
+  realFrom: number
+  realTo: number
+  specialCase: boolean
+} {
   if (!(step instanceof ReplaceStep)) {
-    return { realFrom: 0, realTo: 0 }
+    return { realFrom: 0, realTo: 0, specialCase: false }
   }
 
   const stepFrom = step.from
   const stepTo = step.to
   const deletedSize = stepTo - stepFrom
   const insertedSize = step.slice.size
+  let specialCase = false
 
   // console.log("Step details:", { stepFrom, stepTo, deletedSize, insertedSize })
 
-  const realFrom = stepFrom
+  let realFrom = stepFrom
   let realTo = 0
   if (deletedSize === 0 && insertedSize > 0) {
     // Insertion
@@ -153,7 +181,9 @@ function findCorrectPosition(step: Step): { realFrom: number; realTo: number } {
     // it means we probably/hopefully ran language check
     // and whole content is replaced.
     // In that case we just want to let it slide!
-    realTo = stepTo - deletedSize + insertedSize
+    realFrom = stepFrom // + (deletedSize - insertedSize)
+    realTo = stepTo // - (deletedSize - insertedSize)
+    specialCase = true
     // console.log("Weird case of deletion + insertion:", { realFrom })
     // console.log("Weird case of deletion + insertion:", { realTo })
   } else {
@@ -161,7 +191,8 @@ function findCorrectPosition(step: Step): { realFrom: number; realTo: number } {
     realTo = stepTo + insertedSize
   }
 
-  return { realFrom, realTo }
+  // console.log("Calculated positions:", { realFrom, realTo })
+  return { realFrom, realTo, specialCase }
 }
 
 function isDocumentChanged(
