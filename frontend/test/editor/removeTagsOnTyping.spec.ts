@@ -377,7 +377,7 @@ describe("removeTagsOnTyping extension", () => {
     editor.destroy()
   })
 
-  it("when a selection has multiple word when deleting or replacing it with a character then remove marks in all nodes around this change", () => {
+  it("when a selection has multiple words when deleting or replacing it with a character then remove marks in all nodes around this change", () => {
     const editor = new Editor({
       extensions: [
         Document,
@@ -465,6 +465,130 @@ describe("removeTagsOnTyping extension", () => {
       }
     })
     expect(markedWordsAfter).toBe(0)
+
+    editor.destroy()
+  })
+
+  it("multiple selectio and chnage does not remove marks in other nodes in the same row", () => {
+    const editor = new Editor({
+      extensions: [
+        Document,
+        Paragraph,
+        Text,
+        TextCheckMark,
+        TextCheckExtension,
+      ],
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "wordss",
+              },
+            ],
+          },
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "firstword",
+              },
+              {
+                type: "text",
+                text: " ",
+              },
+              {
+                type: "text",
+                text: "secondword",
+              },
+              {
+                type: "text",
+                text: " ",
+              },
+              {
+                type: "text",
+                text: "thirdword",
+              },
+              {
+                type: "text",
+                text: " ",
+              },
+              {
+                type: "text",
+                text: "fourthword",
+              },
+            ],
+          },
+        ],
+      },
+    })
+
+    const textCheckMark = editor.schema.marks[TextCheckMark.name]
+    const firstFrom = 8
+    const firstTo = 18
+    const secondFrom = 19
+    const secondTo = 29
+    const thirdFrom = 30
+    const thirdTo = 40
+    const fourthFrom = 41
+    const fourthTo = 51
+
+    editor.commands.command(({ tr }) => {
+      tr.addMark(
+        firstFrom,
+        firstTo,
+        textCheckMark.create({ ...textCheckMarkAttrs, id: "1" }),
+      )
+      tr.addMark(
+        secondFrom,
+        secondTo,
+        textCheckMark.create({ ...textCheckMarkAttrs, id: "2" }),
+      )
+      tr.addMark(
+        thirdFrom,
+        thirdTo,
+        textCheckMark.create({ ...textCheckMarkAttrs, id: "3" }),
+      )
+      tr.addMark(
+        fourthFrom,
+        fourthTo,
+        textCheckMark.create({ ...textCheckMarkAttrs, id: "4" }),
+      )
+      return true
+    })
+
+    // Verify all words are marked
+    const secondParagraph = editor.state.doc.child(1)
+    let markedWordsCount = 0
+    secondParagraph.forEach((node) => {
+      if (node.marks.length > 0) {
+        markedWordsCount++
+      }
+    })
+    expect(markedWordsCount).toBe(4)
+    expect(editor.getText()).toBe(
+      "wordss\n\nfirstword secondword thirdword fourthword",
+    )
+
+    editor.commands.insertContentAt({ from: 27, to: 32 }, "x")
+
+    expect(editor.getText()).toBe(
+      "wordss\n\nfirstword secondwoxirdword fourthword",
+    )
+
+    // Verify marks were removed from all affected text nodes
+    const secondParagraphAfter = editor.state.doc.child(1)
+    let markedWordsAfter = 0
+    secondParagraphAfter.forEach((node) => {
+      if (node.isText && node.marks.length > 0) {
+        markedWordsAfter++
+      }
+    })
+    expect(markedWordsAfter).toBe(2)
 
     editor.destroy()
   })
