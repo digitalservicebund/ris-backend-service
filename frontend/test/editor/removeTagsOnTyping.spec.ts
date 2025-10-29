@@ -275,6 +275,108 @@ describe("removeTagsOnTyping extension", () => {
     editor.destroy()
   })
 
+  it("when the last character of word in text is deleted then validate mark removal", () => {
+    const editor = new Editor({
+      extensions: [
+        Document,
+        Paragraph,
+        Text,
+        TextCheckMark,
+        TextCheckExtension,
+      ],
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "firstword",
+              },
+              {
+                type: "text",
+                text: " ",
+              },
+              {
+                type: "text",
+                text: "secondword",
+              },
+              {
+                type: "text",
+                text: " ",
+              },
+              {
+                type: "text",
+                text: "thirdword",
+              },
+            ],
+          },
+        ],
+      },
+    })
+
+    const textCheckMark = editor.schema.marks[TextCheckMark.name]
+    const fromFirst = 1
+    const toFirst = 10
+    const fromSecond = 11
+    const toSecond = 21
+    const fromThird = 22
+    const toThird = 31
+
+    editor.commands.command(({ tr }) => {
+      tr.addMark(
+        fromFirst,
+        toFirst,
+        textCheckMark.create({ ...textCheckMarkAttrs, id: "1" }),
+      )
+      tr.addMark(
+        fromSecond,
+        toSecond,
+        textCheckMark.create({ ...textCheckMarkAttrs, id: "2" }),
+      )
+      tr.addMark(
+        fromThird,
+        toThird,
+        textCheckMark.create({ ...textCheckMarkAttrs, id: "3" }),
+      )
+      return true
+    })
+
+    expect(editor.getText()).toBe("firstword secondword thirdword")
+
+    const paraBeforeDelete = editor.state.doc.firstChild
+    let markedWordsCount = 0
+    paraBeforeDelete?.forEach((node) => {
+      if (node.isText && node.marks.length > 0) {
+        markedWordsCount++
+      }
+    })
+    expect(markedWordsCount).toBe(3)
+
+    // Delete the last character 'd' from the second word "secondword"
+    // "secondword" ends at position 21, so delete from position 20 to 21
+    editor.commands.deleteRange({ from: 20, to: 21 })
+
+    expect(editor.getText()).toBe("firstword secondwor thirdword")
+
+    // Verify the mark was removed only from the second word
+    const paragraphAfterDelete = editor.state.doc.firstChild
+    paragraphAfterDelete?.forEach((node) => {
+      if (node.isText) {
+        if (node.text === "firstword") {
+          expect(node.marks.length).toBe(1)
+        } else if (node.text === "secondwor") {
+          expect(node.marks.length).toBe(0)
+        } else if (node.text === "thirdword") {
+          expect(node.marks.length).toBe(1)
+        }
+      }
+    })
+
+    editor.destroy()
+  })
+
   it("when a selection has multiple word when deleting or replacing it with a character then remove marks in all nodes around this change", () => {
     const editor = new Editor({
       extensions: [
@@ -301,7 +403,7 @@ describe("removeTagsOnTyping extension", () => {
             content: [
               {
                 type: "text",
-                text: "asdasda",
+                text: "firstword",
               },
               {
                 type: "text",
@@ -309,7 +411,7 @@ describe("removeTagsOnTyping extension", () => {
               },
               {
                 type: "text",
-                text: "fdasdsd",
+                text: "secondword",
               },
             ],
           },
@@ -318,48 +420,48 @@ describe("removeTagsOnTyping extension", () => {
     })
 
     const textCheckMark = editor.schema.marks[TextCheckMark.name]
+    const firstFrom = 8
+    const firstTo = 18
+    const secondFrom = 19
+    const secondTo = 29
 
-    // Mark both words in the second paragraph
     editor.commands.command(({ tr }) => {
       tr.addMark(
-        8,
-        15,
+        firstFrom,
+        firstTo,
         textCheckMark.create({ ...textCheckMarkAttrs, id: "1" }),
       )
       tr.addMark(
-        16,
-        23,
+        secondFrom,
+        secondTo,
         textCheckMark.create({ ...textCheckMarkAttrs, id: "2" }),
       )
       return true
     })
 
     // Verify both words are marked
-    const secondPara = editor.state.doc.child(1)
+    const secondParagraph = editor.state.doc.child(1)
     let markedWordsCount = 0
-    secondPara.forEach((node) => {
+    secondParagraph.forEach((node) => {
       if (node.marks.length > 0) {
         markedWordsCount++
       }
     })
     expect(markedWordsCount).toBe(2)
-    expect(editor.getText()).toBe("wordss\n\nasdasda fdasdsd")
+    expect(editor.getText()).toBe("wordss\n\nfirstword secondword")
 
-    // Select "da fd" which spans across both marked words and replace with "x"
-    // "asdas[da ]fd[asdsd]" -> "asdasxasdsd"
-    // "asdasda" starts at position 8, "da" is at offset 5, so position 13
-    // We want to replace "da fd" (5 chars), so from 13 to 18
-    editor.commands.insertContentAt({ from: 14, to: 19 }, "x")
+    // Select "rd se" which spans across both marked words and replace with "x"
+    // "firstwo[rd se]condword" -> "firstwo[x]condword"
+    editor.commands.insertContentAt({ from: 16, to: 21 }, "x")
 
-    expect(editor.getText()).toBe("wordss\n\nasdasxasdsd")
+    expect(editor.getText()).toBe("wordss\n\nfirstwoxcondword")
 
     // Verify marks were removed from all affected text nodes
-    const secondParaAfter = editor.state.doc.child(1)
+    const secondParagraphAfter = editor.state.doc.child(1)
     let markedWordsAfter = 0
-    secondParaAfter.forEach((node) => {
+    secondParagraphAfter.forEach((node) => {
       if (node.isText && node.marks.length > 0) {
         markedWordsAfter++
-        console.log("Node still has marks:", node.text, node.marks)
       }
     })
     expect(markedWordsAfter).toBe(0)
