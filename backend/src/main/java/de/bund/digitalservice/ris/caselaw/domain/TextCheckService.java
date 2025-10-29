@@ -249,6 +249,12 @@ public class TextCheckService {
 
     modifiedMatches.forEach(
         match -> {
+          // check for ignored words - either ignored once or when ignored globally/ in docunit, the
+          // word is added to ignoredTextCheckWords
+          boolean isIgnored =
+              match.isIgnoredOnce()
+                  || (match.ignoredTextCheckWords() != null
+                      && !match.ignoredTextCheckWords().isEmpty());
           newHtmlText
               .append(normalizedHtml, lastPosition.get(), match.offset())
               .append(
@@ -256,7 +262,7 @@ public class TextCheckService {
                       .formatted(
                           match.id(),
                           match.rule().issueType().toLowerCase(),
-                          match.isIgnoredOnce(),
+                          isIgnored,
                           normalizedHtml.substring(
                               match.offset(), match.offset() + match.length())));
           lastPosition.set(match.offset() + match.length());
@@ -314,14 +320,12 @@ public class TextCheckService {
         globalAndDocumentationUnitIgnoredWords.stream()
             .collect(Collectors.groupingBy(IgnoredTextCheckWord::word));
 
-    Document originalDoc = Jsoup.parse(originalHtml);
-
     return matches.stream()
         .map(
             match -> {
               List<IgnoredTextCheckWord> ignoredWords =
                   groupedByWord.getOrDefault(match.word(), null);
-              boolean isIgnoredOnce = isWrappedByIgnoreOnceTag(originalDoc, match);
+              boolean isIgnoredOnce = isWrappedByIgnoreOnceTag(originalHtml, match);
 
               return match.toBuilder()
                   .ignoredTextCheckWords(ignoredWords)
@@ -332,31 +336,44 @@ public class TextCheckService {
   }
 
   /**
-   * Checks if the text content of a Match object is contained within any <ignore-once> tag in the
-   * original HTML document.
+   * Checks if the specific word occurrence is preceded by the <ignore-once> opening tag in the raw
+   * HTML string, using Match.offset().
    */
-  private boolean isWrappedByIgnoreOnceTag(Document originalDoc, Match match) {
-    if (originalDoc == null || match == null) {
+  private boolean isWrappedByIgnoreOnceTag(String originalHTML, Match match) {
+    if (originalHTML == null || match == null) {
       return false;
     }
 
-    String word = match.word();
+    Integer offset = match.offset();
 
-    if (word == null || word.isEmpty()) {
+    if (offset == null || offset < 0 || offset >= originalHTML.length()) {
       return false;
     }
 
-    org.jsoup.select.Elements ignoreElements = originalDoc.select("ignore-once");
+    String searchTarget = "<ignore-once>";
+    // Search back far enough to catch the tag, the 5 is just a 'safety-buffer' (e.g. for linebreaks
+    // or leading whitespaces)
+    int searchLength = searchTarget.length() + 5;
 
-    for (Element ignoreElement : ignoreElements) {
-      String contentWithinIgnoreTag = ignoreElement.text();
+    // Define the region immediately preceding the word
+    int searchStart = Math.max(0, offset - searchLength);
+    String precedingContent = originalHTML.substring(searchStart, offset);
 
-      if (contentWithinIgnoreTag.contains(word)) {
-        return true;
-      }
+    // Find the last occurrence of the full <ignore-once> tag in the preceding string.
+    int lastIgnoreTagIndex = precedingContent.lastIndexOf(searchTarget);
+
+    if (lastIgnoreTagIndex == -1) {
+      return false;
     }
 
-    return false;
+    // Ensure the tag is the immediate wrapper: check if the last opening tag of any kind (e.g. <p>,
+    // <text-check>) matches the <ignore-once> tag found. This confirms no other tag is nested
+    // between.
+    int lastOpeningTagIndex = precedingContent.lastIndexOf('<');
+
+    // If the last opening tag found is exactly where the ignore-tag starts, then the word is
+    // immediately preceded by the <ignore-once> tag.
+    return lastOpeningTagIndex == lastIgnoreTagIndex;
   }
 
   protected record NoIndexNodeWrapperVisitor(String ignoredWord) implements NodeVisitor {
