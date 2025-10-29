@@ -29,6 +29,11 @@ export async function getMarkId(tag: Locator): Promise<string | null> {
   return await tag.evaluate((el) => el.getAttribute("id"))
 }
 
+export const textCheckUnderlinesColors = {
+  error: "#cd5038",
+  ignored: "#66add3",
+} as const
+
 // see text-check.scss for the expected values
 export const ignoredColorStyle = "2px solid rgb(102, 173, 211)"
 export const textMistakeColor = "rgb(205, 80, 56)"
