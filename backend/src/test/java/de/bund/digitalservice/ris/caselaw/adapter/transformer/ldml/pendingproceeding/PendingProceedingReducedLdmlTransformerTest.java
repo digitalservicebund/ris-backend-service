@@ -6,6 +6,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -261,6 +263,8 @@ class PendingProceedingReducedLdmlTransformerTest {
                 .dismissalTypes(List.of("dismissalType test"))
                 .collectiveAgreements(List.of("collectiveAgreement test"))
                 .hasLegislativeMandate(true)
+                .appealAdmission(
+                    AppealAdmission.builder().admitted(true).by(AppealAdmitter.FG).build())
                 .build())
         .previousDecisions(List.of(previousDecision1, previousDecision2))
         .caselawReferences(

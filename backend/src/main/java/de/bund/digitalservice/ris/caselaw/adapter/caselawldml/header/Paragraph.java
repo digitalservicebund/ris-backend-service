@@ -32,5 +32,6 @@ public class Paragraph {
     @XmlElementRef(name = "docTitle", namespace = CaseLawLdml.AKN_NS, type = DocTitle.class),
     @XmlElementRef(name = "shortTitle", namespace = CaseLawLdml.AKN_NS, type = ShortTitle.class)
   })
+  @Builder.Default
   private List<Object> content = new ArrayList<>();
 }

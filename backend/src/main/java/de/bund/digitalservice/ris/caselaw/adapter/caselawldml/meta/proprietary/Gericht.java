@@ -13,23 +13,26 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Builder
-public class Definition {
-  @XmlAttribute(namespace = CaseLawLdml.RIS_NS, name = "domainTerm")
-  private static final String DOMAIN_TERM = "Definition";
+public class Gericht {
+  @XmlAttribute(name = "domainTerm")
+  private static final String DOMAIN_TERM = "Gericht";
 
-  @XmlElement(name = "definierterBegriff", namespace = CaseLawLdml.RIS_NS)
-  private DefinierterBegriff definierterBegriff;
+  @XmlAttribute(namespace = CaseLawLdml.AKN_NS, name = "refersTo")
+  private String refersTo;
 
-  @XmlElement(name = "definierendeRandnummer", namespace = CaseLawLdml.RIS_NS)
-  private DefinierendeRandnummer definierendeRandnummer;
+  @XmlElement(name = "typ", namespace = CaseLawLdml.RIS_NS)
+  private GerichtTyp typ;
+
+  @XmlElement(name = "ort", namespace = CaseLawLdml.RIS_NS)
+  private GerichtOrt ort;
 
   @NoArgsConstructor
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class DefinierterBegriff {
+  public static class GerichtTyp {
     @XmlAttribute(name = "domainTerm")
-    private static final String DOMAIN_TERM = "Definierter Begriff";
+    private static final String DOMAIN_TERM = "Gerichtstyp";
 
     @XmlValue private String value;
   }
@@ -38,12 +41,9 @@ public class Definition {
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class DefinierendeRandnummer {
+  public static class GerichtOrt {
     @XmlAttribute(name = "domainTerm")
-    private static final String DOMAIN_TERM = "Definierende Randnummer";
-
-    @XmlAttribute(namespace = CaseLawLdml.AKN_NS, name = "refersTo")
-    private String refersTo;
+    private static final String DOMAIN_TERM = "Gerichtsort";
 
     @XmlValue private String value;
   }

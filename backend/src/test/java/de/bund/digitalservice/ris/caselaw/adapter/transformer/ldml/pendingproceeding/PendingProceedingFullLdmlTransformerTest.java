@@ -4,8 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.Notation;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -274,7 +277,12 @@ class PendingProceedingFullLdmlTransformerTest {
                             .citationType(CitationType.builder().label("citation test").build())
                             .build()))
                 .keywords(List.of("keyword test"))
-                .fieldsOfLaw(List.of(FieldOfLaw.builder().text("Sachgebiet").build()))
+                .fieldsOfLaw(
+                    List.of(
+                        FieldOfLaw.builder()
+                            .text("Sachgebiet")
+                            .notation(Notation.NEW.toString())
+                            .build()))
                 .norms(
                     List.of(
                         NormReference.builder()
@@ -300,6 +308,8 @@ class PendingProceedingFullLdmlTransformerTest {
                 .dismissalTypes(List.of("dismissalType test"))
                 .collectiveAgreements(List.of("collectiveAgreement test"))
                 .hasLegislativeMandate(true)
+                .appealAdmission(
+                    AppealAdmission.builder().admitted(true).by(AppealAdmitter.FG).build())
                 .build())
         .previousDecisions(List.of(previousDecision1, previousDecision2))
         .caselawReferences(

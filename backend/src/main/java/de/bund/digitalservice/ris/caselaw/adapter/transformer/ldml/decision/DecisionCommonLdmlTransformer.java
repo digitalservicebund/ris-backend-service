@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
-import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNotNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -15,21 +14,23 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Judg
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Motivation;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Opinion;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrLanguage;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentRef;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.ForeignLanguageVersion;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DokumentTyp;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumentationsstelle;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gericht;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Regionen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Spruchkoerper;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
-import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -79,50 +80,74 @@ public abstract class DecisionCommonLdmlTransformer
 
   protected abstract Meta buildMeta(Decision decision);
 
+  @SuppressWarnings("java:S3776")
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(Decision decision) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
 
-    if (decision.previousDecisions() != null) {
-      applyIfNotEmpty(
-          buildRelatedDecisions(decision.previousDecisions()), builder::previousDecision);
-    }
-    if (decision.ensuingDecisions() != null) {
-      applyIfNotEmpty(buildRelatedDecisions(decision.ensuingDecisions()), builder::ensuingDecision);
-    }
+    var coreData = decision.coreData();
+    if (coreData != null) {
+      // Dokumenttyp
+      builder.dokumentTyp(DokumentTyp.builder().value(coreData.documentType().label()).build());
 
-    if (decision.contentRelatedIndexing() != null
-        && decision.contentRelatedIndexing().norms() != null) {
-      applyIfNotEmpty(
-          decision.contentRelatedIndexing().norms().stream()
-              .flatMap(normReference -> normReference.singleNorms().stream())
-              .filter(Objects::nonNull)
-              .map(
-                  singleNorm -> {
-                    var type = nullSafeGet(singleNorm.legalForce(), LegalForce::type);
-                    return type != null ? type.label() : null;
-                  })
-              .filter(Objects::nonNull)
-              .toList(),
-          builder::legalForce);
-    }
-    if (decision.contentRelatedIndexing() != null
-        && decision.contentRelatedIndexing().foreignLanguageVersions() != null) {
-      applyIfNotEmpty(
-          decision.contentRelatedIndexing().foreignLanguageVersions().stream()
-              .map(
-                  foreignLanguageVersion ->
-                      ForeignLanguageVersion.builder()
-                          .documentRef(
-                              DocumentRef.builder()
-                                  .href(foreignLanguageVersion.link())
-                                  .showAs(foreignLanguageVersion.languageCode().label())
-                                  .build())
-                          .frbrLanguage(
-                              new FrbrLanguage(
-                                  foreignLanguageVersion.languageCode().isoCode3Letters()))
-                          .build())
-              .toList(),
-          builder::foreignLanguageVersions);
+      // Gericht (Gerichtstyp + Ort)
+      Court court = coreData.court();
+      if (court != null) {
+        builder.gericht(
+            Gericht.builder()
+                .refersTo("#gericht")
+                .typ(Gericht.GerichtTyp.builder().value(court.type()).build())
+                .ort(Gericht.GerichtOrt.builder().value(court.location()).build())
+                .build());
+      }
+
+      // Regionen
+      List<Regionen.Region> regionen = new ArrayList<>();
+      if (coreData.court() != null && coreData.court().regions() != null) {
+        coreData
+            .court()
+            .regions()
+            .forEach(region -> regionen.add(Regionen.Region.builder().value(region).build()));
+      }
+      if (!regionen.isEmpty()) {
+        builder.regionen(Regionen.builder().regionen(regionen).build());
+      }
+
+      // Dokumentationsstelle
+      if (coreData.documentationOffice() != null) {
+        String docOffice = coreData.documentationOffice().abbreviation();
+        builder.dokumentationsstelle(
+            Dokumentationsstelle.builder()
+                .refersTo("#" + docOffice.toLowerCase() + "-dokumentationsstelle")
+                .value(docOffice)
+                .build());
+      }
+
+      // Aktenzeichenliste
+      List<AktenzeichenListe.Aktenzeichen> aktenzeichenListe = new ArrayList<>();
+      if (coreData.fileNumbers() != null && !coreData.fileNumbers().isEmpty()) {
+        coreData
+            .fileNumbers()
+            .forEach(
+                fileNumber ->
+                    aktenzeichenListe.add(
+                        AktenzeichenListe.Aktenzeichen.builder()
+                            .refersTo("#aktenzeichen")
+                            .value(fileNumber)
+                            .build()));
+      }
+      if (!aktenzeichenListe.isEmpty()) {
+        builder.aktenzeichenListe(
+            AktenzeichenListe.builder().aktenzeichen(aktenzeichenListe).build());
+      }
+
+      // Spruchkörper
+      if (coreData.appraisalBody() != null) {
+        builder.spruchkoerper(
+            Spruchkoerper.builder()
+                .refersTo("#spruchkoerper")
+                .value(coreData.appraisalBody())
+                .build());
+      }
     }
 
     return builder;

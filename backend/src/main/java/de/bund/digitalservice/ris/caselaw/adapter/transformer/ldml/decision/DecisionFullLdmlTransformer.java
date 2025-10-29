@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
-import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -11,22 +10,31 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Classification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Keyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrLanguage;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDaten;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDokumentnummern;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeEclis;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DatenDerMuendlichenVerhandlung;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Definition;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentType;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Definitionen;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentRef;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Eingangsarten;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Evsf;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FehlerhafteGerichte;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FremdsprachigeFassungen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtskraft;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtsmittelzulassung;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
-import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Sachgebiete;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Vorgaenge;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
-import de.bund.digitalservice.ris.caselaw.domain.court.Court;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,86 +70,220 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         .build();
   }
 
-  @SuppressWarnings("java:S3776")
+  @SuppressWarnings({"java:S6541", "java:S3776"})
   private RisMeta buildRisMeta(Decision decision) {
     var builder = buildCommonRisMeta(decision);
 
     var contentRelatedIndexing = decision.contentRelatedIndexing();
     if (contentRelatedIndexing != null) {
+      // Sachgebiete
       if (contentRelatedIndexing.fieldsOfLaw() != null) {
-        applyIfNotEmpty(
-            contentRelatedIndexing.fieldsOfLaw().stream().map(FieldOfLaw::text).toList(),
-            builder::fieldOfLaw);
+        Sachgebiete sachgebiete =
+            Sachgebiete.builder()
+                .sachgebiete(
+                    contentRelatedIndexing.fieldsOfLaw().stream()
+                        .map(
+                            sachgebiet ->
+                                Sachgebiete.Sachgebiet.builder()
+                                    .value(sachgebiet.text())
+                                    .notation(sachgebiet.notation())
+                                    .build())
+                        .toList())
+                .build();
+        builder.sachgebiete(sachgebiete);
       }
 
+      // Definitionen
       if (contentRelatedIndexing.definitions() != null) {
-        applyIfNotEmpty(
+        var defs =
             contentRelatedIndexing.definitions().stream()
                 .map(
                     definition ->
                         Definition.builder()
-                            .definedTerm(definition.definedTerm())
-                            .definingBorderNumber(definition.definingBorderNumber())
+                            .definierterBegriff(
+                                Definition.DefinierterBegriff.builder()
+                                    .value(definition.definedTerm())
+                                    .build())
+                            .definierendeRandnummer(
+                                definition.definingBorderNumber() == null
+                                    ? null
+                                    : Definition.DefinierendeRandnummer.builder()
+                                        .refersTo(
+                                            "#randnummer-" + definition.definingBorderNumber())
+                                        .value(String.valueOf(definition.definingBorderNumber()))
+                                        .build())
                             .build())
-                .toList(),
-            builder::definitions);
+                .toList();
+        builder.definitionen(Definitionen.builder().definitionen(defs).build());
+      }
+
+      // EVSF
+      Optional.ofNullable(contentRelatedIndexing.evsf())
+          .ifPresent(value -> builder.evsf(Evsf.builder().value(value).build()));
+
+      // Rechtsmittelzulassung
+      Optional.ofNullable(contentRelatedIndexing.appealAdmission())
+          .ifPresent(
+              value -> {
+                var rechtsmittelzulassungBuilder =
+                    Rechtsmittelzulassung.builder()
+                        .rechtsmittelZugelassen(
+                            new Rechtsmittelzulassung.RechtsmittelZugelassen(value.admitted()));
+
+                Optional.ofNullable(value.by())
+                    .ifPresent(
+                        appealAdmitter ->
+                            rechtsmittelzulassungBuilder.rechtsmittelZugelassenDurch(
+                                new Rechtsmittelzulassung.RechtsmittelZugelassenDurch(
+                                    appealAdmitter.name())));
+
+                builder.rechtsmittelzulassung(rechtsmittelzulassungBuilder.build());
+              });
+
+      // Fremdsprachige Fassungen
+      if (contentRelatedIndexing.foreignLanguageVersions() != null
+          && !contentRelatedIndexing.foreignLanguageVersions().isEmpty()) {
+        builder.fremdsprachigeFassungen(
+            FremdsprachigeFassungen.builder()
+                .fremdsprachigeFassungen(
+                    contentRelatedIndexing.foreignLanguageVersions().stream()
+                        .map(
+                            version ->
+                                FremdsprachigeFassungen.FremdsprachigeFassung.builder()
+                                    .documentRef(
+                                        DocumentRef.builder()
+                                            .href(version.link())
+                                            .showAs(version.languageCode().label())
+                                            .build())
+                                    .frbrLanguage(
+                                        new FrbrLanguage(version.languageCode().isoCode3Letters()))
+                                    .build())
+                        .toList())
+                .build());
       }
     }
-
-    Optional.ofNullable(contentRelatedIndexing)
-        .map(ContentRelatedIndexing::evsf)
-        .ifPresent(builder::evfs);
 
     var coreData = decision.coreData();
     if (coreData != null) {
-      if (coreData.deviatingDecisionDates() != null) {
-        applyIfNotEmpty(
-            coreData.deviatingDecisionDates().stream().map(DateUtils::toDateString).toList(),
-            builder::deviatingDate);
+
+      if (coreData.deviatingFileNumbers() != null) {
+        // Aktenzeichenliste is already set in CommonTransformer
+        AktenzeichenListe aktenzeichenListe = builder.build().getAktenzeichenListe();
+        List<AktenzeichenListe.Aktenzeichen> aktenzeichen = aktenzeichenListe.getAktenzeichen();
+        if (aktenzeichen != null) {
+          coreData
+              .deviatingFileNumbers()
+              .forEach(
+                  fileNumber ->
+                      aktenzeichen.add(
+                          AktenzeichenListe.Aktenzeichen.builder()
+                              .domainTerm("Abweichendes Aktenzeichen")
+                              .value(fileNumber)
+                              .build()));
+          builder.aktenzeichenListe(
+              aktenzeichenListe.toBuilder().aktenzeichen(aktenzeichen).build());
+        }
       }
+
+      // Fehlerhafte Gerichte
+      if (coreData.deviatingCourts() != null) {
+        builder.fehlerhafteGerichte(
+            FehlerhafteGerichte.builder()
+                .fehlerhafteGerichte(
+                    coreData.deviatingCourts().stream()
+                        .map(
+                            court ->
+                                FehlerhafteGerichte.FehlerhaftesGericht.builder()
+                                    .value(court)
+                                    .build())
+                        .toList())
+                .build());
+      }
+      // Daten der mündlichen Verhandlung
       if (coreData.oralHearingDates() != null) {
-        applyIfNotEmpty(
-            coreData.oralHearingDates().stream().map(DateUtils::toDateString).toList(),
-            builder::oralHearingDate);
-      }
-      applyIfNotEmpty(coreData.deviatingCourts(), builder::deviatingCourt);
-      applyIfNotEmpty(coreData.deviatingEclis(), builder::deviatingEcli);
-      applyIfNotEmpty(coreData.deviatingFileNumbers(), builder::deviatingFileNumber);
-      applyIfNotEmpty(coreData.deviatingDocumentNumbers(), builder::deviatingDocumentNumber);
-      applyIfNotEmpty(coreData.fileNumbers(), builder::fileNumbers);
-      if (coreData.procedure() != null) {
-        applyIfNotEmpty(
-            Stream.of(coreData.procedure())
-                .map(Procedure::label)
-                .flatMap(it -> decision.coreData().previousProcedures().stream())
-                .toList(),
-            builder::procedure);
+        builder.datenDerMuendlichenVerhandlung(
+            DatenDerMuendlichenVerhandlung.builder()
+                .daten(
+                    coreData.oralHearingDates().stream()
+                        .map(
+                            date ->
+                                DatenDerMuendlichenVerhandlung.DatumDerMuendlichenVerhandlung
+                                    .builder()
+                                    .value(DateUtils.toDateString(date))
+                                    .build())
+                        .toList())
+                .build());
       }
 
+      // Abweichende Daten
+      if (coreData.deviatingDecisionDates() != null) {
+        builder.abweichendeDaten(
+            AbweichendeDaten.builder()
+                .daten(
+                    coreData.deviatingDecisionDates().stream()
+                        .map(
+                            date ->
+                                AbweichendeDaten.AbweichendesDatum.builder()
+                                    .value(DateUtils.toDateString(date))
+                                    .build())
+                        .toList())
+                .build());
+      }
+      // Abweichende Dokumentnummern
+      if (coreData.deviatingDocumentNumbers() != null) {
+        builder.abweichendeDokumentnummern(
+            AbweichendeDokumentnummern.builder()
+                .dokumentnummern(
+                    coreData.deviatingDocumentNumbers().stream()
+                        .map(
+                            docNumber ->
+                                AbweichendeDokumentnummern.AbweichendeDokumentnummer.builder()
+                                    .value(docNumber)
+                                    .build())
+                        .toList())
+                .build());
+      }
+      // Abweichende ECLIs
+      if (coreData.deviatingEclis() != null && !coreData.deviatingEclis().isEmpty()) {
+        var abweichendeEclis =
+            coreData.deviatingEclis().stream()
+                .map(ecli -> AbweichendeEclis.AbweichenderEcli.builder().value(ecli).build())
+                .toList();
+        builder.abweichendeEclis(AbweichendeEclis.builder().eclis(abweichendeEclis).build());
+      }
+
+      // Rechtskraft (map from legalEffect yes/no)
       if (coreData.legalEffect() != null) {
-        builder.legalEffect(coreData.legalEffect());
+        String legalEffect = coreData.legalEffect();
+        builder.rechtskraft(Rechtskraft.builder().value(legalEffect).build());
       }
 
+      // Vorgänge (previous procedures + current label)
+      if (coreData.procedure() != null) {
+        List<String> all = new ArrayList<>();
+        all.add(coreData.procedure().label());
+        if (coreData.previousProcedures() != null) {
+          all.addAll(coreData.previousProcedures());
+        }
+        builder.vorgaenge(
+            Vorgaenge.builder()
+                .vorgaenge(
+                    all.stream().map(v -> Vorgaenge.Vorgang.builder().value(v).build()).toList())
+                .build());
+      }
+
+      // Eingangsarten
       if (coreData.inputTypes() != null) {
-        applyIfNotEmpty(coreData.inputTypes(), builder::inputTypes);
+        builder.eingangsarten(
+            Eingangsarten.builder()
+                .eingangsarten(
+                    coreData.inputTypes().stream()
+                        .map(
+                            eingangsart ->
+                                Eingangsarten.Eingangsart.builder().content(eingangsart).build())
+                        .toList())
+                .build());
       }
-
-      builder
-          .documentType(
-              DocumentType.builder()
-                  .eId("dokumenttyp")
-                  .value(coreData.documentType().label())
-                  .build())
-          .courtLocation(nullSafeGet(coreData.court(), Court::location))
-          .courtType(nullSafeGet(coreData.court(), Court::type))
-          .judicialBody(nullIfEmpty(coreData.appraisalBody()))
-          .documentationOffice(
-              nullSafeGet(coreData.documentationOffice(), DocumentationOffice::abbreviation));
-    }
-
-    var decisionNames = nullSafeGet(decision.shortTexts(), ShortTexts::decisionNames);
-    if (decisionNames != null) {
-      builder.decisionName(decisionNames);
     }
 
     return builder.build();

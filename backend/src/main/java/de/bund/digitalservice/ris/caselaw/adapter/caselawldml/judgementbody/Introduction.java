@@ -22,5 +22,5 @@ import lombok.Setter;
 @XmlRootElement(name = "introduction", namespace = CaseLawLdml.AKN_NS)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Introduction extends BaseLdml {
-  @XmlAnyElement private List<Object> content = new ArrayList<>();
+  @Builder.Default @XmlAnyElement private List<Object> content = new ArrayList<>();
 }

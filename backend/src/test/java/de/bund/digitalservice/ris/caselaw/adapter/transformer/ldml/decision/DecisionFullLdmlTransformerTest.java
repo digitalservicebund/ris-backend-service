@@ -4,9 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.Notation;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
@@ -102,7 +105,7 @@ class DecisionFullLdmlTransformerTest {
                     .court(Court.builder().type("AG").location("Aachen").label("AG Aachen").build())
                     .documentType(
                         DocumentType.builder().label("testDocumentTypeAbbreviation").build())
-                    .legalEffect("ja")
+                    .legalEffect("Ja")
                     .fileNumbers(List.of("testFileNumber"))
                     .decisionDate(LocalDate.of(2020, 1, 1))
                     .build())
@@ -441,13 +444,11 @@ class DecisionFullLdmlTransformerTest {
   void testTransformToLdml_longTextWithIgnoreOnceTags_shouldRemoveTags() {
     String expected =
         """
-             <akn:decision>
-                <akn:block name="Entscheidungsgründe">
-                   <akn:embeddedStructure>
-                      <akn:p>text with ignored spell check issue</akn:p>
-                   </akn:embeddedStructure>
-                </akn:block>
-             </akn:decision>
+              <akn:judgmentBody>
+                 <akn:motivation ris:domainTerm="Entscheidungsgründe">
+                    <akn:p>text with ignored spell check issue</akn:p>
+                 </akn:motivation>
+              </akn:judgmentBody>
              """;
     Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
@@ -756,7 +757,7 @@ class DecisionFullLdmlTransformerTest {
                         .value(SourceValue.S)
                         .build())
                 .documentType(DocumentType.builder().label("documentType test").build())
-                .legalEffect("ja")
+                .legalEffect("Ja")
                 .fileNumbers(List.of("fileNumber test"))
                 .decisionDate(LocalDate.of(2020, 1, 1))
                 .oralHearingDates(List.of(LocalDate.of(2021, 2, 3), LocalDate.of(2020, 1, 2)))
@@ -773,7 +774,7 @@ class DecisionFullLdmlTransformerTest {
                 .previousProcedures(List.of("previous procedure test"))
                 .procedure(Procedure.builder().label("procedure test").build())
                 .deviatingEclis(List.of("deviating ecli test"))
-                .deviatingCourts(List.of("deviating court"))
+                .deviatingCourts(List.of("deviating court 1", "deviating court 2"))
                 .deviatingFileNumbers(List.of("deviating fileNumber"))
                 .deviatingDocumentNumbers(List.of("deviating documentNumber"))
                 .deviatingDecisionDates(List.of(LocalDate.of(2010, 5, 12)))
@@ -818,7 +819,12 @@ class DecisionFullLdmlTransformerTest {
                             .citationType(CitationType.builder().label("citation test").build())
                             .build()))
                 .keywords(List.of("keyword test"))
-                .fieldsOfLaw(List.of(FieldOfLaw.builder().text("fieldOfLaw test").build()))
+                .fieldsOfLaw(
+                    List.of(
+                        FieldOfLaw.builder()
+                            .text("fieldOfLaw test")
+                            .notation(Notation.NEW.toString())
+                            .build()))
                 .norms(
                     List.of(
                         NormReference.builder()
@@ -876,6 +882,8 @@ class DecisionFullLdmlTransformerTest {
                             .build(),
                         Definition.builder().definedTerm("Sachgesamtheit").build()))
                 .evsf("evsf test")
+                .appealAdmission(
+                    AppealAdmission.builder().admitted(true).by(AppealAdmitter.FG).build())
                 .build())
         .previousDecisions(List.of(previousDecision1, previousDecision2))
         .ensuingDecisions(List.of(ensuingDecision1, ensuingDecision2))

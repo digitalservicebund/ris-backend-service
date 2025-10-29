@@ -48,51 +48,21 @@
             </akn:references>
             <akn:proprietary source="#ris">
                 <ris:meta>
-                    <ris:previousDecisions>
-                        <ris:previousDecision date="2020-01-01">
-                            <ris:documentNumber>previous decision document number 1</ris:documentNumber>
-                            <ris:fileNumber>previous decision file number</ris:fileNumber>
-                            <ris:courtType>previous decision court type</ris:courtType>
-                        </ris:previousDecision>
-                        <ris:previousDecision date="2020-01-01">
-                            <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                            <ris:fileNumber>previous decision file number</ris:fileNumber>
-                            <ris:courtType>previous decision court type</ris:courtType>
-                        </ris:previousDecision>
-                    </ris:previousDecisions>
-                    <ris:ensuingDecisions>
-                        <ris:ensuingDecision date="2022-10-01">
-                            <ris:documentNumber>ensuing decision document number 1</ris:documentNumber>
-                            <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                            <ris:courtType>ensuing decision court type</ris:courtType>
-                        </ris:ensuingDecision>
-                        <ris:ensuingDecision date="2022-10-01">
-                            <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                            <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                            <ris:courtType>ensuing decision court type</ris:courtType>
-                        </ris:ensuingDecision>
-                    </ris:ensuingDecisions>
-                    <ris:fileNumbers>
-                        <ris:fileNumber>fileNumber test</ris:fileNumber>
-                    </ris:fileNumbers>
-                    <ris:documentType akn:eId="dokumenttyp">documentType test</ris:documentType>
-                    <ris:courtLocation>courtLocation</ris:courtLocation>
-                    <ris:courtType>courtType</ris:courtType>
-                    <ris:legalForces>
-                        <ris:legalForce>legalForce test</ris:legalForce>
-                    </ris:legalForces>
-                    <ris:judicialBody>appraisalBody test</ris:judicialBody>
-                    <ris:foreignLanguageVersions>
-                        <ris:foreignLanguageVersion>
-                            <akn:FRBRlanguage language="eng"/>
-                            <akn:documentRef href="https://ihre-url-zur-englischen-übersetzung" showAs="Englisch"/>
-                        </ris:foreignLanguageVersion>
-                        <ris:foreignLanguageVersion>
-                            <akn:FRBRlanguage language="fra"/>
-                            <akn:documentRef href="https://ihre-url-zur-französischen-übersetzung"
-                                             showAs="Französisch"/>
-                        </ris:foreignLanguageVersion>
-                    </ris:foreignLanguageVersions>
+                    <ris:dokumentTyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">documentType test</ris:dokumentTyp>
+                    <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+                        <ris:typ domainTerm="Gerichtstyp">courtType</ris:typ>
+                        <ris:ort domainTerm="Gerichtsort">courtLocation</ris:ort>
+                    </ris:gericht>
+                    <ris:regionen domainTerm="Regionen">
+                       <ris:region domainTerm="Region">NW</ris:region>
+                    </ris:regionen>
+                    <ris:dokumentationsstelle domainTerm="Dokumentationsstelle" akn:refersTo="#documentationoffice-dokumentationsstelle">documentationOffice</ris:dokumentationsstelle>
+                    <ris:aktenzeichenListe domainTerm="Aktenzeichenliste">
+                        <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">fileNumber test
+                        </ris:aktenzeichen>
+                    </ris:aktenzeichenListe>
+                    <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBody test
+                    </ris:spruchkoerper>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>

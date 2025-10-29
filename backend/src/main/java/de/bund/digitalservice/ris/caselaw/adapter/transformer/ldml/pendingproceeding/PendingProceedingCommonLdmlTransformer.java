@@ -13,19 +13,21 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Intr
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.JudgmentBody;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Motivation;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentType;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DokumentTyp;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumentationsstelle;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gericht;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Regionen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 
@@ -69,6 +71,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
 
   protected abstract Header buildHeader(PendingProceeding pendingProceeding);
 
+  @SuppressWarnings("java:S3776")
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(PendingProceeding pendingProceeding) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
 
@@ -77,34 +80,61 @@ public abstract class PendingProceedingCommonLdmlTransformer
           buildRelatedDecisions(pendingProceeding.previousDecisions()), builder::previousDecision);
     }
 
-    var contentRelatedIndexing = pendingProceeding.contentRelatedIndexing();
-    if (contentRelatedIndexing != null && contentRelatedIndexing.norms() != null) {
-      applyIfNotEmpty(
-          contentRelatedIndexing.norms().stream()
-              .flatMap(normReference -> normReference.singleNorms().stream())
-              .filter(Objects::nonNull)
-              .map(
-                  singleNorm -> {
-                    var type = nullSafeGet(singleNorm.legalForce(), LegalForce::type);
-                    return type != null ? type.label() : null;
-                  })
-              .filter(Objects::nonNull)
-              .toList(),
-          builder::legalForce);
-    }
-
     var coreData = pendingProceeding.coreData();
     if (coreData != null) {
-      applyIfNotEmpty(coreData.fileNumbers(), builder::fileNumbers);
+      // Dokumenttyp
+      builder.dokumentTyp(DokumentTyp.builder().value(coreData.documentType().label()).build());
 
-      builder
-          .documentType(
-              DocumentType.builder()
-                  .eId("dokumenttyp")
-                  .value(coreData.documentType().label())
-                  .build())
-          .courtLocation(nullSafeGet(coreData.court(), Court::location))
-          .courtType(nullSafeGet(coreData.court(), Court::type));
+      // Gericht (Gerichtstyp + Ort)
+      Court court = coreData.court();
+      if (court != null) {
+        builder.gericht(
+            Gericht.builder()
+                .refersTo("#gericht")
+                .typ(Gericht.GerichtTyp.builder().value(court.type()).build())
+                .ort(Gericht.GerichtOrt.builder().value(court.location()).build())
+                .build());
+      }
+
+      // Regionen
+      List<Regionen.Region> regionen = new ArrayList<>();
+      if (coreData.court() != null && coreData.court().regions() != null) {
+        coreData
+            .court()
+            .regions()
+            .forEach(region -> regionen.add(Regionen.Region.builder().value(region).build()));
+      }
+      if (!regionen.isEmpty()) {
+        builder.regionen(Regionen.builder().regionen(regionen).build());
+      }
+
+      // Dokumentationsstelle
+      if (coreData.documentationOffice() != null) {
+        String docOffice = coreData.documentationOffice().abbreviation();
+        builder.dokumentationsstelle(
+            Dokumentationsstelle.builder()
+                .refersTo("#" + docOffice.toLowerCase() + "-dokumentationsstelle")
+                .value(docOffice)
+                .build());
+      }
+
+      // Aktenzeichenliste
+      List<AktenzeichenListe.Aktenzeichen> aktenzeichenListe = new ArrayList<>();
+      if (coreData.fileNumbers() != null && !coreData.fileNumbers().isEmpty()) {
+        coreData
+            .fileNumbers()
+            .forEach(
+                fileNumber ->
+                    aktenzeichenListe.add(
+                        AktenzeichenListe.Aktenzeichen.builder()
+                            .refersTo("#aktenzeichen")
+                            .value(fileNumber)
+                            .build()));
+      }
+      if (!aktenzeichenListe.isEmpty()) {
+        builder.aktenzeichenListe(
+            AktenzeichenListe.builder().aktenzeichen(aktenzeichenListe).build());
+      }
     }
 
     return builder;
