@@ -720,7 +720,7 @@ class TextCheckServiceTest {
   void testAddIgnoredTextChecksIndividually_withOnceIgnoredWord_withSeveralOccurences() {
     // HTML with one wrapped instance and one unwrapped instance
     String originalHtml =
-        "<p>text text with <ignored-once>errrror</ignored-once> and same word again errrror</p>";
+        "<p>text text with <ignore-once>errrror</ignore-once> and same word again errrror</p>";
     String word = "errrror";
 
     final int FIRST_OFFSET = 31;
