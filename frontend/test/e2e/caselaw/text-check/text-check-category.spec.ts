@@ -336,9 +336,7 @@ test.describe(
             Promise.withResolvers<void>()
 
           await page.route(
-            "**/api/v1/caselaw/documentunits/" +
-              prefilledDocumentUnit.uuid +
-              "/text-check*",
+            `**/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}/text-check*`,
             async (route) => {
               await lock
               await route.fulfill(result)
@@ -474,53 +472,6 @@ test.describe(
             },
           ],
         }
-        const textCheckResolvers = [] as {
-          promise: Promise<void>
-          resolve: () => void
-        }[]
-
-        // A counter to track which promise in the array corresponds to the current API call.
-        let callCount = 0
-
-        // Helper to create a new lock object and add it to the array.
-        const createLock = () => {
-          const { promise, resolve } = Promise.withResolvers<void>()
-          textCheckResolvers.push({ promise, resolve })
-        }
-
-        // Mock the API route for text-check ONCE for the entire test.
-        await page.route(
-          "**/api/v1/caselaw/documentunits/" +
-            prefilledDocumentUnit.uuid +
-            "/text-check*",
-          async (route) => {
-            // Get the lock object corresponding to the current call index.
-            const currentLock = textCheckResolvers[callCount]
-            const currentCallIndex = callCount
-            callCount++ // Increment the counter for the next API call.
-
-            // PAUSE the network response until resolve() is called in the test body.
-            await currentLock.promise
-
-            let responseToFulfill
-
-            if (currentCallIndex === 0) {
-              responseToFulfill = headnoteResponseInitial
-            } else if (currentCallIndex === 1) {
-              responseToFulfill = guidingPrincipleResponseInitial
-            } else if (currentCallIndex === 2) {
-              responseToFulfill = headnoteResponseAfterIgnore
-            } else {
-              responseToFulfill = {}
-            }
-
-            await route.fulfill({
-              status: 200,
-              contentType: "application/json",
-              body: JSON.stringify(responseToFulfill),
-            })
-          },
-        )
 
         const headNoteEditor = page.getByTestId("Orientierungssatz")
         const headNoteEditorTextArea = headNoteEditor.locator("div")
@@ -547,7 +498,19 @@ test.describe(
 
         await test.step("trigger text check", async () => {
           // Prepare the lock for the first API call.
-          createLock()
+          const lock = Promise.withResolvers<void>()
+
+          await page.route(
+            `**/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}/text-check?category=headnote`,
+            async (route) => {
+              await lock.promise
+              await route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify(headnoteResponseInitial),
+              })
+            },
+          )
 
           await page
             .getByLabel("Orientierungssatz Button")
@@ -559,7 +522,7 @@ test.describe(
           ).toHaveText("Rechtschreibprüfung läuft")
 
           // Release the lock to end the first text check.
-          textCheckResolvers[0].resolve()
+          lock.resolve()
           await headNoteEditor
             .locator("text-check")
             .first()
@@ -636,7 +599,19 @@ test.describe(
           await expect(guidingPrincipleTextArea).toHaveText(textWithErrors.text)
 
           // Prepare the lock for the second API call.
-          createLock()
+          const lock = Promise.withResolvers<void>()
+
+          await page.route(
+            `**/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}/text-check?category=guidingPrinciple`,
+            async (route) => {
+              await lock.promise
+              await route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify(guidingPrincipleResponseInitial),
+              })
+            },
+          )
 
           await page
             .getByLabel("Leitsatz Button")
@@ -648,7 +623,7 @@ test.describe(
           ).toHaveText("Rechtschreibprüfung läuft")
 
           // Release the lock to end the second text check.
-          textCheckResolvers[1].resolve()
+          lock.resolve()
 
           await guidingPrinciple
             .locator("text-check")
@@ -683,7 +658,19 @@ test.describe(
           await headNoteEditorTextArea.fill(" ")
           await page.keyboard.press("Backspace")
           // Prepare the lock for the third API call.
-          createLock()
+          const lock = Promise.withResolvers<void>()
+
+          await page.route(
+            `**/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}/text-check?category=headnote`,
+            async (route) => {
+              await lock.promise
+              await route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify(headnoteResponseAfterIgnore),
+              })
+            },
+          )
 
           await page
             .getByLabel("Orientierungssatz Button")
@@ -694,7 +681,7 @@ test.describe(
             page.getByTestId("text-check-loading-status"),
           ).toHaveText("Rechtschreibprüfung läuft")
 
-          textCheckResolvers[2].resolve()
+          lock.resolve()
 
           await expect(
             page.getByTestId("text-check-loading-status"),
@@ -797,9 +784,7 @@ test.describe(
           const { promise, resolve } = Promise.withResolvers<void>()
 
           await page.route(
-            "**/api/v1/caselaw/documentunits/" +
-              prefilledDocumentUnit.uuid +
-              "/text-check*",
+            `**/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}/text-check?category=headnote`,
             async (route) => {
               await promise
               await route.fulfill({
@@ -989,9 +974,7 @@ test.describe(
           const { promise, resolve } = Promise.withResolvers<void>()
 
           await page.route(
-            "**/api/v1/caselaw/documentunits/" +
-              prefilledDocumentUnit.uuid +
-              "/text-check*",
+            `**/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}/text-check?category=headnote`,
             async (route) => {
               await promise
               await route.fulfill({
