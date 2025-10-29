@@ -333,7 +333,7 @@
     |akn:FRBRthis|akn:FRBRuri|akn:FRBRalias|akn:FRBRdate|akn:FRBRauthor|akn:FRBRcountry|akn:FRBRlanguage|akn:documentRef
     |ris:meta|ris:fileNumber|ris:dokumentTyp|ris:courtType|ris:gericht|ris:typ|ris:ort
     |ris:fehlerhafteGerichte|ris:fehlerhaftesGericht|ris:regionen|ris:region|ris:dokumentationsstelle
-    |ris:aktenzeichenListe|ris:aktenzeichen|ris:abweichendeDaten|ris:abweichendesDatum
+    |ris:aktenzeichenListe|ris:aktenzeichen|ris:abweichendeDaten|ris:abweichendesDatum|ris:datenDerMuendlichenVerhandlung|ris:datumDerMuendlichenVerhandlung
     |ris:abweichendeDokumentnummern|ris:abweichendeDokumentnummer|ris:abweichendeEclis|ris:abweichenderEcli
     |ris:spruchkoerper|ris:sachgebiete|ris:sachgebiet|ris:rechtskraft|ris:vorgaenge|ris:vorgang
     |ris:eingangsarten|ris:eingangsart|ris:definitionen|ris:definition|ris:definierterBegriff|ris:definierendeRandnummer|ris:fremdsprachigeFassungen|ris:fremdsprachigeFassung|ris:evsf|ris:rechtsmittelzulassung|ris:rechtsmittelZugelassen|ris:rechtsmittelZugelassenDurch

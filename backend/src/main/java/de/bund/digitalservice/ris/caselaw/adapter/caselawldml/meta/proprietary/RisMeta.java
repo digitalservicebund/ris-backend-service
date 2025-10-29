@@ -45,6 +45,9 @@ public class RisMeta {
   @XmlElement(name = "aktenzeichenListe", namespace = CaseLawLdml.RIS_NS)
   private AktenzeichenListe aktenzeichenListe;
 
+  @XmlElement(name = "datenDerMuendlichenVerhandlung", namespace = CaseLawLdml.RIS_NS)
+  private DatenDerMuendlichenVerhandlung datenDerMuendlichenVerhandlung;
+
   @XmlElement(name = "abweichendeDaten", namespace = CaseLawLdml.RIS_NS)
   private AbweichendeDaten abweichendeDaten;
 

@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.A
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDokumentnummern;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeEclis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DatenDerMuendlichenVerhandlung;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Definition;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Definitionen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentRef;
@@ -198,6 +199,22 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                         .toList())
                 .build());
       }
+      // Daten der mündlichen Verhandlung
+      if (coreData.oralHearingDates() != null) {
+        builder.datenDerMuendlichenVerhandlung(
+            DatenDerMuendlichenVerhandlung.builder()
+                .daten(
+                    coreData.oralHearingDates().stream()
+                        .map(
+                            date ->
+                                DatenDerMuendlichenVerhandlung.DatumDerMuendlichenVerhandlung
+                                    .builder()
+                                    .value(DateUtils.toDateString(date))
+                                    .build())
+                        .toList())
+                .build());
+      }
+
       // Abweichende Daten
       if (coreData.deviatingDecisionDates() != null) {
         builder.abweichendeDaten(

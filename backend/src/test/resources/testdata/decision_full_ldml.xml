@@ -65,6 +65,10 @@
                         <ris:aktenzeichen domainTerm="Abweichendes Aktenzeichen" >deviating fileNumber
                         </ris:aktenzeichen>
                     </ris:aktenzeichenListe>
+                    <ris:datenDerMuendlichenVerhandlung domainTerm="Daten der mündlichen Verhandlung">
+                       <ris:datumDerMuendlichenVerhandlung domainTerm="Datum der mündlichen Verhandlung">2021-02-03 </ris:datumDerMuendlichenVerhandlung>
+                       <ris:datumDerMuendlichenVerhandlung domainTerm="Datum der mündlichen Verhandlung">2020-01-02</ris:datumDerMuendlichenVerhandlung>
+                    </ris:datenDerMuendlichenVerhandlung>
                     <ris:abweichendeDaten domainTerm="Abweichende Daten">
                         <ris:abweichendesDatum domainTerm="Abweichendes Datum">2010-05-12</ris:abweichendesDatum>
                     </ris:abweichendeDaten>
