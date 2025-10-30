@@ -52,6 +52,7 @@
                     <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
                         <ris:typ domainTerm="Gerichtstyp">courtType</ris:typ>
                         <ris:ort domainTerm="Gerichtsort">courtLocation</ris:ort>
+                         <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBody test</ris:spruchkoerper>
                     </ris:gericht>
                     <ris:regionen domainTerm="Regionen">
                        <ris:region domainTerm="Region">NW</ris:region>
@@ -61,8 +62,6 @@
                         <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">fileNumber test
                         </ris:aktenzeichen>
                     </ris:aktenzeichenListe>
-                    <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBody test
-                    </ris:spruchkoerper>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>

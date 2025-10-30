@@ -352,6 +352,7 @@ class DecisionReducedLdmlTransformerTest {
                 <ris:gericht domainTerm="Gericht"akn:refersTo="#gericht">
                   <ris:typ domainTerm="Gerichtstyp">courtType</ris:typ>
                   <ris:ort domainTerm="Gerichtsort">courtLocation</ris:ort>
+                  <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBodytest</ris:spruchkoerper>
                 </ris:gericht>
                """),
         Arguments.of(

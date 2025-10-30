@@ -26,6 +26,9 @@ public class Gericht {
   @XmlElement(name = "ort", namespace = CaseLawLdml.RIS_NS)
   private GerichtOrt ort;
 
+  @XmlElement(name = "spruchkoerper", namespace = CaseLawLdml.RIS_NS)
+  private Spruchkoerper spruchkoerper;
+
   @NoArgsConstructor
   @AllArgsConstructor
   @Getter
@@ -44,6 +47,20 @@ public class Gericht {
   public static class GerichtOrt {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Gerichtsort";
+
+    @XmlValue private String value;
+  }
+
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Getter
+  @Builder
+  public static class Spruchkoerper {
+    @XmlAttribute(name = "domainTerm")
+    private static final String DOMAIN_TERM = "Spruchkörper";
+
+    @XmlAttribute(namespace = CaseLawLdml.AKN_NS, name = "refersTo")
+    private static final String REFERS_TO = "#spruchkoerper";
 
     @XmlValue private String value;
   }

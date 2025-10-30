@@ -20,7 +20,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.D
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gericht;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Regionen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Spruchkoerper;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransformer;
@@ -93,12 +92,16 @@ public abstract class DecisionCommonLdmlTransformer
       // Gericht (Gerichtstyp + Ort)
       Court court = coreData.court();
       if (court != null) {
-        builder.gericht(
+        Gericht.GerichtBuilder gerichtBuilder =
             Gericht.builder()
                 .refersTo("#gericht")
                 .typ(Gericht.GerichtTyp.builder().value(court.type()).build())
-                .ort(Gericht.GerichtOrt.builder().value(court.location()).build())
-                .build());
+                .ort(Gericht.GerichtOrt.builder().value(court.location()).build());
+        if (isNotBlank(coreData.appraisalBody())) {
+          gerichtBuilder.spruchkoerper(
+              Gericht.Spruchkoerper.builder().value(coreData.appraisalBody()).build());
+        }
+        builder.gericht(gerichtBuilder.build());
       }
 
       // Regionen
@@ -139,15 +142,6 @@ public abstract class DecisionCommonLdmlTransformer
       if (!aktenzeichenListe.isEmpty()) {
         builder.aktenzeichenListe(
             AktenzeichenListe.builder().aktenzeichen(aktenzeichenListe).build());
-      }
-
-      // Spruchkörper
-      if (coreData.appraisalBody() != null) {
-        builder.spruchkoerper(
-            Spruchkoerper.builder()
-                .refersTo("#spruchkoerper")
-                .value(coreData.appraisalBody())
-                .build());
       }
     }
 
