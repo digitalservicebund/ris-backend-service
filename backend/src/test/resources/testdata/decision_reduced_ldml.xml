@@ -31,6 +31,15 @@
                     <akn:FRBRauthor href="#documentationoffice-dokumentationsstelle"/>
                 </akn:FRBRManifestation>
             </akn:identification>
+            <akn:analysis source="#ris">
+                <akn:otherAnalysis source="#ris">
+                    <ris:dokumentarischeKurztexte domainTerm="Dokumentarische Kurztexte">
+                        <ris:titelzeile eId="titelzeile" ris:domainTerm="Titelzeile">
+                            Bundesverfassungsgericht – Urteil vom 23.09.2025 – Az. 1 BvR 1234/25
+                        </ris:titelzeile>
+                    </ris:dokumentarischeKurztexte>
+                </akn:otherAnalysis>
+            </akn:analysis>
             <akn:references source="#ris">
                 <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
                 <akn:TLCOrganization eId="documentationoffice-dokumentationsstelle"
