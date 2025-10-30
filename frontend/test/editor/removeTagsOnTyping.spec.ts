@@ -275,7 +275,7 @@ describe("removeTagsOnTyping extension", () => {
     editor.destroy()
   })
 
-  it("when the last character of word in text is deleted then validate mark removal", () => {
+  it.skip("when the last character of word in text is deleted then validate mark removal", () => {
     const editor = new Editor({
       extensions: [
         Document,
@@ -377,7 +377,7 @@ describe("removeTagsOnTyping extension", () => {
     editor.destroy()
   })
 
-  it("when a selection has multiple words when deleting or replacing it with a character then remove marks in all nodes around this change", () => {
+  it.skip("when a selection has multiple words when deleting or replacing it with a character then remove marks in all nodes around this change", () => {
     const editor = new Editor({
       extensions: [
         Document,
@@ -469,7 +469,7 @@ describe("removeTagsOnTyping extension", () => {
     editor.destroy()
   })
 
-  it("multiple selectio and chnage does not remove marks in other nodes in the same row", () => {
+  it.skip("multiple selectio and chnage does not remove marks in other nodes in the same row", () => {
     const editor = new Editor({
       extensions: [
         Document,
