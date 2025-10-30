@@ -372,6 +372,113 @@ test.describe(
     )
 
     test(
+      "ignore word once, multi-occurrence",
+      {
+        tag: ["@RISDEV-9171"],
+      },
+      async ({ page, prefilledDocumentUnit }) => {
+        const word = "errrror"
+        const textWithErrors = {
+          text: `Das ist ein ${word}. Das ist ein zweiter ${word}.`,
+        }
+
+        const initialResponse = {
+          htmlText: `<p>Das ist ein <text-check id="1" type="misspelling" ignored="false">${word}</text-check>. Das ist ein zweiter <text-check id="2" type="misspelling" ignored="false">${word}</text-check>.</p>`,
+          matches: [
+            // Assuming Match IDs 1 and 2 correspond to the first and second 'errrror'
+            {
+              id: 1,
+              word: word,
+              shortMessage: "Rechtschreibfehler",
+              category: "headnote",
+              isIgnoredOnce: false,
+            },
+            {
+              id: 2,
+              word: word,
+              shortMessage: "Rechtschreibfehler",
+              category: "headnote",
+              isIgnoredOnce: false,
+            },
+          ],
+        }
+
+        const headNoteEditor = page.getByTestId("Orientierungssatz")
+        const headNoteEditorTextArea = headNoteEditor.locator("div")
+        const errorRGB = convertHexToRGB(textCheckUnderlinesColors.error)
+        const ignoredRgbColors = convertHexToRGB(
+          textCheckUnderlinesColors.ignored,
+        )
+
+        await test.step("add text and run initial check", async () => {
+          await navigateToCategories(
+            page,
+            prefilledDocumentUnit.documentNumber,
+            {
+              category: DocumentUnitCategoriesEnum.TEXTS,
+            },
+          )
+          await clearTextField(page, headNoteEditorTextArea)
+          await headNoteEditorTextArea.fill(textWithErrors.text)
+
+          const lock = Promise.withResolvers<void>()
+          await page.route(
+            `**/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}/text-check?category=headnote`,
+            async (route) => {
+              await lock.promise
+              await route.fulfill({
+                status: 200,
+                contentType: "application/json",
+                body: JSON.stringify(initialResponse),
+              })
+            },
+          )
+
+          await page
+            .getByLabel("Orientierungssatz Button")
+            .getByRole("button", { name: "Rechtschreibprüfung" })
+            .click()
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toHaveText("Rechtschreibprüfung läuft")
+          lock.resolve()
+          await expect(page.locator(`text-check[ignored='false']`)).toHaveCount(
+            2,
+          )
+        })
+
+        await test.step("ignore the first occurrence once", async () => {
+          const firstTag = headNoteEditor.locator('text-check[id="1"]')
+          await firstTag.click()
+
+          await page.getByLabel("Hier ignorieren").click()
+
+          await expect(page.locator("ignore-once")).toHaveCount(1)
+          await expect(firstTag).toHaveCSS(
+            "border-bottom",
+            "2px solid " +
+              `rgb(${ignoredRgbColors.red}, ${ignoredRgbColors.green}, ${ignoredRgbColors.blue})`,
+          )
+        })
+
+        await test.step("verify second word remains an error", async () => {
+          const secondTag = headNoteEditor.locator('text-check[id="2"]')
+
+          await expect(page.locator(`text-check[ignored='false']`)).toHaveCount(
+            1,
+          )
+          await expect(page.locator("ignore-once")).toHaveCount(1)
+
+          await expect(secondTag).toHaveCSS("text-decoration-style", "wavy")
+          await expect(secondTag).toHaveCSS(
+            "text-decoration-color",
+            `rgb(${errorRGB.red}, ${errorRGB.green}, ${errorRGB.blue})`,
+          )
+        })
+      },
+    )
+
+    test(
       "ignore word once, then clicking on ignore in docunit",
       {
         tag: ["@RISDEV-9171"],
