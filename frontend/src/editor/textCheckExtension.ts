@@ -1,5 +1,6 @@
 import { Extension } from "@tiptap/core"
 import { removeTagsOnTypingPlugin } from "./removeTagsOnTyping"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { TextCheckExtensionOptions, TextCheckService } from "@/types/textCheck"
 
 declare module "@tiptap/core" {
@@ -14,9 +15,9 @@ declare module "@tiptap/core" {
   }
 }
 
-// const textCheckRemoveOnTypingFeatureToggle = useFeatureToggle(
-//   "neuris.text-check-remove-on-type",
-// )
+const textCheckRemoveOnTypingFeatureToggle = useFeatureToggle(
+  "neuris.text-check-remove-on-type",
+)
 
 export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
   name: "textCheckExtension",
@@ -78,10 +79,10 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
   },
 
   addProseMirrorPlugins() {
-    // if (textCheckRemoveOnTypingFeatureToggle) {
-    return [removeTagsOnTypingPlugin]
-    // } else {
-    // return []
-    // }
+    if (textCheckRemoveOnTypingFeatureToggle) {
+      return [removeTagsOnTypingPlugin]
+    } else {
+      return []
+    }
   },
 })
