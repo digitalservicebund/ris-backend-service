@@ -4,12 +4,17 @@ import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGe
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.DocTitle;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Classification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Keyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Analysis;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.DokumentarischeKurztexte;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Entscheidungsnamen;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.OtherAnalysis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrLanguage;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDaten;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDokumentnummern;
@@ -66,6 +71,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     return builder
         .identification(buildIdentification(decision))
         .references(buildReferences(decision))
+        .analysis(buildAnalysis(decision))
         .proprietary(Proprietary.builder().meta(buildRisMeta(decision)).build())
         .build();
   }
@@ -286,6 +292,82 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     }
 
     return builder.build();
+  }
+
+  private Analysis buildAnalysis(Decision decision) {
+    var builder = Analysis.builder();
+    boolean hasAnalysisData = false;
+
+    OtherAnalysis otherAnalysis = buildOtherAnalysis(decision);
+    if (otherAnalysis != null) {
+      hasAnalysisData = true;
+      builder.otherAnalysis(otherAnalysis);
+    }
+
+    if (hasAnalysisData) {
+      return builder.build();
+    } else {
+      return null;
+    }
+  }
+
+  private OtherAnalysis buildOtherAnalysis(Decision decision) {
+    var builder = DokumentarischeKurztexte.builder();
+    boolean hasOtherAnalysisData = false;
+
+    ShortTexts shortTexts = decision.shortTexts();
+    if (shortTexts != null) {
+      // Entscheidungsnamen
+      if (shortTexts.decisionNames() != null && !shortTexts.decisionNames().isEmpty()) {
+        hasOtherAnalysisData = true;
+        Entscheidungsnamen entscheidungsnamen =
+            Entscheidungsnamen.builder()
+                .entscheidungsnamen(
+                    shortTexts.decisionNames().stream()
+                        .map(
+                            entscheidungsname ->
+                                Entscheidungsnamen.Entscheidungsname.builder()
+                                    .value(entscheidungsname)
+                                    .build())
+                        .toList())
+                .build();
+        builder.entscheidungsnamen(entscheidungsnamen);
+      }
+
+      // Titelzeile
+      if (isNotBlank(shortTexts.guidingPrinciple())) {
+        hasOtherAnalysisData = true;
+        var titelzeile =
+            JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.guidingPrinciple()));
+        titelzeile.setDomainTerm("Titelzeile");
+        titelzeile.setEId("titelzeile");
+        builder.titelzeile(titelzeile);
+      }
+
+      // Orientierungssatz
+      if (isNotBlank(shortTexts.headnote())) {
+        hasOtherAnalysisData = true;
+        var orientierungssatz =
+            JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.headnote()));
+        orientierungssatz.setDomainTerm("Orientierungssatz");
+        builder.orientierungssatz(orientierungssatz);
+      }
+
+      // Sonstiger Orientierungssatz
+      if (isNotBlank(shortTexts.otherHeadnote())) {
+        hasOtherAnalysisData = true;
+        var sonstigerOrientierungssatz =
+            JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.otherHeadnote()));
+        sonstigerOrientierungssatz.setDomainTerm("Sonstiger Orientierungssatz");
+        builder.sonstigerOrientierungssatz(sonstigerOrientierungssatz);
+      }
+    }
+
+    if (hasOtherAnalysisData) {
+      return OtherAnalysis.builder().dokumentarischeKurztexte(builder.build()).build();
+    } else {
+      return null;
+    }
   }
 
   @Override
