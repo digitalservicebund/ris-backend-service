@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Transformer for converting decisions to the full LDML format. Includes additional metadata like
@@ -77,7 +78,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     var contentRelatedIndexing = decision.contentRelatedIndexing();
     if (contentRelatedIndexing != null) {
       // Sachgebiete
-      if (contentRelatedIndexing.fieldsOfLaw() != null) {
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.fieldsOfLaw())) {
         Sachgebiete sachgebiete =
             Sachgebiete.builder()
                 .sachgebiete(
@@ -94,7 +95,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       }
 
       // Definitionen
-      if (contentRelatedIndexing.definitions() != null) {
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.definitions())) {
         var defs =
             contentRelatedIndexing.definitions().stream()
                 .map(
@@ -141,8 +142,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
               });
 
       // Fremdsprachige Fassungen
-      if (contentRelatedIndexing.foreignLanguageVersions() != null
-          && !contentRelatedIndexing.foreignLanguageVersions().isEmpty()) {
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.foreignLanguageVersions())) {
         builder.fremdsprachigeFassungen(
             FremdsprachigeFassungen.builder()
                 .fremdsprachigeFassungen(
@@ -166,7 +166,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     var coreData = decision.coreData();
     if (coreData != null) {
 
-      if (coreData.deviatingFileNumbers() != null) {
+      if (!CollectionUtils.isEmpty(coreData.deviatingFileNumbers())) {
         // Aktenzeichenliste is already set in CommonTransformer
         AktenzeichenListe aktenzeichenListe = builder.build().getAktenzeichenListe();
         List<AktenzeichenListe.Aktenzeichen> aktenzeichen = aktenzeichenListe.getAktenzeichen();
@@ -186,7 +186,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       }
 
       // Fehlerhafte Gerichte
-      if (coreData.deviatingCourts() != null) {
+      if (!CollectionUtils.isEmpty(coreData.deviatingCourts())) {
         builder.fehlerhafteGerichte(
             FehlerhafteGerichte.builder()
                 .fehlerhafteGerichte(
@@ -200,7 +200,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                 .build());
       }
       // Daten der mündlichen Verhandlung
-      if (coreData.oralHearingDates() != null) {
+      if (!CollectionUtils.isEmpty(coreData.oralHearingDates())) {
         builder.datenDerMuendlichenVerhandlung(
             DatenDerMuendlichenVerhandlung.builder()
                 .daten(
@@ -216,7 +216,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       }
 
       // Abweichende Daten
-      if (coreData.deviatingDecisionDates() != null) {
+      if (!CollectionUtils.isEmpty(coreData.deviatingDecisionDates())) {
         builder.abweichendeDaten(
             AbweichendeDaten.builder()
                 .daten(
@@ -230,7 +230,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                 .build());
       }
       // Abweichende Dokumentnummern
-      if (coreData.deviatingDocumentNumbers() != null) {
+      if (!CollectionUtils.isEmpty(coreData.deviatingDocumentNumbers())) {
         builder.abweichendeDokumentnummern(
             AbweichendeDokumentnummern.builder()
                 .dokumentnummern(
@@ -244,7 +244,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                 .build());
       }
       // Abweichende ECLIs
-      if (coreData.deviatingEclis() != null && !coreData.deviatingEclis().isEmpty()) {
+      if (!CollectionUtils.isEmpty(coreData.deviatingEclis())) {
         var abweichendeEclis =
             coreData.deviatingEclis().stream()
                 .map(ecli -> AbweichendeEclis.AbweichenderEcli.builder().value(ecli).build())
@@ -273,7 +273,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       }
 
       // Eingangsarten
-      if (coreData.inputTypes() != null) {
+      if (!CollectionUtils.isEmpty(coreData.inputTypes())) {
         builder.eingangsarten(
             Eingangsarten.builder()
                 .eingangsarten(
@@ -299,7 +299,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     var headline = nullSafeGet(shortTexts, ShortTexts::headline);
 
     // Entscheidungsname
-    if (decisionNames != null && !decisionNames.isEmpty()) {
+    if (!CollectionUtils.isEmpty(decisionNames)) {
       Paragraph decisionNameParagraph = Paragraph.builder().content(new ArrayList<>()).build();
       decisionNameParagraph.getContent().add("Entscheidungsnamen: ");
       shortTexts

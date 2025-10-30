@@ -34,6 +34,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Abstract base class for transforming decisions into LDML case law format. Provides common
@@ -102,7 +103,7 @@ public abstract class DecisionCommonLdmlTransformer
 
       // Regionen
       List<Regionen.Region> regionen = new ArrayList<>();
-      if (coreData.court() != null && coreData.court().regions() != null) {
+      if (coreData.court() != null && !CollectionUtils.isEmpty(coreData.court().regions())) {
         coreData
             .court()
             .regions()
@@ -124,7 +125,7 @@ public abstract class DecisionCommonLdmlTransformer
 
       // Aktenzeichenliste
       List<AktenzeichenListe.Aktenzeichen> aktenzeichenListe = new ArrayList<>();
-      if (coreData.fileNumbers() != null && !coreData.fileNumbers().isEmpty()) {
+      if (!CollectionUtils.isEmpty(coreData.fileNumbers())) {
         coreData
             .fileNumbers()
             .forEach(
@@ -259,7 +260,7 @@ public abstract class DecisionCommonLdmlTransformer
 
     List<Opinion> opinions = new ArrayList<>();
 
-    if (participatingJudges != null && !participatingJudges.isEmpty()) {
+    if (!CollectionUtils.isEmpty(participatingJudges)) {
       for (var judge : participatingJudges) {
         String byAttribute = "#" + toKebabCase(judge.name());
         Opinion opinion;
