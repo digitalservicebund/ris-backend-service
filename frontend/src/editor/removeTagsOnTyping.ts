@@ -94,42 +94,24 @@ const removeTagsOnTypingPlugin = new Plugin({
         newState.doc.content.size >= realTo
       ) {
         // Normal case
-        console.log("Normal case, both from and to are in bounds.")
       } else if (
         newState.doc.content.size >= realFrom &&
         newState.doc.content.size <= realTo
       ) {
         // From is in the new document but to is not anymore.
-        console.log(
-          "From is in the new document but to is not anymore. doing realTo = realFrom",
-        )
         realTo = realFrom
       } else if (
         newState.doc.content.size <= realFrom &&
         newState.doc.content.size >= realTo
       ) {
         // To is in the new document but from is not anymore.
-        console.log(
-          "To is in the new document but from is not anymore. doing realFrom = realTo",
-        )
         realFrom = realTo
       } else {
         // Both from and to are out of bounds, skip.
-        console.log("Both from and to are out of bounds, skipping.")
         return
       }
 
       newState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
-        console.log(
-          "Node between NEW state:",
-          { node, pos },
-          "isText:",
-          node.isText,
-          "nodeSize:",
-          node.nodeSize,
-          "nodeMark:",
-          node.marks,
-        )
         if (node && node.isText && node.text !== " ") {
           newStateTransaction.removeMark(
             pos,
