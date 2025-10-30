@@ -180,7 +180,8 @@ function findCorrectPosition(step: Step): {
     // Why realFrom !== 0? Because when replacing from 0,
     // it means we probably/hopefully ran language check
     // and whole content is replaced.
-    // In that case we just want to let it slide!
+    // In that case we just want to skip processing.
+    // specialCase = true means later we don't do anything.
     realFrom = stepFrom // + (deletedSize - insertedSize)
     realTo = stepTo // - (deletedSize - insertedSize)
     specialCase = true
