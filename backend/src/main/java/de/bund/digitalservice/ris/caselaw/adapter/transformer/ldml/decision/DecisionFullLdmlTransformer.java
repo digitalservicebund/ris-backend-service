@@ -16,7 +16,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.A
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeEclis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DatenDerMuendlichenVerhandlung;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Definition;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Definitionen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentRef;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Eingangsarten;
@@ -100,15 +99,15 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
             contentRelatedIndexing.definitions().stream()
                 .map(
                     definition ->
-                        Definition.builder()
+                        Definitionen.Definition.builder()
                             .definierterBegriff(
-                                Definition.DefinierterBegriff.builder()
+                                Definitionen.Definition.DefinierterBegriff.builder()
                                     .value(definition.definedTerm())
                                     .build())
                             .definierendeRandnummer(
                                 definition.definingBorderNumber() == null
                                     ? null
-                                    : Definition.DefinierendeRandnummer.builder()
+                                    : Definitionen.Definition.DefinierendeRandnummer.builder()
                                         .refersTo(
                                             "#randnummer-" + definition.definingBorderNumber())
                                         .value(String.valueOf(definition.definingBorderNumber()))
