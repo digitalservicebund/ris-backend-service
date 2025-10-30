@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/vue"
 import { EditorState, Plugin, PluginKey, Transaction } from "prosemirror-state"
 import { ReplaceStep, Step } from "prosemirror-transform"
 import { IgnoreOnceTagName } from "./ignoreOnceMark"
@@ -10,47 +11,23 @@ const removeTagsOnTypingKey = new PluginKey("removeTagsOnTyping")
 
 const removeTagsOnTypingPlugin = new Plugin({
   key: removeTagsOnTypingKey,
-  state: {
-    init() {
-      return { skipNext: false }
-    },
-    apply(tr) {
-      const meta = tr.getMeta(removeTagsOnTypingKey)
-      if (meta?.skipNext !== undefined) {
-        return { skipNext: meta.skipNext }
-      }
-      return { skipNext: false } // Reset after each transaction
-    },
-  },
-  props: {
-    handleKeyDown(view, event) {
-      if (event.key === "Enter") {
-        const { state } = view
-        const isAtEnd = state.selection.$from.pos === state.doc.content.size
-
-        if (isAtEnd) {
-          const tr = state.tr.setMeta(removeTagsOnTypingKey, { skipNext: true })
-          view.dispatch(tr)
-        }
-      }
-    },
-  },
   appendTransaction: (
     transactions: readonly Transaction[],
     oldState: EditorState,
     newState: EditorState,
   ) => {
-    const pluginState = removeTagsOnTypingKey.getState(newState)
+    if (transactions.length > 1) {
+      Sentry.captureMessage(
+        "removeTagsOnTypingPlugin: Multiple transactions detected, skipping tag removal.",
+      )
+      return null
+    }
 
     if (!isDocumentChanged(transactions, oldState, newState)) {
       return null
     }
 
     if (!hasTextCheckMarksInDocument(newState)) {
-      return null
-    }
-
-    if (pluginState.skipNext) {
       return null
     }
 
