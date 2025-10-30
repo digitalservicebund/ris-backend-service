@@ -5,6 +5,7 @@ import { Text } from "@tiptap/extension-text"
 import { describe, it, expect } from "vitest"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
 const textCheckMarkAttrs = {
   id: "1",
@@ -13,6 +14,14 @@ const textCheckMarkAttrs = {
 }
 
 describe("removeTagsOnTyping extension", () => {
+  beforeEach(() => {
+    useFeatureToggleServiceMock()
+  })
+
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
+
   it("removes textCheckMark when text is edited inside the mark", () => {
     const editor = new Editor({
       extensions: [
