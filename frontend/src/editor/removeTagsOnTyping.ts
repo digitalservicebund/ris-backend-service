@@ -19,6 +19,7 @@ const removeTagsOnTypingPlugin = new Plugin({
     if (transactions.length > 1) {
       Sentry.captureMessage(
         "removeTagsOnTypingPlugin: Multiple transactions detected, skipping tag removal.",
+        "info",
       )
       return null
     }
@@ -64,6 +65,10 @@ const removeTagsOnTypingPlugin = new Plugin({
         // they find a node before last that is not a text node.
         // So I am forcing the position to be before last character
         // because then I find the last text node correctly.
+        Sentry.captureMessage(
+          `removeTagsOnTypingPlugin: Last character deletion case handled. realFrom=${realFrom}, realTo=${realTo}, docSize=${newState.doc.content.size}`,
+          "info",
+        )
         realFrom = newState.doc.content.size - 2
         realTo = realFrom
       } else if (
@@ -76,12 +81,20 @@ const removeTagsOnTypingPlugin = new Plugin({
         newState.doc.content.size <= realTo
       ) {
         // From is in the new document but to is not anymore.
+        Sentry.captureMessage(
+          `removeTagsOnTypingPlugin: realTo greater than doc size, setting to realFrom. realFrom=${realFrom}, realTo=${realTo}, docSize=${newState.doc.content.size}`,
+          "info",
+        )
         realTo = realFrom
       } else if (
         newState.doc.content.size <= realFrom &&
         newState.doc.content.size >= realTo
       ) {
         // To is in the new document but from is not anymore.
+        Sentry.captureMessage(
+          `removeTagsOnTypingPlugin: realFrom greater than doc size, setting to realTo. realFrom=${realFrom}, realTo=${realTo}, docSize=${newState.doc.content.size}`,
+          "info",
+        )
         realFrom = realTo
       } else {
         // Both from and to are out of bounds, skip.
@@ -104,6 +117,11 @@ const removeTagsOnTypingPlugin = new Plugin({
         }
       })
     })
+
+    Sentry.captureMessage(
+      `removeTagsOnTypingPlugin: Processing completed. modified=${modified} applying transaction steps=${newStateTransaction.steps.length}`,
+      "info",
+    )
 
     return modified ? newStateTransaction : null
   },
