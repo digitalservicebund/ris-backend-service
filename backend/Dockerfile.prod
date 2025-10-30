@@ -1,0 +1,19 @@
+FROM gradle:9.2-jdk21 AS backend-builder
+WORKDIR /app
+COPY . /app
+RUN --mount=type=secret,id=GH_PACKAGES_REPOSITORY_USER \
+    --mount=type=secret,id=GH_PACKAGES_REPOSITORY_TOKEN \
+    if [ -f /run/secrets/GH_PACKAGES_REPOSITORY_USER ]; then \
+        export GH_PACKAGES_REPOSITORY_USER=$(cat /run/secrets/GH_PACKAGES_REPOSITORY_USER); \
+    fi; \
+    if [ -f /run/secrets/GH_PACKAGES_REPOSITORY_TOKEN ]; then \
+        export GH_PACKAGES_REPOSITORY_TOKEN=$(cat /run/secrets/GH_PACKAGES_REPOSITORY_TOKEN); \
+    fi; \
+    ./gradlew build -x integrationTest -x test -x spotlessCheck
+
+
+FROM cgr.dev/chainguard/jre@sha256:f452e791bdf8a70267d8ad08b506ab57c7471ab6e47c4940431d1bac0f917637
+COPY --from=backend-builder /app/build/libs/ris-backend-service-*.jar /app/app.jar
+ENV spring.cloud.bootstrap.enabled=true
+EXPOSE 8080
+ENTRYPOINT ["java", "-XX:+HeapDumpOnOutOfMemoryError", "-XX:HeapDumpPath=/etc/heap-dumps/heap-dump.bin", "-jar", "/app/app.jar"]
