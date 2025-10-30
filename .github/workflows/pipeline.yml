@@ -85,7 +85,7 @@ jobs:
         run: docker pull paketobuildpacks/builder-jammy-tiny:latest
       - name: Build backend image
         working-directory: ./backend
-        run: ./gradlew bootBuildImage
+        run: ./gradlew bootBuildImage --no-daemon -Pspring-boot.build-image.clean-cache=true
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
