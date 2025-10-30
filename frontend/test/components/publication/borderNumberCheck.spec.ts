@@ -5,12 +5,14 @@ import {
   BorderNumberLinkValidationResult,
   BorderNumberValidationResult,
 } from "@/services/borderNumberService"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 import routes from "~pages"
 
 describe("BorderNumberCheck", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useRealTimers()
+    useFeatureToggleServiceMock()
   })
 
   describe("Valid border numbers and links", () => {
