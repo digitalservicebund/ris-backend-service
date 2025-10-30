@@ -41,7 +41,6 @@ const removeTagsOnTypingPlugin = new Plugin({
       // then realFrom and realTo can be out of bounds and their
       // use in fetching a node will cause error and prevent a
       // deletion or in this case row deletion.
-      // console.log("Node size NEW:", newState.doc.content.size, " OLD:", oldState.doc.content.size)
       if (realFrom === 0 && realTo === 0) {
         return
       } else if (
@@ -55,38 +54,32 @@ const removeTagsOnTypingPlugin = new Plugin({
         // because then I find the last text node correctly.
         realFrom = newState.doc.content.size - 2
         realTo = realFrom
-        // console.log("HERE")
       } else if (
         newState.doc.content.size >= realFrom &&
         newState.doc.content.size >= realTo
       ) {
-        // Normal case, all good
-        // console.log("OK")
+        // Normal case
       } else if (
         newState.doc.content.size >= realFrom &&
         newState.doc.content.size <= realTo
       ) {
         // From is in the new document but to is not anymore.
-        // console.log("WEIRD")
         realTo = realFrom
+        // realTo = newState.doc.content.size
       } else if (
         newState.doc.content.size <= realFrom &&
         newState.doc.content.size >= realTo
       ) {
         // To is in the new document but from is not anymore.
-        // console.log("SET")
         realFrom = realTo
       } else {
         // Both from and to are out of bounds, skip.
-        // console.log("MATCH")
         return
       }
 
       if (!specialCase) {
         oldState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
-          // console.log("OLD node", node, "at pos", pos)
           if (node.isText) {
-            // console.log("Removing marks from OLD node", node, " at pos", pos, " with text", node.text)
             newStateTransaction.removeMark(
               pos,
               pos + node.nodeSize,
@@ -102,9 +95,7 @@ const removeTagsOnTypingPlugin = new Plugin({
         })
 
         newState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
-          // console.log("NEW node", node, "at pos", pos)
           if (node.isText && node.text !== " ") {
-            // console.log("Removing marks from NEW node", node, " at pos", pos, " with text", node.text)
             newStateTransaction.removeMark(
               pos,
               pos + node.nodeSize,
@@ -121,12 +112,21 @@ const removeTagsOnTypingPlugin = new Plugin({
       } else {
         // Special case handling for deletion + insertion.
         // It is expected to find a single node which is a paragraph
-        // containing leftover text nodes that need to be processed
-        // for removal of marks.
+        // containing more child nodes but not all of them need
+        // to be processed for removal of marks.
+        let previousChanged = false
         newState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
-          // console.log("CHILD node", node, "at pos", pos)
           node.descendants((childNode, posInParent) => {
-            if (childNode.isText && childNode.text !== " ") {
+            const childAbsolutePositionStart = pos + 1 + posInParent
+            const childAbsolutePositionEnd =
+              childAbsolutePositionStart + childNode.nodeSize
+            if (
+              (childNode.isText &&
+                childNode.text !== " " &&
+                childAbsolutePositionEnd >= realFrom &&
+                childAbsolutePositionStart <= realTo) ||
+              previousChanged
+            ) {
               newStateTransaction.removeMark(
                 pos + 1 + posInParent,
                 pos + 1 + posInParent + childNode.nodeSize,
@@ -138,6 +138,11 @@ const removeTagsOnTypingPlugin = new Plugin({
                 newState.schema.marks[IgnoreOnceTagName],
               )
               modified = true
+              if (!previousChanged) {
+                previousChanged = true
+              } else {
+                previousChanged = false
+              }
             }
           })
         })
@@ -163,8 +168,6 @@ function findCorrectPosition(step: Step): {
   const insertedSize = step.slice.size
   let specialCase = false
 
-  // console.log("Step details:", { stepFrom, stepTo, deletedSize, insertedSize })
-
   let realFrom = stepFrom
   let realTo = 0
   if (deletedSize === 0 && insertedSize > 0) {
@@ -184,14 +187,11 @@ function findCorrectPosition(step: Step): {
     realFrom = stepFrom // + (deletedSize - insertedSize)
     realTo = stepTo // - (deletedSize - insertedSize)
     specialCase = true
-    // console.log("Weird case of deletion + insertion:", { realFrom })
-    // console.log("Weird case of deletion + insertion:", { realTo })
   } else {
     // Replacement
     realTo = stepTo + insertedSize
   }
 
-  // console.log("Calculated positions:", { realFrom, realTo })
   return { realFrom, realTo, specialCase }
 }
 

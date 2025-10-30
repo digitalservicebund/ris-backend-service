@@ -533,8 +533,8 @@ describe("removeTagsOnTyping extension", () => {
     const secondFrom = 19
     const secondTo = 29
     const thirdFrom = 30
-    const thirdTo = 40
-    const fourthFrom = 41
+    const thirdTo = 39
+    const fourthFrom = 40
     const fourthTo = 51
 
     editor.commands.command(({ tr }) => {
