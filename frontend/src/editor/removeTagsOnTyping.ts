@@ -77,7 +77,44 @@ const removeTagsOnTypingPlugin = new Plugin({
         return
       }
 
-      if (!specialCase) {
+      if (specialCase) {
+        // Special case handling for deletion + insertion.
+        // It is expected to find a single node which is a paragraph
+        // containing more child nodes but not all of them need
+        // to be processed for removal of marks.
+        let previousChanged = false
+        newState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
+          node.descendants((childNode, posInParent) => {
+            const childAbsolutePositionStart = pos + 1 + posInParent
+            const childAbsolutePositionEnd =
+              childAbsolutePositionStart + childNode.nodeSize
+            if (
+              (childNode.isText &&
+                childNode.text !== " " &&
+                childAbsolutePositionEnd >= realFrom &&
+                childAbsolutePositionStart <= realTo) ||
+              previousChanged
+            ) {
+              newStateTransaction.removeMark(
+                pos + 1 + posInParent,
+                pos + 1 + posInParent + childNode.nodeSize,
+                newState.schema.marks[TextCheckTagName],
+              )
+              newStateTransaction.removeMark(
+                pos + posInParent,
+                pos + posInParent + childNode.nodeSize,
+                newState.schema.marks[IgnoreOnceTagName],
+              )
+              modified = true
+              if (previousChanged) {
+                previousChanged = false
+              } else {
+                previousChanged = true
+              }
+            }
+          })
+        })
+      } else {
         oldState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
           if (node.isText) {
             newStateTransaction.removeMark(
@@ -108,43 +145,6 @@ const removeTagsOnTypingPlugin = new Plugin({
             )
             modified = true
           }
-        })
-      } else {
-        // Special case handling for deletion + insertion.
-        // It is expected to find a single node which is a paragraph
-        // containing more child nodes but not all of them need
-        // to be processed for removal of marks.
-        let previousChanged = false
-        newState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
-          node.descendants((childNode, posInParent) => {
-            const childAbsolutePositionStart = pos + 1 + posInParent
-            const childAbsolutePositionEnd =
-              childAbsolutePositionStart + childNode.nodeSize
-            if (
-              (childNode.isText &&
-                childNode.text !== " " &&
-                childAbsolutePositionEnd >= realFrom &&
-                childAbsolutePositionStart <= realTo) ||
-              previousChanged
-            ) {
-              newStateTransaction.removeMark(
-                pos + 1 + posInParent,
-                pos + 1 + posInParent + childNode.nodeSize,
-                newState.schema.marks[TextCheckTagName],
-              )
-              newStateTransaction.removeMark(
-                pos + posInParent,
-                pos + posInParent + childNode.nodeSize,
-                newState.schema.marks[IgnoreOnceTagName],
-              )
-              modified = true
-              if (!previousChanged) {
-                previousChanged = true
-              } else {
-                previousChanged = false
-              }
-            }
-          })
         })
       }
     })
