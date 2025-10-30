@@ -34,6 +34,29 @@
             <akn:classification source="#ris">
                 <akn:keyword dictionary="" ris:domainTerm="Schlagwort" showAs="keyword test" value="keyword test"/>
             </akn:classification>
+            <akn:analysis source="#ris">
+                <akn:otherAnalysis source="#ris">
+                    <ris:dokumentarischeKurztexte domainTerm="Dokumentarische Kurztexte">
+                        <ris:entscheidungsnamen domainTerm="Entscheidungsnamen">
+                            <ris:entscheidungsname domainTerm="Entscheidungsname">
+                                decisionName test
+                            </ris:entscheidungsname>
+                            <ris:entscheidungsname domainTerm="Entscheidungsname">
+                                decisionName2 test
+                            </ris:entscheidungsname>
+                        </ris:entscheidungsnamen>
+                        <ris:titelzeile akn:eId="titelzeile" ris:domainTerm="Titelzeile">
+                            <akn:p>guidingPrinciple test</akn:p>
+                        </ris:titelzeile>
+                        <ris:orientierungssatz ris:domainTerm="Orientierungssatz">
+                            <akn:p>headNote test</akn:p>
+                        </ris:orientierungssatz>
+                        <ris:sonstigerOrientierungssatz ris:domainTerm="Sonstiger Orientierungssatz">
+                            <akn:p>otherHeadNote test</akn:p>
+                        </ris:sonstigerOrientierungssatz>
+                    </ris:dokumentarischeKurztexte>
+                </akn:otherAnalysis>
+            </akn:analysis>
             <akn:references source="#ris">
                 <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
                 <akn:TLCOrganization eId="documentationoffice-dokumentationsstelle" href=""
