@@ -128,6 +128,7 @@ export interface TextCheckService {
    * Updates all matches marks in text based on their ignored status
    */
   updatedMatchesInText(
+    // test
     state: EditorState,
     /* eslint-disable @typescript-eslint/no-explicit-any */
     dispatch: ((args?: any) => any) | undefined,
