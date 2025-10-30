@@ -10,16 +10,47 @@ const removeTagsOnTypingKey = new PluginKey("removeTagsOnTyping")
 
 const removeTagsOnTypingPlugin = new Plugin({
   key: removeTagsOnTypingKey,
+  state: {
+    init() {
+      return { skipNext: false }
+    },
+    apply(tr) {
+      const meta = tr.getMeta(removeTagsOnTypingKey)
+      if (meta?.skipNext !== undefined) {
+        return { skipNext: meta.skipNext }
+      }
+      return { skipNext: false } // Reset after each transaction
+    },
+  },
+  props: {
+    handleKeyDown(view, event) {
+      if (event.key === "Enter") {
+        const { state } = view
+        const isAtEnd = state.selection.$from.pos === state.doc.content.size
+
+        if (isAtEnd) {
+          const tr = state.tr.setMeta(removeTagsOnTypingKey, { skipNext: true })
+          view.dispatch(tr)
+        }
+      }
+    },
+  },
   appendTransaction: (
     transactions: readonly Transaction[],
     oldState: EditorState,
     newState: EditorState,
   ) => {
+    const pluginState = removeTagsOnTypingKey.getState(newState)
+
     if (!isDocumentChanged(transactions, oldState, newState)) {
       return null
     }
 
     if (!hasTextCheckMarksInDocument(newState)) {
+      return null
+    }
+
+    if (pluginState.skipNext) {
       return null
     }
 
@@ -36,6 +67,10 @@ const removeTagsOnTypingPlugin = new Plugin({
 
       let { realFrom, realTo } = findCorrectPosition(transaction.steps[0])
       const { specialCase } = findCorrectPosition(transaction.steps[0])
+      if (specialCase) {
+        return
+      }
+
       // Safety check -------------------------------------------
       // When using backspace on the last row with no characters,
       // then realFrom and realTo can be out of bounds and their
@@ -59,94 +94,56 @@ const removeTagsOnTypingPlugin = new Plugin({
         newState.doc.content.size >= realTo
       ) {
         // Normal case
+        console.log("Normal case, both from and to are in bounds.")
       } else if (
         newState.doc.content.size >= realFrom &&
         newState.doc.content.size <= realTo
       ) {
         // From is in the new document but to is not anymore.
+        console.log(
+          "From is in the new document but to is not anymore. doing realTo = realFrom",
+        )
         realTo = realFrom
-        // realTo = newState.doc.content.size
       } else if (
         newState.doc.content.size <= realFrom &&
         newState.doc.content.size >= realTo
       ) {
         // To is in the new document but from is not anymore.
+        console.log(
+          "To is in the new document but from is not anymore. doing realFrom = realTo",
+        )
         realFrom = realTo
       } else {
         // Both from and to are out of bounds, skip.
+        console.log("Both from and to are out of bounds, skipping.")
         return
       }
 
-      if (specialCase) {
-        // Special case handling for deletion + insertion.
-        // It is expected to find a single node which is a paragraph
-        // containing more child nodes but not all of them need
-        // to be processed for removal of marks.
-        let previousChanged = false
-        newState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
-          node.descendants((childNode, posInParent) => {
-            const childAbsolutePositionStart = pos + 1 + posInParent
-            const childAbsolutePositionEnd =
-              childAbsolutePositionStart + childNode.nodeSize
-            if (
-              (childNode.isText &&
-                childNode.text !== " " &&
-                childAbsolutePositionEnd >= realFrom &&
-                childAbsolutePositionStart <= realTo) ||
-              previousChanged
-            ) {
-              newStateTransaction.removeMark(
-                pos + 1 + posInParent,
-                pos + 1 + posInParent + childNode.nodeSize,
-                newState.schema.marks[TextCheckTagName],
-              )
-              newStateTransaction.removeMark(
-                pos + posInParent,
-                pos + posInParent + childNode.nodeSize,
-                newState.schema.marks[IgnoreOnceTagName],
-              )
-              modified = true
-              if (previousChanged) {
-                previousChanged = false
-              } else {
-                previousChanged = true
-              }
-            }
-          })
-        })
-      } else {
-        oldState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
-          if (node.isText) {
-            newStateTransaction.removeMark(
-              pos,
-              pos + node.nodeSize,
-              newState.schema.marks[TextCheckTagName],
-            )
-            newStateTransaction.removeMark(
-              pos,
-              pos + node.nodeSize,
-              newState.schema.marks[IgnoreOnceTagName],
-            )
-            modified = true
-          }
-        })
-
-        newState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
-          if (node.isText && node.text !== " ") {
-            newStateTransaction.removeMark(
-              pos,
-              pos + node.nodeSize,
-              newState.schema.marks[TextCheckTagName],
-            )
-            newStateTransaction.removeMark(
-              pos,
-              pos + node.nodeSize,
-              newState.schema.marks[IgnoreOnceTagName],
-            )
-            modified = true
-          }
-        })
-      }
+      newState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
+        console.log(
+          "Node between NEW state:",
+          { node, pos },
+          "isText:",
+          node.isText,
+          "nodeSize:",
+          node.nodeSize,
+          "nodeMark:",
+          node.marks,
+        )
+        if (node && node.isText && node.text !== " ") {
+          newStateTransaction.removeMark(
+            pos,
+            pos + node.nodeSize,
+            newState.schema.marks[TextCheckTagName],
+          )
+          newStateTransaction.removeMark(
+            pos,
+            pos + node.nodeSize,
+            newState.schema.marks[IgnoreOnceTagName],
+          )
+          modified = true
+        }
+      })
     })
 
     return modified ? newStateTransaction : null
@@ -191,7 +188,6 @@ function findCorrectPosition(step: Step): {
     // Replacement
     realTo = stepTo + insertedSize
   }
-
   return { realFrom, realTo, specialCase }
 }
 
