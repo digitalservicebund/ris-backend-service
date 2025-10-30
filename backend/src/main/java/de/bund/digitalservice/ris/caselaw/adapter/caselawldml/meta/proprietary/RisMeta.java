@@ -57,9 +57,6 @@ public class RisMeta {
   @XmlElement(name = "abweichendeEclis", namespace = CaseLawLdml.RIS_NS)
   private AbweichendeEclis abweichendeEclis;
 
-  @XmlElement(name = "spruchkoerper", namespace = CaseLawLdml.RIS_NS)
-  private Spruchkoerper spruchkoerper;
-
   @XmlElement(name = "sachgebiete", namespace = CaseLawLdml.RIS_NS)
   private Sachgebiete sachgebiete;
 

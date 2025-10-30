@@ -20,7 +20,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.D
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gericht;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Regionen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Spruchkoerper;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransformer;
@@ -34,6 +33,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Abstract base class for transforming decisions into LDML case law format. Provides common
@@ -92,17 +92,21 @@ public abstract class DecisionCommonLdmlTransformer
       // Gericht (Gerichtstyp + Ort)
       Court court = coreData.court();
       if (court != null) {
-        builder.gericht(
+        Gericht.GerichtBuilder gerichtBuilder =
             Gericht.builder()
                 .refersTo("#gericht")
                 .typ(Gericht.GerichtTyp.builder().value(court.type()).build())
-                .ort(Gericht.GerichtOrt.builder().value(court.location()).build())
-                .build());
+                .ort(Gericht.GerichtOrt.builder().value(court.location()).build());
+        if (isNotBlank(coreData.appraisalBody())) {
+          gerichtBuilder.spruchkoerper(
+              Gericht.Spruchkoerper.builder().value(coreData.appraisalBody()).build());
+        }
+        builder.gericht(gerichtBuilder.build());
       }
 
       // Regionen
       List<Regionen.Region> regionen = new ArrayList<>();
-      if (coreData.court() != null && coreData.court().regions() != null) {
+      if (coreData.court() != null && !CollectionUtils.isEmpty(coreData.court().regions())) {
         coreData
             .court()
             .regions()
@@ -124,7 +128,7 @@ public abstract class DecisionCommonLdmlTransformer
 
       // Aktenzeichenliste
       List<AktenzeichenListe.Aktenzeichen> aktenzeichenListe = new ArrayList<>();
-      if (coreData.fileNumbers() != null && !coreData.fileNumbers().isEmpty()) {
+      if (!CollectionUtils.isEmpty(coreData.fileNumbers())) {
         coreData
             .fileNumbers()
             .forEach(
@@ -138,15 +142,6 @@ public abstract class DecisionCommonLdmlTransformer
       if (!aktenzeichenListe.isEmpty()) {
         builder.aktenzeichenListe(
             AktenzeichenListe.builder().aktenzeichen(aktenzeichenListe).build());
-      }
-
-      // Spruchkörper
-      if (coreData.appraisalBody() != null) {
-        builder.spruchkoerper(
-            Spruchkoerper.builder()
-                .refersTo("#spruchkoerper")
-                .value(coreData.appraisalBody())
-                .build());
       }
     }
 
@@ -259,7 +254,7 @@ public abstract class DecisionCommonLdmlTransformer
 
     List<Opinion> opinions = new ArrayList<>();
 
-    if (participatingJudges != null && !participatingJudges.isEmpty()) {
+    if (!CollectionUtils.isEmpty(participatingJudges)) {
       for (var judge : participatingJudges) {
         String byAttribute = "#" + toKebabCase(judge.name());
         Opinion opinion;

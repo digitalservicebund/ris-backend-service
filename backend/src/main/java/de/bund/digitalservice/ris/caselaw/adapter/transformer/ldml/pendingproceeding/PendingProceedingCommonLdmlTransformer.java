@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Abstract base class for transforming pending proceedings into LDML case law format. Provides
@@ -75,7 +76,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(PendingProceeding pendingProceeding) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
 
-    if (pendingProceeding.previousDecisions() != null) {
+    if (!CollectionUtils.isEmpty(pendingProceeding.previousDecisions())) {
       applyIfNotEmpty(
           buildRelatedDecisions(pendingProceeding.previousDecisions()), builder::previousDecision);
     }
@@ -98,7 +99,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
 
       // Regionen
       List<Regionen.Region> regionen = new ArrayList<>();
-      if (coreData.court() != null && coreData.court().regions() != null) {
+      if (coreData.court() != null && !CollectionUtils.isEmpty(coreData.court().regions())) {
         coreData
             .court()
             .regions()
@@ -120,7 +121,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
 
       // Aktenzeichenliste
       List<AktenzeichenListe.Aktenzeichen> aktenzeichenListe = new ArrayList<>();
-      if (coreData.fileNumbers() != null && !coreData.fileNumbers().isEmpty()) {
+      if (!CollectionUtils.isEmpty(coreData.fileNumbers())) {
         coreData
             .fileNumbers()
             .forEach(

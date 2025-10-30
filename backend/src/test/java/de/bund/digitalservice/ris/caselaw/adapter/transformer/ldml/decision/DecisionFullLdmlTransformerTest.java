@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.Notation;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
@@ -639,7 +641,9 @@ class DecisionFullLdmlTransformerTest {
   void testMinimalLdml_withMandatoryFields_shouldThrowMissingJudgmentBody() {
     // Arrange
     var documentationUnit =
-        Decision.builder()
+
+        // Use empty DTO as basis as it creates empty lists for everything.
+        DecisionTransformer.transformToDomain(new DecisionDTO()).toBuilder()
             .uuid(UUID.randomUUID())
             .coreData(
                 CoreData.builder()
@@ -662,7 +666,8 @@ class DecisionFullLdmlTransformerTest {
   void testMinimalLdml_withMandatoryFieldsAndLongText() throws IOException {
     // Arrange
     var documentationUnit =
-        Decision.builder()
+        // Use empty DTO as basis as it creates empty lists for everything.
+        DecisionTransformer.transformToDomain(new DecisionDTO()).toBuilder()
             .uuid(UUID.randomUUID())
             .coreData(
                 CoreData.builder()
@@ -730,7 +735,8 @@ class DecisionFullLdmlTransformerTest {
     EnsuingDecision ensuingDecision2 =
         ensuingDecision1.toBuilder().documentNumber("previous decision document number 2").build();
 
-    return Decision.builder()
+    // Use empty DTO as basis as it creates empty lists for everything.
+    return DecisionTransformer.transformToDomain(new DecisionDTO()).toBuilder()
         .uuid(documentationUnitId)
         .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
         .note("note test")

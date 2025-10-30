@@ -50,6 +50,7 @@
                     <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
                         <ris:typ domainTerm="Gerichtstyp">courtType</ris:typ>
                         <ris:ort domainTerm="Gerichtsort">courtLocation</ris:ort>
+                         <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBody test</ris:spruchkoerper>
                     </ris:gericht>
                     <ris:fehlerhafteGerichte domainTerm="Fehlerhafte Gerichte">
                         <ris:fehlerhaftesGericht domainTerm="Fehlerhaftes Gericht">deviating court 1</ris:fehlerhaftesGericht>
@@ -78,8 +79,6 @@
                     <ris:abweichendeEclis domainTerm="Abweichende ECLIs">
                         <ris:abweichenderEcli domainTerm="Abweichender ECLI">deviating ecli test</ris:abweichenderEcli>
                     </ris:abweichendeEclis>
-                    <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBody test
-                    </ris:spruchkoerper>
                     <ris:sachgebiete domainTerm="Sachgebiete">
                         <ris:sachgebiet domainTerm="Sachgebiet" notation="neu">fieldOfLaw test</ris:sachgebiet>
                     </ris:sachgebiete>
