@@ -22,7 +22,11 @@ const lastUpdatedBy = computed(() =>
     documentUnit.managementData.lastUpdatedByName,
   ),
 )
-const source = computed(() => formatSource(documentUnit?.coreData?.source))
+const sources = computed(() =>
+  documentUnit?.coreData?.sources
+    ?.map((source) => formatSource(source))
+    .join(", "),
+)
 const procedure = computed(
   () => documentUnit?.coreData?.procedure?.label ?? "–",
 )
@@ -72,7 +76,7 @@ const formatSource = (source?: Source) => {
     </div>
     <div data-testid="management-data-source">
       <dt class="ris-label2-bold">Quelle</dt>
-      <dd class="ris-label2-regular">{{ source }}</dd>
+      <dd class="ris-label2-regular">{{ sources }}</dd>
     </div>
     <div />
     <div data-testid="management-data-last-updated-at">
