@@ -39,8 +39,8 @@ public class TextCheckResponseTransformer {
                   });
 
       suggestion.matches().add(match);
-      categoryTypes.add(match.category());
       if (!isIgnored(match)) {
+        categoryTypes.add(match.category());
         totalTextCheckErrors++;
       }
     }
@@ -132,11 +132,17 @@ public class TextCheckResponseTransformer {
   private static boolean isIgnored(
       de.bund.digitalservice.ris.caselaw.domain.textcheck.Match match) {
     var ignoredWords = match.ignoredTextCheckWords();
+    var ignoredOnce = match.isIgnoredOnce();
+
+    if (ignoredOnce) {
+      return true;
+    }
+
     if (ignoredWords == null || ignoredWords.isEmpty()) {
       return false;
-    } else {
-      return ignoredWords.stream()
-          .anyMatch(ignoredWordObj -> ignoredWordObj.word().equals(match.word()));
     }
+
+    return ignoredWords.stream()
+        .anyMatch(ignoredWordObj -> ignoredWordObj.word().equals(match.word()));
   }
 }
