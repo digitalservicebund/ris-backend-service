@@ -16,12 +16,11 @@ const props = defineProps<{
 }>()
 
 const isPendingProceeding = props.kind === Kind.PENDING_PROCEEDING
-// TODO: (Malte Laukötter, 2025-10-31) change to array
-const sourceValue = computed(() =>
-  props.coreData.sources
-    ? (props.coreData.sources?.[0].value ??
-      props.coreData.sources?.[0].sourceRawValue)
-    : undefined,
+const sourcesValue = computed(
+  () =>
+    props.coreData.sources
+      ?.map((source) => source.value ?? source.sourceRawValue)
+      .join(", ") ?? undefined,
 )
 const dateLabel = computed(() => {
   const decisionDateLabel = props.coreData.hasDeliveryDate
@@ -159,10 +158,10 @@ const dateLabel = computed(() => {
         </FlexContainer>
       </PreviewContent>
     </PreviewRow>
-    <PreviewRow v-if="sourceValue">
+    <PreviewRow v-if="sourcesValue">
       <PreviewCategory>Quelle</PreviewCategory>
       <PreviewContent>
-        {{ sourceValue }}
+        {{ sourcesValue }}
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="coreData.inputTypes && coreData.inputTypes.length > 0">
