@@ -5,8 +5,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationEx
 import jakarta.xml.bind.JAXB;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +26,8 @@ import javax.xml.validation.SchemaFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -48,8 +48,11 @@ public class XmlUtilService {
 
   public Templates getTemplates(String filePath) {
     try {
-      ClassPathResource xsltResource = new ClassPathResource(filePath);
-      String fileContent = IOUtils.toString(xsltResource.getInputStream(), StandardCharsets.UTF_8);
+      InputStream inputStream = getClass().getResourceAsStream("/" + filePath);
+      if (inputStream == null) {
+        throw new FileNotFoundException("Class path resource [" + filePath + "] not found.");
+      }
+      String fileContent = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
       return transformerFactory.newTemplates(new StreamSource(new StringReader(fileContent)));
     } catch (TransformerConfigurationException | IOException e) {
       log.error("XSLT initialization error.", e);
@@ -59,8 +62,14 @@ public class XmlUtilService {
 
   public Schema getSchema(String filePath) {
     try {
-      return SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
-          .newSchema(ResourceUtils.getFile("classpath:" + filePath));
+      URL resourceUrl = getClass().getClassLoader().getResource(filePath);
+      if (resourceUrl == null) {
+        throw new FileNotFoundException(
+            "Class path resource ["
+                + filePath
+                + "] cannot be resolved because it does not reside in the file system.");
+      }
+      return SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(resourceUrl);
     } catch (SAXException | FileNotFoundException e) {
       log.error("Failure during CaseLawPostgresToS3Exporter initialization", e);
       throw new LdmlTransformationException(

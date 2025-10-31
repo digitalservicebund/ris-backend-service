@@ -66,24 +66,26 @@ jobs:
     permissions:
       contents: read
       security-events: write
+    needs: [ backend-build, backend-checks, audit-licenses-backend ]
     steps:
       - uses: actions/checkout@v5
-      - name: Get Gradle version
-        working-directory: ./backend
+      - name: Build backend image (Dockerfile)
         run: |
-          echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
-      - name: Set up JDK
-        uses: actions/setup-java@de5a937a1dc73fbc1a67d7d1aa4bebc1082f3190
-        with:
-          java-version: "21.0"
-          distribution: "temurin"
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
-        with:
-          gradle-version: ${{ env.GRADLE_VERSION }}
-      - name: Build backend image
-        working-directory: ./backend
-        run: ./gradlew bootBuildImage
+          docker build \
+            --file ./backend/Dockerfile.prod \
+            --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }} \
+            --secret id=GH_PACKAGES_REPOSITORY_USER,env=GH_PACKAGES_REPOSITORY_USER \
+            --secret id=GH_PACKAGES_REPOSITORY_TOKEN,env=GH_PACKAGES_REPOSITORY_TOKEN \
+            --secret id=SENTRY_DSN,env=SENTRY_DSN \
+            --secret id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
+            --no-cache \
+            ./backend
+        env:
+          GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }}
+          GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
