@@ -51,7 +51,7 @@ describe("preview core data", () => {
       previousProcedures: ["vorgang-0"],
       legalEffect: "Ja",
       yearsOfDispute: ["2023"],
-      source: { value: SourceValue.Zeitschrift },
+      sources: [{ value: SourceValue.Zeitschrift }],
       inputTypes: ["Papier", "E-Mail"],
       isResolved: true,
       resolutionDate: "2025-06-12",
@@ -650,9 +650,11 @@ describe("preview core data", () => {
     [
       "Quelle",
       {
-        source: {
-          value: SourceValue.Zeitschrift,
-        },
+        sources: [
+          {
+            value: SourceValue.Zeitschrift,
+          },
+        ],
       },
       [
         "Fehlerhaftes Gericht",

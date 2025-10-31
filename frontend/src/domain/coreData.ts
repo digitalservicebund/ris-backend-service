@@ -28,7 +28,7 @@ export type CoreData = {
   creatingDocOffice?: DocumentationOffice
   yearsOfDispute?: string[]
   leadingDecisionNormReferences?: string[]
-  source?: Source
+  sources?: Source[]
   isResolved?: boolean
   resolutionDate?: string
 }
@@ -53,7 +53,7 @@ export const coreDataLabels: {
   isResolved: "Erledigt",
   yearsOfDispute: "Streitjahr",
   resolutionDate: "Erledigungsmitteilung",
-  source: "Quelle",
+  sources: "Quelle",
   deviatingDecisionDates: "Abweichendes Entscheidungsdatum",
   documentType: "Dokumenttyp",
   deviatingEclis: "Abweichender ECLI",

@@ -201,9 +201,11 @@ describe("Core Data", () => {
 
   test("renders source", async () => {
     const coreData = {
-      source: {
-        value: SourceValue.AngefordertesOriginal,
-      },
+      sources: [
+        {
+          value: SourceValue.AngefordertesOriginal,
+        },
+      ],
     }
 
     renderComponent({ initialModelValue: coreData })
@@ -214,7 +216,7 @@ describe("Core Data", () => {
 
   test("updates source", async () => {
     const { user, model } = renderComponent({
-      initialModelValue: { source: undefined },
+      initialModelValue: { sources: undefined },
     })
 
     const dropdown = await screen.findByLabelText("Quelle Input")
@@ -228,9 +230,11 @@ describe("Core Data", () => {
 
     await user.click(options[0])
 
-    expect(model.value.source).toEqual({
-      value: SourceValue.UnaufgefordertesOriginal,
-    })
+    expect(model.value.sources).toEqual([
+      {
+        value: SourceValue.UnaufgefordertesOriginal,
+      },
+    ])
   })
 
   test("renders inputTypes", async () => {
