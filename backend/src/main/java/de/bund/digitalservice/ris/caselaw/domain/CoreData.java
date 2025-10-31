@@ -36,4 +36,4 @@ public record CoreData(
     List<@PastOrPresent Year> yearsOfDispute,
     boolean isResolved,
     @PastOrPresent LocalDate resolutionDate,
-    Source source) {}
+    List<Source> sources) {}

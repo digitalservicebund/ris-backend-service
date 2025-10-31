@@ -88,6 +88,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
+import de.bund.digitalservice.ris.caselaw.domain.Source;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.User;
@@ -1784,9 +1785,9 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         .expectBody(Decision.class)
         .consumeWith(
             response ->
-                assertThat(response.getResponseBody())
-                    .extracting("coreData.source.value")
-                    .isEqualTo(SourceValue.Z));
+                assertThat(response.getResponseBody().coreData().sources())
+                    .extracting(Source::value)
+                    .containsExactly(SourceValue.Z));
   }
 
   @Test

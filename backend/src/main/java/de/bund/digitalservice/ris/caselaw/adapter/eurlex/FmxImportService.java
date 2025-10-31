@@ -173,7 +173,7 @@ public class FmxImportService implements TransformationService {
       CoreData.CoreDataBuilder coreDataBuilder = decision.coreData().toBuilder();
       LongTexts.LongTextsBuilder longTextsBuilder = decision.longTexts().toBuilder();
 
-      coreDataBuilder.source(Source.builder().value(SourceValue.L).build());
+      coreDataBuilder.sources(List.of(Source.builder().value(SourceValue.L).build()));
       CoreData coreData =
           transformCoreData(
               coreDataBuilder, rootTag, decisionDate, ecli, fileNumber, celex, author);
