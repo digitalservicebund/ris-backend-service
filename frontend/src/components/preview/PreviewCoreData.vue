@@ -16,9 +16,11 @@ const props = defineProps<{
 }>()
 
 const isPendingProceeding = props.kind === Kind.PENDING_PROCEEDING
+// TODO: (Malte Laukötter, 2025-10-31) change to array
 const sourceValue = computed(() =>
-  props.coreData.source
-    ? (props.coreData.source.value ?? props.coreData.source.sourceRawValue)
+  props.coreData.sources
+    ? (props.coreData.sources?.[0].value ??
+      props.coreData.sources?.[0].sourceRawValue)
     : undefined,
 )
 const dateLabel = computed(() => {
