@@ -16,4 +16,4 @@ FROM cgr.dev/chainguard/jre@sha256:f452e791bdf8a70267d8ad08b506ab57c7471ab6e47c4
 COPY --from=backend-builder /app/build/libs/ris-backend-service-*.jar /app/app.jar
 ENV spring.cloud.bootstrap.enabled=true
 EXPOSE 8080
-ENTRYPOINT ["java", "-XX:+HeapDumpOnOutOfMemoryError", "-XX:HeapDumpPath=/etc/heap-dumps/heap-dump.bin", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
