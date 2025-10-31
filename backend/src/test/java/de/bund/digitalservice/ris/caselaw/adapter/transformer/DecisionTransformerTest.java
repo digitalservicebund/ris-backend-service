@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
@@ -64,6 +65,9 @@ import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealWithdrawal;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.PkhPlaintiff;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
@@ -1925,6 +1929,61 @@ class DecisionTransformerTest {
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
 
     assertThat(decision.contentRelatedIndexing().appealAdmission()).isNull();
+  }
+
+  @Test
+  void transformToDomain_withAppeal_shouldAddAppeal() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    decisionDTO.setAppeal(
+        AppealDTO.builder()
+            .appealWithdrawal(AppealWithdrawal.JA)
+            .pkhPlaintiff(PkhPlaintiff.JA)
+            .build());
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().appeal()).isNotNull();
+    assertThat(decision.contentRelatedIndexing().appeal().appealWithdrawal())
+        .isEqualTo(AppealWithdrawal.JA);
+    assertThat(decision.contentRelatedIndexing().appeal().pkhPlaintiff())
+        .isEqualTo(PkhPlaintiff.JA);
+  }
+
+  @Test
+  void transformToDomain_withoutAppeal_shouldNotAddAppeal() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().appeal()).isNull();
+  }
+
+  @Test
+  void transformToDTO_withAppeal_shouldAddAppeal() {
+    Decision decision =
+        Decision.builder()
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .appeal(Appeal.builder().appealWithdrawal(AppealWithdrawal.JA).build())
+                    .build())
+            .build();
+
+    DecisionDTO decisionDTO =
+        DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+    assertThat(decisionDTO.getAppeal()).isNotNull();
+    assertThat(decisionDTO.getAppeal().getAppealWithdrawal()).isEqualTo(AppealWithdrawal.JA);
+  }
+
+  @Test
+  void transformToDTO_withoutAppeal_shouldNotAddAppeal() {
+    Decision decision = Decision.builder().build();
+    DecisionDTO currentDTO = generateSimpleDTOBuilder().build();
+
+    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDTO, decision);
+
+    assertThat(decisionDTO.getAppeal()).isNull();
   }
 
   private Decision.DecisionBuilder generateSimpleDocumentationUnitBuilder() {

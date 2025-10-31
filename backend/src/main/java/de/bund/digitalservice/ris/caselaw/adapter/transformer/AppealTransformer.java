@@ -24,11 +24,9 @@ import de.bund.digitalservice.ris.caselaw.domain.appeal.Appellant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.springframework.util.CollectionUtils;
 
-/**
- * Utility class for transforming LegalForce objects between DTOs (Data Transfer Objects) and domain
- * objects.
- */
+/** Utility class for transforming Appeal objects between database entities and domain objects. */
 public class AppealTransformer {
 
   private AppealTransformer() {
@@ -45,13 +43,13 @@ public class AppealTransformer {
     if (appeal == null) {
       return null;
     }
-    if (appeal.appellants().isEmpty()
-        && appeal.revisionDefendantStatuses().isEmpty()
-        && appeal.revisionPlaintiffStatuses().isEmpty()
-        && appeal.jointRevisionDefendantStatuses().isEmpty()
-        && appeal.jointRevisionPlaintiffStatuses().isEmpty()
-        && appeal.nzbDefendantStatuses().isEmpty()
-        && appeal.nzbPlaintiffStatuses().isEmpty()
+    if (CollectionUtils.isEmpty(appeal.appellants())
+        && CollectionUtils.isEmpty(appeal.revisionDefendantStatuses())
+        && CollectionUtils.isEmpty(appeal.revisionPlaintiffStatuses())
+        && CollectionUtils.isEmpty(appeal.jointRevisionDefendantStatuses())
+        && CollectionUtils.isEmpty(appeal.jointRevisionPlaintiffStatuses())
+        && CollectionUtils.isEmpty(appeal.nzbDefendantStatuses())
+        && CollectionUtils.isEmpty(appeal.nzbPlaintiffStatuses())
         && appeal.appealWithdrawal() == null
         && appeal.pkhPlaintiff() == null) {
       return null;
@@ -83,7 +81,7 @@ public class AppealTransformer {
 
   private static void addAppellants(Appeal appeal, AppealDTO appealDTO) {
     if (appeal.appellants() == null || appeal.appellants().isEmpty()) {
-      appealDTO.setAppellants(Collections.emptyList());
+      appealDTO.setAppellants(null);
       return;
     }
     List<AppealAppellantDTO> appealAppellants = new ArrayList<>();
@@ -103,7 +101,7 @@ public class AppealTransformer {
   private static void addRevisionDefendantStatuses(Appeal appeal, AppealDTO appealDTO) {
     if (appeal.revisionDefendantStatuses() == null
         || appeal.revisionDefendantStatuses().isEmpty()) {
-      appealDTO.setRevisionDefendantStatuses(Collections.emptyList());
+      appealDTO.setRevisionDefendantStatuses(null);
       return;
     }
     List<AppealRevisionDefendantDTO> revisionDefendantStatuses = new ArrayList<>();
@@ -123,7 +121,7 @@ public class AppealTransformer {
   private static void addRevisionPlaintiffStatuses(Appeal appeal, AppealDTO appealDTO) {
     if (appeal.revisionPlaintiffStatuses() == null
         || appeal.revisionPlaintiffStatuses().isEmpty()) {
-      appealDTO.setRevisionPlaintiffStatuses(Collections.emptyList());
+      appealDTO.setRevisionPlaintiffStatuses(null);
       return;
     }
     List<AppealRevisionPlaintiffDTO> revisionPlaintiffStatuses = new ArrayList<>();
@@ -143,7 +141,7 @@ public class AppealTransformer {
   private static void addJointRevisionDefendantStatuses(Appeal appeal, AppealDTO appealDTO) {
     if (appeal.jointRevisionDefendantStatuses() == null
         || appeal.jointRevisionDefendantStatuses().isEmpty()) {
-      appealDTO.setJointRevisionDefendantStatuses(Collections.emptyList());
+      appealDTO.setJointRevisionDefendantStatuses(null);
       return;
     }
     List<AppealJointRevisionDefendantDTO> jointRevisionDefendantStatuses = new ArrayList<>();
@@ -163,7 +161,7 @@ public class AppealTransformer {
   private static void addJointRevisionPlaintiffStatuses(Appeal appeal, AppealDTO appealDTO) {
     if (appeal.jointRevisionPlaintiffStatuses() == null
         || appeal.jointRevisionPlaintiffStatuses().isEmpty()) {
-      appealDTO.setJointRevisionPlaintiffStatuses(Collections.emptyList());
+      appealDTO.setJointRevisionPlaintiffStatuses(null);
       return;
     }
     List<AppealJointRevisionPlaintiffDTO> jointRevisionPlaintiffStatuses = new ArrayList<>();
@@ -182,7 +180,7 @@ public class AppealTransformer {
 
   private static void addNzbDefendantStatuses(Appeal appeal, AppealDTO appealDTO) {
     if (appeal.nzbDefendantStatuses() == null || appeal.nzbDefendantStatuses().isEmpty()) {
-      appealDTO.setNzbDefendantStatuses(Collections.emptyList());
+      appealDTO.setNzbDefendantStatuses(null);
       return;
     }
     List<AppealNzbDefendantDTO> nzbDefendantStatuses = new ArrayList<>();
@@ -201,7 +199,7 @@ public class AppealTransformer {
 
   private static void addNzbPlaintiffStatuses(Appeal appeal, AppealDTO appealDTO) {
     if (appeal.nzbPlaintiffStatuses() == null || appeal.nzbPlaintiffStatuses().isEmpty()) {
-      appealDTO.setNzbPlaintiffStatuses(Collections.emptyList());
+      appealDTO.setNzbPlaintiffStatuses(null);
       return;
     }
     List<AppealNzbPlaintiffDTO> nzbPlaintiffStatuses = new ArrayList<>();
@@ -231,48 +229,62 @@ public class AppealTransformer {
 
     return new Appeal(
         dto.getId(),
-        dto.getAppellants().stream()
-            .map(
-                appellant ->
-                    new Appellant(
-                        appellant.getAppellant().getId(), appellant.getAppellant().getValue()))
-            .toList(),
-        dto.getRevisionDefendantStatuses().stream()
-            .map(
-                status ->
-                    new AppealStatus(
-                        status.getAppealStatus().getId(), status.getAppealStatus().getValue()))
-            .toList(),
-        dto.getRevisionPlaintiffStatuses().stream()
-            .map(
-                status ->
-                    new AppealStatus(
-                        status.getAppealStatus().getId(), status.getAppealStatus().getValue()))
-            .toList(),
-        dto.getJointRevisionDefendantStatuses().stream()
-            .map(
-                status ->
-                    new AppealStatus(
-                        status.getAppealStatus().getId(), status.getAppealStatus().getValue()))
-            .toList(),
-        dto.getJointRevisionPlaintiffStatuses().stream()
-            .map(
-                status ->
-                    new AppealStatus(
-                        status.getAppealStatus().getId(), status.getAppealStatus().getValue()))
-            .toList(),
-        dto.getNzbDefendantStatuses().stream()
-            .map(
-                status ->
-                    new AppealStatus(
-                        status.getAppealStatus().getId(), status.getAppealStatus().getValue()))
-            .toList(),
-        dto.getNzbPlaintiffStatuses().stream()
-            .map(
-                status ->
-                    new AppealStatus(
-                        status.getAppealStatus().getId(), status.getAppealStatus().getValue()))
-            .toList(),
+        dto.getAppellants() != null
+            ? dto.getAppellants().stream()
+                .map(
+                    appellant ->
+                        new Appellant(
+                            appellant.getAppellant().getId(), appellant.getAppellant().getValue()))
+                .toList()
+            : Collections.emptyList(),
+        dto.getRevisionDefendantStatuses() != null
+            ? dto.getRevisionDefendantStatuses().stream()
+                .map(
+                    status ->
+                        new AppealStatus(
+                            status.getAppealStatus().getId(), status.getAppealStatus().getValue()))
+                .toList()
+            : Collections.emptyList(),
+        dto.getRevisionPlaintiffStatuses() != null
+            ? dto.getRevisionPlaintiffStatuses().stream()
+                .map(
+                    status ->
+                        new AppealStatus(
+                            status.getAppealStatus().getId(), status.getAppealStatus().getValue()))
+                .toList()
+            : Collections.emptyList(),
+        dto.getJointRevisionDefendantStatuses() != null
+            ? dto.getJointRevisionDefendantStatuses().stream()
+                .map(
+                    status ->
+                        new AppealStatus(
+                            status.getAppealStatus().getId(), status.getAppealStatus().getValue()))
+                .toList()
+            : Collections.emptyList(),
+        dto.getJointRevisionPlaintiffStatuses() != null
+            ? dto.getJointRevisionPlaintiffStatuses().stream()
+                .map(
+                    status ->
+                        new AppealStatus(
+                            status.getAppealStatus().getId(), status.getAppealStatus().getValue()))
+                .toList()
+            : Collections.emptyList(),
+        dto.getNzbDefendantStatuses() != null
+            ? dto.getNzbDefendantStatuses().stream()
+                .map(
+                    status ->
+                        new AppealStatus(
+                            status.getAppealStatus().getId(), status.getAppealStatus().getValue()))
+                .toList()
+            : Collections.emptyList(),
+        dto.getNzbPlaintiffStatuses() != null
+            ? dto.getNzbPlaintiffStatuses().stream()
+                .map(
+                    status ->
+                        new AppealStatus(
+                            status.getAppealStatus().getId(), status.getAppealStatus().getValue()))
+                .toList()
+            : Collections.emptyList(),
         dto.getAppealWithdrawal(),
         dto.getPkhPlaintiff());
   }
