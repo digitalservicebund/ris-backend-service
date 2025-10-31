@@ -179,7 +179,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.36.3"))
+    implementation(platform("software.amazon.awssdk:bom:2.37.2"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -207,10 +207,10 @@ dependencies {
     // for local development:
 //     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.104.jar"))
 
-    implementation("com.fasterxml.jackson.core:jackson-core:2.20.0")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.20.1")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.20.1")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.20")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.20.0")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.20.1")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
