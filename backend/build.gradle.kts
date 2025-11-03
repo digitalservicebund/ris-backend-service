@@ -108,8 +108,9 @@ spotless {
             "**/gradle.properties",
             "**/gradle-wrapper.properties",
             "**/jaxb.properties",
-            "**/sentry-debug-meta.properties"
-        )
+            "**/sentry-debug-meta.properties",
+            "**/sonar-project.properties",
+            )
         // spotless:off
         prettier(
             mapOf(
