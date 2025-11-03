@@ -97,4 +97,12 @@ class CourtTransformerTest {
 
     assertThat(court.isSuperiorCourt()).isTrue();
   }
+
+  @Test
+  void isForeignCourt_shouldTransform() {
+    Court court =
+        CourtTransformer.transformToDomain(CourtDTO.builder().isForeignCourt(true).build());
+
+    assertThat(court.isForeignCourt()).isTrue();
+  }
 }

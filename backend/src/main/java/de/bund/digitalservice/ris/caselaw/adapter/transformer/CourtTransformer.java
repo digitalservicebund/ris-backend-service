@@ -39,6 +39,7 @@ public class CourtTransformer {
                         .toList()
                     : List.of())
             .isSuperiorCourt(courtDTO.isSuperiorCourt())
+            .isForeignCourt(courtDTO.isForeignCourt())
             .revoked(revoked);
 
     if (Boolean.TRUE.equals(courtDTO.isSuperiorCourt())) {
