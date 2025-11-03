@@ -26,9 +26,9 @@ vi.mock("@/composables/useScroll", () => ({
 
 describe("DecisionPlausibilityCheck", () => {
   beforeEach(() => {
+    vi.resetAllMocks()
     setActivePinia(createTestingPinia())
     useFeatureToggleServiceMock()
-    vi.resetAllMocks()
   })
 
   describe("Required fields", () => {
