@@ -109,7 +109,6 @@ spotless {
             "**/gradle-wrapper.properties",
             "**/jaxb.properties",
             "**/sentry-debug-meta.properties",
-            "**/sonar-project.properties",
             )
         // spotless:off
         prettier(
@@ -145,6 +144,7 @@ sonar {
             "sonar.coverage.exclusions",
             "**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/*Exception.java"
         )
+        property("sonar.cpd.exclusions", "**/DecisionCommonLdmlTransformer.java, **/PendingProceedingCommonLdmlTransformer.java")
         property("sonar.sources", "src/main/java")
     }
 }
