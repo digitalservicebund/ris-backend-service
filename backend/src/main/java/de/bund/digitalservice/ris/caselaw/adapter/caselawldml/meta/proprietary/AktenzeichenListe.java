@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 public class AktenzeichenListe {
   @XmlAttribute(name = "domainTerm")
-  private static final String DOMAIN_TERM = "Aktenzeichenliste";
+  private static final String DOMAIN_TERM = "Liste der Aktenzeichen";
 
   @XmlElement(name = "aktenzeichen", namespace = CaseLawLdml.RIS_NS)
   private List<Aktenzeichen> aktenzeichen;

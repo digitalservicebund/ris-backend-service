@@ -46,7 +46,7 @@
                     <ris:regionen domainTerm="Regionen">
                         <ris:region domainTerm="Region">FRA</ris:region>
                     </ris:regionen>
-                    <ris:aktenzeichenListe domainTerm="Aktenzeichenliste">
+                    <ris:aktenzeichenListe domainTerm="Liste der Aktenzeichen">
                         <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">testFileNumber</ris:aktenzeichen>
                     </ris:aktenzeichenListe>
                 </ris:meta>

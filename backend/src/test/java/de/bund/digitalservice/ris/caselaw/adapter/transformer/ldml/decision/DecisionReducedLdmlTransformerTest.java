@@ -373,7 +373,7 @@ class DecisionReducedLdmlTransformerTest {
         Arguments.of(
             "'fileNumber' (Aktenzeichen)",
             """
-              <ris:aktenzeichenListe domainTerm="Aktenzeichenliste">
+              <ris:aktenzeichenListe domainTerm="Liste der Aktenzeichen">
                 <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">fileNumber test</ris:aktenzeichen>
               </ris:aktenzeichenListe>
                """),

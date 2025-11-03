@@ -58,7 +58,7 @@
                        <ris:region domainTerm="Region">NW</ris:region>
                     </ris:regionen>
                     <ris:dokumentationsstelle domainTerm="Dokumentationsstelle" akn:refersTo="#documentationoffice-dokumentationsstelle">documentationOffice</ris:dokumentationsstelle>
-                    <ris:aktenzeichenListe domainTerm="Aktenzeichenliste">
+                    <ris:aktenzeichenListe domainTerm="Liste der Aktenzeichen">
                         <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">fileNumber test
                         </ris:aktenzeichen>
                     </ris:aktenzeichenListe>
