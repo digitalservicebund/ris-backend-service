@@ -137,148 +137,154 @@ const pkhPlaintiff = computed({
 
 onMounted(async () => {
   const appellantsResponse = await appealService.getAppellants()
-  if (appellantsResponse.error) {
-    //todo
-  } else {
+  if (appellantsResponse.data) {
     appellants.value = appellantsResponse.data
   }
 
   const appealStatusesResponse = await appealService.getAppealStatuses()
-  if (appealStatusesResponse.error) {
-    //todo
-  } else {
+  if (appealStatusesResponse.data) {
     appealStatuses.value = appealStatusesResponse.data
   }
 })
 </script>
 
 <template>
-  <div :aria-label="label" class="mb-16 flex flex-col gap-24 bg-white">
+  <div :aria-label="label">
     <div id="appeal" class="ris-label2-regular mb-16">
       {{ label }}
     </div>
-
-    <InputField id="apellant" label="Rechtsmittelführer">
-      <MultiSelect
-        id="appellant"
-        v-model="selectedAppellants"
-        class="w-full"
-        display="chip"
-        option-label="value"
-        :options="appellants"
-        placeholder="Bitte auswählen"
-      />
-    </InputField>
-    <div class="flex flex-row gap-24">
-      <InputField id="revision-defendant" label="Revision (Beklagter)">
+    <div class="mb-16 flex flex-col gap-24 bg-white">
+      <InputField id="apellant" label="Rechtsmittelführer">
         <MultiSelect
-          id="revision-defendant"
-          v-model="selectedRevisionDefendantStatuses"
+          id="appellants"
+          v-model="selectedAppellants"
           class="w-full"
+          data-testid="appellants"
           display="chip"
           option-label="value"
-          :options="appealStatuses"
+          :options="appellants"
           placeholder="Bitte auswählen"
         />
       </InputField>
-      <InputField id="revision-plaintiff" label="Revision (Kläger)">
-        <MultiSelect
-          id="revision-plaintiff"
-          v-model="selectedRevisionPlaintiffStatuses"
-          class="w-full"
-          display="chip"
-          option-label="value"
-          :options="appealStatuses"
-          placeholder="Bitte auswählen"
-        />
-      </InputField>
-    </div>
-    <div class="flex flex-row gap-24">
-      <InputField
-        id="joint-revision-defendant"
-        label="Anschlussrevision (Beklagter)"
-      >
-        <MultiSelect
+      <div class="flex flex-row gap-24">
+        <InputField id="revision-defendant" label="Revision (Beklagter)">
+          <MultiSelect
+            id="revision-defendant"
+            v-model="selectedRevisionDefendantStatuses"
+            class="w-full"
+            data-testid="revision-defendant"
+            display="chip"
+            option-label="value"
+            :options="appealStatuses"
+            placeholder="Bitte auswählen"
+          />
+        </InputField>
+        <InputField id="revision-plaintiff" label="Revision (Kläger)">
+          <MultiSelect
+            id="revision-plaintiff"
+            v-model="selectedRevisionPlaintiffStatuses"
+            class="w-full"
+            data-testid="revision-plaintiff"
+            display="chip"
+            option-label="value"
+            :options="appealStatuses"
+            placeholder="Bitte auswählen"
+          />
+        </InputField>
+      </div>
+      <div class="flex flex-row gap-24">
+        <InputField
           id="joint-revision-defendant"
-          v-model="selectedJointRevisionDefendantStatuses"
-          class="w-full"
-          display="chip"
-          option-label="value"
-          :options="appealStatuses"
-          placeholder="Bitte auswählen"
-        />
-      </InputField>
-      <InputField
-        id="joint-revision-plaintiff"
-        label="Anschlussrevision (Kläger)"
-      >
-        <MultiSelect
+          label="Anschlussrevision (Beklagter)"
+        >
+          <MultiSelect
+            id="joint-revision-defendant"
+            v-model="selectedJointRevisionDefendantStatuses"
+            class="w-full"
+            data-testid="joint-revision-defendant"
+            display="chip"
+            option-label="value"
+            :options="appealStatuses"
+            placeholder="Bitte auswählen"
+          />
+        </InputField>
+        <InputField
           id="joint-revision-plaintiff"
-          v-model="selectedJointRevisionPlaintiffStatuses"
-          class="w-full"
-          display="chip"
-          option-label="value"
-          :options="appealStatuses"
-          placeholder="Bitte auswählen"
-        />
-      </InputField>
-    </div>
-    <div class="flex flex-row gap-24">
-      <InputField id="nzb-defendant" label="NZB (Beklagter)">
-        <MultiSelect
-          id="nzb-defendant"
-          v-model="selectedNzbDefendantStatuses"
-          class="w-full"
-          display="chip"
-          option-label="value"
-          :options="appealStatuses"
-          placeholder="Bitte auswählen"
-        />
-      </InputField>
-      <InputField id="nzb-plaintiff" label="NZB (Kläger)">
-        <MultiSelect
-          id="nzb-plaintiff"
-          v-model="selectedNzbPlaintiffStatuses"
-          class="w-full"
-          display="chip"
-          option-label="value"
-          :options="appealStatuses"
-          placeholder="Bitte auswählen"
-        />
-      </InputField>
-    </div>
-    <div class="flex flex-row gap-24">
-      <InputField
-        id="revision-withdrawal"
-        v-slot="{ id }"
-        label="Zurücknahme der Revision"
-      >
-        <InputSelect
-          :id="id"
-          v-model="appealWithdrawal"
-          aria-label="Rechtskraft"
-          fluid
-          option-label="label"
-          option-value="value"
-          :options="appealWithdrawalItems"
-          placeholder="Bitte auswählen"
-        />
-      </InputField>
-      <InputField
-        id="pkh-plaintiff"
-        v-slot="{ id }"
-        label="PKH-Antrag (Kläger)"
-      >
-        <InputSelect
-          :id="id"
-          v-model="pkhPlaintiff"
-          fluid
-          option-label="label"
-          option-value="value"
-          :options="pkhPlaintiffItems"
-          placeholder="Bitte auswählen"
-        />
-      </InputField>
+          label="Anschlussrevision (Kläger)"
+        >
+          <MultiSelect
+            id="joint-revision-plaintiff"
+            v-model="selectedJointRevisionPlaintiffStatuses"
+            class="w-full"
+            data-testid="joint-revision-plaintiff"
+            display="chip"
+            option-label="value"
+            :options="appealStatuses"
+            placeholder="Bitte auswählen"
+          />
+        </InputField>
+      </div>
+      <div class="flex flex-row gap-24">
+        <InputField id="nzb-defendant" label="NZB (Beklagter)">
+          <MultiSelect
+            id="nzb-defendant"
+            v-model="selectedNzbDefendantStatuses"
+            class="w-full"
+            data-testid="nzb-defendant"
+            display="chip"
+            option-label="value"
+            :options="appealStatuses"
+            placeholder="Bitte auswählen"
+          />
+        </InputField>
+        <InputField id="nzb-plaintiff" label="NZB (Kläger)">
+          <MultiSelect
+            id="nzb-plaintiff"
+            v-model="selectedNzbPlaintiffStatuses"
+            class="w-full"
+            data-testid="nzb-plaintiff"
+            display="chip"
+            option-label="value"
+            :options="appealStatuses"
+            placeholder="Bitte auswählen"
+          />
+        </InputField>
+      </div>
+      <div class="flex flex-row gap-24">
+        <InputField
+          id="appeal-withdrawal"
+          v-slot="{ id }"
+          label="Zurücknahme der Revision"
+        >
+          <InputSelect
+            :id="id"
+            v-model="appealWithdrawal"
+            aria-label="Rechtskraft"
+            data-testid="appeal-withdrawal"
+            fluid
+            option-label="label"
+            option-value="value"
+            :options="appealWithdrawalItems"
+            placeholder="Bitte auswählen"
+          />
+        </InputField>
+        <InputField
+          id="pkh-plaintiff"
+          v-slot="{ id }"
+          label="PKH-Antrag (Kläger)"
+        >
+          <InputSelect
+            :id="id"
+            v-model="pkhPlaintiff"
+            data-testid="pkh-plaintiff"
+            fluid
+            option-label="label"
+            option-value="value"
+            :options="pkhPlaintiffItems"
+            placeholder="Bitte auswählen"
+          />
+        </InputField>
+      </div>
     </div>
   </div>
 </template>

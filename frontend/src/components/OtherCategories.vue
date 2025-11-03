@@ -160,10 +160,10 @@ const shouldDisplayAppeal = computed(
       />
       <CategoryWrapper
         v-if="shouldDisplayAppeal"
-        label="Rechtsmittel"
+        :label="contentRelatedIndexingLabels.appeal"
         :should-show-button="!hasAppeal"
       >
-        <Appeal label="Rechtsmittel" />
+        <Appeal :label="contentRelatedIndexingLabels.appeal" />
       </CategoryWrapper>
     </div>
   </div>
