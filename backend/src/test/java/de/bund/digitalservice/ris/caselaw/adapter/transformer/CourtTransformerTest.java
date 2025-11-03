@@ -89,4 +89,12 @@ class CourtTransformerTest {
 
     assertThat(court.jurisdictionType()).isEqualTo("Ordentliche Gerichtsbarkeit");
   }
+
+  @Test
+  void isSuperiorCourt_shouldTransform() {
+    Court court =
+        CourtTransformer.transformToDomain(CourtDTO.builder().isSuperiorCourt(true).build());
+
+    assertThat(court.isSuperiorCourt()).isTrue();
+  }
 }

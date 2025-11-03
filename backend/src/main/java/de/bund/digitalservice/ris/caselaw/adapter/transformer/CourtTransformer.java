@@ -38,6 +38,7 @@ public class CourtTransformer {
                         .map(RegionDTO::getCode)
                         .toList()
                     : List.of())
+            .isSuperiorCourt(courtDTO.isSuperiorCourt())
             .revoked(revoked);
 
     if (Boolean.TRUE.equals(courtDTO.isSuperiorCourt())) {
