@@ -154,9 +154,9 @@ onMounted(async () => {
       {{ label }}
     </div>
     <div class="mb-16 flex flex-col gap-24 bg-white">
-      <InputField id="apellant" label="Rechtsmittelführer">
+      <InputField id="apellant" v-slot="{ id }" label="Rechtsmittelführer">
         <MultiSelect
-          id="appellants"
+          :id="id"
           v-model="selectedAppellants"
           class="w-full"
           data-testid="appellants"
@@ -167,9 +167,13 @@ onMounted(async () => {
         />
       </InputField>
       <div class="flex flex-row gap-24">
-        <InputField id="revision-defendant" label="Revision (Beklagter)">
+        <InputField
+          id="revision-defendant"
+          v-slot="{ id }"
+          label="Revision (Beklagter)"
+        >
           <MultiSelect
-            id="revision-defendant"
+            :id="id"
             v-model="selectedRevisionDefendantStatuses"
             class="w-full"
             data-testid="revision-defendant"
@@ -179,9 +183,13 @@ onMounted(async () => {
             placeholder="Bitte auswählen"
           />
         </InputField>
-        <InputField id="revision-plaintiff" label="Revision (Kläger)">
+        <InputField
+          id="revision-plaintiff"
+          v-slot="{ id }"
+          label="Revision (Kläger)"
+        >
           <MultiSelect
-            id="revision-plaintiff"
+            :id="id"
             v-model="selectedRevisionPlaintiffStatuses"
             class="w-full"
             data-testid="revision-plaintiff"
@@ -195,10 +203,11 @@ onMounted(async () => {
       <div class="flex flex-row gap-24">
         <InputField
           id="joint-revision-defendant"
+          v-slot="{ id }"
           label="Anschlussrevision (Beklagter)"
         >
           <MultiSelect
-            id="joint-revision-defendant"
+            :id="id"
             v-model="selectedJointRevisionDefendantStatuses"
             class="w-full"
             data-testid="joint-revision-defendant"
@@ -210,10 +219,11 @@ onMounted(async () => {
         </InputField>
         <InputField
           id="joint-revision-plaintiff"
+          v-slot="{ id }"
           label="Anschlussrevision (Kläger)"
         >
           <MultiSelect
-            id="joint-revision-plaintiff"
+            :id="id"
             v-model="selectedJointRevisionPlaintiffStatuses"
             class="w-full"
             data-testid="joint-revision-plaintiff"
@@ -225,9 +235,9 @@ onMounted(async () => {
         </InputField>
       </div>
       <div class="flex flex-row gap-24">
-        <InputField id="nzb-defendant" label="NZB (Beklagter)">
+        <InputField id="nzb-defendant" v-slot="{ id }" label="NZB (Beklagter)">
           <MultiSelect
-            id="nzb-defendant"
+            :id="id"
             v-model="selectedNzbDefendantStatuses"
             class="w-full"
             data-testid="nzb-defendant"
@@ -237,9 +247,9 @@ onMounted(async () => {
             placeholder="Bitte auswählen"
           />
         </InputField>
-        <InputField id="nzb-plaintiff" label="NZB (Kläger)">
+        <InputField id="nzb-plaintiff" v-slot="{ id }" label="NZB (Kläger)">
           <MultiSelect
-            id="nzb-plaintiff"
+            :id="id"
             v-model="selectedNzbPlaintiffStatuses"
             class="w-full"
             data-testid="nzb-plaintiff"

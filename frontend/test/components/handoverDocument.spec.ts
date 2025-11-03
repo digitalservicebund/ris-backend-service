@@ -500,6 +500,9 @@ describe("HandoverDocumentationUnitView:", () => {
             appealAdmission: {
               admitted: false,
             },
+            appeal: {
+              appellants: [{ id: "1", value: "Kläger" }],
+            },
           },
           longTexts: { decisionReasons: "decisionReasons" },
           managementData: {
@@ -523,6 +526,7 @@ describe("HandoverDocumentationUnitView:", () => {
         screen.getByText("Datum der mündlichen Verhandlung"),
       ).toBeInTheDocument()
       expect(screen.getByText("Rechtsmittelzulassung")).toBeInTheDocument()
+      expect(screen.getByText("Rechtsmittel")).toBeInTheDocument()
       const handoverButton = screen.getByRole("button", {
         name: "Dokumentationseinheit an jDV übergeben",
       })
