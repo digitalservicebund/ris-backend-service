@@ -70,7 +70,7 @@
                </ris:regionen>
                <ris:dokumentationsstelle domainTerm="Dokumentationsstelle"
                                          akn:refersTo="#bfh-dokumentationsstelle">BFH</ris:dokumentationsstelle>
-               <ris:aktenzeichenListe domainTerm="Aktenzeichenliste">
+               <ris:aktenzeichenListe domainTerm="Liste der Aktenzeichen">
                   <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">Aktenzeichen</ris:aktenzeichen>
                   <ris:aktenzeichen domainTerm="Abweichendes Aktenzeichen">Abweichendes Aktenzeichen</ris:aktenzeichen>
                </ris:aktenzeichenListe>

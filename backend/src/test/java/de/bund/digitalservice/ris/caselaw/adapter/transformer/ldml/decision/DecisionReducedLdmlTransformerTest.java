@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
@@ -162,7 +164,8 @@ class DecisionReducedLdmlTransformerTest {
         ensuingDecision1.toBuilder().documentNumber("previous decision document number 2").build();
 
     testDocumentUnit =
-        Decision.builder()
+        // Use empty DTO as basis as it creates empty lists for everything.
+        DecisionTransformer.transformToDomain(new DecisionDTO()).toBuilder()
             .uuid(documentationUnitId)
             .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
             .note("note test")
@@ -349,6 +352,7 @@ class DecisionReducedLdmlTransformerTest {
                 <ris:gericht domainTerm="Gericht"akn:refersTo="#gericht">
                   <ris:typ domainTerm="Gerichtstyp">courtType</ris:typ>
                   <ris:ort domainTerm="Gerichtsort">courtLocation</ris:ort>
+                  <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBodytest</ris:spruchkoerper>
                 </ris:gericht>
                """),
         Arguments.of(
@@ -369,7 +373,7 @@ class DecisionReducedLdmlTransformerTest {
         Arguments.of(
             "'fileNumber' (Aktenzeichen)",
             """
-              <ris:aktenzeichenListe domainTerm="Aktenzeichenliste">
+              <ris:aktenzeichenListe domainTerm="Liste der Aktenzeichen">
                 <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">fileNumber test</ris:aktenzeichen>
               </ris:aktenzeichenListe>
                """),

@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 
 /** Transformer for converting pending proceedings to full LDML format. */
 @Slf4j
@@ -58,7 +59,8 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
     var builder = buildCommonRisMeta(pendingProceeding);
 
     var contentRelatedIndexing = pendingProceeding.contentRelatedIndexing();
-    if (contentRelatedIndexing != null && contentRelatedIndexing.fieldsOfLaw() != null) {
+    if (contentRelatedIndexing != null
+        && !CollectionUtils.isEmpty(contentRelatedIndexing.fieldsOfLaw())) {
       Sachgebiete sachgebiete =
           Sachgebiete.builder()
               .sachgebiete(
@@ -77,7 +79,7 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
     var coreData = pendingProceeding.coreData();
     if (coreData != null) {
 
-      if (coreData.deviatingFileNumbers() != null) {
+      if (!CollectionUtils.isEmpty(coreData.deviatingFileNumbers())) {
         AktenzeichenListe aktenzeichenListe = builder.build().getAktenzeichenListe();
         List<AktenzeichenListe.Aktenzeichen> aktenzeichen = aktenzeichenListe.getAktenzeichen();
         if (aktenzeichen != null) {
@@ -96,7 +98,7 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
       }
 
       // Fehlerhafte Gerichte
-      if (coreData.deviatingCourts() != null) {
+      if (!CollectionUtils.isEmpty(coreData.deviatingCourts())) {
         builder.fehlerhafteGerichte(
             FehlerhafteGerichte.builder()
                 .fehlerhafteGerichte(
@@ -110,7 +112,7 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
                 .build());
       }
       // Abweichende Daten
-      if (coreData.deviatingDecisionDates() != null) {
+      if (!CollectionUtils.isEmpty(coreData.deviatingDecisionDates())) {
         builder.abweichendeDaten(
             AbweichendeDaten.builder()
                 .daten(
@@ -124,7 +126,7 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
                 .build());
       }
       // Abweichende Dokumentnummern
-      if (coreData.deviatingDocumentNumbers() != null) {
+      if (!CollectionUtils.isEmpty(coreData.deviatingDocumentNumbers())) {
         builder.abweichendeDokumentnummern(
             AbweichendeDokumentnummern.builder()
                 .dokumentnummern(
