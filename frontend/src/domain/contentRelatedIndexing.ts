@@ -1,6 +1,6 @@
 import ActiveCitation from "@/domain/activeCitation"
-import { AppealAdmission } from "@/domain/appealAdmission"
 import { Appeal } from "@/domain/appeal"
+import { AppealAdmission } from "@/domain/appealAdmission"
 import Definition from "@/domain/definition"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
