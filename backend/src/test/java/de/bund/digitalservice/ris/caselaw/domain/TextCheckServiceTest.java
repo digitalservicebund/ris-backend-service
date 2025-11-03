@@ -46,11 +46,8 @@ class TextCheckServiceTest {
     documentationUnitRepository = mock(DocumentationUnitRepository.class);
     ignoredTextCheckWordRepository = mock(IgnoredTextCheckWordRepository.class);
 
-    FeatureToggleService featureToggleService = mock(FeatureToggleService.class);
-    when(featureToggleService.isEnabled("neuris.text-check-noindex-handover")).thenReturn(true);
     textCheckService =
-        new TextCheckMockService(
-            documentationUnitRepository, ignoredTextCheckWordRepository, featureToggleService);
+        new TextCheckMockService(documentationUnitRepository, ignoredTextCheckWordRepository);
   }
 
   @Test

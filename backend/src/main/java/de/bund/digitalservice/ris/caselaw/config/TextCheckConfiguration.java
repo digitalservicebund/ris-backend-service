@@ -22,10 +22,6 @@ public class TextCheckConfiguration {
       FeatureToggleService featureToggleService,
       LanguageToolClient languageToolClient) {
     return new LanguageToolService(
-        documentationUnitRepository,
-        ignoredTextCheckWordRepository,
-        featureToggleService,
-        config,
-        languageToolClient);
+        documentationUnitRepository, ignoredTextCheckWordRepository, config, languageToolClient);
   }
 }
