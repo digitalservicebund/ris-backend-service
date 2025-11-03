@@ -1,5 +1,6 @@
-import { expect, Locator } from "@playwright/test"
+import { expect } from "@playwright/test"
 import { clearTextField, navigateToCategories } from "../utils/e2e-utils"
+import { getMarkId, textCheckUnderlinesColors } from "./util"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { convertHexToRGB } from "~/test-helper/coloursUtil"
@@ -9,15 +10,6 @@ test.skip(
   ({ browserName }) => browserName !== "chromium",
   "Skipping firefox flaky test",
 )
-
-const textCheckUnderlinesColors = {
-  error: "#cd5038",
-  ignored: "#66add3",
-} as const
-
-async function getMarkId(tag: Locator): Promise<string | null> {
-  return await tag.evaluate((el) => el.getAttribute("id"))
-}
 
 const textWithErrors = {
   text: "LanguageTool   ist ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, z. B. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten. Testgnorierteswort ist zB. grün markiert",
@@ -336,9 +328,7 @@ test.describe(
             Promise.withResolvers<void>()
 
           await page.route(
-            "**/api/v1/caselaw/documentunits/" +
-              prefilledDocumentUnit.uuid +
-              "/text-check*",
+            `**/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}/text-check*`,
             async (route) => {
               await lock
               await route.fulfill(result)

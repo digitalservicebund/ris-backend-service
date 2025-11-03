@@ -190,7 +190,7 @@ _help() {
   echo "dev                   Start full-stack development environment with loopup table initialization"
   echo "                      Add '-n' or '--no-backend' to start everything but backend and initialization"
   echo "                      Add '-f' or '--no-frontend' to start everything but frontend and initialization"
-  echo "                      Add '-i' or '--init' to only initialize the lookup tables (read ./migration_image.md for prerequisites)"
+  echo "                      Add '-i' or '--init' to only initialize the lookup tables (read ./run_migration_locally.md for prerequisites)"
   echo "                      Add '-d' or '--detached' to check the health of the services in the background instead of showing the log stream"
   echo "down                  Stop development environment"
   echo "clean-staging         Deletes all existing documentunits on staging"

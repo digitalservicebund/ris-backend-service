@@ -173,4 +173,57 @@ class TextCheckResponseTransformerTest {
     // Assert = then
     assertEquals(expected, result);
   }
+
+  @Test
+  void givenLocallyIgnoredWord_whenTransforming_thenVerifyCorrectIgnoredWordsCount() {
+    // Arrange = given
+    List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches = new ArrayList<>();
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Context contextTwo =
+        new de.bund.digitalservice.ris.caselaw.domain.textcheck.Context("<p>geanu<p>", 3, 5);
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Type type =
+        new de.bund.digitalservice.ris.caselaw.domain.textcheck.Type("UnknownWord");
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Category category =
+        new de.bund.digitalservice.ris.caselaw.domain.textcheck.Category(
+            "TYPOS", "Mögliche Tippfehler");
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule rule =
+        de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule.builder()
+            .id("GERMAN_SPELLER_RULE")
+            .description("Möglicher Rechtschreibfehler")
+            .issueType("misspelling")
+            .category(category)
+            .build();
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Match matchTwo =
+        de.bund.digitalservice.ris.caselaw.domain.textcheck.Match.builder()
+            .id(1)
+            .word("geanu")
+            .message("Möglicher Tippfehler gefunden.")
+            .shortMessage("Rechtschreibfehler")
+            .category(CategoryType.GUIDING_PRINCIPLE)
+            .replacements(Collections.emptyList())
+            .offset(11)
+            .length(5)
+            .context(contextTwo)
+            .sentence("Rihctig geanu")
+            .type(type)
+            .rule(rule)
+            .ignoreForIncompleteSentence(false)
+            .contextForSureMatch(0)
+            .isIgnoredOnce(true)
+            .build();
+    matches.add(matchTwo);
+
+    Suggestion suggestionTwo = new Suggestion("geanu", List.of(matchTwo));
+    TextCheckAllResponse expected =
+        TextCheckAllResponse.builder()
+            .suggestions(List.of(suggestionTwo))
+            .categoryTypes(Collections.emptySet())
+            .totalTextCheckErrors(0)
+            .build();
+
+    // Act = when
+    var result = TextCheckResponseTransformer.transformToAllDomain(matches);
+
+    // Assert = then
+    assertEquals(expected, result);
+  }
 }
