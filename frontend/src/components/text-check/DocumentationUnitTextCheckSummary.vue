@@ -41,14 +41,6 @@ const checkAll = async () => {
   }
 }
 
-function acceptSuggestion(replacement: string) {
-  throw new Error("accept all not yet implemented: " + replacement)
-}
-
-function ignoreSuggestion() {
-  throw new Error("ignore all not yet implemented ")
-}
-
 onMounted(async () => {
   await checkAll()
   loading.value = false
@@ -83,9 +75,6 @@ onMounted(async () => {
           :is-selected="selectedSuggestion == error"
           :suggestion="error"
           v-bind="{ jumpToMatch }"
-          @click="selectedSuggestion = error"
-          @suggestion:ignore="ignoreSuggestion"
-          @suggestion:update="acceptSuggestion"
         />
       </div>
     </div>

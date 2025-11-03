@@ -4,8 +4,7 @@ import IconBadge from "@/components/IconBadge.vue"
 import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
 import MatchLinkingButton from "@/components/text-check/MatchLinkingButton.vue"
 import MatchNavigator from "@/components/text-check/MatchNavigator.vue"
-import ReplacementBar from "@/components/text-check/ReplacementBar.vue"
-import { Match, Replacement, Suggestion } from "@/types/textCheck"
+import { Match, Suggestion } from "@/types/textCheck"
 
 const props = defineProps<{
   suggestion: Suggestion
@@ -13,29 +12,11 @@ const props = defineProps<{
   jumpToMatch?: (match: Match) => void
 }>()
 
-const emit = defineEmits<{
-  "suggestion:update": [value: string]
-  "suggestion:ignore": [void]
-  jumpToMatch: [value: Match]
-}>()
-
 const currentIndex = ref(0)
 
 const selectedMatch = computed(
   () => props.suggestion.matches[currentIndex.value] ?? undefined,
 )
-
-function acceptSuggestion(replacement: string) {
-  emit("suggestion:update", replacement)
-}
-
-function ignoreSuggestion() {
-  emit("suggestion:ignore")
-}
-
-function getValues(replacements: Replacement[]) {
-  return replacements.flatMap((replacement) => replacement.value)
-}
 
 function updateCurrentIndex(index: number) {
   currentIndex.value = index
@@ -66,17 +47,5 @@ function updateCurrentIndex(index: number) {
     </div>
 
     <IgnoredWordHandler :ignored-locally="false" :match="selectedMatch" />
-    <div>
-      {{ selectedMatch.message }}
-    </div>
-
-    <ReplacementBar
-      v-if="selectedMatch.replacements"
-      :replacement-mode="suggestion.matches.length > 1 ? 'multiple' : 'single'"
-      :replacements="getValues(selectedMatch.replacements)"
-      @jump-to-match="(match: Match) => emit('jumpToMatch', match)"
-      @suggestion:ignore="ignoreSuggestion"
-      @suggestion:update="acceptSuggestion"
-    />
   </div>
 </template>
