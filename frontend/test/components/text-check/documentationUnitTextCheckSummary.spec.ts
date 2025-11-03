@@ -27,7 +27,7 @@ describe("Documentation Text Check Summary", () => {
   })
 
   afterEach(() => {
-    vi.restoreAllMocks()
+    vi.clearAllMocks()
   })
 
   it("updates Document Unit before initiating check all", async () => {

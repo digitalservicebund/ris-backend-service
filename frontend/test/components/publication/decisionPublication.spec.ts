@@ -11,12 +11,19 @@ import {
   ManagementData,
 } from "@/domain/managementData"
 import borderNumberService from "@/services/borderNumberService"
+import documentUnitService from "@/services/documentUnitService"
 import publishDocumentationUnitService from "@/services/publishDocumentationUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 import routes from "~pages"
 
 const previewMock = vi.spyOn(publishDocumentationUnitService, "getPreview")
+
+vi.mock("@/composables/useScroll", () => ({
+  useScroll: () => ({
+    scrollIntoViewportById: vi.fn(),
+  }),
+}))
 
 describe("DecisionPlausibilityCheck", () => {
   beforeEach(() => {
@@ -29,9 +36,40 @@ describe("DecisionPlausibilityCheck", () => {
         success: true,
       },
     })
+
+    vi.spyOn(documentUnitService, "update").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: {
+          documentationUnitVersion: 2,
+          patch: [],
+          errorPaths: [],
+        },
+      }),
+    )
+
+    vi.spyOn(documentUnitService, "getByDocumentNumber").mockImplementation(
+      () => {
+        if (!localDocUnit) {
+          throw new Error(
+            "localDocUnit must be defined before calling getByDocumentNumber",
+          )
+        }
+
+        return Promise.resolve({
+          status: 200,
+          data: new Decision("q834", JSON.parse(JSON.stringify(localDocUnit))),
+        })
+      },
+    )
+
+    vi.spyOn(
+      publishDocumentationUnitService,
+      "publishDocument",
+    ).mockResolvedValue({ status: 200, data: undefined })
   })
   afterEach(() => {
-    vi.resetAllMocks()
+    vi.clearAllMocks()
   })
 
   it("should not show LDML preview if plausibility check fails", async () => {
@@ -125,6 +163,10 @@ describe("DecisionPlausibilityCheck", () => {
   })
 
   it("should pass on publication warnings for invalid border numbers", async () => {
+    vi.spyOn(
+      publishDocumentationUnitService,
+      "publishDocument",
+    ).mockResolvedValue({ status: 200, data: undefined })
     vi.spyOn(borderNumberService, "validateBorderNumberLinks").mockReturnValue({
       isValid: false,
       invalidCategories: [],
@@ -154,6 +196,7 @@ describe("DecisionPlausibilityCheck", () => {
       hasPlausibilityCheckPassed: true,
     })
     const updateDocUnitSpy = vi.spyOn(store, "updateDocumentUnit")
+    updateDocUnitSpy.mockClear()
 
     await fireEvent.click(
       screen.getByRole("button", { name: "Randnummern neu berechnen" }),
@@ -181,6 +224,13 @@ describe("DecisionPlausibilityCheck", () => {
 
   describe("ldml preview", () => {
     it("should display ldml preview whit plausible data", async () => {
+      vi.spyOn(
+        borderNumberService,
+        "validateBorderNumberLinks",
+      ).mockReturnValue({
+        isValid: true,
+      })
+
       await renderComponent({
         hasPlausibilityCheckPassed: true,
       })
@@ -234,6 +284,8 @@ describe("DecisionPlausibilityCheck", () => {
   })
 })
 
+let localDocUnit: Decision | undefined = undefined
+
 async function renderComponent({
   hasPlausibilityCheckPassed,
   duplicateRelations = [],
@@ -283,10 +335,11 @@ function mockDocUnitStore({
   managementData?: ManagementData
 }) {
   const mockedSessionStore = useDocumentUnitStore()
-  mockedSessionStore.documentUnit = new Decision("q834", {
+  localDocUnit = new Decision("q834", {
     coreData,
     managementData,
   })
+  mockedSessionStore.documentUnit = localDocUnit
 
   return mockedSessionStore
 }

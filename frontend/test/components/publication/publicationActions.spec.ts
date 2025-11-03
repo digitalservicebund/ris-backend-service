@@ -21,6 +21,9 @@ describe("PublicationActions", () => {
     setActivePinia(createTestingPinia())
     useFeatureToggleServiceMock()
   })
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
 
   describe("Status: Unpublished", () => {
     it("should show the status", async () => {
