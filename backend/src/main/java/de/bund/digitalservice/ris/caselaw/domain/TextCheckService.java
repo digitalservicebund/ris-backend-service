@@ -40,16 +40,12 @@ public class TextCheckService {
   private final DocumentationUnitRepository documentationUnitRepository;
   private final IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
 
-  //  private final FeatureToggleService featureToggleService;
-
   public TextCheckService(
       DocumentationUnitRepository documentationUnitRepository,
-      IgnoredTextCheckWordRepository ignoredTextCheckWordRepository,
-      FeatureToggleService featureToggleService) {
+      IgnoredTextCheckWordRepository ignoredTextCheckWordRepository) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.ignoredTextCheckWordRepository = ignoredTextCheckWordRepository;
-    //    this.featureToggleService = featureToggleService;
   }
 
   protected List<Match> check(String text) {
@@ -184,89 +180,6 @@ public class TextCheckService {
     NodeTraversor.traverse(new NormalizingNodeVisitor(builder), document.body().children());
     return builder.toString();
   }
-
-  //  /**
-  //   * Method to retrieve no index words and exports the ignore list for jDV publication
-  //   *
-  //   * @param decision without noindex tags
-  //   * @return object with noindex tags on long and short texts
-  //   */
-  //  public Decision addNoIndexTagsForHandOver(Decision decision) {
-  //    if (!featureToggleService.isEnabled("neuris.text-check-noindex-handover")) {
-  //      return decision;
-  //    }
-  //
-  //    List<String> ignoredTextCheckWords =
-  //        ignoredTextCheckWordRepository.findAllByDocumentationUnitId(decision.uuid()).stream()
-  //            .map(IgnoredTextCheckWord::word)
-  //            .sorted(
-  //                (s1, s2) ->
-  //                    Integer.compare(s2.length(), s1.length())) // sort by length (long words
-  // first)
-  //            .toList();
-  //
-  //    if (ignoredTextCheckWords.isEmpty()) {
-  //      return decision;
-  //    }
-  //
-  //    if (decision.longTexts() != null) {
-  //      decision =
-  //          decision.toBuilder()
-  //              .longTexts(updateLongTexts(decision.longTexts(), ignoredTextCheckWords))
-  //              .build();
-  //    }
-  //
-  //    if (decision.shortTexts() != null) {
-  //      decision =
-  //          decision.toBuilder()
-  //              .shortTexts(updateShortTexts(decision.shortTexts(), ignoredTextCheckWords))
-  //              .build();
-  //    }
-  //
-  //    return decision;
-  //  }
-  //
-  //  private LongTexts updateLongTexts(LongTexts texts, List<String> ignoredWords) {
-  //    return texts.toBuilder()
-  //        .reasons(addNoIndexTags(texts.reasons(), ignoredWords))
-  //        .caseFacts(addNoIndexTags(texts.caseFacts(), ignoredWords))
-  //        .decisionReasons(addNoIndexTags(texts.decisionReasons(), ignoredWords))
-  //        .tenor(addNoIndexTags(texts.tenor(), ignoredWords))
-  //        .otherLongText(addNoIndexTags(texts.otherLongText(), ignoredWords))
-  //        .dissentingOpinion(addNoIndexTags(texts.dissentingOpinion(), ignoredWords))
-  //        .outline(addNoIndexTags(texts.outline(), ignoredWords))
-  //        .build();
-  //  }
-  //
-  //  private ShortTexts updateShortTexts(ShortTexts texts, List<String> ignoredWords) {
-  //    return texts.toBuilder()
-  //        .headnote(addNoIndexTags(texts.headnote(), ignoredWords))
-  //        .otherHeadnote(addNoIndexTags(texts.otherHeadnote(), ignoredWords))
-  //        .headline(addNoIndexTags(texts.headline(), ignoredWords))
-  //        .guidingPrinciple(addNoIndexTags(texts.guidingPrinciple(), ignoredWords))
-  //        .build();
-  //  }
-  //
-  //  /**
-  //   * Wraps ignored words with <noindex></noindex> for handover service
-  //   *
-  //   * @param htmlText to add no index tags to
-  //   * @param ignoredWords on Documentation Level or global level
-  //   */
-  //  public static String addNoIndexTags(String htmlText, List<String> ignoredWords) {
-  //    if (htmlText == null || ignoredWords == null || ignoredWords.isEmpty()) {
-  //      return htmlText;
-  //    }
-  //
-  //    Document document = Jsoup.parse(htmlText);
-  //    document.outputSettings().prettyPrint(false);
-  //
-  //    for (String ignoredWord : ignoredWords) {
-  //      NodeTraversor.traverse(new NoIndexNodeWrapperVisitor(ignoredWord), document.body());
-  //    }
-  //
-  //    return document.body().html();
-  //  }
 
   protected TextCheckCategoryResponse checkCategoryByHTML(
       String htmlText, CategoryType categoryType) {
@@ -452,59 +365,6 @@ public class TextCheckService {
     // immediately preceded by the <ignore-once> tag.
     return lastOpeningTagIndex == lastIgnoreTagIndex;
   }
-
-  //  protected record NoIndexNodeWrapperVisitor(String ignoredWord) implements NodeVisitor {
-  //
-  //    @Override
-  //    public void head(@NotNull Node node, int depth) {
-  //      if (!(node instanceof TextNode textNode)) return;
-  //      if (isInsideNoIndex(textNode)) return;
-  //
-  //      String text = textNode.getWholeText();
-  //      Pattern pattern =
-  //          Pattern.compile(
-  //              "(?<![\\p{L}\\p{N}])" + Pattern.quote(ignoredWord) + "(?![\\p{L}\\p{N}])",
-  //              Pattern.UNICODE_CHARACTER_CLASS);
-  //      Matcher matcher = pattern.matcher(text);
-  //
-  //      if (!matcher.find()) return;
-  //
-  //      // Build new content
-  //      List<Node> newNodes = new ArrayList<>();
-  //      int lastEnd = 0;
-  //      matcher.reset();
-  //
-  //      while (matcher.find()) {
-  //        if (matcher.start() > lastEnd) {
-  //          newNodes.add(new TextNode(text.substring(lastEnd, matcher.start())));
-  //        }
-  //        newNodes.add(new Element("noindex").text(matcher.group()));
-  //        lastEnd = matcher.end();
-  //      }
-  //
-  //      if (lastEnd < text.length()) {
-  //        newNodes.add(new TextNode(text.substring(lastEnd)));
-  //      }
-  //
-  //      // Replace original text node
-  //      Node parent = textNode.parent();
-  //      if (parent instanceof Element element) {
-  //        int index = textNode.siblingIndex();
-  //        textNode.remove();
-  //        element.insertChildren(index, newNodes);
-  //      }
-  //    }
-  //
-  //    private boolean isInsideNoIndex(Node node) {
-  //      while (node != null) {
-  //        if ("noindex".equalsIgnoreCase(node.nodeName())) {
-  //          return true;
-  //        }
-  //        node = node.parent();
-  //      }
-  //      return false;
-  //    }
-  //  }
 
   @SuppressWarnings("java:S3776")
   protected record NormalizingNodeVisitor(StringBuilder builder) implements NodeVisitor {
