@@ -29,9 +29,13 @@ public class LanguageToolClient {
     formData.add("data", annotations.toString());
     formData.add("language", languageToolConfig.getLanguage());
     formData.add("mode", "all");
-    formData.add("disabledRules", String.join(",", languageToolConfig.getDisabledRules()));
-    formData.add(
-        "disabledCategories", String.join(",", languageToolConfig.getDisabledCategories()));
+    if (!languageToolConfig.getDisabledRules().isEmpty()) {
+      formData.add("disabledRules", String.join(",", languageToolConfig.getDisabledRules()));
+    }
+    if (!languageToolConfig.getDisabledCategories().isEmpty()) {
+      formData.add(
+          "disabledCategories", String.join(",", languageToolConfig.getDisabledCategories()));
+    }
 
     // Set headers
     HttpHeaders headers = new HttpHeaders();
