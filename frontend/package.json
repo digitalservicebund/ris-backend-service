@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "engines": {
-    "node": ">=22.21.1"
+    "node": ">=24.11.0"
   },
   "type": "module",
   "scripts": {
@@ -95,7 +95,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@testing-library/vue": "^8.1.0",
     "@types/jsdom": "^21.1.7",
-    "@types/node": "^22.19.0",
+    "@types/node": "^24.10.0",
     "@typescript-eslint/eslint-plugin": "^8.46.3",
     "@typescript-eslint/parser": "^8.46.3",
     "@types/lodash": "^4.17.20",
