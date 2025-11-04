@@ -88,8 +88,6 @@ class TextCheckResponseTransformerTest {
     // Arrange = given
     var ignoredWordId = UUID.fromString("00000000-0000-0000-0000-000000000001");
     List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches = new ArrayList<>();
-    de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement replacementOne =
-        new de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement("Richtig");
     de.bund.digitalservice.ris.caselaw.domain.textcheck.Context contextOne =
         new de.bund.digitalservice.ris.caselaw.domain.textcheck.Context("<p>Rihctig<p>", 3, 7);
     de.bund.digitalservice.ris.caselaw.domain.textcheck.Context contextTwo =
