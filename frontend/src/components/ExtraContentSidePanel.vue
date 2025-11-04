@@ -12,8 +12,6 @@ import { ExtraContentSidePanelProps } from "@/components/input/types"
 import DecisionPreview from "@/components/preview/DecisionPreview.vue"
 import PendingProceedingPreview from "@/components/preview/PendingProceedingPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
-import DocumentationUnitTextCheckSummary from "@/components/text-check/DocumentationUnitTextCheckSummary.vue"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
@@ -26,8 +24,6 @@ const { panelMode, currentAttachmentIndex, importDocumentNumber } =
   storeToRefs(store)
 
 const route = useRoute()
-
-const textCheckAll = useFeatureToggle("neuris.text-side-panel")
 
 const hasNote = computed(() => {
   return (
@@ -195,15 +191,6 @@ onMounted(() => {
         <CategoryImport
           v-else-if="panelMode === 'category-import'"
           :document-number="importDocumentNumber"
-        />
-
-        <DocumentationUnitTextCheckSummary
-          v-else-if="
-            panelMode === 'text-check' &&
-            textCheckAll &&
-            isDecision(props.documentUnit)
-          "
-          v-bind="{ jumpToMatch }"
         />
       </div>
     </SideToggle>
