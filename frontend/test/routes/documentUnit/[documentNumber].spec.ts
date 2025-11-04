@@ -170,7 +170,13 @@ describe("Document Number Route", () => {
       ).toBeInTheDocument()
 
       // Main route is rendered
-      expect(screen.getByText("Formaldaten")).toBeInTheDocument()
+      const heading = screen.getByRole("heading", {
+        level: 1,
+        name: "Formaldaten",
+      })
+
+      // 2. Assert it is visible
+      expect(heading).toBeVisible()
     })
 
     test("should render documents with side panels and header", async () => {
