@@ -83,6 +83,7 @@ function renderComponent() {
       },
     ],
   })
+
   return {
     user,
     router,
@@ -149,7 +150,7 @@ describe("Document Number Route", () => {
 
   describe("Conditional rendering", () => {
     test("should render categories with side panels and header", async () => {
-      const { router, container } = renderComponent()
+      const { router } = await renderComponent()
 
       await router.push({
         path: "/caselaw/documentUnit/1234567891234/categories",
@@ -169,7 +170,12 @@ describe("Document Number Route", () => {
       ).toBeInTheDocument()
 
       // Main route is rendered
-      expect(container.querySelector("#coreData")).toBeInTheDocument()
+      const heading = screen.getByRole("heading", {
+        level: 1,
+        name: "Formaldaten",
+      })
+
+      expect(heading).toBeVisible()
     })
 
     test("should render documents with side panels and header", async () => {

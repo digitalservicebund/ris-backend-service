@@ -179,7 +179,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.37.2"))
+    implementation(platform("software.amazon.awssdk:bom:2.37.3"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -203,9 +203,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.104")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.105")
     // for local development:
-//     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.104.jar"))
+//     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.105.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.20.1")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.20.1")

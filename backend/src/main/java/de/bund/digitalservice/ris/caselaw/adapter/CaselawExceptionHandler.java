@@ -5,6 +5,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImportApiKeyException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.TextCheckNotAllowedCategoryTypeException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
+@Slf4j
 public class CaselawExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler({ImportApiKeyException.class})
   public ResponseEntity<Object> handleImportApiKeyException(ImportApiKeyException ex) {
@@ -52,6 +55,16 @@ public class CaselawExceptionHandler extends ResponseEntityExceptionHandler {
     ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 
     return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  @ExceptionHandler({TextCheckNotAllowedCategoryTypeException.class})
+  public ResponseEntity<Object> handleTextCheckNotAllowedCategoryTypeException(
+      TextCheckNotAllowedCategoryTypeException ex) {
+    log.error("", ex);
+
+    ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage());
+
+    return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
   }
 
   public record ApiError(HttpStatus status, String message) {}
