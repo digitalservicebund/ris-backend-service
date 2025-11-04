@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@braintree/sanitize-url": "^7.1.1",
-    "@digitalservicebund/ris-ui": "^3.15.1",
+    "@digitalservicebund/ris-ui": "^3.16.0",
     "@guardian/prosemirror-invisibles": "^3.1.1",
     "@sentry/integrations": "^7.114.0",
     "@sentry/vue": "^10.22.0",
@@ -100,7 +100,7 @@
     "@typescript-eslint/parser": "^8.46.2",
     "@types/lodash": "^4.17.20",
     "@vitejs/plugin-vue": "^6.0.1",
-    "@vitest/coverage-istanbul": "^3.2.4",
+    "@vitest/coverage-istanbul": "^4.0.6",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.6.0",
     "@vue/test-utils": "^2.4.6",
@@ -142,6 +142,6 @@
     "vite-plugin-environment": "^1.1.3",
     "vite-plugin-pages": "^0.33.1",
     "vite-plugin-vue-devtools": "^8.0.3",
-    "vitest": "^3.2.4"
+    "vitest": "^4.0.6"
   }
 }

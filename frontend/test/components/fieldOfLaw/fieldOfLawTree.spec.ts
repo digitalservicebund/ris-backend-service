@@ -215,6 +215,10 @@ describe("FieldOfLawTree", () => {
       })
   })
 
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
+
   it("Tree is fully closed upon at start", async () => {
     renderComponent()
     expect(fetchSpyGetChildrenOf).toBeCalledTimes(0)
