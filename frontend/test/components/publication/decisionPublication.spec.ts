@@ -13,6 +13,7 @@ import {
 import borderNumberService from "@/services/borderNumberService"
 import documentUnitService from "@/services/documentUnitService"
 import publishDocumentationUnitService from "@/services/publishDocumentationUnitService"
+import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 import routes from "~pages"
@@ -62,6 +63,16 @@ describe("DecisionPlausibilityCheck", () => {
         })
       },
     )
+
+    vi.spyOn(languageToolService, "checkAll").mockResolvedValue({
+      status: 200,
+      data: {
+        // Provide the structure expected by the component logic
+        suggestions: [],
+        totalTextCheckErrors: 0,
+        categoryTypes: [],
+      },
+    })
 
     vi.spyOn(
       publishDocumentationUnitService,
