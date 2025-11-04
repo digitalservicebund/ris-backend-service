@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Button from "primevue/button"
 import { computed } from "vue"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { Match } from "@/types/textCheck"
 import IconAutoStoriesOffVariant from "~icons/material-symbols/auto-stories-off-outline"
 import IconAutoStoriesVariant from "~icons/material-symbols/auto-stories-outline"
@@ -57,9 +56,6 @@ async function removeWordGlobally() {
   emit("globally-ignored-word:remove")
 }
 
-const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
-const textCheckIgnoreOnce = useFeatureToggle("neuris.text-check-ignore-once")
-
 const matchIsIgnoredGlobally = computed(() => {
   return props.match.ignoredTextCheckWords?.some(
     (ignoredWord) => ignoredWord.type === "global",
@@ -88,7 +84,6 @@ const matchIsIgnoredInDocument = computed(() => {
         <div>im Wörterbuch / für alle Dokstellen ignoriert</div>
 
         <Button
-          v-if="textCheckGlobal"
           aria-label="Wort aus Wörterbuch entfernen"
           class="self-start"
           data-testid="ignored-word-global-remove-button"
@@ -121,7 +116,6 @@ const matchIsIgnoredInDocument = computed(() => {
         </Button>
 
         <Button
-          v-if="textCheckGlobal"
           aria-label="Zum Wörterbuch hinzufügen"
           class="self-start"
           data-testid="ignored-word-global-add-button"
@@ -140,7 +134,6 @@ const matchIsIgnoredInDocument = computed(() => {
         <div>an dieser Stelle ignoriert</div>
 
         <Button
-          v-if="textCheckGlobal && textCheckIgnoreOnce"
           aria-label="Hier nicht ignorieren"
           class="self-start"
           data-testid="unignore-once-button"
@@ -155,7 +148,6 @@ const matchIsIgnoredInDocument = computed(() => {
         </Button>
 
         <Button
-          v-if="textCheckGlobal"
           aria-label="In Dokumentationseinheit ignorieren"
           class="self-start"
           data-testid="ignored-word-add-button"
@@ -170,7 +162,6 @@ const matchIsIgnoredInDocument = computed(() => {
         </Button>
 
         <Button
-          v-if="textCheckGlobal"
           aria-label="Zum Wörterbuch hinzufügen"
           class="self-start"
           data-testid="ignored-word-global-add-button"
@@ -189,7 +180,6 @@ const matchIsIgnoredInDocument = computed(() => {
         <div>{{ match.shortMessage }}</div>
 
         <Button
-          v-if="textCheckGlobal && textCheckIgnoreOnce"
           aria-label="Hier ignorieren"
           class="self-start"
           data-testid="ignore-once-button"
@@ -204,7 +194,6 @@ const matchIsIgnoredInDocument = computed(() => {
         </Button>
 
         <Button
-          v-if="textCheckGlobal"
           aria-label="In Dokumentationseinheit ignorieren"
           class="self-start"
           data-testid="ignored-word-add-button"
@@ -219,7 +208,6 @@ const matchIsIgnoredInDocument = computed(() => {
         </Button>
 
         <Button
-          v-if="textCheckGlobal"
           aria-label="Zum Wörterbuch hinzufügen"
           class="self-start"
           data-testid="ignored-word-global-add-button"
