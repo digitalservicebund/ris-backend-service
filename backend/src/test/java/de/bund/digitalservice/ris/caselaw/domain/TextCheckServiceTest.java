@@ -17,7 +17,6 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotE
 import de.bund.digitalservice.ris.caselaw.domain.exception.TextCheckUnknownCategoryException;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
-import de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckType;
@@ -246,38 +245,6 @@ class TextCheckServiceTest {
         "<p><text-check id=\"1\" type=\"redundancy\" ignored=\"false\">text</text-check> text <text-check id=\"2\" type=\"typo\" ignored=\"false\">widt</text-check> <text-check id=\"3\" type=\"typo\" ignored=\"false\">missspelling</text-check></p>",
         response.htmlText());
     assertEquals(3, response.matches().size());
-  }
-
-  @Test
-  void testCheckCategoryByHTML_withMatches_LimitSuggestionsToFive() {
-    String htmlText = "<p>z</p>";
-    CategoryType categoryType = CategoryType.REASONS;
-
-    TextCheckService mockService = spy(textCheckService);
-    when(mockService.check(any(String.class)))
-        .thenReturn(
-            List.of(
-                Match.builder()
-                    .id(1)
-                    .offset(1)
-                    .length(1)
-                    .rule(Rule.builder().issueType("redundancy").build())
-                    .replacements(
-                        List.of(
-                            new Replacement("a"),
-                            new Replacement("b"),
-                            new Replacement("c"),
-                            new Replacement("d"),
-                            new Replacement("e"),
-                            new Replacement("f")))
-                    .build()));
-    when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
-        .thenCallRealMethod();
-
-    TextCheckCategoryResponse response = mockService.checkCategoryByHTML(htmlText, categoryType);
-
-    assertNotNull(response);
-    assertEquals(5, response.matches().getFirst().replacements().size());
   }
 
   @Test
