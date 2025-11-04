@@ -20,7 +20,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.0.0"
     id("org.flywaydb.flyway") version "11.15.0"
-    id("io.sentry.jvm.gradle") version "5.12.1"
+    id("io.sentry.jvm.gradle") version "5.12.2"
 }
 
 group = "de.bund.digitalservice"
@@ -179,7 +179,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.37.3"))
+    implementation(platform("software.amazon.awssdk:bom:2.37.4"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
