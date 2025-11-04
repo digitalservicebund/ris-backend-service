@@ -67,7 +67,6 @@ describe("DecisionPlausibilityCheck", () => {
     vi.spyOn(languageToolService, "checkAll").mockResolvedValue({
       status: 200,
       data: {
-        // Provide the structure expected by the component logic
         suggestions: [],
         totalTextCheckErrors: 0,
         categoryTypes: [],

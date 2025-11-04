@@ -175,7 +175,6 @@ describe("Document Number Route", () => {
         name: "Formaldaten",
       })
 
-      // 2. Assert it is visible
       expect(heading).toBeVisible()
     })
 
