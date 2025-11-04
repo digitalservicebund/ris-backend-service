@@ -3,6 +3,10 @@ import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   fillCombobox,
   navigateToCategories,
+  navigateToCategoryImport,
+  navigateToHandover,
+  navigateToPreview,
+  searchForDocumentUnitToImport,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe(
@@ -11,7 +15,11 @@ test.describe(
     tag: ["@RISDEV-8627"],
   },
   () => {
-    test("Rechtsmittel", async ({ page, prefilledDocumentUnit }) => {
+    test("Rechtsmittel", async ({
+      page,
+      prefilledDocumentUnit,
+      secondPrefilledDocumentUnit,
+    }) => {
       const documentNumber = prefilledDocumentUnit.documentNumber
       await navigateToCategories(page, documentNumber)
 
@@ -102,6 +110,53 @@ test.describe(
       await test.step("Ausgefüllte Rubrik wird bei Wechsel zu Nicht-Finanzgericht weiterhin angezeigt", async () => {
         await fillCombobox(page, "Gericht", "BGH")
         await expect(page.getByTestId("appellants")).toBeVisible()
+      })
+
+      await test.step("Rechtsmittel werden in der Vorschau angezeigt", async () => {
+        await navigateToPreview(page, documentNumber)
+        await expect(page.getByText("Rechtsmittel")).toBeVisible()
+        await expect(
+          page.getByText("RechtsmittelführerKläger, Keine Angabe"),
+        ).toBeVisible()
+        await expect(
+          page.getByText("Revision (Beklagter)unzulässig"),
+        ).toBeVisible()
+        await expect(page.getByText("Revision (Kläger)zulässig")).toBeVisible()
+        await expect(
+          page.getByText("Anschlussrevision (Beklagter)teilweise unzulässig"),
+        ).toBeVisible()
+        await expect(
+          page.getByText("Anschlussrevision (Kläger)unbegründet"),
+        ).toBeVisible()
+        await expect(page.getByText("NZB (Beklagter)begründet")).toBeVisible()
+        await expect(
+          page.getByText("NZB (Kläger)teilweise unbegründet"),
+        ).toBeVisible()
+        await expect(page.getByText("Zurücknahme der RevisionJa")).toBeVisible()
+        await expect(page.getByText("PKH-Antrag (Kläger)Nein")).toBeVisible()
+      })
+
+      await test.step("Auf Übergabeseite erscheint Warnung, dass Rechtsmittel nicht übergeben werden", async () => {
+        await navigateToHandover(page, documentNumber)
+        await expect(
+          page.getByText(
+            "Folgende Rubriken sind befüllt und können nicht an die jDV exportiert werden",
+          ),
+        ).toBeVisible()
+        await expect(page.getByText("Rechtsmittel")).toBeVisible()
+      })
+
+      await test.step("Rechtsmittel können importiert werden", async () => {
+        await navigateToCategoryImport(
+          page,
+          secondPrefilledDocumentUnit.documentNumber,
+        )
+        await searchForDocumentUnitToImport(page, documentNumber)
+        await expect(
+          page.getByLabel("Rechtsmittel übernehmen", {
+            exact: true,
+          }),
+        ).toBeVisible()
       })
     })
   },

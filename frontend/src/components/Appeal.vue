@@ -16,8 +16,8 @@ defineProps<{
 
 const store = useDocumentUnitStore()
 
-const appellants = ref<Appellant[]>()
-const appealStatuses = ref<AppealStatus[]>()
+const appellantOptions = ref<Appellant[]>()
+const appealStatusOptions = ref<AppealStatus[]>()
 
 const selectedAppellants = computed({
   get: () =>
@@ -138,12 +138,12 @@ const pkhPlaintiff = computed({
 onMounted(async () => {
   const appellantsResponse = await appealService.getAppellants()
   if (appellantsResponse.data) {
-    appellants.value = appellantsResponse.data
+    appellantOptions.value = appellantsResponse.data
   }
 
   const appealStatusesResponse = await appealService.getAppealStatuses()
   if (appealStatusesResponse.data) {
-    appealStatuses.value = appealStatusesResponse.data
+    appealStatusOptions.value = appealStatusesResponse.data
   }
 })
 </script>
@@ -162,7 +162,7 @@ onMounted(async () => {
           data-testid="appellants"
           display="chip"
           option-label="value"
-          :options="appellants"
+          :options="appellantOptions"
           placeholder="Bitte auswählen"
         />
       </InputField>
@@ -179,7 +179,7 @@ onMounted(async () => {
             data-testid="revision-defendant"
             display="chip"
             option-label="value"
-            :options="appealStatuses"
+            :options="appealStatusOptions"
             placeholder="Bitte auswählen"
           />
         </InputField>
@@ -195,7 +195,7 @@ onMounted(async () => {
             data-testid="revision-plaintiff"
             display="chip"
             option-label="value"
-            :options="appealStatuses"
+            :options="appealStatusOptions"
             placeholder="Bitte auswählen"
           />
         </InputField>
@@ -213,7 +213,7 @@ onMounted(async () => {
             data-testid="joint-revision-defendant"
             display="chip"
             option-label="value"
-            :options="appealStatuses"
+            :options="appealStatusOptions"
             placeholder="Bitte auswählen"
           />
         </InputField>
@@ -229,7 +229,7 @@ onMounted(async () => {
             data-testid="joint-revision-plaintiff"
             display="chip"
             option-label="value"
-            :options="appealStatuses"
+            :options="appealStatusOptions"
             placeholder="Bitte auswählen"
           />
         </InputField>
@@ -243,7 +243,7 @@ onMounted(async () => {
             data-testid="nzb-defendant"
             display="chip"
             option-label="value"
-            :options="appealStatuses"
+            :options="appealStatusOptions"
             placeholder="Bitte auswählen"
           />
         </InputField>
@@ -255,7 +255,7 @@ onMounted(async () => {
             data-testid="nzb-plaintiff"
             display="chip"
             option-label="value"
-            :options="appealStatuses"
+            :options="appealStatusOptions"
             placeholder="Bitte auswählen"
           />
         </InputField>

@@ -187,8 +187,7 @@ describe("appeal", () => {
     expect(screen.queryByLabelText("Keine Angabe")).not.toBeInTheDocument()
   })
 
-  //fixme please
-  it.skip("display non-empty appeal", async () => {
+  it("display non-empty appeal", async () => {
     renderComponent({
       appellants: [{ id: "1", value: "Kläger" }],
       revisionDefendantStatuses: [{ id: "1", value: "unbegründet" }],
@@ -207,6 +206,8 @@ describe("appeal", () => {
       appealWithdrawal: AppealWithdrawal.JA,
       pkhPlaintiff: PkhPlaintiff.NEIN,
     })
+
+    await new Promise((resolve) => setTimeout(resolve, 0))
 
     expect(screen.queryByTestId("appellants")).toHaveTextContent("Kläger")
     expect(screen.queryByTestId("revision-defendant")).toHaveTextContent(
