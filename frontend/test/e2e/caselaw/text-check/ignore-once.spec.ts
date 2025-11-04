@@ -22,7 +22,7 @@ test.describe(
       async ({ page, prefilledDocumentUnit }) => {
         const headnoteResponseInitial = {
           htmlText:
-            '<p>Das ist ein <text-check id="1" type="misspelling" ignored="false">felher</text-check>. Das ist ein zweiter <text-check id="2" type="misspelling" ignored="false">felher</text-check>.</p>',
+            '<p>Das ist ein <text-check id="1" ignored="false">felher</text-check>. Das ist ein zweiter <text-check id="2" ignored="false">felher</text-check>.</p>',
           matches: [
             {
               id: 1,
@@ -45,7 +45,7 @@ test.describe(
 
         const guidingPrincipleResponseInitial = {
           htmlText:
-            '<p>Das ist ein <text-check id="1" type="misspelling" ignored="false">felher</text-check>. Das ist ein zweiter <text-check id="2" type="misspelling" ignored="false">felher</text-check>.</p>',
+            '<p>Das ist ein <text-check id="1" ignored="false">felher</text-check>. Das ist ein zweiter <text-check id="2" ignored="false">felher</text-check>.</p>',
           matches: [
             {
               id: 1,
@@ -68,7 +68,7 @@ test.describe(
 
         const headnoteResponseAfterIgnore = {
           htmlText:
-            '<p>Das ist ein <ignore-once><text-check id="1" type="misspelling" ignored="true">felher</text-check></ignore-once>. Das ist ein zweiter <text-check id="2" type="misspelling" ignored="false">felher</text-check>.</p>',
+            '<p>Das ist ein <ignore-once><text-check id="1" ignored="true">felher</text-check></ignore-once>. Das ist ein zweiter <text-check id="2" ignored="false">felher</text-check>.</p>',
           matches: [
             {
               id: 1,
@@ -383,7 +383,7 @@ test.describe(
         }
 
         const initialResponse = {
-          htmlText: `<p>Das ist ein <text-check id="1" type="misspelling" ignored="false">${word}</text-check>. Das ist ein zweiter <text-check id="2" type="misspelling" ignored="false">${word}</text-check>.</p>`,
+          htmlText: `<p>Das ist ein <text-check id="1" ignored="false">${word}</text-check>. Das ist ein zweiter <text-check id="2" ignored="false">${word}</text-check>.</p>`,
           matches: [
             // Assuming Match IDs 1 and 2 correspond to the first and second 'errrror'
             {
@@ -515,7 +515,7 @@ test.describe(
                 contentType: "application/json",
                 body: JSON.stringify({
                   htmlText:
-                    '<p>Das ist ein <text-check id="1" type="misspelling" ignored="false">felher</text-check>. Das ist ein zweiter <text-check id="2" type="misspelling" ignored="false">felher</text-check>.</p>',
+                    '<p>Das ist ein <text-check id="1" ignored="false">felher</text-check>. Das ist ein zweiter <text-check id="2" ignored="false">felher</text-check>.</p>',
                   matches: [
                     {
                       id: 1,
@@ -705,7 +705,7 @@ test.describe(
                 contentType: "application/json",
                 body: JSON.stringify({
                   htmlText:
-                    '<p>Das ist ein <text-check id="1" type="misspelling" ignored="false">felher</text-check>. Das ist ein zweiter <text-check id="2" type="misspelling" ignored="false">felher</text-check>.</p>',
+                    '<p>Das ist ein <text-check id="1" ignored="false">felher</text-check>. Das ist ein zweiter <text-check id="2" ignored="false">felher</text-check>.</p>',
                   matches: [
                     {
                       id: 1,
