@@ -27,7 +27,6 @@ describe("IgnoredWordHandler", () => {
     word: "testword",
     offset: 0,
     length: 8,
-    replacements: [],
     category: "",
     message: "",
     context: { text: "", length: 0, offset: 0 },

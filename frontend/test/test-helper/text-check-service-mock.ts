@@ -20,11 +20,6 @@ function generateMatch(id?: number): Match {
     message: "Möglicher Tippfehler gefunden.",
     shortMessage: "Rechtschreibfehler",
     category: "reasons",
-    replacements: [
-      {
-        value: "Rechtschreibfehler",
-      },
-    ],
     offset: 3,
     htmlOffset: 0,
     length: 18,
@@ -68,11 +63,6 @@ const matches: Match[] = [
     message: "Möglicher Tippfehler gefunden.",
     shortMessage: "Rechtschreibfehler",
     category: "tenor",
-    replacements: [
-      {
-        value: "Rechtschreibfehler",
-      },
-    ],
     offset: 3,
     length: 18,
     context: {

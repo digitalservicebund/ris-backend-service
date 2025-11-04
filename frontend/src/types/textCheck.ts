@@ -33,7 +33,6 @@ export interface Match {
   id: number
   message: string
   shortMessage: string
-  replacements: Replacement[]
   offset: number
   htmlOffset?: number
   length: number
