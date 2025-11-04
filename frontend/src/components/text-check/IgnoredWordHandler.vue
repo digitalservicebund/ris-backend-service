@@ -18,36 +18,31 @@ const emit = defineEmits<{
   "ignored-word:remove": [void]
   "globally-ignored-word:remove": [void]
   "globally-ignored-word:add": [void]
-  "ignore-once:toggle": [number]
+  "ignore-once:toggle": [void]
 }>()
 
-function addIgnoredWord() {
-  emit("ignored-word:add")
-}
-
-function addIgnoredWordWithCheck() {
-  if (props.ignoredLocally) {
-    emit("ignore-once:toggle", props.match.offset)
-  }
-  emit("ignored-word:add")
-}
-
-function addIgnoredWordGloballyWithCheck() {
-  if (props.ignoredLocally) {
-    emit("ignore-once:toggle", props.match.offset)
-  }
-  emit("globally-ignored-word:add")
-}
-
+// Hier ignorieren
 function ignoreOnceToggle() {
-  emit("ignore-once:toggle", props.match.offset)
+  emit("ignore-once:toggle")
+}
+
+// In Dokeinheit ignorieren
+function addIgnoredWord() {
+  if (props.ignoredLocally) {
+    emit("ignore-once:toggle")
+  }
+  emit("ignored-word:add")
 }
 
 async function removeWord() {
   emit("ignored-word:remove")
 }
 
+// Zum Wörterbuch hin zufügen
 function addIgnoredWordGlobally() {
+  if (props.ignoredLocally) {
+    emit("ignore-once:toggle")
+  }
   emit("ignored-word:remove")
   emit("globally-ignored-word:add")
 }
@@ -154,7 +149,7 @@ const matchIsIgnoredInDocument = computed(() => {
           label="In Dokumentationseinheit ignorieren"
           size="small"
           text
-          @click="addIgnoredWordWithCheck"
+          @click="addIgnoredWord"
         >
           <template #icon>
             <IconDescription />
@@ -168,7 +163,7 @@ const matchIsIgnoredInDocument = computed(() => {
           label="Zum Wörterbuch hinzufügen"
           size="small"
           text
-          @click="addIgnoredWordGloballyWithCheck"
+          @click="addIgnoredWordGlobally"
         >
           <template #icon>
             <IconAutoStoriesVariant />

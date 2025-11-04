@@ -3,9 +3,6 @@ import { render, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
 import { Match } from "@/types/textCheck"
-import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
-
-useFeatureToggleServiceMock()
 
 async function renderComponent(match: Match, ignoredLocally = false) {
   const user = userEvent.setup()
@@ -115,7 +112,7 @@ describe("IgnoredWordHandler", () => {
 
   test("when ignoring locally check the emitted event and word location information", async () => {
     const { emitted, user } = await renderComponent(baseMatch)
-    const expected = [[baseMatch.offset]]
+    const expected = [[]]
 
     await user.click(screen.getByText("Hier ignorieren"))
     expect(emitted()["ignore-once:toggle"]).toEqual(expected)
@@ -126,7 +123,7 @@ describe("IgnoredWordHandler", () => {
 
     await user.click(screen.getByText("In Dokumentationseinheit ignorieren"))
 
-    expect(emitted()["ignore-once:toggle"]).toEqual([[baseMatch.offset]])
+    expect(emitted()["ignore-once:toggle"]).toEqual([[]])
     expect(emitted()["ignored-word:add"]).toEqual([[]])
   })
 
@@ -145,7 +142,7 @@ describe("IgnoredWordHandler", () => {
 
     await user.click(screen.getByText("In Dokumentationseinheit ignorieren"))
 
-    expect(emitted()["ignore-once:toggle"]).toEqual([[baseMatch.offset]])
+    expect(emitted()["ignore-once:toggle"]).toEqual([[]])
     expect(emitted()["ignored-word:add"]).toBeTruthy()
   })
 
@@ -154,7 +151,7 @@ describe("IgnoredWordHandler", () => {
 
     await user.click(screen.getByText("Zum Wörterbuch hinzufügen"))
 
-    expect(emitted()["ignore-once:toggle"]).toEqual([[baseMatch.offset]])
+    expect(emitted()["ignore-once:toggle"]).toEqual([[]])
     expect(emitted()["globally-ignored-word:add"]).toBeTruthy()
   })
 

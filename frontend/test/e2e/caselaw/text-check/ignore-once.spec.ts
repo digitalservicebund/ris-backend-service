@@ -9,7 +9,7 @@ import {
 import { convertHexToRGB } from "~/test-helper/coloursUtil"
 
 test.describe(
-  "global ignore",
+  "ignore once",
   {
     tag: ["@RISDEV-9171"],
   },
