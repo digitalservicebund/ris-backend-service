@@ -15,4 +15,5 @@ public record DocumentationUnitCreationParameters(
     @PastOrPresent LocalDate decisionDate,
     String fileNumber,
     Reference reference,
-    List<String> inputTypes) {}
+    List<String> inputTypes,
+    List<Source> sources) {}
