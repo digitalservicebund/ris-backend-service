@@ -79,7 +79,18 @@ const region = computed(() =>
     : "",
 )
 
-const sourceItems: DropdownItem[] = [
+const rawSourceItems = computed<DropdownItem[]>(
+  () =>
+    coreDataModel.value.sources
+      ?.map((source) => source.sourceRawValue)
+      .filter((rawValue) => rawValue != undefined)
+      .map((rawValue) => ({
+        label: rawValue,
+        value: rawValue,
+      })) ?? [],
+)
+
+const sourceItems = computed<DropdownItem[]>(() => [
   {
     label: "unaufgefordert eingesandtes Original (O)",
     value: SourceValue.UnaufgefordertesOriginal,
@@ -99,7 +110,8 @@ const sourceItems: DropdownItem[] = [
     value: SourceValue.LaenderEuGH,
   },
   { label: "Sonstige (S)", value: SourceValue.Sonstige },
-]
+  ...rawSourceItems.value,
+])
 
 function isSourceValue(value: string): value is SourceValue {
   return Object.values(SourceValue).includes(value as SourceValue)

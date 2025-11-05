@@ -205,6 +205,9 @@ describe("Core Data", () => {
         {
           value: SourceValue.AngefordertesOriginal,
         },
+        {
+          sourceRawValue: "legacy Source",
+        },
       ],
     }
 
@@ -215,6 +218,7 @@ describe("Core Data", () => {
     expect(
       within(sourceSelect).getByText("angefordertes Original (A)"),
     ).toBeInTheDocument()
+    expect(within(sourceSelect).getByText("legacy Source")).toBeInTheDocument()
   })
 
   test("updates source", async () => {
@@ -238,6 +242,38 @@ describe("Core Data", () => {
     expect(model.value.sources).toEqual([
       {
         value: SourceValue.UnaufgefordertesOriginal,
+      },
+    ])
+  })
+
+  test("allows selecting multiple sources", async () => {
+    const { user, model } = renderComponent({
+      initialModelValue: { sources: undefined },
+    })
+
+    // we need to use a test-id as the element selected by the label (or role) is too deep in the html-tree
+    // (it works a11y-wise when using keyboard navigation)
+    const sourceSelect = screen.getByTestId("source-input")
+    await user.click(sourceSelect)
+
+    const options = await screen.findAllByRole("option")
+    expect(options.length).toBe(6)
+    expect(options[0]).toHaveTextContent(
+      "unaufgefordert eingesandtes Original (O)",
+    )
+    expect(options[4]).toHaveTextContent(
+      "Ländergerichte, EuG- und EuGH-Entscheidungen über jDV-Verfahren (L)",
+    )
+
+    await user.click(options[0])
+    await user.click(options[4])
+
+    expect(model.value.sources).toEqual([
+      {
+        value: SourceValue.UnaufgefordertesOriginal,
+      },
+      {
+        value: SourceValue.LaenderEuGH,
       },
     ])
   })
