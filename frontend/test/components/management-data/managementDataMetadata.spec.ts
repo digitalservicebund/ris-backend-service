@@ -244,15 +244,18 @@ describe("ManagementDataMetadata", () => {
   })
 
   describe("Quelle", () => {
-    it("should show source without reference", async () => {
+    it("should show sources without reference", async () => {
       const docUnit = mockDecision({
-        sources: [{ value: SourceValue.Email }],
+        sources: [
+          { value: SourceValue.Email },
+          { value: SourceValue.UnaufgefordertesOriginal },
+        ],
       })
       renderMetadata(docUnit)
 
       const lastUpdated = screen.getByTestId("management-data-source")
       expect(within(lastUpdated).getByText("Quelle")).toBeInTheDocument()
-      expect(within(lastUpdated).getByText("E")).toBeInTheDocument()
+      expect(within(lastUpdated).getByText("E, O")).toBeInTheDocument()
     })
 
     it("should show source without value", async () => {
