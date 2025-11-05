@@ -331,6 +331,8 @@ test.describe("Große Suche nach Entscheidungen", () => {
           .getByRole("row")
           .filter({ hasText: documentNumber })
 
+        // Ersterfassung visible as previous step
+        await expect(documentRow.getByText("EE")).toBeVisible()
         await expect(documentRow.getByText("Fachdokumentation")).toBeVisible()
         await expect(documentRow.getByText("ED")).toBeHidden()
       })
