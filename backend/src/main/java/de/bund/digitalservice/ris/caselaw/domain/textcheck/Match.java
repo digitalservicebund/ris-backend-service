@@ -11,7 +11,6 @@ public record Match(
     String message,
     String shortMessage,
     CategoryType category,
-    List<Replacement> replacements,
     int offset,
     Integer htmlOffset,
     int length,
