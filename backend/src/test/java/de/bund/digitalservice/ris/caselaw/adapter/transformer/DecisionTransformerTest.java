@@ -770,7 +770,9 @@ class DecisionTransformerTest {
     Decision updatedDomainObject =
         Decision.builder()
             .coreData(
-                CoreData.builder().source(Source.builder().value(SourceValue.E).build()).build())
+                CoreData.builder()
+                    .sources(List.of(Source.builder().value(SourceValue.E).build()))
+                    .build())
             .build();
 
     DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
@@ -796,7 +798,9 @@ class DecisionTransformerTest {
     Decision updatedDomainObject =
         Decision.builder()
             .coreData(
-                CoreData.builder().source(Source.builder().value(SourceValue.E).build()).build())
+                CoreData.builder()
+                    .sources(List.of(Source.builder().value(SourceValue.E).build()))
+                    .build())
             .build();
 
     DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
@@ -809,31 +813,34 @@ class DecisionTransformerTest {
 
   @Test
   void testTransformToDTO_withSource_withUnchangedExistingSources() {
-    var reference = CaselawReferenceDTO.builder().build();
     List<SourceDTO> existingSources =
         List.of(
             SourceDTO.builder().value(SourceValue.A).rank(1).build(),
-            SourceDTO.builder()
-                .value(SourceValue.Z)
-                .sourceRawValue("z")
-                .reference(reference)
-                .rank(2)
-                .build());
+            SourceDTO.builder().value(SourceValue.Z).sourceRawValue("z").rank(2).build());
 
     DecisionDTO currentDto = DecisionDTO.builder().source(existingSources).build();
 
     Decision updatedDomainObject =
         Decision.builder()
             .coreData(
-                CoreData.builder().source(Source.builder().value(SourceValue.Z).build()).build())
+                CoreData.builder()
+                    .sources(
+                        List.of(
+                            Source.builder().value(SourceValue.A).build(),
+                            Source.builder().value(SourceValue.Z).sourceRawValue("z").build()))
+                    .build())
             .build();
 
     DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
     assertThat(decisionDTO.getSource()).hasSize(2);
+    assertThat(decisionDTO.getSource().getFirst().getRank()).isEqualTo(1);
+    assertThat(decisionDTO.getSource().getFirst().getValue()).isEqualTo(SourceValue.A);
+    assertThat(decisionDTO.getSource().getFirst().getSourceRawValue()).isNull();
+    assertThat(decisionDTO.getSource().getFirst().getReference()).isNull();
     assertThat(decisionDTO.getSource().getLast().getRank()).isEqualTo(2);
     assertThat(decisionDTO.getSource().getLast().getValue()).isEqualTo(SourceValue.Z);
     assertThat(decisionDTO.getSource().getLast().getSourceRawValue()).isEqualTo("z");
-    assertThat(decisionDTO.getSource().getLast().getReference()).isEqualTo(reference);
+    assertThat(decisionDTO.getSource().getLast().getReference()).isNull();
   }
 
   @Test
@@ -949,10 +956,11 @@ class DecisionTransformerTest {
 
     // --- Assert CoreData fields that are transformed from DecisionTransformer ---
     assertThat(coreData.ecli()).isEqualTo(ecli);
-    assertThat(coreData.source()).isNotNull();
-    assertThat(coreData.source().value()).isEqualTo(SourceValue.E);
-    assertThat(coreData.source().sourceRawValue()).isEqualTo("E");
-    assertThat(coreData.source().reference()).isNull();
+    assertThat(coreData.sources()).isNotNull();
+    assertThat(coreData.sources()).hasSize(1);
+    assertThat(coreData.sources().getFirst().value()).isEqualTo(SourceValue.E);
+    assertThat(coreData.sources().getFirst().sourceRawValue()).isEqualTo("E");
+    assertThat(coreData.sources().getFirst().reference()).isNull();
     assertThat(coreData.legalEffect()).isEqualTo("Ja");
     assertThat(coreData.inputTypes()).containsExactly("Email");
     assertThat(coreData.leadingDecisionNormReferences()).containsExactly("NormAbk");
@@ -972,7 +980,7 @@ class DecisionTransformerTest {
 
     Decision domainObject = DecisionTransformer.transformToDomain(decisionDTO);
 
-    assertThat(domainObject.coreData().source()).isNull();
+    assertThat(domainObject.coreData().sources()).isEmpty();
   }
 
   @Test
@@ -984,12 +992,13 @@ class DecisionTransformerTest {
 
     Decision domainObject = DecisionTransformer.transformToDomain(decisionDTO);
 
-    assertThat(domainObject.coreData().source().value()).isEqualTo(SourceValue.A);
-    assertThat(domainObject.coreData().source().sourceRawValue()).isNull();
+    assertThat(domainObject.coreData().sources()).hasSize(1);
+    assertThat(domainObject.coreData().sources().getFirst().value()).isEqualTo(SourceValue.A);
+    assertThat(domainObject.coreData().sources().getFirst().sourceRawValue()).isNull();
   }
 
   @Test
-  void testTransformToDomain_withMultipleSources_shouldPickHighestRank() {
+  void testTransformToDomain_withMultipleSources() {
     DecisionDTO decisionDTO =
         DecisionDTO.builder()
             .source(
@@ -1001,8 +1010,11 @@ class DecisionTransformerTest {
 
     Decision domainObject = DecisionTransformer.transformToDomain(decisionDTO);
 
-    assertThat(domainObject.coreData().source().value()).isEqualTo(SourceValue.Z);
-    assertThat(domainObject.coreData().source().sourceRawValue()).isNull();
+    assertThat(domainObject.coreData().sources())
+        .containsExactlyInAnyOrder(
+            Source.builder().value(SourceValue.O).build(),
+            Source.builder().value(SourceValue.A).build(),
+            Source.builder().value(SourceValue.Z).build());
   }
 
   @Test
@@ -1101,7 +1113,9 @@ class DecisionTransformerTest {
     Decision updatedDomainObject =
         Decision.builder()
             .coreData(
-                CoreData.builder().source(Source.builder().value(SourceValue.A).build()).build())
+                CoreData.builder()
+                    .sources(List.of(Source.builder().value(SourceValue.A).build()))
+                    .build())
             .build();
 
     DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
@@ -1148,7 +1162,9 @@ class DecisionTransformerTest {
     Decision updatedDomainObject =
         Decision.builder()
             .coreData(
-                CoreData.builder().source(Source.builder().value(SourceValue.A).build()).build())
+                CoreData.builder()
+                    .sources(List.of(Source.builder().value(SourceValue.A).build()))
+                    .build())
             .caselawReferences(referenceType.equals(ReferenceType.CASELAW) ? references : null)
             .literatureReferences(
                 referenceType.equals(ReferenceType.LITERATURE) ? references : null)
@@ -1976,6 +1992,7 @@ class DecisionTransformerTest {
         .deviatingDecisionDates(Collections.emptyList())
         .inputTypes(Collections.emptyList())
         .leadingDecisionNormReferences(Collections.emptyList())
-        .yearsOfDispute(Collections.emptyList());
+        .yearsOfDispute(Collections.emptyList())
+        .sources(Collections.emptyList());
   }
 }

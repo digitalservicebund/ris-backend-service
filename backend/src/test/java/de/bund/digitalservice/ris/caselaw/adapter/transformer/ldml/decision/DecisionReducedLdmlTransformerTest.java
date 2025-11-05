@@ -186,11 +186,12 @@ class DecisionReducedLdmlTransformerTest {
                             .location("courtLocation")
                             .regions(List.of("NW"))
                             .build())
-                    .source(
-                        Source.builder()
-                            .sourceRawValue("sourceRawValue test")
-                            .value(SourceValue.S)
-                            .build())
+                    .sources(
+                        List.of(
+                            Source.builder()
+                                .sourceRawValue("sourceRawValue test")
+                                .value(SourceValue.S)
+                                .build()))
                     .documentType(DocumentType.builder().label("documentType test").build())
                     .legalEffect("ja")
                     .fileNumbers(List.of("fileNumber test"))
