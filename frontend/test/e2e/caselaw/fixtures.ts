@@ -171,9 +171,11 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             fileNumbers: [generateString()],
             decisionDate: "2019-12-31",
             appraisalBody: "1. Senat, 2. Kammer",
-            source: {
-              value: SourceValue.AngefordertesOriginal,
-            },
+            sources: [
+              {
+                value: SourceValue.AngefordertesOriginal,
+              },
+            ],
           },
           contentRelatedIndexing: {
             keywords: ["keyword"],
@@ -263,9 +265,11 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
         fileNumbers: [generateString()],
         decisionDate: "2019-12-31",
         appraisalBody: "1. Senat, 2. Kammer",
-        source: {
-          value: SourceValue.AngefordertesOriginal,
-        },
+        sources: [
+          {
+            value: SourceValue.AngefordertesOriginal,
+          },
+        ],
       },
       contentRelatedIndexing: {
         keywords: ["keyword"],

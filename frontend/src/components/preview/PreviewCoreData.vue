@@ -16,10 +16,11 @@ const props = defineProps<{
 }>()
 
 const isPendingProceeding = props.kind === Kind.PENDING_PROCEEDING
-const sourceValue = computed(() =>
-  props.coreData.source
-    ? (props.coreData.source.value ?? props.coreData.source.sourceRawValue)
-    : undefined,
+const sourcesValue = computed(
+  () =>
+    props.coreData.sources
+      ?.map((source) => source.value ?? source.sourceRawValue)
+      .join(", ") ?? undefined,
 )
 const dateLabel = computed(() => {
   const decisionDateLabel = props.coreData.hasDeliveryDate
@@ -157,10 +158,10 @@ const dateLabel = computed(() => {
         </FlexContainer>
       </PreviewContent>
     </PreviewRow>
-    <PreviewRow v-if="sourceValue">
+    <PreviewRow v-if="sourcesValue">
       <PreviewCategory>Quelle</PreviewCategory>
       <PreviewContent>
-        {{ sourceValue }}
+        {{ sourcesValue }}
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="coreData.inputTypes && coreData.inputTypes.length > 0">
