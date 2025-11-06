@@ -384,8 +384,9 @@ public class DecisionTransformer extends DocumentableTransformer {
         contentRelatedIndexing.collectiveAgreements().stream().distinct().toList();
 
     for (int i = 0; i < collectiveAgreements.size(); i++) {
+      // TODO: (Malte Laukötter, 2025-11-06) adjust for new model
       collectiveAgreementDTOS.add(
-          CollectiveAgreementDTO.builder().value(collectiveAgreements.get(i)).rank(i + 1L).build());
+          CollectiveAgreementDTO.builder().name(collectiveAgreements.get(i)).rank(i + 1L).build());
     }
 
     builder.collectiveAgreements(collectiveAgreementDTOS);
@@ -701,9 +702,10 @@ public class DecisionTransformer extends DocumentableTransformer {
     }
 
     if (decisionDTO.getCollectiveAgreements() != null) {
+      // TODO: (Malte Laukötter, 2025-11-06) adjust for new model
       List<String> collectiveAgreements =
           decisionDTO.getCollectiveAgreements().stream()
-              .map(CollectiveAgreementDTO::getValue)
+              .map(CollectiveAgreementDTO::getName)
               .toList();
       contentRelatedIndexingBuilder.collectiveAgreements(collectiveAgreements);
     }
