@@ -681,7 +681,7 @@ class DecisionTransformerTest {
         DecisionTransformer.transformToDTO(DecisionDTO.builder().build(), decision);
 
     assertThat(decisionDTO.getCollectiveAgreements())
-        .extracting("value")
+        .extracting(CollectiveAgreementDTO::getName)
         .containsExactly("agreement");
   }
 
@@ -1503,10 +1503,11 @@ class DecisionTransformerTest {
 
   @Test
   void testTransformToDomain_withCollectiveAgreements_shouldAddCollectiveAgreements() {
+    // TODO: (Malte Laukötter, 2025-11-06) adjust for new model
     DecisionDTO decisionDTO =
         generateSimpleDTOBuilder()
             .collectiveAgreements(
-                List.of(CollectiveAgreementDTO.builder().value("agreement").build()))
+                List.of(CollectiveAgreementDTO.builder().name("agreement").build()))
             .build();
 
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
