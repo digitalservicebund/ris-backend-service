@@ -1,10 +1,7 @@
 import { expect } from "@playwright/test"
 import { Decision } from "@/domain/decision"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
-import {
-  addIgnoreWordToDocumentationUnit,
-  updateDocumentationUnit,
-} from "~/e2e/caselaw/utils/documentation-unit-api-util"
+import { updateDocumentationUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import {
   clearTextField,
   fillActiveCitationInputs,
