@@ -262,13 +262,13 @@ class AppealTransformerTest {
 
     assertThat(appeal).isNotNull();
     assertThat(appeal.id()).isEqualTo(id);
-    assertThat(appeal.appellants()).hasSize(0);
-    assertThat(appeal.revisionDefendantStatuses()).hasSize(0);
-    assertThat(appeal.revisionPlaintiffStatuses()).hasSize(0);
-    assertThat(appeal.jointRevisionDefendantStatuses()).hasSize(0);
-    assertThat(appeal.jointRevisionPlaintiffStatuses()).hasSize(0);
-    assertThat(appeal.nzbDefendantStatuses()).hasSize(0);
-    assertThat(appeal.nzbPlaintiffStatuses()).hasSize(0);
+    assertThat(appeal.appellants()).isEmpty();
+    assertThat(appeal.revisionDefendantStatuses()).isEmpty();
+    assertThat(appeal.revisionPlaintiffStatuses()).isEmpty();
+    assertThat(appeal.jointRevisionDefendantStatuses()).isEmpty();
+    assertThat(appeal.jointRevisionPlaintiffStatuses()).isEmpty();
+    assertThat(appeal.nzbDefendantStatuses()).isEmpty();
+    assertThat(appeal.nzbPlaintiffStatuses()).isEmpty();
     assertThat(appeal.appealWithdrawal()).isEqualTo(AppealWithdrawal.JA);
     assertThat(appeal.pkhPlaintiff()).isEqualTo(PkhPlaintiff.JA);
   }
