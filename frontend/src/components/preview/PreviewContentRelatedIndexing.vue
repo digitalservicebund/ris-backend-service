@@ -290,7 +290,7 @@ const hasAppeal = computed(() => {
         </div>
       </PreviewContent>
     </PreviewRow>
-    <PreviewRow v-if="hasAppeal">
+    <div v-if="hasAppeal" class="pb-8">
       <PreviewCategory>Rechsmittel</PreviewCategory>
       <PreviewContent v-if="props.contentRelatedIndexing.appeal?.appellants">
         <PreviewCategory>Rechtsmittelführer</PreviewCategory>
@@ -428,6 +428,6 @@ const hasAppeal = computed(() => {
           }}</span>
         </PreviewContent>
       </PreviewContent>
-    </PreviewRow>
+    </div>
   </FlexContainer>
 </template>
