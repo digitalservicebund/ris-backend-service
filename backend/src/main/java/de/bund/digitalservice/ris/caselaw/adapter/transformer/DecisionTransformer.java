@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
@@ -380,13 +381,14 @@ public class DecisionTransformer extends DocumentableTransformer {
     }
 
     List<CollectiveAgreementDTO> collectiveAgreementDTOS = new ArrayList<>();
-    List<String> collectiveAgreements =
+    List<CollectiveAgreement> collectiveAgreements =
         contentRelatedIndexing.collectiveAgreements().stream().distinct().toList();
 
     for (int i = 0; i < collectiveAgreements.size(); i++) {
-      // TODO: (Malte Laukötter, 2025-11-06) adjust for new model
-      collectiveAgreementDTOS.add(
-          CollectiveAgreementDTO.builder().name(collectiveAgreements.get(i)).rank(i + 1L).build());
+      var collectiveAgreement = collectiveAgreements.get(i);
+      var dto = CollectiveAgreementTransformer.transformToDTO(collectiveAgreement);
+      dto.setRank(i + 1L);
+      collectiveAgreementDTOS.add(dto);
     }
 
     builder.collectiveAgreements(collectiveAgreementDTOS);
@@ -711,12 +713,10 @@ public class DecisionTransformer extends DocumentableTransformer {
     }
 
     if (decisionDTO.getCollectiveAgreements() != null) {
-      // TODO: (Malte Laukötter, 2025-11-06) adjust for new model
-      List<String> collectiveAgreements =
+      contentRelatedIndexingBuilder.collectiveAgreements(
           decisionDTO.getCollectiveAgreements().stream()
-              .map(CollectiveAgreementDTO::getName)
-              .toList();
-      contentRelatedIndexingBuilder.collectiveAgreements(collectiveAgreements);
+              .map(CollectiveAgreementTransformer::transformToDomain)
+              .toList());
     }
 
     if (decisionDTO.getDefinitions() != null) {
