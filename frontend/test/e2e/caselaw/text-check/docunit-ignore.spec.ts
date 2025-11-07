@@ -10,18 +10,11 @@ import {
   triggerCheckCategory,
 } from "~/e2e/caselaw/text-check/util"
 
-// eslint-disable-next-line playwright/no-skipped-test
-test.skip(
-  ({ browserName }) => browserName !== "chromium",
-  "Skipping firefox flaky test",
-)
-
 test.describe(
-  "ignored matches feedback",
+  "docunit ignore",
   {
     tag: ["@RISDEV-9120"],
   },
-
   () => {
     test.use({
       decisionToBeCreated: {
@@ -32,9 +25,8 @@ test.describe(
       },
     })
 
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
-      "text check, ignore effects all categories",
+    test(
+      "text check, ignore in docunit effects all categories",
       {
         tag: ["@RISDEV-9234"],
       },
