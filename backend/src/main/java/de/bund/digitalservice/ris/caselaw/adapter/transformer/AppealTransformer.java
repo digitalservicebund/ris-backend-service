@@ -60,7 +60,7 @@ public class AppealTransformer {
     if (currentDTO.getAppeal() != null) {
       builder = currentDTO.getAppeal().toBuilder();
     } else {
-      builder = AppealDTO.builder().id(appeal.id());
+      builder = AppealDTO.builder();
     }
 
     builder.appealWithdrawal(appeal.appealWithdrawal());

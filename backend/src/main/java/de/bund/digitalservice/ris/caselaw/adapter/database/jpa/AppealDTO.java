@@ -8,9 +8,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
@@ -32,8 +34,15 @@ import org.hibernate.proxy.HibernateProxy;
 @Builder(toBuilder = true)
 @Table(schema = "incremental_migration", name = "appeal")
 public class AppealDTO {
-  /** Rechtsmittel */
-  @Id @GeneratedValue private UUID id;
+
+  @Id
+  @Column(name = "decision_id")
+  private UUID id;
+
+  @OneToOne
+  @MapsId
+  @JoinColumn(name = "decision_id")
+  private DecisionDTO decision;
 
   /** Rechtsmittelführer */
   @OneToMany(

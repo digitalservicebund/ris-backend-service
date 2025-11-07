@@ -15,6 +15,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.OrderColumn;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -268,7 +269,8 @@ public class DecisionDTO extends DocumentationUnitDTO {
   private AppealAdmitter appealAdmittedBy;
 
   /** Rechtsmittel */
-  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @OneToOne(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+  @PrimaryKeyJoinColumn
   private AppealDTO appeal;
 
   @Override

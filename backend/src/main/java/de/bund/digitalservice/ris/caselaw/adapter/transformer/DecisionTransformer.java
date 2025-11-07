@@ -182,6 +182,10 @@ public class DecisionTransformer extends DocumentableTransformer {
 
     DecisionDTO result = builder.build();
 
+    if (result.getAppeal() != null) {
+      result.getAppeal().setDecision(result);
+    }
+
     return DocumentableTransformer.postProcessRelationships(result, currentDto);
   }
 
