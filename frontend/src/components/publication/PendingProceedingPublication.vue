@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import { computed, onBeforeMount, Ref, ref } from "vue"
+import HandoverTextCheckView from "../text-check/HandoverTextCheckView.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import InfoModal from "@/components/InfoModal.vue"
@@ -13,6 +14,8 @@ import publishDocumentationUnitService from "@/services/publishDocumentationUnit
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const isPortalPublicationEnabled = useFeatureToggle("neuris.portal-publication")
+const textCheckAllToggle = useFeatureToggle("neuris.text-check-publication")
+
 const isPublishable = computed(
   () => !!preview.value?.success && isPortalPublicationEnabled.value,
 )
@@ -46,6 +49,11 @@ onBeforeMount(async () => {
   <div class="flex w-full flex-1 grow flex-col gap-32 p-24">
     <div class="flex w-full flex-col gap-24 bg-white p-24">
       <TitleElement>Prüfen</TitleElement>
+      <HandoverTextCheckView
+        v-if="textCheckAllToggle"
+        :document-id="pendingProceeding!.uuid"
+        :document-number="pendingProceeding!.documentNumber"
+      />
       <div
         v-if="preview?.success && !!preview.ldml"
         class="border-b-1 border-b-gray-400"

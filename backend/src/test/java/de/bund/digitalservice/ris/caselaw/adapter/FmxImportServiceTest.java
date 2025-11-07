@@ -176,7 +176,7 @@ class FmxImportServiceTest {
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:C:2024:60");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Urteil");
-    assertThat(savedDocUnit.coreData().source().value()).isEqualTo(SourceValue.L);
+    assertThat(savedDocUnit.coreData().sources().getFirst().value()).isEqualTo(SourceValue.L);
     assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
@@ -223,7 +223,7 @@ class FmxImportServiceTest {
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:T:2024:142");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Beschluss");
-    assertThat(savedDocUnit.coreData().source().value()).isEqualTo(SourceValue.L);
+    assertThat(savedDocUnit.coreData().sources().getFirst().value()).isEqualTo(SourceValue.L);
     assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
@@ -270,7 +270,7 @@ class FmxImportServiceTest {
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:C:2014:2303");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Gutachten");
-    assertThat(savedDocUnit.coreData().source().value()).isEqualTo(SourceValue.L);
+    assertThat(savedDocUnit.coreData().sources().getFirst().value()).isEqualTo(SourceValue.L);
     assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 

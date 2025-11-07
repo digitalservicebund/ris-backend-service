@@ -191,7 +191,7 @@ class TextCheckIntegrationTest extends BaseIntegrationTest {
     documentationUnitRepository.save(documentationUnitDTO);
 
     final String expectedContentRegex =
-        "<ignore-once><text-check id=\"\\d+\" type=\"misspelling\" ignored=\"true\">misspellinng</text-check></ignore-once>";
+        "<ignore-once><text-check id=\"\\d+\" ignored=\"true\">misspellinng</text-check></ignore-once>";
 
     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
     queryParams.add("category", "tenor");

@@ -3,4 +3,3 @@ export type SelectablePanelContent =
   | "attachments"
   | "preview"
   | "category-import"
-  | "text-check"

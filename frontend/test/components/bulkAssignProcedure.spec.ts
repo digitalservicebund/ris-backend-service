@@ -15,6 +15,9 @@ vi.mock("primevue/usetoast", () => ({
 }))
 
 describe("BulkAssignProcedure", () => {
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
   let bulkAssignServiceSpy: MockInstance<
     (
       procedureLabel: string,

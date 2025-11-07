@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Button from "primevue/button"
 import { computed } from "vue"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { Match } from "@/types/textCheck"
 import IconAutoStoriesOffVariant from "~icons/material-symbols/auto-stories-off-outline"
 import IconAutoStoriesVariant from "~icons/material-symbols/auto-stories-outline"
@@ -19,36 +18,31 @@ const emit = defineEmits<{
   "ignored-word:remove": [void]
   "globally-ignored-word:remove": [void]
   "globally-ignored-word:add": [void]
-  "ignore-once:toggle": [number]
+  "ignore-once:toggle": [void]
 }>()
 
-function addIgnoredWord() {
-  emit("ignored-word:add")
-}
-
-function addIgnoredWordWithCheck() {
-  if (props.ignoredLocally) {
-    emit("ignore-once:toggle", props.match.offset)
-  }
-  emit("ignored-word:add")
-}
-
-function addIgnoredWordGloballyWithCheck() {
-  if (props.ignoredLocally) {
-    emit("ignore-once:toggle", props.match.offset)
-  }
-  emit("globally-ignored-word:add")
-}
-
+// Hier ignorieren
 function ignoreOnceToggle() {
-  emit("ignore-once:toggle", props.match.offset)
+  emit("ignore-once:toggle")
+}
+
+// In Dokeinheit ignorieren
+function addIgnoredWord() {
+  if (props.ignoredLocally) {
+    emit("ignore-once:toggle")
+  }
+  emit("ignored-word:add")
 }
 
 async function removeWord() {
   emit("ignored-word:remove")
 }
 
+// Zum Wörterbuch hin zufügen
 function addIgnoredWordGlobally() {
+  if (props.ignoredLocally) {
+    emit("ignore-once:toggle")
+  }
   emit("ignored-word:remove")
   emit("globally-ignored-word:add")
 }
@@ -56,9 +50,6 @@ function addIgnoredWordGlobally() {
 async function removeWordGlobally() {
   emit("globally-ignored-word:remove")
 }
-
-const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
-const textCheckIgnoreOnce = useFeatureToggle("neuris.text-check-ignore-once")
 
 const matchIsIgnoredGlobally = computed(() => {
   return props.match.ignoredTextCheckWords?.some(
@@ -88,7 +79,6 @@ const matchIsIgnoredInDocument = computed(() => {
         <div>im Wörterbuch / für alle Dokstellen ignoriert</div>
 
         <Button
-          v-if="textCheckGlobal"
           aria-label="Wort aus Wörterbuch entfernen"
           class="self-start"
           data-testid="ignored-word-global-remove-button"
@@ -121,7 +111,6 @@ const matchIsIgnoredInDocument = computed(() => {
         </Button>
 
         <Button
-          v-if="textCheckGlobal"
           aria-label="Zum Wörterbuch hinzufügen"
           class="self-start"
           data-testid="ignored-word-global-add-button"
@@ -140,7 +129,6 @@ const matchIsIgnoredInDocument = computed(() => {
         <div>an dieser Stelle ignoriert</div>
 
         <Button
-          v-if="textCheckGlobal && textCheckIgnoreOnce"
           aria-label="Hier nicht ignorieren"
           class="self-start"
           data-testid="unignore-once-button"
@@ -155,14 +143,13 @@ const matchIsIgnoredInDocument = computed(() => {
         </Button>
 
         <Button
-          v-if="textCheckGlobal"
           aria-label="In Dokumentationseinheit ignorieren"
           class="self-start"
           data-testid="ignored-word-add-button"
           label="In Dokumentationseinheit ignorieren"
           size="small"
           text
-          @click="addIgnoredWordWithCheck"
+          @click="addIgnoredWord"
         >
           <template #icon>
             <IconDescription />
@@ -170,14 +157,13 @@ const matchIsIgnoredInDocument = computed(() => {
         </Button>
 
         <Button
-          v-if="textCheckGlobal"
           aria-label="Zum Wörterbuch hinzufügen"
           class="self-start"
           data-testid="ignored-word-global-add-button"
           label="Zum Wörterbuch hinzufügen"
           size="small"
           text
-          @click="addIgnoredWordGloballyWithCheck"
+          @click="addIgnoredWordGlobally"
         >
           <template #icon>
             <IconAutoStoriesVariant />
@@ -189,7 +175,6 @@ const matchIsIgnoredInDocument = computed(() => {
         <div>{{ match.shortMessage }}</div>
 
         <Button
-          v-if="textCheckGlobal && textCheckIgnoreOnce"
           aria-label="Hier ignorieren"
           class="self-start"
           data-testid="ignore-once-button"
@@ -204,7 +189,6 @@ const matchIsIgnoredInDocument = computed(() => {
         </Button>
 
         <Button
-          v-if="textCheckGlobal"
           aria-label="In Dokumentationseinheit ignorieren"
           class="self-start"
           data-testid="ignored-word-add-button"
@@ -219,7 +203,6 @@ const matchIsIgnoredInDocument = computed(() => {
         </Button>
 
         <Button
-          v-if="textCheckGlobal"
           aria-label="Zum Wörterbuch hinzufügen"
           class="self-start"
           data-testid="ignored-word-global-add-button"

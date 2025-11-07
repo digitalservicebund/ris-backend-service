@@ -1,8 +1,10 @@
 import { longTextLabels, shortTextLabels } from "@/domain/decision"
+import { pendingProceedingLabels } from "@/domain/pendingProceeding"
 
 const textCheckCategoriesGermanLabels: Record<string, string | undefined> = {
   ...longTextLabels,
   ...shortTextLabels,
+  ...pendingProceedingLabels,
 }
 
 export function getCategoryLabel(
