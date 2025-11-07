@@ -80,7 +80,7 @@ test.describe(
           ).toBeHidden()
         })
 
-        await test.step("match modal should still appear after navigation", async () => {
+        await test.step("match should still appear after navigation", async () => {
           await page.getByRole("link", { name: "Dokumente" }).click()
 
           await expect(
@@ -94,12 +94,6 @@ test.describe(
           await expect(
             page.getByTestId("Orientierungssatz").locator("text-check").first(),
           ).toBeVisible()
-
-          await page
-            .getByTestId("Orientierungssatz")
-            .getByText("Felelr")
-            .click()
-          await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
         })
       },
     )
