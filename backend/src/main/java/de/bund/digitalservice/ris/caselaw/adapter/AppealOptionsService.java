@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class AppealService {
+public class AppealOptionsService {
 
   private final DatabaseAppellantRepository databaseAppellantRepository;
   private final DatabaseAppealStatusRepository databaseAppealStatusRepository;
 
-  public AppealService(
+  public AppealOptionsService(
       DatabaseAppellantRepository databaseAppellantRepository,
       DatabaseAppealStatusRepository databaseAppealStatusRepository) {
     this.databaseAppellantRepository = databaseAppellantRepository;

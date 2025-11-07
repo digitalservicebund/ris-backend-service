@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/v1/caselaw/appeal")
 @Slf4j
-public class AppealController {
+public class AppealOptionsController {
 
-  private final AppealService appealService;
+  private final AppealOptionsService appealOptionsService;
 
-  public AppealController(AppealService appealService) {
-    this.appealService = appealService;
+  public AppealOptionsController(AppealOptionsService appealOptionsService) {
+    this.appealOptionsService = appealOptionsService;
   }
 
   /**
@@ -29,7 +29,7 @@ public class AppealController {
   @GetMapping("/appellants")
   @PreAuthorize("isAuthenticated()")
   public List<Appellant> getAppellants() {
-    return appealService.getAppellantOptions();
+    return appealOptionsService.getAppellantOptions();
   }
 
   /**
@@ -41,6 +41,6 @@ public class AppealController {
   @GetMapping("/statuses")
   @PreAuthorize("isAuthenticated()")
   public List<AppealStatus> getStatuses() {
-    return appealService.getAppealStatusOptions();
+    return appealOptionsService.getAppealStatusOptions();
   }
 }

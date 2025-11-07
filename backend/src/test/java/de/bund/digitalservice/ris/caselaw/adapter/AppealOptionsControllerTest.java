@@ -21,11 +21,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = AppealController.class)
+@WebMvcTest(controllers = AppealOptionsController.class)
 @Import({SecurityConfig.class, TestConfig.class, DocumentNumberPatternConfig.class})
-class AppealControllerTest {
+class AppealOptionsControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
-  @MockitoBean private AppealService appealService;
+  @MockitoBean private AppealOptionsService appealOptionsService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
 
@@ -35,7 +35,7 @@ class AppealControllerTest {
         List.of(
             Appellant.builder().value("Kläger").build(),
             Appellant.builder().value("Beklagter").build());
-    when(appealService.getAppellantOptions()).thenReturn(appellants);
+    when(appealOptionsService.getAppellantOptions()).thenReturn(appellants);
 
     var result =
         risWebTestClient
@@ -57,7 +57,7 @@ class AppealControllerTest {
         List.of(
             AppealStatus.builder().value("zulässig").build(),
             AppealStatus.builder().value("unbegründet").build());
-    when(appealService.getAppealStatusOptions()).thenReturn(statuses);
+    when(appealOptionsService.getAppealStatusOptions()).thenReturn(statuses);
 
     var result =
         risWebTestClient
