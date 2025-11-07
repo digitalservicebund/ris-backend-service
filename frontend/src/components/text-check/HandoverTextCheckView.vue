@@ -4,6 +4,7 @@ import { onBeforeMount, ref } from "vue"
 import { getCategoryLabel } from "./categoryLabels"
 import InfoModal from "@/components/InfoModal.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
+import { Kind } from "@/domain/documentationUnitKind"
 import router from "@/router"
 import { ResponseError } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
@@ -14,6 +15,7 @@ import IconErrorOutline from "~icons/ic/baseline-error-outline"
 const props = defineProps<{
   documentNumber: string
   documentId: string
+  kind: Kind
 }>()
 
 const responseError = ref<ResponseError | undefined>()
@@ -24,9 +26,14 @@ const store = useDocumentUnitStore()
 
 const textCategories = ref<string[] | undefined>()
 
-async function navigateToTextCheckSummaryInCategories() {
+async function navigateToTextCheckSummaryInCategories(kind: Kind) {
+  const routerName =
+    kind == Kind.PENDING_PROCEEDING
+      ? "caselaw-pending-proceeding-documentNumber-categories"
+      : "caselaw-documentUnit-documentNumber-categories"
+
   await router.push({
-    name: "caselaw-documentUnit-documentNumber-categories",
+    name: routerName,
     params: {
       documentNumber: props.documentNumber,
     },
@@ -53,8 +60,11 @@ const checkAll = async (documentUnitId: string) => {
   loading.value = false
 }
 
-const textCategoriesRouter = (category: string) => ({
-  name: "caselaw-documentUnit-documentNumber-categories",
+const textCategoriesRouter = (category: string, kind: Kind) => ({
+  name:
+    kind == Kind.PENDING_PROCEEDING
+      ? "caselaw-pending-proceeding-documentNumber-categories"
+      : "caselaw-documentUnit-documentNumber-categories",
   hash: `#${category}`,
   params: {
     documentNumber: props.documentNumber,
@@ -110,7 +120,7 @@ onBeforeMount(async () => {
                           :key="category"
                           class="ris-link2-regular"
                           :data-testid="`text-check-handover-link-${category}`"
-                          :to="textCategoriesRouter(category)"
+                          :to="textCategoriesRouter(category, props.kind)"
                         >
                           {{ getCategoryLabel(category) }}
                         </RouterLink>
@@ -127,7 +137,7 @@ onBeforeMount(async () => {
             label="Rubriken bearbeiten"
             severity="secondary"
             size="small"
-            @click="navigateToTextCheckSummaryInCategories"
+            @click="navigateToTextCheckSummaryInCategories(props.kind)"
           ></Button>
         </div>
       </div>

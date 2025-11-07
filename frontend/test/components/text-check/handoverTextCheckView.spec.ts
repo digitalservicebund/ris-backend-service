@@ -4,6 +4,7 @@ import { render, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverTextCheckView from "@/components/text-check/HandoverTextCheckView.vue"
+import { Kind } from "@/domain/documentationUnitKind"
 import errorMessages from "@/i18n/errors.json"
 import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
@@ -28,6 +29,7 @@ async function renderComponent() {
       props: {
         documentNumber: "TEST000011225",
         documentId: crypto.randomUUID(),
+        kind: Kind.DECISION,
       },
     }),
   }

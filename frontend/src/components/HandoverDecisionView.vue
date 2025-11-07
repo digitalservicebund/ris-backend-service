@@ -17,6 +17,7 @@ import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
 import { coreDataLabels } from "@/domain/coreData"
 import { contentRelatedIndexingLabels, Decision } from "@/domain/decision"
+import { Kind } from "@/domain/documentationUnitKind"
 import EnsuingDecision, {
   ensuingDecisionFieldLabels,
 } from "@/domain/ensuingDecision"
@@ -541,6 +542,7 @@ const isPublishable = computed<boolean>(
         v-if="textCheckAllToggle"
         :document-id="decision!.uuid"
         :document-number="decision!.documentNumber"
+        :kind="Kind.DECISION"
       />
 
       <div class="border-b-1 border-b-gray-400"></div>
