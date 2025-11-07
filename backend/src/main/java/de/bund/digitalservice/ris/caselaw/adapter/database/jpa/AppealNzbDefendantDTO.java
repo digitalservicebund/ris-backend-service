@@ -8,7 +8,6 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,7 +18,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(schema = "incremental_migration", name = "appeal_nzb_defendant")
 public class AppealNzbDefendantDTO {
 
