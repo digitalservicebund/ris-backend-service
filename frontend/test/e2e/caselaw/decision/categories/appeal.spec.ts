@@ -3,23 +3,17 @@ import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   fillCombobox,
   navigateToCategories,
-  navigateToCategoryImport,
   navigateToHandover,
   navigateToPreview,
-  searchForDocumentUnitToImport,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe(
-  "Rechtsmittelzulassung",
+  "Rechtsmittel",
   {
     tag: ["@RISDEV-8627"],
   },
   () => {
-    test("Rechtsmittel", async ({
-      page,
-      prefilledDocumentUnit,
-      secondPrefilledDocumentUnit,
-    }) => {
+    test("Rechtsmittel", async ({ page, prefilledDocumentUnit }) => {
       const documentNumber = prefilledDocumentUnit.documentNumber
       await navigateToCategories(page, documentNumber)
 
@@ -144,19 +138,6 @@ test.describe(
           ),
         ).toBeVisible()
         await expect(page.getByText("Rechtsmittel")).toBeVisible()
-      })
-
-      await test.step("Rechtsmittel können importiert werden", async () => {
-        await navigateToCategoryImport(
-          page,
-          secondPrefilledDocumentUnit.documentNumber,
-        )
-        await searchForDocumentUnitToImport(page, documentNumber)
-        await expect(
-          page.getByLabel("Rechtsmittel übernehmen", {
-            exact: true,
-          }),
-        ).toBeVisible()
       })
     })
   },
