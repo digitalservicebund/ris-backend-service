@@ -139,8 +139,8 @@ test.describe(
 
         await test.step("removing a word marks match with red in all categories", async () => {
           const textCheckTag = page
-            .locator(`text-check[ignored='true']`)
-            .first()
+            .getByTestId("Gründe")
+            .getByText(wordWithTypo)
 
           await textCheckTag.click()
 
