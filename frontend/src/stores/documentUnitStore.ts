@@ -1,9 +1,9 @@
 import * as jsonpatch from "fast-json-patch"
 import { Operation } from "fast-json-patch"
 import { defineStore } from "pinia"
-import { ref } from "vue"
+import { ref, toRaw } from "vue"
 import fields from "@/data/fieldNames.json"
-import { Decision } from "@/domain/decision"
+import { Decision, LongTexts } from "@/domain/decision"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
@@ -42,6 +42,55 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     matches.value.clear()
   }
 
+  function removeTextCheckTags(text: string): string {
+    if (typeof text !== "string" || !text) {
+      return text
+    }
+
+    const sanitizeRegex = /<text-check[^>]*>(.*?)<\/text-check>/g
+    return text.replace(sanitizeRegex, "$1")
+  }
+
+  function sanitizeLongTextFields(decision: Decision): Decision {
+    if (!decision || !decision.longTexts) {
+      return decision
+    }
+
+    for (const keyAsString in decision.longTexts) {
+      if (
+        Object.prototype.hasOwnProperty.call(decision.longTexts, keyAsString)
+      ) {
+        const key = keyAsString as keyof LongTexts
+        const value = decision.longTexts[key]
+
+        if (key === "participatingJudges") {
+          continue
+        }
+
+        if (typeof value === "string") {
+          decision.longTexts[key] = removeTextCheckTags(value)
+        }
+      }
+    }
+
+    return decision
+  }
+
+  type StructuredCloneFn = <T>(v: T) => T
+  function safeStructuredClone<T>(obj: T): T {
+    const sc = (
+      globalThis as unknown as { structuredClone?: StructuredCloneFn }
+    ).structuredClone
+    if (typeof sc === "function") {
+      try {
+        return sc(obj) as T
+      } catch {
+        /* fallback below */
+      }
+    }
+    return JSON.parse(JSON.stringify(obj)) as T
+  }
+
   // prettier-ignore
   async function updateDocumentUnit(): Promise< // NOSONAR: needs definitely refactoring
         ServiceResponse<RisJsonPatch | FailedValidationServerResponse>
@@ -54,10 +103,15 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
             }
         }
 
+        const currentDocument = safeStructuredClone(toRaw(documentUnit.value))
+        if (isDecision(currentDocument as DocumentationUnit)) {
+          sanitizeLongTextFields(currentDocument as Decision)
+        }
+
         // Create JSON Patch
         const frontendPatch = jsonpatch.compare(
             originalDocumentUnit.value,
-            documentUnit.value,
+            currentDocument
         )
 
         const response = await documentUnitService.update(documentUnit.value.uuid, {
