@@ -105,7 +105,7 @@ jobs:
             ./frontend/test-results/**/*.png
             ./frontend/test-results/**/trace.zip
       - name: Send failed tests to metrics endpoint
-        if: ${{inputs.project != 'queries' }}
+        if: ${{ !cancelled() && inputs.project != 'queries' }}
         run: |
           jq -r '[.suites[] | .specs[]?, .suites[]?.specs[]? | select(.tests[].status != "skipped" and .tests[].status != "expected") | [.title, .file, .tests[].status]  ] | unique[] | @tsv' test-results.json | while IFS=$'\t' read -r  test_title test_file test_status
           do
@@ -116,7 +116,7 @@ jobs:
           done
         working-directory: ./frontend
       - name: Send performance tests to metrics endpoint
-        if: ${{inputs.project == 'queries' }}
+        if: ${{ !cancelled() && inputs.project == 'queries' }}
         run: |
           jq -c '.[]' test-results.json | while read -r item
           do

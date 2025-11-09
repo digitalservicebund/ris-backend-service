@@ -323,13 +323,13 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
   void test_searchByScheduledOnly_shouldReturnDescendingOrder() {
     List<LocalDateTime> scheduledPublicationDates =
         Arrays.asList(
-            LocalDateTime.of(2022, 1, 23, 10, 5),
-            LocalDateTime.of(2024, 1, 24, 10, 5),
-            LocalDateTime.of(2022, 7, 24, 10, 5),
-            LocalDateTime.of(2022, 1, 24, 10, 5),
+            LocalDateTime.of(3022, 1, 23, 10, 5),
+            LocalDateTime.of(3024, 1, 24, 10, 5),
+            LocalDateTime.of(3022, 7, 24, 10, 5),
+            LocalDateTime.of(3022, 1, 24, 10, 5),
             null,
-            LocalDateTime.of(2022, 1, 23, 8, 5),
-            LocalDateTime.of(2022, 1, 23, 10, 4));
+            LocalDateTime.of(3022, 1, 23, 8, 5),
+            LocalDateTime.of(3022, 1, 23, 10, 4));
 
     for (LocalDateTime date : scheduledPublicationDates) {
       EntityBuilderTestUtil.createAndSaveDecision(
@@ -356,12 +356,12 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
     assertThat(responseBody)
         .extracting("scheduledPublicationDateTime")
         .containsExactly(
-            LocalDateTime.of(2024, 1, 24, 10, 5),
-            LocalDateTime.of(2022, 7, 24, 10, 5),
-            LocalDateTime.of(2022, 1, 24, 10, 5),
-            LocalDateTime.of(2022, 1, 23, 10, 5),
-            LocalDateTime.of(2022, 1, 23, 10, 4),
-            LocalDateTime.of(2022, 1, 23, 8, 5));
+            LocalDateTime.of(3024, 1, 24, 10, 5),
+            LocalDateTime.of(3022, 7, 24, 10, 5),
+            LocalDateTime.of(3022, 1, 24, 10, 5),
+            LocalDateTime.of(3022, 1, 23, 10, 5),
+            LocalDateTime.of(3022, 1, 23, 10, 4),
+            LocalDateTime.of(3022, 1, 23, 8, 5));
   }
 
   @Test
