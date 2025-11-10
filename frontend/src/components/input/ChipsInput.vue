@@ -14,6 +14,7 @@ interface Props {
   hasError?: boolean
   readOnly?: boolean
   maska?: string
+  placeholder?: string
 }
 
 const props = defineProps<Props>()
@@ -105,7 +106,14 @@ function focusInputIfEmpty() {
 const wrapperEl = ref<HTMLElement | null>(null)
 
 const inputContentWidth = ref<string | undefined>("auto")
-
+const inputContentMinWidth = ref<string | undefined>("auto")
+const getInputContentMinWidth = () => {
+  if (!newChipText.value && props.placeholder) {
+    const length = props.placeholder.length + 2
+    return `${length}ch`
+  }
+  return "auto"
+}
 async function determineInputWidth() {
   if (!chipsInput.value) return
 
@@ -137,6 +145,7 @@ async function determineInputWidth() {
   inputContentWidth.value = `min(${maxWidth ?? "9999"}px, ${
     chipsInput.value.scrollWidth + borderLeft + borderRight
   }px)`
+  inputContentMinWidth.value = getInputContentMinWidth()
 }
 
 watchEffect(() => {
@@ -190,7 +199,8 @@ watch(newChipText, async () => {
           class="peer w-4 min-w-0 border-none bg-transparent outline-none"
           :data-maska="maska ?? null"
           :data-testid="`chips-input_${id}`"
-          :style="{ width: inputContentWidth }"
+          :placeholder="props.placeholder ? props.placeholder : ''"
+          :style="{ width: inputContentWidth, minWidth: inputContentMinWidth }"
           type="text"
           @blur="addChip"
           @focus="focusedChip = undefined"

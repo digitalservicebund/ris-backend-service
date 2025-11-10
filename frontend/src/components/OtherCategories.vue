@@ -7,6 +7,7 @@ import DismissalInputs from "@/components/DismissalInputs.vue"
 import ForeignLanguageVersions from "@/components/ForeignLanguageVersions.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
+import OriginOfTranslations from "@/components/OriginOfTranslations.vue"
 import TextInputCategory from "@/components/texts/TextInputCategory.vue"
 import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import laborCourtTypes from "@/data/laborCourtTypes.json"
@@ -50,6 +51,12 @@ const evsf = computed({
 const hasForeignLanguageVersion = computed(() => {
   return contentRelatedIndexing.value.foreignLanguageVersions
     ? contentRelatedIndexing.value.foreignLanguageVersions?.length > 0
+    : false
+})
+
+const hasOriginOfTranslations = computed(() => {
+  return contentRelatedIndexing.value.originOfTranslations
+    ? contentRelatedIndexing.value.originOfTranslations?.length > 0
     : false
 })
 
@@ -127,6 +134,12 @@ const shouldDisplayEvsf = computed(() => isFinanceCourt.value || evsf.value)
         :should-show-button="!hasForeignLanguageVersion"
       >
         <ForeignLanguageVersions label="Fremdsprachige Fassung" />
+      </CategoryWrapper>
+      <CategoryWrapper
+        label="Herkunft der Übersetzung"
+        :should-show-button="!hasOriginOfTranslations"
+      >
+        <OriginOfTranslations label="Herkunft der Übersetzung" />
       </CategoryWrapper>
       <TextInputCategory
         v-if="shouldDisplayEvsf"

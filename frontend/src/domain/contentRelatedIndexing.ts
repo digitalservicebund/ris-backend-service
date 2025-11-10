@@ -4,6 +4,7 @@ import Definition from "@/domain/definition"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
 import NormReference from "@/domain/normReference"
+import OriginOfTranslation from "@/domain/originOfTranslation"
 
 export type ContentRelatedIndexing = {
   collectiveAgreements?: string[]
@@ -18,5 +19,6 @@ export type ContentRelatedIndexing = {
   evsf?: string
   definitions?: Definition[]
   foreignLanguageVersions?: ForeignLanguageVersion[]
+  originOfTranslations?: OriginOfTranslation[]
   appealAdmission?: AppealAdmission
 }
