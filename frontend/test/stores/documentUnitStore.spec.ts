@@ -24,10 +24,12 @@ describe("useDocumentUnitStore", () => {
       const mockOriginalDocumentUnit = new Decision("123", { version: 1 })
       mockOriginalDocumentUnit.longTexts = {
         tenor: "<p>Dies ist ein Beispielfall für Textprüfungs-Tags.</p>",
+        participatingJudges: [],
       }
       mockDocumentUnit.longTexts = {
         tenor:
           "<p>Dies ist ein <text-check id='1'>Beispielfall</text-check> für Textprüfungs-Tags.</p>",
+        participatingJudges: [],
       }
 
       const mockedUpdateResponse: ServiceResponse<RisJsonPatch> = {
