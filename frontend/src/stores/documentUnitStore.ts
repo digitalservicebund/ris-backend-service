@@ -16,6 +16,15 @@ import {
 import { Match } from "@/types/textCheck"
 import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
 
+function removeTextCheckTags(text: string): string {
+  if (typeof text !== "string" || !text) {
+    return text
+  }
+
+  const sanitizeRegex = /<text-check[^>]*>(.*?)<\/text-check>/g
+  return text.replaceAll(sanitizeRegex, "$1")
+}
+
 export const useDocumentUnitStore = defineStore("docunitStore", () => {
   const documentUnit = ref<DocumentationUnit | undefined>(undefined)
   const originalDocumentUnit = ref<DocumentationUnit | undefined>(undefined)
@@ -42,17 +51,8 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     matches.value.clear()
   }
 
-  function removeTextCheckTags(text: string): string {
-    if (typeof text !== "string" || !text) {
-      return text
-    }
-
-    const sanitizeRegex = /<text-check[^>]*>(.*?)<\/text-check>/g
-    return text.replace(sanitizeRegex, "$1")
-  }
-
   function sanitizeLongTextFields(decision: Decision): Decision {
-    if (!decision || !decision.longTexts) {
+    if (!decision?.longTexts) {
       return decision
     }
 
