@@ -25,6 +25,29 @@ function removeTextCheckTags(text: string): string {
   return text.replaceAll(sanitizeRegex, "$1")
 }
 
+function sanitizeLongTextFields(decision: Decision): Decision {
+  if (!decision?.longTexts) {
+    return decision
+  }
+
+  for (const keyAsString in decision.longTexts) {
+    if (Object.hasOwn(decision.longTexts, keyAsString)) {
+      const key = keyAsString as keyof LongTexts
+      const value = decision.longTexts[key]
+
+      if (key === "participatingJudges") {
+        continue
+      }
+
+      if (typeof value === "string") {
+        decision.longTexts[key] = removeTextCheckTags(value)
+      }
+    }
+  }
+
+  return decision
+}
+
 export const useDocumentUnitStore = defineStore("docunitStore", () => {
   const documentUnit = ref<DocumentationUnit | undefined>(undefined)
   const originalDocumentUnit = ref<DocumentationUnit | undefined>(undefined)
@@ -49,29 +72,6 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
   async function unloadDocumentUnit(): Promise<void> {
     documentUnit.value = undefined
     matches.value.clear()
-  }
-
-  function sanitizeLongTextFields(decision: Decision): Decision {
-    if (!decision?.longTexts) {
-      return decision
-    }
-
-    for (const keyAsString in decision.longTexts) {
-      if (Object.hasOwn(decision.longTexts, keyAsString)) {
-        const key = keyAsString as keyof LongTexts
-        const value = decision.longTexts[key]
-
-        if (key === "participatingJudges") {
-          continue
-        }
-
-        if (typeof value === "string") {
-          decision.longTexts[key] = removeTextCheckTags(value)
-        }
-      }
-    }
-
-    return decision
   }
 
   // prettier-ignore
