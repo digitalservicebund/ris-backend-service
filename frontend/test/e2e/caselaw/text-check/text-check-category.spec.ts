@@ -1,23 +1,9 @@
-import { expect, Locator } from "@playwright/test"
+import { expect } from "@playwright/test"
 import { clearTextField, navigateToCategories } from "../utils/e2e-utils"
+import { getMarkId, textCheckUnderlinesColors } from "./util"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { convertHexToRGB } from "~/test-helper/coloursUtil"
-
-// eslint-disable-next-line playwright/no-skipped-test
-test.skip(
-  ({ browserName }) => browserName !== "chromium",
-  "Skipping firefox flaky test",
-)
-
-const textCheckUnderlinesColors = {
-  error: "#cd5038",
-  ignored: "#66add3",
-} as const
-
-async function getMarkId(tag: Locator): Promise<string | null> {
-  return await tag.evaluate((el) => el.getAttribute("id"))
-}
 
 const textWithErrors = {
   text: "LanguageTool   ist ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, z. B. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten. Testgnorierteswort ist zB. grün markiert",
@@ -36,101 +22,6 @@ test.describe(
   },
   () => {
     test(
-      "ignore irrelevant text check categories and rules",
-      {
-        tag: ["@RISDEV-9169", "@RISDEV-9170"],
-      },
-      async ({ page, prefilledDocumentUnit }) => {
-        const headNoteEditor = page.getByTestId("Orientierungssatz")
-        const headNoteEditorTextArea = headNoteEditor.locator("div")
-
-        await test.step("navigate to headnote (Orientierungssatz) in categories", async () => {
-          await navigateToCategories(
-            page,
-            prefilledDocumentUnit.documentNumber,
-            { category: DocumentUnitCategoriesEnum.TEXTS },
-          )
-        })
-
-        await test.step("replace text in headnote (Orientierungssatz) with irrelevant style-related mistakes", async () => {
-          await clearTextField(page, headNoteEditorTextArea)
-
-          // Contains examples of Categories we disable
-          const textWithErrorsOfDisabledCategories =
-            "I bims, LanguageTool. " + // COLLOQUIALISMS: I bims
-            "Im täglichen Alltag prüfe ich Texte. " + // REDUNDANCY: täglichen Alltag
-            "Dann habe ich Freizeit. Dann esse ich. Dann schlafe ich. " + // REPETITIONS_STYLE: Dann []. Dann []. Dann [].
-            "Mir ist es egal, ob du Helpdesk oder Help-Desk schreibst." // STYLE: Helpdesk oder Help-Desk
-
-          await headNoteEditorTextArea.fill(textWithErrorsOfDisabledCategories)
-          await expect(headNoteEditorTextArea).toHaveText(
-            textWithErrorsOfDisabledCategories,
-          )
-        })
-
-        await test.step("trigger category text results in no matches for ignored categories", async () => {
-          await page
-            .getByLabel("Orientierungssatz Button")
-            .getByRole("button", { name: "Rechtschreibprüfung" })
-            .click()
-
-          await expect(
-            page.getByTestId("text-check-loading-status"),
-          ).toHaveText("Rechtschreibprüfung läuft")
-
-          await expect(
-            page.getByTestId("text-check-loading-status"),
-          ).toBeHidden({ timeout: 10_000 })
-
-          await expect(page.locator(`text-check`)).not.toBeAttached()
-        })
-
-        await test.step("replace text in headnote (Orientierungssatz) with mistakes of ignored rules", async () => {
-          await clearTextField(page, headNoteEditorTextArea)
-
-          // Contains examples of Rules we disable
-          const textWithErrorsOfDisabledRules =
-            "der Satz wurde, " + // UPPERCASE_SENTENCE_START: "der"
-            "anders als oft behauptet, " + // WIKIPEDIA: "Anders als oft behauptet"
-            "nicht von Feuerwehrmännern " + // GENDER_NEUTRALITY / Geschlechtergerechte Sprache: "Erstsemsterin"
-            "geschrieben.Noch " + // MISC / Sonstiges: "[Ein Satz].[Noch ein Satz]"
-            "hat er mehr als 24Std. " + // TYPOGRAPHY / Typografie: "24Std."
-            "oder gar 25 Std.. gedauert. " + // PUNCTUATION / Zeichensetzung: "Std.."
-            "Ich freue ich " + // CONFUSED_WORDS / Leicht zu verwechselnde Wörter: "Ich freue ich"
-            "seit Geburt an, " + // IDIOMS / Redewendungen: "seit Geburt an"
-            "auf die Haus " + // GRAMMAR / Grammatik: "die Haus"
-            "nach dem es Berg ab geht. " + // COMPOUNDING / Getrennt- und Zusammenschreibung: "Berg ab"
-            "Das tief greifende Problem " + // EMPFOHLENE_RECHTSCHREIBUNG / Empfohlene/Moderne Rechtschreibung: "tief greifende"
-            "ist das ich den Film schauen wollte. " + // HILFESTELLUNG_KOMMASETZUNG
-            "Aber morgen schien die Sonne." // SEMANTICS / Semantische Unstimmigkeiten: "morgen schien"
-
-          await headNoteEditorTextArea.fill(textWithErrorsOfDisabledRules)
-          await expect(headNoteEditorTextArea).toHaveText(
-            textWithErrorsOfDisabledRules,
-          )
-        })
-
-        await test.step("trigger category text button shows results in no matches for ignored rules", async () => {
-          await page
-            .getByLabel("Orientierungssatz Button")
-            .getByRole("button", { name: "Rechtschreibprüfung" })
-            .click()
-
-          await expect(
-            page.getByTestId("text-check-loading-status"),
-          ).toHaveText("Rechtschreibprüfung läuft")
-
-          await expect(
-            page.getByTestId("text-check-loading-status"),
-          ).toBeHidden({ timeout: 10_000 })
-
-          await expect(page.locator(`text-check`)).not.toBeAttached()
-        })
-      },
-    )
-
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
       "clicking on text check button, save document and returns matches",
       {
         tag: ["@RISDEV-6205", "@RISDEV-6154", "@RISDEV-7397"],
@@ -317,5 +208,85 @@ test.describe(
         })
       },
     )
+
+    const results = [
+      { status: "successful", result: { status: 200, body: "" } },
+      { status: "failed", result: { status: 500, body: "" } },
+    ]
+
+    results.forEach(({ status, result }) => {
+      test(
+        "disable editor and set back the old status after the " +
+          status +
+          " call",
+        {
+          tag: ["@RISDEV-9481"],
+        },
+        async ({ page, prefilledDocumentUnit }) => {
+          const { promise: lock, resolve: releaseLock } =
+            Promise.withResolvers<void>()
+
+          await page.route(
+            `**/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}/text-check*`,
+            async (route) => {
+              await lock
+              await route.fulfill(result)
+            },
+          )
+
+          await test.step("navigate to reason (Gründe) in categories", async () => {
+            await navigateToCategories(
+              page,
+              prefilledDocumentUnit.documentNumber,
+              { category: DocumentUnitCategoriesEnum.TEXTS },
+            )
+          })
+
+          await test.step("open reason editor", async () => {
+            await page
+              .getByRole("button", { name: "Gründe", exact: true })
+              .click()
+          })
+
+          const reasonEditor = page.getByTestId("Gründe").locator("div")
+
+          await test.step("fill text into reason editor", async () => {
+            await reasonEditor.fill("This is text before running text check.")
+
+            await expect(reasonEditor).toHaveText(
+              "This is text before running text check.",
+            )
+          })
+
+          await test.step("trigger text check", async () => {
+            await page
+              .getByLabel("Gründe Button")
+              .getByRole("button", { name: "Rechtschreibprüfung" })
+              .click()
+          })
+
+          await test.step("check editor is not editable", async () => {
+            await expect(reasonEditor).toHaveAttribute(
+              "contenteditable",
+              "false",
+            )
+          })
+
+          await test.step("end text check", async () => {
+            releaseLock()
+          })
+
+          await expect(page.getByText("Rechtschreibprüfung läuft")).toBeHidden()
+
+          await test.step("enter text after text check ended", async () => {
+            await reasonEditor.fill("Text added after text check ended.")
+
+            await expect(reasonEditor).toHaveText(
+              "Text added after text check ended.",
+            )
+          })
+        },
+      )
+    })
   },
 )

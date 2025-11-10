@@ -161,20 +161,25 @@ public class PortalPublicationService {
       throws DocumentationUnitNotExistsException {
     try {
       var documentationUnit = documentationUnitRepository.findByUuid(documentationUnitId);
-      log.atInfo()
-          .setMessage("Withdrawing doc unit...")
-          .addKeyValue("documentNumber", documentationUnit.documentNumber())
-          .addKeyValue("id", documentationUnitId)
-          .log();
       var result = withdraw(documentationUnit.documentNumber());
       uploadDeletionChangelog(result.deletedPaths());
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.WITHDRAWN, user);
+      log.atInfo()
+          .setMessage("Documentation unit withdrawn from portal.")
+          .addKeyValue("documentNumber", documentationUnit.documentNumber())
+          .addKeyValue("id", documentationUnitId)
+          .log();
     } catch (Exception e) {
       historyLogService.saveHistoryLog(
           documentationUnitId,
           user,
           HistoryLogEventType.PORTAL_PUBLICATION,
           "Dokeinheit konnte nicht aus dem Portal zurückgezogen werden");
+      log.atError()
+          .setMessage("Could not withdraw documentation unit from portal.")
+          .addKeyValue("id", documentationUnitId)
+          .setCause(e)
+          .log();
       throw e;
     }
   }

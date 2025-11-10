@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.Category;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Context;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match.MatchBuilder;
-import de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Suggestion;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckAllResponse;
@@ -39,8 +38,8 @@ public class TextCheckResponseTransformer {
                   });
 
       suggestion.matches().add(match);
-      categoryTypes.add(match.category());
       if (!isIgnored(match)) {
+        categoryTypes.add(match.category());
         totalTextCheckErrors++;
       }
     }
@@ -72,12 +71,6 @@ public class TextCheckResponseTransformer {
               .shortMessage(match.getShortMessage())
               .ignoreForIncompleteSentence(match.isIgnoreForIncompleteSentence());
 
-      List<Replacement> replacements = new ArrayList<>();
-      for (de.bund.digitalservice.ris.caselaw.adapter.languagetool.Replacement replacement :
-          match.getReplacements()) {
-        replacements.add(new Replacement(replacement.getValue()));
-      }
-
       if (match.getContext() != null) {
         String word = getMatchWord(match);
         matchBuilder
@@ -90,7 +83,6 @@ public class TextCheckResponseTransformer {
       }
 
       matchBuilder
-          .replacements(replacements)
           .offset(match.getOffset())
           .length(match.getLength())
           .sentence(match.getSentence())
@@ -132,11 +124,17 @@ public class TextCheckResponseTransformer {
   private static boolean isIgnored(
       de.bund.digitalservice.ris.caselaw.domain.textcheck.Match match) {
     var ignoredWords = match.ignoredTextCheckWords();
+    var ignoredOnce = match.isIgnoredOnce();
+
+    if (ignoredOnce) {
+      return true;
+    }
+
     if (ignoredWords == null || ignoredWords.isEmpty()) {
       return false;
-    } else {
-      return ignoredWords.stream()
-          .anyMatch(ignoredWordObj -> ignoredWordObj.word().equals(match.word()));
     }
+
+    return ignoredWords.stream()
+        .anyMatch(ignoredWordObj -> ignoredWordObj.word().equals(match.word()));
   }
 }

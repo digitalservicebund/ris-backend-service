@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -38,7 +39,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -109,7 +109,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       addDeviationCourts(builder, coreData);
       addDeviatingDecisionDates(builder, coreData);
       addDeviatingFileNumbers(builder, coreData, currentDto);
-      addSource(currentDto, builder, updatedDomainObject);
+      addSources(currentDto, builder, updatedDomainObject);
       addOralHearingDates(builder, coreData);
 
     } else {
@@ -139,6 +139,13 @@ public class DecisionTransformer extends DocumentableTransformer {
       builder.hasLegislativeMandate(contentRelatedIndexing.hasLegislativeMandate());
       builder.evsf(contentRelatedIndexing.evsf());
       addForeignLanguageVersions(currentDto, builder, contentRelatedIndexing);
+      if (contentRelatedIndexing.appealAdmission() == null) {
+        builder.appealAdmitted(null);
+        builder.appealAdmittedBy(null);
+      } else {
+        builder.appealAdmitted(contentRelatedIndexing.appealAdmission().admitted());
+        builder.appealAdmittedBy(contentRelatedIndexing.appealAdmission().by());
+      }
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -176,22 +183,10 @@ public class DecisionTransformer extends DocumentableTransformer {
     return DocumentableTransformer.postProcessRelationships(result, currentDto);
   }
 
-  // No need to check for null, when accessing max of a non-empty list.
-  @SuppressWarnings("java:S3655")
-  /*
-   Currently, our UI and domain object only support one single source,
-   however our DTO and the jDV support multiple sources.
-   This is why we only update the source with the highest rank.
-
-   A) If the domain object has an empty source, we do not update the sources list in the DTO.
-   B) If the domain object has a source and the DTO has no sources, we add the source to the DTO.
-   C) If the domain object has a source and the DTO has sources...
-   C1) ... and if the value of the highest ranking source is the same -> we don't do anything.
-   C2) ... and if the value of the highest ranking source is different -> we replace the source.
-  */
-  private static void addSource(
+  private static void addSources(
       DecisionDTO currentDto, DecisionDTOBuilder<?, ?> builder, Decision decision) {
-    if (decision.coreData().source() == null) {
+    if (decision.coreData().sources() == null) {
+      builder.source(new ArrayList<>());
       return;
     }
 
@@ -200,33 +195,45 @@ public class DecisionTransformer extends DocumentableTransformer {
             ? new ArrayList<>(currentDto.getSource())
             : new ArrayList<>();
 
-    // Create new SourceDTO
-    SourceDTO newSource = SourceDTO.builder().value(decision.coreData().source().value()).build();
+    List<SourceDTO> newSources = new ArrayList<>();
 
-    if (existingSources.isEmpty()) {
-      newSource.setRank(1);
-      existingSources.add(newSource);
-    } else {
-      SourceDTO firstSource = existingSources.getFirst();
-      var reference = firstSource.getReference();
-      // Check if the first existing source has a reference and remove if it has been deleted in
-      // domain object. A reference is only linked if the doc unit is created from a reference,
-      // that's why it is enough to check the first reference.
-      if (reference != null && !documentableContainsReferenceWithId(decision, reference.getId())) {
-        firstSource.setReference(null); // Otherwise the source can not be deleted
-      }
+    for (Source source : decision.coreData().sources()) {
+      // lookup if an existing source has the same value (or sourceRawValue if it is a legacy source
+      // that couldn't be mapped to a value) and if yes reuse it. This ensures we keep references.
+      var optionalExistingSource =
+          source.value() != null
+              ? existingSources.stream()
+                  .filter(existingSource -> source.value() == existingSource.getValue())
+                  .findFirst()
+              : existingSources.stream()
+                  .filter(
+                      existingSource ->
+                          Objects.equals(
+                              source.sourceRawValue(), existingSource.getSourceRawValue()))
+                  .findFirst();
 
-      var latestSource = existingSources.getLast();
-      if (latestSource.getValue() != newSource.getValue()) {
-        // If the user selected a source with a different value, we replace it.
-        newSource.setRank(existingSources.size());
-        existingSources.remove(latestSource);
-        existingSources.add(newSource);
+      if (optionalExistingSource.isPresent()) {
+        var existingSource = optionalExistingSource.get();
+
+        var reference = existingSource.getReference();
+        if (reference != null
+            && !documentableContainsReferenceWithId(decision, reference.getId())) {
+          existingSource.setReference(null);
+        }
+
+        existingSource.setRank(newSources.size() + 1);
+        newSources.add(optionalExistingSource.get());
+      } else {
+        newSources.add(
+            SourceDTO.builder()
+                .value(source.value())
+                .sourceRawValue(source.sourceRawValue())
+                .rank(newSources.size() + 1)
+                .build());
       }
-      // else: If the user selected the same source or didn't change it, we don't do anything.
     }
 
-    builder.source(existingSources); // Update builder with new list
+    builder.source(newSources);
   }
 
   private static void addLongTexts(Decision updatedDomainObject, DecisionDTOBuilder<?, ?> builder) {
@@ -654,7 +661,7 @@ public class DecisionTransformer extends DocumentableTransformer {
         .creatingDocOffice(
             DocumentationOfficeTransformer.transformToDomain(
                 decisionDTO.getCreatingDocumentationOffice()))
-        .source(getSource(decisionDTO))
+        .sources(getSources(decisionDTO))
         .hasDeliveryDate(decisionDTO.hasDeliveryDate())
         .oralHearingDates(
             Optional.ofNullable(decisionDTO.getOralHearingDates())
@@ -730,6 +737,14 @@ public class DecisionTransformer extends DocumentableTransformer {
               .map(ForeignLanguageTransformer::transformToDomain)
               .toList();
       contentRelatedIndexingBuilder.foreignLanguageVersions(foreignLanguageVersions);
+    }
+
+    if (decisionDTO.getAppealAdmitted() != null) {
+      contentRelatedIndexingBuilder.appealAdmission(
+          AppealAdmission.builder()
+              .admitted(decisionDTO.getAppealAdmitted())
+              .by(decisionDTO.getAppealAdmittedBy())
+              .build());
     }
 
     return contentRelatedIndexingBuilder.build();
@@ -823,9 +838,8 @@ public class DecisionTransformer extends DocumentableTransformer {
             .toList());
   }
 
-  static Source getSource(DocumentationUnitDTO decisionDTO) {
+  static List<Source> getSources(DocumentationUnitDTO decisionDTO) {
     return decisionDTO.getSource().stream()
-        .max(Comparator.comparing(SourceDTO::getRank)) // Find the highest-ranked item
         .map(
             sourceDTO -> {
               SourceValue sourceValue = null;
@@ -842,6 +856,6 @@ public class DecisionTransformer extends DocumentableTransformer {
                   .reference(reference)
                   .build();
             })
-        .orElse(null);
+        .toList();
   }
 }

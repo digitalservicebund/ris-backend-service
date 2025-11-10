@@ -1,10 +1,7 @@
 import { expect } from "@playwright/test"
 import { Decision } from "@/domain/decision"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
-import {
-  addIgnoreWordToDocumentationUnit,
-  updateDocumentationUnit,
-} from "~/e2e/caselaw/utils/documentation-unit-api-util"
+import { updateDocumentationUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import {
   clearTextField,
   fillActiveCitationInputs,
@@ -431,85 +428,6 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
     },
   )
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip(
-    "handover wraps <noindex> on ignored words in preview and publication",
-    {
-      tag: ["@RISDEV-254", "@RISDEV-6205", "@RISDEV-7394"],
-    },
-    async ({ page, prefilledDocumentUnit, request }) => {
-      const expectedNoindexCount = 9
-      await test.step("Befülle Langtexte und Kurztexte mit texts", async () => {
-        await addIgnoreWordToDocumentationUnit(
-          page,
-          prefilledDocumentUnit.uuid,
-          "text",
-        )
-
-        const text =
-          "<p>das wort text soll mit noindex umgeschlossen werden</p>"
-
-        const documentationUnit = {
-          ...prefilledDocumentUnit,
-          shortTexts: {
-            headline: text,
-            guidingPrinciple: text,
-            headnote: text,
-            otherHeadnote: text,
-          },
-          longTexts: {
-            tenor: text,
-            caseFacts: text,
-            decisionReasons: text,
-            otherLongText: text,
-            dissentingOpinion: text,
-          },
-        } as Decision
-        await updateDocumentationUnit(page, documentationUnit, request)
-      })
-
-      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
-
-      await test.step("XML Vorschau zeigt die noindex tags", async () => {
-        await expect(page.getByText("XML Vorschau")).toBeVisible()
-
-        await page.getByText("XML Vorschau").click()
-
-        await expect(
-          page.getByText(
-            "<p>das wort <noindex>text</noindex> soll mit noindex umgeschlossen werden</p>",
-            {
-              exact: true,
-            },
-          ),
-        ).toHaveCount(expectedNoindexCount)
-      })
-
-      await test.step("Übergabe an der jDV beinhaltet noindex", async () => {
-        await page
-          .getByLabel("Dokumentationseinheit an jDV übergeben", { exact: true })
-          .click()
-
-        await expect(page.getByText("Email wurde versendet")).toBeVisible()
-        await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
-
-        // workaround: formatting works on page referseh
-        await page.reload()
-
-        await expect(
-          page
-            .getByTestId("xml-handover-code-snippet-preview")
-            .getByText(
-              "<p>das wort <noindex>text</noindex> soll mit noindex umgeschlossen werden</p>",
-              {
-                exact: true,
-              },
-            ),
-        ).toHaveCount(expectedNoindexCount)
-      })
-    },
-  )
-
   test(
     "error count should correctly show number of errors",
     {
@@ -543,7 +461,6 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
         await navigateToHandover(
           page,
           decision.createdDecision.documentNumber!,
-          undefined,
           { navigationBy: "click" },
         )
 

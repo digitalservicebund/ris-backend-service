@@ -4,7 +4,6 @@ import { computed } from "vue"
 import { RouteLocationRaw } from "vue-router"
 import FileNavigator from "@/components/FileNavigator.vue"
 import Tooltip from "@/components/Tooltip.vue"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import { isDecision } from "@/utils/typeGuards"
@@ -13,7 +12,6 @@ import IconEdit from "~icons/ic/outline-edit"
 import IconOpenInNewTab from "~icons/ic/outline-open-in-new"
 import IconPreview from "~icons/ic/outline-remove-red-eye"
 import IconStickyNote from "~icons/ic/outline-sticky-note-2"
-import IconSpellCheck from "~icons/material-symbols/spellcheck"
 import IconImportCategories from "~icons/material-symbols/text-select-move-back-word"
 
 const props = defineProps<{
@@ -40,8 +38,6 @@ const getRouterLinkTo = (suffix: "categories" | "preview") =>
       },
     }
   })
-
-const textCheckAll = useFeatureToggle("neuris.text-check-side-panel")
 
 function emitSidePanelMode(value: SelectablePanelContent) {
   emit("panelMode:update", value)
@@ -114,25 +110,6 @@ function emitAttachmentIndex(value: number) {
         >
           <template #icon>
             <IconImportCategories />
-          </template>
-        </Button>
-      </Tooltip>
-      <Tooltip
-        v-if="textCheckAll && isDecision(documentUnit)"
-        shortcut="t"
-        text="Rechtschreibprüfung"
-      >
-        <Button
-          id="text-check"
-          aria-label="Rechtschreibprüfung"
-          class="focus-visible:z-20"
-          data-testid="text-check-button"
-          severity="secondary"
-          size="small"
-          @click="() => emitSidePanelMode('text-check')"
-        >
-          <template #icon>
-            <IconSpellCheck />
           </template>
         </Button>
       </Tooltip>

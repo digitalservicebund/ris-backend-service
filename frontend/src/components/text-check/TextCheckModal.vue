@@ -8,6 +8,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
+  "ignore-once:toggle": [void]
   "word:remove": [value: string]
   "word:add": [word: string]
   "globalWord:remove": [value: string]
@@ -30,12 +31,13 @@ function removeGloballyIgnoredWord(word: string) {
   emit("globalWord:remove", word)
 }
 
-const isMatchIgnored = computed(() => {
-  return (
-    Array.isArray(props.match.ignoredTextCheckWords) &&
-    props.match.ignoredTextCheckWords.length > 0
-  )
-})
+const isMatchIgnoredLocally = computed(
+  () => props.match?.isIgnoredOnce ?? false,
+)
+
+function ignoreOnceToggle() {
+  emit("ignore-once:toggle")
+}
 </script>
 
 <template>
@@ -49,12 +51,12 @@ const isMatchIgnored = computed(() => {
       </span>
     </div>
 
-    <p v-if="!isMatchIgnored">{{ match.shortMessage || match.message }}</p>
-
     <IgnoredWordHandler
+      :ignored-locally="isMatchIgnoredLocally"
       :match="match"
       @globally-ignored-word:add="addIgnoredWordGlobally"
       @globally-ignored-word:remove="removeGloballyIgnoredWord(match.word)"
+      @ignore-once:toggle="ignoreOnceToggle"
       @ignored-word:add="addIgnoredWord(match.word)"
       @ignored-word:remove="removeIgnoredWord(match.word)"
     />

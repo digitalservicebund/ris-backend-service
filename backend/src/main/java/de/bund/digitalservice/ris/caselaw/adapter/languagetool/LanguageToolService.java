@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.TextCheckResponseTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
@@ -28,11 +27,10 @@ public class LanguageToolService extends TextCheckService {
   public LanguageToolService(
       DocumentationUnitRepository documentationUnitRepository,
       IgnoredTextCheckWordRepository ignoredTextCheckWordRepository,
-      FeatureToggleService featureToggleService,
       LanguageToolConfig languageToolConfig,
       LanguageToolClient languageToolClient) {
 
-    super(documentationUnitRepository, ignoredTextCheckWordRepository, featureToggleService);
+    super(documentationUnitRepository, ignoredTextCheckWordRepository);
     this.languageToolConfig = languageToolConfig;
     this.languageToolClient = languageToolClient;
   }

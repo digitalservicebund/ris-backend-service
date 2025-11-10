@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import Checkbox from "primevue/checkbox"
 import InputText from "primevue/inputtext"
+import InputMultiSelect from "primevue/multiselect"
 import InputSelect from "primevue/select"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { DropdownItem } from "./input/types"
@@ -43,7 +44,7 @@ const validationStore =
       "yearsOfDispute",
       "deviatingDecisionDates",
       "oralHearingDates",
-      "source",
+      "sources",
     ][number]
   >()
 
@@ -78,7 +79,19 @@ const region = computed(() =>
     : "",
 )
 
-const sourceItems: DropdownItem[] = [
+const rawSourceItems = computed<DropdownItem[]>(
+  () =>
+    coreDataModel.value.sources
+      ?.filter((source) => source.value == undefined)
+      .map((source) => source.sourceRawValue)
+      .filter((rawValue) => rawValue != undefined)
+      .map((rawValue) => ({
+        label: rawValue,
+        value: rawValue,
+      })) ?? [],
+)
+
+const sourceItems = computed<DropdownItem[]>(() => [
   {
     label: "unaufgefordert eingesandtes Original (O)",
     value: SourceValue.UnaufgefordertesOriginal,
@@ -98,21 +111,45 @@ const sourceItems: DropdownItem[] = [
     value: SourceValue.LaenderEuGH,
   },
   { label: "Sonstige (S)", value: SourceValue.Sonstige },
-]
+  ...rawSourceItems.value,
+])
 
-const source = computed({
+function isSourceValue(value: string): value is SourceValue {
+  return Object.values(SourceValue).includes(value as SourceValue)
+}
+
+const sources = computed<string[]>({
   get: () =>
-    coreDataModel.value.source
-      ? (coreDataModel.value.source.value ??
-        coreDataModel.value.source?.sourceRawValue)
-      : undefined,
-  set: (newValue) => {
-    if (Object.values(SourceValue).includes(newValue as SourceValue)) {
-      coreDataModel.value.source = {
-        ...coreDataModel.value.source,
-        value: newValue as SourceValue,
-      }
-    }
+    coreDataModel.value.sources
+      ?.map((source) => source.value ?? source.sourceRawValue)
+      .filter((newValue) => newValue != undefined) ?? [],
+  set: (newValues) => {
+    coreDataModel.value.sources =
+      newValues
+        ?.filter((newValue) => newValue != undefined)
+        ?.map((newValue: string) => {
+          const existingSource =
+            coreDataModel.value.sources?.find(
+              (existingSource) => existingSource.value === newValue,
+            ) ??
+            coreDataModel.value.sources?.find(
+              (existingSource) => existingSource.sourceRawValue === newValue,
+            )
+
+          if (existingSource) {
+            return existingSource
+          }
+
+          if (!isSourceValue(newValue)) {
+            return {
+              sourceRawValue: newValue,
+            }
+          }
+
+          return {
+            value: newValue,
+          }
+        }) ?? []
   },
 })
 
@@ -264,7 +301,7 @@ onBeforeUnmount(() => {
           :validation-error="validationStore.getByField('decisionDate')"
         >
           <DateInput
-            id="decisionDate"
+            :id="slotProps.id"
             v-model="coreDataModel.decisionDate"
             aria-label="Entscheidungsdatum"
             :has-error="slotProps.hasError"
@@ -283,7 +320,7 @@ onBeforeUnmount(() => {
             "
           >
             <ChipsDateInput
-              id="deviatingDecisionDates"
+              :id="slotProps.id"
               v-model="coreDataModel.deviatingDecisionDates"
               aria-label="Abweichendes Entscheidungsdatum"
               data-testid="deviating-decision-dates"
@@ -322,7 +359,7 @@ onBeforeUnmount(() => {
         :validation-error="validationStore.getByField('oralHearingDates')"
       >
         <ChipsDateInput
-          id="oralHearingDates"
+          :id="slotProps.id"
           v-model="coreDataModel.oralHearingDates"
           aria-label="Datum der mündlichen Verhandlung"
           :has-error="slotProps.hasError"
@@ -340,7 +377,7 @@ onBeforeUnmount(() => {
         label="Spruchkörper"
       >
         <InputText
-          id="appraisalBody"
+          :id="slotProps.id"
           v-model="coreDataModel.appraisalBody"
           aria-label="Spruchkörper"
           fluid
@@ -356,7 +393,7 @@ onBeforeUnmount(() => {
         :label="pendingProceedingLabels.resolutionDate"
       >
         <DateInput
-          id="resolutionDate"
+          :id="slotProps.id"
           v-model="coreDataModel.resolutionDate"
           :aria-label="pendingProceedingLabels.resolutionDate"
           :has-error="slotProps.hasError"
@@ -367,11 +404,12 @@ onBeforeUnmount(() => {
       <InputField
         v-if="!isPendingProceeding"
         id="documentType"
+        v-slot="{ id }"
         class="flex-col"
         label="Dokumenttyp *"
       >
         <ComboboxInput
-          id="documentType"
+          :id="id"
           v-model="coreDataModel.documentType"
           aria-label="Dokumenttyp"
           :item-service="ComboboxItemService.getCaselawDocumentTypes"
@@ -382,11 +420,11 @@ onBeforeUnmount(() => {
     <div :class="layoutClass">
       <InputField
         id="deviatingDocumentNumbers"
-        v-slot="slotProps"
+        v-slot="{ id }"
         label="Abweichende Dokumentnummer"
       >
         <ChipsInput
-          :id="slotProps.id"
+          :id="id"
           v-model="deviatingDocumentNumbers"
           aria-label="Abweichende Dokumentnummer"
           data-testid="deviating-document-numbers"
@@ -401,7 +439,7 @@ onBeforeUnmount(() => {
         :label="coreDataLabels.celexNumber"
       >
         <InputText
-          id="celex"
+          :id="slotProps.id"
           v-model="coreDataModel.celexNumber"
           aria-label="Celex-Nummer"
           fluid
@@ -452,9 +490,14 @@ onBeforeUnmount(() => {
         class="w-full"
         :is-open="!!descendingPreviousProcedures?.length"
       >
-        <InputField id="procedure" class="flex-col" label="Vorgang">
+        <InputField
+          id="procedure"
+          v-slot="{ id }"
+          class="flex-col"
+          label="Vorgang"
+        >
           <ComboboxInput
-            id="procedure"
+            :id="id"
             v-model="coreDataModel.procedure"
             aria-label="Vorgang"
             :item-service="ComboboxItemService.getProcedures"
@@ -502,7 +545,7 @@ onBeforeUnmount(() => {
         :validation-error="validationStore.getByField('yearsOfDispute')"
       >
         <ChipsYearInput
-          :id="slotProps.id"
+          id="yearOfDispute"
           v-model="coreDataModel.yearsOfDispute"
           aria-label="Streitjahr"
           :has-error="slotProps.hasError"
@@ -514,15 +557,17 @@ onBeforeUnmount(() => {
     </div>
     <div v-if="!isPendingProceeding" :class="layoutClass">
       <InputField
-        id="source"
+        id="sources"
         v-slot="slotProps"
         label="Quelle"
-        :validation-error="validationStore.getByField('source')"
+        :validation-error="validationStore.getByField('sources')"
       >
-        <InputSelect
+        <InputMultiSelect
           :id="slotProps.id"
-          v-model="source"
+          v-model="sources"
           aria-label="Quelle Input"
+          data-testid="source-input"
+          display="chip"
           fluid
           :invalid="slotProps.hasError"
           option-label="label"

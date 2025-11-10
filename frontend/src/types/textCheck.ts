@@ -33,7 +33,6 @@ export interface Match {
   id: number
   message: string
   shortMessage: string
-  replacements: Replacement[]
   offset: number
   htmlOffset?: number
   length: number
@@ -46,6 +45,7 @@ export interface Match {
   word: string
   category: string
   ignoredTextCheckWords?: IgnoredTextCheckWord[]
+  isIgnoredOnce?: boolean
 }
 
 export interface TextCheckResponse {

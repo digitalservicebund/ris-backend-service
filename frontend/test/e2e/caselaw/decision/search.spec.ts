@@ -331,6 +331,8 @@ test.describe("Große Suche nach Entscheidungen", () => {
           .getByRole("row")
           .filter({ hasText: documentNumber })
 
+        // Ersterfassung visible as previous step
+        await expect(documentRow.getByText("EE")).toBeVisible()
         await expect(documentRow.getByText("Fachdokumentation")).toBeVisible()
         await expect(documentRow.getByText("ED")).toBeHidden()
       })
@@ -636,6 +638,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
   )
 
   test("Entscheidung neu erstellen und löschen", async ({ page }) => {
+    const fileNumber = generateString()
     await navigateToSearch(page)
     await test.step("Klicke auf 'Neue Entscheidung'", async () => {
       await page
@@ -657,9 +660,18 @@ test.describe("Große Suche nach Entscheidungen", () => {
         }),
       ).toBeVisible()
     })
+    await navigateToCategories(page, documentNumberToBeDeleted!, {
+      navigationBy: "click",
+    })
+    await test.step("Setze eindeutiges Aktenzeichen", async () => {
+      await page.getByLabel("Aktenzeichen", { exact: true }).fill(fileNumber)
+      await save(page)
+    })
     await test.step("Suche nach neuer Dokumentnummer", async () => {
-      await navigateToSearch(page)
+      await navigateToSearch(page, { navigationBy: "click" })
       await fillInput(page, "Dokumentnummer Suche", documentNumberToBeDeleted)
+      // Because of the doc number recycling, we need a different unique identifier
+      await fillInput(page, "Aktenzeichen Suche", fileNumber)
       await triggerSearch(page)
     })
     await test.step(`Prüfe, dass 1 Ergebnis gefunden wurde`, async () => {
@@ -670,8 +682,10 @@ test.describe("Große Suche nach Entscheidungen", () => {
       await deleteDocumentUnit(page, documentNumberToBeDeleted!)
     })
     await test.step("Suche nach neuer Dokumentnummer ergibt kein Ergebnis", async () => {
-      await navigateToSearch(page)
+      await navigateToSearch(page, { navigationBy: "click" })
       await fillInput(page, "Dokumentnummer Suche", documentNumberToBeDeleted)
+      // Because of the doc number recycling, we need a different unique identifier
+      await fillInput(page, "Aktenzeichen Suche", fileNumber)
       await triggerSearch(page)
       await expect(
         page.getByText("Keine Suchergebnisse gefunden"),

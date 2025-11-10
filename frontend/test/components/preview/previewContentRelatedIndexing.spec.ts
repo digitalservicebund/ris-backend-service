@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRelatedIndexing.vue"
 import ActiveCitation from "@/domain/activeCitation"
+import { AppealAdmitter } from "@/domain/appealAdmitter"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { Decision } from "@/domain/decision"
 import Definition from "@/domain/definition"
@@ -101,11 +102,16 @@ describe("preview content related indexing", () => {
           definingBorderNumber: 3,
         }),
       ],
+      appealAdmission: {
+        admitted: true,
+        by: AppealAdmitter.BFH,
+      },
     })
 
     expect(await screen.findByText("Schlagwörter")).toBeInTheDocument()
     expect(await screen.findByText("Normen")).toBeInTheDocument()
     expect(await screen.findByText("Aktivzitierung")).toBeInTheDocument()
+    expect(await screen.findByText("Rechtsmittelzulassung")).toBeInTheDocument()
     expect(await screen.findByText("Sachgebiete")).toBeInTheDocument()
     expect(await screen.findByText("Kündigungsgründe")).toBeInTheDocument()
     expect(await screen.findByText("Kündigungsarten")).toBeInTheDocument()
@@ -131,6 +137,7 @@ describe("preview content related indexing", () => {
       hasLegislativeMandate: false,
       collectiveAgreements: [],
       definitions: [],
+      appealAdmission: undefined,
     })
 
     expect(await screen.findByText("Schlagwörter")).toBeInTheDocument()
@@ -147,6 +154,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
   })
 
   test("renders multiple norms and single norms and nothing else", async () => {
@@ -176,6 +184,7 @@ describe("preview content related indexing", () => {
       hasLegislativeMandate: false,
       collectiveAgreements: [],
       definitions: [],
+      appealAdmission: undefined,
     })
 
     expect(await screen.findByText("Normen")).toBeInTheDocument()
@@ -193,6 +202,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
   })
 
   test("renders multiple active citations and nothing else", async () => {
@@ -231,6 +241,7 @@ describe("preview content related indexing", () => {
       hasLegislativeMandate: false,
       collectiveAgreements: [],
       definitions: [],
+      appealAdmission: undefined,
     })
 
     expect(await screen.findByText("Aktivzitierung")).toBeInTheDocument()
@@ -251,6 +262,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
   })
 
   test("renders multiple fields of law and nothing else", async () => {
@@ -308,6 +320,7 @@ describe("preview content related indexing", () => {
       hasLegislativeMandate: false,
       collectiveAgreements: [],
       definitions: [],
+      appealAdmission: undefined,
     })
 
     expect(await screen.findByText("Sachgebiete")).toBeInTheDocument()
@@ -331,6 +344,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
   })
 
   test("renders multiple job profiles and nothing else", async () => {
@@ -345,6 +359,7 @@ describe("preview content related indexing", () => {
       dismissalTypes: [],
       hasLegislativeMandate: false,
       definitions: [],
+      appealAdmission: undefined,
     })
 
     expect(await screen.findByText("Berufsbild")).toBeInTheDocument()
@@ -361,6 +376,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
   })
 
   test("renders multiple collective agreements and nothing else", async () => {
@@ -374,6 +390,7 @@ describe("preview content related indexing", () => {
       dismissalGrounds: [],
       dismissalTypes: [],
       definitions: [],
+      appealAdmission: undefined,
     })
 
     expect(await screen.findByText("Tarifvertrag")).toBeInTheDocument()
@@ -390,6 +407,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
   })
 
   test("renders legislative mandate and nothing else", async () => {
@@ -404,6 +422,7 @@ describe("preview content related indexing", () => {
       collectiveAgreements: [],
       hasLegislativeMandate: true,
       definitions: [],
+      appealAdmission: undefined,
     })
 
     expect(await screen.findByText("Gesetzgebungsauftrag")).toBeInTheDocument()
@@ -419,6 +438,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
   })
 
   test("renders dismissal inputs and nothing else", async () => {
@@ -433,6 +453,7 @@ describe("preview content related indexing", () => {
       collectiveAgreements: [],
       hasLegislativeMandate: false,
       definitions: [],
+      appealAdmission: undefined,
     })
 
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
@@ -445,6 +466,7 @@ describe("preview content related indexing", () => {
     expect(await screen.findByText("Kündigungsgründe")).toBeInTheDocument()
     expect(await screen.findByText("Kündigungsarten")).toBeInTheDocument()
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
   })
 
   test("renders foreign language versions and nothing else", async () => {
@@ -472,6 +494,7 @@ describe("preview content related indexing", () => {
           link: "www.link-to-translation.es",
         }),
       ],
+      appealAdmission: undefined,
     })
 
     expect(screen.getByText("Fremdsprachige Fassung")).toBeInTheDocument()
@@ -497,6 +520,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
   })
 
   test("renders no legislative mandate when it is false", async () => {
@@ -520,6 +544,7 @@ describe("preview content related indexing", () => {
       hasLegislativeMandate: false,
       evsf: "X 00 00-0-0",
       definitions: [],
+      appealAdmission: undefined,
     })
 
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
@@ -534,6 +559,7 @@ describe("preview content related indexing", () => {
     expect(await screen.findByText("E-VSF")).toBeInTheDocument()
     expect(await screen.findByText("X 00 00-0-0")).toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
   })
 
   test("renders definitions and nothing else", async () => {
@@ -573,6 +599,39 @@ describe("preview content related indexing", () => {
     expect(container).toHaveTextContent(
       "DefinitionFinanzkraftRichtige Randnummer | 1Kündigungsfrist (falsche Randnummer) | 3",
     )
+    expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
+  })
+
+  describe("renders appeal admission", () => {
+    test("no", async () => {
+      const { container } = renderComponent({
+        appealAdmission: {
+          admitted: false,
+        },
+      })
+
+      expect(container).toHaveTextContent("RechtsmittelzulassungNein")
+    })
+    test("yes, without appeal admitter", async () => {
+      const { container } = renderComponent({
+        appealAdmission: {
+          admitted: true,
+          by: undefined,
+        },
+      })
+
+      expect(container).toHaveTextContent("RechtsmittelzulassungJa")
+    })
+    test("yes, with appeal admitter", async () => {
+      const { container } = renderComponent({
+        appealAdmission: {
+          admitted: true,
+          by: AppealAdmitter.FG,
+        },
+      })
+
+      expect(container).toHaveTextContent("RechtsmittelzulassungJa, durch FG")
+    })
   })
 
   test("renders nothing when elements are empty", async () => {
@@ -589,6 +648,7 @@ describe("preview content related indexing", () => {
       foreignLanguageVersions: [],
       evsf: "",
       definitions: [],
+      appealAdmission: undefined,
     })
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
@@ -602,6 +662,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
   })
 
   test("renders nothing when elements are undefined", async () => {
@@ -618,6 +679,7 @@ describe("preview content related indexing", () => {
       foreignLanguageVersions: undefined,
       evsf: undefined,
       definitions: undefined,
+      appealAdmission: undefined,
     })
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
@@ -631,5 +693,6 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
   })
 })

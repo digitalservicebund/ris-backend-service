@@ -11,7 +11,6 @@ public record Match(
     String message,
     String shortMessage,
     CategoryType category,
-    List<Replacement> replacements,
     int offset,
     Integer htmlOffset,
     int length,
@@ -21,4 +20,5 @@ public record Match(
     Rule rule,
     boolean ignoreForIncompleteSentence,
     int contextForSureMatch,
-    List<IgnoredTextCheckWord> ignoredTextCheckWords) {}
+    List<IgnoredTextCheckWord> ignoredTextCheckWords,
+    boolean isIgnoredOnce) {}

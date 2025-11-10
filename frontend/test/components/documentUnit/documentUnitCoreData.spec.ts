@@ -1,6 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue"
+import { render, screen, within } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import { InputText } from "primevue"
 import { beforeEach, expect } from "vitest"
@@ -200,25 +200,36 @@ describe("Core Data", () => {
   })
 
   test("renders source", async () => {
-    const coreData = {
-      source: {
-        value: SourceValue.AngefordertesOriginal,
-      },
+    const coreData: Partial<CoreData> = {
+      sources: [
+        {
+          value: SourceValue.AngefordertesOriginal,
+        },
+        {
+          sourceRawValue: "legacy Source",
+        },
+      ],
     }
 
     renderComponent({ initialModelValue: coreData })
 
-    const sourceSelect = screen.getByLabelText("Quelle Input")
-    expect(sourceSelect).toHaveTextContent(SourceValue.AngefordertesOriginal)
+    const sourceSelect = screen.getByTestId("source-input")
+
+    expect(
+      within(sourceSelect).getByText("angefordertes Original (A)"),
+    ).toBeInTheDocument()
+    expect(within(sourceSelect).getByText("legacy Source")).toBeInTheDocument()
   })
 
   test("updates source", async () => {
     const { user, model } = renderComponent({
-      initialModelValue: { source: undefined },
+      initialModelValue: { sources: undefined },
     })
 
-    const dropdown = await screen.findByLabelText("Quelle Input")
-    await user.click(dropdown)
+    // we need to use a test-id as the element selected by the label (or role) is too deep in the html-tree
+    // (it works a11y-wise when using keyboard navigation)
+    const sourceSelect = screen.getByTestId("source-input")
+    await user.click(sourceSelect)
 
     const options = await screen.findAllByRole("option")
     expect(options.length).toBe(6)
@@ -228,9 +239,43 @@ describe("Core Data", () => {
 
     await user.click(options[0])
 
-    expect(model.value.source).toEqual({
-      value: SourceValue.UnaufgefordertesOriginal,
+    expect(model.value.sources).toEqual([
+      {
+        value: SourceValue.UnaufgefordertesOriginal,
+      },
+    ])
+  })
+
+  test("allows selecting multiple sources", async () => {
+    const { user, model } = renderComponent({
+      initialModelValue: { sources: undefined },
     })
+
+    // we need to use a test-id as the element selected by the label (or role) is too deep in the html-tree
+    // (it works a11y-wise when using keyboard navigation)
+    const sourceSelect = screen.getByTestId("source-input")
+    await user.click(sourceSelect)
+
+    const options = await screen.findAllByRole("option")
+    expect(options.length).toBe(6)
+    expect(options[0]).toHaveTextContent(
+      "unaufgefordert eingesandtes Original (O)",
+    )
+    expect(options[4]).toHaveTextContent(
+      "Ländergerichte, EuG- und EuGH-Entscheidungen über jDV-Verfahren (L)",
+    )
+
+    await user.click(options[0])
+    await user.click(options[4])
+
+    expect(model.value.sources).toEqual([
+      {
+        value: SourceValue.UnaufgefordertesOriginal,
+      },
+      {
+        value: SourceValue.LaenderEuGH,
+      },
+    ])
   })
 
   test("renders inputTypes", async () => {

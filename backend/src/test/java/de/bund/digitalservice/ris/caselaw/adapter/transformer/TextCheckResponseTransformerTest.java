@@ -8,7 +8,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.languagetool.Category;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.Context;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolResponse;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.Match;
-import de.bund.digitalservice.ris.caselaw.adapter.languagetool.Replacement;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.Rule;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.Type;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
@@ -38,11 +37,6 @@ class TextCheckResponseTransformerTest {
     context.setOffset(0);
     context.setLength(3);
     match.setContext(context);
-    List<Replacement> replacements = new ArrayList<>();
-    Replacement replacement = new Replacement();
-    replacement.setValue("the");
-    replacements.add(replacement);
-    match.setReplacements(replacements);
     match.setOffset(0);
     match.setLength(3);
     match.setSentence("teh sentence.");
@@ -75,8 +69,6 @@ class TextCheckResponseTransformerTest {
     assertEquals("Spelling mistake", domainMatch.shortMessage());
     assertTrue(domainMatch.ignoreForIncompleteSentence());
     assertEquals("teh", domainMatch.word());
-    assertEquals(1, domainMatch.replacements().size());
-    assertEquals("the", domainMatch.replacements().get(0).value());
     assertEquals(0, domainMatch.offset());
     assertEquals(3, domainMatch.length());
     assertEquals("teh sentence.", domainMatch.sentence());
@@ -96,8 +88,6 @@ class TextCheckResponseTransformerTest {
     // Arrange = given
     var ignoredWordId = UUID.fromString("00000000-0000-0000-0000-000000000001");
     List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches = new ArrayList<>();
-    de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement replacementOne =
-        new de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement("Richtig");
     de.bund.digitalservice.ris.caselaw.domain.textcheck.Context contextOne =
         new de.bund.digitalservice.ris.caselaw.domain.textcheck.Context("<p>Rihctig<p>", 3, 7);
     de.bund.digitalservice.ris.caselaw.domain.textcheck.Context contextTwo =
@@ -126,7 +116,6 @@ class TextCheckResponseTransformerTest {
             .message("Möglicher Tippfehler gefunden.")
             .shortMessage("Rechtschreibfehler")
             .category(CategoryType.GUIDING_PRINCIPLE)
-            .replacements(List.of(replacementOne))
             .offset(3)
             .length(7)
             .context(contextOne)
@@ -144,7 +133,6 @@ class TextCheckResponseTransformerTest {
             .message("Möglicher Tippfehler gefunden.")
             .shortMessage("Rechtschreibfehler")
             .category(CategoryType.GUIDING_PRINCIPLE)
-            .replacements(Collections.emptyList())
             .offset(11)
             .length(5)
             .context(contextTwo)
@@ -165,6 +153,58 @@ class TextCheckResponseTransformerTest {
             .suggestions(List.of(suggestionOne, suggestionTwo))
             .categoryTypes(Set.of(CategoryType.GUIDING_PRINCIPLE))
             .totalTextCheckErrors(1)
+            .build();
+
+    // Act = when
+    var result = TextCheckResponseTransformer.transformToAllDomain(matches);
+
+    // Assert = then
+    assertEquals(expected, result);
+  }
+
+  @Test
+  void givenLocallyIgnoredWord_whenTransforming_thenVerifyCorrectIgnoredWordsCount() {
+    // Arrange = given
+    List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches = new ArrayList<>();
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Context contextTwo =
+        new de.bund.digitalservice.ris.caselaw.domain.textcheck.Context("<p>geanu<p>", 3, 5);
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Type type =
+        new de.bund.digitalservice.ris.caselaw.domain.textcheck.Type("UnknownWord");
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Category category =
+        new de.bund.digitalservice.ris.caselaw.domain.textcheck.Category(
+            "TYPOS", "Mögliche Tippfehler");
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule rule =
+        de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule.builder()
+            .id("GERMAN_SPELLER_RULE")
+            .description("Möglicher Rechtschreibfehler")
+            .issueType("misspelling")
+            .category(category)
+            .build();
+    de.bund.digitalservice.ris.caselaw.domain.textcheck.Match matchTwo =
+        de.bund.digitalservice.ris.caselaw.domain.textcheck.Match.builder()
+            .id(1)
+            .word("geanu")
+            .message("Möglicher Tippfehler gefunden.")
+            .shortMessage("Rechtschreibfehler")
+            .category(CategoryType.GUIDING_PRINCIPLE)
+            .offset(11)
+            .length(5)
+            .context(contextTwo)
+            .sentence("Rihctig geanu")
+            .type(type)
+            .rule(rule)
+            .ignoreForIncompleteSentence(false)
+            .contextForSureMatch(0)
+            .isIgnoredOnce(true)
+            .build();
+    matches.add(matchTwo);
+
+    Suggestion suggestionTwo = new Suggestion("geanu", List.of(matchTwo));
+    TextCheckAllResponse expected =
+        TextCheckAllResponse.builder()
+            .suggestions(List.of(suggestionTwo))
+            .categoryTypes(Collections.emptySet())
+            .totalTextCheckErrors(0)
             .build();
 
     // Act = when

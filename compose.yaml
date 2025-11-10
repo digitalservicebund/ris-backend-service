@@ -14,9 +14,9 @@ services:
       - RIS_MIGRATION_DB_PASSWORD=test
       - RIS_MIGRATION_DB_SCHEMA=incremental_migration
       - RIS_MIGRATION_S3_ENDPOINT=https://obs.eu-de.otc.t-systems.com
-      - RIS_MIGRATION_S3_ACCESS_KEY=${AWS_ACCESS_KEY_ID} # Use the OTC S3 access key from 1Password. See migration_image.md for details.
-      - RIS_MIGRATION_S3_SECRET=${AWS_SECRET_ACCESS_KEY}  # Use the OTC S3 access key from 1Password. See migration_image.md for details.
-      - RIS_MIGRATION_S3_BUCKET=${AWS_BUCKET_NAME} # Use the OTC S3 access key from 1Password. See migration_image.md  for details.
+      - RIS_MIGRATION_S3_ACCESS_KEY=${AWS_ACCESS_KEY_ID} # Use the OTC S3 access key from 1Password. See run_migration_locally.md for details.
+      - RIS_MIGRATION_S3_SECRET=${AWS_SECRET_ACCESS_KEY}  # Use the OTC S3 access key from 1Password. See run_migration_locally.md for details.
+      - RIS_MIGRATION_S3_BUCKET=${AWS_BUCKET_NAME} # Use the OTC S3 access key from 1Password. See run_migration_locally.md  for details.
       - RIS_MIGRATION_S3_DATA_VERSION=2024-09
       - RIS_MIGRATION_S3_FIRST_DAILY_VERSION=2024-08-31
 
@@ -52,7 +52,7 @@ services:
       timeout: 3s
 
   backend:
-    image: gradle:9-jdk17
+    image: gradle:9-jdk21
     user: ${MY_UID}:${MY_GID}
     extra_hosts:
       - localhost:host-gateway
@@ -68,6 +68,10 @@ services:
       - OAUTH2_CLIENT_ISSUER=${OAUTH2_CLIENT_ISSUER}
       - OAUTH2_CLIENT_ID=${OAUTH2_CLIENT_ID}
       - OAUTH2_CLIENT_SECRET=${OAUTH2_CLIENT_SECRET}
+      - OAUTH2_USER_API_CLIENT_ID=${OAUTH2_USER_API_CLIENT_ID}
+      - OAUTH2_USER_API_CLIENT_SECRET=${OAUTH2_USER_API_CLIENT_SECRET}
+      - BAREID_INSTANCE=${BAREID_INSTANCE}
+      - EURLEX_URL=${EURLEX_URL}
       - JAVA_OPTS=-XX:MaxDirectMemorySize=100M
     command: sh run.sh _start
     depends_on:
@@ -154,7 +158,7 @@ services:
       timeout: 3s
 
   redis:
-    image: cgr.dev/chainguard/redis@sha256:4223ec1e1f34964289b20c1db0424b4c8da172e756e49d64221b199533cb71d2
+    image: cgr.dev/chainguard/redis@sha256:5f13c916a3310b021b517fa57ebe3b2a73bb064e39f91e49619d7861d932d93e
     extra_hosts:
       - localhost:host-gateway
     container_name: redis
@@ -179,7 +183,7 @@ services:
       timeout: 5s
 
   languagetool:
-    image: ghcr.io/digitalservicebund/neuris-languagetool:ad3fd980532494b0b9d84d104fb87d72e968b9df
+    image: ghcr.io/digitalservicebund/neuris-languagetool:bf15ea9bf89e02d4148923c52d99c35724c8cd17
     extra_hosts:
       - localhost:host-gateway
     ports:

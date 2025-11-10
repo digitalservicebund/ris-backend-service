@@ -15,7 +15,7 @@ This instruction will allow engineers to setup their local environment with the 
    git clone git@github.com:digitalservicebund/ris-data-migration.git
    ```
 
-2. Follow the steps [here](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/) to get access to OTC buckets via command line. You can use the `AWS_` environment variables that you use for [neuris-infra](https://github.com/digitalservicebund/neuris-infra). Add them to your local `.env` file, that has been generated before (through `./run.sh env`):
+2. Follow the steps [here](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/) to get access to OTC buckets via command line. You can use the `AWS_` environment variables that you use for [neuris-infra](https://github.com/digitalservicebund/neuris-infra). Add them to your local `.env` file, that has been generated before (through `./run.sh init`):
 
    ```bash
    AWS_ACCESS_KEY_ID=YOUR_KEY_HERE
@@ -127,20 +127,13 @@ To repeat files downloading, remove the `../ris-data-migration/juris-xml-data` d
    ./gradlew :cli:bootJar
    ```
 
-10. Import the static lookup tables into your new schema (see Confluence "Wertetabellen" to find out
-    what is static and dynamic)
-
-    ```bash
-    java -jar cli/build/libs/ris-data-migration-cli.jar refdata seed
-    ```
-
-11. Import the dynamic lookup tables
+10. Import the lookup tables
 
     ```bash
     java -jar cli/build/libs/ris-data-migration-cli.jar juris-table seed
     ```
 
-12. Import the BGH DocumentationUnits
+11. Import the BGH DocumentationUnits
 
     ```bash
     java -jar cli/build/libs/ris-data-migration-cli.jar juris-r migrate -p juris-xml-data/

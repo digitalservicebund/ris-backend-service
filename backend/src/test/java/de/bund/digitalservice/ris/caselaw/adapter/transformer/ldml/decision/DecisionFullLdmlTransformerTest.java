@@ -326,6 +326,36 @@ class DecisionFullLdmlTransformerTest {
   }
 
   @Test
+  @DisplayName("Long text with <ignore-once> tags>")
+  void testTransformToLdml_longTextWithIgnoreOnceTags_shouldRemoveTags() {
+    String expected =
+        """
+             <akn:decision>
+                <akn:block name="Entscheidungsgründe">
+                   <akn:embeddedStructure>
+                      <akn:p>text with ignored spell check issue</akn:p>
+                   </akn:embeddedStructure>
+                </akn:block>
+             </akn:decision>
+             """;
+    Decision otherLongTextCaseLaw =
+        testDocumentUnit.toBuilder()
+            .longTexts(
+                LongTexts.builder()
+                    .decisionReasons(
+                        "<p>text with <ignore-once>ignored</ignore-once> spell check issue</p>")
+                    .build())
+            .build();
+
+    CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+    assertThat(fileContent).isPresent();
+    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+        .contains(StringUtils.deleteWhitespace(expected));
+  }
+
+  @Test
   @DisplayName("Mixed text in header")
   void testTransform_mixedTextInHeader() {
     String expected =
@@ -659,11 +689,12 @@ class DecisionFullLdmlTransformerTest {
                         .location("courtLocation test")
                         .regions(List.of("region test"))
                         .build())
-                .source(
-                    Source.builder()
-                        .sourceRawValue("sourceRawValue test")
-                        .value(SourceValue.S)
-                        .build())
+                .sources(
+                    List.of(
+                        Source.builder()
+                            .sourceRawValue("sourceRawValue test")
+                            .value(SourceValue.S)
+                            .build()))
                 .documentType(DocumentType.builder().label("documentType test").build())
                 .legalEffect("ja")
                 .fileNumbers(List.of("fileNumber test"))
