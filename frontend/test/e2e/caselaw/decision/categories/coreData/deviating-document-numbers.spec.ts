@@ -17,8 +17,11 @@ test.describe("deviating document numbers", () => {
     async ({ page, documentNumber }) => {
       await navigateToCategories(page, documentNumber)
 
+      const inputField = page
+        .getByLabel("Abweichende Dokumentnummer")
+        .getByRole("textbox")
+
       await test.step("Enter deviating document numbers", async () => {
-        const inputField = page.locator("#deviatingDocumentNumbers")
         await inputField.fill("XXRE111111111")
         await page.keyboard.press("Enter")
 
@@ -32,7 +35,7 @@ test.describe("deviating document numbers", () => {
       })
 
       await test.step("Delete deviating document number", async () => {
-        await page.locator("#deviatingDocumentNumbers").click()
+        await inputField.click()
         await page.keyboard.press("Shift+Tab")
         await page.keyboard.press("Enter")
 
@@ -48,7 +51,9 @@ test.describe("deviating document numbers", () => {
       await navigateToCategories(page, documentNumber)
 
       await test.step("Enter deviating document numbers", async () => {
-        const inputField = page.locator("#deviatingDocumentNumbers")
+        const inputField = page
+          .getByLabel("Abweichende Dokumentnummer")
+          .getByRole("textbox")
         await inputField.fill("XXRE111111111")
         await page.keyboard.press("Enter")
 
@@ -99,7 +104,9 @@ test.describe("deviating document numbers", () => {
       )
 
       await test.step("Enter deviating document numbers", async () => {
-        const inputField = page.locator("#deviatingDocumentNumbers")
+        const inputField = page
+          .getByLabel("Abweichende Dokumentnummer")
+          .getByRole("textbox")
 
         await inputField.fill("XXRE111111111")
         await page.keyboard.press("Enter")
@@ -133,12 +140,16 @@ test.describe("deviating document numbers", () => {
       const deviatingDocumentNumber = generateString({ length: 13 })
 
       await test.step("Enter and save deviating document number", async () => {
-        const inputField = page.locator("#deviatingDocumentNumbers")
-        await inputField.fill(deviatingDocumentNumber)
+        await page
+          .getByLabel("Abweichende Dokumentnummer")
+          .getByRole("textbox")
+          .fill(deviatingDocumentNumber)
         await page.keyboard.press("Enter")
         await save(page)
 
-        await expect(page.getByText(deviatingDocumentNumber)).toBeVisible()
+        await expect(
+          page.getByRole("listitem").getByText(deviatingDocumentNumber),
+        ).toBeVisible()
       })
 
       await test.step("Search for deviating document number and check that doc unit is displayed", async () => {

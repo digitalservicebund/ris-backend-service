@@ -239,11 +239,11 @@ onBeforeUnmount(() => {
       <template #children>
         <InputField
           id="deviatingCourts"
-          v-slot="slotProps"
+          v-slot="{ id }"
           label="Fehlerhaftes Gericht"
         >
           <ChipsInput
-            :id="slotProps.id"
+            :id="id"
             v-model="deviatingCourts"
             aria-label="Fehlerhaftes Gericht"
             data-testid="deviating-courts"
@@ -259,13 +259,9 @@ onBeforeUnmount(() => {
         class="w-full min-w-0"
         :is-open="!!coreDataModel.deviatingFileNumbers?.length"
       >
-        <InputField
-          id="fileNumberInput"
-          v-slot="slotProps"
-          label="Aktenzeichen *"
-        >
+        <InputField id="fileNumberInput" v-slot="{ id }" label="Aktenzeichen *">
           <ChipsInput
-            :id="slotProps.id"
+            :id="id"
             v-model="fileNumbers"
             aria-label="Aktenzeichen"
             data-testid="file-numbers"
@@ -275,11 +271,11 @@ onBeforeUnmount(() => {
         <template #children>
           <InputField
             id="deviatingFileNumbers"
-            v-slot="slotProps"
+            v-slot="{ id }"
             label="Abweichendes Aktenzeichen"
           >
             <ChipsInput
-              :id="slotProps.id"
+              :id="id"
               v-model="deviatingFileNumbers"
               aria-label="Abweichendes Aktenzeichen"
               data-testid="deviating-file-numbers"
@@ -459,9 +455,9 @@ onBeforeUnmount(() => {
         class="w-full"
         :is-open="!!coreDataModel.deviatingEclis?.length"
       >
-        <InputField id="ecli" class="flex-col" label="ECLI">
+        <InputField id="ecli" v-slot="{ id }" class="flex-col" label="ECLI">
           <InputText
-            id="ecli"
+            :id="id"
             v-model="coreDataModel.ecli"
             aria-label="ECLI"
             fluid
@@ -472,11 +468,11 @@ onBeforeUnmount(() => {
         <template #children>
           <InputField
             id="deviatingEclis"
-            v-slot="slotProps"
+            v-slot="{ id }"
             label="Abweichender ECLI"
           >
             <ChipsInput
-              :id="slotProps.id"
+              :id="id"
               v-model="deviatingEclis"
               aria-label="Abweichender ECLI"
               data-testid="deviating-eclis"
@@ -509,11 +505,11 @@ onBeforeUnmount(() => {
         <template #children>
           <InputField
             id="previousProcedures"
-            v-slot="slotProps"
+            v-slot="{ id }"
             label="Vorgangshistorie"
           >
             <ChipsInput
-              :id="slotProps.id"
+              :id="id"
               v-model="descendingPreviousProcedures"
               aria-label="Vorgangshistorie"
               data-testid="previous-procedures"
@@ -545,7 +541,7 @@ onBeforeUnmount(() => {
         :validation-error="validationStore.getByField('yearsOfDispute')"
       >
         <ChipsYearInput
-          id="yearOfDispute"
+          :id="slotProps.id"
           v-model="coreDataModel.yearsOfDispute"
           aria-label="Streitjahr"
           :has-error="slotProps.hasError"
@@ -576,10 +572,10 @@ onBeforeUnmount(() => {
           placeholder="Bitte auswählen"
         />
       </InputField>
-      <InputField id="inputTypes" v-slot="slotProps" label="Eingangsart">
+      <InputField id="inputTypes" v-slot="{ id }" label="Eingangsart">
         <div class="flex w-full flex-col">
           <ChipsInput
-            :id="slotProps.id"
+            :id="id"
             v-model="inputTypes"
             aria-label="Eingangsart"
             data-testid="input-types"
@@ -593,11 +589,12 @@ onBeforeUnmount(() => {
     <div :class="layoutClass">
       <InputField
         id="jurisdictionType"
+        v-slot="{ id }"
         class="flex-col"
         label="Gerichtsbarkeit"
       >
         <InputText
-          id="jurisdictionType"
+          :id="id"
           v-model="jurisdictionType"
           aria-label="Gerichtsbarkeit"
           data-testid="jurisdiction-type"
@@ -607,9 +604,9 @@ onBeforeUnmount(() => {
         />
       </InputField>
 
-      <InputField id="region" class="flex-col" label="Region">
+      <InputField id="region" v-slot="{ id }" class="flex-col" label="Region">
         <InputText
-          id="region"
+          :id="id"
           v-model="region"
           aria-label="Region"
           fluid
@@ -642,11 +639,11 @@ onBeforeUnmount(() => {
     >
       <InputField
         id="leadingDecisionNormReferences"
-        v-slot="slotProps"
+        v-slot="{ id }"
         label="BGH Nachschlagewerk"
       >
         <ChipsInput
-          :id="slotProps.id"
+          :id="id"
           v-model="leadingDecisionNormReferences"
           aria-label="BGH Nachschlagewerk"
           data-testid="leading-decision-norm-references"

@@ -37,7 +37,10 @@ test.describe("court", () => {
       .getByLabel("Fehlerhaftes Gericht anzeigen", { exact: true })
       .click()
 
-    await page.locator("#deviatingCourts").fill("abc")
+    await page
+      .getByLabel("Fehlerhaftes Gericht")
+      .getByRole("textbox")
+      .fill("abc")
 
     await expect(
       page.getByText("Fehlerhaftes Gericht", { exact: true }),

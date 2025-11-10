@@ -24,8 +24,10 @@ test.describe(
       async ({ page, documentNumber }) => {
         await navigateToCategories(page, documentNumber)
 
+        const inputField = page.getByLabel("Eingangsart").getByRole("textbox")
+
         await test.step("Eingangsart Eingabefeld mit Hinweis wird angezeigt", async () => {
-          await expect(page.locator("#inputTypes")).toBeVisible()
+          await expect(inputField).toBeVisible()
           await expect(
             page.getByText(
               "Papier, BLK-DB-Schnittstelle, EUR-LEX-Schnittstelle, E-Mail",
@@ -34,9 +36,9 @@ test.describe(
         })
 
         await test.step("Neu hinzugefügte Eingangsarten sind sichtbar", async () => {
-          await page.locator("#inputTypes").fill("E-Mail")
+          await inputField.fill("E-Mail")
           await page.keyboard.press("Enter")
-          await page.locator("#inputTypes").fill("Papier")
+          await inputField.fill("Papier")
           await page.keyboard.press("Enter")
 
           await expect(
@@ -77,10 +79,10 @@ test.describe(
         await save(page)
 
         await test.step("Füge die gelöschten Einträge wieder hinzu, sie sind auch nach reload da", async () => {
-          await page.locator("#inputTypes").fill("E-Mail")
+          await inputField.fill("E-Mail")
           await page.keyboard.press("Enter")
 
-          await page.locator("#inputTypes").fill("Papier")
+          await inputField.fill("Papier")
           await page.keyboard.press("Enter")
           await save(page)
 
@@ -101,12 +103,13 @@ test.describe(
       async ({ page, documentNumber }) => {
         await navigateToCategories(page, documentNumber)
         const testData = ["E-Mail", "Papier", "EUR-LEX-Schnittstelle"]
+        const inputField = page.getByLabel("Eingangsart").getByRole("textbox")
 
         for (const inputType of testData) {
           await test.step(
             "Eingangsart '" + inputType + "' wird hinzugefügt",
             async () => {
-              await page.locator("#inputTypes").fill(inputType)
+              await inputField.fill(inputType)
               await page.keyboard.press("Enter")
 
               await expect(
@@ -131,7 +134,7 @@ test.describe(
         await test.step("Sind alle Eingangsarten entfernt, ist die Kategorie in der Preview nicht mehr sichtbar", async () => {
           await navigateToCategories(page, documentNumber)
 
-          await page.locator("#inputTypes").click()
+          await inputField.click()
           await page.keyboard.press("Shift+Tab")
           await page.keyboard.press("Enter")
           await page.keyboard.press("Shift+Tab")
@@ -166,7 +169,10 @@ test.describe(
           await test.step(
             "Eingangsart '" + inputType + "' wird hinzugefügt",
             async () => {
-              await page.locator("#inputTypes").fill(inputType)
+              await page
+                .getByLabel("Eingangsart")
+                .getByRole("textbox")
+                .fill(inputType)
               await page.keyboard.press("Enter")
 
               await expect(

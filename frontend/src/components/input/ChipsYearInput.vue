@@ -39,7 +39,7 @@ const chips = computed<string[]>({
     const newLength = newValue.length
 
     if (newLength === 0) {
-      emit("update:modelValue", undefined)
+      emit("update:modelValue", [])
       clearValidationErrors()
       return
     }

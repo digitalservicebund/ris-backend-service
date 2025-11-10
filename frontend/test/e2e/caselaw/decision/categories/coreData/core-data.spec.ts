@@ -7,7 +7,9 @@ test.describe("core data", () => {
   test("core data change", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("#fileNumberInput").fill("abc")
+    const fileNumberInput = page.getByLabel("Aktenzeichen").getByRole("textbox")
+
+    await fileNumberInput.fill("abc")
     await page.keyboard.press("Enter")
     await page.getByLabel("ECLI", { exact: true }).fill("abc123")
     await page.keyboard.press("Enter")
@@ -15,7 +17,9 @@ test.describe("core data", () => {
     await save(page)
 
     await page.reload()
-    await expect(page.locator("#fileNumberInput")).toHaveValue("")
+    await expect(
+      page.getByLabel("Aktenzeichen").getByRole("listitem"),
+    ).toHaveText("abc")
     await expect(page.getByLabel("ECLI", { exact: true })).toHaveValue("abc123")
   })
 
@@ -34,9 +38,12 @@ test.describe("core data", () => {
 
     await expect(page.getByText("Abweichender ECLI").first()).toBeVisible()
 
-    await page.locator("#deviatingEclis").fill("two")
+    const deviatingInput = page
+      .getByLabel("Abweichender ECLI")
+      .getByRole("textbox")
+    await deviatingInput.fill("two")
     await page.keyboard.press("Enter")
-    await page.locator("#deviatingEclis").fill("three")
+    await deviatingInput.fill("three")
     await page.keyboard.press("Enter")
 
     await save(page)
@@ -58,11 +65,11 @@ test.describe("core data", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-
-    await page.locator("#fileNumberInput").fill("one")
+    const fileNumberInput = page.getByLabel("Aktenzeichen").getByRole("textbox")
+    await fileNumberInput.fill("one")
     await page.keyboard.press("Enter")
 
-    await page.locator("#fileNumberInput").fill("two")
+    await fileNumberInput.fill("two")
     await page.keyboard.press("Enter")
 
     await expect(page.getByText("one").first()).toBeVisible()
@@ -78,7 +85,10 @@ test.describe("core data", () => {
       page.getByText("Abweichendes Aktenzeichen").first(),
     ).toBeVisible()
 
-    await page.locator("#deviatingFileNumbers").fill("three")
+    await page
+      .getByLabel("Abweichendes Aktenzeichen")
+      .getByRole("textbox")
+      .fill("three")
     await page.keyboard.press("Enter")
 
     await save(page)
@@ -100,13 +110,15 @@ test.describe("core data", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("#fileNumberInput").fill("testone")
+    const fileNumberInput = page.getByLabel("Aktenzeichen").getByRole("textbox")
+
+    await fileNumberInput.fill("testone")
     await page.keyboard.press("Enter")
 
-    await page.locator("#fileNumberInput").fill("testtwo")
+    await fileNumberInput.fill("testtwo")
     await page.keyboard.press("Enter")
 
-    await page.locator("#fileNumberInput").fill("testthree")
+    await fileNumberInput.fill("testthree")
     await page.keyboard.press("Enter")
 
     await expect(page.getByText("testone").first()).toBeVisible()
@@ -293,7 +305,7 @@ test.describe("core data", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    const nswInput = page.locator("#leadingDecisionNormReferences")
+    const nswInput = page.getByLabel("BGH Nachschlagewerk").getByRole("textbox")
     const CITATION = "1968, 249-252 (ST)"
     const nswChipTag = page.getByText(CITATION)
     await expect(nswInput).toBeHidden()
@@ -502,9 +514,7 @@ test.describe("core data", () => {
       })
 
       await test.step("Quelle ist nicht sichtbar", async () => {
-        const source = pageWithExternalUser.getByTestId(
-          "chips-input-wrapper_source",
-        )
+        const source = pageWithExternalUser.getByTestId("source-input")
         await expect(source).toBeHidden()
       })
 

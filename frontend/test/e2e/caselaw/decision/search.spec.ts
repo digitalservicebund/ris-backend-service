@@ -664,7 +664,10 @@ test.describe("Große Suche nach Entscheidungen", () => {
       navigationBy: "click",
     })
     await test.step("Setze eindeutiges Aktenzeichen", async () => {
-      await page.getByLabel("Aktenzeichen", { exact: true }).fill(fileNumber)
+      await page
+        .getByLabel("Aktenzeichen")
+        .getByRole("textbox")
+        .fill(fileNumber)
       await save(page)
     })
     await test.step("Suche nach neuer Dokumentnummer", async () => {

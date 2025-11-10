@@ -22,23 +22,21 @@ const dismissalGrounds = computed({
 <template>
   <div class="flex flex-row gap-24">
     <div class="basis-1/2 gap-0">
-      <div class="ris-label2-regular mb-4" data-testid="dismissal-types">
-        Kündigungsarten
-      </div>
+      <div class="ris-label2-regular mb-4">Kündigungsarten</div>
       <ChipsInput
         id="dismissalTypes"
         v-model="dismissalTypes"
         aria-label="Kündigungsarten"
+        data-testid="dismissal-types"
       />
     </div>
     <div class="basis-1/2 gap-0">
-      <div class="ris-label2-regular mb-4" data-testid="dismissal-grounds">
-        Kündigungsgründe
-      </div>
+      <div class="ris-label2-regular mb-4">Kündigungsgründe</div>
       <ChipsInput
         id="dismissalGrounds"
         v-model="dismissalGrounds"
         aria-label="Kündigungsgründe"
+        data-testid="dismissal-grounds"
       />
     </div>
   </div>

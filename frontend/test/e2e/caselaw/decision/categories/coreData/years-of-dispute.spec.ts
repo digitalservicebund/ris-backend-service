@@ -52,7 +52,10 @@ test.describe(
           await test.step(
             "Add year " + year + ", press enter, check for visibility",
             async () => {
-              await page.locator("#yearsOfDispute").fill(year)
+              await page
+                .getByTestId("year-of-dispute")
+                .getByRole("textbox")
+                .fill(year)
               await page.keyboard.press("Enter")
 
               await expect(
@@ -104,10 +107,10 @@ test.describe(
         await save(page)
 
         await test.step("Add deleted years again, check if testdata persists on reload", async () => {
-          await page.locator("#yearsOfDispute").fill("2023")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("2023")
           await page.keyboard.press("Enter")
 
-          await page.locator("#yearsOfDispute").fill("2024")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("2024")
           await page.keyboard.press("Enter")
           await save(page)
 
@@ -138,7 +141,10 @@ test.describe(
           await test.step(
             "Add year " + year + ", press enter, check for visibility",
             async () => {
-              await page.locator("#yearsOfDispute").fill(year)
+              await page
+                .getByLabel("Streitjahr")
+                .getByRole("textbox")
+                .fill(year)
               await page.keyboard.press("Enter")
 
               await expect(
@@ -197,7 +203,10 @@ test.describe(
           await test.step(
             "Add year " + year + ", press enter, check for visibility",
             async () => {
-              await page.locator("#yearsOfDispute").fill(year)
+              await page
+                .getByLabel("Streitjahr")
+                .getByRole("textbox")
+                .fill(year)
               await page.keyboard.press("Enter")
 
               await expect(
@@ -241,26 +250,26 @@ test.describe(
         await navigateToCategories(page, documentNumber)
 
         await test.step("Add two identical years of dispute not possible, shows error", async () => {
-          await page.locator("#yearsOfDispute").fill("2022")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("2022")
           await page.keyboard.press("Enter")
           await expect(
             page.getByTestId("year-of-dispute").getByText("2022"),
           ).toBeVisible()
 
-          await page.locator("#yearsOfDispute").fill("2022")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("2022")
           await page.keyboard.press("Enter")
           await expect(page.getByText("2022 bereits vorhanden")).toBeVisible()
         })
 
         await test.step("Add invalid years of dispute not possible, former error replaced by new one", async () => {
-          await page.locator("#yearsOfDispute").fill("0999")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("0999")
           await page.keyboard.press("Enter")
           await expect(page.getByText("2022 bereits vorhanden")).toBeHidden()
           await expect(page.getByText("Kein valides Jahr")).toBeVisible()
         })
 
         await test.step("Add more then 4 numbers not possible", async () => {
-          await page.locator("#yearsOfDispute").fill("20202")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("20202")
           await page.keyboard.press("Enter")
           await expect(
             page.getByTestId("year-of-dispute").getByText("2020"),
@@ -268,7 +277,7 @@ test.describe(
         })
 
         await test.step("Add characters not possible", async () => {
-          await page.locator("#yearsOfDispute").fill("abcd")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("abcd")
           await page.keyboard.press("Enter")
           await expect(
             page.getByTestId("year-of-dispute").getByText("abcd"),
@@ -276,7 +285,7 @@ test.describe(
         })
 
         await test.step("Add years of dispute in future not possible, former error replaced by new one", async () => {
-          await page.locator("#yearsOfDispute").fill("2030")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("2030")
           await page.keyboard.press("Enter")
           await expect(page.getByText("Kein valides Jahr")).toBeHidden()
           await expect(
@@ -284,19 +293,6 @@ test.describe(
           ).toBeVisible()
         })
 
-        // eslint-disable-next-line playwright/no-skipped-test
-        await test.step.skip(
-          //does not currently work with ris-ui chips input
-          "On blur validates input, input is not saved with error",
-          async () => {
-            await page.locator("#yearsOfDispute").fill("20")
-            await page.keyboard.press("Tab")
-            await expect(
-              page.getByText("Streitjahr darf nicht in der Zukunft liegen"),
-            ).toBeHidden()
-            await expect(page.getByText("Kein valides Jahr")).toBeVisible()
-          },
-        )
         await save(page)
 
         await test.step("Check if only valid years of dispute are persisted in reload", async () => {

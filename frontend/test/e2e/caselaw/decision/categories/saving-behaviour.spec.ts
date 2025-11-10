@@ -66,7 +66,10 @@ test.describe("saving behaviour", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.getByTestId("#fileNumberInput").fill(generateString())
+    await page
+      .getByLabel("Aktenzeichen")
+      .getByRole("textbox")
+      .fill(generateString())
     await page.keyboard.press("Enter")
 
     const labels = [
@@ -143,7 +146,7 @@ test.describe("saving behaviour", () => {
 
     const fileNumber = generateString()
 
-    await page.getByTestId("#fileNumberInput").fill(fileNumber)
+    await page.getByLabel("Aktenzeichen").getByRole("textbox").fill(fileNumber)
     await page.keyboard.press("Enter")
 
     await save(page)

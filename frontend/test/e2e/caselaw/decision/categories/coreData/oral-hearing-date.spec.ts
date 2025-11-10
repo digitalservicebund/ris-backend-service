@@ -152,9 +152,12 @@ test.describe(
 
 async function addTwoDateValues(page: Page) {
   await test.step("Füge zwei Datumswerte hinzu", async () => {
-    await page.locator("#oralHearingDates").fill("01.02.2020")
+    const inputField = page
+      .getByLabel("Datum der mündlichen Verhandlung")
+      .getByRole("textbox")
+    await inputField.fill("01.02.2020")
     await page.keyboard.press("Enter")
-    await page.locator("#oralHearingDates").fill("01.02.2021")
+    await inputField.fill("01.02.2021")
     await page.keyboard.press("Enter")
 
     await expect(page.getByText("01.02.2020")).toBeVisible()
