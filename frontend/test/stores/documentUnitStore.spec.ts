@@ -18,7 +18,7 @@ describe("useDocumentUnitStore", () => {
   })
 
   describe("remove TextCheck tags from given text", () => {
-    it("removes text-check tags from text", async () => {
+    it("removes text-check tags from text actual", async () => {
       // given
       const mockDocumentUnit = new Decision("123", { version: 1 })
       const mockOriginalDocumentUnit = new Decision("123", { version: 1 })
@@ -32,7 +32,7 @@ describe("useDocumentUnitStore", () => {
         participatingJudges: [],
       }
 
-      const mockedUpdateResponse: ServiceResponse<RisJsonPatch> = {
+      const expectedResponse: ServiceResponse<RisJsonPatch> = {
         status: 200,
         data: {
           documentationUnitVersion: 1,
@@ -44,7 +44,7 @@ describe("useDocumentUnitStore", () => {
 
       const documentUnitServiceUpdateMock = vi
         .spyOn(documentUnitService, "update")
-        .mockResolvedValueOnce(mockedUpdateResponse)
+        .mockResolvedValueOnce(expectedResponse)
 
       const store = useDocumentUnitStore()
 
@@ -55,8 +55,11 @@ describe("useDocumentUnitStore", () => {
       const response = await store.updateDocumentUnit()
 
       // then
-      expect(documentUnitServiceUpdateMock).toHaveBeenCalledOnce()
-      expect(response).toEqual(mockedUpdateResponse)
+      expect(documentUnitServiceUpdateMock).toHaveBeenCalledWith(
+        store.documentUnit!.uuid,
+        expect.objectContaining({ patch: [] }),
+      )
+      expect(response).toEqual(expectedResponse)
       expect(store.documentUnit?.version).toBe(1)
     })
   })
