@@ -716,7 +716,11 @@ class DecisionFullLdmlTransformerTest {
     PreviousDecision previousDecision1 =
         PreviousDecision.builder()
             .decisionDate(LocalDate.of(2020, 1, 1))
-            .court(Court.builder().type("previous decision court type").build())
+            .court(
+                Court.builder()
+                    .type("previous decision court type")
+                    .location("previous decision court location")
+                    .build())
             .documentType(DocumentType.builder().label("previous decision document type").build())
             .fileNumber("previous decision file number")
             .documentNumber("previous decision document number 1")
@@ -733,7 +737,10 @@ class DecisionFullLdmlTransformerTest {
             .documentNumber("ensuing decision document number 1")
             .build();
     EnsuingDecision ensuingDecision2 =
-        ensuingDecision1.toBuilder().documentNumber("previous decision document number 2").build();
+        ensuingDecision1.toBuilder()
+            .documentNumber("previous decision document number 2")
+            .pending(true)
+            .build();
 
     // Use empty DTO as basis as it creates empty lists for everything.
     return DecisionTransformer.transformToDomain(new DecisionDTO()).toBuilder()

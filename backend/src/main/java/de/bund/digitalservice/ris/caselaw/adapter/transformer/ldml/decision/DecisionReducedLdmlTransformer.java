@@ -3,6 +3,9 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Analysis;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.ImplicitReference;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.OtherReferences;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
@@ -29,8 +32,27 @@ public class DecisionReducedLdmlTransformer extends DecisionCommonLdmlTransforme
     return builder
         .identification(buildIdentification(decision, false))
         .references(buildReferences(decision))
+        .analysis(buildAnalysis(decision))
         .proprietary(Proprietary.builder().meta(buildRisMeta(decision)).build())
         .build();
+  }
+
+  private Analysis buildAnalysis(Decision decision) {
+    var builder = Analysis.builder();
+    boolean hasAnalysisData = false;
+
+    List<ImplicitReference> implicitReferences = buildImplicitReferences(decision);
+    if (implicitReferences != null && !implicitReferences.isEmpty()) {
+      hasAnalysisData = true;
+      builder.otherReferences(
+          OtherReferences.builder().implicitReferences(implicitReferences).build());
+    }
+
+    if (hasAnalysisData) {
+      return builder.build();
+    } else {
+      return null;
+    }
   }
 
   private RisMeta buildRisMeta(Decision decision) {

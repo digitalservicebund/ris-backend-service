@@ -1,8 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,13 +15,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Builder
-public class Analysis {
+@XmlAccessorType(XmlAccessType.FIELD)
+public class OtherReferences {
+  @Builder.Default
   @XmlAttribute(name = "source")
-  private static final String SOURCE = CaseLawLdml.RIS_REF;
+  private String source = CaseLawLdml.RIS_REF;
 
-  @XmlElement(name = "otherReferences", namespace = CaseLawLdml.AKN_NS)
-  private OtherReferences otherReferences;
-
-  @XmlElement(name = "otherAnalysis", namespace = CaseLawLdml.AKN_NS)
-  private OtherAnalysis otherAnalysis;
+  @XmlElement(name = "implicitReference", namespace = CaseLawLdml.AKN_NS)
+  private List<ImplicitReference> implicitReferences;
 }

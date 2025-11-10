@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Judg
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Motivation;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Opinion;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.ImplicitReference;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DokumentTyp;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumentationsstelle;
@@ -24,7 +25,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationEx
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
+import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
@@ -79,6 +83,96 @@ public abstract class DecisionCommonLdmlTransformer
   protected abstract Header buildHeader(Decision decision);
 
   protected abstract Meta buildMeta(Decision decision);
+
+  protected List<ImplicitReference> buildImplicitReferences(Decision decision) {
+    List<ImplicitReference> implicitReferences = new ArrayList<>();
+
+    // Vorgehende Entscheidungen
+    var previousDecisions = decision.previousDecisions();
+    if (previousDecisions != null) {
+      for (PreviousDecision previousDecision : previousDecisions) {
+        if (previousDecision == null) continue;
+
+        var vorgehendBuilder = ImplicitReference.Vorgehend.builder();
+        buildCaselawReference(previousDecision, vorgehendBuilder);
+        implicitReferences.add(
+            ImplicitReference.builder().vorgehend(vorgehendBuilder.build()).build());
+      }
+    }
+
+    // Nachgehende Entscheidungen
+    var ensuingDecisions = decision.ensuingDecisions();
+    if (ensuingDecisions != null) {
+      for (EnsuingDecision ensuingDecision : ensuingDecisions) {
+        if (ensuingDecision == null) continue;
+
+        var nachgehendBuilder = ImplicitReference.Nachgehend.builder();
+        buildCaselawReference(ensuingDecision, nachgehendBuilder);
+
+        if (isNotBlank(ensuingDecision.getNote())) {
+          nachgehendBuilder.vermerk(
+              ImplicitReference.Vermerk.builder().value(ensuingDecision.getNote()).build());
+        }
+
+        nachgehendBuilder.art(
+            ensuingDecision.isPending()
+                ? ImplicitReference.ArtDerNachgehendenEntscheidung.ANHAENGIG
+                : ImplicitReference.ArtDerNachgehendenEntscheidung.NACHGEHEND);
+
+        implicitReferences.add(
+            ImplicitReference.builder().nachgehend(nachgehendBuilder.build()).build());
+      }
+    }
+
+    return implicitReferences;
+  }
+
+  private void buildCaselawReference(
+      RelatedDocumentationUnit relatedDocUnit,
+      ImplicitReference.CaselawReference.CaselawReferenceBuilder<
+              ?, ? extends ImplicitReference.CaselawReference.CaselawReferenceBuilder<?, ?>>
+          builder) {
+    if (relatedDocUnit.getDocumentType() != null
+        && isNotBlank(relatedDocUnit.getDocumentType().label())) {
+      builder.dokumentTyp(
+          DokumentTyp.builder().eId(null).value(relatedDocUnit.getDocumentType().label()).build());
+    }
+    if (relatedDocUnit.getDecisionDate() != null) {
+      builder.datum(
+          ImplicitReference.Datum.builder()
+              .value(
+                  de.bund.digitalservice.ris.caselaw.adapter.DateUtils.toDateString(
+                      relatedDocUnit.getDecisionDate()))
+              .build());
+    }
+    if (isNotBlank(relatedDocUnit.getDocumentNumber())) {
+      builder.dokumentNummer(
+          ImplicitReference.DokumentNummer.builder()
+              .value(relatedDocUnit.getDocumentNumber())
+              .build());
+    }
+    if (isNotBlank(relatedDocUnit.getFileNumber())) {
+      builder.aktenzeichen(
+          AktenzeichenListe.Aktenzeichen.builder().value(relatedDocUnit.getFileNumber()).build());
+    }
+    if (relatedDocUnit.getCourt() != null) {
+      Gericht.GerichtBuilder gerichtBuilder =
+          Gericht.builder()
+              // FIXME: Does this really make sense here? (It does not refer to the decision's
+              // court, which has eId #court)
+              .refersTo("#gericht");
+      if (isNotBlank(relatedDocUnit.getCourt().type())) {
+        gerichtBuilder.typ(
+            Gericht.GerichtTyp.builder().value(relatedDocUnit.getCourt().type()).build());
+      }
+      if (isNotBlank(relatedDocUnit.getCourt().location())) {
+        gerichtBuilder.ort(
+            Gericht.GerichtOrt.builder().value(relatedDocUnit.getCourt().location()).build());
+      }
+
+      builder.gericht(gerichtBuilder.build());
+    }
+  }
 
   @SuppressWarnings("java:S3776")
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(Decision decision) {

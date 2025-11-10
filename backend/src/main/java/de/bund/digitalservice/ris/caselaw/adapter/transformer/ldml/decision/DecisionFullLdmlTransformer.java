@@ -14,7 +14,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Analysis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.DokumentarischeKurztexte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Entscheidungsnamen;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.ImplicitReference;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.OtherAnalysis;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.OtherReferences;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrLanguage;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDaten;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDokumentnummern;
@@ -302,6 +304,13 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     if (otherAnalysis != null) {
       hasAnalysisData = true;
       builder.otherAnalysis(otherAnalysis);
+    }
+
+    List<ImplicitReference> implicitReferences = buildImplicitReferences(decision);
+    if (implicitReferences != null && !implicitReferences.isEmpty()) {
+      hasAnalysisData = true;
+      builder.otherReferences(
+          OtherReferences.builder().implicitReferences(implicitReferences).build());
     }
 
     if (hasAnalysisData) {
