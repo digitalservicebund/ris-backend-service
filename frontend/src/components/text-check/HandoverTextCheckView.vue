@@ -30,13 +30,13 @@ const router = useRouter()
 const textCategories = ref<string[] | undefined>()
 
 async function navigateToTextCheckSummaryInCategories(kind: Kind) {
-  const routerName =
+  const routeName =
     kind == Kind.PENDING_PROCEEDING
       ? "caselaw-pending-proceeding-documentNumber-categories"
       : "caselaw-documentUnit-documentNumber-categories"
 
   await router.push({
-    name: routerName,
+    name: routeName,
     params: {
       documentNumber: props.documentNumber,
     },
