@@ -57,9 +57,7 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     }
 
     for (const keyAsString in decision.longTexts) {
-      if (
-        Object.prototype.hasOwnProperty.call(decision.longTexts, keyAsString)
-      ) {
+      if (Object.hasOwn(decision.longTexts, keyAsString)) {
         const key = keyAsString as keyof LongTexts
         const value = decision.longTexts[key]
 
@@ -76,21 +74,6 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     return decision
   }
 
-  type StructuredCloneFn = <T>(v: T) => T
-  function safeStructuredClone<T>(obj: T): T {
-    const sc = (
-      globalThis as unknown as { structuredClone?: StructuredCloneFn }
-    ).structuredClone
-    if (typeof sc === "function") {
-      try {
-        return sc(obj) as T
-      } catch {
-        /* fallback below */
-      }
-    }
-    return JSON.parse(JSON.stringify(obj)) as T
-  }
-
   // prettier-ignore
   async function updateDocumentUnit(): Promise< // NOSONAR: needs definitely refactoring
         ServiceResponse<RisJsonPatch | FailedValidationServerResponse>
@@ -103,7 +86,7 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
             }
         }
 
-        const currentDocument = safeStructuredClone(toRaw(documentUnit.value))
+        const currentDocument = structuredClone(toRaw(documentUnit.value))
         if (isDecision(currentDocument as DocumentationUnit)) {
           sanitizeLongTextFields(currentDocument as Decision)
         }
