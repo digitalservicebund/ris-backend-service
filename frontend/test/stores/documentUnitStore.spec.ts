@@ -17,7 +17,47 @@ describe("useDocumentUnitStore", () => {
     vi.resetAllMocks()
   })
 
-  describe("removeTextCheckTags", () => {})
+  describe("remove TextCheck tags from given text", () => {
+    it("removes text-check tags from text", async () => {
+      // given
+      const mockDocumentUnit = new Decision("123", { version: 1 })
+      const mockOriginalDocumentUnit = new Decision("123", { version: 1 })
+      mockOriginalDocumentUnit.longTexts = {
+        tenor: "<p>Dies ist ein Beispielfall für Textprüfungs-Tags.</p>",
+      }
+      mockDocumentUnit.longTexts = {
+        tenor:
+          "<p>Dies ist ein <text-check id='1'>Beispielfall</text-check> für Textprüfungs-Tags.</p>",
+      }
+
+      const mockedUpdateResponse: ServiceResponse<RisJsonPatch> = {
+        status: 200,
+        data: {
+          documentationUnitVersion: 1,
+          patch: [],
+          errorPaths: [],
+        },
+        error: undefined,
+      }
+
+      const documentUnitServiceUpdateMock = vi
+        .spyOn(documentUnitService, "update")
+        .mockResolvedValueOnce(mockedUpdateResponse)
+
+      const store = useDocumentUnitStore()
+
+      store.originalDocumentUnit = mockOriginalDocumentUnit
+      store.documentUnit = mockDocumentUnit
+
+      // when
+      const response = await store.updateDocumentUnit()
+
+      // then
+      expect(documentUnitServiceUpdateMock).toHaveBeenCalledOnce()
+      expect(response).toEqual(mockedUpdateResponse)
+      expect(store.documentUnit?.version).toBe(1)
+    })
+  })
 
   describe("loadDocumentUnit", () => {
     it("loads a document unit successfully", async () => {
