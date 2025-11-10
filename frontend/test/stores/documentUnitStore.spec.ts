@@ -17,6 +17,8 @@ describe("useDocumentUnitStore", () => {
     vi.resetAllMocks()
   })
 
+  describe("removeTextCheckTags", () => {})
+
   describe("loadDocumentUnit", () => {
     it("loads a document unit successfully", async () => {
       const mockDocumentUnit = new Decision("123", { version: 1 })

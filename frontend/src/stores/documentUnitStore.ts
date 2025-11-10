@@ -86,6 +86,8 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
             }
         }
 
+        // TODO: We need to sanitize every relevant text field for text-check tags
+        // for now only long text as this is specified in the ticket.
         const currentDocument = structuredClone(toRaw(documentUnit.value))
         if (isDecision(currentDocument as DocumentationUnit)) {
           sanitizeLongTextFields(currentDocument as Decision)
