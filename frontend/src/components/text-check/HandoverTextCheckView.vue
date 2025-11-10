@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import Button from "primevue/button"
 import { onBeforeMount, ref } from "vue"
+import { useRouter } from "vue-router"
 import { getCategoryLabel } from "./categoryLabels"
 import InfoModal from "@/components/InfoModal.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import { Kind } from "@/domain/documentationUnitKind"
-import router from "@/router"
+// import router from "@/router"
 import { ResponseError } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -23,6 +24,8 @@ const responseError = ref<ResponseError | undefined>()
 const loading = ref(true)
 const totalTextCheckErrors = ref(0)
 const store = useDocumentUnitStore()
+
+const router = useRouter()
 
 const textCategories = ref<string[] | undefined>()
 

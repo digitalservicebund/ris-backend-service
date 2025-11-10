@@ -6,12 +6,12 @@ import { createRouter, createWebHistory } from "vue-router"
 import HandoverTextCheckView from "@/components/text-check/HandoverTextCheckView.vue"
 import { Kind } from "@/domain/documentationUnitKind"
 import errorMessages from "@/i18n/errors.json"
-import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
 import { TextCheckAllResponse } from "@/types/textCheck"
 import routes from "~/test-helper/routes"
 import { suggestions } from "~/test-helper/text-check-service-mock"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
 async function renderComponent(kind: Kind) {
   const user = userEvent.setup()
@@ -19,12 +19,12 @@ async function renderComponent(kind: Kind) {
     history: createWebHistory(),
     routes: routes,
   })
-  await flushPromises()
+
   return {
     user,
     ...render(HandoverTextCheckView, {
       global: {
-        plugins: [router, [createTestingPinia({})]],
+        plugins: [router, createTestingPinia({})],
       },
       props: {
         documentNumber: "TEST000011225",
@@ -32,21 +32,20 @@ async function renderComponent(kind: Kind) {
         kind,
       },
     }),
+    router,
   }
 }
 
 describe("text check handover", () => {
-  describe("for decisions", () => {
-    beforeEach(async () => {
-      vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-        status: 200,
-        data: true,
-      })
-    })
+  beforeEach(async () => {
+    useFeatureToggleServiceMock()
+  })
 
-    afterEach(() => {
-      vi.restoreAllMocks()
-    })
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  describe("for decisions", () => {
     it("displays links to categories when text mistakes are found", async () => {
       const expectedError = 494
       const enabledTextCheckCategories: Record<string, string> = {
@@ -72,7 +71,7 @@ describe("text check handover", () => {
         },
       } as ServiceResponse<TextCheckAllResponse>)
 
-      await renderComponent(Kind.DECISION)
+      const { user, router } = await renderComponent(Kind.DECISION)
 
       await flushPromises()
 
@@ -92,6 +91,15 @@ describe("text check handover", () => {
       expect(
         screen.queryByText(errorMessages.TEXT_CHECK_FAILED.title),
       ).not.toBeInTheDocument()
+
+      const button = screen.getByRole("button", { name: "Rubriken bearbeiten" })
+      expect(button).toBeVisible()
+
+      const routerSpy = vi.spyOn(router, "push")
+
+      await user.click(button)
+
+      expect(routerSpy).toHaveBeenCalledOnce()
     })
 
     it("displays success message when no text mistakes are found", async () => {
@@ -122,10 +130,7 @@ describe("text check handover", () => {
 
   describe("for pending proceedings", () => {
     beforeEach(async () => {
-      vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-        status: 200,
-        data: true,
-      })
+      useFeatureToggleServiceMock()
     })
 
     afterEach(() => {
@@ -148,7 +153,7 @@ describe("text check handover", () => {
         },
       } as ServiceResponse<TextCheckAllResponse>)
 
-      await renderComponent(Kind.PENDING_PROCEEDING)
+      const { user, router } = await renderComponent(Kind.PENDING_PROCEEDING)
 
       await flushPromises()
 
@@ -168,6 +173,14 @@ describe("text check handover", () => {
       expect(
         screen.queryByText(errorMessages.TEXT_CHECK_FAILED.title),
       ).not.toBeInTheDocument()
+
+      const routerSpy = vi.spyOn(router, "push")
+
+      const button = screen.getByRole("button", { name: "Rubriken bearbeiten" })
+
+      await user.click(button)
+
+      expect(routerSpy).toHaveBeenCalledOnce()
     })
 
     it("displays success message when no text mistakes are found", async () => {
@@ -194,5 +207,25 @@ describe("text check handover", () => {
         screen.getByText("Es wurden keine Rechtschreibfehler identifiziert."),
       ).toBeInTheDocument()
     })
+  })
+
+  it("error in text check service call shows error info modal", async () => {
+    vi.spyOn(languageToolService, "checkAll").mockResolvedValue({
+      status: 400,
+      error: {
+        title: "error title for text check service",
+        description: "error description for text check service",
+      },
+    } as ServiceResponse<TextCheckAllResponse>)
+
+    await renderComponent(Kind.PENDING_PROCEEDING)
+
+    await flushPromises()
+
+    expect(screen.getByText("error title for text check service")).toBeVisible()
+
+    expect(
+      screen.getByText("error description for text check service"),
+    ).toBeVisible()
   })
 })
