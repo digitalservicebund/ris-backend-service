@@ -4,6 +4,7 @@ import { API_PREFIX } from "./httpClient"
 import { ComboboxInputModelType, ComboboxItem } from "@/components/input/types"
 import { Page } from "@/components/Pagination.vue"
 import { CitationType } from "@/domain/citationType"
+import { CollectiveAgreementIndustry } from "@/domain/collectiveAgreementIndustry"
 import { Court } from "@/domain/court"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentType } from "@/domain/documentType"
@@ -30,6 +31,7 @@ enum Endpoint {
   documentationOffices = `documentationoffices`,
   languageCodes = `languagecodes`,
   usersForDocOffice = "users",
+  collectiveAgreementIndustries = "collective-agreement-industries",
 }
 
 function formatDropdownItems(
@@ -120,6 +122,12 @@ function formatDropdownItems(
         value: item,
       }))
     }
+    case Endpoint.collectiveAgreementIndustries: {
+      return (responseData as CollectiveAgreementIndustry[]).map((item) => ({
+        label: item.label,
+        value: item,
+      }))
+    }
   }
 }
 
@@ -180,6 +188,8 @@ type ComboboxItemService = {
 }
 
 const service: ComboboxItemService = {
+  getCollectiveAgreementIndustries: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.collectiveAgreementIndustries, filter),
   getCourts: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.courts, filter, 200),
   getCaselawDocumentTypes: (filter: Ref<string | undefined>) =>
