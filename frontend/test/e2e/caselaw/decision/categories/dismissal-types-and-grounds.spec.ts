@@ -54,9 +54,7 @@ test.describe(
       await page.getByRole("button", { name: "Kündigung" }).click()
 
       await test.step("enter dismissal type", async () => {
-        await page
-          .getByLabel("Kündigungsarten")
-          .fill("Betriebsbedingte Kündigung")
+        await page.locator("#dismissalTypes").fill("Betriebsbedingte Kündigung")
         await page.keyboard.press("Enter")
         await expect(
           page
@@ -67,13 +65,11 @@ test.describe(
 
       await test.step("enter dismissal ground", async () => {
         await page
-          .getByLabel("Kündigungsgründe")
+          .locator("#dismissalGrounds")
           .fill("Einführung neuer Technologien")
         await page.keyboard.press("Enter")
         await expect(
-          page
-            .getByTestId("chips-input-wrapper_dismissalGrounds")
-            .getByTestId("chip-value"),
+          page.getByRole("listitem").getByLabel("Eintrag bearbeiten"),
         ).toHaveText("Einführung neuer Technologien")
       })
       await save(page)

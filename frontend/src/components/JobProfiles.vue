@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { RisChipsInput } from "@digitalservicebund/ris-ui/components"
-import { computed } from "vue"
+import ChipsInput from "@/components/input/ChipsInput.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 defineProps<{
@@ -8,13 +7,6 @@ defineProps<{
 }>()
 
 const store = useDocumentUnitStore()
-
-const jobProfiles = computed({
-  get: () => store.documentUnit!.contentRelatedIndexing.jobProfiles ?? [],
-  set: (newValue) => {
-    store.documentUnit!.contentRelatedIndexing.jobProfiles = newValue
-  },
-})
 </script>
 
 <template>
@@ -22,9 +14,9 @@ const jobProfiles = computed({
     <div class="ris-label2-regular mb-4" data-testid="Berufsbild">
       {{ label }}
     </div>
-    <RisChipsInput
+    <ChipsInput
       id="jobProfiles"
-      v-model="jobProfiles"
+      v-model="store.documentUnit!.contentRelatedIndexing.jobProfiles"
       aria-label="Berufsbild"
     />
   </div>

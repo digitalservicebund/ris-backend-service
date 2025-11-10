@@ -1,18 +1,18 @@
 <script lang="ts" setup>
-import { RisChipsInput } from "@digitalservicebund/ris-ui/components"
 import { computed } from "vue"
+import ChipsInput from "@/components/input/ChipsInput.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const store = useDocumentUnitStore()
 
 const dismissalTypes = computed({
-  get: () => store.documentUnit!.contentRelatedIndexing.dismissalTypes ?? [],
+  get: () => store.documentUnit!.contentRelatedIndexing.dismissalTypes,
   set: (newValues) => {
     store.documentUnit!.contentRelatedIndexing.dismissalTypes = newValues
   },
 })
 const dismissalGrounds = computed({
-  get: () => store.documentUnit!.contentRelatedIndexing.dismissalGrounds ?? [],
+  get: () => store.documentUnit!.contentRelatedIndexing.dismissalGrounds,
   set: (newValues) => {
     store.documentUnit!.contentRelatedIndexing.dismissalGrounds = newValues
   },
@@ -25,7 +25,7 @@ const dismissalGrounds = computed({
       <div class="ris-label2-regular mb-4" data-testid="dismissal-types">
         Kündigungsarten
       </div>
-      <RisChipsInput
+      <ChipsInput
         id="dismissalTypes"
         v-model="dismissalTypes"
         aria-label="Kündigungsarten"
@@ -35,7 +35,7 @@ const dismissalGrounds = computed({
       <div class="ris-label2-regular mb-4" data-testid="dismissal-grounds">
         Kündigungsgründe
       </div>
-      <RisChipsInput
+      <ChipsInput
         id="dismissalGrounds"
         v-model="dismissalGrounds"
         aria-label="Kündigungsgründe"

@@ -84,10 +84,7 @@ test.describe(
       await addTwoJobProfiles(page)
 
       await test.step("delete first entry", async () => {
-        await page
-          .locator("[data-testid='chip']", { hasText: firstJobProfile })
-          .getByLabel("Löschen")
-          .click()
+        await removeFirstJobProfile(page)
       })
 
       await save(page)
@@ -104,9 +101,7 @@ test.describe(
       await addFirstJobProfile(page)
 
       await test.step("Enter second job profile", async () => {
-        await page
-          .getByLabel("Berufsbild", { exact: true })
-          .fill(secondJobProfile)
+        await page.locator("#jobProfiles").fill(secondJobProfile)
         await page.keyboard.press("Enter")
       })
 
@@ -115,9 +110,7 @@ test.describe(
 
     async function addFirstJobProfile(page: Page) {
       await test.step("enter job profile", async () => {
-        await page
-          .getByLabel("Berufsbild", { exact: true })
-          .fill(firstJobProfile)
+        await page.locator("#jobProfiles").fill(firstJobProfile)
         await page.keyboard.press("Enter")
         await expect(page.getByText(firstJobProfile)).toBeVisible()
         await save(page)
@@ -127,8 +120,9 @@ test.describe(
     async function removeFirstJobProfile(page: Page) {
       await test.step("remove job profile", async () => {
         await page
-          .locator("[data-testid='chip']", { hasText: firstJobProfile })
-          .getByLabel("Löschen")
+          .getByRole("listitem")
+          .filter({ hasText: firstJobProfile })
+          .getByLabel("Eintrag löschen")
           .click()
 
         await expect(page.getByText(firstJobProfile)).toBeHidden()

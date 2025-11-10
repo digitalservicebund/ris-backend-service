@@ -605,7 +605,7 @@ test.describe("core data", () => {
       })
 
       await test.step("Streitjahr ist bearbeitbar", async () => {
-        const yearsOfDispute = page.locator("#yearOfDispute")
+        const yearsOfDispute = page.locator("#yearsOfDispute")
         await expect(yearsOfDispute).toBeEditable()
       })
 

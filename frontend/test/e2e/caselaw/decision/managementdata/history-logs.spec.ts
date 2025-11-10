@@ -154,9 +154,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
     await test.step("Externe Person ändert Entscheidungsname", async () => {
       await navigateToCategories(pageWithExternalUser, documentNumber)
       await clickCategoryButton("Entscheidungsnamen", pageWithExternalUser)
-      await pageWithExternalUser
-        .getByLabel("Entscheidungsname")
-        .fill("ein Name")
+      await pageWithExternalUser.locator("#decisionNames").fill("ein Name")
       await save(pageWithExternalUser)
     })
 

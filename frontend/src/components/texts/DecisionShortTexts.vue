@@ -90,12 +90,16 @@ const otherHeadnote = computed({
         :label="shortTextLabels.decisionNames"
         :should-show-button="!decision?.shortTexts?.decisionNames?.length"
       >
-        <InputField id="fileNumber" :label="shortTextLabels.decisionNames">
+        <InputField
+          id="decisionNames"
+          v-slot="slotProps"
+          :label="shortTextLabels.decisionNames"
+        >
           <RisChipsInput
-            id="decisionNames"
             v-model="decisionNames"
             :aria-label="shortTextLabels.decisionNames"
             :data-testid="shortTextLabels.decisionNames"
+            :input-id="slotProps.id"
           />
         </InputField>
       </CategoryWrapper>

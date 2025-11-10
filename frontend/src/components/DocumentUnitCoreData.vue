@@ -502,7 +502,7 @@ onBeforeUnmount(() => {
         :validation-error="validationStore.getByField('yearsOfDispute')"
       >
         <ChipsYearInput
-          id="yearOfDispute"
+          :id="slotProps.id"
           v-model="coreDataModel.yearsOfDispute"
           aria-label="Streitjahr"
           :has-error="slotProps.hasError"

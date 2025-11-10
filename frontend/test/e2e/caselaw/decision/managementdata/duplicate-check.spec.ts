@@ -342,7 +342,7 @@ test.describe(
 async function setFileNumberToMatchDocUnit(page: Page, docUnit: Decision) {
   await test.step("Set fileNumber to match existing doc", async () => {
     await page
-      .getByLabel("Aktenzeichen", { exact: true })
+      .locator("#fileNumberInput")
       .fill(docUnit.coreData.fileNumbers?.[0] ?? "")
   })
 }
@@ -356,7 +356,7 @@ async function setDeviatingFileNumberToMatchDocUnit(
 
     await page
       // .getByTestId("chips-input_deviatingFileNumber")
-      .getByLabel("Abweichendes Aktenzeichen", { exact: true })
+      .locator("#deviatingFileNumber")
       .pressSequentially(docUnit.coreData.fileNumbers?.[0] ?? "")
     await page.keyboard.press("Enter")
   })
@@ -376,9 +376,7 @@ async function setDeviatingDecisionDateToMatchDocUnit(
   await test.step("Set deviating decisionDate to match existing doc", async () => {
     await page.getByLabel("Abweichendes Entscheidungsdatum anzeigen").click()
     const date = DateUtil.formatDate(docUnit.coreData.decisionDate)!
-    await page
-      .getByLabel("Abweichendes Entscheidungsdatum", { exact: true })
-      .pressSequentially(date)
+    await page.locator("#deviatingDecisionDate").pressSequentially(date)
     await page.keyboard.press("Enter")
   })
 }

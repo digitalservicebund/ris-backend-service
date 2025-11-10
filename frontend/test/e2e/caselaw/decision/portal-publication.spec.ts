@@ -2,10 +2,10 @@ import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   expectHistoryLogRow,
-  openInPortal,
   navigateToCategories,
   navigateToManagementData,
   navigateToPublication,
+  openInPortal,
   save,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
@@ -296,7 +296,7 @@ test.describe(
 
         await test.step("Anzeige wird nach dem Ausfüllen einer Rubrik geupdated", async () => {
           await page.getByLabel("Rubriken bearbeiten", { exact: true }).click()
-          await page.getByLabel("Aktenzeichen", { exact: true }).fill("abc")
+          await page.locator("#fileNumberInput").fill("abc")
           await page.keyboard.press("Enter")
           await save(page)
           await page.getByLabel("Veröffentlichen", { exact: true }).click()

@@ -22,12 +22,10 @@ test.describe("short and long texts", () => {
         category: DocumentUnitCategoriesEnum.TEXTS,
       })
 
-      const decisionNameInput = page.getByLabel("Entscheidungsnamen", {
-        exact: true,
-      })
-      const decisionNameChips = page.getByTestId(
-        "chips-input-wrapper_decisionNames",
-      )
+      const decisionNameInput = page.locator("#decisionNames")
+      const decisionNameChips = page
+        .getByRole("listitem")
+        .getByLabel("Eintrag bearbeiten")
 
       await test.step("multiple decision names can be added", async () => {
         await clickCategoryButton("Entscheidungsnamen", page)
@@ -64,7 +62,7 @@ test.describe("short and long texts", () => {
           category: DocumentUnitCategoriesEnum.TEXTS,
         })
         await decisionNameInput.click()
-        await page.keyboard.press("ArrowLeft")
+        await page.keyboard.press("Shift+Tab")
         await page.keyboard.press("Enter")
         await expect(decisionNameChips.getByText("Augenoptiker")).toBeHidden()
       })

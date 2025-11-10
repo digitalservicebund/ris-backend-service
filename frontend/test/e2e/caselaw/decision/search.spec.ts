@@ -2,14 +2,14 @@ import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import {
-  fillInput,
-  navigateToSearch,
   checkResultListContent,
-  openSearchWithFileNumberPrefix,
-  triggerSearch,
+  fillInput,
   fillSearchInput,
   navigateToCategories,
+  navigateToSearch,
+  openSearchWithFileNumberPrefix,
   save,
+  triggerSearch,
 } from "~/e2e/caselaw/utils/e2e-utils"
 import { noteContent } from "~/e2e/testdata"
 import { generateString } from "~/test-helper/dataGenerators"
@@ -727,9 +727,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
         }),
       ).toHaveValue("05.07.2022")
       await expect(
-        page
-          .getByTestId("chips-input-wrapper_fileNumber")
-          .getByTestId("chip-value"),
+        page.getByRole("listitem").getByLabel("Eintrag bearbeiten"),
       ).toHaveText(fileNumber)
     })
 

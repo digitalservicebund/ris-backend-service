@@ -169,9 +169,7 @@ test.describe(
 
         await test.step("Assigned external user can edit and save Entscheidungsnamen", async () => {
           await clickCategoryButton("Entscheidungsnamen", pageWithExternalUser)
-          await pageWithExternalUser
-            .getByLabel("Entscheidungsnamen")
-            .fill("ein Name")
+          await pageWithExternalUser.locator("#decisionNames").fill("ein Name")
           await save(pageWithExternalUser)
         })
 
@@ -179,7 +177,7 @@ test.describe(
 
         await test.step("Unassigned external user gets error when editing Entscheidungsname", async () => {
           await pageWithExternalUser
-            .getByLabel("Entscheidungsname")
+            .locator("#decisionNames")
             .fill("ein anderer Name")
           await pageWithExternalUser
             .getByLabel("Speichern Button", { exact: true })

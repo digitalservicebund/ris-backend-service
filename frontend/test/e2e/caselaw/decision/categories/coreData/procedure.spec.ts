@@ -57,9 +57,7 @@ test.describe("procedure", () => {
       // If deviating data is available, it is automatically expanded
       await expect(page.getByText("Vorgangshistorie")).toBeVisible()
       await expect(
-        page
-          .getByTestId("chips-input-wrapper_previousProcedures")
-          .getByText(newProcedure),
+        page.getByTestId("previous-procedures").getByText(newProcedure),
       ).toBeVisible()
     })
 

@@ -9,7 +9,7 @@ test.describe("info panel", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.getByLabel("Aktenzeichen", { exact: true }).fill("-firstChip")
+    await page.locator("#fileNumberInput").fill("-firstChip")
     await page.keyboard.press("Enter")
 
     await expect(
@@ -18,7 +18,7 @@ test.describe("info panel", () => {
         .getByText("-firstChip"),
     ).toBeVisible()
 
-    await page.getByLabel("Aktenzeichen", { exact: true }).fill("-secondChip")
+    await page.locator("#fileNumberInput").fill("-secondChip")
     await page.keyboard.press("Enter")
     await expect(
       page
@@ -28,9 +28,9 @@ test.describe("info panel", () => {
 
     // delete first chip
     await page
-      .locator("[data-testid='chip']", { hasText: "-firstChip" })
+      .getByRole("listitem", { name: "-firstChip" })
+      .getByLabel("Eintrag löschen")
       .click()
-    await page.keyboard.press("Enter")
     await expect(
       page
         .getByTestId("document-unit-info-panel-items")
