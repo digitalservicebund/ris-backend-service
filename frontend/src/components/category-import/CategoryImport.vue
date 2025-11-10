@@ -531,7 +531,10 @@ function importAppeal() {
     const source = sourceDocumentUnit.value?.contentRelatedIndexing.appeal
 
     if (targetDocumentUnit.value) {
-      targetDocumentUnit.value.contentRelatedIndexing.appeal = source
+      targetDocumentUnit.value.contentRelatedIndexing.appeal = {
+        ...source,
+        id: undefined,
+      }
     }
   }
 }

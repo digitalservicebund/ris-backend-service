@@ -193,7 +193,7 @@ describe("CategoryImport", () => {
     })
   })
 
-  it("should import an object (Rechtsmittelzulassung) from content related indexing", async () => {
+  it("should import an object (Rechtsmittel) from content related indexing", async () => {
     const target = new Decision("uuid", {
       documentNumber: "XXRE123456789",
       kind: Kind.DECISION,
@@ -203,6 +203,7 @@ describe("CategoryImport", () => {
       documentNumber: "TARGET3456789",
       contentRelatedIndexing: {
         appeal: {
+          id: "id123",
           appellants: [{ id: "1", value: "Kläger" }],
           revisionDefendantStatuses: [],
           revisionPlaintiffStatuses: [],
@@ -235,6 +236,7 @@ describe("CategoryImport", () => {
     await fireEvent.click(screen.getByLabelText("Rechtsmittel übernehmen"))
 
     expect(store.documentUnit?.contentRelatedIndexing.appeal).toEqual({
+      id: undefined,
       appellants: [{ id: "1", value: "Kläger" }],
       revisionDefendantStatuses: [],
       revisionPlaintiffStatuses: [],
