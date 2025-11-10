@@ -1,13 +1,62 @@
-import * as Sentry from "@sentry/vue"
+import { ResolvedPos, Node } from "prosemirror-model"
 import { EditorState, Plugin, PluginKey, Transaction } from "prosemirror-state"
-import { ReplaceStep, Step } from "prosemirror-transform"
+import { ReplaceStep } from "prosemirror-transform"
 import { IgnoreOnceTagName } from "./ignoreOnceMark"
 import { TextCheckTagName } from "@/types/textCheck"
 
-// Plugin to remove HTML tags, Marks in ProseMirror lingo, from text
-// that is being edited.
-
 const removeTagsOnTypingKey = new PluginKey("removeTagsOnTyping")
+
+// Prüft, ob ein Node die TextCheck-Markierung enthält.
+function hasTextCheckMark(node: Node, state: EditorState): boolean {
+  if (!node || !node.isText) return false
+  const textCheckMark = state.schema.marks[TextCheckTagName]
+  return !!textCheckMark?.isInSet(node.marks)
+}
+
+/**
+ * Führt eine einfache Wortgrenzen-Suche durch und bestimmt den betroffenen Textbereich im ALTEN Dokument.
+ * Dies ist notwendig, um zu verhindern, dass bei jedem Tastendruck der gesamte Parent-Block (z.B. Absatz)
+ * nach Tags gescannt werden muss, was die Performance negativ beeinflussen würde.
+ * * @param $pos Die aufgelöste Position (ResolvedPos) im ALTEN Dokument.
+ * @returns { start: number, end: number } Die absoluten Grenzen des betroffenen Textbereichs im alten Dokument.
+ */
+function findAffectedRangeInOldDoc($pos: ResolvedPos): {
+  start: number
+  end: number
+} {
+  // Starten an der aktuellen Position des Steps
+  let wordStart = $pos.pos
+  let wordEnd = $pos.pos
+
+  // Wir suchen die Grenzen innerhalb des direkten Eltern-Blocks (z.B. Paragraph), da Markierungen
+  // oft über das aktuelle Wort hinausgehen könnten.
+  const parentStart = $pos.start() // Startposition des Eltern-Blocks
+  const parentEnd = $pos.end() // Endposition des Eltern-Blocks
+
+  // Vereinfachte Wortgrenzen-Suche: Wir suchen nach links und rechts nach Leerzeichen.
+  // Das ist robuster als nur den unmittelbaren Textknoten zu betrachten.
+
+  // Suche nach links (bis zum Leerzeichen oder Blockanfang)
+  while (wordStart > parentStart) {
+    // textBetween ist besser für die Zeichenprüfung
+    const char = $pos.doc.textBetween(wordStart - 1, wordStart, " ")
+    if (/\s/.test(char)) {
+      break
+    }
+    wordStart--
+  }
+
+  // Suche nach rechts (bis zum Leerzeichen oder Blockende)
+  while (wordEnd < parentEnd) {
+    const char = $pos.doc.textBetween(wordEnd, wordEnd + 1, " ")
+    if (/\s/.test(char)) {
+      break
+    }
+    wordEnd++
+  }
+
+  return { start: wordStart, end: wordEnd }
+}
 
 const removeTagsOnTypingPlugin = new Plugin({
   key: removeTagsOnTypingKey,
@@ -16,93 +65,93 @@ const removeTagsOnTypingPlugin = new Plugin({
     oldState: EditorState,
     newState: EditorState,
   ) => {
-    if (transactions.length > 1) {
-      Sentry.captureMessage(
-        "removeTagsOnTypingPlugin: Multiple transactions detected, skipping tag removal.",
-        "info",
-      )
+    // Grundlegende Filterung: nur Änderungen eines einzelnen Textbereichs durch eine Tasten- oder Mauseingabe soll beachtet werden.
+    // Das Plugin sollte komplexere Operationen überspringen.
+    if (
+      transactions.length !== 1 ||
+      transactions[0].steps.length !== 1 ||
+      !(transactions[0].steps[0] instanceof ReplaceStep)
+    ) {
+      return null
+    }
+    // Eine Transaktion ist die logische Einheit einer Zustandsänderung im ProseMirror-Editor von oldState zu newState.
+    // Sie kann eine oder mehrere atomare Änderungen umfassen, die der Benutzer oder ein Befehl als einen einzigen Vorgang betrachtet.
+    // Zum Beispiel: Text mit fetter Formatierung kopieren und einfügen.
+    const transaction = transactions[0]
+    // Ein Step ist die atomare Einheit einer Zustandsänderung. Er definiert die kleinstmögliche, unteilbare Änderung am Dokument.
+    // Für das Beispiel mit fetter Formatierung:
+    // - Step 1 (ReplaceStep): Fügt den reinen Text ein.
+    // - Step 2 (AddMarkStep): Fügt die fette Markierung (Bold Mark) über den eingefügten Text hinzu
+    const step = transaction.steps[0] as ReplaceStep
+
+    // Filterung von History (Undo/Redo)
+    if (transaction.getMeta("history$")) return null
+    // Filterung von Cursorbewegungen und Klicks
+    if (!transaction.docChanged) return null
+
+    // Der Inhalt, der im oldState als geändert markiert wurde
+    const deletedSize = step.to - step.from
+    // Der Inhalt, der in den newState eingefügt wird
+    const insertedSize = step.slice.size
+
+    // Reines Löschen (z.B. Backspace): Hier wird Inhalt entfernt, und nichts wird eingefügt (slice ist leer): deletedSize > 0 & insertedSize = 0.
+    // Reines Tippen (Einfügen): Hier wird ein Bereich der Länge Null (step.from = step.to) entfernt und Inhalt eingefügt: deletedSize = 0 & insertedSize > 0.
+    // Ersetzen (Selektion + Paste): Hier wird der markierte Bereich entfernt und der neue Inhalt eingefügt: deletedSize > 0 & insertedSize > 0
+
+    // Nur fortfahren, wenn tatsächlich Inhalt hinzugefügt oder gelöscht wurde
+    if (deletedSize === 0 && insertedSize === 0) return null
+
+    // Position im ALTEN Zustand auflösen (ResolvedPos)
+    const $oldPos = oldState.doc.resolve(step.from)
+
+    // Bestimmung des betroffenen Textknoten, basierend auf der Art der Änderung (deletedSize vs. insertedSize) und der Cursorposition ($oldPos.textOffset)
+    let affectedNode: Node | null = null
+
+    if (deletedSize > 0) {
+      // Bei Löschung: Das ist fast immer der Knoten VOR der Position
+      affectedNode = $oldPos.nodeBefore
+    } else if (insertedSize > 0) {
+      // Wenn Inhalt eingefügt wird (Tippen), bestimmen wir den betroffenen Textknoten (im oldState) wie folgt:
+      // 1. $oldPos.textOffset > 0: Wir sind IN einem Textknoten (normales Tippen). Der Textknoten VOR der Position ($oldPos.nodeBefore) ist der sicherste Träger der ursprünglichen Tags.
+      // 2. $oldPos.textOffset === 0: Wir sind ZWISCHEN zwei Knoten (z.B. nach einem Leerzeichen oder Inline-Element). ProseMirror versucht angrenzende (neue) Textknoten mit dem NACHFOLGENDEN Knoten ($oldPos.nodeAfter) denselben Markierungen automatisch zu verschmelzen oder ihn dort zu erzeugen, daher wird dieser geprüft.
+      affectedNode =
+        $oldPos.textOffset > 0 ? $oldPos.nodeBefore : $oldPos.nodeAfter
+    }
+
+    // Prüfung: Hat der betroffene Node überhaupt TextCheck-Tags?
+    // Wir brechen ab, wenn der gefundene Knoten kein Textknoten ist oder keine Tags hat.
+    if (
+      !affectedNode ||
+      !affectedNode.isText ||
+      !hasTextCheckMark(affectedNode, oldState)
+    ) {
       return null
     }
 
-    if (!isDocumentChanged(transactions, oldState, newState)) {
-      return null
-    }
+    // Bestimmung des zu bereinigenden Bereichs im ALTEN Zustand (Wortgrenzen)
+    // Wir können nicht einfach die Start- und Endposition des affectedNode (affectedNode.nodeSize) nehmen, weil die Tags über die Grenzen
+    // des einzelnen Textknotens hinausreichen, der bei der Bearbeitung entsteht.
+    const { start: oldStart, end: oldEnd } = findAffectedRangeInOldDoc($oldPos)
 
-    if (!hasTextCheckMarksInDocument(newState)) {
-      return null
-    }
+    // Mappe die Positionen auf den NEUEN Zustand
+    // Verwendet das Mapping-System von ProseMirror, um die im alten Dokument gefundenen Wortgrenzen (oldStart, oldEnd) in die korrekten
+    // absoluten Positionen im neuen Dokument (newState.doc) zu übersetzen.
+    // Die Methode .map macht folgendes:
+    // - Sie nimmt eine Position aus dem alten Zustand (oldStart oder oldEnd).
+    // - Sie durchläuft alle Steps in der Transaktion und deren Positionsverschiebungen.
+    // - Sie gibt die korrespondierende Position im neuen Zustand zurück (newFrom oder newTo).
+    const newFrom = transaction.mapping.map(oldStart)
+    const newTo = transaction.mapping.map(oldEnd)
 
     let modified = false
     const newStateTransaction = newState.tr
 
-    transactions.forEach((transaction) => {
-      // If transaction has multiple steps,
-      // likely some kind of a bulk operation
-      // so skip processing.
-      if (transaction.steps.length > 1 || transaction.steps.length === 0) {
-        return
-      }
-
-      let { realFrom, realTo } = findCorrectPosition(transaction.steps[0])
-      const { specialCase } = findCorrectPosition(transaction.steps[0])
-      if (specialCase) {
-        return
-      }
-
-      // Safety check -------------------------------------------
-      // When using backspace on the last row with no characters,
-      // then realFrom and realTo can be out of bounds and their
-      // use in fetching a node will cause error and prevent a
-      // deletion or in this case row deletion.
-      if (realFrom === 0 && realTo === 0) {
-        return
-      } else if (
-        realFrom === newState.doc.content.size - 1 &&
-        newState.doc.content.size === realTo
-      ) {
-        // Last character deletion is a tricky case
-        // because even though realFrom and realTo are valid and in range,
-        // they find a node before last that is not a text node.
-        // So I am forcing the position to be before last character
-        // because then I find the last text node correctly.
-        Sentry.captureMessage(
-          `removeTagsOnTypingPlugin: Last character deletion case handled. realFrom=${realFrom}, realTo=${realTo}, docSize=${newState.doc.content.size}`,
-          "info",
-        )
-        realFrom = newState.doc.content.size - 2
-        realTo = realFrom
-      } else if (
-        newState.doc.content.size >= realFrom &&
-        newState.doc.content.size >= realTo
-      ) {
-        // Normal case
-      } else if (
-        newState.doc.content.size >= realFrom &&
-        newState.doc.content.size <= realTo
-      ) {
-        // From is in the new document but to is not anymore.
-        Sentry.captureMessage(
-          `removeTagsOnTypingPlugin: realTo greater than doc size, setting to realFrom. realFrom=${realFrom}, realTo=${realTo}, docSize=${newState.doc.content.size}`,
-          "info",
-        )
-        realTo = realFrom
-      } else if (
-        newState.doc.content.size <= realFrom &&
-        newState.doc.content.size >= realTo
-      ) {
-        // To is in the new document but from is not anymore.
-        Sentry.captureMessage(
-          `removeTagsOnTypingPlugin: realFrom greater than doc size, setting to realTo. realFrom=${realFrom}, realTo=${realTo}, docSize=${newState.doc.content.size}`,
-          "info",
-        )
-        realFrom = realTo
-      } else {
-        // Both from and to are out of bounds, skip.
-        return
-      }
-
-      newState.doc.nodesBetween(realFrom, realTo, (node, pos) => {
-        if (node && node.isText && node.text !== " ") {
+    // Markierungen im NEUEN Zustand über den gemappten Bereich entfernen
+    if (newFrom >= 0 && newTo <= newState.doc.content.size && newFrom < newTo) {
+      newState.doc.nodesBetween(newFrom, newTo, (node, pos) => {
+        // Nur Textknoten mit tatsächlichem Inhalt verarbeiten
+        if (node && node.isText && node.text && node.text.trim() !== "") {
+          // Entferne beide Markierungen
           newStateTransaction.removeMark(
             pos,
             pos + node.nodeSize,
@@ -116,89 +165,10 @@ const removeTagsOnTypingPlugin = new Plugin({
           modified = true
         }
       })
-    })
-
-    Sentry.captureMessage(
-      `removeTagsOnTypingPlugin: Processing completed. modified=${modified} applying transaction steps=${newStateTransaction.steps.length}`,
-      "info",
-    )
+    }
 
     return modified ? newStateTransaction : null
   },
 })
-
-function findCorrectPosition(step: Step): {
-  realFrom: number
-  realTo: number
-  specialCase: boolean
-} {
-  if (!(step instanceof ReplaceStep)) {
-    return { realFrom: 0, realTo: 0, specialCase: false }
-  }
-
-  const stepFrom = step.from
-  const stepTo = step.to
-  const deletedSize = stepTo - stepFrom
-  const insertedSize = step.slice.size
-  let specialCase = false
-
-  let realFrom = stepFrom
-  let realTo = 0
-  if (deletedSize === 0 && insertedSize > 0) {
-    // Insertion
-    realTo = stepFrom + insertedSize
-  } else if (deletedSize > 0 && insertedSize === 0) {
-    // Deletion
-    realTo = stepTo
-  } else if (deletedSize > 0 && insertedSize > 0 && realFrom !== 0) {
-    // Weird case of deletion + insertion
-    // Happens when replacing a selection
-    // that spans more words/nodes
-    // Why realFrom !== 0? Because when replacing from 0,
-    // it means we probably/hopefully ran language check
-    // and whole content is replaced.
-    // In that case we just want to skip processing.
-    // specialCase = true means later we don't do anything.
-    realFrom = stepFrom // + (deletedSize - insertedSize)
-    realTo = stepTo // - (deletedSize - insertedSize)
-    specialCase = true
-  } else {
-    // Replacement
-    realTo = stepTo + insertedSize
-  }
-  return { realFrom, realTo, specialCase }
-}
-
-function isDocumentChanged(
-  transactions: readonly Transaction[],
-  oldState: EditorState,
-  newState: EditorState,
-): boolean {
-  const isChanged = transactions.some((transaction) => transaction.docChanged)
-
-  const sizeDiff = Math.abs(
-    newState.doc.content.size - oldState.doc.content.size,
-  )
-
-  return isChanged || sizeDiff > 0
-}
-
-function hasTextCheckMarksInDocument(state: EditorState): boolean {
-  const textCheckMark = state.schema.marks[TextCheckTagName]
-
-  let hasCustomMarks = false
-
-  state.doc.descendants((node) => {
-    if (node.isText) {
-      const hasTextCheck = textCheckMark?.isInSet(node.marks)
-
-      if (hasTextCheck) {
-        hasCustomMarks = true
-      }
-    }
-  })
-
-  return hasCustomMarks
-}
 
 export { removeTagsOnTypingPlugin }
