@@ -267,6 +267,16 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @JdbcType(PostgreSQLEnumJdbcType.class)
   private AppealAdmitter appealAdmittedBy;
 
+  /** Herkunft der Übersetzung */
+  @OneToMany(
+      mappedBy = "decision",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true)
+  @OrderBy("rank")
+  @Builder.Default
+  private List<OriginOfTranslationDTO> originOfTranslations = new ArrayList<>();
+
   @Override
   @SuppressWarnings("java:S2097") // Class type check is not recognized by Sonar
   public final boolean equals(Object o) {
