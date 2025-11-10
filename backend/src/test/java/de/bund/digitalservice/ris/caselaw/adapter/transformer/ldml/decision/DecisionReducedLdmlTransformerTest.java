@@ -409,39 +409,57 @@ class DecisionReducedLdmlTransformerTest {
         Arguments.of(
             "'previousDecisions' (Vorgehende Entscheidungen)",
             """
-                      <ris:previousDecisions>
-                          <ris:previousDecision date="2020-01-01">
-                             <ris:documentNumber>previous decision document number
-         1</ris:documentNumber>
-                             <ris:fileNumber>previous decision file number</ris:fileNumber>
-                             <ris:courtType>previous decision court type</ris:courtType>
-                          </ris:previousDecision>
-                          <ris:previousDecision date="2020-01-01">
-                             <ris:documentNumber>previous decision document number
-         2</ris:documentNumber>
-                             <ris:fileNumber>previous decision file number</ris:fileNumber>
-                             <ris:courtType>previous decision court type</ris:courtType>
-                          </ris:previousDecision>
-                       </ris:previousDecisions>
+                 <akn:implicitReference ris:domainTerm="Rechtszug">
+                     <ris:vorgehend domainTerm="Vorgehende Entscheidung">
+                         <ris:dokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:dokumentTyp>
+                         <ris:datum domainTerm="Entscheidungsdatum">2020-01-01</ris:datum>
+                         <ris:dokumentNummer domainTerm="Dokumentnummer">previous decision document number 1</ris:dokumentNummer>
+                         <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
+                         <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+                             <ris:typ domainTerm="Gerichtstyp">previous decision court type</ris:typ>
+                             <ris:ort domainTerm="Gerichtsort">previous decision court location</ris:ort>
+                         </ris:gericht>
+                     </ris:vorgehend>
+                 </akn:implicitReference>
+                 <akn:implicitReference ris:domainTerm="Rechtszug">
+                     <ris:vorgehend domainTerm="Vorgehende Entscheidung">
+                         <ris:dokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:dokumentTyp>
+                         <ris:datum domainTerm="Entscheidungsdatum">2020-01-01</ris:datum>
+                         <ris:dokumentNummer domainTerm="Dokumentnummer">previous decision document number 2</ris:dokumentNummer>
+                         <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
+                         <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+                             <ris:typ domainTerm="Gerichtstyp">previous decision court type</ris:typ>
+                             <ris:ort domainTerm="Gerichtsort">previous decision court location</ris:ort>
+                         </ris:gericht>
+                     </ris:vorgehend>
+                 </akn:implicitReference>
                        """),
         // EnsuingDecisions -->
         Arguments.of(
             "'ensuingDecisions' (Nachgehende Entscheidungen)",
             """
-                      <ris:ensuingDecisions>
-                          <ris:ensuingDecision date="2022-10-01">
-                             <ris:documentNumber>ensuing decision document number
-         1</ris:documentNumber>
-                             <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                             <ris:courtType>ensuing decision court type</ris:courtType>
-                          </ris:ensuingDecision>
-                          <ris:ensuingDecision date="2022-10-01">
-                             <ris:documentNumber>previous decision document number
-         2</ris:documentNumber>
-                             <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                             <ris:courtType>ensuing decision court type</ris:courtType>
-                          </ris:ensuingDecision>
-                       </ris:ensuingDecisions>
+                <akn:implicitReference ris:domainTerm="Rechtszug">
+                    <ris:nachgehend domainTerm="Nachgehende Entscheidung" art="anhängig">
+                        <ris:dokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:dokumentTyp>
+                        <ris:datum domainTerm="Entscheidungsdatum">2022-10-01</ris:datum>
+                        <ris:dokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 1</ris:dokumentNummer>
+                        <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
+                        <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+                            <ris:typ domainTerm="Gerichtstyp">ensuing decision court type</ris:typ>
+                        </ris:gericht>
+                    </ris:nachgehend>
+                </akn:implicitReference>
+                <akn:implicitReference ris:domainTerm="Rechtszug">
+                    <ris:nachgehend domainTerm="Nachgehende Entscheidung" art="anhängig">
+                        <ris:dokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:dokumentTyp>
+                        <ris:datum domainTerm="Entscheidungsdatum">2022-10-01</ris:datum>
+                        <ris:dokumentNummer domainTerm="Dokumentnummer">previous decision document number 2</ris:dokumentNummer>
+                        <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
+                        <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+                            <ris:typ domainTerm="Gerichtstyp">ensuing decision court type</ris:typ>
+                        </ris:gericht>
+                    </ris:nachgehend>
+                </akn:implicitReference>
                       """),
         // LongTexts/Langtexte -->
         Arguments.of(
