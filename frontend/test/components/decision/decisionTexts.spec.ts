@@ -137,7 +137,7 @@ describe("Texts", () => {
         outline: "outline",
       },
     )
-    expect(screen.getByLabelText("Entscheidungsnamen")).toBeVisible()
+    expect(screen.getByTestId("Entscheidungsnamen")).toBeVisible()
     expect(screen.getByLabelText("Titelzeile Button Leiste")).toBeVisible()
     expect(screen.getByLabelText("Leitsatz Button Leiste")).toBeVisible()
     expect(

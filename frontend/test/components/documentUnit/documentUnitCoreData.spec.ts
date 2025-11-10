@@ -178,7 +178,7 @@ describe("Core Data", () => {
     })
 
     await screen.findByText("Streitjahr")
-    const input = screen.getByLabelText("Streitjahr")
+    const input = screen.getByTestId("year-of-dispute")
     await user.type(input, "2023{enter}")
 
     expect(model.value.yearsOfDispute).toEqual(["2023"])

@@ -92,14 +92,14 @@ const otherHeadnote = computed({
       >
         <InputField
           id="decisionNames"
-          v-slot="slotProps"
+          v-slot="{ id }"
           :label="shortTextLabels.decisionNames"
         >
           <RisChipsInput
             v-model="decisionNames"
             :aria-label="shortTextLabels.decisionNames"
             :data-testid="shortTextLabels.decisionNames"
-            :input-id="slotProps.id"
+            :input-id="id"
           />
         </InputField>
       </CategoryWrapper>
