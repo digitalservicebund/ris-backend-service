@@ -9,6 +9,7 @@ import { LdmlPreview } from "@/components/input/types"
 import PublicationActions from "@/components/publication/PublicationActions.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
+import { Kind } from "@/domain/documentationUnitKind"
 import PendingProceeding from "@/domain/pendingProceeding"
 import publishDocumentationUnitService from "@/services/publishDocumentationUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -53,6 +54,7 @@ onBeforeMount(async () => {
         v-if="textCheckAllToggle"
         :document-id="pendingProceeding!.uuid"
         :document-number="pendingProceeding!.documentNumber"
+        :kind="Kind.PENDING_PROCEEDING"
       />
       <div
         v-if="preview?.success && !!preview.ldml"
