@@ -237,5 +237,127 @@ test.describe(
         })
       },
     )
+
+    test(
+      "Rechtschreibprüfung liefert Fehler",
+      {
+        tag: ["@RISDEV-10103"],
+      },
+      async ({ page, prefilledDocumentUnit }) => {
+        const { promise: lock, resolve: releaseLock } =
+          Promise.withResolvers<void>()
+
+        const result = {
+          status: 200,
+          body: JSON.stringify({
+            categoryTypes: ["headline", "legalIssue", "resolutionNote"],
+            suggestions: [],
+            totalTextCheckErrors: 5,
+          }),
+        }
+        await page.route(
+          `**/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}/text-check/all`,
+          async (route) => {
+            await lock
+            await route.fulfill(result)
+          },
+        )
+
+        await test.step("Rechtschreibfehler werden auf Veröffentlichungsseite angezeigt", async () => {
+          await navigateToPublication(
+            page,
+            prefilledDocumentUnit.documentNumber,
+          )
+          const textcheck = page.getByLabel("Rechtschreibprüfung")
+
+          await expect(textcheck.getByLabel("Ladestatus")).toBeVisible()
+
+          releaseLock()
+
+          await expect(textcheck.getByLabel("Ladestatus")).toBeHidden()
+
+          await expect(
+            page.getByText("Es wurden Rechtschreibfehler identifiziert:"),
+          ).toBeVisible()
+
+          await expect(page.getByTestId("total-text-check-errors")).toHaveText(
+            "5",
+          )
+
+          await expect(
+            page.getByTestId("text-check-handover-link-headline"),
+          ).toHaveText("Titelzeile")
+
+          await expect(
+            page.getByTestId("text-check-handover-link-legalIssue"),
+          ).toHaveText("Rechtsfrage")
+
+          await expect(
+            page.getByTestId("text-check-handover-link-resolutionNote"),
+          ).toHaveText("Erledigungsvermerk")
+        })
+
+        await test.step("Veröffentlichung ist trotz Rechtschreibfehler möglich", async () => {
+          await page.getByRole("button", { name: "Veröffentlichen" }).click()
+
+          await expect(
+            page.getByTestId("portal-publication-status-badge"),
+          ).toHaveText("Veröffentlicht")
+        })
+      },
+    )
+
+    test(
+      "Rechtschreibprüfung liefert keine Fehler",
+      {
+        tag: ["@RISDEV-10103"],
+      },
+      async ({ page, prefilledDocumentUnit }) => {
+        const { promise: lock, resolve: releaseLock } =
+          Promise.withResolvers<void>()
+
+        const result = {
+          status: 200,
+          body: JSON.stringify({
+            categoryTypes: [],
+            suggestions: [],
+            totalTextCheckErrors: 0,
+          }),
+        }
+        await page.route(
+          `**/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}/text-check/all`,
+          async (route) => {
+            await lock
+            await route.fulfill(result)
+          },
+        )
+
+        await test.step("Rechtschreibfehler werden auf Veröffentlichungsseite angezeigt", async () => {
+          await navigateToPublication(
+            page,
+            prefilledDocumentUnit.documentNumber,
+          )
+          const textcheck = page.getByLabel("Rechtschreibprüfung")
+
+          await expect(textcheck.getByLabel("Ladestatus")).toBeVisible()
+
+          releaseLock()
+
+          await expect(textcheck.getByLabel("Ladestatus")).toBeHidden()
+
+          await expect(
+            page.getByText("Es wurden keine Rechtschreibfehler identifiziert."),
+          ).toBeVisible()
+        })
+
+        await test.step("Veröffentlichung ist möglich", async () => {
+          await page.getByRole("button", { name: "Veröffentlichen" }).click()
+
+          await expect(
+            page.getByTestId("portal-publication-status-badge"),
+          ).toHaveText("Veröffentlicht")
+        })
+      },
+    )
   },
 )
