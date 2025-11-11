@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslati
 import de.bund.digitalservice.ris.caselaw.domain.OriginOfTranslation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Utility class for transforming OriginOfTranslation objects between DTOs (Data Transfer Objects)
@@ -20,12 +21,13 @@ public class OriginOfTranslationTransformer {
   }
 
   /**
-   * Transforms a OriginOfTranslation domain object into it's database representation, a
+   * Transforms an OriginOfTranslation domain object into it's database representation, a
    * OriginOfTranslationDTO (Data Transfer Object).
    *
-   * @param currentDto
-   * @param originOfTranslation The source of the translation.
-   * @param index
+   * @param currentDto A database representation of the origin of translation to be transformed in
+   *     to a domain object.
+   * @param originOfTranslation The Origin of the translation.
+   * @param index position of the current origin of translation
    * @return A database representation of a domain object.
    */
   public static OriginOfTranslationDTO transformToDTO(
@@ -57,8 +59,8 @@ public class OriginOfTranslationTransformer {
         dto.setOriginOfTranslation(originOfTranslationDTO);
         translatorDTOs.add(dto);
       }
-      originOfTranslationDTO.setTranslators(translatorDTOs);
     }
+    originOfTranslationDTO.setTranslators(translatorDTOs);
 
     List<OriginOfTranslationBorderNumberDTO> borderNumberDTOS = new ArrayList<>();
     if (originOfTranslation.borderNumbers() != null
@@ -73,8 +75,8 @@ public class OriginOfTranslationTransformer {
                 .build();
         borderNumberDTOS.add(dto);
       }
-      originOfTranslationDTO.setBorderNumbers(borderNumberDTOS);
     }
+    originOfTranslationDTO.setBorderNumbers(borderNumberDTOS);
 
     List<OriginOfTranslationUrl> urlDTOS = new ArrayList<>();
     if (originOfTranslation.urls() != null && !originOfTranslation.urls().isEmpty()) {
@@ -89,8 +91,8 @@ public class OriginOfTranslationTransformer {
         dto.setOriginOfTranslation(originOfTranslationDTO);
         urlDTOS.add(dto);
       }
-      originOfTranslationDTO.setUrls(urlDTOS);
     }
+    originOfTranslationDTO.setUrls(urlDTOS);
 
     return originOfTranslationDTO;
   }
@@ -113,14 +115,17 @@ public class OriginOfTranslationTransformer {
         .languageCode(LanguageCodeTransformer.transformToDomain(dto.getLanguageCode()))
         .translationType(dto.getTranslationType())
         .translators(
-            dto.getTranslators().stream()
+            Optional.ofNullable(dto.getTranslators()).orElse(new ArrayList<>()).stream()
                 .map(OriginOfTranslationTranslatorDTO::getTranslatorName)
                 .toList())
         .borderNumbers(
-            dto.getBorderNumbers().stream()
+            Optional.ofNullable(dto.getBorderNumbers()).orElse(new ArrayList<>()).stream()
                 .map(OriginOfTranslationBorderNumberDTO::getBorderNumber)
                 .toList())
-        .urls(dto.getUrls().stream().map(OriginOfTranslationUrl::getUrl).toList())
+        .urls(
+            Optional.ofNullable(dto.getUrls()).orElse(new ArrayList<>()).stream()
+                .map(OriginOfTranslationUrl::getUrl)
+                .toList())
         .build();
   }
 }
