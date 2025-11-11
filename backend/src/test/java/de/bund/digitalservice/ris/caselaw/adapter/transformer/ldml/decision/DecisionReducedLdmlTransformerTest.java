@@ -415,7 +415,7 @@ class DecisionReducedLdmlTransformerTest {
                          <ris:datum domainTerm="Entscheidungsdatum">2020-01-01</ris:datum>
                          <ris:dokumentNummer domainTerm="Dokumentnummer">previous decision document number 1</ris:dokumentNummer>
                          <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
-                         <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+                         <ris:gericht domainTerm="Gericht">
                              <ris:typ domainTerm="Gerichtstyp">previous decision court type</ris:typ>
                              <ris:ort domainTerm="Gerichtsort">previous decision court location</ris:ort>
                          </ris:gericht>
@@ -427,7 +427,7 @@ class DecisionReducedLdmlTransformerTest {
                          <ris:datum domainTerm="Entscheidungsdatum">2020-01-01</ris:datum>
                          <ris:dokumentNummer domainTerm="Dokumentnummer">previous decision document number 2</ris:dokumentNummer>
                          <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
-                         <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+                         <ris:gericht domainTerm="Gericht">
                              <ris:typ domainTerm="Gerichtstyp">previous decision court type</ris:typ>
                              <ris:ort domainTerm="Gerichtsort">previous decision court location</ris:ort>
                          </ris:gericht>
@@ -444,7 +444,7 @@ class DecisionReducedLdmlTransformerTest {
                         <ris:datum domainTerm="Entscheidungsdatum">2022-10-01</ris:datum>
                         <ris:dokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 1</ris:dokumentNummer>
                         <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
-                        <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+                        <ris:gericht domainTerm="Gericht">
                             <ris:typ domainTerm="Gerichtstyp">ensuing decision court type</ris:typ>
                         </ris:gericht>
                     </ris:nachgehend>
@@ -455,7 +455,7 @@ class DecisionReducedLdmlTransformerTest {
                         <ris:datum domainTerm="Entscheidungsdatum">2022-10-01</ris:datum>
                         <ris:dokumentNummer domainTerm="Dokumentnummer">previous decision document number 2</ris:dokumentNummer>
                         <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
-                        <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+                        <ris:gericht domainTerm="Gericht">
                             <ris:typ domainTerm="Gerichtstyp">ensuing decision court type</ris:typ>
                         </ris:gericht>
                     </ris:nachgehend>

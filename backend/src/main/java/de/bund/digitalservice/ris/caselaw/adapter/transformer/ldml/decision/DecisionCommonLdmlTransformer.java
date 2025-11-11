@@ -158,7 +158,7 @@ public abstract class DecisionCommonLdmlTransformer
 
   @Nonnull
   private List<ImplicitReference> getNachgehendeEntscheidungen(Decision decision) {
-    List<ImplicitReference> implicitReferences2 = new ArrayList<>();
+    List<ImplicitReference> nachgehendeEntscheidungen = new ArrayList<>();
     var ensuingDecisions = decision.ensuingDecisions();
     if (ensuingDecisions != null) {
       for (EnsuingDecision ensuingDecision : ensuingDecisions) {
@@ -177,16 +177,16 @@ public abstract class DecisionCommonLdmlTransformer
                 ? ImplicitReference.ArtDerNachgehendenEntscheidung.ANHAENGIG
                 : ImplicitReference.ArtDerNachgehendenEntscheidung.NACHGEHEND);
 
-        implicitReferences2.add(
+        nachgehendeEntscheidungen.add(
             ImplicitReference.builder().nachgehend(nachgehendBuilder.build()).build());
       }
     }
-    return implicitReferences2;
+    return nachgehendeEntscheidungen;
   }
 
   @Nonnull
   private List<ImplicitReference> getVorgehendeEntscheidungen(Decision decision) {
-    List<ImplicitReference> implicitReferences = new ArrayList<>();
+    List<ImplicitReference> vorhergehendeEntscheidungen = new ArrayList<>();
     var previousDecisions = decision.previousDecisions();
     if (previousDecisions != null) {
       for (PreviousDecision previousDecision : previousDecisions) {
@@ -194,11 +194,11 @@ public abstract class DecisionCommonLdmlTransformer
 
         var vorgehendBuilder = ImplicitReference.Vorgehend.builder();
         buildCaselawReference(previousDecision, vorgehendBuilder);
-        implicitReferences.add(
+        vorhergehendeEntscheidungen.add(
             ImplicitReference.builder().vorgehend(vorgehendBuilder.build()).build());
       }
     }
-    return implicitReferences;
+    return vorhergehendeEntscheidungen;
   }
 
   private void buildCaselawReference(
@@ -230,11 +230,7 @@ public abstract class DecisionCommonLdmlTransformer
           AktenzeichenListe.Aktenzeichen.builder().value(relatedDocUnit.getFileNumber()).build());
     }
     if (relatedDocUnit.getCourt() != null) {
-      Gericht.GerichtBuilder gerichtBuilder =
-          Gericht.builder()
-              // FIXME: Does this really make sense here? (It does not refer to the decision's
-              // court, which has eId #court)
-              .refersTo("#gericht");
+      Gericht.GerichtBuilder gerichtBuilder = Gericht.builder();
       if (isNotBlank(relatedDocUnit.getCourt().type())) {
         gerichtBuilder.typ(
             Gericht.GerichtTyp.builder().value(relatedDocUnit.getCourt().type()).build());
