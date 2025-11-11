@@ -339,7 +339,7 @@
     |ris:spruchkoerper|ris:sachgebiete|ris:sachgebiet|ris:rechtskraft|ris:vorgaenge|ris:vorgang
     |ris:dokumentarischeKurztexte|ris:orientierungssatz|ris:sonstigerOrientierungssatz|ris:entscheidungsnamen|ris:entscheidungsname|ris:titelzeile
     |ris:eingangsarten|ris:eingangsart|ris:definitionen|ris:definition|ris:definierterBegriff|ris:definierendeRandnummer|ris:fremdsprachigeFassungen|ris:fremdsprachigeFassung|ris:evsf|ris:rechtsmittelzulassung|ris:rechtsmittelZugelassen|ris:rechtsmittelZugelassenDurch
-    |ris:documentNumber|ris:vorgehend|ris:nachgehend|ris:datum|ris:dokumentNummer|akn:otherReferences
+    |ris:documentNumber|ris:vorgehend|ris:nachgehend|ris:datum|ris:dokumentNummer|akn:otherReferences|ris:vermerk
     |ris:decisionNames|ris:decisionName
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@akn:refersTo|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
     |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId|@akn:eId|@type|@by|@domainTerm|@notation|@ris:domainTerm|@art">

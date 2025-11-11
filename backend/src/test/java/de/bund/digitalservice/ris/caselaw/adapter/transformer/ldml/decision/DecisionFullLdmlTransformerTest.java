@@ -738,8 +738,9 @@ class DecisionFullLdmlTransformerTest {
             .build();
     EnsuingDecision ensuingDecision2 =
         ensuingDecision1.toBuilder()
-            .documentNumber("previous decision document number 2")
+            .documentNumber("ensuing decision document number 2")
             .pending(true)
+            .note("ensuing decision note")
             .build();
 
     // Use empty DTO as basis as it creates empty lists for everything.

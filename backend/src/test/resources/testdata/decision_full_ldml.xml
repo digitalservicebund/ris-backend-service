@@ -75,11 +75,12 @@
                         <ris:nachgehend domainTerm="Nachgehende Entscheidung" art="anhängig">
                             <ris:dokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:dokumentTyp>
                             <ris:datum domainTerm="Entscheidungsdatum">2022-10-01</ris:datum>
-                            <ris:dokumentNummer domainTerm="Dokumentnummer">previous decision document number 2</ris:dokumentNummer>
+                     <ris:dokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 2</ris:dokumentNummer>
                             <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
                             <ris:gericht domainTerm="Gericht">
                                 <ris:typ domainTerm="Gerichtstyp">ensuing decision court type</ris:typ>
                             </ris:gericht>
+                     <ris:vermerk domainTerm="Vermerk">ensuing decision note</ris:vermerk>
                         </ris:nachgehend>
                     </akn:implicitReference>
                 </akn:otherReferences>
