@@ -18,6 +18,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Anal
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.DokumentarischeKurztexte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.ImplicitReference;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.OtherAnalysis;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.OtherReferences;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DokumentTyp;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumentationsstelle;
@@ -37,6 +38,8 @@ import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -89,10 +92,22 @@ public abstract class DecisionCommonLdmlTransformer
   @Nullable
   protected Analysis buildAnalysis(Decision decision) {
     OtherAnalysis otherAnalysis = buildOtherAnalysis(decision);
+    OtherReferences otherReferences = buildOtherReferences(decision);
 
-    Analysis analysis = Analysis.builder().otherAnalysis(otherAnalysis).build();
+    Analysis analysis =
+        Analysis.builder().otherAnalysis(otherAnalysis).otherReferences(otherReferences).build();
     if (!analysis.isEmpty()) {
       return analysis;
+    } else {
+      return null;
+    }
+  }
+
+  @Nullable
+  protected OtherReferences buildOtherReferences(Decision decision) {
+    List<ImplicitReference> implicitReferences = buildImplicitReferences(decision);
+    if (!implicitReferences.isEmpty()) {
+      return OtherReferences.builder().implicitReferences(implicitReferences).build();
     } else {
       return null;
     }
@@ -133,23 +148,17 @@ public abstract class DecisionCommonLdmlTransformer
 
   protected abstract Meta buildMeta(Decision decision);
 
+  @Nonnull
   protected List<ImplicitReference> buildImplicitReferences(Decision decision) {
-    List<ImplicitReference> implicitReferences = new ArrayList<>();
+    return Stream.concat(
+            getVorgehendeEntscheidungen(decision).stream(),
+            getNachgehendeEntscheidungen(decision).stream())
+        .toList();
+  }
 
-    // Vorgehende Entscheidungen
-    var previousDecisions = decision.previousDecisions();
-    if (previousDecisions != null) {
-      for (PreviousDecision previousDecision : previousDecisions) {
-        if (previousDecision == null) continue;
-
-        var vorgehendBuilder = ImplicitReference.Vorgehend.builder();
-        buildCaselawReference(previousDecision, vorgehendBuilder);
-        implicitReferences.add(
-            ImplicitReference.builder().vorgehend(vorgehendBuilder.build()).build());
-      }
-    }
-
-    // Nachgehende Entscheidungen
+  @Nonnull
+  private List<ImplicitReference> getNachgehendeEntscheidungen(Decision decision) {
+    List<ImplicitReference> implicitReferences2 = new ArrayList<>();
     var ensuingDecisions = decision.ensuingDecisions();
     if (ensuingDecisions != null) {
       for (EnsuingDecision ensuingDecision : ensuingDecisions) {
@@ -168,11 +177,27 @@ public abstract class DecisionCommonLdmlTransformer
                 ? ImplicitReference.ArtDerNachgehendenEntscheidung.ANHAENGIG
                 : ImplicitReference.ArtDerNachgehendenEntscheidung.NACHGEHEND);
 
-        implicitReferences.add(
+        implicitReferences2.add(
             ImplicitReference.builder().nachgehend(nachgehendBuilder.build()).build());
       }
     }
+    return implicitReferences2;
+  }
 
+  @Nonnull
+  private List<ImplicitReference> getVorgehendeEntscheidungen(Decision decision) {
+    List<ImplicitReference> implicitReferences = new ArrayList<>();
+    var previousDecisions = decision.previousDecisions();
+    if (previousDecisions != null) {
+      for (PreviousDecision previousDecision : previousDecisions) {
+        if (previousDecision == null) continue;
+
+        var vorgehendBuilder = ImplicitReference.Vorgehend.builder();
+        buildCaselawReference(previousDecision, vorgehendBuilder);
+        implicitReferences.add(
+            ImplicitReference.builder().vorgehend(vorgehendBuilder.build()).build());
+      }
+    }
     return implicitReferences;
   }
 
