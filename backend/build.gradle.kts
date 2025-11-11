@@ -18,8 +18,8 @@ plugins {
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
-    id("io.freefair.lombok") version "9.0.0"
-    id("org.flywaydb.flyway") version "11.15.0"
+    id("io.freefair.lombok") version "9.1.0"
+    id("org.flywaydb.flyway") version "11.16.0"
     id("io.sentry.jvm.gradle") version "5.12.2"
 }
 
@@ -180,7 +180,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.37.5"))
+    implementation(platform("software.amazon.awssdk:bom:2.38.2"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -215,8 +215,8 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.15.5")
-    implementation("io.micrometer:micrometer-core:1.15.5")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.16.0")
+    implementation("io.micrometer:micrometer-core:1.16.0")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
@@ -230,10 +230,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.2")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.15.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.16.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.15.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.16.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -241,7 +241,7 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.20.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.7.12")
+    testImplementation("io.projectreactor:reactor-test:3.8.0")
     testImplementation("org.springframework.security:spring-security-test:6.5.6")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")

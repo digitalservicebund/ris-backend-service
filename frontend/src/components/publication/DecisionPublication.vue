@@ -13,6 +13,7 @@ import HandoverTextCheckView from "@/components/text-check/HandoverTextCheckView
 import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { Decision } from "@/domain/decision"
+import { Kind } from "@/domain/documentationUnitKind"
 import { DuplicateRelationStatus } from "@/domain/managementData"
 import publishDocumentationUnitService from "@/services/publishDocumentationUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -92,6 +93,7 @@ onBeforeMount(async () => {
         v-if="textCheckAllToggle"
         :document-id="decision!.uuid"
         :document-number="decision!.documentNumber"
+        :kind="Kind.DECISION"
       />
       <div
         v-if="hasPlausibilityCheckPassed && preview?.success && !!preview.ldml"

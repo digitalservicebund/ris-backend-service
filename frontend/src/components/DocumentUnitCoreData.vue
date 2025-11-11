@@ -82,7 +82,8 @@ const region = computed(() =>
 const rawSourceItems = computed<DropdownItem[]>(
   () =>
     coreDataModel.value.sources
-      ?.map((source) => source.sourceRawValue)
+      ?.filter((source) => source.value == undefined)
+      .map((source) => source.sourceRawValue)
       .filter((rawValue) => rawValue != undefined)
       .map((rawValue) => ({
         label: rawValue,

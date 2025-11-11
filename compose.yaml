@@ -158,7 +158,7 @@ services:
       timeout: 3s
 
   redis:
-    image: cgr.dev/chainguard/redis@sha256:9c1d635cba8d3c5daf2ddda7ca4404c8629701b8a18a6ba8f4b2b399d64854d9
+    image: cgr.dev/chainguard/redis@sha256:bdd7f803aa6546c23215811aef30f4091ec59ad5f81b5b1c43e4672e95143860
     extra_hosts:
       - localhost:host-gateway
     container_name: redis

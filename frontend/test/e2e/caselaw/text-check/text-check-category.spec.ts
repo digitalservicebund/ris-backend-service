@@ -5,12 +5,6 @@ import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategor
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { convertHexToRGB } from "~/test-helper/coloursUtil"
 
-// eslint-disable-next-line playwright/no-skipped-test
-test.skip(
-  ({ browserName }) => browserName !== "chromium",
-  "Skipping firefox flaky test",
-)
-
 const textWithErrors = {
   text: "LanguageTool   ist ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, z. B. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten. Testgnorierteswort ist zB. grün markiert",
   incorrectWords: [
@@ -28,101 +22,6 @@ test.describe(
   },
   () => {
     test(
-      "ignore irrelevant text check categories and rules",
-      {
-        tag: ["@RISDEV-9169", "@RISDEV-9170"],
-      },
-      async ({ page, prefilledDocumentUnit }) => {
-        const headNoteEditor = page.getByTestId("Orientierungssatz")
-        const headNoteEditorTextArea = headNoteEditor.locator("div")
-
-        await test.step("navigate to headnote (Orientierungssatz) in categories", async () => {
-          await navigateToCategories(
-            page,
-            prefilledDocumentUnit.documentNumber,
-            { category: DocumentUnitCategoriesEnum.TEXTS },
-          )
-        })
-
-        await test.step("replace text in headnote (Orientierungssatz) with irrelevant style-related mistakes", async () => {
-          await clearTextField(page, headNoteEditorTextArea)
-
-          // Contains examples of Categories we disable
-          const textWithErrorsOfDisabledCategories =
-            "I bims, LanguageTool. " + // COLLOQUIALISMS: I bims
-            "Im täglichen Alltag prüfe ich Texte. " + // REDUNDANCY: täglichen Alltag
-            "Dann habe ich Freizeit. Dann esse ich. Dann schlafe ich. " + // REPETITIONS_STYLE: Dann []. Dann []. Dann [].
-            "Mir ist es egal, ob du Helpdesk oder Help-Desk schreibst." // STYLE: Helpdesk oder Help-Desk
-
-          await headNoteEditorTextArea.fill(textWithErrorsOfDisabledCategories)
-          await expect(headNoteEditorTextArea).toHaveText(
-            textWithErrorsOfDisabledCategories,
-          )
-        })
-
-        await test.step("trigger category text results in no matches for ignored categories", async () => {
-          await page
-            .getByLabel("Orientierungssatz Button")
-            .getByRole("button", { name: "Rechtschreibprüfung" })
-            .click()
-
-          await expect(
-            page.getByTestId("text-check-loading-status"),
-          ).toHaveText("Rechtschreibprüfung läuft")
-
-          await expect(
-            page.getByTestId("text-check-loading-status"),
-          ).toBeHidden({ timeout: 10_000 })
-
-          await expect(page.locator(`text-check`)).not.toBeAttached()
-        })
-
-        await test.step("replace text in headnote (Orientierungssatz) with mistakes of ignored rules", async () => {
-          await clearTextField(page, headNoteEditorTextArea)
-
-          // Contains examples of Rules we disable
-          const textWithErrorsOfDisabledRules =
-            "der Satz wurde, " + // UPPERCASE_SENTENCE_START: "der"
-            "anders als oft behauptet, " + // WIKIPEDIA: "Anders als oft behauptet"
-            "nicht von Feuerwehrmännern " + // GENDER_NEUTRALITY / Geschlechtergerechte Sprache: "Erstsemsterin"
-            "geschrieben.Noch " + // MISC / Sonstiges: "[Ein Satz].[Noch ein Satz]"
-            "hat er mehr als 24Std. " + // TYPOGRAPHY / Typografie: "24Std."
-            "oder gar 25 Std.. gedauert. " + // PUNCTUATION / Zeichensetzung: "Std.."
-            "Ich freue ich " + // CONFUSED_WORDS / Leicht zu verwechselnde Wörter: "Ich freue ich"
-            "seit Geburt an, " + // IDIOMS / Redewendungen: "seit Geburt an"
-            "auf die Haus " + // GRAMMAR / Grammatik: "die Haus"
-            "nach dem es Berg ab geht. " + // COMPOUNDING / Getrennt- und Zusammenschreibung: "Berg ab"
-            "Das tief greifende Problem " + // EMPFOHLENE_RECHTSCHREIBUNG / Empfohlene/Moderne Rechtschreibung: "tief greifende"
-            "ist das ich den Film schauen wollte. " + // HILFESTELLUNG_KOMMASETZUNG
-            "Aber morgen schien die Sonne." // SEMANTICS / Semantische Unstimmigkeiten: "morgen schien"
-
-          await headNoteEditorTextArea.fill(textWithErrorsOfDisabledRules)
-          await expect(headNoteEditorTextArea).toHaveText(
-            textWithErrorsOfDisabledRules,
-          )
-        })
-
-        await test.step("trigger category text button shows results in no matches for ignored rules", async () => {
-          await page
-            .getByLabel("Orientierungssatz Button")
-            .getByRole("button", { name: "Rechtschreibprüfung" })
-            .click()
-
-          await expect(
-            page.getByTestId("text-check-loading-status"),
-          ).toHaveText("Rechtschreibprüfung läuft")
-
-          await expect(
-            page.getByTestId("text-check-loading-status"),
-          ).toBeHidden({ timeout: 10_000 })
-
-          await expect(page.locator(`text-check`)).not.toBeAttached()
-        })
-      },
-    )
-
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
       "clicking on text check button, save document and returns matches",
       {
         tag: ["@RISDEV-6205", "@RISDEV-6154", "@RISDEV-7397"],

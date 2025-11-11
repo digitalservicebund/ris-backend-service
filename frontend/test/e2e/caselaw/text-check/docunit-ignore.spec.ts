@@ -1,40 +1,90 @@
-import { expect } from "@playwright/test"
+import { expect, Page } from "@playwright/test"
 import { navigateToCategories } from "../utils/e2e-utils"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
-  defaultText,
   getMarkId,
   ignoredColorStyle,
   textMistakeColor,
-  triggerCheckCategory,
 } from "~/e2e/caselaw/text-check/util"
+import { generateString } from "~/test-helper/dataGenerators"
 
-// eslint-disable-next-line playwright/no-skipped-test
-test.skip(
-  ({ browserName }) => browserName !== "chromium",
-  "Skipping firefox flaky test",
-)
+const wordWithTypo = generateString({ prefix: "etoe" }) // e.g. etoedsfjg
+
+/**
+ * Mockt den API-Aufruf für die Rechtschreibprüfung einer Kategorie,
+ * klickt den entsprechenden Button und wartet auf das Ergebnis.
+ * @param page Die aktuelle Playwright-Seite.
+ * @param uuid Die UUID der Dokumenteneinheit.
+ * @param category Die Kategorie ('tenor' oder 'reasons').
+ */
+async function triggerAndMockTextCheck(
+  page: Page,
+  uuid: string,
+  category: string,
+) {
+  const categoryTestId = category === "tenor" ? "Tenor" : "Gründe"
+
+  // Mock-Response ist für beide gleich (da nur das 'category' Feld in matches variiert)
+  const mockResponse = {
+    htmlText: `<p>Text mit Fehler: <text-check id="1" type="misspelling" ignored="false">${wordWithTypo}</text-check></p>`,
+    matches: [
+      {
+        id: 1,
+        word: wordWithTypo,
+        shortMessage: "Rechtschreibfehler",
+        category: category,
+      },
+    ],
+  }
+
+  const lock = Promise.withResolvers<void>()
+  await page.route(
+    `**/api/v1/caselaw/documentunits/${uuid}/text-check?category=${category}`,
+    async (route) => {
+      await lock.promise
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(mockResponse),
+      })
+    },
+  )
+
+  const container = page.getByTestId(category)
+
+  await container.click()
+  await container.getByRole("button", { name: "Rechtschreibprüfung" }).click()
+
+  await expect(container.getByTestId("text-check-loading-status")).toHaveText(
+    "Rechtschreibprüfung läuft",
+  )
+  lock.resolve()
+
+  await page
+    .getByTestId(categoryTestId)
+    .locator("text-check")
+    .first()
+    .waitFor({ state: "visible" })
+}
 
 test.describe(
-  "ignored matches feedback",
+  "docunit ignore",
   {
     tag: ["@RISDEV-9120"],
   },
-
   () => {
     test.use({
       decisionToBeCreated: {
         longTexts: {
-          tenor: `<p>${defaultText}</p>`,
-          reasons: `<p>${defaultText}</p>`,
+          tenor: `<p>Text mit Fehler: ${wordWithTypo}</p>`,
+          reasons: `<p>Text mit Fehler: ${wordWithTypo}</p>`,
         },
       },
     })
 
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
-      "text check, ignore effects all categories",
+    test(
+      "text check, ignore in docunit effects all categories",
       {
         tag: ["@RISDEV-9234"],
       },
@@ -50,14 +100,22 @@ test.describe(
         })
 
         await test.step("Trigger text check in tenor and reasons", async () => {
-          await triggerCheckCategory(page, "Tenor")
-          await triggerCheckCategory(page, "Gründe")
+          await triggerAndMockTextCheck(
+            page,
+            decision.createdDecision.uuid,
+            "tenor",
+          )
+          await triggerAndMockTextCheck(
+            page,
+            decision.createdDecision.uuid,
+            "reasons",
+          )
         })
 
         await test.step("ignoring a word marks match with blue in all categories", async () => {
           const textCheckTag = page
-            .locator(`text-check[ignored='false']`)
-            .first()
+            .getByTestId("Gründe")
+            .getByText(wordWithTypo)
 
           await textCheckTag.click()
 
@@ -81,8 +139,8 @@ test.describe(
 
         await test.step("removing a word marks match with red in all categories", async () => {
           const textCheckTag = page
-            .locator(`text-check[ignored='true']`)
-            .first()
+            .getByTestId("Gründe")
+            .getByText(wordWithTypo)
 
           await textCheckTag.click()
 
