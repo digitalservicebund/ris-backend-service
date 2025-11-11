@@ -8,7 +8,7 @@ const removeTagsOnTypingKey = new PluginKey("removeTagsOnTyping")
 
 // Prüft, ob ein Node die TextCheck-Markierung enthält.
 function hasTextCheckMark(node: Node, state: EditorState): boolean {
-  if (!node || !node.isText) return false
+  if (!node?.isText) return false
   const textCheckMark = state.schema.marks[TextCheckTagName]
   return !!textCheckMark?.isInSet(node.marks)
 }
