@@ -72,5 +72,5 @@ public class OriginOfTranslationDTO {
       orphanRemoval = true,
       fetch = FetchType.LAZY)
   @OrderBy("rank")
-  private List<OriginOfTranslationUrl> urls;
+  private List<OriginOfTranslationUrlDTO> urls;
 }

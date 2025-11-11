@@ -9,7 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LanguageCodeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationBorderNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationTranslatorDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationUrl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationUrlDTO;
 import de.bund.digitalservice.ris.caselaw.domain.LanguageCode;
 import de.bund.digitalservice.ris.caselaw.domain.OriginOfTranslation;
 import de.bund.digitalservice.ris.caselaw.domain.TranslationType;
@@ -164,10 +164,10 @@ class OriginOfTranslationTransformerTest {
       OriginOfTranslationBorderNumberDTO borderNumberDTO2 =
           OriginOfTranslationBorderNumberDTO.builder().borderNumber(24L).build();
 
-      OriginOfTranslationUrl urlDTO1 =
-          OriginOfTranslationUrl.builder().url("https://url1.com").build();
-      OriginOfTranslationUrl urlDTO2 =
-          OriginOfTranslationUrl.builder().url("https://url2.com").build();
+      OriginOfTranslationUrlDTO urlDTO1 =
+          OriginOfTranslationUrlDTO.builder().url("https://url1.com").build();
+      OriginOfTranslationUrlDTO urlDTO2 =
+          OriginOfTranslationUrlDTO.builder().url("https://url2.com").build();
 
       OriginOfTranslationDTO dto =
           OriginOfTranslationDTO.builder()

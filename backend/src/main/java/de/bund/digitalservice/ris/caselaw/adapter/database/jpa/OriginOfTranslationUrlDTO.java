@@ -22,7 +22,7 @@ import lombok.Setter;
 @Builder
 @Entity
 @Table(schema = "incremental_migration", name = "origin_of_translation_external_link")
-public class OriginOfTranslationUrl {
+public class OriginOfTranslationUrlDTO {
   @Id @GeneratedValue private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)

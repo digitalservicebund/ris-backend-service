@@ -4,7 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationBorderNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationTranslatorDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationUrl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationUrlDTO;
 import de.bund.digitalservice.ris.caselaw.domain.OriginOfTranslation;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,12 +78,12 @@ public class OriginOfTranslationTransformer {
     }
     originOfTranslationDTO.setBorderNumbers(borderNumberDTOS);
 
-    List<OriginOfTranslationUrl> urlDTOS = new ArrayList<>();
+    List<OriginOfTranslationUrlDTO> urlDTOS = new ArrayList<>();
     if (originOfTranslation.urls() != null && !originOfTranslation.urls().isEmpty()) {
       for (int i = 0; i < originOfTranslation.urls().size(); i++) {
         var url = originOfTranslation.urls().get(i);
-        OriginOfTranslationUrl dto =
-            OriginOfTranslationUrl.builder()
+        OriginOfTranslationUrlDTO dto =
+            OriginOfTranslationUrlDTO.builder()
                 .originOfTranslation(originOfTranslationDTO)
                 .url(url)
                 .rank(i + 1L)
@@ -124,7 +124,7 @@ public class OriginOfTranslationTransformer {
                 .toList())
         .urls(
             Optional.ofNullable(dto.getUrls()).orElse(new ArrayList<>()).stream()
-                .map(OriginOfTranslationUrl::getUrl)
+                .map(OriginOfTranslationUrlDTO::getUrl)
                 .toList())
         .build();
   }
