@@ -3,11 +3,13 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.DokumentarischeKurztexte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,12 +32,20 @@ public class DecisionReducedLdmlTransformer extends DecisionCommonLdmlTransforme
         .identification(buildIdentification(decision, false))
         .references(buildReferences(decision))
         .proprietary(Proprietary.builder().meta(buildRisMeta(decision)).build())
+        .analysis(buildAnalysis(decision))
         .build();
   }
 
   private RisMeta buildRisMeta(Decision decision) {
     var builder = buildCommonRisMeta(decision);
     return builder.build();
+  }
+
+  @Nullable
+  protected DokumentarischeKurztexte buildKurztexte(Decision decision) {
+    var builder = getCommonKurztexteBuilder(decision);
+    DokumentarischeKurztexte kurztexte = builder.build();
+    return kurztexte.isEmpty() ? null : kurztexte;
   }
 
   @Override

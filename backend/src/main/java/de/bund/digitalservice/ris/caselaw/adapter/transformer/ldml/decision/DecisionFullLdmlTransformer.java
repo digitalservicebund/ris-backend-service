@@ -4,12 +4,15 @@ import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGe
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.DocTitle;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Classification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Keyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.DokumentarischeKurztexte;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Entscheidungsnamen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrLanguage;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDaten;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDokumentnummern;
@@ -34,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
@@ -66,6 +70,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     return builder
         .identification(buildIdentification(decision))
         .references(buildReferences(decision))
+        .analysis(buildAnalysis(decision))
         .proprietary(Proprietary.builder().meta(buildRisMeta(decision)).build())
         .build();
   }
@@ -286,6 +291,48 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     }
 
     return builder.build();
+  }
+
+  @Nullable
+  protected DokumentarischeKurztexte buildKurztexte(Decision decision) {
+    var builder = getCommonKurztexteBuilder(decision);
+
+    ShortTexts shortTexts = decision.shortTexts();
+    if (shortTexts != null) {
+      // Entscheidungsnamen
+      if (shortTexts.decisionNames() != null && !shortTexts.decisionNames().isEmpty()) {
+        Entscheidungsnamen entscheidungsnamen =
+            Entscheidungsnamen.builder()
+                .entscheidungsnamen(
+                    shortTexts.decisionNames().stream()
+                        .map(
+                            entscheidungsname ->
+                                Entscheidungsnamen.Entscheidungsname.builder()
+                                    .value(entscheidungsname)
+                                    .build())
+                        .toList())
+                .build();
+        builder.entscheidungsnamen(entscheidungsnamen);
+      }
+
+      // Orientierungssatz
+      if (isNotBlank(shortTexts.headnote())) {
+        var orientierungssatz =
+            JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.headnote()));
+        orientierungssatz.setDomainTerm("Orientierungssatz");
+        builder.orientierungssatz(orientierungssatz);
+      }
+
+      // Sonstiger Orientierungssatz
+      if (isNotBlank(shortTexts.otherHeadnote())) {
+        var sonstigerOrientierungssatz =
+            JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.otherHeadnote()));
+        sonstigerOrientierungssatz.setDomainTerm("Sonstiger Orientierungssatz");
+        builder.sonstigerOrientierungssatz(sonstigerOrientierungssatz);
+      }
+    }
+    DokumentarischeKurztexte kurztexte = builder.build();
+    return kurztexte.isEmpty() ? null : kurztexte;
   }
 
   @Override
