@@ -11,18 +11,18 @@ import { Source, SourceValue } from "@/domain/source"
 
 function mockDecision({
   managementData,
-  source,
+  sources,
   procedure,
   creatingDocOffice,
 }: {
   managementData?: Partial<ManagementData>
-  source?: Source
+  sources?: Source[]
   procedure?: Procedure
   creatingDocOffice?: DocumentationOffice
 } = {}) {
   return new Decision("q834", {
     documentNumber: "original",
-    coreData: { source, procedure, creatingDocOffice },
+    coreData: { sources, procedure, creatingDocOffice },
     managementData: {
       duplicateRelations: [],
       borderNumbers: [],
@@ -244,20 +244,23 @@ describe("ManagementDataMetadata", () => {
   })
 
   describe("Quelle", () => {
-    it("should show source without reference", async () => {
+    it("should show sources without reference", async () => {
       const docUnit = mockDecision({
-        source: { value: SourceValue.Email },
+        sources: [
+          { value: SourceValue.Email },
+          { value: SourceValue.UnaufgefordertesOriginal },
+        ],
       })
       renderMetadata(docUnit)
 
       const lastUpdated = screen.getByTestId("management-data-source")
       expect(within(lastUpdated).getByText("Quelle")).toBeInTheDocument()
-      expect(within(lastUpdated).getByText("E")).toBeInTheDocument()
+      expect(within(lastUpdated).getByText("E, O")).toBeInTheDocument()
     })
 
     it("should show source without value", async () => {
       const docUnit = mockDecision({
-        source: { value: undefined, sourceRawValue: "Custom" },
+        sources: [{ value: undefined, sourceRawValue: "Custom" }],
       })
       renderMetadata(docUnit)
 
@@ -268,16 +271,18 @@ describe("ManagementDataMetadata", () => {
 
     it("should show source with reference without creating doc office", async () => {
       const docUnit = mockDecision({
-        source: {
-          value: SourceValue.Zeitschrift,
-          reference: new Reference({
-            legalPeriodical: { abbreviation: "OLF" },
-            citation: "2024, 01",
-            referenceSupplement: "L",
-            author: "Marie Merke",
-            documentType: { label: "janz doll", jurisShortcut: "jd" },
-          }),
-        },
+        sources: [
+          {
+            value: SourceValue.Zeitschrift,
+            reference: new Reference({
+              legalPeriodical: { abbreviation: "OLF" },
+              citation: "2024, 01",
+              referenceSupplement: "L",
+              author: "Marie Merke",
+              documentType: { label: "janz doll", jurisShortcut: "jd" },
+            }),
+          },
+        ],
       })
       renderMetadata(docUnit)
 
@@ -292,13 +297,15 @@ describe("ManagementDataMetadata", () => {
 
     it("should show source with reference with creating doc office", async () => {
       const docUnit = mockDecision({
-        source: {
-          value: SourceValue.Zeitschrift,
-          reference: new Reference({
-            legalPeriodical: { abbreviation: "R&R" },
-            citation: "2024, 01",
-          }),
-        },
+        sources: [
+          {
+            value: SourceValue.Zeitschrift,
+            reference: new Reference({
+              legalPeriodical: { abbreviation: "R&R" },
+              citation: "2024, 01",
+            }),
+          },
+        ],
         creatingDocOffice: { abbreviation: "BGH", id: "123" },
       })
       renderMetadata(docUnit)
@@ -312,13 +319,15 @@ describe("ManagementDataMetadata", () => {
 
     it("should show source with reference without value", async () => {
       const docUnit = mockDecision({
-        source: {
-          sourceRawValue: "Custom",
-          reference: new Reference({
-            legalPeriodical: { abbreviation: "R&R" },
-            citation: "2024",
-          }),
-        },
+        sources: [
+          {
+            sourceRawValue: "Custom",
+            reference: new Reference({
+              legalPeriodical: { abbreviation: "R&R" },
+              citation: "2024",
+            }),
+          },
+        ],
       })
       renderMetadata(docUnit)
 

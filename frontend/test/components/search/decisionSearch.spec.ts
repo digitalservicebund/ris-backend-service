@@ -14,6 +14,7 @@ import { Court } from "@/domain/court"
 import { Decision } from "@/domain/decision"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import ProcessStep from "@/domain/processStep"
+import { SourceValue } from "@/domain/source"
 import errorMessages from "@/i18n/errors.json"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
@@ -26,14 +27,31 @@ vi.mock("primevue/usetoast", () => ({
   useToast: () => ({ add: addToastMock }),
 }))
 
+const courtBGH: Court = {
+  type: "BGH",
+  location: "",
+  label: "BGH",
+  isSuperiorCourt: true,
+  isForeignCourt: false,
+}
+const courtEUGH: Court = {
+  type: "EUGH",
+  location: "",
+  label: "EUGH",
+  isSuperiorCourt: true,
+  isForeignCourt: true,
+}
+const courtAG: Court = {
+  type: "AG",
+  location: "Aachen",
+  label: "AG Aachen",
+  isSuperiorCourt: false,
+  isForeignCourt: false,
+}
+
 const server = setupServer(
   http.get("/api/v1/caselaw/courts", () => {
-    const court: Court = {
-      type: "BGH",
-      location: "",
-      label: "BGH",
-    }
-    return HttpResponse.json([court])
+    return HttpResponse.json([courtBGH, courtEUGH, courtAG])
   }),
   http.get("/api/v1/caselaw/processsteps", () => {
     return HttpResponse.json([
@@ -385,5 +403,100 @@ describe("Decision Search", () => {
     expect(
       within(resultList).getByText("Übernehmen und fortfahren"),
     ).toBeVisible()
+  })
+
+  it("'Übernehmen und fortfahren' creates documentation unit for federal court with source", async () => {
+    vi.spyOn(documentUnitService, "createNew").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: new Decision("foo", {
+          documentNumber: "1234567891234",
+        }),
+      }),
+    )
+
+    mockNoSearchResult()
+    const { user, router } = renderComponent()
+    await router.replace({ path: "/" })
+    await user.type(screen.getByLabelText("Gerichtstyp Suche"), "BGH")
+
+    await user.click(screen.getByText("Ergebnisse zeigen"))
+    await user.click(screen.getByText("Übernehmen und fortfahren"))
+
+    expect(documentUnitService.createNew).toHaveBeenCalledWith(
+      {
+        court: courtBGH,
+        decisionDate: undefined,
+        fileNumber: undefined,
+        sources: [
+          {
+            value: SourceValue.UnaufgefordertesOriginal,
+          },
+        ],
+      },
+      {
+        kind: "DECISION",
+      },
+    )
+  })
+
+  it("'Übernehmen und fortfahren' creates documentation unit for foreign court without source", async () => {
+    vi.spyOn(documentUnitService, "createNew").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: new Decision("foo", {
+          documentNumber: "1234567891234",
+        }),
+      }),
+    )
+
+    mockNoSearchResult()
+    const { user, router } = renderComponent()
+    await router.replace({ path: "/" })
+    await user.type(screen.getByLabelText("Gerichtstyp Suche"), "EUGH")
+
+    await user.click(screen.getByText("Ergebnisse zeigen"))
+    await user.click(screen.getByText("Übernehmen und fortfahren"))
+
+    expect(documentUnitService.createNew).toHaveBeenCalledWith(
+      {
+        court: courtEUGH,
+        decisionDate: undefined,
+        fileNumber: undefined,
+      },
+      {
+        kind: "DECISION",
+      },
+    )
+  })
+
+  it("'Übernehmen und fortfahren' creates documentation unit for non-superior without source", async () => {
+    vi.spyOn(documentUnitService, "createNew").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: new Decision("foo", {
+          documentNumber: "1234567891234",
+        }),
+      }),
+    )
+
+    mockNoSearchResult()
+    const { user, router } = renderComponent()
+    await router.replace({ path: "/" })
+    await user.type(screen.getByLabelText("Gerichtstyp Suche"), "AG Aachen")
+
+    await user.click(screen.getByText("Ergebnisse zeigen"))
+    await user.click(screen.getByText("Übernehmen und fortfahren"))
+
+    expect(documentUnitService.createNew).toHaveBeenCalledWith(
+      {
+        court: courtAG,
+        decisionDate: undefined,
+        fileNumber: undefined,
+      },
+      {
+        kind: "DECISION",
+      },
+    )
   })
 })

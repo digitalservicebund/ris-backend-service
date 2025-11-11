@@ -2119,6 +2119,8 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                   .id(court1Id)
                   .jurisdictionType("")
                   .regions(List.of("NW"))
+                  .isSuperiorCourt(false)
+                  .isForeignCourt(false)
                   .build(),
               JsonNode.class);
       List<JsonPatchOperation> operationsUser1 =
@@ -2258,6 +2260,8 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                   .jurisdictionType("")
                   .regions(List.of("NW"))
                   .id(court1Id)
+                  .isSuperiorCourt(false)
+                  .isForeignCourt(false)
                   .build(),
               JsonNode.class);
       List<JsonPatchOperation> operationsUser1 =
@@ -2471,6 +2475,8 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                   .jurisdictionType("")
                   .regions(List.of("NW"))
                   .id(court1Id)
+                  .isSuperiorCourt(false)
+                  .isForeignCourt(false)
                   .build(),
               JsonNode.class);
       List<JsonPatchOperation> operationsUser1 =
@@ -5103,7 +5109,9 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
             "revoked": null,
             "jurisdictionType": "",
             "regions": ["NW"],
-            "responsibleDocOffice": null
+            "responsibleDocOffice": null,
+            "isSuperiorCourt": false,
+            "isForeignCourt": false
           }
         }
         """

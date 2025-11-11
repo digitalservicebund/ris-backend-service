@@ -48,9 +48,9 @@ test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-7247"] }, () => {
     await expectProcedure(page, "–")
     await expectFirstPublishedAt(page, "–")
 
-    await test.step("Setze die Quelle auf Z", async () => {
+    await test.step("Setze die Quelle auf Z,O", async () => {
       await navigateToCategories(page, documentNumber!)
-      const dropdown = page.getByRole("combobox", { name: "Quelle Input" })
+      const dropdown = page.getByTestId("source-input")
       await expect(dropdown).toHaveText("Bitte auswählen")
 
       await dropdown.click()
@@ -60,7 +60,15 @@ test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-7247"] }, () => {
           name: "Zeitschriftenveröffentlichung (Z)",
         })
         .click()
-      await expect(dropdown).toHaveText("Zeitschriftenveröffentlichung (Z)")
+
+      await page
+        .getByRole("option", {
+          name: "unaufgefordert eingesandtes Original (O)",
+        })
+        .click()
+      await expect(dropdown).toHaveText(
+        "Zeitschriftenveröffentlichung (Z)unaufgefordert eingesandtes Original (O)",
+      )
     })
 
     await test.step("Setze den Vorgang", async () => {
@@ -77,7 +85,7 @@ test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-7247"] }, () => {
 
     await navigateToManagementData(page, documentNumber!)
 
-    await expectSource(page, "Z")
+    await expectSource(page, "Z, O")
     await expectLastUpdatedAt(page, /^\d{2}\.\d{2}\.\d{4} um \d{2}:\d{2} Uhr$/)
     await expectLastUpdatedBy(page, "DS (e2e_tests DigitalService)")
     await expectProcedure(page, newProcedure!)

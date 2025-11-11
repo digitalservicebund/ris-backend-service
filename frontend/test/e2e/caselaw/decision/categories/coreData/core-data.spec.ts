@@ -335,13 +335,13 @@ test.describe("core data", () => {
   test(
     "source dropdown",
     {
-      tag: ["@RISDEV-6381"],
+      tag: ["@RISDEV-6381", "@RISDEV-7139"],
     },
     async ({ page, documentNumber }) => {
       await test.step("source can be selected via dropdown", async () => {
         await navigateToCategories(page, documentNumber)
 
-        const dropdown = page.getByRole("combobox", { name: "Quelle Input" })
+        const dropdown = page.getByTestId("source-input")
         await expect(dropdown).toHaveText("Bitte auswählen")
 
         await dropdown.click()
@@ -369,6 +369,18 @@ test.describe("core data", () => {
           })
           .click()
         await expect(dropdown).toHaveText("Zeitschriftenveröffentlichung (Z)")
+      })
+
+      await test.step("a second source can be selected", async () => {
+        const dropdown = page.getByTestId("source-input")
+        await page
+          .getByRole("option", {
+            name: "unaufgefordert eingesandtes Original (O)",
+          })
+          .click()
+        await expect(dropdown).toHaveText(
+          "Zeitschriftenveröffentlichung (Z)unaufgefordert eingesandtes Original (O)",
+        )
       })
 
       // Todo: display legacy values if not in dropdown options

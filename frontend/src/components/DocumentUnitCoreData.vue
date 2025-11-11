@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import Checkbox from "primevue/checkbox"
 import InputText from "primevue/inputtext"
+import InputMultiSelect from "primevue/multiselect"
 import InputSelect from "primevue/select"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { DropdownItem } from "./input/types"
@@ -43,7 +44,7 @@ const validationStore =
       "yearsOfDispute",
       "deviatingDecisionDates",
       "oralHearingDates",
-      "source",
+      "sources",
     ][number]
   >()
 
@@ -78,7 +79,19 @@ const region = computed(() =>
     : "",
 )
 
-const sourceItems: DropdownItem[] = [
+const rawSourceItems = computed<DropdownItem[]>(
+  () =>
+    coreDataModel.value.sources
+      ?.filter((source) => source.value == undefined)
+      .map((source) => source.sourceRawValue)
+      .filter((rawValue) => rawValue != undefined)
+      .map((rawValue) => ({
+        label: rawValue,
+        value: rawValue,
+      })) ?? [],
+)
+
+const sourceItems = computed<DropdownItem[]>(() => [
   {
     label: "unaufgefordert eingesandtes Original (O)",
     value: SourceValue.UnaufgefordertesOriginal,
@@ -98,21 +111,45 @@ const sourceItems: DropdownItem[] = [
     value: SourceValue.LaenderEuGH,
   },
   { label: "Sonstige (S)", value: SourceValue.Sonstige },
-]
+  ...rawSourceItems.value,
+])
 
-const source = computed({
+function isSourceValue(value: string): value is SourceValue {
+  return Object.values(SourceValue).includes(value as SourceValue)
+}
+
+const sources = computed<string[]>({
   get: () =>
-    coreDataModel.value.source
-      ? (coreDataModel.value.source.value ??
-        coreDataModel.value.source?.sourceRawValue)
-      : undefined,
-  set: (newValue) => {
-    if (Object.values(SourceValue).includes(newValue as SourceValue)) {
-      coreDataModel.value.source = {
-        ...coreDataModel.value.source,
-        value: newValue as SourceValue,
-      }
-    }
+    coreDataModel.value.sources
+      ?.map((source) => source.value ?? source.sourceRawValue)
+      .filter((newValue) => newValue != undefined) ?? [],
+  set: (newValues) => {
+    coreDataModel.value.sources =
+      newValues
+        ?.filter((newValue) => newValue != undefined)
+        ?.map((newValue: string) => {
+          const existingSource =
+            coreDataModel.value.sources?.find(
+              (existingSource) => existingSource.value === newValue,
+            ) ??
+            coreDataModel.value.sources?.find(
+              (existingSource) => existingSource.sourceRawValue === newValue,
+            )
+
+          if (existingSource) {
+            return existingSource
+          }
+
+          if (!isSourceValue(newValue)) {
+            return {
+              sourceRawValue: newValue,
+            }
+          }
+
+          return {
+            value: newValue,
+          }
+        }) ?? []
   },
 })
 
@@ -462,15 +499,17 @@ onBeforeUnmount(() => {
     </div>
     <div v-if="!isPendingProceeding" :class="layoutClass">
       <InputField
-        id="source"
+        id="sources"
         v-slot="slotProps"
         label="Quelle"
-        :validation-error="validationStore.getByField('source')"
+        :validation-error="validationStore.getByField('sources')"
       >
-        <InputSelect
+        <InputMultiSelect
           :id="slotProps.id"
-          v-model="source"
+          v-model="sources"
           aria-label="Quelle Input"
+          data-testid="source-input"
+          display="chip"
           fluid
           :invalid="slotProps.hasError"
           option-label="label"

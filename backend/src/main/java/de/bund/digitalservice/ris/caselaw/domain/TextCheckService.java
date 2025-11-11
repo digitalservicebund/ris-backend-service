@@ -206,7 +206,6 @@ public class TextCheckService {
             htmlText,
             matches.stream()
                 .map(match -> match.toBuilder().category(categoryType).build())
-                .map(this::limitReplacements)
                 .toList());
 
     modifiedMatches.forEach(
@@ -220,10 +219,9 @@ public class TextCheckService {
           newHtmlText
               .append(normalizedHtml, lastPosition.get(), match.offset())
               .append(
-                  "<text-check id=\"%s\" type=\"%s\" ignored=\"%s\">%s</text-check>"
+                  "<text-check id=\"%s\" ignored=\"%s\">%s</text-check>"
                       .formatted(
                           match.id(),
-                          match.rule().issueType().toLowerCase(),
                           isIgnored,
                           normalizedHtml.substring(
                               match.offset(), match.offset() + match.length())));
@@ -233,15 +231,6 @@ public class TextCheckService {
     newHtmlText.append(normalizedHtml, lastPosition.get(), normalizedHtml.length());
 
     return new TextCheckCategoryResponse(newHtmlText.toString(), modifiedMatches);
-  }
-
-  private Match limitReplacements(Match match) {
-    if (match.replacements() != null) {
-      return match.toBuilder()
-          .replacements(match.replacements().subList(0, Math.min(match.replacements().size(), 5)))
-          .build();
-    }
-    return match;
   }
 
   /**

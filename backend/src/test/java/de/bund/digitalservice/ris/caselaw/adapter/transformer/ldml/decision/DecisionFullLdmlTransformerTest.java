@@ -689,11 +689,12 @@ class DecisionFullLdmlTransformerTest {
                         .location("courtLocation test")
                         .regions(List.of("region test"))
                         .build())
-                .source(
-                    Source.builder()
-                        .sourceRawValue("sourceRawValue test")
-                        .value(SourceValue.S)
-                        .build())
+                .sources(
+                    List.of(
+                        Source.builder()
+                            .sourceRawValue("sourceRawValue test")
+                            .value(SourceValue.S)
+                            .build()))
                 .documentType(DocumentType.builder().label("documentType test").build())
                 .legalEffect("ja")
                 .fileNumbers(List.of("fileNumber test"))

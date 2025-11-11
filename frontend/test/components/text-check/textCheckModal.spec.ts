@@ -49,7 +49,6 @@ const baseMatch: Match = {
   word: "testword",
   offset: 0,
   length: 8,
-  replacements: [{ value: "suggestion1" }, { value: "suggestion2" }],
   category: "",
   message: "This is a test message.",
   context: { text: "test context", length: 12, offset: 0 },

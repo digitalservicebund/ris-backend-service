@@ -11,7 +11,7 @@ import {
   TextCheckResponse,
 } from "@/types/textCheck"
 
-interface TextCheckService {
+interface TextCheckApiService {
   check(text: string): Promise<ServiceResponse<TextCheckResponse>>
 
   checkAll(id: string): Promise<ServiceResponse<TextCheckAllResponse>>
@@ -33,7 +33,7 @@ interface TextCheckService {
   removeGlobalIgnore(word: string): Promise<ServiceResponse<void>>
 }
 
-const service: TextCheckService = {
+const service: TextCheckApiService = {
   async check(text: string) {
     return await httpClient.post<string, TextCheckResponse>(
       `caselaw/documentunits/text-check`,
