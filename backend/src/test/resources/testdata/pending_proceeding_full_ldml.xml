@@ -8,7 +8,7 @@
                 <akn:FRBRWork>
                     <akn:FRBRthis value="YYTestDoc0013"/>
                     <akn:FRBRuri value="YYTestDoc0013"/>
-                    <akn:FRBRalias name="Übergreifende ID" value="8ea9d41a-9768-462b-b79f-f7147f61df52"/>
+                    <akn:FRBRalias name="Übergreifende ID" value="d9ae1e4d-562e-4cc4-b223-a45e4abc2aaa"/>
                     <akn:FRBRalias name="Dokumentnummer" value="YYTestDoc0013"/>
                     <akn:FRBRalias eId="aktenzeichen" name="Aktenzeichen" value="Aktenzeichen"/>
                     <akn:FRBRdate eId="mitteilungsdatum" date="2020-01-01" name="Mitteilungsdatum"/>
@@ -25,7 +25,7 @@
                 <akn:FRBRManifestation>
                     <akn:FRBRthis value="YYTestDoc0013.xml"/>
                     <akn:FRBRuri value="YYTestDoc0013.xml"/>
-                    <akn:FRBRdate date="2025-10-02" name="XML Transformation"/>
+                    <akn:FRBRdate date="2025-11-11" name="XML Transformation"/>
                     <akn:FRBRauthor href="#bfh-dokumentationsstelle"/>
                 </akn:FRBRManifestation>
             </akn:identification>
@@ -35,76 +35,83 @@
                              showAs="keyword test"
                              value="keyword test"/>
             </akn:classification>
+            <akn:analysis source="#ris">
+                <akn:otherReferences source="#ris">
+                    <akn:implicitReference ris:domainTerm="Rechtszug">
+                        <ris:vorgehend domainTerm="Vorgehende Entscheidung">
+                            <ris:dokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:dokumentTyp>
+                            <ris:datum domainTerm="Entscheidungsdatum">2020-01-01</ris:datum>
+                            <ris:dokumentNummer domainTerm="Dokumentnummer">previous decision document number 1</ris:dokumentNummer>
+                            <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
+                            <ris:gericht domainTerm="Gericht">
+                                <ris:typ domainTerm="Gerichtstyp">previous decision court type</ris:typ>
+                            </ris:gericht>
+                        </ris:vorgehend>
+                    </akn:implicitReference>
+                    <akn:implicitReference ris:domainTerm="Rechtszug">
+                        <ris:vorgehend domainTerm="Vorgehende Entscheidung">
+                            <ris:dokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:dokumentTyp>
+                            <ris:datum domainTerm="Entscheidungsdatum">2020-01-01</ris:datum>
+                            <ris:dokumentNummer domainTerm="Dokumentnummer">previous decision document number 2</ris:dokumentNummer>
+                            <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
+                            <ris:gericht domainTerm="Gericht">
+                                <ris:typ domainTerm="Gerichtstyp">previous decision court type</ris:typ>
+                            </ris:gericht>
+                        </ris:vorgehend>
+                    </akn:implicitReference>
+                </akn:otherReferences>
+            </akn:analysis>
             <akn:references source="#ris">
                 <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
                 <akn:TLCOrganization eId="bfh-dokumentationsstelle" href="" showAs="BFH"/>
-                <akn:TLCOrganization eId="gericht"
-                                     href=""
-                                     showAs="courtType courtLocation"/>
+                <akn:TLCOrganization eId="gericht" href="" showAs="courtType courtLocation"/>
                 <akn:TLCLocation eId="gerichtsort" href="" showAs="courtLocation"/>
             </akn:references>
             <akn:proprietary source="#ris">
                 <ris:meta>
-                    <ris:previousDecisions>
-                        <ris:previousDecision date="2020-01-01">
-                            <ris:documentNumber>previous decision document number 1</ris:documentNumber>
-                            <ris:fileNumber>previous decision file number</ris:fileNumber>
-                            <ris:courtType>previous decision court type</ris:courtType>
-                        </ris:previousDecision>
-                        <ris:previousDecision date="2020-01-01">
-                            <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                            <ris:fileNumber>previous decision file number</ris:fileNumber>
-                            <ris:courtType>previous decision court type</ris:courtType>
-                        </ris:previousDecision>
-                    </ris:previousDecisions>
-               <ris:dokumentTyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">Anhängiges Verfahren</ris:dokumentTyp>
-               <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
-                  <ris:typ domainTerm="Gerichtstyp">courtType</ris:typ>
-                  <ris:ort domainTerm="Gerichtsort">courtLocation</ris:ort>
-               </ris:gericht>
-               <ris:fehlerhafteGerichte domainTerm="Fehlerhafte Gerichte">
-                  <ris:fehlerhaftesGericht domainTerm="Fehlerhaftes Gericht">Abweichendes Gericht</ris:fehlerhaftesGericht>
-               </ris:fehlerhafteGerichte>
-               <ris:regionen domainTerm="Regionen">
-                  <ris:region domainTerm="Region">NW</ris:region>
-               </ris:regionen>
-               <ris:dokumentationsstelle domainTerm="Dokumentationsstelle"
-                                         akn:refersTo="#bfh-dokumentationsstelle">BFH</ris:dokumentationsstelle>
-               <ris:aktenzeichenListe domainTerm="Liste der Aktenzeichen">
-                  <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">Aktenzeichen</ris:aktenzeichen>
-                  <ris:aktenzeichen domainTerm="Abweichendes Aktenzeichen">Abweichendes Aktenzeichen</ris:aktenzeichen>
-               </ris:aktenzeichenListe>
-               <ris:abweichendeDaten domainTerm="Abweichende Daten">
-                  <ris:abweichendesDatum domainTerm="Abweichendes Datum">2010-05-12</ris:abweichendesDatum>
-               </ris:abweichendeDaten>
-               <ris:abweichendeDokumentnummern domainTerm="Abweichende Dokumentnummern">
-                  <ris:abweichendeDokumentnummer domainTerm="Abweichende Dokumentnummer">Abweichende Dokumentnummer</ris:abweichendeDokumentnummer>
-               </ris:abweichendeDokumentnummern>
-               <ris:sachgebiete domainTerm="Sachgebiete">
-                  <ris:sachgebiet domainTerm="Sachgebiet" notation="neu">Sachgebiet</ris:sachgebiet>
-               </ris:sachgebiete>
+                    <ris:dokumentTyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">Anhängiges Verfahren</ris:dokumentTyp>
+                    <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+                        <ris:typ domainTerm="Gerichtstyp">courtType</ris:typ>
+                        <ris:ort domainTerm="Gerichtsort">courtLocation</ris:ort>
+                    </ris:gericht>
+                    <ris:fehlerhafteGerichte domainTerm="Fehlerhafte Gerichte">
+                        <ris:fehlerhaftesGericht domainTerm="Fehlerhaftes Gericht">Abweichendes Gericht</ris:fehlerhaftesGericht>
+                    </ris:fehlerhafteGerichte>
+                    <ris:regionen domainTerm="Regionen">
+                        <ris:region domainTerm="Region">NW</ris:region>
+                    </ris:regionen>
+                    <ris:dokumentationsstelle domainTerm="Dokumentationsstelle"
+                                              akn:refersTo="#bfh-dokumentationsstelle">BFH</ris:dokumentationsstelle>
+                    <ris:aktenzeichenListe domainTerm="Liste der Aktenzeichen">
+                        <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">Aktenzeichen</ris:aktenzeichen>
+                        <ris:aktenzeichen domainTerm="Abweichendes Aktenzeichen">Abweichendes Aktenzeichen</ris:aktenzeichen>
+                    </ris:aktenzeichenListe>
+                    <ris:abweichendeDaten domainTerm="Abweichende Daten">
+                        <ris:abweichendesDatum domainTerm="Abweichendes Datum">2010-05-12</ris:abweichendesDatum>
+                    </ris:abweichendeDaten>
+                    <ris:abweichendeDokumentnummern domainTerm="Abweichende Dokumentnummern">
+                        <ris:abweichendeDokumentnummer domainTerm="Abweichende Dokumentnummer">Abweichende Dokumentnummer</ris:abweichendeDokumentnummer>
+                    </ris:abweichendeDokumentnummern>
+                    <ris:sachgebiete domainTerm="Sachgebiete">
+                        <ris:sachgebiet domainTerm="Sachgebiet" notation="neu">Sachgebiet</ris:sachgebiet>
+                    </ris:sachgebiete>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>
         <akn:header>
-            <akn:p>Aktenzeichen:
-                <akn:docNumber refersTo="#aktenzeichen">Aktenzeichen</akn:docNumber>
+            <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">Aktenzeichen</akn:docNumber>
             </akn:p>
-            <akn:p>Mitteilungsdatum:
-                <akn:docDate date="2020-01-01" refersTo="#mitteilungsdatum">01.01.2020</akn:docDate>
+            <akn:p>Mitteilungsdatum: <akn:docDate date="2020-01-01" refersTo="#mitteilungsdatum">01.01.2020</akn:docDate>
             </akn:p>
-            <akn:p>Gericht:
-                <akn:courtType refersTo="#gericht">courtType courtLocation</akn:courtType>
+            <akn:p>Gericht: <akn:courtType refersTo="#gericht">courtType courtLocation</akn:courtType>
             </akn:p>
-            <akn:p>Dokumenttyp:
-                <akn:docType refersTo="#dokumenttyp">Anhängiges Verfahren</akn:docType>
+            <akn:p>Dokumenttyp: <akn:docType refersTo="#dokumenttyp">Anhängiges Verfahren</akn:docType>
             </akn:p>
-            <akn:p>Titelzeile:
-                <akn:shortTitle refersTo="#titelzeile">
-                    <akn:embeddedStructure>
-                        <akn:p alternativeTo="textWrapper">Titelzeile</akn:p>
-                    </akn:embeddedStructure>
-                </akn:shortTitle>
+            <akn:p>Titelzeile: <akn:shortTitle refersTo="#titelzeile">
+                <akn:embeddedStructure>
+                    <akn:p alternativeTo="textWrapper">Titelzeile</akn:p>
+                </akn:embeddedStructure>
+            </akn:shortTitle>
             </akn:p>
         </akn:header>
         <akn:judgmentBody>

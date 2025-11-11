@@ -15,8 +15,9 @@ import lombok.NoArgsConstructor;
 public class DokumentTyp {
   @XmlValue private String value;
 
+  @Builder.Default
   @XmlAttribute(namespace = CaseLawLdml.AKN_NS, name = "eId")
-  private static final String E_ID = "dokumenttyp";
+  private String eId = "dokumenttyp";
 
   @XmlAttribute(name = "domainTerm")
   private static final String DOMAIN_TERM = "Dokumenttyp";

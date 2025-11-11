@@ -143,7 +143,11 @@ class DecisionReducedLdmlTransformerTest {
     PreviousDecision previousDecision1 =
         PreviousDecision.builder()
             .decisionDate(LocalDate.of(2020, 1, 1))
-            .court(Court.builder().type("previous decision court type").build())
+            .court(
+                Court.builder()
+                    .type("previous decision court type")
+                    .location("previous decision court location")
+                    .build())
             .documentType(DocumentType.builder().label("previous decision document type").build())
             .fileNumber("previous decision file number")
             .documentNumber("previous decision document number 1")
@@ -161,7 +165,11 @@ class DecisionReducedLdmlTransformerTest {
             .pending(true)
             .build();
     EnsuingDecision ensuingDecision2 =
-        ensuingDecision1.toBuilder().documentNumber("previous decision document number 2").build();
+        ensuingDecision1.toBuilder()
+            .documentNumber("ensuing decision document number 2")
+            .pending(true)
+            .note("ensuing decision note")
+            .build();
 
     testDocumentUnit =
         // Use empty DTO as basis as it creates empty lists for everything.
@@ -399,43 +407,62 @@ class DecisionReducedLdmlTransformerTest {
         //              </ris:legalForces>
         //               """),
         // PreviousDecisions -->
-        //        Arguments.of(
-        //            "'previousDecisions' (Vorgehende Entscheidungen)",
-        //            """
-        //              <ris:previousDecisions>
-        //                  <ris:previousDecision date="2020-01-01">
-        //                     <ris:documentNumber>previous decision document number
-        // 1</ris:documentNumber>
-        //                     <ris:fileNumber>previous decision file number</ris:fileNumber>
-        //                     <ris:courtType>previous decision court type</ris:courtType>
-        //                  </ris:previousDecision>
-        //                  <ris:previousDecision date="2020-01-01">
-        //                     <ris:documentNumber>previous decision document number
-        // 2</ris:documentNumber>
-        //                     <ris:fileNumber>previous decision file number</ris:fileNumber>
-        //                     <ris:courtType>previous decision court type</ris:courtType>
-        //                  </ris:previousDecision>
-        //               </ris:previousDecisions>
-        //               """),
+        Arguments.of(
+            "'previousDecisions' (Vorgehende Entscheidungen)",
+            """
+                 <akn:implicitReference ris:domainTerm="Rechtszug">
+                     <ris:vorgehend domainTerm="Vorgehende Entscheidung">
+                         <ris:dokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:dokumentTyp>
+                         <ris:datum domainTerm="Entscheidungsdatum">2020-01-01</ris:datum>
+                         <ris:dokumentNummer domainTerm="Dokumentnummer">previous decision document number 1</ris:dokumentNummer>
+                         <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
+                         <ris:gericht domainTerm="Gericht">
+                             <ris:typ domainTerm="Gerichtstyp">previous decision court type</ris:typ>
+                             <ris:ort domainTerm="Gerichtsort">previous decision court location</ris:ort>
+                         </ris:gericht>
+                     </ris:vorgehend>
+                 </akn:implicitReference>
+                 <akn:implicitReference ris:domainTerm="Rechtszug">
+                     <ris:vorgehend domainTerm="Vorgehende Entscheidung">
+                         <ris:dokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:dokumentTyp>
+                         <ris:datum domainTerm="Entscheidungsdatum">2020-01-01</ris:datum>
+                         <ris:dokumentNummer domainTerm="Dokumentnummer">previous decision document number 2</ris:dokumentNummer>
+                         <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
+                         <ris:gericht domainTerm="Gericht">
+                             <ris:typ domainTerm="Gerichtstyp">previous decision court type</ris:typ>
+                             <ris:ort domainTerm="Gerichtsort">previous decision court location</ris:ort>
+                         </ris:gericht>
+                     </ris:vorgehend>
+                 </akn:implicitReference>
+                       """),
         // EnsuingDecisions -->
-        //        Arguments.of(
-        //            "'ensuingDecisions' (Nachgehende Entscheidungen)",
-        //            """
-        //              <ris:ensuingDecisions>
-        //                  <ris:ensuingDecision date="2022-10-01">
-        //                     <ris:documentNumber>ensuing decision document number
-        // 1</ris:documentNumber>
-        //                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-        //                     <ris:courtType>ensuing decision court type</ris:courtType>
-        //                  </ris:ensuingDecision>
-        //                  <ris:ensuingDecision date="2022-10-01">
-        //                     <ris:documentNumber>previous decision document number
-        // 2</ris:documentNumber>
-        //                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-        //                     <ris:courtType>ensuing decision court type</ris:courtType>
-        //                  </ris:ensuingDecision>
-        //               </ris:ensuingDecisions>
-        //              """),
+        Arguments.of(
+            "'ensuingDecisions' (Nachgehende Entscheidungen)",
+            """
+                <akn:implicitReference ris:domainTerm="Rechtszug">
+                    <ris:nachgehend domainTerm="Nachgehende Entscheidung" art="anhängig">
+                        <ris:dokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:dokumentTyp>
+                        <ris:datum domainTerm="Entscheidungsdatum">2022-10-01</ris:datum>
+                        <ris:dokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 1</ris:dokumentNummer>
+                        <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
+                        <ris:gericht domainTerm="Gericht">
+                            <ris:typ domainTerm="Gerichtstyp">ensuing decision court type</ris:typ>
+                        </ris:gericht>
+                    </ris:nachgehend>
+                </akn:implicitReference>
+                <akn:implicitReference ris:domainTerm="Rechtszug">
+                    <ris:nachgehend domainTerm="Nachgehende Entscheidung" art="anhängig">
+                        <ris:dokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:dokumentTyp>
+                        <ris:datum domainTerm="Entscheidungsdatum">2022-10-01</ris:datum>
+                        <ris:dokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 2</ris:dokumentNummer>
+                        <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
+                        <ris:gericht domainTerm="Gericht">
+                            <ris:typ domainTerm="Gerichtstyp">ensuing decision court type</ris:typ>
+                        </ris:gericht>
+                        <ris:vermerk domainTerm="Vermerk">ensuing decision note</ris:vermerk>
+                    </ris:nachgehend>
+                </akn:implicitReference>
+                      """),
         // LongTexts/Langtexte -->
         Arguments.of(
             "'dissentingOpinion' (Abweichende Meinung)",

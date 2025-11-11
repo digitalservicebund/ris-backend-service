@@ -32,6 +32,55 @@
                 </akn:FRBRManifestation>
             </akn:identification>
             <akn:analysis source="#ris">
+                <akn:otherReferences source="#ris">
+                    <akn:implicitReference ris:domainTerm="Rechtszug">
+                        <ris:vorgehend domainTerm="Vorgehende Entscheidung">
+                            <ris:dokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:dokumentTyp>
+                            <ris:datum domainTerm="Entscheidungsdatum">2020-01-01</ris:datum>
+                            <ris:dokumentNummer domainTerm="Dokumentnummer">previous decision document number 1</ris:dokumentNummer>
+                            <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
+                            <ris:gericht domainTerm="Gericht">
+                                <ris:typ domainTerm="Gerichtstyp">previous decision court type</ris:typ>
+                                <ris:ort domainTerm="Gerichtsort">previous decision court location</ris:ort>
+                            </ris:gericht>
+                        </ris:vorgehend>
+                    </akn:implicitReference>
+                    <akn:implicitReference ris:domainTerm="Rechtszug">
+                        <ris:vorgehend domainTerm="Vorgehende Entscheidung">
+                            <ris:dokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:dokumentTyp>
+                            <ris:datum domainTerm="Entscheidungsdatum">2020-01-01</ris:datum>
+                            <ris:dokumentNummer domainTerm="Dokumentnummer">previous decision document number 2</ris:dokumentNummer>
+                            <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
+                            <ris:gericht domainTerm="Gericht">
+                                <ris:typ domainTerm="Gerichtstyp">previous decision court type</ris:typ>
+                                <ris:ort domainTerm="Gerichtsort">previous decision court location</ris:ort>
+                            </ris:gericht>
+                        </ris:vorgehend>
+                    </akn:implicitReference>
+                    <akn:implicitReference ris:domainTerm="Rechtszug">
+                        <ris:nachgehend domainTerm="Nachgehende Entscheidung" art="anhängig">
+                            <ris:dokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:dokumentTyp>
+                            <ris:datum domainTerm="Entscheidungsdatum">2022-10-01</ris:datum>
+                            <ris:dokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 1</ris:dokumentNummer>
+                            <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
+                            <ris:gericht domainTerm="Gericht">
+                                <ris:typ domainTerm="Gerichtstyp">ensuing decision court type</ris:typ>
+                            </ris:gericht>
+                        </ris:nachgehend>
+                    </akn:implicitReference>
+                    <akn:implicitReference ris:domainTerm="Rechtszug">
+                        <ris:nachgehend domainTerm="Nachgehende Entscheidung" art="anhängig">
+                            <ris:dokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:dokumentTyp>
+                            <ris:datum domainTerm="Entscheidungsdatum">2022-10-01</ris:datum>
+                            <ris:dokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 2</ris:dokumentNummer>
+                            <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
+                            <ris:gericht domainTerm="Gericht">
+                                <ris:typ domainTerm="Gerichtstyp">ensuing decision court type</ris:typ>
+                            </ris:gericht>
+                     <ris:vermerk domainTerm="Vermerk">ensuing decision note</ris:vermerk>
+                        </ris:nachgehend>
+                    </akn:implicitReference>
+                </akn:otherReferences>
                 <akn:otherAnalysis source="#ris">
                     <ris:dokumentarischeKurztexte domainTerm="Dokumentarische Kurztexte">
                         <ris:titelzeile akn:eId="titelzeile" ris:domainTerm="Titelzeile">
