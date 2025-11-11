@@ -23,12 +23,11 @@ const emit = defineEmits<{
 }>()
 
 const { documentUnit } = storeToRefs(useDocumentUnitStore())
-const lastChipValue = ref<number | undefined>()
-const isValidBorderNumber = computed(
-  () =>
-    !documentUnit.value?.managementData.borderNumbers.includes(
-      `${lastChipValue.value}`,
-    ),
+const lastChipValue = ref<string | undefined>()
+const isValidBorderNumber = computed(() =>
+  documentUnit.value?.managementData.borderNumbers.includes(
+    `${lastChipValue.value}`,
+  ),
 )
 
 const chips = computed<string[]>({
@@ -44,8 +43,7 @@ const chips = computed<string[]>({
       return
     }
 
-    const foo = newValue.at(-1) ?? ""
-    lastChipValue.value = Number.parseInt(foo)
+    lastChipValue.value = newValue.at(-1)
 
     validateInput()
 

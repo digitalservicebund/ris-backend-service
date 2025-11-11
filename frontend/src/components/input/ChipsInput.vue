@@ -15,6 +15,7 @@ interface Props {
   readOnly?: boolean
   maska?: string
   placeholder?: string
+  testId?: string
 }
 
 const props = defineProps<Props>()
@@ -64,9 +65,9 @@ const addChip = () => {
   newChipText.value = ""
 }
 
-function onDeleteChip() {
+async function onDeleteChip() {
   if (props.readOnly) return
-
+  await determineInputWidth()
   focusInputIfEmpty()
 }
 
@@ -106,13 +107,20 @@ function focusInputIfEmpty() {
 const wrapperEl = ref<HTMLElement | null>(null)
 
 const inputContentWidth = ref<string | undefined>("auto")
-const inputContentMinWidth = ref<string | undefined>("auto")
-const getInputContentMinWidth = () => {
-  if (!newChipText.value && props.placeholder) {
+
+const getInputContentWidth = (
+  maxWidth: number | undefined,
+  borderLeft: number,
+  borderRight: number,
+) => {
+  if (props.placeholder?.length && props.modelValue?.length === 0) {
     const length = props.placeholder.length + 2
     return `${length}ch`
+  } else if (!chipsInput.value || !maxWidth) {
+    return "auto"
   }
-  return "auto"
+
+  return `min(${maxWidth}px, ${chipsInput.value.scrollWidth + borderLeft + borderRight}px)`
 }
 async function determineInputWidth() {
   if (!chipsInput.value) return
@@ -141,11 +149,11 @@ async function determineInputWidth() {
     const padding = parseInt(paddingLeft) + parseInt(paddingRight)
     maxWidth = wrapperEl.value.clientWidth - padding - 16 // 16px for the icon
   }
-
-  inputContentWidth.value = `min(${maxWidth ?? "9999"}px, ${
-    chipsInput.value.scrollWidth + borderLeft + borderRight
-  }px)`
-  inputContentMinWidth.value = getInputContentMinWidth()
+  inputContentWidth.value = getInputContentWidth(
+    maxWidth,
+    borderLeft,
+    borderRight,
+  )
 }
 
 watchEffect(() => {
@@ -199,8 +207,12 @@ watch(newChipText, async () => {
           class="peer w-4 min-w-0 border-none bg-transparent outline-none"
           :data-maska="maska ?? null"
           :data-testid="`chips-input_${id}`"
-          :placeholder="props.placeholder ? props.placeholder : ''"
-          :style="{ width: inputContentWidth, minWidth: inputContentMinWidth }"
+          :placeholder="
+            props.placeholder && props.modelValue?.length === 0
+              ? props.placeholder
+              : ''
+          "
+          :style="{ width: inputContentWidth }"
           type="text"
           @blur="addChip"
           @focus="focusedChip = undefined"

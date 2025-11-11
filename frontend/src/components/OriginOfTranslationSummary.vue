@@ -9,7 +9,10 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div class="flex w-full justify-between">
+  <div
+    class="flex w-full justify-between"
+    data-testid="originOfTranslationSummary"
+  >
     <div class="flex flex-row items-center">
       <IcBaselineTranslate class="mr-8" />
       <div class="ris-label1-regular mr-8 max-w-[calc(30vw)] truncate">

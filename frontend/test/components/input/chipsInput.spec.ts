@@ -18,6 +18,7 @@ function renderComponent(props?: Partial<ChipsInputProps>) {
     "onUpdate:validationError": props?.["onUpdate:validationError"],
     ariaLabel: props?.ariaLabel ?? "aria-label",
     readOnly: props?.readOnly,
+    placeholder: props?.placeholder,
   }
 
   return { user, ...render(ChipsInput, { props: effectiveProps }) }
@@ -247,5 +248,25 @@ describe("Chips Input", () => {
     await user.click(chips[1])
     await user.keyboard("{enter}")
     expect(onUpdate).toHaveBeenCalledWith(["foo"])
+  })
+
+  it("shows placeholder when input is empty", () => {
+    renderComponent({
+      modelValue: [],
+      placeholder: "placeholder",
+    })
+
+    const input = screen.getByRole("textbox")
+    expect(input).toHaveAttribute("placeholder", "placeholder")
+  })
+
+  it("hdoes not show placeholder when input has values", () => {
+    renderComponent({
+      modelValue: ["foo", "bar"],
+      placeholder: "placeholder",
+    })
+
+    const input = screen.getByRole("textbox")
+    expect(input).not.toHaveAttribute("placeholder", "placeholder")
   })
 })

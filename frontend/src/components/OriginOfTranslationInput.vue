@@ -5,6 +5,7 @@ import ComboboxInput from "@/components/ComboboxInput.vue"
 import ChipsBorderNumberInput from "@/components/input/ChipsBorderNumberInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
 import InputField from "@/components/input/InputField.vue"
+import { useValidationStore } from "@/composables/useValidationStore"
 import OriginOfTranslation from "@/domain/originOfTranslation"
 import ComboboxItemService from "@/services/comboboxItemService"
 
@@ -19,6 +20,8 @@ const emit = defineEmits<{
   cancelEdit: [void]
   removeEntry: [value?: boolean]
 }>()
+
+const validationStore = useValidationStore<["borderNumber"][number]>()
 
 const lastSavedModelValue = ref(
   new OriginOfTranslation({ ...props.modelValue }),
@@ -95,6 +98,7 @@ onMounted(() => {
       <div class="basis-1/2">
         <InputField
           id="originOfTranslationBorderNumbers"
+          v-slot="slotProps"
           data-testid="translation-source-border-numbers"
           label="Fundstelle: Interne Verlinkung"
         >
@@ -104,8 +108,11 @@ onMounted(() => {
             aria-label="Fundstelle: Interne Verlinkung"
             class="w-full"
             data-testid="translation-source-border-numbers-input"
+            :has-error="slotProps.hasError"
             placeholder="Randnummer"
             size="small"
+            @focus="validationStore.remove('borderNumber')"
+            @update:validation-error="slotProps.updateValidationError"
           ></ChipsBorderNumberInput>
         </InputField>
       </div>
