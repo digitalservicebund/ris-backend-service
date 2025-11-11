@@ -8,4 +8,6 @@ export type Court = {
   jurisdictionType?: string
   regions?: string[]
   responsibleDocOffice?: DocumentationOffice
+  isSuperiorCourt?: boolean
+  isForeignCourt?: boolean
 }
