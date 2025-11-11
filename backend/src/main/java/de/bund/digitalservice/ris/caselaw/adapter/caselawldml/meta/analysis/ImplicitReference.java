@@ -51,7 +51,6 @@ public class ImplicitReference {
   }
 
   @NoArgsConstructor
-  //  @AllArgsConstructor
   @Getter
   @SuperBuilder
   public static class Vorgehend extends CaselawReference {
