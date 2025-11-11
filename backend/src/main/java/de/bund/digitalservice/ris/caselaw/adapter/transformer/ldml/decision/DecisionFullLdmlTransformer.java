@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
@@ -377,6 +378,48 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     } else {
       return null;
     }
+  }
+
+  @Nullable
+  protected DokumentarischeKurztexte buildKurztexte(Decision decision) {
+    var builder = getCommonKurztexteBuilder(decision);
+
+    ShortTexts shortTexts = decision.shortTexts();
+    if (shortTexts != null) {
+      // Entscheidungsnamen
+      if (shortTexts.decisionNames() != null && !shortTexts.decisionNames().isEmpty()) {
+        Entscheidungsnamen entscheidungsnamen =
+            Entscheidungsnamen.builder()
+                .entscheidungsnamen(
+                    shortTexts.decisionNames().stream()
+                        .map(
+                            entscheidungsname ->
+                                Entscheidungsnamen.Entscheidungsname.builder()
+                                    .value(entscheidungsname)
+                                    .build())
+                        .toList())
+                .build();
+        builder.entscheidungsnamen(entscheidungsnamen);
+      }
+
+      // Orientierungssatz
+      if (isNotBlank(shortTexts.headnote())) {
+        var orientierungssatz =
+            JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.headnote()));
+        orientierungssatz.setDomainTerm("Orientierungssatz");
+        builder.orientierungssatz(orientierungssatz);
+      }
+
+      // Sonstiger Orientierungssatz
+      if (isNotBlank(shortTexts.otherHeadnote())) {
+        var sonstigerOrientierungssatz =
+            JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.otherHeadnote()));
+        sonstigerOrientierungssatz.setDomainTerm("Sonstiger Orientierungssatz");
+        builder.sonstigerOrientierungssatz(sonstigerOrientierungssatz);
+      }
+    }
+    DokumentarischeKurztexte kurztexte = builder.build();
+    return kurztexte.isEmpty() ? null : kurztexte;
   }
 
   @Override

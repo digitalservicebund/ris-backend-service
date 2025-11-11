@@ -82,8 +82,8 @@
                 </akn:otherReferences>
                 <akn:otherAnalysis source="#ris">
                     <ris:dokumentarischeKurztexte domainTerm="Dokumentarische Kurztexte">
-                        <ris:titelzeile eId="titelzeile" ris:domainTerm="Titelzeile">
-                            Bundesverfassungsgericht – Urteil vom 23.09.2025 – Az. 1 BvR 1234/25
+                        <ris:titelzeile akn:eId="titelzeile" ris:domainTerm="Titelzeile">
+                            <akn:p>headline test</akn:p>
                         </ris:titelzeile>
                     </ris:dokumentarischeKurztexte>
                 </akn:otherAnalysis>

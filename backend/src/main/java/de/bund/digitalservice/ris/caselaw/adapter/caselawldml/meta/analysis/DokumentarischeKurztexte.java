@@ -7,6 +7,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,4 +34,12 @@ public class DokumentarischeKurztexte {
 
   @XmlElement(name = "sonstigerOrientierungssatz", namespace = CaseLawLdml.RIS_NS)
   private JaxbHtml sonstigerOrientierungssatz;
+
+  @XmlTransient
+  public boolean isEmpty() {
+    return entscheidungsnamen == null
+        && titelzeile == null
+        && orientierungssatz == null
+        && sonstigerOrientierungssatz == null;
+  }
 }

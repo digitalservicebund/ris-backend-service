@@ -5,6 +5,7 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,4 +23,9 @@ public class OtherAnalysis {
 
   @XmlElement(name = "dokumentarischeKurztexte", namespace = CaseLawLdml.RIS_NS)
   private DokumentarischeKurztexte dokumentarischeKurztexte;
+
+  @XmlTransient
+  public boolean isEmpty() {
+    return dokumentarischeKurztexte == null || dokumentarischeKurztexte.isEmpty();
+  }
 }
