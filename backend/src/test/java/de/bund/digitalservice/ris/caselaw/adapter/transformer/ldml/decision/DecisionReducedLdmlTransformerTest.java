@@ -39,6 +39,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
+import java.io.FileWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -133,6 +134,11 @@ class DecisionReducedLdmlTransformerTest {
             .build();
 
     if (diff.hasDifferences()) {
+      try (FileWriter writer =
+          new FileWriter(
+              "/Users/kimkern/workspace/ris-backend-service/backend/src/test/resources/testdata/testoutput.xml")) {
+        writer.write(fileContent.get());
+      }
       StringBuilder differences = new StringBuilder();
       diff.getDifferences().forEach(d -> differences.append(d.toString()).append("\n"));
       Assertions.fail("XMLs differ:\n" + differences.toString());

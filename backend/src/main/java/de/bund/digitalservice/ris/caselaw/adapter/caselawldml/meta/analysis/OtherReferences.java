@@ -23,4 +23,8 @@ public class OtherReferences {
 
   @XmlElement(name = "implicitReference", namespace = CaseLawLdml.AKN_NS)
   private List<ImplicitReference> implicitReferences;
+
+  public boolean isEmpty() {
+    return implicitReferences == null || implicitReferences.isEmpty();
+  }
 }

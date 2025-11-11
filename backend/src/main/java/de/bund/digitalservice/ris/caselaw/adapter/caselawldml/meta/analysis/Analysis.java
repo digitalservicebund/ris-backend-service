@@ -28,6 +28,7 @@ public class Analysis {
 
   @XmlTransient
   public boolean isEmpty() {
-    return otherAnalysis == null || otherAnalysis.isEmpty();
+    return (otherAnalysis == null || otherAnalysis.isEmpty())
+        && (otherReferences == null || otherReferences.isEmpty());
   }
 }

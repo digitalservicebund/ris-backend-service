@@ -28,6 +28,7 @@ public class PendingProceedingReducedLdmlTransformer
         .identification(buildIdentification(pendingProceeding, false))
         .references(buildReferences(pendingProceeding))
         .proprietary(Proprietary.builder().meta(buildRisMeta(pendingProceeding)).build())
+        .analysis(buildAnalysis(pendingProceeding))
         .build();
   }
 

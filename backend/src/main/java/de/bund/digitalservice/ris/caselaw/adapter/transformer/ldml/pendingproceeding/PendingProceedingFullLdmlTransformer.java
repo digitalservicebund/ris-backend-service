@@ -52,6 +52,7 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
         .identification(buildIdentification(pendingProceeding))
         .references(buildReferences(pendingProceeding))
         .proprietary(Proprietary.builder().meta(buildRisMeta(pendingProceeding)).build())
+        .analysis(buildAnalysis(pendingProceeding))
         .build();
   }
 
