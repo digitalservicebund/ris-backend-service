@@ -11,10 +11,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Classification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Keyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Analysis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.DokumentarischeKurztexte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Entscheidungsnamen;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.OtherAnalysis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrLanguage;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDaten;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDokumentnummern;
@@ -39,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
@@ -294,32 +293,14 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     return builder.build();
   }
 
-  private Analysis buildAnalysis(Decision decision) {
-    var builder = Analysis.builder();
-    boolean hasAnalysisData = false;
-
-    OtherAnalysis otherAnalysis = buildOtherAnalysis(decision);
-    if (otherAnalysis != null) {
-      hasAnalysisData = true;
-      builder.otherAnalysis(otherAnalysis);
-    }
-
-    if (hasAnalysisData) {
-      return builder.build();
-    } else {
-      return null;
-    }
-  }
-
-  private OtherAnalysis buildOtherAnalysis(Decision decision) {
-    var builder = DokumentarischeKurztexte.builder();
-    boolean hasOtherAnalysisData = false;
+  @Nullable
+  protected DokumentarischeKurztexte buildKurztexte(Decision decision) {
+    var builder = getCommonKurztexteBuilder(decision);
 
     ShortTexts shortTexts = decision.shortTexts();
     if (shortTexts != null) {
       // Entscheidungsnamen
       if (shortTexts.decisionNames() != null && !shortTexts.decisionNames().isEmpty()) {
-        hasOtherAnalysisData = true;
         Entscheidungsnamen entscheidungsnamen =
             Entscheidungsnamen.builder()
                 .entscheidungsnamen(
@@ -334,19 +315,8 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         builder.entscheidungsnamen(entscheidungsnamen);
       }
 
-      // Titelzeile
-      if (isNotBlank(shortTexts.guidingPrinciple())) {
-        hasOtherAnalysisData = true;
-        var titelzeile =
-            JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.guidingPrinciple()));
-        titelzeile.setDomainTerm("Titelzeile");
-        titelzeile.setEId("titelzeile");
-        builder.titelzeile(titelzeile);
-      }
-
       // Orientierungssatz
       if (isNotBlank(shortTexts.headnote())) {
-        hasOtherAnalysisData = true;
         var orientierungssatz =
             JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.headnote()));
         orientierungssatz.setDomainTerm("Orientierungssatz");
@@ -355,19 +325,14 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
       // Sonstiger Orientierungssatz
       if (isNotBlank(shortTexts.otherHeadnote())) {
-        hasOtherAnalysisData = true;
         var sonstigerOrientierungssatz =
             JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.otherHeadnote()));
         sonstigerOrientierungssatz.setDomainTerm("Sonstiger Orientierungssatz");
         builder.sonstigerOrientierungssatz(sonstigerOrientierungssatz);
       }
     }
-
-    if (hasOtherAnalysisData) {
-      return OtherAnalysis.builder().dokumentarischeKurztexte(builder.build()).build();
-    } else {
-      return null;
-    }
+    DokumentarischeKurztexte kurztexte = builder.build();
+    return kurztexte.isEmpty() ? null : kurztexte;
   }
 
   @Override

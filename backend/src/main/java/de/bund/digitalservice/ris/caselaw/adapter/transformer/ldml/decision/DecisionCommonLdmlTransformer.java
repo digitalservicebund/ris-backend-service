@@ -14,6 +14,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Judg
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Motivation;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Opinion;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Analysis;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.DokumentarischeKurztexte;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.OtherAnalysis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DokumentTyp;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumentationsstelle;
@@ -30,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -77,6 +81,51 @@ public abstract class DecisionCommonLdmlTransformer
   }
 
   protected abstract Header buildHeader(Decision decision);
+
+  @Nullable
+  protected Analysis buildAnalysis(Decision decision) {
+    OtherAnalysis otherAnalysis = buildOtherAnalysis(decision);
+
+    Analysis analysis = Analysis.builder().otherAnalysis(otherAnalysis).build();
+    if (!analysis.isEmpty()) {
+      return analysis;
+    } else {
+      return null;
+    }
+  }
+
+  @Nullable
+  protected OtherAnalysis buildOtherAnalysis(Decision decision) {
+    DokumentarischeKurztexte kurztexte = buildKurztexte(decision);
+
+    OtherAnalysis otherAnalysis =
+        OtherAnalysis.builder().dokumentarischeKurztexte(kurztexte).build();
+    if (!otherAnalysis.isEmpty()) {
+      return otherAnalysis;
+    } else {
+      return null;
+    }
+  }
+
+  @Nullable
+  protected abstract DokumentarischeKurztexte buildKurztexte(Decision decision);
+
+  protected DokumentarischeKurztexte.DokumentarischeKurztexteBuilder getCommonKurztexteBuilder(
+      Decision decision) {
+    var builder = DokumentarischeKurztexte.builder();
+
+    ShortTexts shortTexts = decision.shortTexts();
+    // Titelzeile
+    if (shortTexts != null && isNotBlank(shortTexts.headline())) {
+      var titelzeile =
+          JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.headline()));
+      titelzeile.setDomainTerm("Titelzeile");
+      titelzeile.setEId("titelzeile");
+      builder.titelzeile(titelzeile);
+    }
+
+    return builder;
+  }
 
   protected abstract Meta buildMeta(Decision decision);
 

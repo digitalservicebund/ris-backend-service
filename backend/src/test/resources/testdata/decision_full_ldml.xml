@@ -46,7 +46,7 @@
                             </ris:entscheidungsname>
                         </ris:entscheidungsnamen>
                         <ris:titelzeile akn:eId="titelzeile" ris:domainTerm="Titelzeile">
-                            <akn:p>guidingPrinciple test</akn:p>
+                            <akn:p>headline test</akn:p>
                         </ris:titelzeile>
                         <ris:orientierungssatz ris:domainTerm="Orientierungssatz">
                             <akn:p>headNote test</akn:p>
