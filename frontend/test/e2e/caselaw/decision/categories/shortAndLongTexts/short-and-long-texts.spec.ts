@@ -22,7 +22,9 @@ test.describe("short and long texts", () => {
         category: DocumentUnitCategoriesEnum.TEXTS,
       })
 
-      const decisionNameInput = page.locator("#decisionNames")
+      const decisionNameInput = page
+        .getByLabel("Entscheidungsnamen")
+        .getByRole("textbox")
       const decisionNameChips = page
         .getByRole("listitem")
         .getByLabel("Eintrag bearbeiten")

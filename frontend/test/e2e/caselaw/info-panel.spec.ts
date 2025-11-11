@@ -9,7 +9,10 @@ test.describe("info panel", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("#fileNumberInput").fill("-firstChip")
+    await page
+      .getByLabel("Aktenzeichen")
+      .getByRole("textbox")
+      .fill("-firstChip")
     await page.keyboard.press("Enter")
 
     await expect(
@@ -18,7 +21,10 @@ test.describe("info panel", () => {
         .getByText("-firstChip"),
     ).toBeVisible()
 
-    await page.locator("#fileNumberInput").fill("-secondChip")
+    await page
+      .getByLabel("Aktenzeichen")
+      .getByRole("textbox")
+      .fill("-secondChip")
     await page.keyboard.press("Enter")
     await expect(
       page

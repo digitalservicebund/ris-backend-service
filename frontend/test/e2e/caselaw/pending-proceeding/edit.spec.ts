@@ -27,7 +27,7 @@ test.describe("edit pending proceeding", () => {
 
       // Aktenzeichen
       await test.step("fileNumbers can be added", async () => {
-        await page.locator("#fileNumberInput").fill("abc")
+        await page.getByLabel("Aktenzeichen").getByRole("textbox").fill("abc")
         await page.keyboard.press("Enter")
         await expect(page.getByRole("listitem", { name: "abc" })).toBeVisible()
       })
@@ -61,7 +61,10 @@ test.describe("edit pending proceeding", () => {
 
       // Abweichende Dokumentnummer
       await test.step("deviating document numbers can be added", async () => {
-        await page.locator("#deviatingDocumentNumbers").fill("def")
+        await page
+          .getByLabel("Abweichende Dokumentnummer")
+          .getByRole("textbox")
+          .fill("def")
         await page.keyboard.press("Enter")
         await expect(page.getByRole("listitem", { name: "def" })).toBeVisible()
       })
