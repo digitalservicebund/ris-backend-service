@@ -3,6 +3,7 @@ import Button from "primevue/button"
 import InputText from "primevue/inputtext"
 import { onMounted, ref, watch } from "vue"
 import CollectiveAgreementDateInput from "@/components/CollectiveAgreementDateInput.vue"
+import CollectiveAgreementNormInput from "@/components/CollectiveAgreementNormInput.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import { ValidationError } from "@/components/input/types"
@@ -92,14 +93,11 @@ onMounted(() => {
           v-slot="slotProps"
           label="Tarifnorm"
         >
-          <InputText
+          <CollectiveAgreementNormInput
             id="collectiveAgreementNormInputText"
             v-model="collectiveAgreement.norm"
-            aria-label="Tarifnorm"
-            class="w-full"
-            data-testid="collective-agreement-norm-input"
-            size="small"
-          ></InputText>
+            @update:validation-error="slotProps.updateValidationError"
+          ></CollectiveAgreementNormInput>
         </InputField>
       </div>
 
