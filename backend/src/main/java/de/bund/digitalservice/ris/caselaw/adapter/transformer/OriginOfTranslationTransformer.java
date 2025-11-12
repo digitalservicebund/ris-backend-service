@@ -39,7 +39,6 @@ public class OriginOfTranslationTransformer {
     OriginOfTranslationDTO originOfTranslationDTO =
         OriginOfTranslationDTO.builder()
             .id(originOfTranslation.newEntry() ? null : originOfTranslation.id())
-            .decision(currentDto)
             .translationType(originOfTranslation.translationType())
             .languageCode(
                 LanguageCodeTransformer.transformToDTO(originOfTranslation.languageCode()))

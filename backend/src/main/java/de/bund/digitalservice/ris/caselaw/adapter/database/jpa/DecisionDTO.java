@@ -268,11 +268,8 @@ public class DecisionDTO extends DocumentationUnitDTO {
   private AppealAdmitter appealAdmittedBy;
 
   /** Herkunft der Übersetzung */
-  @OneToMany(
-      mappedBy = "decision",
-      cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY,
-      orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "decision_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
   private List<OriginOfTranslationDTO> originOfTranslations = new ArrayList<>();

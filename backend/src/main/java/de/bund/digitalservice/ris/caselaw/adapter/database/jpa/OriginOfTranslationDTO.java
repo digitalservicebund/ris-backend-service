@@ -35,10 +35,6 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 public class OriginOfTranslationDTO {
   @Id @GeneratedValue private UUID id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "decision_id", nullable = false)
-  private DecisionDTO decision;
-
   @Column @NotNull private Long rank;
 
   @ManyToOne
