@@ -663,15 +663,7 @@ public class DocumentationUnitService {
         patchMapperService.calculatePatch(
             existingDocumentationUnit.uuid(), patch.documentationUnitVersion());
 
-    if (!patch.patch().getOperations().isEmpty() || !newPatch.getOperations().isEmpty()) {
-      log.debug(
-          "documentation unit '{}' with patch '{}' for version '{}'",
-          documentationUnitId,
-          patch.documentationUnitVersion(),
-          patch.patch());
-      log.debug("new version is {}", newVersion);
-      log.debug("version {} - patch in database: {}", patch.documentationUnitVersion(), newPatch);
-    }
+    logPatches(patch, newPatch, newVersion, documentationUnitId);
 
     JsonPatch toFrontendJsonPatch = new JsonPatch(Collections.emptyList());
     RisJsonPatch toFrontend;
@@ -765,6 +757,19 @@ public class DocumentationUnitService {
     }
 
     return toFrontend;
+  }
+
+  private void logPatches(
+      RisJsonPatch patch, JsonPatch newPatch, long newVersion, UUID documentationUnitId) {
+    if (!patch.patch().getOperations().isEmpty() || !newPatch.getOperations().isEmpty()) {
+      log.debug(
+          "documentation unit '{}' with patch '{}' for version '{}'",
+          documentationUnitId,
+          patch.documentationUnitVersion(),
+          patch.patch());
+      log.debug("new version is {}", newVersion);
+      log.debug("version {} - patch in database: {}", patch.documentationUnitVersion(), newPatch);
+    }
   }
 
   /** Return a documentation unit with a new version */
