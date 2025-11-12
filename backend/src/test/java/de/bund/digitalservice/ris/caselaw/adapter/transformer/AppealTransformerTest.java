@@ -2,18 +2,18 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealAppellantDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealJointRevisionDefendantDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealJointRevisionPlaintiffDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealNzbDefendantDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealNzbPlaintiffDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealRevisionDefendantDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealRevisionPlaintiffDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealStatusDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppellantDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealAppellantDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealJointRevisionDefendantDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealJointRevisionPlaintiffDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealNzbDefendantDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealNzbPlaintiffDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealRevisionDefendantDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealRevisionPlaintiffDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealStatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppellantDTO;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealStatus;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealWithdrawal;

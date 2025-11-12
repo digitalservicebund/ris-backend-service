@@ -207,6 +207,7 @@ describe("appeal", () => {
       pkhPlaintiff: PkhPlaintiff.NEIN,
     })
 
+    // Need to wait for Wertetabelle to be loaded in OnMounted
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     expect(screen.queryByTestId("appellants")).toHaveTextContent("Kläger")

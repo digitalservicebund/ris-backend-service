@@ -1,6 +1,4 @@
 import { DropdownItem } from "@/components/input/types"
-import { AppealStatus } from "@/domain/appealStatus"
-import { Appellant } from "@/domain/appellant"
 
 export type Appeal = {
   id?: string
@@ -13,6 +11,16 @@ export type Appeal = {
   nzbPlaintiffStatuses?: AppealStatus[]
   appealWithdrawal?: AppealWithdrawal
   pkhPlaintiff?: PkhPlaintiff
+}
+
+export type Appellant = {
+  id: string
+  value: string
+}
+
+export type AppealStatus = {
+  id: string
+  value: string
 }
 
 export enum AppealWithdrawal {

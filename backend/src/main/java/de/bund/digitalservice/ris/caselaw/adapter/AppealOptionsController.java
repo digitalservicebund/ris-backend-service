@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/v1/caselaw/appeal")
+@RequestMapping("api/v1/caselaw/appealoptions")
 @Slf4j
 public class AppealOptionsController {
 

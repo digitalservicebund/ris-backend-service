@@ -5,6 +5,7 @@ import {
   navigateToCategories,
   navigateToHandover,
   navigateToPreview,
+  save,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe(
@@ -99,6 +100,8 @@ test.describe(
         )
         await expect(page.getByTestId("appeal-withdrawal")).toHaveText("Ja")
         await expect(page.getByTestId("pkh-plaintiff")).toHaveText("Nein")
+
+        await save(page)
       })
 
       await test.step("Ausgefüllte Rubrik wird bei Wechsel zu Nicht-Finanzgericht weiterhin angezeigt", async () => {

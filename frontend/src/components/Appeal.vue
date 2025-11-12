@@ -4,9 +4,12 @@ import MultiSelect from "primevue/multiselect"
 import InputSelect from "primevue/select"
 import { computed, onMounted, ref } from "vue"
 import InputField from "@/components/input/InputField.vue"
-import { appealWithdrawalItems, pkhPlaintiffItems } from "@/domain/appeal"
-import { AppealStatus } from "@/domain/appealStatus"
-import { Appellant } from "@/domain/appellant"
+import {
+  AppealStatus,
+  appealWithdrawalItems,
+  Appellant,
+  pkhPlaintiffItems,
+} from "@/domain/appeal"
 import appealService from "@/services/appealService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 

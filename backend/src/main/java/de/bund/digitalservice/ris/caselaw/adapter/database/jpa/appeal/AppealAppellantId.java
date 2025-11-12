@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
+package de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal;
 
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @NoArgsConstructor
 @EqualsAndHashCode
-public class AppealNzbDefendantId implements Serializable {
+public class AppealAppellantId implements Serializable {
   private UUID appealId;
 
-  private UUID appealStatusId;
+  private UUID appellantId;
 
-  public AppealNzbDefendantId(UUID appealId, UUID appealStatusId) {
+  public AppealAppellantId(UUID appealId, UUID appellantId) {
     this.appealId = appealId;
-    this.appealStatusId = appealStatusId;
+    this.appellantId = appellantId;
   }
 }

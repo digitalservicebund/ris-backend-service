@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

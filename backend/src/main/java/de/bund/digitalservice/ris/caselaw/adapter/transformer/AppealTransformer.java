@@ -1,23 +1,17 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealAppellantDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealAppellantId;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealJointRevisionDefendantDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealJointRevisionDefendantId;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealJointRevisionPlaintiffDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealJointRevisionPlaintiffId;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealNzbDefendantDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealNzbDefendantId;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealNzbPlaintiffDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealNzbPlaintiffId;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealRevisionDefendantDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealRevisionDefendantId;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealRevisionPlaintiffDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealRevisionPlaintiffId;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppealStatusDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AppellantDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealAppellantDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealAppellantId;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealJointRevisionDefendantDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealJointRevisionPlaintiffDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealNzbDefendantDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealNzbPlaintiffDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealRevisionDefendantDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealRevisionPlaintiffDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealStatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppellantDTO;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealStatus;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.Appellant;
@@ -107,13 +101,14 @@ public class AppealTransformer {
     List<AppealRevisionDefendantDTO> revisionDefendantStatuses = new ArrayList<>();
     for (int i = 0; i < appeal.revisionDefendantStatuses().size(); i++) {
       var status = appeal.revisionDefendantStatuses().get(i);
-      revisionDefendantStatuses.add(
+      var revisionDefendantDTO =
           AppealRevisionDefendantDTO.builder()
-              .primaryKey(new AppealRevisionDefendantId(appeal.id(), status.id()))
               .appeal(appealDTO)
               .appealStatus(AppealStatusDTO.builder().id(status.id()).value(status.value()).build())
               .rank(i + 1)
-              .build());
+              .build();
+      revisionDefendantDTO.setPrimaryKey(appeal.id(), status.id());
+      revisionDefendantStatuses.add(revisionDefendantDTO);
     }
     appealDTO.setRevisionDefendantStatuses(revisionDefendantStatuses);
   }
@@ -127,13 +122,14 @@ public class AppealTransformer {
     List<AppealRevisionPlaintiffDTO> revisionPlaintiffStatuses = new ArrayList<>();
     for (int i = 0; i < appeal.revisionPlaintiffStatuses().size(); i++) {
       var status = appeal.revisionPlaintiffStatuses().get(i);
-      revisionPlaintiffStatuses.add(
+      var obj =
           AppealRevisionPlaintiffDTO.builder()
-              .primaryKey(new AppealRevisionPlaintiffId(appeal.id(), status.id()))
               .appeal(appealDTO)
               .appealStatus(AppealStatusDTO.builder().id(status.id()).value(status.value()).build())
               .rank(i + 1)
-              .build());
+              .build();
+      obj.setPrimaryKey(appeal.id(), status.id());
+      revisionPlaintiffStatuses.add(obj);
     }
     appealDTO.setRevisionPlaintiffStatuses(revisionPlaintiffStatuses);
   }
@@ -147,13 +143,14 @@ public class AppealTransformer {
     List<AppealJointRevisionDefendantDTO> jointRevisionDefendantStatuses = new ArrayList<>();
     for (int i = 0; i < appeal.jointRevisionDefendantStatuses().size(); i++) {
       var status = appeal.jointRevisionDefendantStatuses().get(i);
-      jointRevisionDefendantStatuses.add(
+      var jointRevisionDefendantDTO =
           AppealJointRevisionDefendantDTO.builder()
-              .primaryKey(new AppealJointRevisionDefendantId(appeal.id(), status.id()))
               .appeal(appealDTO)
               .appealStatus(AppealStatusDTO.builder().id(status.id()).value(status.value()).build())
               .rank(i + 1)
-              .build());
+              .build();
+      jointRevisionDefendantDTO.setPrimaryKey(appeal.id(), status.id());
+      jointRevisionDefendantStatuses.add(jointRevisionDefendantDTO);
     }
     appealDTO.setJointRevisionDefendantStatuses(jointRevisionDefendantStatuses);
   }
@@ -167,13 +164,14 @@ public class AppealTransformer {
     List<AppealJointRevisionPlaintiffDTO> jointRevisionPlaintiffStatuses = new ArrayList<>();
     for (int i = 0; i < appeal.jointRevisionPlaintiffStatuses().size(); i++) {
       var status = appeal.jointRevisionPlaintiffStatuses().get(i);
-      jointRevisionPlaintiffStatuses.add(
+      var jointRevisionPlaintiffDTO =
           AppealJointRevisionPlaintiffDTO.builder()
-              .primaryKey(new AppealJointRevisionPlaintiffId(appeal.id(), status.id()))
               .appeal(appealDTO)
               .appealStatus(AppealStatusDTO.builder().id(status.id()).value(status.value()).build())
               .rank(i + 1)
-              .build());
+              .build();
+      jointRevisionPlaintiffDTO.setPrimaryKey(appeal.id(), status.id());
+      jointRevisionPlaintiffStatuses.add(jointRevisionPlaintiffDTO);
     }
     appealDTO.setJointRevisionPlaintiffStatuses(jointRevisionPlaintiffStatuses);
   }
@@ -186,13 +184,14 @@ public class AppealTransformer {
     List<AppealNzbDefendantDTO> nzbDefendantStatuses = new ArrayList<>();
     for (int i = 0; i < appeal.nzbDefendantStatuses().size(); i++) {
       var status = appeal.nzbDefendantStatuses().get(i);
-      nzbDefendantStatuses.add(
+      var nzbDefendantDTO =
           AppealNzbDefendantDTO.builder()
-              .primaryKey(new AppealNzbDefendantId(appeal.id(), status.id()))
               .appeal(appealDTO)
               .appealStatus(AppealStatusDTO.builder().id(status.id()).value(status.value()).build())
               .rank(i + 1)
-              .build());
+              .build();
+      nzbDefendantDTO.setPrimaryKey(appeal.id(), status.id());
+      nzbDefendantStatuses.add(nzbDefendantDTO);
     }
     appealDTO.setNzbDefendantStatuses(nzbDefendantStatuses);
   }
@@ -205,13 +204,14 @@ public class AppealTransformer {
     List<AppealNzbPlaintiffDTO> nzbPlaintiffStatuses = new ArrayList<>();
     for (int i = 0; i < appeal.nzbPlaintiffStatuses().size(); i++) {
       var status = appeal.nzbPlaintiffStatuses().get(i);
-      nzbPlaintiffStatuses.add(
+      var nzbPlaintiffDTO =
           AppealNzbPlaintiffDTO.builder()
-              .primaryKey(new AppealNzbPlaintiffId(appeal.id(), status.id()))
               .appeal(appealDTO)
               .appealStatus(AppealStatusDTO.builder().id(status.id()).value(status.value()).build())
               .rank(i + 1)
-              .build());
+              .build();
+      nzbPlaintiffDTO.setPrimaryKey(appeal.id(), status.id());
+      nzbPlaintiffStatuses.add(nzbPlaintiffDTO);
     }
     appealDTO.setNzbPlaintiffStatuses(nzbPlaintiffStatuses);
   }

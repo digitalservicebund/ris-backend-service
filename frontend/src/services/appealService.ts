@@ -1,17 +1,16 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import { AppealStatus } from "@/domain/appealStatus"
-import { Appellant } from "@/domain/appellant"
+import { AppealStatus, Appellant } from "@/domain/appeal"
 import errorMessages from "@/i18n/errors.json"
 
-interface AppealService {
+interface AppealOptionService {
   getAppellants(): Promise<ServiceResponse<Appellant[]>>
   getAppealStatuses(): Promise<ServiceResponse<AppealStatus[]>>
 }
 
-const service: AppealService = {
+const service: AppealOptionService = {
   async getAppellants() {
     const response = await httpClient.get<Appellant[]>(
-      "caselaw/appeal/appellants",
+      "caselaw/appealoptions/appellants",
     )
     if (response.status >= 300 || response.error) {
       response.data = undefined
@@ -22,7 +21,7 @@ const service: AppealService = {
 
   async getAppealStatuses() {
     const response = await httpClient.get<AppealStatus[]>(
-      "caselaw/appeal/statuses",
+      "caselaw/appealoptions/statuses",
     )
     if (response.status >= 300 || response.error) {
       response.data = undefined

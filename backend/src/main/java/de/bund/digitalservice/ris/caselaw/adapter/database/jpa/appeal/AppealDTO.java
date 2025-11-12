@@ -1,5 +1,6 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
+package de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealWithdrawal;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.PkhPlaintiff;
 import jakarta.persistence.CascadeType;

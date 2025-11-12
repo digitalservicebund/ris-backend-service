@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
+package de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,10 +8,10 @@ import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Immutable;
 
 @Getter
 @Setter
@@ -19,7 +19,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Immutable
 @Table(schema = "incremental_migration", name = "appeal_status")
 public class AppealStatusDTO {
 

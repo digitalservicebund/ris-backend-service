@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
+package de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -18,11 +18,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(schema = "incremental_migration", name = "appeal_revision_defendant")
-public class AppealRevisionDefendantDTO {
+@Table(schema = "incremental_migration", name = "appeal_appellant")
+public class AppealAppellantDTO {
 
-  @EmbeddedId @Builder.Default
-  private AppealRevisionDefendantId primaryKey = new AppealRevisionDefendantId();
+  @EmbeddedId @Builder.Default private AppealAppellantId primaryKey = new AppealAppellantId();
 
   @ManyToOne
   @MapsId("appealId")
@@ -30,9 +29,9 @@ public class AppealRevisionDefendantDTO {
   private AppealDTO appeal;
 
   @ManyToOne
-  @MapsId("appealStatusId")
-  @JoinColumn(name = "appeal_status_id")
-  private AppealStatusDTO appealStatus;
+  @MapsId("appellantId")
+  @JoinColumn(name = "appellant_id")
+  private AppellantDTO appellant;
 
   private int rank;
 }
