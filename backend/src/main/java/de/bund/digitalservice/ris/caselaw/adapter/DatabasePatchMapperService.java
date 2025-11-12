@@ -233,55 +233,47 @@ public class DatabasePatchMapperService implements PatchMapperService {
   @Override
   public JsonPatch removeCustomTagsAndCompareContentForDiff(
       JsonPatch patch, DocumentationUnit documentationUnit) {
-    String replaceOperation = "replace";
-    var relevantTypes = getRelevantTypes();
-
-    // No long texts in Pending proceeding so not relevant here.
     if (documentationUnit instanceof PendingProceeding) {
       return patch;
     }
 
-    var storedDecision = (Decision) documentationUnit;
+    Decision storedDecision = (Decision) documentationUnit;
 
     var filteredOperations =
-        patch.getOperations().stream()
-            .filter(
-                operation -> {
-                  if (operation instanceof PathValueOperation valueOperation
-                      && valueOperation.getValue() instanceof TextNode valueNode) {
-                    if (!replaceOperation.equals(valueOperation.getOp())) {
-                      return true;
-                    }
-
-                    if (!valueOperation.getPath().startsWith("/longTexts/")) {
-                      return true;
-                    }
-
-                    String longTextName = extractLongTextName(operation);
-                    var category = CategoryType.forName(longTextName);
-                    boolean isRelevant = relevantTypes.contains(category);
-                    if (category == null || !isRelevant) {
-                      return true;
-                    }
-
-                    var storedLongText = getStoredTextForCategory(storedDecision, category);
-                    if (storedLongText == null) {
-                      return true;
-                    }
-
-                    var cleanedText = cleatTextFromTextCheckTags(valueNode.textValue());
-                    if (storedLongText.equals(cleanedText)) {
-                      log.debug(
-                          "Long text '{}' has not changed, skipping patch operation.",
-                          longTextName);
-                      return false;
-                    }
-                  }
-                  return true;
-                })
-            .toList();
+        patch.getOperations().stream().filter(op -> keepOperation(op, storedDecision)).toList();
 
     return new JsonPatch(filteredOperations);
+  }
+
+  /**
+   * Helper to decide whether an operation should be kept in the resulting patch. Keeps all
+   * operations except replace operations on relevant longTexts where the cleaned incoming text
+   * equals the stored text (in which case the op is redundant and can be dropped).
+   */
+  private boolean keepOperation(JsonPatchOperation operation, Decision storedDecision) {
+    if (!(operation instanceof PathValueOperation valueOp
+        && valueOp.getValue() instanceof TextNode valueNode)) {
+      return true;
+    }
+
+    if (!isReplaceOnLongText(valueOp)) {
+      return true;
+    }
+
+    String longTextName = extractLongTextName(operation);
+    CategoryType category = CategoryType.forName(longTextName);
+    if (!isRelevantCategory(category)) {
+      return true;
+    }
+
+    String cleanedText = cleatTextFromTextCheckTags(valueNode.textValue());
+    String storedText = getStoredTextForCategory(storedDecision, category);
+
+    if (storedText == null) {
+      return true;
+    }
+
+    return !storedText.equals(cleanedText);
   }
 
   private static final java.util.Map<CategoryType, java.util.function.Function<LongTexts, String>>
@@ -306,11 +298,7 @@ public class DatabasePatchMapperService implements PatchMapperService {
       return null;
     }
 
-    String storedLongText = getter.apply(longTexts);
-    if (storedLongText == null) {
-      return null;
-    }
-    return storedLongText;
+    return getter.apply(longTexts);
   }
 
   private Set<CategoryType> getRelevantTypes() {
@@ -435,5 +423,14 @@ public class DatabasePatchMapperService implements PatchMapperService {
     } else {
       return originalOperation;
     }
+  }
+
+  private boolean isReplaceOnLongText(PathValueOperation valueOperation) {
+    return "replace".equals(valueOperation.getOp())
+        && valueOperation.getPath().startsWith("/longTexts/");
+  }
+
+  private boolean isRelevantCategory(CategoryType category) {
+    return category != null && getRelevantTypes().contains(category);
   }
 }
