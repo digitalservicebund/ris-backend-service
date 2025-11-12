@@ -746,6 +746,8 @@ class DocumentationUnitServiceTest {
                 .documentationUnitVersion(1L)
                 .errorPaths(Collections.emptyList())
                 .build());
+    when(patchMapperService.removeCustomTagsAndCompareContentForDiff(any(), any()))
+        .thenReturn(patch);
 
     var risJsonPatch = RisJsonPatch.builder().patch(patch).build();
 
@@ -822,6 +824,8 @@ class DocumentationUnitServiceTest {
                 .documentationUnitVersion(1L)
                 .errorPaths(Collections.emptyList())
                 .build());
+    when(patchMapperService.removeCustomTagsAndCompareContentForDiff(any(), any()))
+        .thenReturn(patch);
 
     JsonNode valueToReplace = new TextNode("value");
     JsonPatchOperation replaceOp = new ReplaceOperation(path, valueToReplace);
@@ -866,6 +870,8 @@ class DocumentationUnitServiceTest {
                 .documentationUnitVersion(1L)
                 .errorPaths(Collections.emptyList())
                 .build());
+    when(patchMapperService.removeCustomTagsAndCompareContentForDiff(any(), any()))
+        .thenReturn(patch);
 
     JsonNode valueToReplace = new TextNode("value");
     JsonPatchOperation replaceOp = new ReplaceOperation(path, valueToReplace);
