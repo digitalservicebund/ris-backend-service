@@ -292,7 +292,12 @@ const hasAppeal = computed(() => {
     </PreviewRow>
     <div v-if="hasAppeal" class="pb-8">
       <PreviewCategory>Rechsmittel</PreviewCategory>
-      <PreviewContent v-if="props.contentRelatedIndexing.appeal?.appellants">
+      <PreviewRow
+        v-if="
+          props.contentRelatedIndexing.appeal?.appellants &&
+          props.contentRelatedIndexing.appeal?.appellants.length > 0
+        "
+      >
         <PreviewCategory>Rechtsmittelführer</PreviewCategory>
         <PreviewContent>
           <span>{{
@@ -301,8 +306,8 @@ const hasAppeal = computed(() => {
               .join(", ")
           }}</span>
         </PreviewContent>
-      </PreviewContent>
-      <PreviewContent
+      </PreviewRow>
+      <PreviewRow
         v-if="
           props.contentRelatedIndexing.appeal?.revisionDefendantStatuses &&
           props.contentRelatedIndexing.appeal?.revisionDefendantStatuses
@@ -317,8 +322,8 @@ const hasAppeal = computed(() => {
               .join(", ")
           }}</span>
         </PreviewContent>
-      </PreviewContent>
-      <PreviewContent
+      </PreviewRow>
+      <PreviewRow
         v-if="
           props.contentRelatedIndexing.appeal?.revisionPlaintiffStatuses &&
           props.contentRelatedIndexing.appeal?.revisionPlaintiffStatuses
@@ -333,8 +338,8 @@ const hasAppeal = computed(() => {
               .join(", ")
           }}</span>
         </PreviewContent>
-      </PreviewContent>
-      <PreviewContent
+      </PreviewRow>
+      <PreviewRow
         v-if="
           props.contentRelatedIndexing.appeal?.jointRevisionDefendantStatuses &&
           props.contentRelatedIndexing.appeal?.jointRevisionDefendantStatuses
@@ -349,8 +354,8 @@ const hasAppeal = computed(() => {
               .join(", ")
           }}</span>
         </PreviewContent>
-      </PreviewContent>
-      <PreviewContent
+      </PreviewRow>
+      <PreviewRow
         v-if="
           props.contentRelatedIndexing.appeal?.jointRevisionPlaintiffStatuses &&
           props.contentRelatedIndexing.appeal?.jointRevisionPlaintiffStatuses
@@ -365,8 +370,8 @@ const hasAppeal = computed(() => {
               .join(", ")
           }}</span>
         </PreviewContent>
-      </PreviewContent>
-      <PreviewContent
+      </PreviewRow>
+      <PreviewRow
         v-if="
           props.contentRelatedIndexing.appeal?.nzbDefendantStatuses &&
           props.contentRelatedIndexing.appeal?.nzbDefendantStatuses.length > 0
@@ -380,8 +385,8 @@ const hasAppeal = computed(() => {
               .join(", ")
           }}</span>
         </PreviewContent>
-      </PreviewContent>
-      <PreviewContent
+      </PreviewRow>
+      <PreviewRow
         v-if="
           props.contentRelatedIndexing.appeal?.nzbPlaintiffStatuses &&
           props.contentRelatedIndexing.appeal?.nzbPlaintiffStatuses.length > 0
@@ -395,10 +400,8 @@ const hasAppeal = computed(() => {
               .join(", ")
           }}</span>
         </PreviewContent>
-      </PreviewContent>
-      <PreviewContent
-        v-if="props.contentRelatedIndexing.appeal?.appealWithdrawal"
-      >
+      </PreviewRow>
+      <PreviewRow v-if="props.contentRelatedIndexing.appeal?.appealWithdrawal">
         <PreviewCategory>Zurücknahme der Revision</PreviewCategory>
         <PreviewContent>
           <span>{{
@@ -412,8 +415,8 @@ const hasAppeal = computed(() => {
               .join(", ")
           }}</span>
         </PreviewContent>
-      </PreviewContent>
-      <PreviewContent v-if="props.contentRelatedIndexing.appeal?.pkhPlaintiff">
+      </PreviewRow>
+      <PreviewRow v-if="props.contentRelatedIndexing.appeal?.pkhPlaintiff">
         <PreviewCategory>PKH-Antrag (Kläger)</PreviewCategory>
         <PreviewContent>
           <span>{{
@@ -427,7 +430,7 @@ const hasAppeal = computed(() => {
               .join(", ")
           }}</span>
         </PreviewContent>
-      </PreviewContent>
+      </PreviewRow>
     </div>
   </FlexContainer>
 </template>
