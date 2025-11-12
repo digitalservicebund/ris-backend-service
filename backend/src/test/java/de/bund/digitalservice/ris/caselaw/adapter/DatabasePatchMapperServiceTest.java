@@ -434,8 +434,11 @@ class DatabasePatchMapperServiceTest {
         Decision.builder()
             .uuid(UUID.randomUUID())
             .documentNumber("YYDocNumber")
-            .longTexts(LongTexts.builder().tenor("<p>Some text with extra content</p>").build())
-            .longTexts(LongTexts.builder().reasons("<p>Some old text</p>").build())
+            .longTexts(
+                LongTexts.builder()
+                    .tenor("<p>Some text with extra content</p>")
+                    .reasons("<p>Some old text</p>")
+                    .build())
             .build();
 
     // when
@@ -443,7 +446,7 @@ class DatabasePatchMapperServiceTest {
 
     // then
     assertThat(result.getOperations()).hasSize(1);
-    JsonPatchOperation remaining = result.getOperations().get(0);
+    JsonPatchOperation remaining = result.getOperations().getFirst();
     assertThat(remaining).isInstanceOf(ReplaceOperation.class);
     assertEquals(reasonsReplace.getPath(), remaining.getPath());
     assertEquals(reasonsReplace.getOp(), remaining.getOp());
