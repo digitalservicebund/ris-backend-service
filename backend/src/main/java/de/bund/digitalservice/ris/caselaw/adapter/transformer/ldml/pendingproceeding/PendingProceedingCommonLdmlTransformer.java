@@ -26,12 +26,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.Documentation
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
-import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -91,72 +89,12 @@ public abstract class PendingProceedingCommonLdmlTransformer
 
   @Nullable
   protected OtherReferences buildOtherReferences(PendingProceeding pendingProceeding) {
-    List<ImplicitReference> implicitReferences = buildImplicitReferences(pendingProceeding);
+    List<ImplicitReference> implicitReferences = buildCommonImplicitReferences(pendingProceeding);
     if (!implicitReferences.isEmpty()) {
       return OtherReferences.builder().implicitReferences(implicitReferences).build();
     } else {
       return null;
     }
-  }
-
-  @Nonnull
-  protected List<ImplicitReference> buildImplicitReferences(PendingProceeding pendingProceeding) {
-    List<ImplicitReference> vorhergehendeEntscheidungen = new ArrayList<>();
-    var previousDecisions = pendingProceeding.previousDecisions();
-    if (previousDecisions != null) {
-      for (PreviousDecision previousDecision : previousDecisions) {
-        if (previousDecision == null) continue;
-        var vorhergehendeEntscheidung = getVorgehendeEntscheidungen(previousDecision);
-        vorhergehendeEntscheidungen.add(vorhergehendeEntscheidung);
-      }
-    }
-    return vorhergehendeEntscheidungen;
-  }
-
-  @Nonnull
-  private ImplicitReference getVorgehendeEntscheidungen(PreviousDecision previousDecision) {
-    var builder = ImplicitReference.Vorgehend.builder();
-
-    if (previousDecision.getDocumentType() != null
-        && isNotBlank(previousDecision.getDocumentType().label())) {
-      builder.dokumentTyp(
-          DokumentTyp.builder()
-              .eId(null)
-              .value(previousDecision.getDocumentType().label())
-              .build());
-    }
-    if (previousDecision.getDecisionDate() != null) {
-      builder.datum(
-          ImplicitReference.Datum.builder()
-              .value(
-                  de.bund.digitalservice.ris.caselaw.adapter.DateUtils.toDateString(
-                      previousDecision.getDecisionDate()))
-              .build());
-    }
-    if (isNotBlank(previousDecision.getDocumentNumber())) {
-      builder.dokumentNummer(
-          ImplicitReference.DokumentNummer.builder()
-              .value(previousDecision.getDocumentNumber())
-              .build());
-    }
-    if (isNotBlank(previousDecision.getFileNumber())) {
-      builder.aktenzeichen(
-          AktenzeichenListe.Aktenzeichen.builder().value(previousDecision.getFileNumber()).build());
-    }
-    if (previousDecision.getCourt() != null) {
-      Gericht.GerichtBuilder gerichtBuilder = Gericht.builder();
-      if (isNotBlank(previousDecision.getCourt().type())) {
-        gerichtBuilder.typ(
-            Gericht.GerichtTyp.builder().value(previousDecision.getCourt().type()).build());
-      }
-      if (isNotBlank(previousDecision.getCourt().location())) {
-        gerichtBuilder.ort(
-            Gericht.GerichtOrt.builder().value(previousDecision.getCourt().location()).build());
-      }
-
-      builder.gericht(gerichtBuilder.build());
-    }
-    return ImplicitReference.builder().vorgehend(builder.build()).build();
   }
 
   @SuppressWarnings("java:S3776")
