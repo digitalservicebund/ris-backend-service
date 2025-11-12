@@ -1899,7 +1899,6 @@ class DecisionTransformerTest {
           OriginOfTranslationDTO.builder()
               .languageCode(LanguageCodeDTO.builder().isoCode("en").value("Englisch").build())
               .translationType(KEINE_ANGABE)
-              .decision(decisionDTO)
               .translators(
                   List.of(
                       OriginOfTranslationTranslatorDTO.builder()
