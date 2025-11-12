@@ -455,7 +455,7 @@ describe("other categories", () => {
       expect(links[0]).toHaveAttribute("href", "http://link-to-translation.en")
       expect(links[1]).toHaveAttribute("href", "https://link-to-translation.fr")
 
-      const summaries = screen.getAllByTestId("originOfTranslationSummary")
+      const summaries = screen.getAllByTestId("origin-of-translation-summary")
       expect(summaries[0]).toHaveTextContent(
         "Englisch, translator a, translator b: 23, 42, http://link-to-translation.en (nicht-amtlich)",
       )
