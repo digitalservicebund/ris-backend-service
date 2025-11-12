@@ -13,7 +13,7 @@ import { Decision } from "@/domain/decision"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
-  http.get("/api/v1/caselaw/appeal/appellants", () => {
+  http.get("/api/v1/caselaw/appealoptions/appellants", () => {
     const appellants = [
       { id: "1", value: "Kläger" },
       { id: "2", value: "Beklagter" },
@@ -22,7 +22,7 @@ const server = setupServer(
     ]
     return HttpResponse.json(appellants)
   }),
-  http.get("/api/v1/caselaw/appeal/statuses", () => {
+  http.get("/api/v1/caselaw/appealoptions/statuses", () => {
     const statuses = [
       { id: "1", value: "unbegründet" },
       { id: "2", value: "unzulässig" },

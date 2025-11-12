@@ -41,7 +41,7 @@ class AppealOptionsControllerTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/appeal/appellants")
+            .uri("/api/v1/caselaw/appealoptions/appellants")
             .exchange()
             .expectStatus()
             .isOk()
@@ -63,7 +63,7 @@ class AppealOptionsControllerTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/appeal/statuses")
+            .uri("/api/v1/caselaw/appealoptions/statuses")
             .exchange()
             .expectStatus()
             .isOk()

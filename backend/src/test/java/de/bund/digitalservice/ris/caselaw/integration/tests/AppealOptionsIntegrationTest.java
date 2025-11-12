@@ -24,7 +24,7 @@ class AppealOptionsIntegrationTest extends BaseIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/appeal/appellants")
+        .uri("/api/v1/caselaw/appealoptions/appellants")
         .exchange()
         .expectStatus()
         .isOk()
@@ -46,7 +46,7 @@ class AppealOptionsIntegrationTest extends BaseIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/appeal/statuses")
+        .uri("/api/v1/caselaw/appealoptions/statuses")
         .exchange()
         .expectStatus()
         .isOk()
