@@ -61,7 +61,7 @@ onMounted(() => {
         <InputField
           id="originOfTranslationLanguageInput"
           v-slot="slotProps"
-          data-testid="translation-source-language"
+          data-testid="origin-of-translation-language"
           label="Originalsprache*"
         >
           <ComboboxInput
@@ -69,7 +69,7 @@ onMounted(() => {
             v-model="originOfTranslation.languageCode"
             aria-label="Originalsprache"
             class="w-full"
-            data-testid="translation-source-language-input"
+            data-testid="origin-of-translation-language-input"
             :invalid="slotProps.hasError"
             :item-service="ComboboxItemService.getLanguageCodes"
             placeholder="Sprache auswählen"
@@ -79,7 +79,7 @@ onMounted(() => {
       <div class="basis-1/2">
         <InputField
           id="originOfTranslationTranslators"
-          data-testid="translation-source-translators"
+          data-testid="origin-of-translation-translators"
           label="Übersetzer:innen"
         >
           <ChipsInput
@@ -87,7 +87,7 @@ onMounted(() => {
             v-model="originOfTranslation.translators"
             aria-label="Übersetzer:innen"
             class="w-full"
-            data-testid="translation-source-translators-input"
+            data-testid="origin-of-translation-translators-input"
             placeholder="Name"
             size="small"
           ></ChipsInput>
@@ -99,7 +99,7 @@ onMounted(() => {
         <InputField
           id="originOfTranslationBorderNumbers"
           v-slot="slotProps"
-          data-testid="translation-source-border-numbers"
+          data-testid="origin-of-translation-border-numbers"
           label="Fundstelle: Interne Verlinkung"
         >
           <ChipsBorderNumberInput
@@ -107,7 +107,7 @@ onMounted(() => {
             v-model="originOfTranslation.borderNumbers"
             aria-label="Fundstelle: Interne Verlinkung"
             class="w-full"
-            data-testid="translation-source-border-numbers-input"
+            data-testid="origin-of-translation-border-numbers-input"
             :has-error="slotProps.hasError"
             placeholder="Randnummer"
             size="small"
@@ -119,7 +119,7 @@ onMounted(() => {
       <div class="basis-1/2">
         <InputField
           id="originOfTranslationUrls"
-          data-testid="translation-source-urls"
+          data-testid="origin-of-translation-urls"
           label="Fundstelle: Externe Verlinkung"
         >
           <ChipsInput
@@ -127,7 +127,7 @@ onMounted(() => {
             v-model="originOfTranslation.urls"
             aria-label="Fundstelle: Externe Verlinkung"
             class="w-full"
-            data-testid="translation-source-urls-input"
+            data-testid="origin-of-translation-urls-input"
             placeholder="URL Website"
             size="small"
           ></ChipsInput>

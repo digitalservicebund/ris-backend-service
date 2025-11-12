@@ -111,6 +111,9 @@ describe("ChipsBorderNumberInput", () => {
 
   it("does not allow input in readOnly mode", () => {
     renderComponent({ modelValue: [1, 2], readOnly: true })
+    const chipsInput = screen.getByTestId("chips-input-wrapper_identifier")
+    expect(chipsInput).toBeInTheDocument()
+    expect(chipsInput).toHaveTextContent("12")
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument()
   })
 })
