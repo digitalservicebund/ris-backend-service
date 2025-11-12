@@ -655,10 +655,9 @@ public class DocumentationUnitService {
     DocumentationUnit existingDocumentationUnit = getByUuid(documentationUnitId, user);
 
     DocumentationUnit patchedDocumentationUnitWithBase64Images;
-    long newVersion = 1L;
-    if (existingDocumentationUnit.version() != null) {
-      newVersion = existingDocumentationUnit.version() + 1;
-    }
+
+    var newVersion =
+        existingDocumentationUnit.version() != null ? 1L : existingDocumentationUnit.version() + 1;
 
     JsonPatch newPatch =
         patchMapperService.calculatePatch(

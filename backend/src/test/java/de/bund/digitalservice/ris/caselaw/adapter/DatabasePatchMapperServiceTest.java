@@ -416,8 +416,7 @@ class DatabasePatchMapperServiceTest {
   }
 
   @Test
-  void givenTwoLongTextReplaces_whenTenorUnchanged_thenOnlyReasonsReplaceRemains()
-      throws Exception {
+  void givenTwoLongTextReplaces_whenTenorUnchanged_thenOnlyReasonsReplaceRemains() {
     // given
     ReplaceOperation reasonsReplace =
         new ReplaceOperation("/longTexts/reasons", new TextNode("<p>Some new text</p>"));
