@@ -353,7 +353,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
           AktenzeichenListe.Aktenzeichen.builder().value(relatedDocUnit.getFileNumber()).build());
     }
     if (relatedDocUnit.getCourt() != null) {
-      Gericht.GerichtBuilder gerichtBuilder = Gericht.builder();
+      var gerichtBuilder = Gericht.builder();
       if (isNotBlank(relatedDocUnit.getCourt().type())) {
         gerichtBuilder.typ(
             Gericht.GerichtTyp.builder().value(relatedDocUnit.getCourt().type()).build());
