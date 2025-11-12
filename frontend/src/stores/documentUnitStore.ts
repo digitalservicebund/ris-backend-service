@@ -44,105 +44,106 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
 
   // prettier-ignore
   async function updateDocumentUnit(): Promise< // NOSONAR: needs definitely refactoring
-    ServiceResponse<RisJsonPatch | FailedValidationServerResponse>
-  > {
-    if (!documentUnit.value || !originalDocumentUnit.value) {
-      return {
-        status: 404,
-        data: undefined,
-        error: errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED,
-      }
-    }
-
-    const frontendPatch = jsonpatch.compare(
-      originalDocumentUnit.value,
-      documentUnit.value
-    )
-
-    const response = await documentUnitService.update(documentUnit.value.uuid, {
-        documentationUnitVersion: documentUnit.value.version,
-        patch: frontendPatch,
-        errorPaths: [],
-      })
-
-    if (response.status === 200) {
-      //Apply backend patch to original documentunit reference, with updated version
-      const backendPatch = response.data as RisJsonPatch
-
-      // Here, the patch from the frontend was successfully applied in the backend database.
-      try {
-        // We apply the changes from the backend response to our local docUnit
-        documentUnit.value = getPatchApplyResult(
-          instantiateDocUnitClass(documentUnit.value as DocumentationUnit),
-          backendPatch.patch,
-        )
-        // We apply the local changes that were successfully saved in the backend on our docUnit backend representation
-        originalDocumentUnit.value = getPatchApplyResult(
-          instantiateDocUnitClass(originalDocumentUnit.value as DocumentationUnit),
-          frontendPatch,
-        )
-        // We apply the backend response changes to our backend docUnit representation.
-        originalDocumentUnit.value = getPatchApplyResult(
-          instantiateDocUnitClass(originalDocumentUnit.value as DocumentationUnit),
-          backendPatch.patch,
-        )
-
-      } catch {
-        if (documentUnit.value.documentNumber) {
-          const response = await loadDocumentUnit(
-            documentUnit.value.documentNumber,
-          )
-          if (response.data) {
+        ServiceResponse<RisJsonPatch | FailedValidationServerResponse>
+    > {
+        if (!documentUnit.value || !originalDocumentUnit.value) {
             return {
-              status: response.status,
-              data: {
-                documentationUnitVersion: response.data.version,
-                patch: [],
-                errorPaths: [],
-              },
+                status: 404,
+                data: undefined,
+                error: errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED,
             }
-          } else {
+        }
+
+        // Create JSON Patch
+        const frontendPatch = jsonpatch.compare(
+            originalDocumentUnit.value,
+            documentUnit.value,
+        )
+
+        const response = await documentUnitService.update(documentUnit.value.uuid, {
+            documentationUnitVersion: documentUnit.value.version,
+            patch: frontendPatch,
+            errorPaths: [],
+        })
+
+        if (response.status === 200) {
+            //Apply backend patch to original documentunit reference, with updated version
+            const backendPatch = response.data as RisJsonPatch
+
+            // Here, the patch from the frontend was successfully applied in the backend database.
+            try {
+                // We apply the changes from the backend response to our local docUnit
+                documentUnit.value = getPatchApplyResult(
+                    instantiateDocUnitClass(documentUnit.value as DocumentationUnit),
+                    backendPatch.patch,
+                )
+                // We apply the local changes that were successfully saved in the backend on our docUnit backend representation
+                originalDocumentUnit.value = getPatchApplyResult(
+                    instantiateDocUnitClass(originalDocumentUnit.value as DocumentationUnit),
+                    frontendPatch,
+                )
+                // We apply the backend response changes to our backend docUnit representation.
+                originalDocumentUnit.value = getPatchApplyResult(
+                    instantiateDocUnitClass(originalDocumentUnit.value as DocumentationUnit),
+                    backendPatch.patch,
+                )
+
+            } catch {
+                if (documentUnit.value.documentNumber) {
+                    const response = await loadDocumentUnit(
+                        documentUnit.value.documentNumber,
+                    )
+                    if (response.data) {
+                        return {
+                            status: response.status,
+                            data: {
+                                documentationUnitVersion: response.data.version,
+                                patch: [],
+                                errorPaths: [],
+                            },
+                        }
+                    } else {
+                        return {
+                            status: 404,
+                            data: undefined,
+                            error: errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED,
+                        }
+                    }
+                }
+            }
+            documentUnit.value.version = backendPatch.documentationUnitVersion
+
+            if (
+                backendPatch.errorPaths != undefined &&
+                backendPatch.errorPaths.length > 0
+            ) {
+                // ^\/ matches a leading slash.
+                // \/$ matches a trailing slash.
+                // \/\d+$ matches a trailing slash followed by one or more digits at the end of the string, to collect list items.
+                const path = backendPatch.errorPaths[0].replace(/(^\/|\/$|\/\d+$)/g, "")
+
+                const mappedValue = fields[path as keyof typeof fields]
+
+                return {
+                    status: 207,
+                    data: undefined,
+                    error: {
+                        title: mappedValue,
+                    },
+                }
+            }
+        } else {
             return {
-              status: 404,
-              data: undefined,
-              error: errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED,
+                status: response.status,
+                data: undefined,
+                error:
+                    response.status === 403
+                        ? errorMessages.NOT_ALLOWED
+                        : errorMessages.DOCUMENT_UNIT_UPDATE_FAILED,
             }
-          }
         }
-      }
-      documentUnit.value.version = backendPatch.documentationUnitVersion
-
-      if (
-        backendPatch.errorPaths != undefined &&
-        backendPatch.errorPaths.length > 0
-      ) {
-        // ^\/ matches a leading slash.
-        // \/$ matches a trailing slash.
-        // \/\d+$ matches a trailing slash followed by one or more digits at the end of the string, to collect list items.
-        const path = backendPatch.errorPaths[0].replace(/(^\/|\/$|\/\d+$)/g, "")
-
-        const mappedValue = fields[path as keyof typeof fields]
-
-        return {
-          status: 207,
-          data: undefined,
-          error: {
-            title: mappedValue,
-          },
-        }
-      }
-    } else {
-      return {
-        status: response.status,
-        data: undefined,
-        error:
-          response.status === 403
-            ? errorMessages.NOT_ALLOWED
-            : errorMessages.DOCUMENT_UNIT_UPDATE_FAILED,
-      }
+        return response
     }
-    return response
-  }
 
   function instantiateDocUnitClass(docUnit?: DocumentationUnit) {
     if (isDecision(docUnit)) {
