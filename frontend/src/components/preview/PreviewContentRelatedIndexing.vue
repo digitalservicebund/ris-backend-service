@@ -260,7 +260,7 @@ const hasDefinitions = computed(() => {
         contentRelatedIndexingLabels.originOfTranslations
       }}</PreviewCategory>
       <PreviewContent
-        data-testid="{{contentRelatedIndexingLabels.originOfTranslations}}"
+        :data-testid="contentRelatedIndexingLabels.originOfTranslations"
       >
         <span
           v-for="originOfTranslation in props.contentRelatedIndexing

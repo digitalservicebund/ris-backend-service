@@ -54,6 +54,9 @@ describe("OriginOfTranslationInput", () => {
     expect(
       screen.getByTestId("origin-of-translation-border-numbers"),
     ).toBeInTheDocument()
+    expect(
+      screen.getByTestId("origin-of-translation-translation-type"),
+    ).toBeInTheDocument()
     expect(screen.getByTestId("origin-of-translation-urls")).toBeInTheDocument()
   })
 

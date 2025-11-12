@@ -11,7 +11,7 @@ const props = defineProps<{
 <template>
   <div
     class="flex w-full justify-between"
-    data-testid="originOfTranslationSummary"
+    data-testid="origin-of-translation-summary"
   >
     <div class="flex flex-row items-center">
       <IcBaselineTranslate class="mr-8" />

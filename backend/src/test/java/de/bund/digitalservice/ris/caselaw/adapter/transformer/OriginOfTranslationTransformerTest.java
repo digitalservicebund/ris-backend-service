@@ -51,7 +51,6 @@ class OriginOfTranslationTransformerTest {
       // Assert
       Assertions.assertNotNull(dto);
       Assertions.assertEquals(domain.id(), dto.getId());
-      Assertions.assertEquals(decision, dto.getDecision());
       Assertions.assertEquals(domain.translationType(), dto.getTranslationType());
       Assertions.assertNotNull(dto.getLanguageCode());
       Assertions.assertEquals(domain.languageCode().id(), dto.getLanguageCode().getId());

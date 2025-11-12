@@ -1,11 +1,13 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
+import InputSelect from "primevue/select"
 import { onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import ChipsBorderNumberInput from "@/components/input/ChipsBorderNumberInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
+import { translationType } from "@/data/translationType"
 import OriginOfTranslation from "@/domain/originOfTranslation"
 import ComboboxItemService from "@/services/comboboxItemService"
 
@@ -133,6 +135,25 @@ onMounted(() => {
           ></ChipsInput>
         </InputField>
       </div>
+    </div>
+    <div class="flex flex-row gap-24">
+      <InputField
+        id="originOfTranslationTranslationType"
+        v-slot="{ id }"
+        data-testid="origin-of-translation-translation-type"
+        label="Übersetzungsart"
+      >
+        <InputSelect
+          :id="id"
+          v-model="originOfTranslation.translationType"
+          aria-label="Übersetzungsart"
+          fluid
+          option-label="label"
+          option-value="value"
+          :options="translationType"
+          placeholder="Übersetzungsart auswählen"
+        />
+      </InputField>
     </div>
 
     <div class="flex w-full flex-row justify-between">

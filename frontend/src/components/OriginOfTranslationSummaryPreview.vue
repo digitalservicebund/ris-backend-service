@@ -8,7 +8,7 @@ const props = defineProps<{
   data: OriginOfTranslation
 }>()
 </script>
-<template>
+<template data-testid="origin-of-translation-summary-preview">
   {{ props.data.languageCode?.label
   }}<span v-for="translator in props.data.translators" :key="translator"
     >, {{ translator }}</span
