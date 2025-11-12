@@ -2,8 +2,10 @@
 import Button from "primevue/button"
 import InputText from "primevue/inputtext"
 import { onMounted, ref, watch } from "vue"
+import CollectiveAgreementDateInput from "@/components/CollectiveAgreementDateInput.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
+import { ValidationError } from "@/components/input/types"
 import { CollectiveAgreement } from "@/domain/collectiveAgreement"
 import ComboboxItemService from "@/services/comboboxItemService"
 
@@ -14,6 +16,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "update:modelValue": [value: CollectiveAgreement]
+  "update:validationError": [value: ValidationError]
   addEntry: [void]
   cancelEdit: [void]
   removeEntry: [value?: boolean]
@@ -74,15 +77,11 @@ onMounted(() => {
           v-slot="slotProps"
           label="Datum"
         >
-          <InputText
+          <CollectiveAgreementDateInput
             id="collectiveAgreementDateInputText"
             v-model="collectiveAgreement.date"
-            aria-label="Datum"
-            class="w-full"
-            data-testid="collective-agreement-date-input"
-            placeholder="TT.MM.JJJJ, MM.JJJJ, JJJJ"
-            size="small"
-          ></InputText>
+            @update:validation-error="slotProps.updateValidationError"
+          ></CollectiveAgreementDateInput>
         </InputField>
       </div>
     </div>
