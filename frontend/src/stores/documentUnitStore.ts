@@ -1,9 +1,9 @@
 import * as jsonpatch from "fast-json-patch"
 import { Operation } from "fast-json-patch"
 import { defineStore } from "pinia"
-import { ref, toRaw } from "vue"
+import { ref } from "vue"
 import fields from "@/data/fieldNames.json"
-import { Decision, LongTexts } from "@/domain/decision"
+import { Decision } from "@/domain/decision"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
@@ -15,38 +15,6 @@ import {
 } from "@/services/httpClient"
 import { Match } from "@/types/textCheck"
 import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
-
-function removeTextCheckTags(text: string): string {
-  if (typeof text !== "string" || !text) {
-    return text
-  }
-
-  const sanitizeRegex = /<text-check[^>]*>(.*?)<\/text-check>/g
-  return text.replaceAll(sanitizeRegex, "$1")
-}
-
-function sanitizeLongTextFields(decision: Decision): Decision {
-  if (!decision?.longTexts) {
-    return decision
-  }
-
-  for (const keyAsString in decision.longTexts) {
-    if (Object.hasOwn(decision.longTexts, keyAsString)) {
-      const key = keyAsString as keyof LongTexts
-      const value = decision.longTexts[key]
-
-      if (key === "participatingJudges") {
-        continue
-      }
-
-      if (typeof value === "string") {
-        decision.longTexts[key] = removeTextCheckTags(value)
-      }
-    }
-  }
-
-  return decision
-}
 
 export const useDocumentUnitStore = defineStore("docunitStore", () => {
   const documentUnit = ref<DocumentationUnit | undefined>(undefined)
@@ -86,37 +54,16 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
       }
     }
 
-    const currentDocument = structuredClone(toRaw(documentUnit.value))
-    if (isDecision(currentDocument as DocumentationUnit)) {
-      sanitizeLongTextFields(currentDocument as Decision)
-    }
-
-    // Create JSON Patch
-    const frontendPatchFromSanitizedObjects = jsonpatch.compare(
-      originalDocumentUnit.value,
-      currentDocument
-    )
-
     const frontendPatch = jsonpatch.compare(
       originalDocumentUnit.value,
       documentUnit.value
     )
 
-    let response: ServiceResponse<RisJsonPatch | FailedValidationServerResponse>;
-
-    if (frontendPatchFromSanitizedObjects.length === 0 && frontendPatch.length !== 0) {
-      response = await documentUnitService.update(documentUnit.value.uuid, {
-        documentationUnitVersion: documentUnit.value.version,
-        patch: frontendPatchFromSanitizedObjects,
-        errorPaths: [],
-      })
-    } else {
-      response = await documentUnitService.update(documentUnit.value.uuid, {
+    const response = await documentUnitService.update(documentUnit.value.uuid, {
         documentationUnitVersion: documentUnit.value.version,
         patch: frontendPatch,
         errorPaths: [],
       })
-    }
 
     if (response.status === 200) {
       //Apply backend patch to original documentunit reference, with updated version
