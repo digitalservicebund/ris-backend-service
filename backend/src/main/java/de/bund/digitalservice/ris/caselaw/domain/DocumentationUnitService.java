@@ -685,44 +685,54 @@ public class DocumentationUnitService {
       if (!toUpdate.getOperations().isEmpty()) {
         toUpdate = patchMapperService.removeTextCheckTags(toUpdate);
 
-        // Saving a return patch including the base64 images as src attributes with an api path.
-        patchedDocumentationUnitWithBase64Images =
-            cloneDocumentationUnitWithNewVersion(
-                patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit),
-                newVersion);
+        var textCheckSanitizedUpdate =
+            patchMapperService.removeCustomTagsAndCompareContentForDiff(
+                toUpdate, existingDocumentationUnit);
 
-        toUpdate =
-            patchMapperService.extractAndStoreBase64Images(
-                toUpdate, existingDocumentationUnit, null);
+        if (!textCheckSanitizedUpdate.getOperations().isEmpty()) {
+          // Saving a return patch including the base64 images as src attributes with an api path.
+          patchedDocumentationUnitWithBase64Images =
+              cloneDocumentationUnitWithNewVersion(
+                  patchMapperService.applyPatchToEntity(
+                      textCheckSanitizedUpdate, existingDocumentationUnit),
+                  newVersion);
 
-        DocumentationUnit patchedDocumentationUnit =
-            patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
+          textCheckSanitizedUpdate =
+              patchMapperService.extractAndStoreBase64Images(
+                  textCheckSanitizedUpdate, existingDocumentationUnit, null);
 
-        patchedDocumentationUnit =
-            cloneDocumentationUnitWithNewVersion(patchedDocumentationUnit, newVersion);
+          DocumentationUnit patchedDocumentationUnit =
+              patchMapperService.applyPatchToEntity(
+                  textCheckSanitizedUpdate, existingDocumentationUnit);
 
-        DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
+          patchedDocumentationUnit =
+              cloneDocumentationUnitWithNewVersion(patchedDocumentationUnit, newVersion);
 
-        DocumentationUnit updatedDocumentationUnit =
-            updateDocumentationUnit(user, patchedDocumentationUnit, duplicateCheckStatus);
+          DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
 
-        toFrontendJsonPatch =
-            patchMapperService.getDiffPatch(
-                patchedDocumentationUnitWithBase64Images, updatedDocumentationUnit);
+          DocumentationUnit updatedDocumentationUnit =
+              updateDocumentationUnit(user, patchedDocumentationUnit, duplicateCheckStatus);
 
-        log.debug(
-            "version {} - raw to frontend patch: {}",
-            patch.documentationUnitVersion(),
-            toFrontendJsonPatch);
+          toFrontendJsonPatch =
+              patchMapperService.getDiffPatch(
+                  patchedDocumentationUnitWithBase64Images, updatedDocumentationUnit);
 
-        JsonPatch toSaveJsonPatch =
-            patchMapperService.addUpdatePatch(toUpdate, toFrontendJsonPatch);
+          log.debug(
+              "version {} - raw to frontend patch: {}",
+              patch.documentationUnitVersion(),
+              toFrontendJsonPatch);
 
-        log.debug(
-            "version {} - to save patch: {}", patch.documentationUnitVersion(), toSaveJsonPatch);
+          JsonPatch toSaveJsonPatch =
+              patchMapperService.addUpdatePatch(toUpdate, toFrontendJsonPatch);
 
-        patchMapperService.savePatch(
-            toSaveJsonPatch, existingDocumentationUnit.uuid(), existingDocumentationUnit.version());
+          log.debug(
+              "version {} - to save patch: {}", patch.documentationUnitVersion(), toSaveJsonPatch);
+
+          patchMapperService.savePatch(
+              toSaveJsonPatch,
+              existingDocumentationUnit.uuid(),
+              existingDocumentationUnit.version());
+        }
       }
 
       toFrontend =

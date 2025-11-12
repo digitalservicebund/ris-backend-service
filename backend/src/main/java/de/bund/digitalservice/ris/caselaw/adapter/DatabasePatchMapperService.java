@@ -17,17 +17,22 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitPatchDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
 import de.bund.digitalservice.ris.caselaw.domain.image.ImageUtil;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -223,6 +228,120 @@ public class DatabasePatchMapperService implements PatchMapperService {
             });
 
     return new JsonPatch(operations);
+  }
+
+  @Override
+  public JsonPatch removeCustomTagsAndCompareContentForDiff(
+      JsonPatch patch, DocumentationUnit documentationUnit) {
+    String replaceOperation = "replace";
+    var relevantTypes = getRelevantTypes();
+
+    // No long texts in Pending proceeding so not relevant here.
+    if (documentationUnit instanceof PendingProceeding) {
+      return patch;
+    }
+
+    var storedDecision = (Decision) documentationUnit;
+
+    var filteredOperations =
+        patch.getOperations().stream()
+            .filter(
+                operation -> {
+                  if (operation instanceof PathValueOperation valueOperation
+                      && valueOperation.getValue() instanceof TextNode valueNode) {
+                    if (!replaceOperation.equals(valueOperation.getOp())) {
+                      return true;
+                    }
+
+                    if (!valueOperation.getPath().startsWith("/longTexts/")) {
+                      return true;
+                    }
+
+                    String longTextName = extractLongTextName(operation);
+                    var category = CategoryType.forName(longTextName);
+                    boolean isRelevant = relevantTypes.contains(category);
+                    if (category == null || !isRelevant) {
+                      return true;
+                    }
+
+                    var storedLongText = getStoredTextForCategory(storedDecision, category);
+                    if (storedLongText == null) {
+                      return true;
+                    }
+
+                    var cleanedText = cleatTextFromTextCheckTags(valueNode.textValue());
+                    if (storedLongText.equals(cleanedText)) {
+                      log.debug(
+                          "Long text '{}' has not changed, skipping patch operation.",
+                          longTextName);
+                      return false;
+                    }
+                  }
+                  return true;
+                })
+            .toList();
+
+    return new JsonPatch(filteredOperations);
+  }
+
+  private static final java.util.Map<CategoryType, java.util.function.Function<LongTexts, String>>
+      LONG_TEXT_GETTERS =
+          java.util.Map.ofEntries(
+              java.util.Map.entry(CategoryType.TENOR, LongTexts::tenor),
+              java.util.Map.entry(CategoryType.REASONS, LongTexts::reasons),
+              java.util.Map.entry(CategoryType.CASE_FACTS, LongTexts::caseFacts),
+              java.util.Map.entry(CategoryType.DECISION_REASONS, LongTexts::decisionReasons),
+              java.util.Map.entry(CategoryType.DISSENTING_OPINION, LongTexts::dissentingOpinion),
+              java.util.Map.entry(CategoryType.OTHER_LONG_TEXT, LongTexts::otherLongText),
+              java.util.Map.entry(CategoryType.OUTLINE, LongTexts::outline));
+
+  private String getStoredTextForCategory(Decision decision, CategoryType category) {
+    var longTexts = decision.longTexts();
+    if (longTexts == null) {
+      return null;
+    }
+
+    var getter = LONG_TEXT_GETTERS.get(category);
+    if (getter == null) {
+      return null;
+    }
+
+    String storedLongText = getter.apply(longTexts);
+    if (storedLongText == null) {
+      return null;
+    }
+    return storedLongText;
+  }
+
+  private Set<CategoryType> getRelevantTypes() {
+    return java.util.EnumSet.of(
+        CategoryType.TENOR,
+        CategoryType.OTHER_LONG_TEXT,
+        CategoryType.REASONS,
+        CategoryType.DISSENTING_OPINION,
+        CategoryType.OUTLINE,
+        CategoryType.CASE_FACTS,
+        CategoryType.DECISION_REASONS);
+  }
+
+  private String extractLongTextName(JsonPatchOperation operation) {
+    String path = operation.getPath();
+    String fieldName = path.substring("/longTexts/".length());
+    int slashIndex = fieldName.indexOf('/');
+    if (slashIndex != -1) {
+      fieldName = fieldName.substring(0, slashIndex);
+    }
+    return fieldName;
+  }
+
+  private String cleatTextFromTextCheckTags(String text) {
+    Matcher matcher = TEXT_CHECK_PATTERN.matcher(text);
+    StringBuilder builder = new StringBuilder();
+    while (matcher.find()) {
+      matcher.appendReplacement(builder, matcher.group(1));
+    }
+    matcher.appendTail(builder);
+    return builder.toString();
   }
 
   /**
