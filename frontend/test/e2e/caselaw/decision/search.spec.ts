@@ -697,7 +697,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
     })
   })
 
-  test("Neuanlage aus Suche", async ({ page }) => {
+  test("Neuanlage aus Suche", { tag: ["@RISDEV-7139"] }, async ({ page }) => {
     const fileNumber = generateString()
     await navigateToSearch(page)
     await test.step("Suche nach Gericht, Datum und Aktenzeichen", async () => {
@@ -746,6 +746,12 @@ test.describe("Große Suche nach Entscheidungen", () => {
       await expect(
         page.getByRole("listitem").getByLabel("Eintrag bearbeiten"),
       ).toHaveText(fileNumber)
+    })
+
+    await test.step("Quelle ist für Bundesgericht bereits auf O gesetzt", async () => {
+      await expect(page.getByTestId("source-input")).toHaveText(
+        "unaufgefordert eingesandtes Original (O)",
+      )
     })
 
     await test.step("Lösche Entscheidung", async () => {

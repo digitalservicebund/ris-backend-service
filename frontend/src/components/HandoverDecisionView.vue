@@ -17,6 +17,7 @@ import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
 import { coreDataLabels } from "@/domain/coreData"
 import { contentRelatedIndexingLabels, Decision } from "@/domain/decision"
+import { Kind } from "@/domain/documentationUnitKind"
 import EnsuingDecision, {
   ensuingDecisionFieldLabels,
 } from "@/domain/ensuingDecision"
@@ -164,6 +165,8 @@ const fieldsWithoutJdvExport = computed<string[]>(() => {
     fieldLabels.push(contentRelatedIndexingLabels.foreignLanguageVersions)
   if (decision.value?.contentRelatedIndexing?.appealAdmission != null)
     fieldLabels.push(contentRelatedIndexingLabels.appealAdmission)
+  if (decision.value?.contentRelatedIndexing?.appeal != null)
+    fieldLabels.push(contentRelatedIndexingLabels.appeal)
   if (decision.value?.coreData?.celexNumber)
     fieldLabels.push(coreDataLabels.celexNumber)
   if (decision.value?.coreData?.hasDeliveryDate)
@@ -541,6 +544,7 @@ const isPublishable = computed<boolean>(
         v-if="textCheckAllToggle"
         :document-id="decision!.uuid"
         :document-number="decision!.documentNumber"
+        :kind="Kind.DECISION"
       />
 
       <div class="border-b-1 border-b-gray-400"></div>

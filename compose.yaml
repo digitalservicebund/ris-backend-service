@@ -21,7 +21,7 @@ services:
       - RIS_MIGRATION_S3_FIRST_DAILY_VERSION=2024-08-31
 
   traefik:
-    image: traefik:v3.5
+    image: traefik:v3.6
     extra_hosts:
       - localhost:host-gateway
     container_name: traefik
@@ -158,7 +158,7 @@ services:
       timeout: 3s
 
   redis:
-    image: cgr.dev/chainguard/redis@sha256:5f13c916a3310b021b517fa57ebe3b2a73bb064e39f91e49619d7861d932d93e
+    image: cgr.dev/chainguard/redis@sha256:9e60ae80ea3b6f9d46426835aeda2df4dc4df74b332dfcc503c3bc640b2122ae
     extra_hosts:
       - localhost:host-gateway
     container_name: redis
@@ -183,7 +183,7 @@ services:
       timeout: 5s
 
   languagetool:
-    image: ghcr.io/digitalservicebund/neuris-languagetool:bf15ea9bf89e02d4148923c52d99c35724c8cd17
+    image: ghcr.io/digitalservicebund/neuris-languagetool:d6765e75df9c4dc0b5bce910e4ebc4242ad3f891
     extra_hosts:
       - localhost:host-gateway
     ports:

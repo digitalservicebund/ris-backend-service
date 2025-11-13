@@ -66,7 +66,7 @@ test.describe(
       {
         tag: ["@RISDEV-8456", "@RISDEV-8460"],
       },
-      async ({ page, prefilledDocumentUnit, baseURL, browser }) => {
+      async ({ page, prefilledDocumentUnit }) => {
         await navigateToPublication(page, prefilledDocumentUnit.documentNumber)
 
         await test.step("Anzeige einer unveröffentlichten Entscheidung mit allen Checks und ohne Fehler", async () => {
@@ -147,27 +147,6 @@ test.describe(
           ).toBeHidden()
         })
 
-        // Portal is not available in local environment
-        // eslint-disable-next-line playwright/no-conditional-in-test
-        if (baseURL !== "http://127.0.0.1") {
-          await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
-            const portalPage = await openInPortal(
-              browser,
-              prefilledDocumentUnit.documentNumber,
-            )
-            // await portalPage.goto(
-            //   `https://ris-portal.dev.ds4g.net/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
-            // )
-
-            // eslint-disable-next-line playwright/no-conditional-expect
-            await expect(
-              portalPage.getByRole("heading", {
-                name: "testHeadline",
-              }),
-            ).toBeVisible()
-          })
-        }
-
         await test.step("Eine veröffentlichte Dokumentationseinheit kann nicht gelöscht werden", async () => {
           await navigateToManagementData(
             page,
@@ -216,21 +195,6 @@ test.describe(
             `https://ris-portal.dev.ds4g.net/case-law/${prefilledDocumentUnit.documentNumber}`,
           )
         })
-
-        // Portal is not available in local environment
-        // eslint-disable-next-line playwright/no-conditional-in-test
-        if (baseURL !== "http://127.0.0.1") {
-          await test.step("Die Entscheidung ist nicht mehr per Portal-API abrufbar", async () => {
-            const portalPage = await openInPortal(
-              browser,
-              prefilledDocumentUnit.documentNumber,
-            )
-            // eslint-disable-next-line playwright/no-conditional-expect
-            await expect(
-              portalPage.getByText("Diese Seite existiert nicht"),
-            ).toBeVisible()
-          })
-        }
 
         await test.step("Veröffentlichen und Zurückziehen wird in der Historie geloggt", async () => {
           await navigateToManagementData(

@@ -13,6 +13,7 @@ import { Query } from "@/composables/useQueryFromRoute"
 import { Court } from "@/domain/court"
 import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import { SourceValue } from "@/domain/source"
 import errorMessages from "@/i18n/errors.json"
 import ComboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/documentUnitService"
@@ -183,6 +184,18 @@ async function createNewFromSearch() {
     fileNumber: searchQuery.value.fileNumber,
     decisionDate: searchQuery.value.decisionDate,
     court: courtFromQuery.value,
+  }
+
+  if (
+    courtFromQuery.value?.isSuperiorCourt &&
+    !courtFromQuery.value?.isForeignCourt
+  ) {
+    requestBodyParameters.sources = [
+      ...(requestBodyParameters.sources ?? []),
+      {
+        value: SourceValue.UnaufgefordertesOriginal,
+      },
+    ]
   }
 
   const createResponse = await service.createNew(requestBodyParameters, {

@@ -253,6 +253,7 @@ public class DocumentationUnitService {
                             .orElse(LegalEffect.NOT_SPECIFIED)
                             .getLabel())
                     .inputTypes(params.inputTypes())
+                    .sources(params.sources())
                     .build())
             .inboxStatus(isExternalHandover ? InboxStatus.EXTERNAL_HANDOVER : null)
             .build();

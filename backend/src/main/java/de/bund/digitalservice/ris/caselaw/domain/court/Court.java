@@ -14,4 +14,6 @@ public record Court(
     String revoked,
     String jurisdictionType,
     List<String> regions,
-    DocumentationOffice responsibleDocOffice) {}
+    DocumentationOffice responsibleDocOffice,
+    Boolean isSuperiorCourt,
+    Boolean isForeignCourt) {}
