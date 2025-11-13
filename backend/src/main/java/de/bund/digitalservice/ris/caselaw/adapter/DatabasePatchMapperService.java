@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -261,6 +262,8 @@ public class DatabasePatchMapperService implements PatchMapperService {
     }
 
     String longTextName = extractLongTextName(operation);
+    if (longTextName == null) return true;
+
     CategoryType category = CategoryType.forName(longTextName);
     if (!isRelevantCategory(category)) {
       return true;
@@ -275,16 +278,15 @@ public class DatabasePatchMapperService implements PatchMapperService {
     return !storedText.equals(valueNode.textValue());
   }
 
-  private static final Map<CategoryType, java.util.function.Function<LongTexts, String>>
-      LONG_TEXT_GETTERS =
-          Map.ofEntries(
-              Map.entry(CategoryType.TENOR, LongTexts::tenor),
-              Map.entry(CategoryType.REASONS, LongTexts::reasons),
-              Map.entry(CategoryType.CASE_FACTS, LongTexts::caseFacts),
-              Map.entry(CategoryType.DECISION_REASONS, LongTexts::decisionReasons),
-              Map.entry(CategoryType.DISSENTING_OPINION, LongTexts::dissentingOpinion),
-              Map.entry(CategoryType.OTHER_LONG_TEXT, LongTexts::otherLongText),
-              Map.entry(CategoryType.OUTLINE, LongTexts::outline));
+  private static final Map<CategoryType, Function<LongTexts, String>> LONG_TEXT_GETTERS =
+      Map.ofEntries(
+          Map.entry(CategoryType.TENOR, LongTexts::tenor),
+          Map.entry(CategoryType.REASONS, LongTexts::reasons),
+          Map.entry(CategoryType.CASE_FACTS, LongTexts::caseFacts),
+          Map.entry(CategoryType.DECISION_REASONS, LongTexts::decisionReasons),
+          Map.entry(CategoryType.DISSENTING_OPINION, LongTexts::dissentingOpinion),
+          Map.entry(CategoryType.OTHER_LONG_TEXT, LongTexts::otherLongText),
+          Map.entry(CategoryType.OUTLINE, LongTexts::outline));
 
   private String getStoredTextForCategory(Decision decision, CategoryType category) {
     var longTexts = decision.longTexts();
@@ -301,14 +303,7 @@ public class DatabasePatchMapperService implements PatchMapperService {
   }
 
   private Set<CategoryType> getRelevantTypes() {
-    return java.util.EnumSet.of(
-        CategoryType.TENOR,
-        CategoryType.OTHER_LONG_TEXT,
-        CategoryType.REASONS,
-        CategoryType.DISSENTING_OPINION,
-        CategoryType.OUTLINE,
-        CategoryType.CASE_FACTS,
-        CategoryType.DECISION_REASONS);
+    return LONG_TEXT_GETTERS.keySet();
   }
 
   private String extractLongTextName(JsonPatchOperation operation) {
