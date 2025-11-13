@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRelatedIndexing.vue"
 import ActiveCitation from "@/domain/activeCitation"
+import { AppealWithdrawal, PkhPlaintiff } from "@/domain/appeal"
 import { AppealAdmitter } from "@/domain/appealAdmitter"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { Decision } from "@/domain/decision"
@@ -634,6 +635,39 @@ describe("preview content related indexing", () => {
     })
   })
 
+  test("renders appeal", () => {
+    const { container } = renderComponent({
+      appeal: {
+        appellants: [{ id: "1", value: "Kläger" }],
+        revisionDefendantStatuses: [
+          { id: "1", value: "unbegründet" },
+          { id: "1", value: "unzulässig" },
+        ],
+        revisionPlaintiffStatuses: [{ id: "1", value: "unbegründet" }],
+        jointRevisionDefendantStatuses: [{ id: "1", value: "unbegründet" }],
+        jointRevisionPlaintiffStatuses: [{ id: "1", value: "unbegründet" }],
+        nzbDefendantStatuses: [{ id: "1", value: "unbegründet" }],
+        nzbPlaintiffStatuses: [{ id: "1", value: "unbegründet" }],
+        appealWithdrawal: AppealWithdrawal.JA,
+        pkhPlaintiff: PkhPlaintiff.NEIN,
+      },
+    })
+
+    expect(container).toHaveTextContent("RechtsmittelführerKläger")
+    expect(container).toHaveTextContent(
+      "Revision (Beklagter)unbegründet, unzulässig",
+    )
+    expect(container).toHaveTextContent("Revision (Kläger)unbegründet")
+    expect(container).toHaveTextContent(
+      "Anschlussrevision (Beklagter)unbegründet",
+    )
+    expect(container).toHaveTextContent("Anschlussrevision (Kläger)unbegründet")
+    expect(container).toHaveTextContent("NZB (Beklagter)unbegründet")
+    expect(container).toHaveTextContent("NZB (Kläger)unbegründet")
+    expect(container).toHaveTextContent("Zurücknahme der RevisionJa")
+    expect(container).toHaveTextContent("PKH-Antrag (Kläger)Nein")
+  })
+
   test("renders nothing when elements are empty", async () => {
     renderComponent({
       keywords: [],
@@ -649,6 +683,17 @@ describe("preview content related indexing", () => {
       evsf: "",
       definitions: [],
       appealAdmission: undefined,
+      appeal: {
+        appellants: [],
+        revisionDefendantStatuses: [],
+        revisionPlaintiffStatuses: [],
+        jointRevisionDefendantStatuses: [],
+        jointRevisionPlaintiffStatuses: [],
+        nzbDefendantStatuses: [],
+        nzbPlaintiffStatuses: [],
+        appealWithdrawal: undefined,
+        pkhPlaintiff: undefined,
+      },
     })
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
@@ -663,6 +708,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittel")).not.toBeInTheDocument()
   })
 
   test("renders nothing when elements are undefined", async () => {
@@ -680,6 +726,7 @@ describe("preview content related indexing", () => {
       evsf: undefined,
       definitions: undefined,
       appealAdmission: undefined,
+      appeal: undefined,
     })
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
@@ -694,5 +741,6 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittel")).not.toBeInTheDocument()
   })
 })
