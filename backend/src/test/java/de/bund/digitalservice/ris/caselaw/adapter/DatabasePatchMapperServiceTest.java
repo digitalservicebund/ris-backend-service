@@ -296,10 +296,9 @@ class DatabasePatchMapperServiceTest {
   }
 
   @Test
-  void givenPatchWithOnlyTextCheckChanges_whenComparingToStoredText_thenRemoveOperation() {
+  void givenPatchWithNoChanges_whenComparingToStoredText_thenRemoveOperation() {
     // given
-    var textWithTextCheckTags =
-        "<p>Some text with <text-check id=1 ignored=false>some</text-check> flag</p>";
+    var textWithTextCheckTags = "<p>Some text with some flag</p>";
     var patchPath = "/longTexts/tenor";
     JsonPatch patch =
         new JsonPatch(
@@ -315,7 +314,7 @@ class DatabasePatchMapperServiceTest {
     var expectedPatch = new JsonPatch(Collections.emptyList());
 
     // when
-    var result = service.removeCustomTagsAndCompareContentForDiff(patch, docUnit);
+    var result = service.removeOpsWhereContentNotChanged(patch, docUnit);
 
     // then
     assertEquals(expectedPatch.getOperations(), result.getOperations());
@@ -361,7 +360,7 @@ class DatabasePatchMapperServiceTest {
         Decision.builder().uuid(UUID.randomUUID()).documentNumber("YYDocNumber").build();
 
     // when
-    JsonPatch result = service.removeCustomTagsAndCompareContentForDiff(patch, docUnit);
+    JsonPatch result = service.removeOpsWhereContentNotChanged(patch, docUnit);
 
     // then
     assertEquals(patch.getOperations(), result.getOperations());
@@ -389,8 +388,7 @@ class DatabasePatchMapperServiceTest {
     AddOperation addOp = new AddOperation("/contentRelatedIndexing/fieldsOfLaw/0", valueNode);
 
     var storedText = "<p>Some text with extra content</p>";
-    var incomingTextWithTextCheck =
-        "<p>Some <text-check id=1 ignored=false>text</text-check> with extra content</p>";
+    var incomingTextWithTextCheck = "<p>Some text with extra content</p>";
 
     ReplaceOperation replaceOp =
         new ReplaceOperation("/longTexts/tenor", new TextNode(incomingTextWithTextCheck));
@@ -405,7 +403,7 @@ class DatabasePatchMapperServiceTest {
             .build();
 
     // when
-    JsonPatch result = service.removeCustomTagsAndCompareContentForDiff(patch, docUnit);
+    JsonPatch result = service.removeOpsWhereContentNotChanged(patch, docUnit);
 
     // then
     assertThat(result.getOperations()).hasSize(1);
@@ -423,9 +421,7 @@ class DatabasePatchMapperServiceTest {
 
     ReplaceOperation tenorReplace =
         new ReplaceOperation(
-            "/longTexts/tenor",
-            new TextNode(
-                "<p>Some <text-check id=1 ignored=false>text</text-check> with extra content</p>"));
+            "/longTexts/tenor", new TextNode("<p>Some text with extra content</p>"));
 
     JsonPatch patch = new JsonPatch(List.of(reasonsReplace, tenorReplace));
 
@@ -441,7 +437,7 @@ class DatabasePatchMapperServiceTest {
             .build();
 
     // when
-    JsonPatch result = service.removeCustomTagsAndCompareContentForDiff(patch, docUnit);
+    JsonPatch result = service.removeOpsWhereContentNotChanged(patch, docUnit);
 
     // then
     assertThat(result.getOperations()).hasSize(1);

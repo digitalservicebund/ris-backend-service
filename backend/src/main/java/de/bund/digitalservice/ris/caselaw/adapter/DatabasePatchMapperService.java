@@ -231,7 +231,7 @@ public class DatabasePatchMapperService implements PatchMapperService {
   }
 
   @Override
-  public JsonPatch removeCustomTagsAndCompareContentForDiff(
+  public JsonPatch removeOpsWhereContentNotChanged(
       JsonPatch patch, DocumentationUnit documentationUnit) {
     if (documentationUnit instanceof PendingProceeding) {
       return patch;
@@ -266,14 +266,13 @@ public class DatabasePatchMapperService implements PatchMapperService {
       return true;
     }
 
-    String cleanedText = cleanTextFromTextCheckTags(valueNode.textValue());
     String storedText = getStoredTextForCategory(storedDecision, category);
 
     if (storedText == null) {
       return true;
     }
 
-    return !storedText.equals(cleanedText);
+    return !storedText.equals(valueNode.textValue());
   }
 
   private static final Map<CategoryType, java.util.function.Function<LongTexts, String>>

@@ -680,25 +680,22 @@ public class DocumentationUnitService {
     if (!toUpdate.getOperations().isEmpty()) {
       toUpdate = patchMapperService.removeTextCheckTags(toUpdate);
 
-      var textCheckSanitizedUpdate =
-          patchMapperService.removeCustomTagsAndCompareContentForDiff(
-              toUpdate, existingDocumentationUnit);
+      toUpdate =
+          patchMapperService.removeOpsWhereContentNotChanged(toUpdate, existingDocumentationUnit);
 
-      if (!textCheckSanitizedUpdate.getOperations().isEmpty()) {
+      if (!toUpdate.getOperations().isEmpty()) {
         // Saving a return patch including the base64 images as src attributes with an api path.
         patchedDocumentationUnitWithBase64Images =
             cloneDocumentationUnitWithNewVersion(
-                patchMapperService.applyPatchToEntity(
-                    textCheckSanitizedUpdate, existingDocumentationUnit),
+                patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit),
                 newVersion);
 
-        textCheckSanitizedUpdate =
+        toUpdate =
             patchMapperService.extractAndStoreBase64Images(
-                textCheckSanitizedUpdate, existingDocumentationUnit, null);
+                toUpdate, existingDocumentationUnit, null);
 
         DocumentationUnit patchedDocumentationUnit =
-            patchMapperService.applyPatchToEntity(
-                textCheckSanitizedUpdate, existingDocumentationUnit);
+            patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
 
         patchedDocumentationUnit =
             cloneDocumentationUnitWithNewVersion(patchedDocumentationUnit, newVersion);

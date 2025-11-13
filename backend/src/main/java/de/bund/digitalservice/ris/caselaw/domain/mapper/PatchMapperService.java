@@ -105,8 +105,7 @@ public interface PatchMapperService {
    * @param patch The JSON patch to check.
    * @return true if after removal of text check tags, the text is the same as the stored text.
    */
-  JsonPatch removeCustomTagsAndCompareContentForDiff(
-      JsonPatch patch, DocumentationUnit documentationUnit);
+  JsonPatch removeOpsWhereContentNotChanged(JsonPatch patch, DocumentationUnit documentationUnit);
 
   /**
    * Remove all informational tags for the text check.
