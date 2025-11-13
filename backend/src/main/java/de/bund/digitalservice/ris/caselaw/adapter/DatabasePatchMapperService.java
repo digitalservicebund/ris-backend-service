@@ -266,7 +266,7 @@ public class DatabasePatchMapperService implements PatchMapperService {
       return true;
     }
 
-    String cleanedText = cleatTextFromTextCheckTags(valueNode.textValue());
+    String cleanedText = cleanTextFromTextCheckTags(valueNode.textValue());
     String storedText = getStoredTextForCategory(storedDecision, category);
 
     if (storedText == null) {
@@ -276,16 +276,16 @@ public class DatabasePatchMapperService implements PatchMapperService {
     return !storedText.equals(cleanedText);
   }
 
-  private static final java.util.Map<CategoryType, java.util.function.Function<LongTexts, String>>
+  private static final Map<CategoryType, java.util.function.Function<LongTexts, String>>
       LONG_TEXT_GETTERS =
-          java.util.Map.ofEntries(
-              java.util.Map.entry(CategoryType.TENOR, LongTexts::tenor),
-              java.util.Map.entry(CategoryType.REASONS, LongTexts::reasons),
-              java.util.Map.entry(CategoryType.CASE_FACTS, LongTexts::caseFacts),
-              java.util.Map.entry(CategoryType.DECISION_REASONS, LongTexts::decisionReasons),
-              java.util.Map.entry(CategoryType.DISSENTING_OPINION, LongTexts::dissentingOpinion),
-              java.util.Map.entry(CategoryType.OTHER_LONG_TEXT, LongTexts::otherLongText),
-              java.util.Map.entry(CategoryType.OUTLINE, LongTexts::outline));
+          Map.ofEntries(
+              Map.entry(CategoryType.TENOR, LongTexts::tenor),
+              Map.entry(CategoryType.REASONS, LongTexts::reasons),
+              Map.entry(CategoryType.CASE_FACTS, LongTexts::caseFacts),
+              Map.entry(CategoryType.DECISION_REASONS, LongTexts::decisionReasons),
+              Map.entry(CategoryType.DISSENTING_OPINION, LongTexts::dissentingOpinion),
+              Map.entry(CategoryType.OTHER_LONG_TEXT, LongTexts::otherLongText),
+              Map.entry(CategoryType.OUTLINE, LongTexts::outline));
 
   private String getStoredTextForCategory(Decision decision, CategoryType category) {
     var longTexts = decision.longTexts();
@@ -322,7 +322,7 @@ public class DatabasePatchMapperService implements PatchMapperService {
     return fieldName;
   }
 
-  private String cleatTextFromTextCheckTags(String text) {
+  private String cleanTextFromTextCheckTags(String text) {
     Matcher matcher = TEXT_CHECK_PATTERN.matcher(text);
     StringBuilder builder = new StringBuilder();
     while (matcher.find()) {

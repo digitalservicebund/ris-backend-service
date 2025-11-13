@@ -652,7 +652,7 @@ public class DocumentationUnitService {
        * handle unique following operation (sometimes by add and remove operations at the same time)
     */
 
-    DocumentationUnit existingDocumentationUnit = getByUuid(documentationUnitId, user);
+    var existingDocumentationUnit = getByUuid(documentationUnitId, user);
 
     DocumentationUnit patchedDocumentationUnitWithBase64Images;
 
@@ -749,27 +749,33 @@ public class DocumentationUnitService {
           patch.documentationUnitVersion(),
           toFrontend);
     } else {
-      if (newPatch == null) {
-        newPatch = new JsonPatch(Collections.emptyList());
-      }
-      toFrontend =
-          new RisJsonPatch(existingDocumentationUnit.version(), newPatch, Collections.emptyList());
+      toFrontend = defaultNoUpdateResponse(newPatch, existingDocumentationUnit);
     }
 
     return toFrontend;
   }
 
+  private RisJsonPatch defaultNoUpdateResponse(
+      JsonPatch newPatch, DocumentationUnit existingDocumentationUnit) {
+    if (newPatch == null) {
+      newPatch = new JsonPatch(Collections.emptyList());
+    }
+    return new RisJsonPatch(existingDocumentationUnit.version(), newPatch, Collections.emptyList());
+  }
+
   private void logPatches(
       RisJsonPatch patch, JsonPatch newPatch, long newVersion, UUID documentationUnitId) {
-    if (!patch.patch().getOperations().isEmpty() || !newPatch.getOperations().isEmpty()) {
-      log.debug(
-          "documentation unit '{}' with patch '{}' for version '{}'",
-          documentationUnitId,
-          patch.documentationUnitVersion(),
-          patch.patch());
-      log.debug("new version is {}", newVersion);
-      log.debug("version {} - patch in database: {}", patch.documentationUnitVersion(), newPatch);
+    if (patch.patch().getOperations().isEmpty() || newPatch.getOperations().isEmpty()) {
+      return;
     }
+
+    log.debug(
+        "documentation unit '{}' with patch '{}' for version '{}'",
+        documentationUnitId,
+        patch.documentationUnitVersion(),
+        patch.patch());
+    log.debug("new version is {}", newVersion);
+    log.debug("version {} - patch in database: {}", patch.documentationUnitVersion(), newPatch);
   }
 
   /** Return a documentation unit with a new version */
