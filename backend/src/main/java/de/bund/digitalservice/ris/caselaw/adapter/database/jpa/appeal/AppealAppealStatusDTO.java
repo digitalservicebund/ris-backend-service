@@ -20,7 +20,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder(toBuilder = true)
+@SuperBuilder(builderMethodName = "appealAppealStatusBuilder")
 @MappedSuperclass
 public class AppealAppealStatusDTO {
 
