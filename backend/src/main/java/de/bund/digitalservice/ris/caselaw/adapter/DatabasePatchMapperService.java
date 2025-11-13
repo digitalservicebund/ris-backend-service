@@ -321,16 +321,6 @@ public class DatabasePatchMapperService implements PatchMapperService {
     return fieldName;
   }
 
-  private String cleanTextFromTextCheckTags(String text) {
-    Matcher matcher = TEXT_CHECK_PATTERN.matcher(text);
-    StringBuilder builder = new StringBuilder();
-    while (matcher.find()) {
-      matcher.appendReplacement(builder, matcher.group(1));
-    }
-    matcher.appendTail(builder);
-    return builder.toString();
-  }
-
   /**
    * Extracts base64 images from HTML content in the given JSON patch, stores them as attachments,
    * and replaces the image sources with URLs pointing to the stored images.
