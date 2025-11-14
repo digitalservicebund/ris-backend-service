@@ -469,84 +469,85 @@ class DecisionFullLdmlTransformerTest {
         .contains(StringUtils.deleteWhitespace(expected));
   }
 
-  @Test
-  @DisplayName("Mixed text in header")
-  void testTransform_withSuperiorCourt_shouldNotIncludeGerichtsOrt() {
-    String expected =
-        """
-        <akn:references source="#ris">
-            <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
-            <akn:TLCOrganization eId="gericht" href="" showAs="BGH"/>
-        </akn:references>
-       """;
-    Decision decision =
-        testDocumentUnit.toBuilder()
-            .coreData(
-                CoreData.builder()
-                    .court(
-                        Court.builder()
-                            .isSuperiorCourt(true)
-                            .isForeignCourt(false)
-                            .label("BGH")
-                            .type("BGH")
-                            .regions(List.of("DEU"))
-                            .jurisdictionType("Ordentliche Gerichtsbarkeit")
-                            .build())
-                    .documentType(
-                        DocumentType.builder().label("testDocumentTypeAbbreviation").build())
-                    .fileNumbers(List.of("testFileNumber"))
-                    .decisionDate(LocalDate.of(2020, 1, 1))
-                    .build())
-            .build();
+  @Nested
+  class CourtTest {
+    @Test
+    void testTransform_withSuperiorCourt_shouldNotIncludeGerichtsOrt() {
+      String expected =
+          """
+          <akn:references source="#ris">
+              <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
+              <akn:TLCOrganization eId="gericht" href="" showAs="BGH"/>
+          </akn:references>
+         """;
+      Decision decision =
+          testDocumentUnit.toBuilder()
+              .coreData(
+                  CoreData.builder()
+                      .court(
+                          Court.builder()
+                              .isSuperiorCourt(true)
+                              .isForeignCourt(false)
+                              .label("BGH")
+                              .type("BGH")
+                              .regions(List.of("DEU"))
+                              .jurisdictionType("Ordentliche Gerichtsbarkeit")
+                              .build())
+                      .documentType(
+                          DocumentType.builder().label("testDocumentTypeAbbreviation").build())
+                      .fileNumbers(List.of("testFileNumber"))
+                      .decisionDate(LocalDate.of(2020, 1, 1))
+                      .build())
+              .build();
 
-    CaseLawLdml ldml = subject.transformToLdml(decision);
+      CaseLawLdml ldml = subject.transformToLdml(decision);
 
-    Assertions.assertNotNull(ldml);
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    assertThat(fileContent).isPresent();
-    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
-        .contains(StringUtils.deleteWhitespace(expected));
-  }
+      Assertions.assertNotNull(ldml);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      assertThat(fileContent).isPresent();
+      assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+          .contains(StringUtils.deleteWhitespace(expected));
+    }
 
-  @Test
-  @DisplayName("Mixed text in header")
-  void testTransform_withNonSuperiorCourt_shouldIncludeGerichtsOrt() {
-    String expected =
-        """
-        <akn:references source="#ris">
-            <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
-            <akn:TLCOrganization eId="gericht" href="" showAs="AG Aachen"/>
-            <akn:TLCLocation eId="gerichtsort" href="" showAs="Aachen"/>
-        </akn:references>
-       """;
-    Decision decision =
-        testDocumentUnit.toBuilder()
-            .coreData(
-                CoreData.builder()
-                    .court(
-                        Court.builder()
-                            .isSuperiorCourt(false)
-                            .isForeignCourt(false)
-                            .label("AG Aachen")
-                            .type("AG")
-                            .location("Aachen")
-                            .regions(List.of("NW"))
-                            .jurisdictionType("Ordentliche Gerichtsbarkeit")
-                            .build())
-                    .documentType(
-                        DocumentType.builder().label("testDocumentTypeAbbreviation").build())
-                    .fileNumbers(List.of("testFileNumber"))
-                    .decisionDate(LocalDate.of(2020, 1, 1))
-                    .build())
-            .build();
+    @Test
+    void testTransform_withNonSuperiorCourt_shouldIncludeGerichtsOrt() {
+      String expected =
+          """
+          <akn:references source="#ris">
+              <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
+              <akn:TLCOrganization eId="gericht" href="" showAs="AG Aachen"/>
+              <akn:TLCLocation eId="gerichtsort" href="" showAs="Aachen"/>
+          </akn:references>
+         """;
+      Decision decision =
+          testDocumentUnit.toBuilder()
+              .coreData(
+                  CoreData.builder()
+                      .court(
+                          Court.builder()
+                              .isSuperiorCourt(false)
+                              .isForeignCourt(false)
+                              .label("AG Aachen")
+                              .type("AG")
+                              .location("Aachen")
+                              .regions(List.of("NW"))
+                              .jurisdictionType("Ordentliche Gerichtsbarkeit")
+                              .build())
+                      .documentType(
+                          DocumentType.builder().label("testDocumentTypeAbbreviation").build())
+                      .fileNumbers(List.of("testFileNumber"))
+                      .decisionDate(LocalDate.of(2020, 1, 1))
+                      .build())
+              .build();
 
-    CaseLawLdml ldml = subject.transformToLdml(decision);
+      CaseLawLdml ldml = subject.transformToLdml(decision);
 
-    Assertions.assertNotNull(ldml);
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    assertThat(fileContent).isPresent();
-    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
-        .contains(StringUtils.deleteWhitespace(expected));
+      Assertions.assertNotNull(ldml);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      assertThat(fileContent).isPresent();
+      assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+          .contains(StringUtils.deleteWhitespace(expected));
+    }
   }
 
   @Test
