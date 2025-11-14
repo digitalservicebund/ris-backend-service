@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
+import Appeal from "@/components/Appeal.vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import CollectiveAgreements from "@/components/CollectiveAgreements.vue"
 import DefinitionList from "@/components/DefinitionList.vue"
@@ -53,6 +54,22 @@ const hasForeignLanguageVersion = computed(() => {
     : false
 })
 
+const hasAppeal = computed(() => {
+  return (
+    contentRelatedIndexing.value.appeal?.appellants?.length ||
+    contentRelatedIndexing.value.appeal?.revisionDefendantStatuses?.length ||
+    contentRelatedIndexing.value.appeal?.revisionPlaintiffStatuses?.length ||
+    contentRelatedIndexing.value.appeal?.jointRevisionDefendantStatuses
+      ?.length ||
+    contentRelatedIndexing.value.appeal?.jointRevisionPlaintiffStatuses
+      ?.length ||
+    contentRelatedIndexing.value.appeal?.nzbDefendantStatuses?.length ||
+    contentRelatedIndexing.value.appeal?.nzbPlaintiffStatuses?.length ||
+    contentRelatedIndexing.value.appeal?.appealWithdrawal ||
+    contentRelatedIndexing.value.appeal?.pkhPlaintiff
+  )
+})
+
 const shouldDisplayLegislativeMandateCategory = computed(() => {
   return (
     constitutionalCourtTypes.items.includes(
@@ -82,6 +99,10 @@ const shouldDisplayCollectiveAgreements = computed(
 )
 
 const shouldDisplayEvsf = computed(() => isFinanceCourt.value || evsf.value)
+
+const shouldDisplayAppeal = computed(
+  () => isFinanceCourt.value || hasAppeal.value,
+)
 </script>
 
 <template>
@@ -137,6 +158,13 @@ const shouldDisplayEvsf = computed(() => isFinanceCourt.value || evsf.value)
         :label="contentRelatedIndexingLabels.evsf"
         :should-show-button="!evsf"
       />
+      <CategoryWrapper
+        v-if="shouldDisplayAppeal"
+        :label="contentRelatedIndexingLabels.appeal"
+        :should-show-button="!hasAppeal"
+      >
+        <Appeal :label="contentRelatedIndexingLabels.appeal" />
+      </CategoryWrapper>
     </div>
   </div>
 </template>

@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.1.0"
-    id("org.flywaydb.flyway") version "11.16.0"
+    id("org.flywaydb.flyway") version "11.17.0"
     id("io.sentry.jvm.gradle") version "5.12.2"
 }
 
@@ -150,7 +150,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "2.0.1"
+    val testContainersVersion = "2.0.2"
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -168,7 +168,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.33.0")
+    implementation("com.google.protobuf:protobuf-java:4.33.1")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.6.0")
@@ -180,7 +180,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.38.2"))
+    implementation(platform("software.amazon.awssdk:bom:2.38.5"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -204,9 +204,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.105")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.106")
     // for local development:
-//     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.105.jar"))
+//     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.106.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.20.1")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.20.1")
@@ -230,10 +230,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.2")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.16.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.17.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.16.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.17.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -250,7 +250,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.34.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.35.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

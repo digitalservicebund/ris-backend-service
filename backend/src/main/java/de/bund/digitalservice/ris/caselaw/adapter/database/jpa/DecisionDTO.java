@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,6 +16,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.OrderColumn;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -266,6 +268,11 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @Enumerated(EnumType.STRING)
   @JdbcType(PostgreSQLEnumJdbcType.class)
   private AppealAdmitter appealAdmittedBy;
+
+  /** Rechtsmittel */
+  @OneToOne(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
+  @PrimaryKeyJoinColumn
+  private AppealDTO appeal;
 
   @Override
   @SuppressWarnings("java:S2097") // Class type check is not recognized by Sonar

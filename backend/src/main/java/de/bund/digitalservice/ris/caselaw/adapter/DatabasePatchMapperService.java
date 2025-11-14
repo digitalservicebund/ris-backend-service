@@ -17,18 +17,24 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitPatchDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
 import de.bund.digitalservice.ris.caselaw.domain.image.ImageUtil;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -225,6 +231,91 @@ public class DatabasePatchMapperService implements PatchMapperService {
     return new JsonPatch(operations);
   }
 
+  @Override
+  public JsonPatch removeOpsWhereContentNotChanged(
+      JsonPatch patch, DocumentationUnit documentationUnit) {
+    if (documentationUnit instanceof PendingProceeding) {
+      return patch;
+    }
+
+    Decision storedDecision = (Decision) documentationUnit;
+
+    var filteredOperations =
+        patch.getOperations().stream().filter(op -> keepOperation(op, storedDecision)).toList();
+
+    return new JsonPatch(filteredOperations);
+  }
+
+  /**
+   * Helper to decide whether an operation should be kept in the resulting patch. Keeps all
+   * operations except replace operations on relevant longTexts where the cleaned incoming text
+   * equals the stored text (in which case the op is redundant and can be dropped).
+   */
+  private boolean keepOperation(JsonPatchOperation operation, Decision storedDecision) {
+    if (!(operation instanceof PathValueOperation valueOp
+        && valueOp.getValue() instanceof TextNode valueNode)) {
+      return true;
+    }
+
+    if (!isReplaceOnLongText(valueOp)) {
+      return true;
+    }
+
+    String longTextName = extractLongTextName(operation);
+    if (longTextName == null) return true;
+
+    CategoryType category = CategoryType.forName(longTextName);
+    if (!isRelevantCategory(category)) {
+      return true;
+    }
+
+    String storedText = getStoredTextForCategory(storedDecision, category);
+
+    if (storedText == null) {
+      return true;
+    }
+
+    return !storedText.equals(valueNode.textValue());
+  }
+
+  private static final Map<CategoryType, Function<LongTexts, String>> LONG_TEXT_GETTERS =
+      Map.ofEntries(
+          Map.entry(CategoryType.TENOR, LongTexts::tenor),
+          Map.entry(CategoryType.REASONS, LongTexts::reasons),
+          Map.entry(CategoryType.CASE_FACTS, LongTexts::caseFacts),
+          Map.entry(CategoryType.DECISION_REASONS, LongTexts::decisionReasons),
+          Map.entry(CategoryType.DISSENTING_OPINION, LongTexts::dissentingOpinion),
+          Map.entry(CategoryType.OTHER_LONG_TEXT, LongTexts::otherLongText),
+          Map.entry(CategoryType.OUTLINE, LongTexts::outline));
+
+  private String getStoredTextForCategory(Decision decision, CategoryType category) {
+    var longTexts = decision.longTexts();
+    if (longTexts == null) {
+      return null;
+    }
+
+    var getter = LONG_TEXT_GETTERS.get(category);
+    if (getter == null) {
+      return null;
+    }
+
+    return getter.apply(longTexts);
+  }
+
+  private Set<CategoryType> getRelevantTypes() {
+    return LONG_TEXT_GETTERS.keySet();
+  }
+
+  private String extractLongTextName(JsonPatchOperation operation) {
+    String path = operation.getPath();
+    String fieldName = path.substring("/longTexts/".length());
+    int slashIndex = fieldName.indexOf('/');
+    if (slashIndex != -1) {
+      fieldName = fieldName.substring(0, slashIndex);
+    }
+    return fieldName;
+  }
+
   /**
    * Extracts base64 images from HTML content in the given JSON patch, stores them as attachments,
    * and replaces the image sources with URLs pointing to the stored images.
@@ -316,5 +407,14 @@ public class DatabasePatchMapperService implements PatchMapperService {
     } else {
       return originalOperation;
     }
+  }
+
+  private boolean isReplaceOnLongText(PathValueOperation valueOperation) {
+    return "replace".equals(valueOperation.getOp())
+        && valueOperation.getPath().startsWith("/longTexts/");
+  }
+
+  private boolean isRelevantCategory(CategoryType category) {
+    return category != null && getRelevantTypes().contains(category);
   }
 }
