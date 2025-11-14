@@ -54,7 +54,7 @@ class ForeignLanguageVersionTransformerTest {
   @Test
   void transformToDTO_withNullInput_returnsNull() {
     DecisionDTO decision = new DecisionDTO();
-    assertNull(ForeignLanguageTransformer.transformToDTO(null, decision));
+    assertNull(ForeignLanguageTransformer.transformToDTO(null, 1));
   }
 
   @Test
@@ -75,7 +75,7 @@ class ForeignLanguageVersionTransformerTest {
 
     // Act
     ForeignLanguageVersionDTO foreignLanguageVersionDTO =
-        ForeignLanguageTransformer.transformToDTO(foreignLanguageVersion, new DecisionDTO());
+        ForeignLanguageTransformer.transformToDTO(foreignLanguageVersion, 1);
 
     // Assert
     assertNotNull(foreignLanguageVersionDTO);
