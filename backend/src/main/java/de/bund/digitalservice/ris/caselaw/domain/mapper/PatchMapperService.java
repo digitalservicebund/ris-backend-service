@@ -98,6 +98,16 @@ public interface PatchMapperService {
   }
 
   /**
+   * Returns true if the JSON patch contains updates only for long texts and also that these changes
+   * to long texts are only insertions of text check tags. We should not update the version if there
+   * was no actual change to the long text.
+   *
+   * @param patch The JSON patch to check.
+   * @return true if after removal of text check tags, the text is the same as the stored text.
+   */
+  JsonPatch removeOpsWhereContentNotChanged(JsonPatch patch, DocumentationUnit documentationUnit);
+
+  /**
    * Remove all informational tags for the text check.
    *
    * @param patch with text check tags
