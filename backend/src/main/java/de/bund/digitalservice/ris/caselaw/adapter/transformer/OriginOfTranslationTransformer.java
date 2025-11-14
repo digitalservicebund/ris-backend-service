@@ -23,9 +23,7 @@ public class OriginOfTranslationTransformer {
    * Transforms an OriginOfTranslation domain object into it's database representation, a
    * OriginOfTranslationDTO (Data Transfer Object).
    *
-   * @param currentDto A database representation of the origin of translation to be transformed in
-   *     to a domain object.
-   * @param originOfTranslation The Origin of the translation.
+   * @param originOfTranslation The Origin of the translation as a domain object.
    * @param index position of the current origin of translation
    * @return A database representation of a domain object.
    */

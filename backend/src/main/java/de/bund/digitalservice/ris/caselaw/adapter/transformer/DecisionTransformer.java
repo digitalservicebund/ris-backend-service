@@ -149,7 +149,7 @@ public class DecisionTransformer extends DocumentableTransformer {
         builder.appealAdmittedBy(contentRelatedIndexing.appealAdmission().by());
       }
       builder.appeal(AppealTransformer.transformToDTO(currentDto, contentRelatedIndexing.appeal()));
-      addOriginOfTranslations(currentDto, builder, contentRelatedIndexing);
+      addOriginOfTranslations(builder, contentRelatedIndexing);
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -564,9 +564,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   }
 
   private static void addOriginOfTranslations(
-      DecisionDTO currentDto,
-      DecisionDTOBuilder<?, ?> builder,
-      ContentRelatedIndexing contentRelatedIndexing) {
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
     if (contentRelatedIndexing.originOfTranslations() == null) {
       return;
     }
@@ -576,8 +574,7 @@ public class DecisionTransformer extends DocumentableTransformer {
 
     for (int i = 0; i < originOfTranslations.size(); i++) {
       originOfTranslationDTOS.add(
-          OriginOfTranslationTransformer.transformToDTO(
-              currentDto, originOfTranslations.get(i), i));
+          OriginOfTranslationTransformer.transformToDTO(originOfTranslations.get(i), i));
     }
 
     builder.originOfTranslations(originOfTranslationDTOS);

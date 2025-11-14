@@ -25,7 +25,7 @@ class OriginOfTranslationTransformerTest {
     @Test
     void transformToDTO_withNullInput_returnsNull() {
       DecisionDTO decision = new DecisionDTO();
-      assertNull(OriginOfTranslationTransformer.transformToDTO(decision, null, 0));
+      assertNull(OriginOfTranslationTransformer.transformToDTO(null, 0));
     }
 
     @Test
@@ -45,8 +45,7 @@ class OriginOfTranslationTransformerTest {
               .build();
 
       // Act
-      OriginOfTranslationDTO dto =
-          OriginOfTranslationTransformer.transformToDTO(decision, domain, 0);
+      OriginOfTranslationDTO dto = OriginOfTranslationTransformer.transformToDTO(domain, 0);
 
       // Assert
       Assertions.assertNotNull(dto);
@@ -83,8 +82,7 @@ class OriginOfTranslationTransformerTest {
       OriginOfTranslation domain = OriginOfTranslation.builder().id(UUID.randomUUID()).build();
 
       // Act
-      OriginOfTranslationDTO dto =
-          OriginOfTranslationTransformer.transformToDTO(decision, domain, 0);
+      OriginOfTranslationDTO dto = OriginOfTranslationTransformer.transformToDTO(domain, 0);
 
       // Assert
       Assertions.assertTrue(dto.getTranslators().isEmpty());
@@ -106,8 +104,7 @@ class OriginOfTranslationTransformerTest {
               .build();
 
       // Act
-      OriginOfTranslationDTO dto =
-          OriginOfTranslationTransformer.transformToDTO(decision, domain, 0);
+      OriginOfTranslationDTO dto = OriginOfTranslationTransformer.transformToDTO(domain, 0);
 
       // Assert
       Assertions.assertTrue(dto.getTranslators().isEmpty());
@@ -129,8 +126,7 @@ class OriginOfTranslationTransformerTest {
               .build();
 
       // Act
-      OriginOfTranslationDTO dto =
-          OriginOfTranslationTransformer.transformToDTO(decision, domain, 0);
+      OriginOfTranslationDTO dto = OriginOfTranslationTransformer.transformToDTO(domain, 0);
 
       // Assert
       Assertions.assertTrue(dto.getTranslators().isEmpty());
