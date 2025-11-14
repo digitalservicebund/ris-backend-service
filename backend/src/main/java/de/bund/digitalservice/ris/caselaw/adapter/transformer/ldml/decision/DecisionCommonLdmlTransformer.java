@@ -259,8 +259,10 @@ public abstract class DecisionCommonLdmlTransformer
         Gericht.GerichtBuilder gerichtBuilder =
             Gericht.builder()
                 .refersTo("#gericht")
-                .typ(Gericht.GerichtTyp.builder().value(court.type()).build())
-                .ort(Gericht.GerichtOrt.builder().value(court.location()).build());
+                .typ(Gericht.GerichtTyp.builder().value(court.type()).build());
+        if (Boolean.FALSE.equals(court.isSuperiorCourt()) && court.location() != null) {
+          gerichtBuilder.ort(Gericht.GerichtOrt.builder().value(court.location()).build());
+        }
         if (isNotBlank(coreData.appraisalBody())) {
           gerichtBuilder.spruchkoerper(
               Gericht.Spruchkoerper.builder().value(coreData.appraisalBody()).build());

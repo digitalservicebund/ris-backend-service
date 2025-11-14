@@ -243,6 +243,8 @@ class PendingProceedingFullLdmlTransformerTest {
             CoreData.builder()
                 .court(
                     Court.builder()
+                        .isSuperiorCourt(false)
+                        .isForeignCourt(false)
                         .type("courtType")
                         .location("courtLocation")
                         .label("courtType courtLocation")

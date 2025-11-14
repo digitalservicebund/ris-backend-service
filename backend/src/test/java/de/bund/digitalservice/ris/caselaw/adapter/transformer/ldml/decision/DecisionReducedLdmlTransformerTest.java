@@ -189,6 +189,8 @@ class DecisionReducedLdmlTransformerTest {
                             .build())
                     .court(
                         Court.builder()
+                            .isSuperiorCourt(false)
+                            .isForeignCourt(false)
                             .label("courtLabel test")
                             .type("courtType")
                             .location("courtLocation")

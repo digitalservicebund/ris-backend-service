@@ -473,12 +473,18 @@ class DecisionFullLdmlTransformerTest {
   class CourtTest {
     @Test
     void testTransform_withSuperiorCourt_shouldNotIncludeGerichtsOrt() {
-      String expected =
+      String expectedReferences =
           """
           <akn:references source="#ris">
               <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
               <akn:TLCOrganization eId="gericht" href="" showAs="BGH"/>
           </akn:references>
+         """;
+      String expectedRisMeta =
+          """
+          <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+             <ris:typ domainTerm="Gerichtstyp">BGH</ris:typ>
+         </ris:gericht>
          """;
       Decision decision =
           testDocumentUnit.toBuilder()
@@ -506,18 +512,72 @@ class DecisionFullLdmlTransformerTest {
       Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
       assertThat(fileContent).isPresent();
       assertThat(StringUtils.deleteWhitespace(fileContent.get()))
-          .contains(StringUtils.deleteWhitespace(expected));
+          .contains(StringUtils.deleteWhitespace(expectedReferences));
+      assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+          .contains(StringUtils.deleteWhitespace(expectedRisMeta));
     }
 
     @Test
-    void testTransform_withNonSuperiorCourt_shouldIncludeGerichtsOrt() {
-      String expected =
+    void testTransform_withNullCourtLocation_shouldNotIncludeGerichtsOrt() {
+      String expectedReferences =
+          """
+          <akn:references source="#ris">
+              <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
+              <akn:TLCOrganization eId="gericht" href="" showAs="Tribunal Economico-Administrativo Regional Katalonien"/>
+          </akn:references>
+         """;
+      String expectedRisMeta =
+          """
+          <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+             <ris:typ domainTerm="Gerichtstyp">Tribunal Economico-Administrativo Regional Katalonien</ris:typ>
+         </ris:gericht>
+         """;
+      Decision decision =
+          testDocumentUnit.toBuilder()
+              .coreData(
+                  CoreData.builder()
+                      .court(
+                          Court.builder()
+                              .isSuperiorCourt(false)
+                              .isForeignCourt(true)
+                              .label("Tribunal Economico-Administrativo Regional Katalonien")
+                              .type("Tribunal Economico-Administrativo Regional Katalonien")
+                              .jurisdictionType("")
+                              .build())
+                      .documentType(
+                          DocumentType.builder().label("testDocumentTypeAbbreviation").build())
+                      .fileNumbers(List.of("testFileNumber"))
+                      .decisionDate(LocalDate.of(2020, 1, 1))
+                      .build())
+              .build();
+
+      CaseLawLdml ldml = subject.transformToLdml(decision);
+
+      Assertions.assertNotNull(ldml);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      assertThat(fileContent).isPresent();
+      assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+          .contains(StringUtils.deleteWhitespace(expectedReferences));
+      assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+          .contains(StringUtils.deleteWhitespace(expectedRisMeta));
+    }
+
+    @Test
+    void testTransform_withWithCourtLocation_shouldIncludeGerichtsOrt() {
+      String expectedReferences =
           """
           <akn:references source="#ris">
               <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
               <akn:TLCOrganization eId="gericht" href="" showAs="AG Aachen"/>
               <akn:TLCLocation eId="gerichtsort" href="" showAs="Aachen"/>
           </akn:references>
+         """;
+      String expectedRisMeta =
+          """
+          <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+             <ris:typ domainTerm="Gerichtstyp">AG</ris:typ>
+             <ris:ort domainTerm="Gerichtsort">Aachen</ris:ort>
+         </ris:gericht>
          """;
       Decision decision =
           testDocumentUnit.toBuilder()
@@ -546,7 +606,9 @@ class DecisionFullLdmlTransformerTest {
       Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
       assertThat(fileContent).isPresent();
       assertThat(StringUtils.deleteWhitespace(fileContent.get()))
-          .contains(StringUtils.deleteWhitespace(expected));
+          .contains(StringUtils.deleteWhitespace(expectedReferences));
+      assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+          .contains(StringUtils.deleteWhitespace(expectedRisMeta));
     }
   }
 
@@ -843,6 +905,8 @@ class DecisionFullLdmlTransformerTest {
                         .build())
                 .court(
                     Court.builder()
+                        .isSuperiorCourt(false)
+                        .isForeignCourt(false)
                         .label("courtLabel test")
                         .type("courtType")
                         .location("courtLocation")

@@ -228,7 +228,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
 
       // Superior German Courts have null as courtLocation in the domain because
       // the "Standort des Gerichts" is non-relevant/misleading
-      if (Boolean.FALSE.equals(court.isSuperiorCourt()) || (court.location() != null)) {
+      if (Boolean.FALSE.equals(court.isSuperiorCourt()) && (court.location() != null)) {
         TlcElement tlcCourtLocation = new TlcElement("gerichtsort", "", court.location());
         tlcLocations.add(tlcCourtLocation);
       }
