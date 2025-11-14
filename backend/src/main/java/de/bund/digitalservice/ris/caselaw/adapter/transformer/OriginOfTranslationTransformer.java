@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationBorderNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationTranslatorDTO;
@@ -31,7 +30,7 @@ public class OriginOfTranslationTransformer {
    * @return A database representation of a domain object.
    */
   public static OriginOfTranslationDTO transformToDTO(
-      DecisionDTO currentDto, OriginOfTranslation originOfTranslation, int index) {
+      OriginOfTranslation originOfTranslation, int index) {
     if (originOfTranslation == null) {
       return null;
     }
