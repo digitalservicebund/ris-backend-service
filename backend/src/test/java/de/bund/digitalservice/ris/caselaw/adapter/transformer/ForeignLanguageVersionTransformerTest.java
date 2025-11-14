@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ForeignLanguageVersionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LanguageCodeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
@@ -53,7 +52,6 @@ class ForeignLanguageVersionTransformerTest {
 
   @Test
   void transformToDTO_withNullInput_returnsNull() {
-    DecisionDTO decision = new DecisionDTO();
     assertNull(ForeignLanguageTransformer.transformToDTO(null, 1));
   }
 
