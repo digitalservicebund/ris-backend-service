@@ -7,6 +7,7 @@ import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
 
+import { appealWithdrawalItems, pkhPlaintiffItems } from "@/domain/appeal"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { contentRelatedIndexingLabels } from "@/domain/decision"
 
@@ -91,6 +92,22 @@ const hasEvsf = computed(() => {
 
 const hasDefinitions = computed(() => {
   return !!props.contentRelatedIndexing.definitions?.length
+})
+
+const hasAppeal = computed(() => {
+  return (
+    props.contentRelatedIndexing.appeal?.appellants?.length ||
+    props.contentRelatedIndexing.appeal?.revisionDefendantStatuses?.length ||
+    props.contentRelatedIndexing.appeal?.revisionPlaintiffStatuses?.length ||
+    props.contentRelatedIndexing.appeal?.jointRevisionDefendantStatuses
+      ?.length ||
+    props.contentRelatedIndexing.appeal?.jointRevisionPlaintiffStatuses
+      ?.length ||
+    props.contentRelatedIndexing.appeal?.nzbDefendantStatuses?.length ||
+    props.contentRelatedIndexing.appeal?.nzbPlaintiffStatuses?.length ||
+    props.contentRelatedIndexing.appeal?.appealWithdrawal ||
+    props.contentRelatedIndexing.appeal?.pkhPlaintiff
+  )
 })
 </script>
 
@@ -273,5 +290,147 @@ const hasDefinitions = computed(() => {
         </div>
       </PreviewContent>
     </PreviewRow>
+    <div v-if="hasAppeal" class="pb-8">
+      <PreviewCategory>Rechsmittel</PreviewCategory>
+      <PreviewRow
+        v-if="
+          props.contentRelatedIndexing.appeal?.appellants &&
+          props.contentRelatedIndexing.appeal?.appellants.length > 0
+        "
+      >
+        <PreviewCategory>Rechtsmittelführer</PreviewCategory>
+        <PreviewContent>
+          <span>{{
+            props.contentRelatedIndexing.appeal.appellants
+              .map((appellant) => appellant.value)
+              .join(", ")
+          }}</span>
+        </PreviewContent>
+      </PreviewRow>
+      <PreviewRow
+        v-if="
+          props.contentRelatedIndexing.appeal?.revisionDefendantStatuses &&
+          props.contentRelatedIndexing.appeal?.revisionDefendantStatuses
+            .length > 0
+        "
+      >
+        <PreviewCategory>Revision (Beklagter)</PreviewCategory>
+        <PreviewContent>
+          <span>{{
+            props.contentRelatedIndexing.appeal.revisionDefendantStatuses
+              .map((it) => it.value)
+              .join(", ")
+          }}</span>
+        </PreviewContent>
+      </PreviewRow>
+      <PreviewRow
+        v-if="
+          props.contentRelatedIndexing.appeal?.revisionPlaintiffStatuses &&
+          props.contentRelatedIndexing.appeal?.revisionPlaintiffStatuses
+            .length > 0
+        "
+      >
+        <PreviewCategory>Revision (Kläger)</PreviewCategory>
+        <PreviewContent>
+          <span>{{
+            props.contentRelatedIndexing.appeal.revisionPlaintiffStatuses
+              .map((it) => it.value)
+              .join(", ")
+          }}</span>
+        </PreviewContent>
+      </PreviewRow>
+      <PreviewRow
+        v-if="
+          props.contentRelatedIndexing.appeal?.jointRevisionDefendantStatuses &&
+          props.contentRelatedIndexing.appeal?.jointRevisionDefendantStatuses
+            .length > 0
+        "
+      >
+        <PreviewCategory>Anschlussrevision (Beklagter)</PreviewCategory>
+        <PreviewContent>
+          <span>{{
+            props.contentRelatedIndexing.appeal.jointRevisionDefendantStatuses
+              .map((it) => it.value)
+              .join(", ")
+          }}</span>
+        </PreviewContent>
+      </PreviewRow>
+      <PreviewRow
+        v-if="
+          props.contentRelatedIndexing.appeal?.jointRevisionPlaintiffStatuses &&
+          props.contentRelatedIndexing.appeal?.jointRevisionPlaintiffStatuses
+            .length > 0
+        "
+      >
+        <PreviewCategory>Anschlussrevision (Kläger)</PreviewCategory>
+        <PreviewContent>
+          <span>{{
+            props.contentRelatedIndexing.appeal.jointRevisionPlaintiffStatuses
+              .map((it) => it.value)
+              .join(", ")
+          }}</span>
+        </PreviewContent>
+      </PreviewRow>
+      <PreviewRow
+        v-if="
+          props.contentRelatedIndexing.appeal?.nzbDefendantStatuses &&
+          props.contentRelatedIndexing.appeal?.nzbDefendantStatuses.length > 0
+        "
+      >
+        <PreviewCategory>NZB (Beklagter)</PreviewCategory>
+        <PreviewContent>
+          <span>{{
+            props.contentRelatedIndexing.appeal.nzbDefendantStatuses
+              .map((it) => it.value)
+              .join(", ")
+          }}</span>
+        </PreviewContent>
+      </PreviewRow>
+      <PreviewRow
+        v-if="
+          props.contentRelatedIndexing.appeal?.nzbPlaintiffStatuses &&
+          props.contentRelatedIndexing.appeal?.nzbPlaintiffStatuses.length > 0
+        "
+      >
+        <PreviewCategory>NZB (Kläger)</PreviewCategory>
+        <PreviewContent>
+          <span>{{
+            props.contentRelatedIndexing.appeal.nzbPlaintiffStatuses
+              .map((it) => it.value)
+              .join(", ")
+          }}</span>
+        </PreviewContent>
+      </PreviewRow>
+      <PreviewRow v-if="props.contentRelatedIndexing.appeal?.appealWithdrawal">
+        <PreviewCategory>Zurücknahme der Revision</PreviewCategory>
+        <PreviewContent>
+          <span>{{
+            appealWithdrawalItems
+              .filter(
+                (it) =>
+                  it.value ===
+                  props.contentRelatedIndexing.appeal?.appealWithdrawal,
+              )
+              .map((it) => it.label)
+              .join(", ")
+          }}</span>
+        </PreviewContent>
+      </PreviewRow>
+      <PreviewRow v-if="props.contentRelatedIndexing.appeal?.pkhPlaintiff">
+        <PreviewCategory>PKH-Antrag (Kläger)</PreviewCategory>
+        <PreviewContent>
+          <span>{{
+            pkhPlaintiffItems
+              .filter(
+                (it) =>
+                  it.value ===
+                  props.contentRelatedIndexing.appeal?.pkhPlaintiff,
+              )
+              .map((it) => it.label)
+              .join(", ")
+          }}</span>
+        </PreviewContent>
+      </PreviewRow>
+    </div>
   </FlexContainer>
 </template>

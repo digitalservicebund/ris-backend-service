@@ -666,6 +666,11 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               admitted: true,
               by: AppealAdmitter.FG,
             },
+            appeal: {
+              appellants: [
+                { id: "37213474-a727-4d85-8cc6-309d86944132", value: "Kläger" },
+              ],
+            },
           },
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },

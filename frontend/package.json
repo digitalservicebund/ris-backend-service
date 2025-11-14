@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "engines": {
-    "node": ">=24.11.0"
+    "node": ">=24.11.1"
   },
   "type": "module",
   "scripts": {
@@ -32,10 +32,10 @@
   },
   "dependencies": {
     "@braintree/sanitize-url": "^7.1.1",
-    "@digitalservicebund/ris-ui": "^3.16.0",
+    "@digitalservicebund/ris-ui": "^3.17.1",
     "@guardian/prosemirror-invisibles": "^3.1.1",
     "@sentry/integrations": "^7.114.0",
-    "@sentry/vue": "^10.24.0",
+    "@sentry/vue": "^10.25.0",
     "@tailwindcss/postcss": "^4.1.17",
     "@tiptap/extension-blockquote": "^2.27.1",
     "@tiptap/extension-bold": "^2.27.1",
@@ -84,7 +84,7 @@
     "@eslint/compat": "^1.4.1",
     "@eslint/js": "^9.39.1",
     "@iconify-json/ic": "^1.2.4",
-    "@iconify-json/material-symbols": "^1.2.44",
+    "@iconify-json/material-symbols": "^1.2.46",
     "@iconify-json/mdi": "^1.2.3",
     "@namics/stylelint-bem": "^10.1.0",
     "@pinia/testing": "^1.0.3",
@@ -94,8 +94,8 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/user-event": "^14.6.1",
     "@testing-library/vue": "^8.1.0",
-    "@types/jsdom": "^27.0.0",
-    "@types/node": "^24.10.0",
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^24.10.1",
     "@typescript-eslint/eslint-plugin": "^8.46.4",
     "@typescript-eslint/parser": "^8.46.4",
     "@types/lodash": "^4.17.20",
