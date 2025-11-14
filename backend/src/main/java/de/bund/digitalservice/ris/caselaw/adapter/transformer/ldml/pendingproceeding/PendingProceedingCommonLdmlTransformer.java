@@ -97,66 +97,6 @@ public abstract class PendingProceedingCommonLdmlTransformer
     }
   }
 
-  @Nonnull
-  protected List<ImplicitReference> buildImplicitReferences(PendingProceeding pendingProceeding) {
-    List<ImplicitReference> vorhergehendeEntscheidungen = new ArrayList<>();
-    var previousDecisions = pendingProceeding.previousDecisions();
-    if (previousDecisions != null) {
-      for (PreviousDecision previousDecision : previousDecisions) {
-        if (previousDecision == null) continue;
-        var vorhergehendeEntscheidung = getVorgehendeEntscheidungen(previousDecision);
-        vorhergehendeEntscheidungen.add(vorhergehendeEntscheidung);
-      }
-    }
-    return vorhergehendeEntscheidungen;
-  }
-
-  @Nonnull
-  private ImplicitReference getVorgehendeEntscheidungen(PreviousDecision previousDecision) {
-    var builder = ImplicitReference.Vorgehend.builder();
-
-    if (previousDecision.getDocumentType() != null
-        && isNotBlank(previousDecision.getDocumentType().label())) {
-      builder.dokumentTyp(
-          DokumentTyp.builder()
-              .eId(null)
-              .value(previousDecision.getDocumentType().label())
-              .build());
-    }
-    if (previousDecision.getDecisionDate() != null) {
-      builder.datum(
-          ImplicitReference.Datum.builder()
-              .value(
-                  de.bund.digitalservice.ris.caselaw.adapter.DateUtils.toDateString(
-                      previousDecision.getDecisionDate()))
-              .build());
-    }
-    if (isNotBlank(previousDecision.getDocumentNumber())) {
-      builder.dokumentNummer(
-          ImplicitReference.DokumentNummer.builder()
-              .value(previousDecision.getDocumentNumber())
-              .build());
-    }
-    if (isNotBlank(previousDecision.getFileNumber())) {
-      builder.aktenzeichen(
-          AktenzeichenListe.Aktenzeichen.builder().value(previousDecision.getFileNumber()).build());
-    }
-    if (previousDecision.getCourt() != null) {
-      Gericht.GerichtBuilder gerichtBuilder = Gericht.builder();
-      if (isNotBlank(previousDecision.getCourt().type())) {
-        gerichtBuilder.typ(
-            Gericht.GerichtTyp.builder().value(previousDecision.getCourt().type()).build());
-      }
-      if (isNotBlank(previousDecision.getCourt().location())) {
-        gerichtBuilder.ort(
-            Gericht.GerichtOrt.builder().value(previousDecision.getCourt().location()).build());
-      }
-
-      builder.gericht(gerichtBuilder.build());
-    }
-    return ImplicitReference.builder().vorgehend(builder.build()).build();
-  }
-
   @SuppressWarnings("java:S3776")
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(PendingProceeding pendingProceeding) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
