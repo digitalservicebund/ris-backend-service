@@ -80,6 +80,7 @@ export const contentRelatedIndexingLabels: {
   foreignLanguageVersions: "Fremdsprachige Fassung",
   originOfTranslations: "Herkunft der Übersetzung",
   appealAdmission: "Rechtsmittelzulassung",
+  appeal: "Rechtsmittel",
 }
 export const allLabels = {
   caselawReferences: "Rechtsprechungsfundstellen",

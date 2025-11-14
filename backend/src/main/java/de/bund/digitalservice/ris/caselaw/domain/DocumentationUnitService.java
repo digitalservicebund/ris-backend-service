@@ -253,6 +253,7 @@ public class DocumentationUnitService {
                             .orElse(LegalEffect.NOT_SPECIFIED)
                             .getLabel())
                     .inputTypes(params.inputTypes())
+                    .sources(params.sources())
                     .build())
             .inboxStatus(isExternalHandover ? InboxStatus.EXTERNAL_HANDOVER : null)
             .build();
@@ -652,39 +653,38 @@ public class DocumentationUnitService {
        * handle unique following operation (sometimes by add and remove operations at the same time)
     */
 
-    DocumentationUnit existingDocumentationUnit = getByUuid(documentationUnitId, user);
+    var existingDocumentationUnit = getByUuid(documentationUnitId, user);
 
     DocumentationUnit patchedDocumentationUnitWithBase64Images;
-    long newVersion = 1L;
-    if (existingDocumentationUnit.version() != null) {
-      newVersion = existingDocumentationUnit.version() + 1;
-    }
 
-    JsonPatch newPatch =
+    long newVersion =
+        existingDocumentationUnit.version() != null ? existingDocumentationUnit.version() + 1 : 1L;
+
+    var newPatch =
         patchMapperService.calculatePatch(
             existingDocumentationUnit.uuid(), patch.documentationUnitVersion());
 
-    if (!patch.patch().getOperations().isEmpty() || !newPatch.getOperations().isEmpty()) {
-      log.debug(
-          "documentation unit '{}' with patch '{}' for version '{}'",
-          documentationUnitId,
-          patch.documentationUnitVersion(),
-          patch.patch());
-      log.debug("new version is {}", newVersion);
-      log.debug("version {} - patch in database: {}", patch.documentationUnitVersion(), newPatch);
+    logPatches(patch, newPatch, newVersion, documentationUnitId);
+
+    var toFrontendJsonPatch = new JsonPatch(Collections.emptyList());
+    RisJsonPatch toFrontend;
+
+    if (patch.patch().getOperations().isEmpty()
+        || PatchMapperService.containsOnlyVersionInPatch(patch.patch())) {
+      return defaultNoUpdateResponse(newPatch, existingDocumentationUnit);
     }
 
-    JsonPatch toFrontendJsonPatch = new JsonPatch(Collections.emptyList());
-    RisJsonPatch toFrontend;
-    if (!patch.patch().getOperations().isEmpty()
-        && !PatchMapperService.containsOnlyVersionInPatch(patch.patch())) {
-      JsonPatch toUpdate = patchMapperService.removePatchForSamePath(patch.patch(), newPatch);
+    var toUpdate = patchMapperService.removePatchForSamePath(patch.patch(), newPatch);
 
-      log.debug("version {} - update patch: {}", patch.documentationUnitVersion(), toUpdate);
+    log.debug("version {} - update patch: {}", patch.documentationUnitVersion(), toUpdate);
+
+    if (!toUpdate.getOperations().isEmpty()) {
+      toUpdate = patchMapperService.removeTextCheckTags(toUpdate);
+
+      toUpdate =
+          patchMapperService.removeOpsWhereContentNotChanged(toUpdate, existingDocumentationUnit);
 
       if (!toUpdate.getOperations().isEmpty()) {
-        toUpdate = patchMapperService.removeTextCheckTags(toUpdate);
-
         // Saving a return patch including the base64 images as src attributes with an api path.
         patchedDocumentationUnitWithBase64Images =
             cloneDocumentationUnitWithNewVersion(
@@ -724,38 +724,53 @@ public class DocumentationUnitService {
         patchMapperService.savePatch(
             toSaveJsonPatch, existingDocumentationUnit.uuid(), existingDocumentationUnit.version());
       }
-
-      toFrontend =
-          patchMapperService.handlePatchForSamePath(
-              existingDocumentationUnit, toFrontendJsonPatch, patch.patch(), newPatch);
-
-      log.debug(
-          "version {} - cleaned to frontend patch: {}",
-          patch.documentationUnitVersion(),
-          toFrontend);
-
-      if (toFrontend.errorPaths().isEmpty()) {
-        toFrontend = toFrontend.toBuilder().documentationUnitVersion(newVersion).build();
-      } else {
-        toFrontend =
-            toFrontend.toBuilder()
-                .documentationUnitVersion(existingDocumentationUnit.version())
-                .build();
-      }
-
-      log.debug(
-          "version {} - second cleaned to frontend patch: {}",
-          patch.documentationUnitVersion(),
-          toFrontend);
-    } else {
-      if (newPatch == null) {
-        newPatch = new JsonPatch(Collections.emptyList());
-      }
-      toFrontend =
-          new RisJsonPatch(existingDocumentationUnit.version(), newPatch, Collections.emptyList());
     }
 
+    toFrontend =
+        patchMapperService.handlePatchForSamePath(
+            existingDocumentationUnit, toFrontendJsonPatch, patch.patch(), newPatch);
+
+    log.debug(
+        "version {} - cleaned to frontend patch: {}", patch.documentationUnitVersion(), toFrontend);
+
+    if (toFrontend.errorPaths().isEmpty()) {
+      toFrontend = toFrontend.toBuilder().documentationUnitVersion(newVersion).build();
+    } else {
+      toFrontend =
+          toFrontend.toBuilder()
+              .documentationUnitVersion(existingDocumentationUnit.version())
+              .build();
+    }
+
+    log.debug(
+        "version {} - second cleaned to frontend patch: {}",
+        patch.documentationUnitVersion(),
+        toFrontend);
+
     return toFrontend;
+  }
+
+  private RisJsonPatch defaultNoUpdateResponse(
+      JsonPatch newPatch, DocumentationUnit existingDocumentationUnit) {
+    if (newPatch == null) {
+      newPatch = new JsonPatch(Collections.emptyList());
+    }
+    return new RisJsonPatch(existingDocumentationUnit.version(), newPatch, Collections.emptyList());
+  }
+
+  private void logPatches(
+      RisJsonPatch patch, JsonPatch newPatch, long newVersion, UUID documentationUnitId) {
+    if (patch.patch().getOperations().isEmpty() || newPatch.getOperations().isEmpty()) {
+      return;
+    }
+
+    log.debug(
+        "documentation unit '{}' with patch '{}' for version '{}'",
+        documentationUnitId,
+        patch.documentationUnitVersion(),
+        patch.patch());
+    log.debug("new version is {}", newVersion);
+    log.debug("version {} - patch in database: {}", patch.documentationUnitVersion(), newPatch);
   }
 
   /** Return a documentation unit with a new version */

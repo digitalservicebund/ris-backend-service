@@ -148,6 +148,7 @@ public class DecisionTransformer extends DocumentableTransformer {
         builder.appealAdmitted(contentRelatedIndexing.appealAdmission().admitted());
         builder.appealAdmittedBy(contentRelatedIndexing.appealAdmission().by());
       }
+      builder.appeal(AppealTransformer.transformToDTO(currentDto, contentRelatedIndexing.appeal()));
       addOriginOfTranslations(currentDto, builder, contentRelatedIndexing);
     }
 
@@ -182,6 +183,10 @@ public class DecisionTransformer extends DocumentableTransformer {
     addManagementData(updatedDomainObject, builder);
 
     DecisionDTO result = builder.build();
+
+    if (result.getAppeal() != null) {
+      result.getAppeal().setDecision(result);
+    }
 
     return DocumentableTransformer.postProcessRelationships(result, currentDto);
   }
@@ -769,6 +774,9 @@ public class DecisionTransformer extends DocumentableTransformer {
               .by(decisionDTO.getAppealAdmittedBy())
               .build());
     }
+
+    contentRelatedIndexingBuilder.appeal(
+        AppealTransformer.transformToDomain(decisionDTO.getAppeal()));
 
     if (decisionDTO.getOriginOfTranslations() != null) {
       List<OriginOfTranslation> originOfTranslations =

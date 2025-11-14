@@ -1,4 +1,5 @@
 import ActiveCitation from "@/domain/activeCitation"
+import { Appeal } from "@/domain/appeal"
 import { AppealAdmission } from "@/domain/appealAdmission"
 import Definition from "@/domain/definition"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
@@ -21,4 +22,5 @@ export type ContentRelatedIndexing = {
   foreignLanguageVersions?: ForeignLanguageVersion[]
   originOfTranslations?: OriginOfTranslation[]
   appealAdmission?: AppealAdmission
+  appeal?: Appeal
 }
