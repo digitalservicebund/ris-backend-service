@@ -5,7 +5,6 @@ import {
   navigateToCategories,
   navigateToManagementData,
   navigateToPublication,
-  openInPortal,
   save,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
