@@ -547,14 +547,7 @@ public class DecisionTransformer extends DocumentableTransformer {
 
     for (int i = 0; i < foreignLanguageVersions.size(); i++) {
       foreignLanguageVersionDTOs.add(
-          ForeignLanguageVersionDTO.builder()
-              .documentationUnit(currentDto)
-              .url(foreignLanguageVersions.get(i).link())
-              .languageCode(
-                  LanguageCodeTransformer.transformToDTO(
-                      foreignLanguageVersions.get(i).languageCode()))
-              .rank(i + 1L)
-              .build());
+          ForeignLanguageTransformer.transformToDTO(foreignLanguageVersions.get(i), currentDto, i));
     }
 
     builder.foreignLanguageVersions(foreignLanguageVersionDTOs);

@@ -22,15 +22,15 @@ public class ForeignLanguageTransformer {
   }
 
   public static ForeignLanguageVersionDTO transformToDTO(
-      ForeignLanguageVersion foreignLanguageVersion, DecisionDTO decisionDTO) {
+      ForeignLanguageVersion foreignLanguageVersion, DecisionDTO decisionDTO, int index) {
     if (foreignLanguageVersion == null) {
       return null;
     }
     return ForeignLanguageVersionDTO.builder()
-        .id(foreignLanguageVersion.id())
-        .documentationUnit(decisionDTO)
-        .languageCode(LanguageCodeTransformer.transformToDTO(foreignLanguageVersion.languageCode()))
+        .id(foreignLanguageVersion.newEntry() ? null : foreignLanguageVersion.id())
         .url(foreignLanguageVersion.link())
+        .languageCode(LanguageCodeTransformer.transformToDTO(foreignLanguageVersion.languageCode()))
+        .rank(index + 1L)
         .build();
   }
 }
