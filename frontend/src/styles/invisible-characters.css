@@ -25,9 +25,3 @@
   margin-left: 30px;
   position: absolute;
 }
-
-.ProseMirror-focused table td.invisible-table:not([style*="border-"]),
-.ProseMirror-focused table th.invisible-table:not([style*="border-"]) {
-  border: 1px dashed #4466ff;
-  box-sizing: border-box; 
-}

@@ -1,14 +1,7 @@
-div.tiptap[contenteditable="true"] .invisible-table::after {
-  content: "";
-  position: absolute;
-  border-collapse: collapse;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border: 1px dotted theme("colors.blue.300");
-  pointer-events: none;
-}
+div.tiptap:has(.ProseMirror-widget.invisible) .invisible-table {
+  border: 1px dashed #4466ff;
+  box-sizing: border-box; 
+} 
 
 .tiptap {
   :first-child {
