@@ -163,6 +163,8 @@ const fieldsWithoutJdvExport = computed<string[]>(() => {
     fieldLabels.push(contentRelatedIndexingLabels.evsf)
   if (decision.value?.contentRelatedIndexing?.foreignLanguageVersions?.length)
     fieldLabels.push(contentRelatedIndexingLabels.foreignLanguageVersions)
+  if (decision.value?.contentRelatedIndexing?.originOfTranslations?.length)
+    fieldLabels.push(contentRelatedIndexingLabels.originOfTranslations)
   if (decision.value?.contentRelatedIndexing?.appealAdmission != null)
     fieldLabels.push(contentRelatedIndexingLabels.appealAdmission)
   if (decision.value?.contentRelatedIndexing?.appeal != null)
