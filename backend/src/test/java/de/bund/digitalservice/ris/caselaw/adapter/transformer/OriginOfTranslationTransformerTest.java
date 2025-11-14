@@ -4,7 +4,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LanguageCodeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationBorderNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationDTO;
@@ -24,14 +23,12 @@ class OriginOfTranslationTransformerTest {
   class TransformToDTO {
     @Test
     void transformToDTO_withNullInput_returnsNull() {
-      DecisionDTO decision = new DecisionDTO();
       assertNull(OriginOfTranslationTransformer.transformToDTO(null, 0));
     }
 
     @Test
     void transformToDTO_withFullValidDomain_transformsCorrectly() {
       // Arrange
-      DecisionDTO decision = new DecisionDTO();
       LanguageCode languageCode =
           LanguageCode.builder().id(UUID.randomUUID()).label("Deutsch").isoCode("de").build();
       OriginOfTranslation domain =
@@ -77,8 +74,6 @@ class OriginOfTranslationTransformerTest {
     @Test
     void transformToDTO_withoutSubLists_transformsToEmptyList() {
       // Arrange
-      DecisionDTO decision = new DecisionDTO();
-
       OriginOfTranslation domain = OriginOfTranslation.builder().id(UUID.randomUUID()).build();
 
       // Act
@@ -93,8 +88,6 @@ class OriginOfTranslationTransformerTest {
     @Test
     void transformToDTO_withNullSubLists_transformsToEmptyList() {
       // Arrange
-      DecisionDTO decision = new DecisionDTO();
-
       OriginOfTranslation domain =
           OriginOfTranslation.builder()
               .id(UUID.randomUUID())
@@ -115,8 +108,6 @@ class OriginOfTranslationTransformerTest {
     @Test
     void transformToDTO_withEmptySubLists_transformsToEmptyList() {
       // Arrange
-      DecisionDTO decision = new DecisionDTO();
-
       OriginOfTranslation domain =
           OriginOfTranslation.builder()
               .id(UUID.randomUUID())
