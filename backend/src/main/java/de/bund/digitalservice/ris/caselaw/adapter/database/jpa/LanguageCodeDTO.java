@@ -29,4 +29,7 @@ public class LanguageCodeDTO {
 
   @Column(name = "iso_code")
   private String isoCode;
+
+  @Column(name = "iso_code_3_letters")
+  private String isoCode3Letters;
 }

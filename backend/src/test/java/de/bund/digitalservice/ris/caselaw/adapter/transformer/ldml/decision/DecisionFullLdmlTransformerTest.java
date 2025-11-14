@@ -4,7 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.Notation;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
@@ -34,6 +41,11 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.List;
@@ -43,15 +55,20 @@ import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilderFactory;
 import net.sf.saxon.TransformerFactoryImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 @ExtendWith(MockitoExtension.class)
 class DecisionFullLdmlTransformerTest {
@@ -87,15 +104,10 @@ class DecisionFullLdmlTransformerTest {
             .coreData(
                 CoreData.builder()
                     .ecli("testecli")
-                    .court(
-                        Court.builder()
-                            .type("testCourtType")
-                            .location("testCourtLocation")
-                            .label("Type Location")
-                            .build())
+                    .court(Court.builder().type("AG").location("Aachen").label("AG Aachen").build())
                     .documentType(
                         DocumentType.builder().label("testDocumentTypeAbbreviation").build())
-                    .legalEffect("ja")
+                    .legalEffect("Ja")
                     .fileNumbers(List.of("testFileNumber"))
                     .decisionDate(LocalDate.of(2020, 1, 1))
                     .build())
@@ -106,64 +118,149 @@ class DecisionFullLdmlTransformerTest {
             .build();
   }
 
-  @Test
-  @DisplayName("Fallback title test")
-  void documentNumberIsFallbackTitleTest() {
-    String expected =
-        """
-      <akn:header>
-         <akn:p>Type Location, 01.01.2020, testFileNumber</akn:p>
-      </akn:header>
-     """;
-    CaseLawLdml ldml = subject.transformToLdml(testDocumentUnit);
-    Assertions.assertNotNull(ldml);
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    Assertions.assertTrue(fileContent.isPresent());
-    Assertions.assertTrue(
-        StringUtils.deleteWhitespace(fileContent.get())
-            .contains(StringUtils.deleteWhitespace(expected)));
+  @Nested
+  class DissentingOpinion {
+    @Test
+    void testDissentingOpinion_withoutParticipatingJudges() {
+      String expected =
+          """
+          <akn:motivation ris:domainTerm="Abweichende Meinung">
+            <akn:p>dissenting test</akn:p>
+          </akn:motivation>
+         """;
+      Decision dissentingCaseLaw =
+          testDocumentUnit.toBuilder()
+              .longTexts(
+                  testDocumentUnit.longTexts().toBuilder()
+                      .dissentingOpinion("<p>dissenting test</p>")
+                      .build())
+              .build();
+      CaseLawLdml ldml = subject.transformToLdml(dissentingCaseLaw);
+      Assertions.assertNotNull(ldml);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      Assertions.assertTrue(fileContent.isPresent());
+      Assertions.assertTrue(
+          StringUtils.deleteWhitespace(fileContent.get())
+              .contains(StringUtils.deleteWhitespace(expected)));
+    }
+
+    @Test
+    void testDissentingOpinion_withParticipatingJudgeWithoutReferencedOpinion() {
+      String expected =
+          """
+          <akn:motivation ris:domainTerm="Abweichende Meinung">
+            <akn:p>dissenting test</akn:p>
+            <akn:block name="Mitwirkende Richter">
+               <akn:opinion by="#maxi-musterfrau"/>
+            </akn:block>
+          </akn:motivation>
+         """;
+      Decision dissentingCaseLaw =
+          testDocumentUnit.toBuilder()
+              .longTexts(
+                  testDocumentUnit.longTexts().toBuilder()
+                      .dissentingOpinion("<p>dissenting test</p>")
+                      .participatingJudges(
+                          List.of(ParticipatingJudge.builder().name("Maxi Musterfrau").build()))
+                      .build())
+              .build();
+      CaseLawLdml ldml = subject.transformToLdml(dissentingCaseLaw);
+      Assertions.assertNotNull(ldml);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      Assertions.assertTrue(fileContent.isPresent());
+      Assertions.assertTrue(
+          StringUtils.deleteWhitespace(fileContent.get())
+              .contains(StringUtils.deleteWhitespace(expected)));
+    }
+
+    @Test
+    void testDissentingOpinion_withParticipatingJudgesWithReferencedOpinions() {
+      String expected =
+          """
+         <akn:motivation ris:domainTerm="Abweichende Meinung">
+            <akn:p>dissenting test</akn:p>
+            <akn:block name="Mitwirkende Richter">
+               <akn:opinion ris:domainTerm="Art der Mitwirkung"
+                            type="dissenting"
+                            by="#maxi-gaertner">Art der Mitwirkung 1</akn:opinion>
+               <akn:opinion ris:domainTerm="Art der Mitwirkung"
+                            type="dissenting"
+                            by="#herbert-guenter">Art der Mitwirkung 2</akn:opinion>
+            </akn:block>
+         </akn:motivation>
+         """;
+      Decision dissentingCaseLaw =
+          testDocumentUnit.toBuilder()
+              .longTexts(
+                  testDocumentUnit.longTexts().toBuilder()
+                      .dissentingOpinion("<p>dissenting test</p>")
+                      .participatingJudges(
+                          List.of(
+                              ParticipatingJudge.builder()
+                                  .name("Maxi Gärtner")
+                                  .referencedOpinions("Art der Mitwirkung 1")
+                                  .build(),
+                              ParticipatingJudge.builder()
+                                  .name("Herbert Günter")
+                                  .referencedOpinions("Art der Mitwirkung 2")
+                                  .build()))
+                      .build())
+              .build();
+      CaseLawLdml ldml = subject.transformToLdml(dissentingCaseLaw);
+      Assertions.assertNotNull(ldml);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      Assertions.assertTrue(fileContent.isPresent());
+      Assertions.assertTrue(
+          StringUtils.deleteWhitespace(fileContent.get())
+              .contains(StringUtils.deleteWhitespace(expected)));
+    }
+
+    @Test
+    void testWithoutDissentingOpinionAndWithParticipatingJudges_shouldNotBuildDissentingOpinion() {
+      String expected =
+          """
+              <akn:judgmentBody>
+                <akn:background ris:domainTerm="Tatbestand">
+                   <akn:p>Example content 1</akn:p>
+                </akn:background>
+             </akn:judgmentBody>
+         """;
+      Decision dissentingCaseLaw =
+          testDocumentUnit.toBuilder()
+              .longTexts(
+                  testDocumentUnit.longTexts().toBuilder()
+                      .participatingJudges(
+                          List.of(
+                              ParticipatingJudge.builder()
+                                  .name("Maxi Gärtner")
+                                  .referencedOpinions("Art der Mitwirkung 1")
+                                  .build(),
+                              ParticipatingJudge.builder()
+                                  .name("Herbert Günter")
+                                  .referencedOpinions("Art der Mitwirkung 2")
+                                  .build()))
+                      .build())
+              .build();
+      CaseLawLdml ldml = subject.transformToLdml(dissentingCaseLaw);
+      Assertions.assertNotNull(ldml);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      Assertions.assertTrue(fileContent.isPresent());
+      Assertions.assertTrue(
+          StringUtils.deleteWhitespace(fileContent.get())
+              .contains(StringUtils.deleteWhitespace(expected)));
+    }
   }
 
   @Test
-  @DisplayName("Dissenting Opinion test")
-  void dissentingOpinionTest() {
-    String expected =
-        """
-           <akn:block name="Abweichende Meinung">
-              <akn:opinion>
-                 <akn:embeddedStructure>
-                    <akn:p>dissenting test</akn:p>
-                 </akn:embeddedStructure>
-              </akn:opinion>
-           </akn:block>
-           """;
-    Decision dissentingCaseLaw =
-        testDocumentUnit.toBuilder()
-            .longTexts(
-                testDocumentUnit.longTexts().toBuilder()
-                    .dissentingOpinion("<p>dissenting test</p>")
-                    .build())
-            .build();
-    CaseLawLdml ldml = subject.transformToLdml(dissentingCaseLaw);
-    Assertions.assertNotNull(ldml);
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    Assertions.assertTrue(fileContent.isPresent());
-    Assertions.assertTrue(
-        StringUtils.deleteWhitespace(fileContent.get())
-            .contains(StringUtils.deleteWhitespace(expected)));
-  }
-
-  @Test
+  @Disabled("Should be enabled with https://digitalservicebund.atlassian.net/browse/RISDEV-9358")
   @DisplayName("Headnote test")
   void headnoteTest() {
     String expected =
         """
-            <akn:block name="Orientierungssatz">
-               <akn:embeddedStructure>
-                  <akn:p>headnote test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-           """;
+          <akn:introduction ris:domainTerm="Orientierungssatz">
+              <akn:p>headnote test</akn:p>
+          </akn:introduction>
+        """;
     Decision headnoteCaseLaw =
         testDocumentUnit.toBuilder()
             .shortTexts(
@@ -179,16 +276,15 @@ class DecisionFullLdmlTransformerTest {
   }
 
   @Test
+  @Disabled("Should be enabled with https://digitalservicebund.atlassian.net/browse/RISDEV-9358")
   @DisplayName("OtherHeadnote test")
   void otherHeadnoteTest() {
     String expected =
         """
-            <akn:block name="Sonstiger Orientierungssatz">
-               <akn:embeddedStructure>
-                  <akn:p>other headnote test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-           """;
+         <akn:introduction ris:domainTerm="Sonstiger Orientierungssatz">
+            <akn:p>other headnote test</akn:p>
+         </akn:introduction>
+         """;
     Decision otherHeadnoteCaseLaw =
         testDocumentUnit.toBuilder()
             .shortTexts(
@@ -210,12 +306,10 @@ class DecisionFullLdmlTransformerTest {
   void groundTest() {
     String expected =
         """
-            <akn:block name="Gründe">
-               <akn:embeddedStructure>
-                  <akn:p>grounds test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-           """;
+         <akn:motivation ris:domainTerm="Gründe">
+            <akn:p>grounds test</akn:p>
+         </akn:motivation>
+         """;
     Decision groundsCaseLaw =
         testDocumentUnit.toBuilder()
             .longTexts(
@@ -235,13 +329,9 @@ class DecisionFullLdmlTransformerTest {
   void otherLongTextWithoutMainDecisionTest() {
     String expected =
         """
-         <akn:decision>
-            <akn:block name="Sonstiger Langtext">
-               <akn:embeddedStructure>
-                  <akn:p>Other long text test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-         </akn:decision>
+         <akn:motivation ris:domainTerm="Sonstiger Langtext">
+            <akn:p>Other long text test</akn:p>
+         </akn:motivation>
          """;
     Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
@@ -264,13 +354,9 @@ class DecisionFullLdmlTransformerTest {
   void testTransformToLdml_longTextWithNBSP_shouldReplaceItWithUnicode() {
     String expected =
         """
-         <akn:decision>
-            <akn:block name="Gründe">
-               <akn:embeddedStructure>
-                  <akn:p>text with non\u00a0breaking\u00a0spaces</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-         </akn:decision>
+         <akn:motivation ris:domainTerm="Gründe">
+            <akn:p>text with non breaking spaces</akn:p>
+         </akn:motivation>
          """;
     Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
@@ -293,26 +379,26 @@ class DecisionFullLdmlTransformerTest {
   void testTransform_borderNumber() {
     String expected =
         """
-                                <akn:hcontainer name="randnummer">
-                                   <akn:num>1</akn:num>
-                                   <akn:content>
-                                     <akn:p>Lorem ipsum</akn:p>
-                                   </akn:content>
-                                </akn:hcontainer>
-                                """;
+        <akn:hcontainer ris:domainTerm="Randnummer" eId="randnummer-1" name="Randnummer">
+           <akn:num>1</akn:num>
+           <akn:content>
+             <akn:p>Lorem ipsum</akn:p>
+           </akn:content>
+        </akn:hcontainer>
+        """;
     Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
             .longTexts(
                 LongTexts.builder()
                     .reasons(
                         """
-                                    <border-number>
-                                        <number>1</number>
-                                        <content>
-                                            <p>Lorem ipsum</p>
-                                        </content>
-                                    </border-number>
-                                    """)
+                        <border-number>
+                            <number>1</number>
+                            <content>
+                                <p>Lorem ipsum</p>
+                            </content>
+                        </border-number>
+                        """)
                     .build())
             .build();
 
@@ -326,17 +412,45 @@ class DecisionFullLdmlTransformerTest {
   }
 
   @Test
+  void testTransform_borderNumberLink() {
+    String expected =
+        """
+        <akn:p>Übertragungsleistungssteuerungsverfahren</akn:p>
+        <akn:p>
+          This is my guiding principle<akn:ref ris:domainTerm="Randnummernverlinkung" class="border-number-link" href="#randnummer-70">70</akn:ref>
+        </akn:p>
+        """;
+    Decision decision =
+        testDocumentUnit.toBuilder()
+            .shortTexts(
+                ShortTexts.builder()
+                    .guidingPrinciple(
+                        """
+                        <p>Übertragungsleistungssteuerungsverfahren</p>
+                        <p>This is my guiding principle<border-number-link nr="70">70</border-number-link></p>
+                        """)
+                    .build())
+            .build();
+
+    CaseLawLdml ldml = subject.transformToLdml(decision);
+
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+    assertThat(fileContent).isPresent();
+    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+        .contains(StringUtils.deleteWhitespace(expected));
+  }
+
+  @Test
   @DisplayName("Long text with <ignore-once> tags>")
   void testTransformToLdml_longTextWithIgnoreOnceTags_shouldRemoveTags() {
     String expected =
         """
-             <akn:decision>
-                <akn:block name="Entscheidungsgründe">
-                   <akn:embeddedStructure>
-                      <akn:p>text with ignored spell check issue</akn:p>
-                   </akn:embeddedStructure>
-                </akn:block>
-             </akn:decision>
+              <akn:judgmentBody>
+                 <akn:motivation ris:domainTerm="Entscheidungsgründe">
+                    <akn:p>text with ignored spell check issue</akn:p>
+                 </akn:motivation>
+              </akn:judgmentBody>
              """;
     Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
@@ -355,20 +469,181 @@ class DecisionFullLdmlTransformerTest {
         .contains(StringUtils.deleteWhitespace(expected));
   }
 
+  @Nested
+  class CourtTest {
+    @Test
+    void testTransform_withSuperiorCourt_shouldNotIncludeGerichtsOrt() {
+      String expectedReferences =
+          """
+          <akn:references source="#ris">
+              <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
+              <akn:TLCOrganization eId="gericht" href="" showAs="BGH"/>
+          </akn:references>
+         """;
+      String expectedRisMeta =
+          """
+          <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+             <ris:typ domainTerm="Gerichtstyp">BGH</ris:typ>
+         </ris:gericht>
+         """;
+      Decision decision =
+          testDocumentUnit.toBuilder()
+              .coreData(
+                  CoreData.builder()
+                      .court(
+                          Court.builder()
+                              .isSuperiorCourt(true)
+                              .isForeignCourt(false)
+                              .label("BGH")
+                              .type("BGH")
+                              .regions(List.of("DEU"))
+                              .jurisdictionType("Ordentliche Gerichtsbarkeit")
+                              .build())
+                      .documentType(
+                          DocumentType.builder().label("testDocumentTypeAbbreviation").build())
+                      .fileNumbers(List.of("testFileNumber"))
+                      .decisionDate(LocalDate.of(2020, 1, 1))
+                      .build())
+              .build();
+
+      CaseLawLdml ldml = subject.transformToLdml(decision);
+
+      Assertions.assertNotNull(ldml);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      assertThat(fileContent).isPresent();
+      assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+          .contains(StringUtils.deleteWhitespace(expectedReferences));
+      assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+          .contains(StringUtils.deleteWhitespace(expectedRisMeta));
+    }
+
+    @Test
+    void testTransform_withNullCourtLocation_shouldNotIncludeGerichtsOrt() {
+      String expectedReferences =
+          """
+          <akn:references source="#ris">
+              <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
+              <akn:TLCOrganization eId="gericht" href="" showAs="Tribunal Economico-Administrativo Regional Katalonien"/>
+          </akn:references>
+         """;
+      String expectedRisMeta =
+          """
+          <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+             <ris:typ domainTerm="Gerichtstyp">Tribunal Economico-Administrativo Regional Katalonien</ris:typ>
+         </ris:gericht>
+         """;
+      Decision decision =
+          testDocumentUnit.toBuilder()
+              .coreData(
+                  CoreData.builder()
+                      .court(
+                          Court.builder()
+                              .isSuperiorCourt(false)
+                              .isForeignCourt(true)
+                              .label("Tribunal Economico-Administrativo Regional Katalonien")
+                              .type("Tribunal Economico-Administrativo Regional Katalonien")
+                              .jurisdictionType("")
+                              .build())
+                      .documentType(
+                          DocumentType.builder().label("testDocumentTypeAbbreviation").build())
+                      .fileNumbers(List.of("testFileNumber"))
+                      .decisionDate(LocalDate.of(2020, 1, 1))
+                      .build())
+              .build();
+
+      CaseLawLdml ldml = subject.transformToLdml(decision);
+
+      Assertions.assertNotNull(ldml);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      assertThat(fileContent).isPresent();
+      assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+          .contains(StringUtils.deleteWhitespace(expectedReferences));
+      assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+          .contains(StringUtils.deleteWhitespace(expectedRisMeta));
+    }
+
+    @Test
+    void testTransform_withWithCourtLocation_shouldIncludeGerichtsOrt() {
+      String expectedReferences =
+          """
+          <akn:references source="#ris">
+              <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
+              <akn:TLCOrganization eId="gericht" href="" showAs="AG Aachen"/>
+              <akn:TLCLocation eId="gerichtsort" href="" showAs="Aachen"/>
+          </akn:references>
+         """;
+      String expectedRisMeta =
+          """
+          <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+             <ris:typ domainTerm="Gerichtstyp">AG</ris:typ>
+             <ris:ort domainTerm="Gerichtsort">Aachen</ris:ort>
+         </ris:gericht>
+         """;
+      Decision decision =
+          testDocumentUnit.toBuilder()
+              .coreData(
+                  CoreData.builder()
+                      .court(
+                          Court.builder()
+                              .isSuperiorCourt(false)
+                              .isForeignCourt(false)
+                              .label("AG Aachen")
+                              .type("AG")
+                              .location("Aachen")
+                              .regions(List.of("NW"))
+                              .jurisdictionType("Ordentliche Gerichtsbarkeit")
+                              .build())
+                      .documentType(
+                          DocumentType.builder().label("testDocumentTypeAbbreviation").build())
+                      .fileNumbers(List.of("testFileNumber"))
+                      .decisionDate(LocalDate.of(2020, 1, 1))
+                      .build())
+              .build();
+
+      CaseLawLdml ldml = subject.transformToLdml(decision);
+
+      Assertions.assertNotNull(ldml);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      assertThat(fileContent).isPresent();
+      assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+          .contains(StringUtils.deleteWhitespace(expectedReferences));
+      assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+          .contains(StringUtils.deleteWhitespace(expectedRisMeta));
+    }
+  }
+
   @Test
   @DisplayName("Mixed text in header")
   void testTransform_mixedTextInHeader() {
     String expected =
         """
-                                <akn:header>
-                                  <akn:p alternativeTo="textWrapper">Hello</akn:p>
-                                  <akn:p> paragraph</akn:p>
-                                  <akn:p alternativeTo="textWrapper"> world!</akn:p>
-                                </akn:header>
-                                """;
+       <akn:header>
+          <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">testFileNumber</akn:docNumber>
+          </akn:p>
+          <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
+          </akn:p>
+          <akn:p>Gericht: <akn:courtType refersTo="#gericht">AG Aachen</akn:courtType>
+          </akn:p>
+          <akn:p>Dokumenttyp: <akn:docType refersTo="#dokumenttyp">testDocumentTypeAbbreviation</akn:docType></akn:p>
+          <akn:p>Entscheidungsnamen:
+          <akn:docTitle refersTo="#entscheidungsname">Entscheidungsname</akn:docTitle></akn:p>
+          <akn:p>Titelzeile:
+          <akn:shortTitle refersTo="#titelzeile">
+            <akn:embeddedStructure>
+              <akn:p alternativeTo="textWrapper">Hello</akn:p>
+              <akn:p> paragraph</akn:p>
+              <akn:p alternativeTo="textWrapper"> world!</akn:p>
+            </akn:embeddedStructure>
+          </akn:shortTitle></akn:p>
+        </akn:header>
+       """;
     Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
-            .shortTexts(ShortTexts.builder().headline("Hello<p> paragraph</p> world!").build())
+            .shortTexts(
+                ShortTexts.builder()
+                    .decisionNames(List.of("Entscheidungsname"))
+                    .headline("Hello<p> paragraph</p> world!")
+                    .build())
             .build();
 
     CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
@@ -385,12 +660,15 @@ class DecisionFullLdmlTransformerTest {
   void testTransform_keywords() {
     String expected =
         """
-                                <akn:keyworddictionary="attributsemantik-noch-undefiniert"showAs="attributsemantik-noch-undefiniert"value="keyword1"/>
-                                """;
+      <akn:keyword ris:domainTerm="Schlagwort" dictionary="" showAs="keyword 1" value="keyword 1"/>
+      <akn:keyword ris:domainTerm="Schlagwort" dictionary="" showAs="Keyword 2" value="Keyword 2"/>
+    """;
     Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
             .contentRelatedIndexing(
-                ContentRelatedIndexing.builder().keywords(List.of("keyword 1")).build())
+                ContentRelatedIndexing.builder()
+                    .keywords(List.of("keyword 1", "Keyword 2"))
+                    .build())
             .build();
 
     CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
@@ -400,6 +678,32 @@ class DecisionFullLdmlTransformerTest {
     assertThat(fileContent).isPresent();
     assertThat(StringUtils.deleteWhitespace(fileContent.get()))
         .contains(StringUtils.deleteWhitespace(expected));
+  }
+
+  @Test
+  @DisplayName("hasDeliveryDate")
+  void testTransform_hasDeliveryDate() {
+    String expectedHeader =
+"""
+  <akn:p>Datum der Zustellung an Verkündungs statt: <akn:docDate date="2020-01-01" refersTo="#datum-der-zustellung-an-verkuendungs-statt">01.01.2020</akn:docDate>
+  </akn:p>
+""";
+    String expectedFRBRdate =
+"""
+  <akn:FRBRdate date="2020-01-01" name="Datum der Zustellung an Verkündungs statt"/>
+""";
+    Decision deliveryDateCaseLaw =
+        testDocumentUnit.toBuilder()
+            .coreData(testDocumentUnit.coreData().toBuilder().hasDeliveryDate(true).build())
+            .build();
+    CaseLawLdml ldml = subject.transformToLdml(deliveryDateCaseLaw);
+
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+    assertThat(fileContent).isPresent();
+    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+        .contains(StringUtils.deleteWhitespace(expectedHeader))
+        .contains(StringUtils.deleteWhitespace(expectedFRBRdate));
   }
 
   static Stream<Arguments> provideTagFormattingTestCases() {
@@ -445,196 +749,11 @@ class DecisionFullLdmlTransformerTest {
   }
 
   @Test
-  void testEntireLdml() {
+  void testEntireLdml() throws IOException {
+    // Arrange
     var documentationUnit = getEntireDocumentationUnit();
-    var expected =
-        String.format(
-"""
-<?xml version="1.0" encoding="utf-8"?>
-<akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/WD17"
-                xmlns:ris="http://example.com/0.1/"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/WD17 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/csprd02/part2-specs/schemas/akomantoso30.xsd">
-   <akn:judgment name="attributsemantik-noch-undefiniert">
-      <akn:meta>
-         <akn:identification source="attributsemantik-noch-undefiniert">
-            <akn:FRBRWork>
-               <akn:FRBRthis value="YYTestDoc0013"/>
-               <akn:FRBRuri value="YYTestDoc0013"/>
-               <akn:FRBRalias name="uebergreifende-id" value="%s"/>
-               <akn:FRBRalias name="ecli" value="ecli test"/>
-               <akn:FRBRalias name="celex" value="celex test"/>
-               <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
-               <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-               <akn:FRBRcountry value="de"/>
-            </akn:FRBRWork>
-            <akn:FRBRExpression>
-               <akn:FRBRthis value="YYTestDoc0013/dokument"/>
-               <akn:FRBRuri value="YYTestDoc0013/dokument"/>
-               <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
-               <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-               <akn:FRBRlanguage language="de"/>
-            </akn:FRBRExpression>
-            <akn:FRBRManifestation>
-               <akn:FRBRthis value="YYTestDoc0013/dokument.xml"/>
-               <akn:FRBRuri value="YYTestDoc0013/dokument.xml"/>
-               <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
-               <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-            </akn:FRBRManifestation>
-         </akn:identification>
-         <akn:classification source="attributsemantik-noch-undefiniert">
-            <akn:keyword dictionary="attributsemantik-noch-undefiniert"
-                         showAs="attributsemantik-noch-undefiniert"
-                         value="keyword test"/>
-         </akn:classification>
-         <akn:proprietary source="attributsemantik-noch-undefiniert">
-            <ris:meta>
-               <ris:decisionNames>
-                  <ris:decisionName>decisionNames test</ris:decisionName>
-               </ris:decisionNames>
-               <ris:previousDecisions>
-                  <ris:previousDecision date="2020-01-01">
-                     <ris:documentNumber>previous decision document number 1</ris:documentNumber>
-                     <ris:fileNumber>previous decision file number</ris:fileNumber>
-                     <ris:courtType>previous decision court type</ris:courtType>
-                  </ris:previousDecision>
-                  <ris:previousDecision date="2020-01-01">
-                     <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                     <ris:fileNumber>previous decision file number</ris:fileNumber>
-                     <ris:courtType>previous decision court type</ris:courtType>
-                  </ris:previousDecision>
-               </ris:previousDecisions>
-               <ris:ensuingDecisions>
-                  <ris:ensuingDecision date="2022-10-01">
-                     <ris:documentNumber>ensuing decision document number 1</ris:documentNumber>
-                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                     <ris:courtType>ensuing decision court type</ris:courtType>
-                  </ris:ensuingDecision>
-                  <ris:ensuingDecision date="2022-10-01">
-                     <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                     <ris:courtType>ensuing decision court type</ris:courtType>
-                  </ris:ensuingDecision>
-               </ris:ensuingDecisions>
-               <ris:fileNumbers>
-                  <ris:fileNumber>fileNumber test</ris:fileNumber>
-               </ris:fileNumbers>
-               <ris:documentType>documentType test</ris:documentType>
-               <ris:courtLocation>courtLocation test</ris:courtLocation>
-               <ris:courtType>courtType test</ris:courtType>
-               <ris:legalForces>
-                  <ris:legalForce>legalForce test</ris:legalForce>
-               </ris:legalForces>
-               <ris:legalEffect>ja</ris:legalEffect>
-               <ris:fieldOfLaws>
-                  <ris:fieldOfLaw>fieldOfLaw test</ris:fieldOfLaw>
-               </ris:fieldOfLaws>
-               <ris:judicialBody>appraisalBody test</ris:judicialBody>
-               <ris:deviatingCourts>
-                  <ris:deviatingCourt>deviating court</ris:deviatingCourt>
-               </ris:deviatingCourts>
-               <ris:deviatingDates>
-                  <ris:deviatingDate>2010-05-12</ris:deviatingDate>
-               </ris:deviatingDates>
-               <ris:deviatingDocumentNumbers>
-                  <ris:deviatingDocumentNumber>deviating documentNumber</ris:deviatingDocumentNumber>
-               </ris:deviatingDocumentNumbers>
-               <ris:deviatingEclis>
-                  <ris:deviatingEcli>deviating ecli test</ris:deviatingEcli>
-               </ris:deviatingEclis>
-               <ris:deviatingFileNumbers>
-                  <ris:deviatingFileNumber>deviating fileNumber</ris:deviatingFileNumber>
-               </ris:deviatingFileNumbers>
-               <ris:publicationStatus>PUBLISHED</ris:publicationStatus>
-               <ris:error>false</ris:error>
-               <ris:documentationOffice>documentationOffice test</ris:documentationOffice>
-               <ris:procedures>
-                  <ris:procedure>previous procedure test</ris:procedure>
-               </ris:procedures>
-               <ris:inputTypes>
-                  <ris:inputType>E-Mail</ris:inputType>
-                  <ris:inputType>Papier</ris:inputType>
-               </ris:inputTypes>
-               <ris:foreignLanguageVersions>
-                  <ris:foreignLanguageVersion>
-                     <akn:FRBRlanguage language="en"/>
-                     <akn:documentRef href="https://ihre-url-zur-englischen-übersetzung" showAs="Englisch"/>
-                  </ris:foreignLanguageVersion>
-                  <ris:foreignLanguageVersion>
-                     <akn:FRBRlanguage language="fr"/>
-                     <akn:documentRef href="https://ihre-url-zur-französischen-übersetzung"
-                                      showAs="Französisch"/>
-                  </ris:foreignLanguageVersion>
-               </ris:foreignLanguageVersions>
-               <ris:definitions>
-                  <ris:definition ris:definedTerm="indirekte Steuern" ris:definingBorderNumber="2"/>
-                  <ris:definition ris:definedTerm="Sachgesamtheit"/>
-               </ris:definitions>
-               <ris:evfs>evsf test</ris:evfs>
-            </ris:meta>
-         </akn:proprietary>
-      </akn:meta>
-      <akn:header>
-         <akn:p>headline test</akn:p>
-      </akn:header>
-      <akn:judgmentBody>
-         <akn:motivation>
-            <akn:p>guidingPrinciple test</akn:p>
-         </akn:motivation>
-         <akn:introduction>
-            <akn:block name="Orientierungssatz">
-               <akn:embeddedStructure>
-                  <akn:p>headNote test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-            <akn:block name="Sonstiger Orientierungssatz">
-               <akn:embeddedStructure>
-                  <akn:p>otherHeadNote test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-            <akn:block name="Gliederung">
-               <akn:embeddedStructure>
-                  <akn:p>outline test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-            <akn:block name="Tenor">
-               <akn:embeddedStructure>
-                  <akn:p>tenor test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-         </akn:introduction>
-         <akn:background>
-            <akn:p>caseFacts test</akn:p>
-         </akn:background>
-         <akn:decision>
-            <akn:block name="Entscheidungsgründe">
-               <akn:embeddedStructure>
-                  <akn:p>decisionGrounds test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-            <akn:block name="Gründe">
-               <akn:embeddedStructure>
-                  <akn:p>grounds test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-            <akn:block name="Sonstiger Langtext">
-               <akn:embeddedStructure>
-                  <akn:p>otherLongText test</akn:p>
-               </akn:embeddedStructure>
-            </akn:block>
-            <akn:block name="Abweichende Meinung">
-               <akn:opinion>
-                  <akn:embeddedStructure>
-                     <akn:p>dissenting test</akn:p>
-                  </akn:embeddedStructure>
-               </akn:opinion>
-            </akn:block>
-         </akn:decision>
-      </akn:judgmentBody>
-   </akn:judgment>
-</akn:akomaNtoso>
-           """,
-            documentationUnitId);
+    Path expectedFilePath = Paths.get("src/test/resources/testdata/decision_full_ldml.xml");
+    String expected = Files.readString(expectedFilePath, StandardCharsets.UTF_8);
 
     // Act
     CaseLawLdml ldml = subject.transformToLdml(documentationUnit);
@@ -642,14 +761,111 @@ class DecisionFullLdmlTransformerTest {
     // Assert
     Assertions.assertNotNull(ldml);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    assertThat(fileContent).isPresent().get().isEqualTo(expected);
+    assertThat(fileContent).isPresent();
+
+    Diff diff =
+        DiffBuilder.compare(expected)
+            .withTest(fileContent.get())
+            .withDifferenceEvaluator(TestUtils.ignoreAttributeEvaluator)
+            .ignoreWhitespace()
+            .checkForIdentical()
+            .build();
+
+    if (diff.hasDifferences()) {
+      StringBuilder differences = new StringBuilder();
+      diff.getDifferences().forEach(d -> differences.append(d.toString()).append("\n"));
+      System.out.println("Transformed LDML:");
+      System.out.println(fileContent.get());
+      Assertions.fail("XMLs differ:\n" + differences);
+    }
+  }
+
+  @Test
+  void testMinimalLdml_withMandatoryFields_shouldThrowMissingJudgmentBody() {
+    // Arrange
+    var documentationUnit =
+
+        // Use empty DTO as basis as it creates empty lists for everything.
+        DecisionTransformer.transformToDomain(new DecisionDTO()).toBuilder()
+            .uuid(UUID.randomUUID())
+            .coreData(
+                CoreData.builder()
+                    .court(Court.builder().type("AG").location("Aachen").label("AG Aachen").build())
+                    .documentType(
+                        DocumentType.builder().label("testDocumentTypeAbbreviation").build())
+                    .fileNumbers(List.of("testFileNumber"))
+                    .decisionDate(LocalDate.of(2020, 1, 1))
+                    .build())
+            .documentNumber("testDocumentNumber")
+            .build();
+
+    // Act + Assert
+    AssertionsForClassTypes.assertThatThrownBy(() -> subject.transformToLdml(documentationUnit))
+        .isInstanceOf(LdmlTransformationException.class)
+        .hasMessageContaining("Missing judgment body.");
+  }
+
+  @Test
+  void testMinimalLdml_withMandatoryFieldsAndLongText() throws IOException {
+    // Arrange
+    var documentationUnit =
+        // Use empty DTO as basis as it creates empty lists for everything.
+        DecisionTransformer.transformToDomain(new DecisionDTO()).toBuilder()
+            .uuid(UUID.randomUUID())
+            .coreData(
+                CoreData.builder()
+                    .court(
+                        Court.builder()
+                            .isSuperiorCourt(false)
+                            .isForeignCourt(true)
+                            .type("Tribunal Administratif")
+                            .location("Nantes")
+                            .label("Tribunal Administratif Nantes")
+                            .regions(List.of("FRA"))
+                            .build())
+                    .documentType(
+                        DocumentType.builder().label("testDocumentTypeAbbreviation").build())
+                    .fileNumbers(List.of("testFileNumber"))
+                    .decisionDate(LocalDate.of(2020, 1, 1))
+                    .build())
+            .documentNumber("testDocumentNumber")
+            .longTexts(LongTexts.builder().caseFacts("<p>Example content 1</p>").build())
+            .build();
+    Path expectedFilePath = Paths.get("src/test/resources/testdata/decision_minimal_ldml.xml");
+    String expected = Files.readString(expectedFilePath, StandardCharsets.UTF_8);
+
+    // Act
+    CaseLawLdml ldml = subject.transformToLdml(documentationUnit);
+
+    // Assert
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+    Assertions.assertTrue(fileContent.isPresent());
+
+    Diff diff =
+        DiffBuilder.compare(expected)
+            .withTest(fileContent.get())
+            .withDifferenceEvaluator(TestUtils.ignoreAttributeEvaluator)
+            .ignoreWhitespace()
+            .checkForIdentical()
+            .build();
+
+    if (diff.hasDifferences()) {
+      StringBuilder differences = new StringBuilder();
+      diff.getDifferences().forEach(d -> differences.append(d.toString()).append("\n"));
+      Assertions.fail("XMLs differ:\n" + differences);
+    }
   }
 
   Decision getEntireDocumentationUnit() {
     PreviousDecision previousDecision1 =
         PreviousDecision.builder()
             .decisionDate(LocalDate.of(2020, 1, 1))
-            .court(Court.builder().type("previous decision court type").build())
+            .court(
+                Court.builder()
+                    .type("previous decision court type")
+                    .location("previous decision court location")
+                    .build())
             .documentType(DocumentType.builder().label("previous decision document type").build())
             .fileNumber("previous decision file number")
             .documentNumber("previous decision document number 1")
@@ -666,9 +882,14 @@ class DecisionFullLdmlTransformerTest {
             .documentNumber("ensuing decision document number 1")
             .build();
     EnsuingDecision ensuingDecision2 =
-        ensuingDecision1.toBuilder().documentNumber("previous decision document number 2").build();
+        ensuingDecision1.toBuilder()
+            .documentNumber("ensuing decision document number 2")
+            .pending(true)
+            .note("ensuing decision note")
+            .build();
 
-    return Decision.builder()
+    // Use empty DTO as basis as it creates empty lists for everything.
+    return DecisionTransformer.transformToDomain(new DecisionDTO()).toBuilder()
         .uuid(documentationUnitId)
         .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
         .note("note test")
@@ -677,17 +898,19 @@ class DecisionFullLdmlTransformerTest {
                 .ecli("ecli test")
                 .celexNumber("celex test")
                 .documentationOffice(
-                    DocumentationOffice.builder().abbreviation("documentationOffice test").build())
+                    DocumentationOffice.builder().abbreviation("documentationOffice").build())
                 .creatingDocOffice(
                     DocumentationOffice.builder()
                         .abbreviation("creatingDocumentationOffice test")
                         .build())
                 .court(
                     Court.builder()
+                        .isSuperiorCourt(false)
+                        .isForeignCourt(false)
                         .label("courtLabel test")
-                        .type("courtType test")
-                        .location("courtLocation test")
-                        .regions(List.of("region test"))
+                        .type("courtType")
+                        .location("courtLocation")
+                        .regions(List.of("NW"))
                         .build())
                 .sources(
                     List.of(
@@ -696,21 +919,24 @@ class DecisionFullLdmlTransformerTest {
                             .value(SourceValue.S)
                             .build()))
                 .documentType(DocumentType.builder().label("documentType test").build())
-                .legalEffect("ja")
+                .legalEffect("Ja")
                 .fileNumbers(List.of("fileNumber test"))
                 .decisionDate(LocalDate.of(2020, 1, 1))
+                .oralHearingDates(List.of(LocalDate.of(2021, 2, 3), LocalDate.of(2020, 1, 2)))
                 .appraisalBody("appraisalBody test")
                 .inputTypes(List.of("E-Mail", "Papier"))
                 .procedure(Procedure.builder().label("procedure test").build())
                 .previousProcedures(List.of("previous procedure test"))
                 .documentationOffice(
-                    DocumentationOffice.builder().abbreviation("documentationOffice test").build())
+                    DocumentationOffice.builder().abbreviation("documentationOffice").build())
                 .creatingDocOffice(
-                    DocumentationOffice.builder().abbreviation("documentationOffice test").build())
+                    DocumentationOffice.builder()
+                        .abbreviation("creatingDocumentationOffice")
+                        .build())
                 .previousProcedures(List.of("previous procedure test"))
                 .procedure(Procedure.builder().label("procedure test").build())
                 .deviatingEclis(List.of("deviating ecli test"))
-                .deviatingCourts(List.of("deviating court"))
+                .deviatingCourts(List.of("deviating court 1", "deviating court 2"))
                 .deviatingFileNumbers(List.of("deviating fileNumber"))
                 .deviatingDocumentNumbers(List.of("deviating documentNumber"))
                 .deviatingDecisionDates(List.of(LocalDate.of(2010, 5, 12)))
@@ -731,15 +957,19 @@ class DecisionFullLdmlTransformerTest {
                 .participatingJudges(
                     List.of(
                         ParticipatingJudge.builder()
-                            .name("participating judge test")
-                            .referencedOpinions("referenced opinions test")
+                            .name("Dr. Phil. Max Mustermann")
+                            .referencedOpinions("referenced opinions test 1")
+                            .build(),
+                        ParticipatingJudge.builder()
+                            .name("Richterin Maxima Mustermann")
+                            .referencedOpinions("referenced opinions test 2")
                             .build()))
                 .build())
         .shortTexts(
             ShortTexts.builder()
                 .guidingPrinciple("<p>guidingPrinciple test</p>")
                 .headline("<p>headline test</p>")
-                .decisionNames(List.of("decisionNames test"))
+                .decisionNames(List.of("decisionName test", "decisionName2 test"))
                 .headnote("<p>headNote test</p>")
                 .otherHeadnote("<p>otherHeadNote test</p>")
                 .build())
@@ -751,7 +981,12 @@ class DecisionFullLdmlTransformerTest {
                             .citationType(CitationType.builder().label("citation test").build())
                             .build()))
                 .keywords(List.of("keyword test"))
-                .fieldsOfLaw(List.of(FieldOfLaw.builder().text("fieldOfLaw test").build()))
+                .fieldsOfLaw(
+                    List.of(
+                        FieldOfLaw.builder()
+                            .text("fieldOfLaw test")
+                            .notation(Notation.NEW.toString())
+                            .build()))
                 .norms(
                     List.of(
                         NormReference.builder()
@@ -786,6 +1021,7 @@ class DecisionFullLdmlTransformerTest {
                                     .id(UUID.randomUUID())
                                     .label("Englisch")
                                     .isoCode("en")
+                                    .isoCode3Letters("eng")
                                     .build())
                             .link("https://ihre-url-zur-englischen-übersetzung")
                             .build(),
@@ -796,6 +1032,7 @@ class DecisionFullLdmlTransformerTest {
                                     .id(UUID.randomUUID())
                                     .label("Französisch")
                                     .isoCode("fr")
+                                    .isoCode3Letters("fra")
                                     .build())
                             .link("https://ihre-url-zur-französischen-übersetzung")
                             .build()))
@@ -807,6 +1044,8 @@ class DecisionFullLdmlTransformerTest {
                             .build(),
                         Definition.builder().definedTerm("Sachgesamtheit").build()))
                 .evsf("evsf test")
+                .appealAdmission(
+                    AppealAdmission.builder().admitted(true).by(AppealAdmitter.FG).build())
                 .build())
         .previousDecisions(List.of(previousDecision1, previousDecision2))
         .ensuingDecisions(List.of(ensuingDecision1, ensuingDecision2))
