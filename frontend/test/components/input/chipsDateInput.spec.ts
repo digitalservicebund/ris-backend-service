@@ -1,5 +1,6 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { InputText } from "primevue"
 import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
 
 type DateChipsInputProps = InstanceType<typeof ChipsDateInput>["$props"]
@@ -19,7 +20,15 @@ function renderComponent(props?: Partial<DateChipsInputProps>) {
     ariaLabel: props?.ariaLabel ?? "aria-label",
   }
 
-  return { user, ...render(ChipsDateInput, { props: effectiveProps }) }
+  return {
+    user,
+    ...render(ChipsDateInput, {
+      props: effectiveProps,
+      global: {
+        stubs: { InputMask: InputText },
+      },
+    }),
+  }
 }
 
 describe("ChipsDateInput", () => {
@@ -29,6 +38,34 @@ describe("ChipsDateInput", () => {
 
     expect(input).toBeInTheDocument()
     expect(input?.type).toBe("text")
+  })
+
+  it("emits model update when a chip is removed", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      modelValue: ["2020-11-30", "2020-05-15"],
+    })
+
+    const button = screen.getAllByLabelText("Eintrag löschen")[0]
+    await user.click(button)
+    expect(onUpdate).toHaveBeenCalledWith(["2020-05-15"])
+  })
+
+  it("does not add chips if input already exists", async () => {
+    const id = "id"
+
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      id: id,
+      modelValue: ["2020-11-30", "2020-05-15"],
+      "onUpdate:modelValue": onUpdate,
+    })
+
+    const input = screen.getByRole<HTMLInputElement>("textbox")
+    await user.type(input, "15.05.2020{enter}")
+
+    expect(onUpdate).not.toHaveBeenCalled()
   })
 
   it("shows dates in correct format", () => {
@@ -48,14 +85,6 @@ describe("ChipsDateInput", () => {
     expect(onUpdate).toHaveBeenCalledWith(["2020-11-30"])
   })
 
-  it("uses date input maska", async () => {
-    const { user } = renderComponent()
-
-    const input = screen.getByRole("textbox")
-    await user.type(input, "abc12d§07202099")
-    expect(input).toHaveValue("12.07.2020")
-  })
-
   it("does not accept incorrect dates", async () => {
     const id = "id"
 
@@ -68,7 +97,7 @@ describe("ChipsDateInput", () => {
     })
 
     const input = screen.getByRole("textbox")
-    await user.type(input, "50022020{enter}")
+    await user.type(input, "50.02.2020{enter}")
 
     expect(onUpdate).not.toHaveBeenCalled()
     expect(onError).toHaveBeenCalledWith({
@@ -91,7 +120,7 @@ describe("ChipsDateInput", () => {
     })
 
     const input = screen.getByRole("textbox")
-    await user.type(input, "01012100{enter}")
+    await user.type(input, "12.12.3000{enter}")
 
     expect(onUpdate).not.toHaveBeenCalled()
     expect(onError).toHaveBeenCalledWith({
@@ -106,21 +135,8 @@ describe("ChipsDateInput", () => {
       modelValue: ["2020-01-01"],
       "onUpdate:modelValue": onUpdate,
     })
-    const deleteButtons = screen.getAllByRole("button")
+    const deleteButtons = screen.getAllByLabelText("Eintrag löschen")
     await user.click(deleteButtons[0])
     expect(onUpdate).toHaveBeenCalled()
-  })
-
-  it("deletes the focused chip on enter", async () => {
-    const onUpdate = vi.fn()
-    const { user } = renderComponent({
-      "onUpdate:modelValue": onUpdate,
-      modelValue: ["2020-01-01", "2021-01-01"],
-    })
-
-    const chips = screen.getAllByRole("listitem")
-    await user.click(chips[1])
-    await user.keyboard("{enter}")
-    expect(onUpdate).toHaveBeenCalledWith(["2020-01-01"])
   })
 })

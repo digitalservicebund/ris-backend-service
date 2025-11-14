@@ -1,5 +1,6 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { InputText } from "primevue"
 import ChipsYearInput from "@/components/input/ChipsYearInput.vue"
 
 type YearChipsInputProps = InstanceType<typeof ChipsYearInput>["$props"]
@@ -19,7 +20,15 @@ function renderComponent(props?: Partial<YearChipsInputProps>) {
     ariaLabel: props?.ariaLabel ?? "aria-label",
   }
 
-  return { user, ...render(ChipsYearInput, { props: effectiveProps }) }
+  return {
+    user,
+    ...render(ChipsYearInput, {
+      props: effectiveProps,
+      global: {
+        stubs: { InputMask: InputText },
+      },
+    }),
+  }
 }
 
 describe("ChipsYearInput", () => {
@@ -29,6 +38,34 @@ describe("ChipsYearInput", () => {
 
     expect(input).toBeInTheDocument()
     expect(input?.type).toBe("text")
+  })
+
+  it("emits model update when a chip is removed", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      modelValue: ["2020", "2021"],
+    })
+
+    const button = screen.getAllByLabelText("Eintrag löschen")[0]
+    await user.click(button)
+    expect(onUpdate).toHaveBeenCalledWith(["2021"])
+  })
+
+  it("does not add chips if input already exists", async () => {
+    const id = "id"
+
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      id: id,
+      modelValue: ["2020", "2021"],
+      "onUpdate:modelValue": onUpdate,
+    })
+
+    const input = screen.getByRole<HTMLInputElement>("textbox")
+    await user.type(input, "2021{enter}")
+
+    expect(onUpdate).not.toHaveBeenCalled()
   })
 
   it("shows dates in correct format", () => {
@@ -46,14 +83,6 @@ describe("ChipsYearInput", () => {
     const input = screen.getByRole("textbox")
     await user.type(input, "2020{enter}")
     expect(onUpdate).toHaveBeenCalledWith(["2020"])
-  })
-
-  it("uses date input maska", async () => {
-    const { user } = renderComponent()
-
-    const input = screen.getByRole("textbox")
-    await user.type(input, "abd§202sa0")
-    expect(input).toHaveValue("2020")
   })
 
   it("does not accept incorrect year", async () => {
@@ -124,14 +153,14 @@ describe("ChipsYearInput", () => {
     })
   })
 
-  it("deletes the focused chip on enter", async () => {
+  it("deletes the chip on button click", async () => {
     const onUpdate = vi.fn()
     const { user } = renderComponent({
       "onUpdate:modelValue": onUpdate,
       modelValue: ["2020", "2021"],
     })
 
-    const chips = screen.getAllByRole("listitem")
+    const chips = screen.getAllByLabelText("Eintrag löschen")
     await user.click(chips[1])
     await user.keyboard("{enter}")
     expect(onUpdate).toHaveBeenCalledWith(["2020"])

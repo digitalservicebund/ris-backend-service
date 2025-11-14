@@ -93,7 +93,7 @@ test.describe("preview decision", () => {
 
       await page.getByLabel("Aktenzeichen", { exact: true }).click()
       // Navigate back and delete on enter
-      await page.keyboard.press("ArrowLeft")
+      await page.keyboard.press("Shift+Tab")
       await page.keyboard.press("Enter")
 
       // Delete court entry

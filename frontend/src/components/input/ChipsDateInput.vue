@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import { RisChipsInput } from "@digitalservicebund/ris-ui/components"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import { computed, ref } from "vue"
-import ChipsInput from "@/components/input/ChipsInput.vue"
 import { ValidationError } from "@/components/input/types"
 
 interface Props {
@@ -14,54 +14,66 @@ interface Props {
   testId?: string
 }
 const props = defineProps<Props>()
-
 const emit = defineEmits<{
   "update:modelValue": [value?: string[]]
   "update:validationError": [value?: ValidationError]
 }>()
 
-const lastChipValue = ref<string | undefined>("")
+const lastChip = ref<string | undefined>("")
+const formattedChips = computed<string[]>(() =>
+  props.modelValue
+    ? props.modelValue.map((value) =>
+        dayjs(value, "YYYY-MM-DD", true).format("DD.MM.YYYY"),
+      )
+    : [],
+)
+
 const isValidDate = computed(() =>
-  dayjs(lastChipValue.value, "DD.MM.YYYY", true).isValid(),
+  dayjs(lastChip.value, "DD.MM.YYYY", true).isValid(),
 )
 const isInFuture = computed(() =>
-  dayjs(lastChipValue.value, "DD.MM.YYYY", true).isAfter(dayjs()),
+  dayjs(lastChip.value, "DD.MM.YYYY", true).isAfter(dayjs()),
+)
+const isDuplicate = computed(
+  () => lastChip.value && formattedChips.value.includes(lastChip.value),
 )
 
 const chips = computed<string[]>({
-  get: () => {
-    return props.modelValue
-      ? props.modelValue.map((value) =>
-          dayjs(value, "YYYY-MM-DD", true).format("DD.MM.YYYY"),
-        )
-      : []
-  },
-
+  get: () => formattedChips.value,
   set: (newValue: string[]) => {
-    if (!newValue || newValue.length === 0) {
+    const oldLength = formattedChips.value.length
+    const newLength = newValue.length
+
+    if (newLength === 0) {
       emit("update:modelValue", [])
+      clearValidationErrors()
       return
     }
 
-    lastChipValue.value = newValue.at(-1)
-    validateInput()
+    if (newLength > oldLength) {
+      lastChip.value = newValue.at(-1)
 
-    if (isValidDate.value && !isInFuture.value)
-      emit(
-        "update:modelValue",
-        newValue.map((value) =>
+      validateInput()
+
+      if (isValidDate.value && !isInFuture.value && !isDuplicate.value) {
+        const valuesInStandardFormat = newValue.map((value) =>
           dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
-        ),
+        )
+        emit("update:modelValue", valuesInStandardFormat)
+      }
+    } else if (newLength < oldLength) {
+      clearValidationErrors()
+
+      const valuesInStandardFormat = newValue.map((value) =>
+        dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
       )
+      emit("update:modelValue", valuesInStandardFormat)
+    }
   },
 })
 
-function validateInput(event?: ValidationError) {
-  if (event) {
-    emit("update:validationError", event)
-    return
-  }
-  if (!isValidDate.value && lastChipValue.value) {
+function validateInput() {
+  if (!isValidDate.value && lastChip.value) {
     emit("update:validationError", {
       message: "Kein valides Datum",
       instance: props.id,
@@ -71,24 +83,34 @@ function validateInput(event?: ValidationError) {
       message: props.ariaLabel + " darf nicht in der Zukunft liegen",
       instance: props.id,
     })
-    return
+  } else if (isDuplicate.value) {
+    emit("update:validationError", {
+      message: lastChip.value + " bereits vorhanden",
+      instance: props.id,
+    })
   } else {
-    emit("update:validationError", undefined)
+    clearValidationErrors()
   }
+}
+
+function clearValidationErrors() {
+  emit("update:validationError", undefined)
 }
 
 dayjs.extend(customParseFormat)
 </script>
 
 <template>
-  <ChipsInput
-    :id="id"
+  <RisChipsInput
     v-model="chips"
     :aria-label="ariaLabel"
     :data-testid="testId"
     :has-error="hasError"
-    maska="##.##.####"
+    :input-id="id"
+    mask="99.99.9999"
+    placeholder="TT.MM.JJJJ"
     :read-only="readOnly"
-    @update:validation-error="validateInput($event)"
+    @blur="clearValidationErrors"
+    @focus="clearValidationErrors"
   />
 </template>

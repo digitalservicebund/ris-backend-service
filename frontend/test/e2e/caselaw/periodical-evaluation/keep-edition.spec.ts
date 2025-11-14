@@ -100,7 +100,7 @@ test.describe(
       await test.step("Navigate to documentation unit categories, add file number and save", async () => {
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
-        await page.getByLabel("Aktenzeichen", { exact: true }).fill("test")
+        await page.getByLabel("Aktenzeichen").getByRole("textbox").fill("test")
         await page.keyboard.press("Enter")
 
         await save(page)

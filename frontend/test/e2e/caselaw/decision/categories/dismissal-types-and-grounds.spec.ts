@@ -56,24 +56,22 @@ test.describe(
       await test.step("enter dismissal type", async () => {
         await page
           .getByLabel("Kündigungsarten")
+          .getByRole("textbox")
           .fill("Betriebsbedingte Kündigung")
         await page.keyboard.press("Enter")
         await expect(
-          page
-            .getByTestId("chips-input-wrapper_dismissalTypes")
-            .getByTestId("chip-value"),
+          page.getByLabel("Kündigungsarten").getByRole("listitem"),
         ).toHaveText("Betriebsbedingte Kündigung")
       })
 
       await test.step("enter dismissal ground", async () => {
         await page
           .getByLabel("Kündigungsgründe")
+          .getByRole("textbox")
           .fill("Einführung neuer Technologien")
         await page.keyboard.press("Enter")
         await expect(
-          page
-            .getByTestId("chips-input-wrapper_dismissalGrounds")
-            .getByTestId("chip-value"),
+          page.getByLabel("Kündigungsgründe").getByRole("listitem"),
         ).toHaveText("Einführung neuer Technologien")
       })
       await save(page)

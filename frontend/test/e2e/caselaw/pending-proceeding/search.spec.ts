@@ -3,9 +3,9 @@ import { Kind } from "@/domain/documentationUnitKind"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import {
+  checkResultListContent,
   fillInput,
   navigateToSearch,
-  checkResultListContent,
   openSearchWithFileNumberPrefix,
   triggerSearch,
 } from "~/e2e/caselaw/utils/e2e-utils"
@@ -371,9 +371,7 @@ test.describe(
           }),
         ).toHaveValue("05.07.2022")
         await expect(
-          pageWithBfhUser
-            .getByTestId("chips-input-wrapper_fileNumber")
-            .getByTestId("chip-value"),
+          pageWithBfhUser.getByLabel("Aktenzeichen").getByRole("listitem"),
         ).toHaveText(fileNumber)
       })
       await test.step("Lösche Entscheidung", async () => {

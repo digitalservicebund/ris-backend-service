@@ -281,7 +281,9 @@ test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-7247"] }, () => {
     await expect(
       newTab.getByLabel("Entscheidungsdatum", { exact: true }),
     ).toHaveValue(formattedDate)
-    await expect(newTab.getByTestId("chip-value")).toHaveText(randomFileNumber)
+    await expect(
+      newTab.getByRole("listitem").getByLabel("Eintrag bearbeiten"),
+    ).toHaveText(randomFileNumber)
     await expect(newTab.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
       "Anerkenntnisurteil",
     )

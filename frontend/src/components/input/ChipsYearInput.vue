@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import { RisChipsInput } from "@digitalservicebund/ris-ui/components"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import { computed, ref } from "vue"
-import ChipsInput from "@/components/input/ChipsInput.vue"
 import { ValidationError } from "@/components/input/types"
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
   ariaLabel: string
   hasError?: boolean
   readOnly?: boolean
+  testId?: string
 }
 
 const props = defineProps<Props>()
@@ -20,38 +21,45 @@ const emit = defineEmits<{
   "update:validationError": [value?: ValidationError]
 }>()
 
-const lastChipValue = ref<string | undefined>("")
-const isValidYear = computed(() => validateYear(lastChipValue.value))
+const localChips = computed<string[]>(() => props.modelValue ?? [])
+const lastChip = ref<string | undefined>("")
+const isValidYear = computed(() => validateYear(lastChip.value))
 const isInFuture = computed(() =>
-  dayjs(lastChipValue.value, "YYYY", true).isAfter(dayjs()),
+  dayjs(lastChip.value, "YYYY", true).isAfter(dayjs()),
+)
+const isDuplicate = computed(
+  () => lastChip.value && localChips.value.includes(lastChip.value),
 )
 
 const chips = computed<string[]>({
-  get: () => {
-    return props.modelValue ? props.modelValue : []
-  },
+  get: () => localChips.value,
 
   set: (newValue: string[]) => {
-    if (!newValue || newValue.length === 0) {
-      emit("update:modelValue", undefined)
+    const oldLength = localChips.value.length
+    const newLength = newValue.length
+
+    if (newLength === 0) {
+      emit("update:modelValue", [])
+      clearValidationErrors()
       return
     }
 
-    lastChipValue.value = newValue.at(-1)
+    if (newLength > oldLength) {
+      lastChip.value = newValue.at(-1)
 
-    validateInput()
-
-    if (isValidYear.value && !isInFuture.value)
+      validateInput()
+      if (isValidYear.value && !isInFuture.value && !isDuplicate.value) {
+        emit("update:modelValue", newValue)
+      }
+    } else if (newLength < oldLength) {
+      clearValidationErrors()
       emit("update:modelValue", newValue)
+    }
   },
 })
 
-function validateInput(event?: ValidationError) {
-  if (event) {
-    emit("update:validationError", event)
-    return
-  }
-  if (!isValidYear.value && lastChipValue.value) {
+function validateInput() {
+  if (!isValidYear.value && lastChip.value) {
     emit("update:validationError", {
       message: "Kein valides Jahr",
       instance: props.id,
@@ -62,9 +70,18 @@ function validateInput(event?: ValidationError) {
       instance: props.id,
     })
     return
+  } else if (isDuplicate.value) {
+    emit("update:validationError", {
+      message: lastChip.value + " bereits vorhanden",
+      instance: props.id,
+    })
   } else {
-    emit("update:validationError", undefined)
+    clearValidationErrors()
   }
+}
+
+function clearValidationErrors() {
+  emit("update:validationError", undefined)
 }
 
 function validateYear(input: string | undefined): boolean {
@@ -78,13 +95,15 @@ dayjs.extend(customParseFormat)
 </script>
 
 <template>
-  <ChipsInput
-    :id="id"
+  <RisChipsInput
     v-model="chips"
     :aria-label="ariaLabel"
+    :data-testid="testId"
     :has-error="hasError"
-    maska="####"
+    :input-id="id"
+    mask="9999"
+    placeholder="JJJJ"
     :read-only="readOnly"
-    @update:validation-error="validateInput($event)"
+    @blur="clearValidationErrors"
   />
 </template>
