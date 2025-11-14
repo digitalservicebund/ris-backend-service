@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementIndustryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DefinitionDTO;
@@ -44,6 +45,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
+import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
+import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreementIndustry;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
@@ -665,24 +668,6 @@ class DecisionTransformerTest {
         DecisionTransformer.transformToDTO(DecisionDTO.builder().build(), decision);
 
     assertThat(decisionDTO.getDismissalGrounds()).extracting("value").containsExactly("ground");
-  }
-
-  @Test
-  void testTransformToDTO_withSameCollectiveAgreements_shouldMakeCollectiveAgreementsDistinct() {
-    Decision decision =
-        generateSimpleDocumentationUnitBuilder()
-            .contentRelatedIndexing(
-                ContentRelatedIndexing.builder()
-                    .collectiveAgreements(List.of("agreement", "agreement"))
-                    .build())
-            .build();
-
-    DecisionDTO decisionDTO =
-        DecisionTransformer.transformToDTO(DecisionDTO.builder().build(), decision);
-
-    assertThat(decisionDTO.getCollectiveAgreements())
-        .extracting("value")
-        .containsExactly("agreement");
   }
 
   @Test
@@ -1506,13 +1491,32 @@ class DecisionTransformerTest {
     DecisionDTO decisionDTO =
         generateSimpleDTOBuilder()
             .collectiveAgreements(
-                List.of(CollectiveAgreementDTO.builder().value("agreement").build()))
+                List.of(
+                    CollectiveAgreementDTO.builder()
+                        .name("Stehende Bühnen")
+                        .date("21.2000")
+                        .norm("§ 23")
+                        .industry(
+                            CollectiveAgreementIndustryDTO.builder()
+                                .id(UUID.fromString("4512f151-6b7f-4080-bb07-91b16877a510"))
+                                .value(
+                                    "Eisen-, Stahl-, Metall-, und Elektroindustrie, Metallverarbeitung")
+                                .build())
+                        .build()))
             .build();
-
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
 
     assertThat(decision.contentRelatedIndexing().collectiveAgreements())
-        .containsExactly("agreement");
+        .containsExactly(
+            CollectiveAgreement.builder()
+                .name("Stehende Bühnen")
+                .date("21.2000")
+                .norm("§ 23")
+                .industry(
+                    new CollectiveAgreementIndustry(
+                        UUID.fromString("4512f151-6b7f-4080-bb07-91b16877a510"),
+                        "Eisen-, Stahl-, Metall-, und Elektroindustrie, Metallverarbeitung"))
+                .build());
   }
 
   @Test

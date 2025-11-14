@@ -117,11 +117,10 @@ const shouldDisplayAppeal = computed(
       </CategoryWrapper>
       <CategoryWrapper
         v-if="shouldDisplayCollectiveAgreements"
-        v-slot="slotProps"
         label="Tarifvertrag"
         :should-show-button="!hasCollectiveAgreement"
       >
-        <CollectiveAgreements label="Tarifvertrag" @reset="slotProps.reset" />
+        <CollectiveAgreements label="Tarifvertrag" />
       </CategoryWrapper>
       <CategoryWrapper
         v-if="shouldDisplayDismissalAttributes"

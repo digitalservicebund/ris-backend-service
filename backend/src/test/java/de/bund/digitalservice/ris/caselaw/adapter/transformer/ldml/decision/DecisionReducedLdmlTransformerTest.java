@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
@@ -387,7 +388,9 @@ class DecisionReducedLdmlTransformerTest {
                     .jobProfiles(List.of("jobProfile test"))
                     .dismissalGrounds(List.of("dismissalGround test"))
                     .dismissalTypes(List.of("dismissalType test"))
-                    .collectiveAgreements(List.of("collectiveAgreement test"))
+                    .collectiveAgreements(
+                        List.of(
+                            CollectiveAgreement.builder().name("collectiveAgreement test").build()))
                     .hasLegislativeMandate(true)
                     .foreignLanguageVersions(
                         List.of(

@@ -21,7 +21,7 @@ public record ContentRelatedIndexing(
     List<ActiveCitation> activeCitations,
     List<String> dismissalGrounds,
     List<String> dismissalTypes,
-    List<String> collectiveAgreements,
+    List<CollectiveAgreement> collectiveAgreements,
     List<Definition> definitions,
     List<ForeignLanguageVersion> foreignLanguageVersions,
     boolean hasLegislativeMandate,
