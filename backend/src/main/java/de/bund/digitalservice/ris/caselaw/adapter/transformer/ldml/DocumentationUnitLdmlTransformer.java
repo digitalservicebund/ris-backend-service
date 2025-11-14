@@ -222,12 +222,16 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     }
 
     if (documentationUnit.coreData() != null && documentationUnit.coreData().court() != null) {
-      TlcElement tlcCourt =
-          new TlcElement("gericht", "", documentationUnit.coreData().court().label());
+      var court = documentationUnit.coreData().court();
+      TlcElement tlcCourt = new TlcElement("gericht", "", court.label());
       tlcOrganizations.add(tlcCourt);
-      TlcElement tlcCourtLocation =
-          new TlcElement("gerichtsort", "", documentationUnit.coreData().court().location());
-      tlcLocations.add(tlcCourtLocation);
+
+      // Superior German Courts have null as courtLocation in the domain because
+      // the "Standort des Gerichts" is non-relevant/misleading
+      if (Boolean.FALSE.equals(court.isSuperiorCourt()) || (court.location() != null)) {
+        TlcElement tlcCourtLocation = new TlcElement("gerichtsort", "", court.location());
+        tlcLocations.add(tlcCourtLocation);
+      }
     }
 
     if (documentationUnit.coreData() != null

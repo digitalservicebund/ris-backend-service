@@ -159,7 +159,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
     return ImplicitReference.builder().vorgehend(builder.build()).build();
   }
 
-  @SuppressWarnings("java:S3776")
+  @SuppressWarnings({"java:S3776", "java:S1854"})
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(PendingProceeding pendingProceeding) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
 
