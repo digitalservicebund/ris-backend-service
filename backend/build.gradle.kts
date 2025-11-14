@@ -149,7 +149,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "2.0.1"
+    val testContainersVersion = "2.0.2"
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -167,7 +167,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.33.0")
+    implementation("com.google.protobuf:protobuf-java:4.33.1")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.6.0")
@@ -249,7 +249,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.34.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.35.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
