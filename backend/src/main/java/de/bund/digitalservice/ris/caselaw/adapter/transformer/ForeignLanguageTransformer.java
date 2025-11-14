@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ForeignLanguageVersionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
 
@@ -22,15 +21,16 @@ public class ForeignLanguageTransformer {
   }
 
   public static ForeignLanguageVersionDTO transformToDTO(
-      ForeignLanguageVersion foreignLanguageVersion, DecisionDTO decisionDTO) {
+      ForeignLanguageVersion foreignLanguageVersion, Integer index) {
     if (foreignLanguageVersion == null) {
       return null;
     }
     return ForeignLanguageVersionDTO.builder()
-        .id(foreignLanguageVersion.id())
-        .documentationUnit(decisionDTO)
+        .id(foreignLanguageVersion.newEntry() ? null : foreignLanguageVersion.id())
         .languageCode(LanguageCodeTransformer.transformToDTO(foreignLanguageVersion.languageCode()))
         .url(foreignLanguageVersion.link())
+        .languageCode(LanguageCodeTransformer.transformToDTO(foreignLanguageVersion.languageCode()))
+        .rank(index + 1L)
         .build();
   }
 }

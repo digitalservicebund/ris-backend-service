@@ -18,11 +18,7 @@ const { documentUnit: decision } = storeToRefs(store)
   <div id="definitions" class="ris-label2-regular mb-16">
     {{ label }}
   </div>
-  <div
-    aria-label="Definitionen"
-    class="border-b-1 border-blue-300"
-    data-testid="Definitionen"
-  >
+  <div aria-label="Definitionen" data-testid="Definitionen">
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList

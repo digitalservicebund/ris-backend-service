@@ -237,11 +237,8 @@ public class DecisionDTO extends DocumentationUnitDTO {
   private Set<DuplicateRelationDTO> duplicateRelations2 = new HashSet<>();
 
   /** Fremdsprachige Fassung */
-  @OneToMany(
-      mappedBy = "documentationUnit",
-      cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY,
-      orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
   private List<ForeignLanguageVersionDTO> foreignLanguageVersions = new ArrayList<>();

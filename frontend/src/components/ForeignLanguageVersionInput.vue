@@ -61,7 +61,7 @@ onMounted(() => {
           id="foreignLanguageVersionLanguageInput"
           v-slot="slotProps"
           data-testid="foreign-language-version-language"
-          label="Sprache"
+          label="Sprache *"
         >
           <ComboboxInput
             id="foreignLanguageVersionLanguageInputText"
@@ -78,7 +78,7 @@ onMounted(() => {
         <InputField
           id="foreignLanguageVersionLinkInput"
           data-testid="foreign-language-version-link"
-          label="Link"
+          label="Link *"
         >
           <InputText
             id="foreignLanguageVersionLinkTextInputText"
