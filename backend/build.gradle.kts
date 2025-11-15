@@ -179,7 +179,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.38.6"))
+    implementation(platform("software.amazon.awssdk:bom:2.38.7"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -227,7 +227,7 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.10.0")
 
     // CVE-2023-3635
-    implementation("com.squareup.okio:okio-jvm:3.16.2")
+    implementation("com.squareup.okio:okio-jvm:3.16.3")
 
     val flywayCore = "org.flywaydb:flyway-core:11.17.0"
     implementation(flywayCore)
