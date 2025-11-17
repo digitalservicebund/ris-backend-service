@@ -15,4 +15,13 @@ public class CollectiveAgreementIndustryTransformer {
     return new CollectiveAgreementIndustry(
         collectiveAgreementIndustryDTO.getId(), collectiveAgreementIndustryDTO.getValue());
   }
+
+  public static CollectiveAgreementIndustryDTO transformToDto(
+      CollectiveAgreementIndustry collectiveAgreementIndustry) {
+    if (collectiveAgreementIndustry == null) {
+      return null;
+    }
+
+    return CollectiveAgreementIndustryDTO.builder().id(collectiveAgreementIndustry.id()).build();
+  }
 }
