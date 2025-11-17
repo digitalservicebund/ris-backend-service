@@ -16,6 +16,7 @@ public record CoreData(
     @UniqueElements List<String> deviatingFileNumbers,
     Court court,
     @UniqueElements List<String> deviatingCourts,
+    String courtBranchLocation,
     DocumentType documentType,
     Procedure procedure,
     List<String> previousProcedures,
