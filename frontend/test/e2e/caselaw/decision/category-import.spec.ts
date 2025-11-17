@@ -117,7 +117,7 @@ test.describe("category import", () => {
           prefilledDocumentUnitWithTexts.documentNumber,
         )
 
-        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(22) // number of non-importable categories, if target category already filled
+        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(23) // number of non-importable categories, if target category already filled
       })
     },
   )
@@ -912,6 +912,42 @@ test.describe("category import", () => {
 
       await test.step("scroll to category", async () => {
         await expect(page.getByTestId("appellants")).toBeInViewport()
+      })
+    },
+  )
+
+  // Rechtsmittel
+  test(
+    "import collective agreement",
+    {
+      tag: ["@RISDEV-6687"],
+    },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(page.getByLabel("Tarifvertrag übernehmen")).toBeVisible()
+        await page.getByLabel("Tarifvertrag übernehmen").click()
+
+        await expect(
+          page.getByText(
+            "Stehende Bühnen, 12.2002, § 23 (Bühne, Theater, Orchester)",
+          ),
+        ).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByRole("heading", { name: "Tarifvertrag" }),
+        ).toBeInViewport()
       })
     },
   )
