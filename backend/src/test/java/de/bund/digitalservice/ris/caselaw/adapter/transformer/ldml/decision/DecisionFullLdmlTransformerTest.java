@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
+import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreementIndustry;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
@@ -1012,7 +1013,16 @@ class DecisionFullLdmlTransformerTest {
                 .dismissalGrounds(List.of("dismissalGround test"))
                 .dismissalTypes(List.of("dismissalType test"))
                 .collectiveAgreements(
-                    List.of(CollectiveAgreement.builder().name("collectiveAgreement test").build()))
+                    List.of(
+                        CollectiveAgreement.builder()
+                            .name("Stehende Bühnen")
+                            .date("12.2001")
+                            .norm("§ 23")
+                            .industry(
+                                new CollectiveAgreementIndustry(
+                                    UUID.fromString("fa5800ee-1102-42e1-a516-4356e6232a41"),
+                                    "Bühne, Theater, Orchester"))
+                            .build()))
                 .hasLegislativeMandate(true)
                 .foreignLanguageVersions(
                     List.of(
