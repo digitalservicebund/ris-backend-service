@@ -179,11 +179,11 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.38.6"))
+    implementation(platform("software.amazon.awssdk:bom:2.38.7"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
-    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.6")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.7")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
@@ -223,11 +223,11 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.14.0")
     implementation("org.jsoup:jsoup:1.21.2")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:6.10.0")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.10.0")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:7.0.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.0.0")
 
     // CVE-2023-3635
-    implementation("com.squareup.okio:okio-jvm:3.16.2")
+    implementation("com.squareup.okio:okio-jvm:3.16.3")
 
     val flywayCore = "org.flywaydb:flyway-core:11.17.0"
     implementation(flywayCore)
@@ -249,7 +249,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.35.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.36.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
