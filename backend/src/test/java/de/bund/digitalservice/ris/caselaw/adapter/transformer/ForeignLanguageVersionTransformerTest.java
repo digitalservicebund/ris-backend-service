@@ -29,6 +29,7 @@ class ForeignLanguageVersionTransformerTest {
             .id(UUID.randomUUID())
             .languageCode(languageCodeDTO)
             .url("https://example.com")
+            .rank(2L)
             .build();
 
     LanguageCode expectedLanguageCode =
@@ -82,5 +83,6 @@ class ForeignLanguageVersionTransformerTest {
     assertEquals(
         expectedLanguageCodeDTO.getId(), foreignLanguageVersionDTO.getLanguageCode().getId());
     assertEquals(foreignLanguageVersion.link(), foreignLanguageVersionDTO.getUrl());
+    assertEquals(2L, foreignLanguageVersionDTO.getRank());
   }
 }
