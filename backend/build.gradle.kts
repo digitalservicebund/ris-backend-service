@@ -223,8 +223,8 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.14.0")
     implementation("org.jsoup:jsoup:1.21.2")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:6.10.0")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.10.0")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:7.0.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.0.0")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.2")
