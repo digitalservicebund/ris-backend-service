@@ -11,6 +11,7 @@ export type CoreData = {
   deviatingFileNumbers?: string[]
   court?: Court
   deviatingCourts?: string[]
+  courtBranchLocation?: string
   documentType?: DocumentType
   procedure?: Procedure
   previousProcedures?: string[]
@@ -41,6 +42,7 @@ export const coreDataLabels: {
   oralHearingDates: "Datum der mündlichen Verhandlung",
   court: "Gericht",
   deviatingCourts: "Fehlerhaftes Gericht",
+  courtBranchLocation: "Sitz der Außenstelle",
   fileNumbers: "Aktenzeichen",
   deviatingFileNumbers: "Abweichendes Aktenzeichen",
   deviatingDocumentNumbers: "Abweichende Dokumentnummer",

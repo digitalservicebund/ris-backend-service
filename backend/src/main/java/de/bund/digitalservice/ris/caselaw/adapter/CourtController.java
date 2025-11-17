@@ -35,4 +35,19 @@ public class CourtController {
       @RequestParam(value = "sz", required = false, defaultValue = "200") Integer size) {
     return service.getCourts(searchStr, size);
   }
+
+  /**
+   * Returns branch locations for a specific court
+   *
+   * @param type the type of the court
+   * @param location the location of the court
+   * @return a list of branch locations for the court
+   */
+  @GetMapping("branchlocations")
+  @PreAuthorize("isAuthenticated()")
+  public List<String> getBranchLocationsForCourt(
+      @RequestParam(value = "type") String type,
+      @RequestParam(value = "location", required = false) String location) {
+    return service.getBranchLocationsForCourt(type, location);
+  }
 }

@@ -10,4 +10,5 @@ export type Court = {
   responsibleDocOffice?: DocumentationOffice
   isSuperiorCourt?: boolean
   isForeignCourt?: boolean
+  branchLocations?: string[]
 }

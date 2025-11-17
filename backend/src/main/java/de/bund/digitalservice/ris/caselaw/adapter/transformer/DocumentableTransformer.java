@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtBranchLocationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDocumentNumberDTO;
@@ -280,7 +281,7 @@ public class DocumentableTransformer {
     builder.deviatingDates(deviatingDateDTOs);
   }
 
-  static void addDeviationCourts(
+  static void addDeviatingCourts(
       DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder, CoreData coreData) {
     if (coreData.deviatingCourts() == null) {
       return;
@@ -298,6 +299,16 @@ public class DocumentableTransformer {
     }
 
     builder.deviatingCourts(deviatingCourtDTOs);
+  }
+
+  static void addCourtBranchLocation(
+      DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder, CoreData coreData) {
+    if (coreData.courtBranchLocation() == null) {
+      builder.courtBranchLocation(null);
+    } else {
+      builder.courtBranchLocation(
+          CourtBranchLocationDTO.builder().value(coreData.courtBranchLocation()).build());
+    }
   }
 
   static void addFileNumbers(
@@ -327,6 +338,10 @@ public class DocumentableTransformer {
     CoreDataBuilder coreDataBuilder =
         CoreData.builder()
             .court(CourtTransformer.transformToDomain(documentationUnitDTO.getCourt()))
+            .courtBranchLocation(
+                documentationUnitDTO.getCourtBranchLocation() != null
+                    ? documentationUnitDTO.getCourtBranchLocation().getValue()
+                    : null)
             .documentationOffice(
                 DocumentationOfficeTransformer.transformToDomain(
                     documentationUnitDTO.getDocumentationOffice()))

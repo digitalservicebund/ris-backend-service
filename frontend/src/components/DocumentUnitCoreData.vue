@@ -6,6 +6,7 @@ import InputSelect from "primevue/select"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { DropdownItem } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import CourtBranchLocation from "@/components/CourtBranchLocation.vue"
 import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
 import ChipsYearInput from "@/components/input/ChipsYearInput.vue"
@@ -189,17 +190,23 @@ onBeforeUnmount(() => {
       </InputField>
       <!-- Child  -->
       <template #children>
-        <InputField
-          id="deviatingCourt"
-          v-slot="{ id }"
-          label="Fehlerhaftes Gericht"
-        >
-          <ChipsInput
-            :id="id"
-            v-model="coreDataModel.deviatingCourts"
-            aria-label="Fehlerhaftes Gericht"
-          ></ChipsInput>
-        </InputField>
+        <div :class="layoutClass">
+          <InputField
+            id="deviatingCourt"
+            v-slot="{ id }"
+            label="Fehlerhaftes Gericht"
+          >
+            <ChipsInput
+              :id="id"
+              v-model="coreDataModel.deviatingCourts"
+              aria-label="Fehlerhaftes Gericht"
+            ></ChipsInput>
+          </InputField>
+          <CourtBranchLocation
+            v-model="coreDataModel.courtBranchLocation"
+            :court="coreDataModel.court"
+          />
+        </div>
       </template>
     </NestedComponent>
 
