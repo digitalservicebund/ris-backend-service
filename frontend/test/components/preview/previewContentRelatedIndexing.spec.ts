@@ -5,6 +5,7 @@ import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRe
 import ActiveCitation from "@/domain/activeCitation"
 import { AppealWithdrawal, PkhPlaintiff } from "@/domain/appeal"
 import { AppealAdmitter } from "@/domain/appealAdmitter"
+import { CollectiveAgreement } from "@/domain/collectiveAgreement"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { Decision } from "@/domain/decision"
 import Definition from "@/domain/definition"
@@ -82,7 +83,10 @@ describe("preview content related indexing", () => {
       jobProfiles: ["Handwerker", "Elektriker"],
       dismissalGrounds: ["Betriebsbedingte Kündigung"],
       dismissalTypes: ["Einführung neuer Technologien"],
-      collectiveAgreements: ["Normalvertrag Chor", "Stehende Bühnen"],
+      collectiveAgreements: [
+        new CollectiveAgreement({ name: "Normalvertrag Chor" }),
+        new CollectiveAgreement({ name: "Stehende Bühnen" }),
+      ],
       hasLegislativeMandate: true,
       foreignLanguageVersions: [
         new ForeignLanguageVersion({
@@ -437,7 +441,24 @@ describe("preview content related indexing", () => {
       activeCitations: [],
       fieldsOfLaw: [],
       jobProfiles: [],
-      collectiveAgreements: ["Normalvertrag Chor", "Stehende Bühnen"],
+      collectiveAgreements: [
+        new CollectiveAgreement({
+          name: "Normalvertrag Chor",
+          date: "2000",
+          norm: "§ 23",
+          industry: {
+            id: "290b39dc-9368-4d1c-9076-7f96e05cb575",
+            label: "Bühne, Theater, Orchester",
+          },
+        }),
+        new CollectiveAgreement({
+          name: "Stehende Bühnen",
+          industry: {
+            id: "290b39dc-9368-4d1c-9076-7f96e05cb575",
+            label: "Bühne, Theater, Orchester",
+          },
+        }),
+      ],
       dismissalGrounds: [],
       dismissalTypes: [],
       definitions: [],
@@ -446,8 +467,14 @@ describe("preview content related indexing", () => {
     })
 
     expect(await screen.findByText("Tarifvertrag")).toBeInTheDocument()
-    expect(await screen.findByText("Normalvertrag Chor")).toBeInTheDocument()
-    expect(await screen.findByText("Stehende Bühnen")).toBeInTheDocument()
+    expect(
+      await screen.findByText(
+        "Normalvertrag Chor, 2000, § 23 (Bühne, Theater, Orchester)",
+      ),
+    ).toBeInTheDocument()
+    expect(
+      await screen.findByText("Stehende Bühnen (Bühne, Theater, Orchester)"),
+    ).toBeInTheDocument()
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()

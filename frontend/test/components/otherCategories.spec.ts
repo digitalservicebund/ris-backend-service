@@ -5,6 +5,7 @@ import { vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import OtherCategories from "@/components/OtherCategories.vue"
 import { AppealWithdrawal } from "@/domain/appeal"
+import { CollectiveAgreement } from "@/domain/collectiveAgreement"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { Decision } from "@/domain/decision"
 import Definition from "@/domain/definition"
@@ -182,6 +183,11 @@ describe("other categories", () => {
   })
 
   describe("CollectiveAgreements", () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: routes,
+    })
+
     test("should not display collective agreements button when it is empty and not a labor court", async () => {
       // Arrange
       mockSessionStore({ collectiveAgreements: [] }, "BVerfG")
@@ -216,15 +222,24 @@ describe("other categories", () => {
 
     test("should display collective agreements when it is not empty without labor court", async () => {
       // Arrange
-      mockSessionStore({ collectiveAgreements: ["Stehende Bühnen"] }, "BVerfG")
+      mockSessionStore(
+        {
+          collectiveAgreements: [
+            new CollectiveAgreement({ name: "Stehende Bühnen", norm: "§ 23" }),
+          ],
+        },
+        "BVerfG",
+      )
 
       // Act
-      render(OtherCategories)
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
 
       // Assert
-      expect(
-        screen.getByRole("textbox", { name: "Tarifvertrag Input" }),
-      ).toHaveValue("Stehende Bühnen")
+      expect(screen.getByText("Stehende Bühnen, § 23")).toBeInTheDocument()
 
       expect(
         screen.queryByRole("button", { name: "Tarifvertrag" }),
