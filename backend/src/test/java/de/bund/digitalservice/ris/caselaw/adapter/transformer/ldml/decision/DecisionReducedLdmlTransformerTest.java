@@ -137,7 +137,7 @@ class DecisionReducedLdmlTransformerTest {
     if (diff.hasDifferences()) {
       StringBuilder differences = new StringBuilder();
       diff.getDifferences().forEach(d -> differences.append(d.toString()).append("\n"));
-      Assertions.fail("XMLs differ:\n" + differences.toString());
+      Assertions.fail("XMLs differ:\n" + differences);
     }
   }
 
@@ -430,18 +430,19 @@ class DecisionReducedLdmlTransformerTest {
               <ris:aktenzeichenListe domainTerm="Liste der Aktenzeichen">
                 <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">fileNumber test</ris:aktenzeichen>
               </ris:aktenzeichenListe>
-               """),
+              """),
         Arguments.of(
             "'appraisalBody/judicialBody' (Spruchkörper)",
             """
                 <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBody test</ris:spruchkoerper>
                """),
-        // Fixme: should be included -->
-        //        Arguments.of(
-        //            "'region' (Region)",
-        //            """
-        //                <ris:region>region test</ris:region>
-        //               """),
+        Arguments.of(
+            "'region' (Region)",
+            """
+            <ris:regionen domainTerm="Regionen">
+              <ris:region domainTerm="Region">NW</ris:region>
+            </ris:regionen>
+            """),
         // Normen -->
         Arguments.of(
             "'normReferences' (Normen)",
@@ -460,7 +461,7 @@ class DecisionReducedLdmlTransformerTest {
                         <ris:jahr domainTerm="Jahr">2022</ris:jahr>
                      </ris:einzelnorm>
                   </ris:norm>
-                       """),
+               """),
         // PreviousDecisions -->
         Arguments.of(
             "'previousDecisions' (Vorgehende Entscheidungen)",
@@ -489,7 +490,7 @@ class DecisionReducedLdmlTransformerTest {
                          </ris:gericht>
                      </ris:vorgehend>
                  </akn:implicitReference>
-                       """),
+                 """),
         // EnsuingDecisions -->
         Arguments.of(
             "'ensuingDecisions' (Nachgehende Entscheidungen)",
@@ -517,7 +518,7 @@ class DecisionReducedLdmlTransformerTest {
                         <ris:vermerk domainTerm="Vermerk">ensuing decision note</ris:vermerk>
                     </ris:nachgehend>
                 </akn:implicitReference>
-                      """),
+                """),
         // LongTexts/Langtexte -->
         Arguments.of(
             "'dissentingOpinion' (Abweichende Meinung)",
@@ -603,7 +604,7 @@ class DecisionReducedLdmlTransformerTest {
             <ris:decisionNames>
                <ris:decisionNames>decisionNames test</ris:decisionNames>
             </ris:decisionNames>
-               """),
+            """),
         Arguments.of(
             "'keywords' (Schlagworte)",
             """
@@ -612,7 +613,7 @@ class DecisionReducedLdmlTransformerTest {
                          showAs="attributsemantik-noch-undefiniert"
                          value="keyword test"/>
          </akn:classification>
-            """),
+        """),
         Arguments.of(
             "'headnote' (Orientierungssatz)",
             """
@@ -647,7 +648,7 @@ class DecisionReducedLdmlTransformerTest {
             <ris:procedures>
               <ris:procedure>previous procedure test</ris:procedure>
            </ris:procedures>
-            """),
+           """),
         Arguments.of(
             "'fieldsOfLaw' (Sachgebiete)",
             """
