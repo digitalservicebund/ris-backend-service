@@ -60,7 +60,7 @@ onMounted(() => {
       <div class="basis-1/2">
         <InputField
           id="collectiveAgreementNameInput"
-          label="Bezeichnung des Tarifvertrags"
+          label="Bezeichnung des Tarifvertrags *"
         >
           <InputText
             id="collectiveAgreementNameInputText"
