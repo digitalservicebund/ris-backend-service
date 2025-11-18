@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -80,11 +81,9 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
   @Override
   @Nonnull
   protected List<ImplicitReference> buildImplicitReferences(Decision decision) {
-    List<ImplicitReference> implicitReferences = super.buildImplicitReferences(decision);
-    List<ImplicitReference> fundstellen = buildFundstellen(decision);
-    if (fundstellen.isEmpty()) return implicitReferences;
-    implicitReferences.addAll(fundstellen);
-    return implicitReferences;
+    return Stream.concat(
+            super.buildImplicitReferences(decision).stream(), buildFundstellen(decision).stream())
+        .toList();
   }
 
   @SuppressWarnings({"java:S6541", "java:S3776"})

@@ -151,12 +151,12 @@ public abstract class DecisionCommonLdmlTransformer
   protected List<ImplicitReference> buildImplicitReferences(Decision decision) {
     return Stream.concat(
             buildCommonImplicitReferences(decision).stream(),
-            getNachgehendeEntscheidungen(decision).stream())
+            buildNachgehendeEntscheidungen(decision).stream())
         .toList();
   }
 
   @Nonnull
-  private List<ImplicitReference> getNachgehendeEntscheidungen(Decision decision) {
+  private List<ImplicitReference> buildNachgehendeEntscheidungen(Decision decision) {
     List<ImplicitReference> nachgehendeEntscheidungen = new ArrayList<>();
     var ensuingDecisions = decision.ensuingDecisions();
     if (ensuingDecisions != null) {

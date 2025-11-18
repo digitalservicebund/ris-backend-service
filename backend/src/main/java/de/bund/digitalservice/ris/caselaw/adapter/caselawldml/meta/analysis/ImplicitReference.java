@@ -31,8 +31,8 @@ public class ImplicitReference {
   private Fundstelle fundstelle;
 
   @XmlElement(name = "fundstelleLiteraturSelbststaendig", namespace = CaseLawLdml.RIS_NS)
-  private FundstelleLiteraturSelbststaendig fundstelleLiteraturSelbststaendig;
+  private Fundstelle fundstelleLiteraturSelbststaendig;
 
   @XmlElement(name = "fundstelleLiteraturUnselbststaendig", namespace = CaseLawLdml.RIS_NS)
-  private FundstelleLiteraturUnselbststaendig fundstelleLiteraturUnselbststaendig;
+  private Fundstelle fundstelleLiteraturUnselbststaendig;
 }

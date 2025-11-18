@@ -109,6 +109,20 @@
                      <ris:vermerk domainTerm="Vermerk">ensuing decision note</ris:vermerk>
                         </ris:nachgehend>
                     </akn:implicitReference>
+               <akn:implicitReference ris:domainTerm="Fundstelle">
+                  <ris:fundstelle domainTerm="Fundstelle">
+                     <ris:periodikum domainTerm="Periodikum">
+                        <ris:abkuerzung domainTerm="Abkürzung">LegalPeriodical</ris:abkuerzung>
+                     </ris:periodikum>
+                     <ris:zitatstelle domainTerm="Zitatstelle">citation</ris:zitatstelle>
+                  </ris:fundstelle>
+               </akn:implicitReference>
+               <akn:implicitReference ris:domainTerm="Fundstelle">
+                  <ris:fundstelleLiteraturSelbststaendig domainTerm="Fundstelle selbstständige Literatur">
+                     <ris:titel domainTerm="Titel">author</ris:titel>
+                     <ris:zitatstelle domainTerm="Zitatstelle">citation</ris:zitatstelle>
+                  </ris:fundstelleLiteraturSelbststaendig>
+               </akn:implicitReference>
                 </akn:otherReferences>
                 <akn:otherAnalysis source="#ris">
                     <ris:dokumentarischeKurztexte domainTerm="Dokumentarische Kurztexte">

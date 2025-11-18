@@ -23,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -166,13 +167,19 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
   @Nullable
   @Override
   protected OtherReferences buildOtherReferences(PendingProceeding pendingProceeding) {
-    List<ImplicitReference> implicitReferences = buildCommonImplicitReferences(pendingProceeding);
-    List<ImplicitReference> fundstellen = buildFundstellen(pendingProceeding);
-    implicitReferences.addAll(fundstellen);
-    if (!implicitReferences.isEmpty()) {
-      return OtherReferences.builder().implicitReferences(implicitReferences).build();
+    List<ImplicitReference> implicitReferences =
+        Stream.concat(
+                buildCommonImplicitReferences(pendingProceeding).stream(),
+                buildFundstellen(pendingProceeding).stream())
+            .toList();
+    OtherReferences otherReferences =
+        OtherReferences.builder().implicitReferences(implicitReferences).build();
+
+    if (!otherReferences.isEmpty()) {
+      return otherReferences;
+    } else {
+      return null;
     }
-    return null;
   }
 
   @Override
