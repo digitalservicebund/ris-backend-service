@@ -7,7 +7,6 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RelatedDecision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.TlcElement;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.CourtType;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.DocDate;
@@ -40,7 +39,6 @@ import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
-import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -99,8 +97,8 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
         && documentationUnit.coreData().court().regions() != null
         && !documentationUnit.coreData().court().regions().isEmpty()) {
       elementBuilder.frbrCountry(
-          // The schmema says ISO 3166-1 Alpha-2 code, but we only have Alpha-3 available (for now)
-          // (We have only two regions for a handful of german courts)
+          // The schema says ISO 3166-1 Alpha-2 code, but we only have Alpha-3 available (for now)
+          // (We have only two regions for a handful of German courts)
           new FrbrCountry(getCountry(documentationUnit.coreData().court().regions().getFirst())));
     }
 
@@ -200,22 +198,6 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     } else {
       throw new ValidationException("Core data is null");
     }
-  }
-
-  default List<RelatedDecision> buildRelatedDecisions(
-      List<? extends RelatedDocumentationUnit> relatedDecisions) {
-    List<RelatedDecision> previousDecision = new ArrayList<>();
-    for (RelatedDocumentationUnit current : relatedDecisions) {
-      RelatedDecision decision =
-          RelatedDecision.builder()
-              .date(DateUtils.toDateString(current.getDecisionDate()))
-              .documentNumber(current.getDocumentNumber())
-              .fileNumber(current.getFileNumber())
-              .courtType(nullSafeGet(current.getCourt(), Court::type))
-              .build();
-      previousDecision.add(decision);
-    }
-    return previousDecision;
   }
 
   default References buildReferences(DocumentationUnit documentationUnit) {
