@@ -140,7 +140,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       addCollectiveAgreements(builder, contentRelatedIndexing);
       builder.hasLegislativeMandate(contentRelatedIndexing.hasLegislativeMandate());
       builder.evsf(contentRelatedIndexing.evsf());
-      addForeignLanguageVersions(currentDto, builder, contentRelatedIndexing);
+      addForeignLanguageVersions(builder, contentRelatedIndexing);
       if (contentRelatedIndexing.appealAdmission() == null) {
         builder.appealAdmitted(null);
         builder.appealAdmittedBy(null);
@@ -537,9 +537,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   }
 
   private static void addForeignLanguageVersions(
-      DecisionDTO currentDto,
-      DecisionDTOBuilder<?, ?> builder,
-      ContentRelatedIndexing contentRelatedIndexing) {
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
     if (contentRelatedIndexing.foreignLanguageVersions() == null) {
       return;
     }
@@ -550,14 +548,7 @@ public class DecisionTransformer extends DocumentableTransformer {
 
     for (int i = 0; i < foreignLanguageVersions.size(); i++) {
       foreignLanguageVersionDTOs.add(
-          ForeignLanguageVersionDTO.builder()
-              .documentationUnit(currentDto)
-              .url(foreignLanguageVersions.get(i).link())
-              .languageCode(
-                  LanguageCodeTransformer.transformToDTO(
-                      foreignLanguageVersions.get(i).languageCode()))
-              .rank(i + 1L)
-              .build());
+          ForeignLanguageTransformer.transformToDTO(foreignLanguageVersions.get(i), i));
     }
 
     builder.foreignLanguageVersions(foreignLanguageVersionDTOs);
