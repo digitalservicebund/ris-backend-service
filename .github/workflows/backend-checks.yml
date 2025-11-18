@@ -63,11 +63,12 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: Test Summary
-        uses: test-summary/action@31493c76ec9e7aa675f1585d3ed6f1da69269a86
+        uses: dorny/test-reporter@dc3a92680fcc15842eef52e8c4606ea7ce6bd3f3
         if: ${{ !cancelled() }}
         with:
-          paths: "**/test-results/**/*.xml"
-          show: "fail"
+          name: "Backend tests"
+          path: "**/test-results/**/*.xml"
+          reporter: java-junit
 #          output: test-summary.md
 #      - name: Upload test summary
 #        uses: actions/upload-artifact@v5
