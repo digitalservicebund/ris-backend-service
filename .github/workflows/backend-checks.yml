@@ -68,13 +68,13 @@ jobs:
         with:
           paths: "**/test-results/**/*.xml"
           show: "fail"
-          output: test-summary.md
-      - name: Upload test summary
-        uses: actions/upload-artifact@v5
-        with:
-          name: test-summary
-          path: ./test-summary.md
-        if: always()
+#          output: test-summary.md
+#      - name: Upload test summary
+#        uses: actions/upload-artifact@v5
+#        with:
+#          name: test-summary
+#          path: ./test-summary.md
+#        if: always()
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
