@@ -139,6 +139,7 @@ test.describe(
         await expect(acceptButton).toBeEnabled()
 
         await acceptButton.click()
+        await save(page)
       })
 
       await test.step("Zusammenfassung wird angezeigt", async () => {
