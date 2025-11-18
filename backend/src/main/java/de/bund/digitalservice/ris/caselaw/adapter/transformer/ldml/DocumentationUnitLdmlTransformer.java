@@ -86,7 +86,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
                 + getDocOfficeEid(
                     nullSafeGet(documentationUnit.coreData(), CoreData::documentationOffice)));
 
-    List<FrbrAlias> aliases = generateAliases(documentationUnit, isFullLdml);
+    List<FrbrAlias> aliases = generateAliases(documentationUnit);
 
     var elementBuilder =
         FrbrElement.builder()
@@ -500,7 +500,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     return "";
   }
 
-  private List<FrbrAlias> generateAliases(DocumentationUnit documentationUnit, boolean isFullLdml) {
+  private List<FrbrAlias> generateAliases(DocumentationUnit documentationUnit) {
     List<FrbrAlias> aliases = new ArrayList<>();
 
     aliases.add(new FrbrAlias("Übergreifende ID", documentationUnit.uuid().toString()));
@@ -512,7 +512,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
 
     if (documentationUnit.coreData() != null
         && documentationUnit.coreData().celexNumber() != null
-        && isFullLdml) {
+        && this.isFullLDML()) {
       aliases.add(new FrbrAlias("CELEX-Nummer", documentationUnit.coreData().celexNumber()));
     }
 
@@ -533,4 +533,6 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     }
     return aliases;
   }
+
+  boolean isFullLDML();
 }

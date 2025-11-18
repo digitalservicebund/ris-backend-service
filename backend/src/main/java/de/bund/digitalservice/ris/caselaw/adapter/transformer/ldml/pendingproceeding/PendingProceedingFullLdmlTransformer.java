@@ -159,4 +159,9 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
 
     return Header.builder().paragraphs(paragraphs).build();
   }
+
+  @Override
+  public boolean isFullLDML() {
+    return true;
+  }
 }

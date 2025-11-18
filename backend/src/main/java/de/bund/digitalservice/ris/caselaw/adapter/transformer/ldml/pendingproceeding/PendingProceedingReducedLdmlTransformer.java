@@ -25,7 +25,7 @@ public class PendingProceedingReducedLdmlTransformer
     Meta.MetaBuilder builder = Meta.builder();
 
     return builder
-        .identification(buildIdentification(pendingProceeding, false))
+        .identification(buildIdentification(pendingProceeding))
         .references(buildReferences(pendingProceeding))
         .proprietary(Proprietary.builder().meta(buildRisMeta(pendingProceeding)).build())
         .analysis(buildAnalysis(pendingProceeding))
@@ -41,5 +41,10 @@ public class PendingProceedingReducedLdmlTransformer
     List<Paragraph> paragraphs = new ArrayList<>();
     paragraphs = buildCommonHeader(pendingProceeding, paragraphs);
     return Header.builder().paragraphs(paragraphs).build();
+  }
+
+  @Override
+  public boolean isFullLDML() {
+    return true;
   }
 }
