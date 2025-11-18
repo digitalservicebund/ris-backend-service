@@ -1,5 +1,4 @@
 import EditableListItem from "./editableListItem"
-import { DropdownItem } from "@/components/input/types"
 
 export type LanguageCode = {
   id: string
@@ -17,13 +16,6 @@ export const TranslationTypeLabels: Record<TranslationType, string> = {
   [TranslationType.NICHT_AMTLICH]: "nicht-amtlich",
   [TranslationType.KEINE_ANGABE]: "keine Angabe",
 }
-
-export const dropdownItems: DropdownItem[] = Object.values(TranslationType).map(
-  (value) => ({
-    label: TranslationTypeLabels[value],
-    value,
-  }),
-)
 
 export default class OriginOfTranslation implements EditableListItem {
   public id?: string
@@ -47,24 +39,10 @@ export default class OriginOfTranslation implements EditableListItem {
     }
   }
 
-  get renderSummary(): string {
-    return [
-      ...(this.languageCode?.label ? [this.languageCode.label] : []),
-      ...(this.translationType ? [`: ${this.translationType}`] : []),
-      ...(this.translators ? [`: ${this.translators}`] : []),
-      ...(this.borderNumbers ? [`: ${this.borderNumbers}`] : []),
-      ...(this.urls ? [`: ${this.urls}`] : []),
-    ].join("")
-  }
-
   get isEmpty(): boolean {
     return OriginOfTranslation.fields.some((field) =>
       this.fieldIsEmpty(this[field]),
     )
-  }
-
-  equals(entry: OriginOfTranslation): boolean {
-    return this.id === entry.id
   }
 
   private fieldIsEmpty(

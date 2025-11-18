@@ -21,13 +21,6 @@ export default class Definition implements EditableListItem {
     }
   }
 
-  get renderSummary(): string {
-    return [
-      ...(this.definedTerm ? [this.definedTerm] : []),
-      ...(this.definingBorderNumber ? [this.definingBorderNumber] : []),
-    ].join(" | ")
-  }
-
   get hasMissingRequiredFields(): boolean {
     return this.missingRequiredFields.length > 0
   }
@@ -40,10 +33,6 @@ export default class Definition implements EditableListItem {
 
   get isEmpty(): boolean {
     return Definition.fields.every((field) => this.fieldIsEmpty(this[field]))
-  }
-
-  equals(entry: Definition): boolean {
-    return this.id === entry.id
   }
 
   private fieldIsEmpty(
