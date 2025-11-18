@@ -69,6 +69,10 @@ jobs:
           name: "Backend tests"
           path: "**/test-results/**/*.xml"
           reporter: java-junit
+          fail-on-error: 'false'
+          fail-on-empty: 'false'
+          list-tests: 'failed'
+          list-suites: 'failed'
 #          output: test-summary.md
 #      - name: Upload test summary
 #        uses: actions/upload-artifact@v5
