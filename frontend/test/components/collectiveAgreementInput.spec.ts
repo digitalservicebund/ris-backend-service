@@ -120,14 +120,7 @@ describe("Collective Agreement Input", () => {
     const { user, emitted } = renderComponent({
       modelValue: {
         id: "73b51cc0-c779-4c31-954a-0cc74943d6d4",
-        industry: {
-          id: "4512f151-6b7f-4080-bb07-91b16877a510",
-          label:
-            "Eisen-, Stahl-, Metall-, und Elektroindustrie, Metallverarbeitung",
-        } as CollectiveAgreementIndustry,
         name: "Stehende Bühnen",
-        date: "12.2001",
-        norm: "§ 23",
       } as CollectiveAgreement,
     })
 
@@ -143,14 +136,7 @@ describe("Collective Agreement Input", () => {
     const { user, emitted } = renderComponent({
       modelValue: {
         id: "73b51cc0-c779-4c31-954a-0cc74943d6d4",
-        industry: {
-          id: "4512f151-6b7f-4080-bb07-91b16877a510",
-          label:
-            "Eisen-, Stahl-, Metall-, und Elektroindustrie, Metallverarbeitung",
-        } as CollectiveAgreementIndustry,
         name: "Stehende Bühnen",
-        date: "12.2001",
-        norm: "§ 23",
       } as CollectiveAgreement,
     })
 
