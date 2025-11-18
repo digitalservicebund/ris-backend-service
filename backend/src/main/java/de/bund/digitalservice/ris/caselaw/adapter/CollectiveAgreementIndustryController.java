@@ -23,9 +23,8 @@ public class CollectiveAgreementIndustryController {
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public List<CollectiveAgreementIndustry> getDocumentTypes(
-      @RequestParam(value = "q", required = false) String searchStr,
-      @RequestParam(value = "sz", required = false, defaultValue = "200") Integer size) {
-    return service.getCollectiveAgreementIndustries(searchStr, size);
+  public List<CollectiveAgreementIndustry> getCollectiveAgreementIndustries(
+      @RequestParam(value = "q", required = false) String searchStr) {
+    return service.getCollectiveAgreementIndustries(searchStr);
   }
 }

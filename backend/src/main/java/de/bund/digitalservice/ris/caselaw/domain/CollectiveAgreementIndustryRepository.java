@@ -6,7 +6,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface CollectiveAgreementIndustryRepository {
 
-  List<CollectiveAgreementIndustry> findAllBySearchStr(String searchStr, Integer size);
+  List<CollectiveAgreementIndustry> findAllBySearchStr(String searchStr);
 
-  List<CollectiveAgreementIndustry> findAll(Integer size);
+  List<CollectiveAgreementIndustry> findAll();
 }
