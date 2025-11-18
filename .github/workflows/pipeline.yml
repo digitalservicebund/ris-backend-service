@@ -424,7 +424,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@4aa34024d63633a127b08bf0446655e8e4b27b52
+      - uses: chainguard-dev/actions/setup-gitsign@07270321fd721f69019aa29f9c5d82beb69b28df
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -575,7 +575,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@4aa34024d63633a127b08bf0446655e8e4b27b52
+      - uses: chainguard-dev/actions/setup-gitsign@07270321fd721f69019aa29f9c5d82beb69b28df
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -617,7 +617,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@4aa34024d63633a127b08bf0446655e8e4b27b52
+      - uses: chainguard-dev/actions/setup-gitsign@07270321fd721f69019aa29f9c5d82beb69b28df
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
