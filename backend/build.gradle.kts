@@ -162,7 +162,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.6")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.7")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
 
@@ -179,7 +179,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.38.7"))
+    implementation(platform("software.amazon.awssdk:bom:2.38.8"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -227,7 +227,7 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.0.0")
 
     // CVE-2023-3635
-    implementation("com.squareup.okio:okio-jvm:3.16.3")
+    implementation("com.squareup.okio:okio-jvm:3.16.4")
 
     val flywayCore = "org.flywaydb:flyway-core:11.17.0"
     implementation(flywayCore)
@@ -241,7 +241,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.8.0")
-    testImplementation("org.springframework.security:spring-security-test:6.5.6")
+    testImplementation("org.springframework.security:spring-security-test:6.5.7")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter:$testContainersVersion")
