@@ -15,7 +15,7 @@ import IconAlignCenter from "~icons/ic/sharp-format-align-center"
 import IconAlignLeft from "~icons/ic/sharp-format-align-left"
 import IconAlignRight from "~icons/ic/sharp-format-align-right"
 import IconBold from "~icons/ic/sharp-format-bold"
-import IndentDecrease from "~icons/ic/sharp-format-indent-decrease"
+import IconIndentDecrease from "~icons/ic/sharp-format-indent-decrease"
 import IndentIncrease from "~icons/ic/sharp-format-indent-increase"
 import IconItalic from "~icons/ic/sharp-format-italic"
 import IconUnorderedList from "~icons/ic/sharp-format-list-bulleted"
@@ -27,6 +27,12 @@ import IconRedo from "~icons/ic/sharp-redo"
 import IconSubscript from "~icons/ic/sharp-subscript"
 import IconSuperscript from "~icons/ic/sharp-superscript"
 import IconUndo from "~icons/ic/sharp-undo"
+import IconBorderAll from "~icons/material-symbols/border-all-outline"
+import IconBorderBottom from "~icons/material-symbols/border-bottom"
+import IconBorderClear from "~icons/material-symbols/border-clear"
+import IconBorderLeft from "~icons/material-symbols/border-left"
+import IconBorderRight from "~icons/material-symbols/border-right"
+import IconBorderTop from "~icons/material-symbols/border-top"
 import IconParagraph from "~icons/material-symbols/format-paragraph"
 import IconSpellCheck from "~icons/material-symbols/spellcheck"
 import MdiTableColumnPlusAfter from "~icons/mdi/table-column-plus-after"
@@ -61,6 +67,14 @@ const borderNumberCategories = [
 const shouldShowAddBorderNumbersButton = computed(() =>
   borderNumberCategories.includes(props.ariaLabel),
 )
+
+const ATTRIBUTE_TOP = "borderTopValue"
+const ATTRIBUTE_BOTTOM = "borderBottomValue"
+const ATTRIBUTE_LEFT = "borderLeftValue"
+const ATTRIBUTE_RIGHT = "borderRightValue"
+
+const DEFAULT_BORDER_VALUE = "1px solid black"
+const REMOVE_BORDER_VALUE = "null"
 
 const buttons = computed(() => {
   const buttons = [
@@ -189,7 +203,7 @@ const buttons = computed(() => {
     },
     {
       type: "outdent",
-      icon: IndentDecrease,
+      icon: IconIndentDecrease,
       ariaLabel: "Einzug verringern",
       group: "indent",
       isCollapsable: false,
@@ -257,6 +271,119 @@ const buttons = computed(() => {
           group: "Tabelle",
           isCollapsable: false,
           callback: () => props.editor.chain().focus().deleteColumn().run(),
+        },
+      ],
+      callback: () =>
+        props.editor
+          .chain()
+          .focus()
+          .insertTable({ rows: 3, cols: 3, withHeaderRow: false })
+          .run(),
+    },
+    {
+      type: "menu",
+      icon: IconBorderTop,
+      ariaLabel: "Tabelle Rahmen",
+      group: "Tabelle Rahmen",
+      isCollapsable: false,
+      childButtons: [
+        {
+          type: "borderAll",
+          icon: IconBorderAll,
+          ariaLabel: "Rahmen",
+          group: "Tabelle Rahmen",
+          isCollapsable: false,
+          callback: (borderValue?: string) => {
+            const value = borderValue ?? DEFAULT_BORDER_VALUE
+            return props.editor
+              .chain()
+              .focus()
+              .setCellAttribute(ATTRIBUTE_TOP, value)
+              .setCellAttribute(ATTRIBUTE_RIGHT, value)
+              .setCellAttribute(ATTRIBUTE_BOTTOM, value)
+              .setCellAttribute(ATTRIBUTE_LEFT, value)
+              .run()
+          },
+        },
+        {
+          type: "borderClear",
+          icon: IconBorderClear,
+          ariaLabel: "Kein Rahmen",
+          group: "Tabelle Rahmen",
+          isCollapsable: false,
+          callback: () =>
+            props.editor
+              .chain()
+              .focus()
+              .setCellAttribute(ATTRIBUTE_TOP, REMOVE_BORDER_VALUE)
+              .setCellAttribute(ATTRIBUTE_RIGHT, REMOVE_BORDER_VALUE)
+              .setCellAttribute(ATTRIBUTE_BOTTOM, REMOVE_BORDER_VALUE)
+              .setCellAttribute(ATTRIBUTE_LEFT, REMOVE_BORDER_VALUE)
+              .run(),
+        },
+        {
+          type: "borderLeft",
+          icon: IconBorderLeft,
+          ariaLabel: "Linker Rahmen",
+          group: "Tabelle Rahmen",
+          isCollapsable: false,
+          callback: (borderValue?: string) =>
+            props.editor
+              .chain()
+              .focus()
+              .setCellAttribute(
+                ATTRIBUTE_LEFT,
+                borderValue ?? DEFAULT_BORDER_VALUE,
+              )
+              .run(),
+        },
+        {
+          type: "borderRight",
+          icon: IconBorderRight,
+          ariaLabel: "Rechter Rahmen",
+          group: "Tabelle Rahmen",
+          isCollapsable: false,
+          callback: (borderValue?: string) =>
+            props.editor
+              .chain()
+              .focus()
+              .setCellAttribute(
+                ATTRIBUTE_RIGHT,
+                borderValue ?? DEFAULT_BORDER_VALUE,
+              )
+              .run(),
+        },
+        {
+          type: "borderTop",
+          icon: IconBorderTop,
+          ariaLabel: "Oberer Rahmen",
+          group: "Tabelle Rahmen",
+          isCollapsable: false,
+          callback: (borderValue?: string) =>
+            props.editor
+              .chain()
+              .focus()
+              .setCellAttribute(
+                ATTRIBUTE_TOP,
+                borderValue ?? DEFAULT_BORDER_VALUE,
+              )
+              .run(),
+        },
+        {
+          type: "border Bottom",
+          icon: IconBorderBottom,
+          ariaLabel: "Unterer Rahmen",
+          group: "Tabelle Rahmen",
+          isCollapsable: false,
+          callback: (borderValue?: string) =>
+            props.editor
+              .chain()
+              .focus()
+              .setCellAttribute(
+                ATTRIBUTE_BOTTOM,
+                borderValue ?? DEFAULT_BORDER_VALUE,
+              )
+              .run(),
         },
       ],
       callback: () =>

@@ -9,8 +9,6 @@ import { History } from "@tiptap/extension-history"
 import { Italic } from "@tiptap/extension-italic"
 import { Strike } from "@tiptap/extension-strike"
 import { Table } from "@tiptap/extension-table"
-import { TableCell } from "@tiptap/extension-table-cell"
-import { TableHeader } from "@tiptap/extension-table-header"
 import { TableRow } from "@tiptap/extension-table-row"
 import { Text } from "@tiptap/extension-text"
 import { TextAlign } from "@tiptap/extension-text-align"
@@ -41,6 +39,8 @@ import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
+import { CustomTableCell } from "@/editor/tableCell"
+import { CustomTableHeader } from "@/editor/tableHeader"
 import { TableStyle } from "@/editor/tableStyle"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
@@ -114,8 +114,8 @@ const editor: Editor = new Editor({
       resizable: true,
       allowTableNodeSelection: true,
     }),
-    TableCell,
-    TableHeader,
+    CustomTableCell,
+    CustomTableHeader,
     TableRow,
     TableStyle,
     TextStyle,
