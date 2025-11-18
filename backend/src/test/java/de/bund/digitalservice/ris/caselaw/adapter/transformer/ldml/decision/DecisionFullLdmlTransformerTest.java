@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
+import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
@@ -1052,7 +1053,8 @@ class DecisionFullLdmlTransformerTest {
                 .jobProfiles(List.of("jobProfile test"))
                 .dismissalGrounds(List.of("dismissalGround test"))
                 .dismissalTypes(List.of("dismissalType test"))
-                .collectiveAgreements(List.of("collectiveAgreement test"))
+                .collectiveAgreements(
+                    List.of(CollectiveAgreement.builder().name("collectiveAgreement test").build()))
                 .hasLegislativeMandate(true)
                 .foreignLanguageVersions(
                     List.of(

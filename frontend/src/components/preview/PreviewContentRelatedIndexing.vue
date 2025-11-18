@@ -8,6 +8,7 @@ import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
 
 import { appealWithdrawalItems, pkhPlaintiffItems } from "@/domain/appeal"
+import { CollectiveAgreement } from "@/domain/collectiveAgreement"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { contentRelatedIndexingLabels } from "@/domain/decision"
 
@@ -200,9 +201,9 @@ const hasAppeal = computed(() => {
         <div
           v-for="collectiveAgreement in props.contentRelatedIndexing
             .collectiveAgreements"
-          :key="collectiveAgreement"
+          :key="collectiveAgreement.id"
         >
-          {{ collectiveAgreement }}
+          {{ new CollectiveAgreement(collectiveAgreement).renderSummary }}
         </div>
       </PreviewContent>
     </PreviewRow>
