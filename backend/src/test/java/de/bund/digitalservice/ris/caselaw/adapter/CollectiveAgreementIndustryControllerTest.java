@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -34,9 +33,8 @@ class CollectiveAgreementIndustryControllerTest {
   @MockitoBean private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
 
   @Test
-  void testGetCollectiveAgreementIndustriesWithoutSize() {
-    when(service.getCollectiveAgreementIndustries(anyString(), anyInt()))
-        .thenReturn(new ArrayList<>());
+  void testGetCollectiveAgreementIndustries() {
+    when(service.getCollectiveAgreementIndustries(anyString())).thenReturn(new ArrayList<>());
 
     risWebTestClient
         .withDefaultLogin()
@@ -46,29 +44,12 @@ class CollectiveAgreementIndustryControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).getCollectiveAgreementIndustries(null, 200);
-  }
-
-  @Test
-  void testGetCollectiveAgreementIndustriesWithSize() {
-    when(service.getCollectiveAgreementIndustries(anyString(), anyInt()))
-        .thenReturn(new ArrayList<>());
-
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/collective-agreement-industries?sz=100")
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    verify(service, times(1)).getCollectiveAgreementIndustries(null, 100);
+    verify(service, times(1)).getCollectiveAgreementIndustries(null);
   }
 
   @Test
   void testGetCollectiveAgreementIndustriesWithQuery() {
-    when(service.getCollectiveAgreementIndustries(anyString(), anyInt()))
-        .thenReturn(new ArrayList<>());
+    when(service.getCollectiveAgreementIndustries(anyString())).thenReturn(new ArrayList<>());
 
     risWebTestClient
         .withDefaultLogin()
@@ -78,6 +59,6 @@ class CollectiveAgreementIndustryControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).getCollectiveAgreementIndustries("test", 200);
+    verify(service, times(1)).getCollectiveAgreementIndustries("test");
   }
 }

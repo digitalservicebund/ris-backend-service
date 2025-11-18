@@ -14,12 +14,11 @@ public class CollectiveAgreementIndustryService {
     this.collectiveAgreementIndustryRepository = collectiveAgreementIndustryRepository;
   }
 
-  public List<CollectiveAgreementIndustry> getCollectiveAgreementIndustries(
-      String searchStr, Integer size) {
+  public List<CollectiveAgreementIndustry> getCollectiveAgreementIndustries(String searchStr) {
     if (searchStr != null && !searchStr.trim().isBlank()) {
-      return collectiveAgreementIndustryRepository.findAllBySearchStr(searchStr.trim(), size);
+      return collectiveAgreementIndustryRepository.findAllBySearchStr(searchStr.trim());
     }
 
-    return collectiveAgreementIndustryRepository.findAll(size);
+    return collectiveAgreementIndustryRepository.findAll();
   }
 }

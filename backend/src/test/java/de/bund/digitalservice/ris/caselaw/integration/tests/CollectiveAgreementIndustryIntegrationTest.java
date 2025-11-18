@@ -61,23 +61,4 @@ class CollectiveAgreementIndustryIntegrationTest extends BaseIntegrationTest {
                       "Textil-, Bekleidungs- und Schuhindustrie");
             });
   }
-
-  @Test
-  void testGetCollectiveAgreementIndustriesWithSizeLimit() {
-    assertThat(databaseCollectiveAgreementIndustryRepository.findAll()).hasSize(24);
-
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/collective-agreement-industries?sz=5")
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(CollectiveAgreementIndustry[].class)
-        .consumeWith(
-            response -> {
-              CollectiveAgreementIndustry[] body = response.getResponseBody();
-              assertThat(body).hasSize(5);
-            });
-  }
 }
