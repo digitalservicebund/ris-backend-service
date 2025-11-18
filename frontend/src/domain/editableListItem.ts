@@ -5,5 +5,5 @@ export default interface EditableListItem {
   hasMissingRequiredFields?: boolean
   missingRequiredFields?: string[]
 
-  equals?(entry: EditableListItem): boolean
+  equals(entry: EditableListItem): boolean
 }

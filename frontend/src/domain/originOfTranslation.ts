@@ -45,6 +45,10 @@ export default class OriginOfTranslation implements EditableListItem {
     )
   }
 
+  equals(entry: OriginOfTranslation): boolean {
+    return this.id === entry.id
+  }
+
   private fieldIsEmpty(
     value: OriginOfTranslation[(typeof OriginOfTranslation.fields)[number]],
   ): boolean {

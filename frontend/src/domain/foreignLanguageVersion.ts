@@ -30,6 +30,10 @@ export default class ForeignLanguageVersion implements EditableListItem {
     )
   }
 
+  equals(entry: ForeignLanguageVersion): boolean {
+    return this.id === entry.id
+  }
+
   private fieldIsEmpty(
     value: ForeignLanguageVersion[(typeof ForeignLanguageVersion.fields)[number]],
   ): boolean {
