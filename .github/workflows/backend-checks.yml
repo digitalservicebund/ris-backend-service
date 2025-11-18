@@ -69,6 +69,7 @@ jobs:
           name: "Backend tests"
           path: "**/test-results/**/*.xml"
           reporter: java-junit
+          working-directory: backend
           fail-on-error: 'false'
           fail-on-empty: 'false'
           list-tests: 'failed'
