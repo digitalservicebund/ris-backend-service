@@ -410,7 +410,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
       einzelnormBuilder.bezeichnung(
           Norm.Bezeichnung.builder().value(singleNorm.singleNorm()).build());
     }
-    if (singleNorm.legalForce() != null) {
+    if (isFullLDML() && singleNorm.legalForce() != null) {
       Norm.Gesetzeskraft.GesetzeskraftBuilder gkBuilder = Norm.Gesetzeskraft.builder();
       if (singleNorm.legalForce().type() != null
           && isNotBlank(singleNorm.legalForce().type().label())) {

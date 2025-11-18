@@ -45,6 +45,6 @@ public class PendingProceedingReducedLdmlTransformer
 
   @Override
   public boolean isFullLDML() {
-    return true;
+    return false;
   }
 }

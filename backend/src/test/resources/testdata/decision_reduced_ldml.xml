@@ -38,10 +38,6 @@
                      <ris:abkuerzung domainTerm="Abkürzung">normReference test</ris:abkuerzung>
                      <ris:einzelnorm domainTerm="Einzelnorm">
                         <ris:bezeichnung domainTerm="Bezeichnung">singleNorm test</ris:bezeichnung>
-                        <ris:gesetzeskraft domainTerm="Gesetzeskraft">
-                           <ris:typ domainTerm="Typ der Gesetzeskraft">legalForceType label</ris:typ>
-                           <ris:geltungsbereich domainTerm="Geltungsbereich">legalForce region longText</ris:geltungsbereich>
-                        </ris:gesetzeskraft>
                         <ris:datum domainTerm="Fassungsdatum">2021-02-05</ris:datum>
                         <ris:jahr domainTerm="Jahr">2020</ris:jahr>
                      </ris:einzelnorm>
