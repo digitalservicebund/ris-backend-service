@@ -9,6 +9,7 @@ import { Decision } from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import { TranslationType } from "@/domain/originOfTranslation"
 import PendingProceeding from "@/domain/pendingProceeding"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { SourceValue } from "@/domain/source"
@@ -655,6 +656,20 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                   label: "Afar",
                   isoCode: "aa",
                 },
+                newEntry: true,
+              },
+            ],
+            originOfTranslations: [
+              {
+                languageCode: {
+                  id: "5a36047e-3b85-52a2-812b-02420b4a8499",
+                  label: "Französisch",
+                  isoCode: "fr",
+                },
+                translators: ["Maxi Muster"],
+                borderNumbers: [1],
+                urls: ["www.link-to-translation.fr"],
+                translationType: TranslationType.AMTLICH,
                 newEntry: true,
               },
             ],

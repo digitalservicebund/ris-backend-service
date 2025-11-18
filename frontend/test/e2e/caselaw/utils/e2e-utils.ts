@@ -590,7 +590,7 @@ export async function fillSelect(
 ) {
   const dropdown = page.getByRole("combobox", { name: ariaLabel, exact: true })
   await dropdown.click()
-  await page.getByRole("option", { name: optionLabel }).click()
+  await page.getByRole("option", { name: optionLabel, exact: true }).click()
   await expect(dropdown).toHaveText(optionLabel)
 }
 

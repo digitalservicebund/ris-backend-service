@@ -820,6 +820,41 @@ test.describe("category import", () => {
     },
   )
 
+  // Herkunft der Übersetzung
+  test(
+    "import originOfTranslations",
+    { tag: ["@RISDEV-8624"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(
+          page.getByLabel("Herkunft der Übersetzung übernehmen"),
+        ).toBeVisible()
+        await page.getByLabel("Herkunft der Übersetzung übernehmen").click()
+
+        await expect(page.getByText("Französisch, Maxi Muster:")).toBeVisible()
+        await expect(
+          page.getByText("1, www.link-to-translation.fr (Amtlich)"),
+        ).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByText("Französisch, Maxi Muster:"),
+        ).toBeInViewport()
+      })
+    },
+  )
+
   // E-VSF
   test(
     "import evsf",

@@ -64,7 +64,7 @@ onMounted(() => {
           id="originOfTranslationLanguageInput"
           v-slot="slotProps"
           data-testid="origin-of-translation-language"
-          label="Originalsprache*"
+          label="Originalsprache *"
         >
           <ComboboxInput
             id="originOfTranslationLanguageInputText"
@@ -90,7 +90,6 @@ onMounted(() => {
             aria-label="Übersetzer:innen"
             class="w-full"
             data-testid="origin-of-translation-translators-input"
-            placeholder="Name"
             size="small"
           ></ChipsInput>
         </InputField>
@@ -111,7 +110,6 @@ onMounted(() => {
             class="w-full"
             data-testid="origin-of-translation-border-numbers-input"
             :has-error="slotProps.hasError"
-            placeholder="Randnummer"
             size="small"
             @focus="validationStore.remove('borderNumber')"
             @update:validation-error="slotProps.updateValidationError"
@@ -130,7 +128,6 @@ onMounted(() => {
             aria-label="Fundstelle: Externe Verlinkung"
             class="w-full"
             data-testid="origin-of-translation-urls-input"
-            placeholder="URL Website"
             size="small"
           ></ChipsInput>
         </InputField>
