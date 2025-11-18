@@ -62,6 +62,19 @@ jobs:
         timeout-minutes: 3 # Force to fail step after a specific time
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Test Summary
+        uses: test-summary/action@v2
+        if: ${{ !cancelled() }}
+        with:
+          paths: "build/reports/jacoco/test/jacocoTestReport.xml"
+          show: "fail"
+          output: test-summary.md
+      - name: Upload test summary
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-summary
+          path: test-summary.md
+        if: always()
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
