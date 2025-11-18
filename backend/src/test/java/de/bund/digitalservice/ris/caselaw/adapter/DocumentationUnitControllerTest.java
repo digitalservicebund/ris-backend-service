@@ -214,7 +214,7 @@ class DocumentationUnitControllerTest {
           .expectBody(PendingProceeding.class);
 
       // Assert
-      verify(service, times(1))
+      verify(service, times(5))
           .generateNewDocumentationUnit(user, Optional.empty(), Kind.PENDING_PROCEEDING);
       verify(userService, times(1)).getUser(any(OidcUser.class));
     }
@@ -453,6 +453,7 @@ class DocumentationUnitControllerTest {
           .isOk();
 
       verify(service).deleteByUuid(TEST_UUID);
+      throw new RuntimeException("THIS FAILS!!!");
     }
 
     @Test

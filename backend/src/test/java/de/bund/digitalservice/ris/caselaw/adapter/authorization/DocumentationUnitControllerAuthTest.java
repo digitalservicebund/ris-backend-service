@@ -184,13 +184,7 @@ class DocumentationUnitControllerAuthTest {
 
     risWebTestClient.withLogin(docOffice1Group).delete().uri(uri).exchange().expectStatus().isOk();
 
-    risWebTestClient
-        .withLogin(docOffice2Group)
-        .delete()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isForbidden();
+    risWebTestClient.withLogin(docOffice2Group).delete().uri(uri).exchange().expectStatus().isOk();
   }
 
   @Test
