@@ -63,10 +63,10 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: Test Summary
-        uses: test-summary/action@v2
+        uses: test-summary/action@31493c76ec9e7aa675f1585d3ed6f1da69269a86
         if: ${{ !cancelled() }}
         with:
-          paths: "**/reports/**/*.xml"
+          paths: "**/test-results/**/*.xml"
           show: "fail"
           output: test-summary.md
       - name: Upload test summary
