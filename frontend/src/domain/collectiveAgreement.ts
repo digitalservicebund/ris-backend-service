@@ -10,8 +10,6 @@ export class CollectiveAgreement implements EditableListItem {
 
   public newEntry?: boolean
 
-  static readonly fields = ["name", "date", "norm", "industry"] as const
-
   constructor(data: Partial<CollectiveAgreement> = {}) {
     Object.assign(this, data)
 
@@ -31,18 +29,10 @@ export class CollectiveAgreement implements EditableListItem {
   }
 
   get isEmpty(): boolean {
-    return CollectiveAgreement.fields.every((field) =>
-      this.fieldIsEmpty(this[field]),
-    )
+    return this.name == null || this.name.length === 0
   }
 
   equals(entry: CollectiveAgreement): boolean {
     return this.id === entry.id
-  }
-
-  private fieldIsEmpty(
-    value: CollectiveAgreement[(typeof CollectiveAgreement.fields)[number]],
-  ): boolean {
-    return !value
   }
 }
