@@ -314,6 +314,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     return normen;
   }
 
+  @SuppressWarnings("java:S1854")
   default void buildCaselawReference(
       RelatedDocumentationUnit relatedDocUnit,
       Rechtszug.CaselawReference.CaselawReferenceBuilder<
@@ -339,7 +340,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
           AktenzeichenListe.Aktenzeichen.builder().value(relatedDocUnit.getFileNumber()).build());
     }
     if (relatedDocUnit.getCourt() != null) {
-      var gerichtBuilder = Gericht.builder();
+      Gericht.GerichtBuilder gerichtBuilder = Gericht.builder();
       if (isNotBlank(relatedDocUnit.getCourt().type())) {
         gerichtBuilder.typ(
             Gericht.GerichtTyp.builder().value(relatedDocUnit.getCourt().type()).build());
