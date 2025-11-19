@@ -4,6 +4,7 @@ import {
   expectHistoryLogRow,
   navigateToManagementData,
   navigateToPublication,
+  openInPortal,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe(
@@ -47,7 +48,7 @@ test.describe(
       {
         tag: ["@RISDEV-7896", "@RISDEV-8460"],
       },
-      async ({ page, prefilledPendingProceeding }) => {
+      async ({ page, prefilledPendingProceeding, baseURL, browser }) => {
         await navigateToPublication(
           page,
           prefilledPendingProceeding.documentNumber,
@@ -83,6 +84,27 @@ test.describe(
             page.getByRole("button", { name: "Zurückziehen" }),
           ).toBeVisible()
         })
+
+        // Portal is not available in local environment
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (baseURL !== "http://127.0.0.1") {
+          await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
+            const portalPage = await openInPortal(
+              browser,
+              prefilledPendingProceeding.documentNumber,
+            )
+            await portalPage.goto(
+              `https://ris-portal.dev.ds4g.net/v1/case-law/${prefilledPendingProceeding.documentNumber}.html`,
+            )
+
+            // eslint-disable-next-line playwright/no-conditional-expect
+            await expect(
+              portalPage.getByRole("heading", {
+                name: "test headline",
+              }),
+            ).toBeVisible()
+          })
+        }
 
         await test.step("Eine veröffentlichte Dokumentationseinheit kann nicht gelöscht werden", async () => {
           await navigateToManagementData(
