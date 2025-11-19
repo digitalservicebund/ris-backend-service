@@ -1,4 +1,3 @@
-import fs from "fs"
 import { expect, JSHandle, Locator, Page, Request } from "@playwright/test"
 import dayjs from "dayjs"
 import { Browser } from "playwright"
@@ -269,43 +268,26 @@ export const navigateToSettings = async (page: Page) => {
   })
 }
 
-export async function openInPortal(
+export async function requestHtmlFromPortalApi(
   browser: Browser,
   documentNumber: string,
-): Promise<Page> {
-  const cookieFilePath = `test/e2e/caselaw/.auth/staging-portal-user.json`
-  let page: Page | undefined
-  if (fs.existsSync(cookieFilePath)) {
-    const context = await browser.newContext({
-      storageState: cookieFilePath,
-    })
-    page = await context.newPage()
+): Promise<{ status: number; content?: string }> {
+  const context = await browser.newContext({
+    httpCredentials: {
+      username: process.env.PORTAL_STAGING_BASIC_AUTH_USER as string,
+      password: process.env.PORTAL_STAGING_BASIC_AUTH_PASSWORD as string,
+      origin: "https://ris-portal.dev.ds4g.net",
+    },
+  })
 
-    const cookies = await context.cookies()
-    const sessionCookie = cookies.find(
-      (cookie) => cookie.name === "AUTH_SESSION_ID",
-    )
-
-    if (sessionCookie !== null) {
-      await page.goto(
-        `https://ris-portal.dev.ds4g.net/v1/case-law/${documentNumber}.html`,
-      )
-      return page
-    }
-  } else {
-    page = await browser.newPage()
-  }
-
-  await page.goto(
-    `https://ris-portal.dev.ds4g.net/auth?redirectTo=/v1/case-law/${documentNumber}.html`,
+  const response = await context.request.get(
+    `https://ris-portal.dev.ds4g.net/v1/case-law/${documentNumber}.html`,
   )
-
-  await page.fill("#username", process.env.E2E_TEST_USER as string)
-  await page.fill("#password", process.env.E2E_TEST_PASSWORD as string)
-  await page.locator("input#kc-login").click()
-
-  await page.context().storageState({ path: cookieFilePath })
-  return page
+  if (response.ok()) {
+    return { status: response.status(), content: await response.text() }
+  } else {
+    return { status: response.status() }
+  }
 }
 
 export const handoverDocumentationUnit = async (

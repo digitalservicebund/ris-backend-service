@@ -84,6 +84,8 @@ jobs:
           IMPORTER_PASSWORD: ${{ secrets.IMPORTER_PASSWORD }}
           GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }}
           GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
+          PORTAL_STAGING_BASIC_AUTH_USER: ${{ secrets.PORTAL_STAGING_BASIC_AUTH_USER }}
+          PORTAL_STAGING_BASIC_AUTH_PASSWORD: ${{ secrets.PORTAL_STAGING_BASIC_AUTH_PASSWORD }}
         run: |
           echo "Running ${{ inputs.project }} tests ${{ inputs.runs }} times"
 
