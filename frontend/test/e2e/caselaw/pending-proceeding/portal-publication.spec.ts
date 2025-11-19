@@ -4,7 +4,7 @@ import {
   expectHistoryLogRow,
   navigateToManagementData,
   navigateToPublication,
-  openInPortal,
+  requestHtmlFromPortalApi,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe(
@@ -89,20 +89,15 @@ test.describe(
         // eslint-disable-next-line playwright/no-conditional-in-test
         if (baseURL !== "http://127.0.0.1") {
           await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
-            const portalPage = await openInPortal(
+            const portalResponse = await requestHtmlFromPortalApi(
               browser,
               prefilledPendingProceeding.documentNumber,
             )
-            await portalPage.goto(
-              `https://ris-portal.dev.ds4g.net/v1/case-law/${prefilledPendingProceeding.documentNumber}.html`,
-            )
 
             // eslint-disable-next-line playwright/no-conditional-expect
-            await expect(
-              portalPage.getByRole("heading", {
-                name: "test headline",
-              }),
-            ).toBeVisible()
+            expect(portalResponse.status).toBe(200)
+            // eslint-disable-next-line playwright/no-conditional-expect
+            expect(portalResponse.content).toContain("test headline")
           })
         }
 
@@ -143,6 +138,20 @@ test.describe(
             page.getByRole("button", { name: "Zurückziehen" }),
           ).toBeHidden()
         })
+
+        // Portal is not available in local environment
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (baseURL !== "http://127.0.0.1") {
+          await test.step("Die Entscheidung ist nicht per Portal-API abrufbar", async () => {
+            const portalResponse = await requestHtmlFromPortalApi(
+              browser,
+              prefilledPendingProceeding.documentNumber,
+            )
+
+            // eslint-disable-next-line playwright/no-conditional-expect
+            expect(portalResponse.status).toBe(404)
+          })
+        }
 
         await test.step("Veröffentlichen und Zurückziehen wird in der Historie geloggt", async () => {
           await navigateToManagementData(

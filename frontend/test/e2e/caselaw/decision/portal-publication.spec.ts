@@ -2,7 +2,7 @@ import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   expectHistoryLogRow,
-  openInPortal,
+  requestHtmlFromPortalApi,
   navigateToCategories,
   navigateToManagementData,
   navigateToPublication,
@@ -151,20 +151,15 @@ test.describe(
         // eslint-disable-next-line playwright/no-conditional-in-test
         if (baseURL !== "http://127.0.0.1") {
           await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
-            const portalPage = await openInPortal(
+            const portalResponse = await requestHtmlFromPortalApi(
               browser,
               prefilledDocumentUnit.documentNumber,
             )
-            // await portalPage.goto(
-            //   `https://ris-portal.dev.ds4g.net/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
-            // )
 
             // eslint-disable-next-line playwright/no-conditional-expect
-            await expect(
-              portalPage.getByRole("heading", {
-                name: "testHeadline",
-              }),
-            ).toBeVisible()
+            expect(portalResponse.status).toBe(200)
+            // eslint-disable-next-line playwright/no-conditional-expect
+            expect(portalResponse.content).toContain("testHeadline")
           })
         }
 
@@ -221,14 +216,13 @@ test.describe(
         // eslint-disable-next-line playwright/no-conditional-in-test
         if (baseURL !== "http://127.0.0.1") {
           await test.step("Die Entscheidung ist nicht mehr per Portal-API abrufbar", async () => {
-            const portalPage = await openInPortal(
+            const portalResponse = await requestHtmlFromPortalApi(
               browser,
               prefilledDocumentUnit.documentNumber,
             )
+
             // eslint-disable-next-line playwright/no-conditional-expect
-            await expect(
-              portalPage.getByText("Diese Seite existiert nicht"),
-            ).toBeVisible()
+            expect(portalResponse.status).toBe(404)
           })
         }
 
