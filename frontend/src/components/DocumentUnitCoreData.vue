@@ -512,7 +512,6 @@ onBeforeUnmount(() => {
               :id="id"
               v-model="descendingPreviousProcedures"
               aria-label="Vorgangshistorie"
-              data-testid="previous-procedures"
               fluid
               readonly
             />

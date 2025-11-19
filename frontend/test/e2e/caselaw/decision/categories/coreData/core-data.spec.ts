@@ -493,8 +493,11 @@ test.describe("core data", () => {
         const procedure = pageWithExternalUser.getByLabel("Vorgang", {
           exact: true,
         })
-        const previousProcedures = pageWithExternalUser.getByTestId(
-          "previous-procedures",
+        const previousProcedures = pageWithExternalUser.getByLabel(
+          "Vorgangshistorie",
+          {
+            exact: true,
+          },
         )
         await expect(procedure).toBeHidden()
         await expect(previousProcedures).toBeHidden()
@@ -616,9 +619,14 @@ test.describe("core data", () => {
 
       await test.step("Vorgang ist bearbeitbar", async () => {
         const procedure = page.getByLabel("Vorgang", { exact: true })
-        const previousProcedures = page.locator("#previousProcedures")
         await expect(procedure).toBeEditable()
-        await expect(previousProcedures).toBeEditable()
+      })
+
+      await test.step("'Vorgangshistorie' is readonly", async () => {
+        const procedureHistory = page.getByLabel("Vorgangshistorie", {
+          exact: true,
+        })
+        await expect(procedureHistory).toHaveAttribute("readonly", "")
       })
 
       await test.step("Rechtskraft ist bearbeitbar", async () => {

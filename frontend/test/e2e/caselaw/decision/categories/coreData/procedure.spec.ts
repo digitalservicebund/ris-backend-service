@@ -57,8 +57,8 @@ test.describe("procedure", () => {
       // If deviating data is available, it is automatically expanded
       await expect(page.getByText("Vorgangshistorie")).toBeVisible()
       await expect(
-        page.getByTestId("previous-procedures").getByText(newProcedure),
-      ).toBeVisible()
+        page.getByLabel("Vorgangshistorie", { exact: true }),
+      ).toHaveValue(newProcedure)
     })
 
     await test.step("reuse created procedure", async () => {
