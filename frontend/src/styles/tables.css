@@ -1,7 +1,7 @@
 div.tiptap:has(.ProseMirror-widget.invisible) .invisible-table {
   border: 1px dashed #4466ff;
-  box-sizing: border-box; 
-} 
+  box-sizing: border-box;
+}
 
 .tiptap {
   :first-child {
