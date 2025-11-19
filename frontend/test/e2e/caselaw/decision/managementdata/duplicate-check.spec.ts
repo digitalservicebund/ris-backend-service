@@ -345,6 +345,7 @@ async function setFileNumberToMatchDocUnit(page: Page, docUnit: Decision) {
       .getByLabel("Aktenzeichen")
       .getByRole("textbox")
       .fill(docUnit.coreData.fileNumbers?.[0] ?? "")
+    await page.keyboard.press("Enter")
   })
 }
 
@@ -367,6 +368,7 @@ async function setDecisionDateToMatchDocUnit(page: Page, docUnit: Decision) {
   await test.step("Set decisionDate to match existing doc", async () => {
     const date = DateUtil.formatDate(docUnit.coreData.decisionDate)!
     await page.getByLabel("Entscheidungsdatum", { exact: true }).fill(date)
+    await page.keyboard.press("Enter")
   })
 }
 
