@@ -13,9 +13,9 @@ test.describe(
     annotation: {
       type: "story",
       description:
-        "https://digitalservicebund.atlassian.net/browse/RISDEV-4578",
+        "https://digitalservicebund.atlassian.net/browse/RISDEV-6687",
     },
-    tag: ["@RISDEV-4578"],
+    tag: ["@RISDEV-4578", "@RISDEV-6687"],
   },
   () => {
     test("saving and exporting collective agreement", async ({
@@ -54,15 +54,24 @@ test.describe(
       await page.getByRole("button", { name: "Tarifvertrag" }).click()
 
       await test.step("enter collective agreement", async () => {
-        await page
-          .getByTestId("Tarifvertrag_ListInputEdit")
+        const section = page.getByLabel("Tarifvertrag", { exact: true })
+        await section
+          .getByRole("textbox", { name: "Bezeichnung des Tarifvertrags" })
           .fill("Stehende Bühnen")
+        await section.getByRole("textbox", { name: "Datum" }).fill("12.2001")
+        await section.getByRole("textbox", { name: "Tarifnorm" }).fill("§ 23")
+        await section.getByRole("textbox", { name: "Branche" }).fill("Bü")
+        await section.getByText("Bühne, Theater, Orchester").click()
 
-        await page.getByLabel("Tarifvertrag übernehmen").click()
+        await section
+          .getByRole("button", { name: "Tarifvertrag speichern" })
+          .click()
 
         await expect(
-          page.getByTestId("ListInputDisplay_Tarifvertrag_Stehende Bühnen"),
-        ).toHaveText("Stehende Bühnen")
+          section.getByText(
+            "Stehende Bühnen, 12.2001, § 23 (Bühne, Theater, Orchester)",
+          ),
+        ).toBeVisible()
 
         await save(page)
       })
@@ -74,7 +83,7 @@ test.describe(
         const innerText = await xmlPreview.innerText()
 
         const regex =
-          /<zuordnung>\s*\d*\s*<aspekt>Tarifvertrag<\/aspekt>\s*\d*\s*<begriff>Stehende Bühnen<\/begriff>\s*\d*\s*<\/zuordnung>/
+          /<zuordnung>\s*\d*\s*<aspekt>Tarifvertrag<\/aspekt>\s*\d*\s*<begriff>bezeichnung=Stehende Bühnen|datum=12.2001|tarifnorm=§ 23|branche=Bühne, Theater, Orchester<\/begriff>\s*\d*\s*<\/zuordnung>/
 
         expect(innerText).toMatch(regex)
       })
@@ -83,7 +92,7 @@ test.describe(
         await navigateToPreview(page, prefilledDocumentUnit.documentNumber!)
 
         await expect(page.getByTestId("Tarifvertrag")).toHaveText(
-          "Stehende Bühnen",
+          "Stehende Bühnen, 12.2001, § 23 (Bühne, Theater, Orchester)",
         )
       })
     })

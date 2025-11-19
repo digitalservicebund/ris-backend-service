@@ -671,6 +671,19 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                 { id: "37213474-a727-4d85-8cc6-309d86944132", value: "Kläger" },
               ],
             },
+            collectiveAgreements: [
+              {
+                id: "24028dd6-7298-4a80-a9a0-91ea5886f90e",
+                newEntry: true,
+                name: "Stehende Bühnen",
+                norm: "§ 23",
+                date: "12.2002",
+                industry: {
+                  id: "290b39dc-9368-4d1c-9076-7f96e05cb575",
+                  label: "Bühne, Theater, Orchester",
+                },
+              },
+            ],
           },
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
