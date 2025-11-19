@@ -637,9 +637,7 @@ test.describe("category import", () => {
     })
 
     await test.step("scroll to category", async () => {
-      await expect(
-        page.getByTestId("chips-input-wrapper_dismissalTypes"),
-      ).toBeInViewport()
+      await expect(page.getByTestId("dismissal-types")).toBeInViewport()
     })
   })
 
@@ -667,9 +665,7 @@ test.describe("category import", () => {
     })
 
     await test.step("scroll to category", async () => {
-      await expect(
-        page.getByTestId("chips-input-wrapper_dismissalGrounds"),
-      ).toBeInViewport()
+      await expect(page.getByTestId("dismissal-grounds")).toBeInViewport()
     })
   })
 
@@ -697,9 +693,7 @@ test.describe("category import", () => {
     })
 
     await test.step("scroll to category", async () => {
-      await expect(
-        page.getByTestId("chips-input-wrapper_jobProfiles"),
-      ).toBeInViewport()
+      await expect(page.getByTestId("job-profiles")).toBeInViewport()
     })
   })
 
@@ -1007,10 +1001,8 @@ test.describe("category import", () => {
         ).toBeVisible()
         await page.getByLabel("Entscheidungsnamen übernehmen").click()
         await expect(
-          page
-            .getByTestId("chips-input-wrapper_decisionNames")
-            .getByText("Test Entscheidungsname"),
-        ).toBeVisible()
+          page.getByLabel("Entscheidungsnamen").getByRole("listitem"),
+        ).toHaveText("Test Entscheidungsname")
       })
 
       await test.step("show success badge", async () => {

@@ -27,7 +27,7 @@ test.describe("court", () => {
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("BGH")
   })
 
-  test("open incorrect court field, input one, save and reload", async ({
+  test("open deviating court field, input one, save and reload", async ({
     page,
     documentNumber,
   }) => {
@@ -37,7 +37,10 @@ test.describe("court", () => {
       .getByLabel("Fehlerhaftes Gericht anzeigen", { exact: true })
       .click()
 
-    await page.getByText("Fehlerhaftes Gericht", { exact: true }).fill("abc")
+    await page
+      .getByLabel("Fehlerhaftes Gericht")
+      .getByRole("textbox")
+      .fill("abc")
 
     await expect(
       page.getByText("Fehlerhaftes Gericht", { exact: true }),
@@ -52,7 +55,7 @@ test.describe("court", () => {
     await expect(page.getByText("abc").first()).toBeVisible()
   })
 
-  test("open incorrect court field, input two, save, reload, remove first, save and reload", async ({
+  test("open deviating court field, input two, save, reload, remove first, save and reload", async ({
     page,
     documentNumber,
   }) => {
@@ -79,7 +82,8 @@ test.describe("court", () => {
     await expect(page.getByText("IncorrectCourt2")).toBeVisible()
 
     await page
-      .locator(":text('incorrectCourt1') + button[aria-label='Löschen']")
+      .getByRole("listitem", { name: "incorrectCourt1" })
+      .getByLabel("Eintrag löschen")
       .click()
 
     await save(page)

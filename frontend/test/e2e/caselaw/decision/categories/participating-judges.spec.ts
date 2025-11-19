@@ -114,7 +114,10 @@ test.describe(
           .getByTestId("Mitwirkende Richter")
           .getByTestId("list-entry-0")
           .click()
-        await page.getByRole("button", { name: "Eintrag löschen" }).click()
+        await page
+          .getByTestId("Mitwirkende Richter")
+          .getByRole("button", { name: "Eintrag löschen" })
+          .click()
       })
 
       await test.step("Summary of list entry should be gone", async () => {

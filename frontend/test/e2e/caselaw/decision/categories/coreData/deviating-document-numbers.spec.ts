@@ -17,10 +17,11 @@ test.describe("deviating document numbers", () => {
     async ({ page, documentNumber }) => {
       await navigateToCategories(page, documentNumber)
 
+      const inputField = page
+        .getByLabel("Abweichende Dokumentnummer")
+        .getByRole("textbox")
+
       await test.step("Enter deviating document numbers", async () => {
-        const inputField = page.getByLabel("Abweichende Dokumentnummer", {
-          exact: true,
-        })
         await inputField.fill("XXRE111111111")
         await page.keyboard.press("Enter")
 
@@ -29,20 +30,13 @@ test.describe("deviating document numbers", () => {
       })
 
       await test.step("Check visibility of deviating document numbers", async () => {
-        const chipsLocator = page.getByTestId("chip")
-        const chips = await chipsLocator.all()
-        await expect(chipsLocator).toHaveCount(2)
-        await expect(chips[0].getByTestId("chip-value")).toHaveText(
-          "XXRE111111111",
-        )
-        await expect(chips[1].getByTestId("chip-value")).toHaveText(
-          "XXRE222222222",
-        )
+        await expect(page.getByText("XXRE111111111")).toBeVisible()
+        await expect(page.getByText("XXRE222222222")).toBeVisible()
       })
 
       await test.step("Delete deviating document number", async () => {
-        await expect(page.getByText("XXRE222222222")).toBeVisible()
-        await page.keyboard.press("ArrowLeft")
+        await inputField.click()
+        await page.keyboard.press("Shift+Tab")
         await page.keyboard.press("Enter")
 
         await expect(page.getByText("XXRE222222222")).toBeHidden()
@@ -57,9 +51,9 @@ test.describe("deviating document numbers", () => {
       await navigateToCategories(page, documentNumber)
 
       await test.step("Enter deviating document numbers", async () => {
-        const inputField = page.getByLabel("Abweichende Dokumentnummer", {
-          exact: true,
-        })
+        const inputField = page
+          .getByLabel("Abweichende Dokumentnummer")
+          .getByRole("textbox")
         await inputField.fill("XXRE111111111")
         await page.keyboard.press("Enter")
 
@@ -85,11 +79,10 @@ test.describe("deviating document numbers", () => {
       await test.step("Remove all deviating document numbers, check that category in preview is not visible anymore", async () => {
         await navigateToCategories(page, documentNumber)
 
-        await page.getByLabel("Löschen").first().click()
-        await page.getByLabel("Löschen").first().click()
-        await page.getByLabel("Löschen").first().click()
+        await page.getByLabel("Eintrag löschen").first().click()
+        await page.getByLabel("Eintrag löschen").first().click()
+        await page.getByLabel("Eintrag löschen").first().click()
 
-        await save(page)
         await navigateToPreview(page, documentNumber)
         await expect(page.getByText("Abweichende Dokumentnummer")).toBeHidden()
       })
@@ -111,9 +104,9 @@ test.describe("deviating document numbers", () => {
       )
 
       await test.step("Enter deviating document numbers", async () => {
-        const inputField = page.getByLabel("Abweichende Dokumentnummer", {
-          exact: true,
-        })
+        const inputField = page
+          .getByLabel("Abweichende Dokumentnummer")
+          .getByRole("textbox")
 
         await inputField.fill("XXRE111111111")
         await page.keyboard.press("Enter")
@@ -147,19 +140,16 @@ test.describe("deviating document numbers", () => {
       const deviatingDocumentNumber = generateString({ length: 13 })
 
       await test.step("Enter and save deviating document number", async () => {
-        const inputField = page.getByLabel("Abweichende Dokumentnummer", {
-          exact: true,
-        })
-        await inputField.fill(deviatingDocumentNumber)
+        await page
+          .getByLabel("Abweichende Dokumentnummer")
+          .getByRole("textbox")
+          .fill(deviatingDocumentNumber)
         await page.keyboard.press("Enter")
         await save(page)
 
-        const chipsLocator = page.getByTestId("chip")
-        const chips = await chipsLocator.all()
-        await expect(chipsLocator).toHaveCount(1)
-        await expect(chips[0].getByTestId("chip-value")).toHaveText(
-          deviatingDocumentNumber,
-        )
+        await expect(
+          page.getByRole("listitem").getByText(deviatingDocumentNumber),
+        ).toBeVisible()
       })
 
       await test.step("Search for deviating document number and check that doc unit is displayed", async () => {

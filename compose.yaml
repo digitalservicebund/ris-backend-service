@@ -183,7 +183,7 @@ services:
       timeout: 5s
 
   languagetool:
-    image: ghcr.io/digitalservicebund/neuris-languagetool:d6765e75df9c4dc0b5bce910e4ebc4242ad3f891
+    image: ghcr.io/digitalservicebund/neuris-languagetool:5e0eab8bd42c554960d5c1e0d31d70236a33bcc9
     extra_hosts:
       - localhost:host-gateway
     ports:
