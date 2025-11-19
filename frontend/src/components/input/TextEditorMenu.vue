@@ -74,7 +74,7 @@ const ATTRIBUTE_LEFT = "borderLeftValue"
 const ATTRIBUTE_RIGHT = "borderRightValue"
 
 const DEFAULT_BORDER_VALUE = "1px solid black"
-const REMOVE_BORDER_VALUE = "null"
+const REMOVE_BORDER_VALUE = null
 
 const buttons = computed(() => {
   const buttons = [

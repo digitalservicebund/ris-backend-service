@@ -5,7 +5,7 @@ export const TableStyle = Extension.create({
   addGlobalAttributes() {
     return [
       {
-        types: ["table", "tableCell", "tableHeader"],
+        types: ["tableCell", "tableHeader"],
         attributes: {
           style: {
             renderHTML: (attributes) => {
