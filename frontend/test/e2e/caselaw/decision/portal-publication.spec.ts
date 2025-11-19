@@ -259,7 +259,7 @@ test.describe(
 
         await test.step("Anzeige wird nach dem Ausfüllen einer Rubrik geupdated", async () => {
           await page.getByLabel("Rubriken bearbeiten", { exact: true }).click()
-          await page.getByLabel("Aktenzeichen", { exact: true }).fill("abc")
+          await page.getByLabel("Aktenzeichen").getByRole("textbox").fill("abc")
           await page.keyboard.press("Enter")
           await save(page)
           await page.getByLabel("Veröffentlichen", { exact: true }).click()
