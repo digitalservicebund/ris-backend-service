@@ -65,8 +65,8 @@ const layoutClass = computed(() =>
  */
 const descendingPreviousProcedures = computed(() =>
   coreDataModel.value.previousProcedures
-    ? coreDataModel.value.previousProcedures.toReversed()
-    : [],
+    ? coreDataModel.value.previousProcedures.toReversed().join(", ")
+    : "",
 )
 
 const jurisdictionType = computed(() =>
@@ -247,7 +247,7 @@ onBeforeUnmount(() => {
             v-model="deviatingCourts"
             aria-label="Fehlerhaftes Gericht"
             data-testid="deviating-courts"
-          ></ChipsInput>
+          />
         </InputField>
       </template>
     </NestedComponent>
@@ -508,12 +508,13 @@ onBeforeUnmount(() => {
             v-slot="{ id }"
             label="Vorgangshistorie"
           >
-            <ChipsInput
+            <InputText
               :id="id"
               v-model="descendingPreviousProcedures"
               aria-label="Vorgangshistorie"
               data-testid="previous-procedures"
-              read-only
+              fluid
+              readonly
             />
           </InputField>
         </template>
@@ -647,7 +648,7 @@ onBeforeUnmount(() => {
           v-model="leadingDecisionNormReferences"
           aria-label="BGH Nachschlagewerk"
           data-testid="leading-decision-norm-references"
-        ></ChipsInput>
+        />
       </InputField>
     </div>
 
