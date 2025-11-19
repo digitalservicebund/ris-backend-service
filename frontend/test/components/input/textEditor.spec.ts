@@ -157,6 +157,9 @@ describe("text editor", async () => {
     expect(
       screen.getByLabelText("Tabelle", { exact: true }),
     ).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Tabelle Rahmen", { exact: true }),
+    ).toBeInTheDocument()
     expect(screen.getByLabelText("Zitat einfügen")).toBeInTheDocument()
     expect(
       screen.getByLabelText("Randnummern neu erstellen"),
@@ -203,6 +206,44 @@ describe("text editor", async () => {
     expect(screen.getByLabelText("Spalte löschen")).toBeInTheDocument()
     expect(screen.getByLabelText("Zeile löschen")).toBeInTheDocument()
     expect(screen.getByLabelText("Rechtschreibprüfung")).toBeInTheDocument()
+  })
+
+  it("shows all table border buttons after menu is expanded", async () => {
+    await renderComponent({
+      value: "Test Value",
+      ariaLabel: "Gründe",
+      editable: true,
+    })
+
+    const editorField = screen.getByTestId("Gründe")
+
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+    }
+
+    expect(
+      screen.getByLabelText("Tabelle Rahmen", { exact: true }),
+    ).toBeInTheDocument()
+    expect(screen.queryByLabelText("Alle Rahmen")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Kein Rahmen")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Linker Rahmen")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Rechter Rahmen")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Oberer Rahmen")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Unterer Rahmen")).not.toBeInTheDocument()
+
+    await fireEvent.click(
+      screen.getByLabelText("Tabelle Rahmen", { exact: true }),
+    )
+
+    expect(
+      screen.getByLabelText("Tabelle Rahmen", { exact: true }),
+    ).toBeInTheDocument()
+    expect(screen.getByLabelText("Alle Rahmen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Kein Rahmen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Linker Rahmen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Rechter Rahmen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Oberer Rahmen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Unterer Rahmen")).toBeInTheDocument()
   })
 
   it.each([

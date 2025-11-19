@@ -10,21 +10,6 @@ export const CustomTableCell = TableCell.extend({
 
     return {
       ...parentAttributes,
-      backgroundColor: {
-        default: null,
-        renderHTML: (attributes) => {
-          if (!attributes.backgroundColor) {
-            return {}
-          }
-
-          return {
-            style: `background-color: ${attributes.backgroundColor}`,
-          }
-        },
-        parseHTML: (element) => {
-          return element.style.backgroundColor.replace(/['"]+/g, "")
-        },
-      },
       borderTopValue: {
         default: null,
         renderHTML: (attributes) => {

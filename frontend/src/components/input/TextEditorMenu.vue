@@ -290,7 +290,7 @@ const buttons = computed(() => {
         {
           type: "borderAll",
           icon: IconBorderAll,
-          ariaLabel: "Rahmen",
+          ariaLabel: "Alle Rahmen",
           group: "Tabelle Rahmen",
           isCollapsable: false,
           callback: (borderValue?: string) => {
