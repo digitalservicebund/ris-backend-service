@@ -26,8 +26,6 @@ export default class OriginOfTranslation implements EditableListItem {
   public borderNumbers?: number[]
   public urls?: string[]
 
-  static readonly fields = ["languageCode"] as const
-
   constructor(data: Partial<OriginOfTranslation> = {}) {
     Object.assign(this, data)
 
@@ -40,18 +38,10 @@ export default class OriginOfTranslation implements EditableListItem {
   }
 
   get isEmpty(): boolean {
-    return OriginOfTranslation.fields.some((field) =>
-      this.fieldIsEmpty(this[field]),
-    )
+    return !this["languageCode"]
   }
 
   equals(entry: OriginOfTranslation): boolean {
     return this.id === entry.id
-  }
-
-  private fieldIsEmpty(
-    value: OriginOfTranslation[(typeof OriginOfTranslation.fields)[number]],
-  ): boolean {
-    return !value
   }
 }

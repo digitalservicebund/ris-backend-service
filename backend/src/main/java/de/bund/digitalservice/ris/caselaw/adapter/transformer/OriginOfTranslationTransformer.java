@@ -48,11 +48,9 @@ public class OriginOfTranslationTransformer {
         var translator = originOfTranslation.translators().get(i);
         OriginOfTranslationTranslatorDTO dto =
             OriginOfTranslationTranslatorDTO.builder()
-                .originOfTranslation(originOfTranslationDTO)
                 .translatorName(translator)
                 .rank(i + 1L)
                 .build();
-        dto.setOriginOfTranslation(originOfTranslationDTO);
         translatorDTOs.add(dto);
       }
     }
@@ -65,7 +63,6 @@ public class OriginOfTranslationTransformer {
         var borderNumber = originOfTranslation.borderNumbers().get(i);
         OriginOfTranslationBorderNumberDTO dto =
             OriginOfTranslationBorderNumberDTO.builder()
-                .originOfTranslation(originOfTranslationDTO)
                 .borderNumber(borderNumber)
                 .rank(i + 1L)
                 .build();
@@ -79,12 +76,7 @@ public class OriginOfTranslationTransformer {
       for (int i = 0; i < originOfTranslation.urls().size(); i++) {
         var url = originOfTranslation.urls().get(i);
         OriginOfTranslationUrlDTO dto =
-            OriginOfTranslationUrlDTO.builder()
-                .originOfTranslation(originOfTranslationDTO)
-                .url(url)
-                .rank(i + 1L)
-                .build();
-        dto.setOriginOfTranslation(originOfTranslationDTO);
+            OriginOfTranslationUrlDTO.builder().url(url).rank(i + 1L).build();
         urlDTOS.add(dto);
       }
     }

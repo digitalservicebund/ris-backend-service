@@ -46,27 +46,18 @@ public class OriginOfTranslationDTO {
   @JdbcType(PostgreSQLEnumJdbcType.class)
   private TranslationType translationType;
 
-  @OneToMany(
-      mappedBy = "originOfTranslation",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true,
-      fetch = FetchType.LAZY)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @JoinColumn(name = "origin_of_translation_id", nullable = false)
   @OrderBy("rank")
   private List<OriginOfTranslationTranslatorDTO> translators;
 
-  @OneToMany(
-      mappedBy = "originOfTranslation",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true,
-      fetch = FetchType.LAZY)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @JoinColumn(name = "origin_of_translation_id", nullable = false)
   @OrderBy("rank")
   private List<OriginOfTranslationBorderNumberDTO> borderNumbers;
 
-  @OneToMany(
-      mappedBy = "originOfTranslation",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true,
-      fetch = FetchType.LAZY)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @OrderBy("rank")
+  @JoinColumn(name = "origin_of_translation_id", nullable = false)
   private List<OriginOfTranslationUrlDTO> urls;
 }

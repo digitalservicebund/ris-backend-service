@@ -90,6 +90,7 @@ onMounted(() => {
             aria-label="Übersetzer:innen"
             class="w-full"
             data-testid="origin-of-translation-translators-input"
+            placeholder="Name"
             size="small"
           ></ChipsInput>
         </InputField>
@@ -104,7 +105,7 @@ onMounted(() => {
           label="Fundstelle: Interne Verlinkung"
         >
           <ChipsBorderNumberInput
-            id="originOfTranslationBorderNumbersInputText"
+            :id="slotProps.id"
             v-model="originOfTranslation.borderNumbers"
             aria-label="Fundstelle: Interne Verlinkung"
             class="w-full"
@@ -128,6 +129,7 @@ onMounted(() => {
             aria-label="Fundstelle: Externe Verlinkung"
             class="w-full"
             data-testid="origin-of-translation-urls-input"
+            placeholder="URL Website"
             size="small"
           ></ChipsInput>
         </InputField>

@@ -3,7 +3,7 @@ import OriginOfTranslationSummaryPreview from "@/components/OriginOfTranslationS
 import OriginOfTranslation from "@/domain/originOfTranslation"
 import IcBaselineTranslate from "~icons/ic/baseline-translate"
 
-const props = defineProps<{
+defineProps<{
   data: OriginOfTranslation
 }>()
 </script>
@@ -16,7 +16,7 @@ const props = defineProps<{
     <div class="flex flex-row items-center">
       <IcBaselineTranslate class="mr-8" />
       <div class="ris-label1-regular mr-8 max-w-[calc(30vw)] truncate">
-        <OriginOfTranslationSummaryPreview :data="props.data" />
+        <OriginOfTranslationSummaryPreview :data="data" />
       </div>
     </div>
   </div>

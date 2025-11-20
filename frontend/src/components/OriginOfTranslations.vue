@@ -14,7 +14,7 @@ defineProps<{
 
 const store = useDocumentUnitStore()
 const { documentUnit: decision } = storeToRefs(store) as {
-  documentUnit: Ref<Decision | undefined>
+  documentUnit: Ref<Decision>
 }
 </script>
 

@@ -278,9 +278,7 @@ const hasAppeal = computed(() => {
       <PreviewCategory>{{
         contentRelatedIndexingLabels.originOfTranslations
       }}</PreviewCategory>
-      <PreviewContent
-        :data-testid="contentRelatedIndexingLabels.originOfTranslations"
-      >
+      <PreviewContent data-testid="Herkunft der Übersetzung">
         <span
           v-for="originOfTranslation in props.contentRelatedIndexing
             .originOfTranslations"
