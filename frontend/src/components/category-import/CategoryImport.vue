@@ -262,6 +262,9 @@ const handleImport = async (key: keyof typeof allLabels) => {
     case "appeal":
       importAppeal()
       break
+    case "corrections":
+      // TODO: (Malte Laukötter, 2025-11-20) include import for corrections
+      break
     default: {
       // The never type ensures all keys are handled in the switch.
       const unimportableKey: never = key
@@ -540,8 +543,12 @@ function importAppeal() {
   }
 }
 
-// By narrowing the type of key to exclude "participatingJudges", TypeScript no longer considers the possibility of assigning a non-string value to documentUnit.value.longTexts[key].
-type LongTextStringKeys = keyof Omit<LongTexts, "participatingJudges">
+type KeysOfType<Type, TypeOfValue> = keyof {
+  [Key in keyof Type as Type[Key] extends TypeOfValue ? Key : never]: unknown
+}
+
+// Narrowing the type of key to exclude non string values
+type LongTextStringKeys = KeysOfType<LongTexts, string | undefined>
 
 function importLongTexts(key: LongTextStringKeys) {
   if (
