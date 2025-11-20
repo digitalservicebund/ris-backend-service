@@ -27,7 +27,7 @@ jobs:
   backend-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Get Gradle version
         working-directory: ./backend
         run: |
@@ -68,7 +68,7 @@ jobs:
       security-events: write
     needs: [ backend-build, backend-checks, audit-licenses-backend ]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Build backend image (Dockerfile)
         run: |
           docker build \
@@ -159,7 +159,7 @@ jobs:
   audit-licenses-backend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Set up JDK
         uses: actions/setup-java@46c56d6f92c88cf540acf95a12a4a41197499222
         with:
@@ -189,7 +189,7 @@ jobs:
   audit-licenses-frontend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
@@ -222,7 +222,7 @@ jobs:
       contents: read
       security-events: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Build frontend image
         run: docker build --file frontend/Dockerfile.prod --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }} ./frontend
       - name: Run Trivy vulnerability image scanner
@@ -481,7 +481,7 @@ jobs:
     needs: [ e2e-tests ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
@@ -535,13 +535,13 @@ jobs:
     environment: production
     steps:
       - name: Checkout infra repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: digitalservicebund/neuris-infra
           ssh-key: ${{ secrets.DEPLOY_KEY }}
           path: infra
       - name: Checkout main repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           path: main
@@ -661,7 +661,7 @@ jobs:
         ports:
           - 5432:5432
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install uuid-ossp extension
         run: docker exec postgres psql -d ${{ env.POSTGRES_DB }}  -U ${{ env.POSTGRES_USER }} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
       - name: Apply incremental migration structure
@@ -706,7 +706,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Set up JDK
         uses: actions/setup-java@46c56d6f92c88cf540acf95a12a4a41197499222
         with:
@@ -746,7 +746,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     steps:
       # Setup
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: ${{ env.REPORTS_REPOSITORY }}
           ssh-key: ${{ secrets.REPORTS_DEPLOY_KEY }}
@@ -757,7 +757,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       # First checkout ris-backend-service because of ADRs
       - name: Checkout ris-backend-service repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: ris-backend-service
       # Copy ADRs into tmp folder

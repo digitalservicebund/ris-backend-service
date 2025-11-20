@@ -15,7 +15,7 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -29,7 +29,7 @@ jobs:
     if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main' && false  }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Get Gradle version
         working-directory: ./backend
         run: |
@@ -63,7 +63,7 @@ jobs:
     if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main' && false  }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Get Gradle version
         working-directory: ./backend
         run: |
@@ -97,7 +97,7 @@ jobs:
     if: ${{ needs.scan-backend-changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up JDK
