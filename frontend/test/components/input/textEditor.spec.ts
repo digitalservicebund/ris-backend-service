@@ -47,6 +47,24 @@ describe("text editor", async () => {
     await flushPromises()
   }
 
+  const WARNING_TEXT = "Keine Tabellenzeile ausgewählt"
+
+  const clickTableSubButton = async (subButtonLabel: string) => {
+    const tableBorderMenu = screen.getByLabelText("Tabelle Rahmen")
+    await userEvent.click(tableBorderMenu)
+    const subButton = screen.getByLabelText(subButtonLabel)
+    await userEvent.click(subButton)
+  }
+
+  const insertTable = async () => {
+    const tableMenu = screen.getByLabelText("Tabelle", { exact: true })
+    await userEvent.click(tableMenu)
+
+    const insertButton = screen.getByLabelText("Tabelle einfügen")
+    await userEvent.click(insertButton)
+    await flushPromises()
+  }
+
   test("renders text editor with default props", async () => {
     await renderComponent()
 
@@ -290,5 +308,44 @@ describe("text editor", async () => {
     expect(
       screen.getByLabelText("Randnummern neu erstellen"),
     ).toBeInTheDocument()
+  })
+
+  describe("table selection warning", () => {
+    test("should show warning when a border command is executed without cell selection", async () => {
+      await renderComponent({
+        value: "<p></p>",
+        ariaLabel: "Gründe",
+        editable: true,
+      })
+      const editorField = screen.getByTestId("Gründe")
+      await fireEvent.focus(editorField.firstElementChild!)
+
+      await clickTableSubButton("Alle Rahmen")
+      await flushPromises()
+
+      expect(screen.getByText(WARNING_TEXT)).toBeInTheDocument()
+    })
+
+    test("should hide warning immediately after a cell is focused", async () => {
+      await renderComponent({
+        value: "<p></p>",
+        ariaLabel: "Gründe",
+        editable: true,
+      })
+      const editorField = screen.getByTestId("Gründe")
+      await fireEvent.focus(editorField.firstElementChild!)
+
+      await clickTableSubButton("Alle Rahmen")
+      expect(screen.getByText(WARNING_TEXT)).toBeInTheDocument()
+
+      await insertTable()
+      const firstCell =
+        editorField.querySelector("th") || editorField.querySelector("td")
+      await userEvent.click(firstCell!)
+
+      await flushPromises() // Warten auf Vue-Reaktivität und onSelectionUpdate
+
+      expect(screen.queryByText(WARNING_TEXT)).not.toBeInTheDocument()
+    })
   })
 })
