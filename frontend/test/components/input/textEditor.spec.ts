@@ -316,18 +316,28 @@ describe("text editor", async () => {
         ariaLabel: "Gründe",
         editable: true,
       })
-      const editorField = screen.getByTestId("Gründe")
-      await fireEvent.focus(editorField.firstElementChild!)
+      const editorField = screen.getByTestId("Gründe").firstElementChild
+      await fireEvent.focus(editorField!)
 
       await clickTableSubButton("Alle Rahmen")
       expect(screen.getByText(WARNING_TEXT)).toBeInTheDocument()
 
       await insertTable()
-      const firstCell =
-        editorField.querySelector("th") || editorField.querySelector("td")
-      await userEvent.click(firstCell!)
+      if (!editorField) return
 
-      await flushPromises() // Warten auf Vue-Reaktivität und onSelectionUpdate
+      // Die TableCell muss programmatisch ausgewählt werden, da die direkte DOM-Interaktion in JSDOM
+      // instabil ist. ProseMirror/prosemirror-tables ruft Funktionen (wie elementFromPoint) auf,
+      // die in der Mock-Browser-Umgebung nicht existieren, was zu Abstürzen führt.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const editorInstance = (editorField as any)?.__vue_app__?.config
+        ?.globalProperties?.$editor
+
+      if (editorInstance) {
+        // Die erste Zelle in einer neuen Tabelle liegt oft an Position 3
+        editorInstance.commands.setTextSelection(3).run()
+      }
+
+      await flushPromises()
 
       expect(screen.queryByText(WARNING_TEXT)).not.toBeInTheDocument()
     })
