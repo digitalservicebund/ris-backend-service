@@ -7,6 +7,7 @@ public class TableCellElement extends BlockElement implements DocumentationUnitD
   public final List<DocumentationUnitDocx> paragraphElements;
   private final Integer usedStyles;
   private Integer columnSpan;
+  private Integer widthPx;
 
   public TableCellElement(List<DocumentationUnitDocx> paragraphElements, Integer usedStyles) {
     this.paragraphElements = paragraphElements;
@@ -17,6 +18,11 @@ public class TableCellElement extends BlockElement implements DocumentationUnitD
 
   public void setColumnSpan(Integer columnSpan) {
     this.columnSpan = columnSpan;
+  }
+
+  public void setWidthPx(Integer widthPx) {
+    this.widthPx = widthPx;
+    addStyle("width", widthPx + "px");
   }
 
   public Integer getUsedStyles() {
