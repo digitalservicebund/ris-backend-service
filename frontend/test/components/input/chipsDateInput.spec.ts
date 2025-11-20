@@ -137,6 +137,24 @@ describe("ChipsDateInput", () => {
     })
     const deleteButtons = screen.getAllByLabelText("Eintrag löschen")
     await user.click(deleteButtons[0])
-    expect(onUpdate).toHaveBeenCalled()
+    expect(onUpdate).toHaveBeenCalledWith([])
+  })
+
+  it("edits the chip on double click", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      modelValue: ["2020-01-01"],
+    })
+
+    const editButton = screen.getByRole("button", {
+      name: /eintrag bearbeiten/i,
+    })
+    await user.dblClick(editButton)
+    const input = screen.getByRole("textbox")
+    await user.keyboard("{backspace}")
+    await user.type(input, "2")
+    await user.keyboard("{enter}")
+    expect(onUpdate).toHaveBeenCalledWith(["2022-01-01"])
   })
 })

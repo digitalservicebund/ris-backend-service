@@ -2,7 +2,7 @@
 import { RisChipsInput } from "@digitalservicebund/ris-ui/components"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
-import { computed, ref } from "vue"
+import { computed, ref, watch } from "vue"
 import { ValidationError } from "@/components/input/types"
 
 interface Props {
@@ -13,30 +13,26 @@ interface Props {
   readOnly?: boolean
   testId?: string
 }
+
 const props = defineProps<Props>()
+
 const emit = defineEmits<{
   "update:modelValue": [value?: string[]]
   "update:validationError": [value?: ValidationError]
 }>()
 
 const lastChip = ref<string | undefined>("")
-const formattedChips = computed<string[]>(() =>
-  props.modelValue
-    ? props.modelValue.map((value) =>
-        dayjs(value, "YYYY-MM-DD", true).format("DD.MM.YYYY"),
-      )
-    : [],
-)
+const formattedChips = ref<string[]>([])
 
-const isValidDate = computed(() =>
-  dayjs(lastChip.value, "DD.MM.YYYY", true).isValid(),
-)
-const isInFuture = computed(() =>
-  dayjs(lastChip.value, "DD.MM.YYYY", true).isAfter(dayjs()),
-)
-const isDuplicate = computed(
-  () => lastChip.value && formattedChips.value.includes(lastChip.value),
-)
+function isValidDate(value?: string) {
+  return value ? dayjs(value, "DD.MM.YYYY", true).isValid() : false
+}
+function isInFuture(value?: string) {
+  return value ? dayjs(value, "DD.MM.YYYY", true).isAfter(dayjs()) : false
+}
+function isDuplicate(value?: string, chipsArr: string[] = []) {
+  return value ? chipsArr.includes(value) : false
+}
 
 const chips = computed<string[]>({
   get: () => formattedChips.value,
@@ -44,18 +40,12 @@ const chips = computed<string[]>({
     const oldLength = formattedChips.value.length
     const newLength = newValue.length
 
-    if (newLength === 0) {
-      emit("update:modelValue", [])
-      clearValidationErrors()
-      return
-    }
-
-    if (newLength > oldLength) {
+    if (newLength >= oldLength) {
       lastChip.value = newValue.at(-1)
 
-      validateInput()
+      const isValid = validateInput(lastChip.value, newValue.slice(0, -1))
 
-      if (isValidDate.value && !isInFuture.value && !isDuplicate.value) {
+      if (isValid) {
         const valuesInStandardFormat = newValue.map((value) =>
           dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
         )
@@ -72,24 +62,28 @@ const chips = computed<string[]>({
   },
 })
 
-function validateInput() {
-  if (!isValidDate.value && lastChip.value) {
+function validateInput(oldValue?: string, newValue?: string[]) {
+  if (!isValidDate(oldValue)) {
     emit("update:validationError", {
       message: "Kein valides Datum",
       instance: props.id,
     })
-  } else if (isInFuture.value) {
+    return false
+  } else if (isInFuture(oldValue)) {
     emit("update:validationError", {
       message: props.ariaLabel + " darf nicht in der Zukunft liegen",
       instance: props.id,
     })
-  } else if (isDuplicate.value) {
+    return false
+  } else if (isDuplicate(oldValue, newValue)) {
     emit("update:validationError", {
-      message: lastChip.value + " bereits vorhanden",
+      message: oldValue + " bereits vorhanden",
       instance: props.id,
     })
+    return false
   } else {
     clearValidationErrors()
+    return true
   }
 }
 
@@ -98,6 +92,20 @@ function clearValidationErrors() {
 }
 
 dayjs.extend(customParseFormat)
+
+watch(
+  () => props.modelValue,
+  (newValue, oldValue) => {
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      formattedChips.value = newValue
+        ? newValue.map((value) =>
+            dayjs(value, "YYYY-MM-DD", true).format("DD.MM.YYYY"),
+          )
+        : []
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
