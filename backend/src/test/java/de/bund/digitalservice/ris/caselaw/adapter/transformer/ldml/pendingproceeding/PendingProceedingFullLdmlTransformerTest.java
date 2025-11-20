@@ -363,6 +363,7 @@ class PendingProceedingFullLdmlTransformerTest {
                 Reference.builder()
                     .referenceType(ReferenceType.CASELAW)
                     .citation("citation")
+                    .primaryReference(true)
                     .referenceSupplement("reference supplement")
                     .legalPeriodical(
                         LegalPeriodical.builder()
@@ -378,6 +379,7 @@ class PendingProceedingFullLdmlTransformerTest {
                     .referenceType(ReferenceType.LITERATURE)
                     .author("author")
                     .citation("citation")
+                    .primaryReference(false)
                     .legalPeriodicalRawValue("LegalPeriodical RawValue")
                     .documentType(DocumentType.builder().label("doc type").build())
                     .build()))

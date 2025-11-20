@@ -113,6 +113,7 @@
                   <ris:fundstelle domainTerm="Fundstelle">
                      <ris:periodikum domainTerm="Periodikum">
                         <ris:abkuerzung domainTerm="Abkürzung">LegalPeriodical abbreviation</ris:abkuerzung>
+                        <ris:typ domainTerm="Art der Fundstelle">amtlich</ris:typ>
                         <ris:titel domainTerm="Titel">LegalPeriodical Title</ris:titel>
                         <ris:untertitel domainTerm="Untertitel">LegalPeriodical Subtitle</ris:untertitel>
                      </ris:periodikum>
@@ -123,6 +124,7 @@
                   <ris:fundstelleLiteraturUnselbststaendig domainTerm="Fundstelle unselbstständige Literatur">
                      <ris:periodikum domainTerm="Periodikum">
                         <ris:abkuerzung domainTerm="Abkürzung">LegalPeriodical RawValue</ris:abkuerzung>
+                        <ris:typ domainTerm="Art der Fundstelle">nicht-amtlich</ris:typ>
                      </ris:periodikum>
                      <ris:zitatstelle domainTerm="Zitatstelle">citation</ris:zitatstelle>
                   </ris:fundstelleLiteraturUnselbststaendig>
