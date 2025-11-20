@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validate;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNotNull;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
@@ -288,58 +287,24 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
 
     for (Reference ref : literatureRefs) {
       if (ref == null) continue;
-      fundstellen.add(buildFundstelleLiteratur(ref));
+      fundstellen.add(buildFundstelleLiteraturUnselbststaendig(ref));
     }
 
     return fundstellen;
   }
 
   @Nonnull
-  private ImplicitReference buildFundstelleLiteratur(Reference ref) {
-    boolean isSelbststaendig =
-        ref.legalPeriodical() == null && ref.legalPeriodicalRawValue() == null;
-
-    if (isSelbststaendig) {
-      return buildFundstelleLiteraturSelbststaendig(ref);
-    } else {
-      return buildFundstelleLiteraturUnselbststaendig(ref);
-    }
-  }
-
-  private ImplicitReference buildFundstelleLiteraturSelbststaendig(Reference ref) {
-    var builder = Fundstelle.builder().domainTerm("Fundstelle selbstständige Literatur");
-    String title = ref.author();
-    if (isBlank(title)) {
-      title = ref.citation();
-    }
-    if (isNotBlank(title)) {
-      builder.titel(Fundstelle.Titel.builder().value(title).build());
-    }
-    if (isNotBlank(ref.citation())) {
-      builder.zitatstelle(Fundstelle.Zitatstelle.builder().value(ref.citation()).build());
-    }
-    var fundstelle = builder.build();
-    return ImplicitReference.builder()
-        .domainTerm(Fundstelle.DOMAIN_TERM)
-        .fundstelleLiteraturSelbststaendig(fundstelle)
-        .build();
-  }
-
   private ImplicitReference buildFundstelleLiteraturUnselbststaendig(Reference ref) {
     var builder = Fundstelle.builder().domainTerm("Fundstelle unselbstständige Literatur");
-    String title = ref.author();
-    if (title == null || title.isBlank()) {
-      title = ref.citation();
-    }
-    if (title != null && !title.isBlank()) {
-      builder.titel(Fundstelle.Titel.builder().value(title).build());
-    }
+
     Periodikum periodikum = buildPeriodikum(ref);
     builder.periodikum(periodikum);
-    if (ref.citation() != null && !ref.citation().isBlank()) {
+
+    if (isNotBlank(ref.citation())) {
       var zitatstelle = Fundstelle.Zitatstelle.builder().value(ref.citation()).build();
       builder.zitatstelle(zitatstelle);
     }
+
     var fundstelle = builder.build();
     return ImplicitReference.builder()
         .domainTerm(Fundstelle.DOMAIN_TERM)
@@ -352,10 +317,12 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
 
     Periodikum periodikum = buildPeriodikum(ref);
     builder.periodikum(periodikum);
+
     if (isNotBlank(ref.citation())) {
       var zitatstelle = Fundstelle.Zitatstelle.builder().value(ref.citation()).build();
       builder.zitatstelle(zitatstelle);
     }
+
     Fundstelle fundstelle = builder.build();
     return ImplicitReference.builder()
         .domainTerm(Fundstelle.DOMAIN_TERM)
@@ -367,27 +334,29 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
   default Periodikum buildPeriodikum(@Nonnull Reference ref) {
     Periodikum.PeriodikumBuilder builder = Periodikum.builder();
 
-    String abbr = null;
+    String abbreviation = null;
     String title = null;
     String subtitle = null;
-    Boolean primary = ref.primaryReference();
+    Boolean isPrimary = ref.primaryReference();
 
     if (ref.legalPeriodical() != null) {
-      abbr = ref.legalPeriodical().abbreviation();
+      abbreviation = ref.legalPeriodical().abbreviation();
       title = ref.legalPeriodical().title();
       subtitle = ref.legalPeriodical().subtitle();
-      if (primary != null) {
-        builder.typ(Periodikum.Typ.builder().value(primary ? "amtlich" : "nicht-amtlich").build());
+      if (isPrimary != null) {
+        builder.typ(
+            Periodikum.Typ.builder().value(isPrimary ? "amtlich" : "nicht-amtlich").build());
       }
     } else if (isNotBlank(ref.legalPeriodicalRawValue())) {
-      abbr = ref.legalPeriodicalRawValue();
-      if (primary != null) {
-        builder.typ(Periodikum.Typ.builder().value(primary ? "amtlich" : "nicht-amtlich").build());
+      abbreviation = ref.legalPeriodicalRawValue();
+      if (isPrimary != null) {
+        builder.typ(
+            Periodikum.Typ.builder().value(isPrimary ? "amtlich" : "nicht-amtlich").build());
       }
     }
 
-    if (isNotBlank(abbr)) {
-      builder.abkuerzung(Periodikum.Abkuerzung.builder().value(abbr).build());
+    if (isNotBlank(abbreviation)) {
+      builder.abkuerzung(Periodikum.Abkuerzung.builder().value(abbreviation).build());
     }
     if (isNotBlank(title)) {
       builder.titel(Periodikum.Titel.builder().value(title).build());

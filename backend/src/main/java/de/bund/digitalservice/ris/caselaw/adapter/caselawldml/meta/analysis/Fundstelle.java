@@ -23,22 +23,8 @@ public class Fundstelle {
   @XmlElement(name = "periodikum", namespace = CaseLawLdml.RIS_NS)
   private Periodikum periodikum;
 
-  @XmlElement(name = "titel", namespace = CaseLawLdml.RIS_NS)
-  private Titel titel;
-
   @XmlElement(name = "zitatstelle", namespace = CaseLawLdml.RIS_NS)
   private Zitatstelle zitatstelle;
-
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @Getter
-  @Builder
-  public static class Titel {
-    @XmlAttribute(name = "domainTerm")
-    private static final String DOMAIN_TERM = "Titel";
-
-    @XmlValue private String value;
-  }
 
   @NoArgsConstructor
   @AllArgsConstructor

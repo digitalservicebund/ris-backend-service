@@ -1100,7 +1100,11 @@ class DecisionFullLdmlTransformerTest {
                     .citation("citation")
                     .referenceSupplement("reference supplement")
                     .legalPeriodical(
-                        LegalPeriodical.builder().abbreviation("LegalPeriodical").build())
+                        LegalPeriodical.builder()
+                            .abbreviation("LegalPeriodical abbreviation")
+                            .title("LegalPeriodical Title")
+                            .subtitle("LegalPeriodical Subtitle")
+                            .build())
                     .legalPeriodicalRawValue("LegalPeriodical")
                     .build()))
         .literatureReferences(
@@ -1109,6 +1113,7 @@ class DecisionFullLdmlTransformerTest {
                     .referenceType(ReferenceType.LITERATURE)
                     .author("author")
                     .citation("citation")
+                    .legalPeriodicalRawValue("LegalPeriodical RawValue")
                     .documentType(DocumentType.builder().label("doc type").build())
                     .build()))
         .build();
