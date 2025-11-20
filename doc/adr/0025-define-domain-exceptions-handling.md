@@ -60,7 +60,7 @@ public ResponseEntity<ErrorDTO> handleAsBadRequest(NeuRisException ex) {
 }
 ```
 
-This way every system interacting with ours can know that we always deliver errors in the same format, and they don't need to introduce more complexity than necessary.
+This way every system interacting with ours can know that we always deliver errors in the same standardised format, and they don't need to introduce more complexity than necessary.
 
 ### Suggestions for refactoring
 
