@@ -7,6 +7,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
 import { longTextLabels } from "@/domain/decision"
+import { clickTableSubButton, insertTable } from "~/test-helper/tableUtil"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
 useFeatureToggleServiceMock()
@@ -44,24 +45,6 @@ describe("text editor", async () => {
       global: { plugins: [router, createTestingPinia()] },
     })
 
-    await flushPromises()
-  }
-
-  const WARNING_TEXT = "Keine Tabellenzeile ausgewählt"
-
-  const clickTableSubButton = async (subButtonLabel: string) => {
-    const tableBorderMenu = screen.getByLabelText("Tabelle Rahmen")
-    await userEvent.click(tableBorderMenu)
-    const subButton = screen.getByLabelText(subButtonLabel)
-    await userEvent.click(subButton)
-  }
-
-  const insertTable = async () => {
-    const tableMenu = screen.getByLabelText("Tabelle", { exact: true })
-    await userEvent.click(tableMenu)
-
-    const insertButton = screen.getByLabelText("Tabelle einfügen")
-    await userEvent.click(insertButton)
     await flushPromises()
   }
 
@@ -311,6 +294,7 @@ describe("text editor", async () => {
   })
 
   describe("table selection warning", () => {
+    const WARNING_TEXT = "Keine Tabellenzeile ausgewählt"
     test("should show warning when a border command is executed without cell selection", async () => {
       await renderComponent({
         value: "<p></p>",

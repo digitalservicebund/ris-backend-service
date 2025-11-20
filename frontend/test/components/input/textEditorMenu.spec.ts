@@ -7,36 +7,15 @@ import { beforeAll, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
 import { mockDocumentForProsemirror } from "~/test-helper/prosemirror-document-mock"
+import {
+  clickTableSubButton,
+  getFirstCellHTML,
+  insertTable,
+} from "~/test-helper/tableUtil"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 import routes from "~pages"
 
 const DEFAULT_BORDER_STYLE = "1px solid black"
-
-const clickTableSubButton = async (subButtonLabel: string) => {
-  const tableBorderMenu = screen.getByLabelText("Tabelle Rahmen")
-  await userEvent.click(tableBorderMenu)
-
-  const subButton = screen.getByLabelText(subButtonLabel)
-  await userEvent.click(subButton)
-}
-
-const insertTable = async () => {
-  expect(screen.getByLabelText("Tabelle", { exact: true })).toBeInTheDocument()
-  const tableMenu = screen.getByLabelText("Tabelle", { exact: true })
-  await userEvent.click(tableMenu)
-
-  const insertButton = screen.getByLabelText("Tabelle einfügen")
-  await userEvent.click(insertButton)
-}
-
-const getFirstCellHTML = () => {
-  const editorContent = screen.getByTestId("Gründe")
-  const firstCell =
-    editorContent.querySelector("th") || editorContent.querySelector("td")
-  if (!firstCell) throw new Error("No table cell found in the document.")
-
-  return firstCell.getAttribute("style") || ""
-}
 
 beforeAll(() => {
   mockDocumentForProsemirror()
