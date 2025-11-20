@@ -3,7 +3,6 @@ import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   clickCategoryButton,
   fillCombobox,
-  fillInput,
   fillSelect,
   navigateToCategories,
   navigateToHandover,
@@ -98,7 +97,10 @@ test.describe(
       })
 
       await test.step("Eintrag mit nicht existierender Randnummer erzeugt Warnung", async () => {
-        await fillInput(page, "Fundstelle: Interne Verlinkung", "1")
+        await page
+          .getByLabel("Fundstelle: Interne Verlinkung")
+          .getByRole("textbox")
+          .fill("1")
         await page.keyboard.press("Enter")
         await expect(page.getByText("Randnummer existiert nicht")).toBeVisible()
       })

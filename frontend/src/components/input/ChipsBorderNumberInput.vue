@@ -1,9 +1,7 @@
 <script lang="ts" setup>
-import dayjs from "dayjs"
-import customParseFormat from "dayjs/plugin/customParseFormat"
+import { RisChipsInput } from "@digitalservicebund/ris-ui/components"
 import { storeToRefs } from "pinia"
 import { computed, ref } from "vue"
-import ChipsInput from "@/components/input/ChipsInput.vue"
 import { ValidationError } from "@/components/input/types"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -13,6 +11,7 @@ interface Props {
   ariaLabel: string
   hasError?: boolean
   readOnly?: boolean
+  testId?: string
 }
 
 const props = defineProps<Props>()
@@ -22,65 +21,84 @@ const emit = defineEmits<{
   "update:validationError": [value?: ValidationError]
 }>()
 
+const localChips = computed(() => props.modelValue ?? [])
+const lastChip = ref<number | undefined>()
 const { documentUnit } = storeToRefs(useDocumentUnitStore())
-const lastChipValue = ref<string | undefined>()
 const isValidBorderNumber = computed(() =>
   documentUnit.value?.managementData.borderNumbers.includes(
-    `${lastChipValue.value}`,
+    `${lastChip.value}`,
   ),
+)
+const isDuplicate = computed(
+  () => lastChip.value && localChips.value.includes(lastChip.value),
 )
 
 const chips = computed<string[]>({
   get: () => {
-    return props.modelValue
-      ? props.modelValue.map((value) => value.toString())
-      : []
+    return localChips.value.map((value) => value.toString())
   },
 
   set: (newValue: string[]) => {
-    if (!newValue || newValue.length === 0) {
-      emit("update:modelValue", undefined)
+    const oldLength = localChips.value.length
+    const newLength = newValue.length
+
+    if (newLength === 0) {
+      emit("update:modelValue", [])
+      clearValidationErrors()
       return
     }
 
-    lastChipValue.value = newValue.at(-1)
+    const newNumber = newValue.at(-1)
+    if (newLength > oldLength && newNumber) {
+      lastChip.value = Number.parseInt(newNumber)
 
-    validateInput()
-
-    if (isValidBorderNumber.value)
+      validateInput()
+      if (isValidBorderNumber.value && !isDuplicate.value) {
+        emit(
+          "update:modelValue",
+          newValue.map((value) => Number.parseInt(value)),
+        )
+      }
+    } else if (newLength < oldLength) {
+      clearValidationErrors()
       emit(
         "update:modelValue",
         newValue.map((value) => Number.parseInt(value)),
       )
+    }
   },
 })
 
-function validateInput(event?: ValidationError) {
-  if (event) {
-    emit("update:validationError", event)
-    return
-  }
-  if (!isValidBorderNumber.value && lastChipValue.value) {
+function validateInput() {
+  if (!isValidBorderNumber.value && lastChip.value) {
     emit("update:validationError", {
       message: "Randnummer existiert nicht",
       instance: props.id,
     })
+  } else if (isDuplicate.value) {
+    emit("update:validationError", {
+      message: lastChip.value + " bereits vorhanden",
+      instance: props.id,
+    })
   } else {
-    emit("update:validationError", undefined)
+    clearValidationErrors()
   }
 }
 
-dayjs.extend(customParseFormat)
+function clearValidationErrors() {
+  emit("update:validationError", undefined)
+}
 </script>
 
 <template>
-  <ChipsInput
-    :id="id"
+  <RisChipsInput
     v-model="chips"
     :aria-label="ariaLabel"
+    :data-testid="testId"
     :has-error="hasError"
-    maska="####"
+    :input-id="id"
+    placeholder="Randnummer"
     :read-only="readOnly"
-    @update:validation-error="validateInput($event)"
+    @blur="clearValidationErrors"
   />
 </template>

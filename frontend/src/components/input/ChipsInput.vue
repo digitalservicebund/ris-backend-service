@@ -9,6 +9,7 @@ interface Props {
   hasError?: boolean
   readOnly?: boolean
   testId?: string
+  placeholder?: string
 }
 
 const props = defineProps<Props>()
@@ -47,6 +48,7 @@ const chips = computed<string[]>({
     :data-testid="testId"
     :has-error="hasError"
     :input-id="id"
+    :placeholder="placeholder"
     :read-only="readOnly"
   />
 </template>
