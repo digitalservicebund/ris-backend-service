@@ -1930,9 +1930,6 @@ class DecisionTransformerTest {
                           .build()))
               .rank(1L)
               .build();
-      englisch.getTranslators().getFirst().setOriginOfTranslation(englisch);
-      englisch.getBorderNumbers().getFirst().setOriginOfTranslation(englisch);
-      englisch.getUrls().getFirst().setOriginOfTranslation(englisch);
       decisionDTO.setOriginOfTranslations(List.of(englisch));
 
       // Act
