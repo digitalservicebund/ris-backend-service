@@ -244,10 +244,10 @@ describe("text editor toolbar", async () => {
       await clickTableSubButton("Kein Rahmen")
       const cellStyle = getFirstCellHTML()
 
-      expect(cellStyle).toContain(`border-top: null`)
-      expect(cellStyle).toContain(`border-right: null`)
-      expect(cellStyle).toContain(`border-bottom: null`)
-      expect(cellStyle).toContain(`border-left: null`)
+      expect(cellStyle).not.toContain(`border-top`)
+      expect(cellStyle).not.toContain(`border-right: null`)
+      expect(cellStyle).not.toContain(`border-bottom: null`)
+      expect(cellStyle).not.toContain(`border-left: null`)
     })
 
     test("should set left border attribute when 'Linker Rahmen' is clicked", async () => {
