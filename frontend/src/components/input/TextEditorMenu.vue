@@ -51,7 +51,11 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits<{ onEditorExpandedChanged: [boolean] }>()
+const emit = defineEmits<{
+  onEditorExpandedChanged: [boolean]
+  noCellSelected: [boolean]
+}>()
+
 const route = useRoute()
 const isPendingProceeding = computed(() =>
   route.path.includes("pending-proceeding"),
@@ -75,6 +79,19 @@ const ATTRIBUTE_RIGHT = "borderRightValue"
 
 const DEFAULT_BORDER_VALUE = "1px solid black"
 const REMOVE_BORDER_VALUE = null
+
+const validateCellSelection = (callback: () => unknown) => {
+  const isCellSelected =
+    props.editor.isActive("tableCell") || props.editor.isActive("tableHeader")
+
+  if (!isCellSelected) {
+    emit("noCellSelected", true)
+    return
+  }
+
+  emit("noCellSelected", false)
+  return callback()
+}
 
 const buttons = computed(() => {
   const buttons = [
@@ -293,17 +310,18 @@ const buttons = computed(() => {
           ariaLabel: "Alle Rahmen",
           group: "Tabelle Rahmen",
           isCollapsable: false,
-          callback: (borderValue?: string) => {
-            const value = borderValue ?? DEFAULT_BORDER_VALUE
-            return props.editor
-              .chain()
-              .focus()
-              .setCellAttribute(ATTRIBUTE_TOP, value)
-              .setCellAttribute(ATTRIBUTE_RIGHT, value)
-              .setCellAttribute(ATTRIBUTE_BOTTOM, value)
-              .setCellAttribute(ATTRIBUTE_LEFT, value)
-              .run()
-          },
+          callback: (borderValue?: string) =>
+            validateCellSelection(() => {
+              const value = borderValue ?? DEFAULT_BORDER_VALUE
+              return props.editor
+                .chain()
+                .focus()
+                .setCellAttribute(ATTRIBUTE_TOP, value)
+                .setCellAttribute(ATTRIBUTE_RIGHT, value)
+                .setCellAttribute(ATTRIBUTE_BOTTOM, value)
+                .setCellAttribute(ATTRIBUTE_LEFT, value)
+                .run()
+            }),
         },
         {
           type: "borderClear",
@@ -312,14 +330,16 @@ const buttons = computed(() => {
           group: "Tabelle Rahmen",
           isCollapsable: false,
           callback: () =>
-            props.editor
-              .chain()
-              .focus()
-              .setCellAttribute(ATTRIBUTE_TOP, REMOVE_BORDER_VALUE)
-              .setCellAttribute(ATTRIBUTE_RIGHT, REMOVE_BORDER_VALUE)
-              .setCellAttribute(ATTRIBUTE_BOTTOM, REMOVE_BORDER_VALUE)
-              .setCellAttribute(ATTRIBUTE_LEFT, REMOVE_BORDER_VALUE)
-              .run(),
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute(ATTRIBUTE_TOP, REMOVE_BORDER_VALUE)
+                .setCellAttribute(ATTRIBUTE_RIGHT, REMOVE_BORDER_VALUE)
+                .setCellAttribute(ATTRIBUTE_BOTTOM, REMOVE_BORDER_VALUE)
+                .setCellAttribute(ATTRIBUTE_LEFT, REMOVE_BORDER_VALUE)
+                .run(),
+            ),
         },
         {
           type: "borderLeft",
@@ -328,14 +348,16 @@ const buttons = computed(() => {
           group: "Tabelle Rahmen",
           isCollapsable: false,
           callback: (borderValue?: string) =>
-            props.editor
-              .chain()
-              .focus()
-              .setCellAttribute(
-                ATTRIBUTE_LEFT,
-                borderValue ?? DEFAULT_BORDER_VALUE,
-              )
-              .run(),
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute(
+                  ATTRIBUTE_LEFT,
+                  borderValue ?? DEFAULT_BORDER_VALUE,
+                )
+                .run(),
+            ),
         },
         {
           type: "borderRight",
@@ -344,14 +366,16 @@ const buttons = computed(() => {
           group: "Tabelle Rahmen",
           isCollapsable: false,
           callback: (borderValue?: string) =>
-            props.editor
-              .chain()
-              .focus()
-              .setCellAttribute(
-                ATTRIBUTE_RIGHT,
-                borderValue ?? DEFAULT_BORDER_VALUE,
-              )
-              .run(),
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute(
+                  ATTRIBUTE_RIGHT,
+                  borderValue ?? DEFAULT_BORDER_VALUE,
+                )
+                .run(),
+            ),
         },
         {
           type: "borderTop",
@@ -360,14 +384,16 @@ const buttons = computed(() => {
           group: "Tabelle Rahmen",
           isCollapsable: false,
           callback: (borderValue?: string) =>
-            props.editor
-              .chain()
-              .focus()
-              .setCellAttribute(
-                ATTRIBUTE_TOP,
-                borderValue ?? DEFAULT_BORDER_VALUE,
-              )
-              .run(),
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute(
+                  ATTRIBUTE_TOP,
+                  borderValue ?? DEFAULT_BORDER_VALUE,
+                )
+                .run(),
+            ),
         },
         {
           type: "border Bottom",
@@ -376,14 +402,16 @@ const buttons = computed(() => {
           group: "Tabelle Rahmen",
           isCollapsable: false,
           callback: (borderValue?: string) =>
-            props.editor
-              .chain()
-              .focus()
-              .setCellAttribute(
-                ATTRIBUTE_BOTTOM,
-                borderValue ?? DEFAULT_BORDER_VALUE,
-              )
-              .run(),
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute(
+                  ATTRIBUTE_BOTTOM,
+                  borderValue ?? DEFAULT_BORDER_VALUE,
+                )
+                .run(),
+            ),
         },
       ],
       callback: () =>
