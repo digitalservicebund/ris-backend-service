@@ -16,7 +16,7 @@ import IconAlignLeft from "~icons/ic/sharp-format-align-left"
 import IconAlignRight from "~icons/ic/sharp-format-align-right"
 import IconBold from "~icons/ic/sharp-format-bold"
 import IconIndentDecrease from "~icons/ic/sharp-format-indent-decrease"
-import IndentIncrease from "~icons/ic/sharp-format-indent-increase"
+import IconIndentIncrease from "~icons/ic/sharp-format-indent-increase"
 import IconItalic from "~icons/ic/sharp-format-italic"
 import IconUnorderedList from "~icons/ic/sharp-format-list-bulleted"
 import IconOrderedList from "~icons/ic/sharp-format-list-numbered"
@@ -228,7 +228,7 @@ const buttons = computed(() => {
     },
     {
       type: "indent",
-      icon: IndentIncrease,
+      icon: IconIndentIncrease,
       ariaLabel: "Einzug vergrößern",
       group: "indent",
       isCollapsable: false,
