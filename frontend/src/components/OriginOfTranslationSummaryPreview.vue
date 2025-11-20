@@ -10,8 +10,7 @@ const props = defineProps<{
 </script>
 <!-- prettier-ignore -->
 <template data-testid="origin-of-translation-summary-preview">
-  {{ props.data.languageCode?.label }}
-  <span v-for="translator in props.data.translators" :key="translator">, {{ translator }}</span>
+  {{ props.data.languageCode?.label }}<span v-for="translator in props.data.translators" :key="translator">, {{ translator }}</span>
   <span
     v-for="(borderNumber, index) in props.data.borderNumbers"
     :key="borderNumber">{{ index === 0 ? ": " : ", " }}
