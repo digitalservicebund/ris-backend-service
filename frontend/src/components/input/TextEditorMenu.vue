@@ -300,15 +300,15 @@ const buttons = computed(() => {
     {
       type: "menu",
       icon: IconBorderTop,
-      ariaLabel: "Tabelle Rahmen",
-      group: "Tabelle Rahmen",
+      ariaLabel: "Tabellenrahmen",
+      group: "Tabellenrahmen",
       isCollapsable: false,
       childButtons: [
         {
           type: "borderAll",
           icon: IconBorderAll,
           ariaLabel: "Alle Rahmen",
-          group: "Tabelle Rahmen",
+          group: "Tabellenrahmen",
           isCollapsable: false,
           callback: (borderValue?: string) =>
             validateCellSelection(() => {
@@ -327,7 +327,7 @@ const buttons = computed(() => {
           type: "borderClear",
           icon: IconBorderClear,
           ariaLabel: "Kein Rahmen",
-          group: "Tabelle Rahmen",
+          group: "Tabellenrahmen",
           isCollapsable: false,
           callback: () =>
             validateCellSelection(() =>
@@ -345,7 +345,7 @@ const buttons = computed(() => {
           type: "borderLeft",
           icon: IconBorderLeft,
           ariaLabel: "Linker Rahmen",
-          group: "Tabelle Rahmen",
+          group: "Tabellenrahmen",
           isCollapsable: false,
           callback: (borderValue?: string) =>
             validateCellSelection(() =>
@@ -363,7 +363,7 @@ const buttons = computed(() => {
           type: "borderRight",
           icon: IconBorderRight,
           ariaLabel: "Rechter Rahmen",
-          group: "Tabelle Rahmen",
+          group: "Tabellenrahmen",
           isCollapsable: false,
           callback: (borderValue?: string) =>
             validateCellSelection(() =>
@@ -381,7 +381,7 @@ const buttons = computed(() => {
           type: "borderTop",
           icon: IconBorderTop,
           ariaLabel: "Oberer Rahmen",
-          group: "Tabelle Rahmen",
+          group: "Tabellenrahmen",
           isCollapsable: false,
           callback: (borderValue?: string) =>
             validateCellSelection(() =>
@@ -399,7 +399,7 @@ const buttons = computed(() => {
           type: "border Bottom",
           icon: IconBorderBottom,
           ariaLabel: "Unterer Rahmen",
-          group: "Tabelle Rahmen",
+          group: "Tabellenrahmen",
           isCollapsable: false,
           callback: (borderValue?: string) =>
             validateCellSelection(() =>

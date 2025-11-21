@@ -3,7 +3,7 @@ import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 
 export const clickTableSubButton = async (subButtonLabel: string) => {
-  const tableBorderMenu = screen.getByLabelText("Tabelle Rahmen")
+  const tableBorderMenu = screen.getByLabelText("Tabellenrahmen")
   await userEvent.click(tableBorderMenu)
   const subButton = screen.getByLabelText(subButtonLabel)
   await userEvent.click(subButton)

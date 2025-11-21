@@ -159,7 +159,7 @@ describe("text editor", async () => {
       screen.getByLabelText("Tabelle", { exact: true }),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Tabelle Rahmen", { exact: true }),
+      screen.getByLabelText("Tabellenrahmen", { exact: true }),
     ).toBeInTheDocument()
     expect(screen.getByLabelText("Zitat einfügen")).toBeInTheDocument()
     expect(
@@ -223,7 +223,7 @@ describe("text editor", async () => {
     }
 
     expect(
-      screen.getByLabelText("Tabelle Rahmen", { exact: true }),
+      screen.getByLabelText("Tabellenrahmen", { exact: true }),
     ).toBeInTheDocument()
     expect(screen.queryByLabelText("Alle Rahmen")).not.toBeInTheDocument()
     expect(screen.queryByLabelText("Kein Rahmen")).not.toBeInTheDocument()
@@ -233,11 +233,11 @@ describe("text editor", async () => {
     expect(screen.queryByLabelText("Unterer Rahmen")).not.toBeInTheDocument()
 
     await fireEvent.click(
-      screen.getByLabelText("Tabelle Rahmen", { exact: true }),
+      screen.getByLabelText("Tabellenrahmen", { exact: true }),
     )
 
     expect(
-      screen.getByLabelText("Tabelle Rahmen", { exact: true }),
+      screen.getByLabelText("Tabellenrahmen", { exact: true }),
     ).toBeInTheDocument()
     expect(screen.getByLabelText("Alle Rahmen")).toBeInTheDocument()
     expect(screen.getByLabelText("Kein Rahmen")).toBeInTheDocument()
