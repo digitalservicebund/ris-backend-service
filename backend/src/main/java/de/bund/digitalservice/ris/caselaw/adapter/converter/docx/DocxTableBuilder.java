@@ -660,21 +660,26 @@ public class DocxTableBuilder extends DocxBuilder {
         var widthPx = DocxUnitConverter.convertTwipToPixel(tcPr.getTcW().getW().longValue());
         cellElement.setWidthPx(widthPx);
       } else {
-        if (columnWidthsPx != null && !columnWidthsPx.isEmpty()) {
-          var columnIndex = colIndex.get();
-          var finalWidth = 0;
-          for (int i = 0; i < span; i++) {
-            var colPos = columnIndex + i;
-            if (colPos < columnWidthsPx.size()) {
-              finalWidth += columnWidthsPx.get(colPos);
-            }
-          }
-          if (finalWidth > 0) {
-            cellElement.setWidthPx(finalWidth);
-          }
-        }
+        setCellWidthFromGlobal(cellElement, span, colIndex);
       }
       colIndex.addAndGet(span);
+    }
+  }
+
+  private void setCellWidthFromGlobal(
+      TableCellElement cellElement, int span, AtomicInteger colIndex) {
+    if (columnWidthsPx != null && !columnWidthsPx.isEmpty()) {
+      var columnIndex = colIndex.get();
+      var finalWidth = 0;
+      for (int i = 0; i < span; i++) {
+        var colPos = columnIndex + i;
+        if (colPos < columnWidthsPx.size()) {
+          finalWidth += columnWidthsPx.get(colPos);
+        }
+      }
+      if (finalWidth > 0) {
+        cellElement.setWidthPx(finalWidth);
+      }
     }
   }
 }
