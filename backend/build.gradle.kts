@@ -10,16 +10,16 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.5.7"
+    id("org.springframework.boot") version "3.5.8"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.diffplug.spotless") version "8.0.0"
-    id("org.sonarqube") version "7.0.1.6134"
+    id("com.diffplug.spotless") version "8.1.0"
+    id("org.sonarqube") version "7.1.0.6387"
     id("com.github.jk1.dependency-license-report") version "3.0.1"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.1.0"
-    id("org.flywaydb.flyway") version "11.17.0"
+    id("org.flywaydb.flyway") version "11.17.1"
     id("io.sentry.jvm.gradle") version "5.12.2"
 }
 
@@ -179,7 +179,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.38.8"))
+    implementation(platform("software.amazon.awssdk:bom:2.39.1"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -223,16 +223,16 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.14.0")
     implementation("org.jsoup:jsoup:1.21.2")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:7.0.0")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.0.0")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:7.1.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.1.0")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.4")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.17.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.17.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.17.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.17.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
