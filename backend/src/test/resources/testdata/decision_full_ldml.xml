@@ -213,7 +213,8 @@
                     <ris:rechtsmittelzulassung domainTerm="Rechtsmittelzulassung">
                         <ris:rechtsmittelZugelassen domainTerm="Rechtsmittel zugelassen">true</ris:rechtsmittelZugelassen>
                         <ris:rechtsmittelZugelassenDurch domainTerm="Rechtsmittel zugelassen durch">FG</ris:rechtsmittelZugelassenDurch>
-                    </ris:rechtsmittelzulassung><ris:tarifvertraege domainTerm="Tarifverträge">
+                    </ris:rechtsmittelzulassung>
+                    <ris:tarifvertraege domainTerm="Tarifverträge">
                         <ris:tarifvertrag domainTerm="Tarifvertrag">
                             <ris:tarifvertragName domainTerm="Bezeichnung des Tarifvertrag">Stehende Bühnen</ris:tarifvertragName>
                             <ris:tarifvertragTarifnorm domainTerm="Tarifnorm">§ 23</ris:tarifvertragTarifnorm>
