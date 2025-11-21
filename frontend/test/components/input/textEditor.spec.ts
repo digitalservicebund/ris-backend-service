@@ -227,10 +227,10 @@ describe("text editor", async () => {
     ).toBeInTheDocument()
     expect(screen.queryByLabelText("Alle Rahmen")).not.toBeInTheDocument()
     expect(screen.queryByLabelText("Kein Rahmen")).not.toBeInTheDocument()
-    expect(screen.queryByLabelText("Linker Rahmen")).not.toBeInTheDocument()
-    expect(screen.queryByLabelText("Rechter Rahmen")).not.toBeInTheDocument()
-    expect(screen.queryByLabelText("Oberer Rahmen")).not.toBeInTheDocument()
-    expect(screen.queryByLabelText("Unterer Rahmen")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Rahmen links")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Rahmen rechts")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Rahmen oben")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Rahmen unten")).not.toBeInTheDocument()
 
     await fireEvent.click(
       screen.getByLabelText("Tabellenrahmen", { exact: true }),
@@ -241,10 +241,10 @@ describe("text editor", async () => {
     ).toBeInTheDocument()
     expect(screen.getByLabelText("Alle Rahmen")).toBeInTheDocument()
     expect(screen.getByLabelText("Kein Rahmen")).toBeInTheDocument()
-    expect(screen.getByLabelText("Linker Rahmen")).toBeInTheDocument()
-    expect(screen.getByLabelText("Rechter Rahmen")).toBeInTheDocument()
-    expect(screen.getByLabelText("Oberer Rahmen")).toBeInTheDocument()
-    expect(screen.getByLabelText("Unterer Rahmen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Rahmen links")).toBeInTheDocument()
+    expect(screen.getByLabelText("Rahmen rechts")).toBeInTheDocument()
+    expect(screen.getByLabelText("Rahmen oben")).toBeInTheDocument()
+    expect(screen.getByLabelText("Rahmen unten")).toBeInTheDocument()
   })
 
   it.each([

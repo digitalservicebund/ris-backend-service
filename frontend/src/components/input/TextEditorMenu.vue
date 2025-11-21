@@ -344,7 +344,7 @@ const buttons = computed(() => {
         {
           type: "borderLeft",
           icon: IconBorderLeft,
-          ariaLabel: "Linker Rahmen",
+          ariaLabel: "Rahmen links",
           group: "Tabellenrahmen",
           isCollapsable: false,
           callback: (borderValue?: string) =>
@@ -362,7 +362,7 @@ const buttons = computed(() => {
         {
           type: "borderRight",
           icon: IconBorderRight,
-          ariaLabel: "Rechter Rahmen",
+          ariaLabel: "Rahmen rechts",
           group: "Tabellenrahmen",
           isCollapsable: false,
           callback: (borderValue?: string) =>
@@ -380,7 +380,7 @@ const buttons = computed(() => {
         {
           type: "borderTop",
           icon: IconBorderTop,
-          ariaLabel: "Oberer Rahmen",
+          ariaLabel: "Rahmen oben",
           group: "Tabellenrahmen",
           isCollapsable: false,
           callback: (borderValue?: string) =>
@@ -398,7 +398,7 @@ const buttons = computed(() => {
         {
           type: "border Bottom",
           icon: IconBorderBottom,
-          ariaLabel: "Unterer Rahmen",
+          ariaLabel: "Rahmen unten",
           group: "Tabellenrahmen",
           isCollapsable: false,
           callback: (borderValue?: string) =>
