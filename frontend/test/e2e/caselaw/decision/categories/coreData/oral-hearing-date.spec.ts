@@ -54,6 +54,7 @@ test.describe(
       })
 
       await test.step("Prüfe, dass der Wert gespeichert wird und beim Reload vorhanden ist", async () => {
+        await save(page)
         await page.reload()
         await expect(page.getByText("01.02.2025")).toBeVisible()
       })
