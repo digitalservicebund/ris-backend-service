@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
@@ -138,7 +139,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       addCollectiveAgreements(builder, contentRelatedIndexing);
       builder.hasLegislativeMandate(contentRelatedIndexing.hasLegislativeMandate());
       builder.evsf(contentRelatedIndexing.evsf());
-      addForeignLanguageVersions(currentDto, builder, contentRelatedIndexing);
+      addForeignLanguageVersions(builder, contentRelatedIndexing);
       if (contentRelatedIndexing.appealAdmission() == null) {
         builder.appealAdmitted(null);
         builder.appealAdmittedBy(null);
@@ -146,6 +147,7 @@ public class DecisionTransformer extends DocumentableTransformer {
         builder.appealAdmitted(contentRelatedIndexing.appealAdmission().admitted());
         builder.appealAdmittedBy(contentRelatedIndexing.appealAdmission().by());
       }
+      builder.appeal(AppealTransformer.transformToDTO(currentDto, contentRelatedIndexing.appeal()));
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -179,6 +181,10 @@ public class DecisionTransformer extends DocumentableTransformer {
     addManagementData(updatedDomainObject, builder);
 
     DecisionDTO result = builder.build();
+
+    if (result.getAppeal() != null) {
+      result.getAppeal().setDecision(result);
+    }
 
     return DocumentableTransformer.postProcessRelationships(result, currentDto);
   }
@@ -375,12 +381,14 @@ public class DecisionTransformer extends DocumentableTransformer {
     }
 
     List<CollectiveAgreementDTO> collectiveAgreementDTOS = new ArrayList<>();
-    List<String> collectiveAgreements =
+    List<CollectiveAgreement> collectiveAgreements =
         contentRelatedIndexing.collectiveAgreements().stream().distinct().toList();
 
     for (int i = 0; i < collectiveAgreements.size(); i++) {
-      collectiveAgreementDTOS.add(
-          CollectiveAgreementDTO.builder().value(collectiveAgreements.get(i)).rank(i + 1L).build());
+      var collectiveAgreement = collectiveAgreements.get(i);
+      var dto = CollectiveAgreementTransformer.transformToDTO(collectiveAgreement);
+      dto.setRank(i + 1L);
+      collectiveAgreementDTOS.add(dto);
     }
 
     builder.collectiveAgreements(collectiveAgreementDTOS);
@@ -529,9 +537,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   }
 
   private static void addForeignLanguageVersions(
-      DecisionDTO currentDto,
-      DecisionDTOBuilder<?, ?> builder,
-      ContentRelatedIndexing contentRelatedIndexing) {
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
     if (contentRelatedIndexing.foreignLanguageVersions() == null) {
       return;
     }
@@ -542,14 +548,7 @@ public class DecisionTransformer extends DocumentableTransformer {
 
     for (int i = 0; i < foreignLanguageVersions.size(); i++) {
       foreignLanguageVersionDTOs.add(
-          ForeignLanguageVersionDTO.builder()
-              .documentationUnit(currentDto)
-              .url(foreignLanguageVersions.get(i).link())
-              .languageCode(
-                  LanguageCodeTransformer.transformToDTO(
-                      foreignLanguageVersions.get(i).languageCode()))
-              .rank(i + 1L)
-              .build());
+          ForeignLanguageTransformer.transformToDTO(foreignLanguageVersions.get(i), i));
     }
 
     builder.foreignLanguageVersions(foreignLanguageVersionDTOs);
@@ -705,11 +704,10 @@ public class DecisionTransformer extends DocumentableTransformer {
     }
 
     if (decisionDTO.getCollectiveAgreements() != null) {
-      List<String> collectiveAgreements =
+      contentRelatedIndexingBuilder.collectiveAgreements(
           decisionDTO.getCollectiveAgreements().stream()
-              .map(CollectiveAgreementDTO::getValue)
-              .toList();
-      contentRelatedIndexingBuilder.collectiveAgreements(collectiveAgreements);
+              .map(CollectiveAgreementTransformer::transformToDomain)
+              .toList());
     }
 
     if (decisionDTO.getDefinitions() != null) {
@@ -746,6 +744,9 @@ public class DecisionTransformer extends DocumentableTransformer {
               .by(decisionDTO.getAppealAdmittedBy())
               .build());
     }
+
+    contentRelatedIndexingBuilder.appeal(
+        AppealTransformer.transformToDomain(decisionDTO.getAppeal()));
 
     return contentRelatedIndexingBuilder.build();
   }

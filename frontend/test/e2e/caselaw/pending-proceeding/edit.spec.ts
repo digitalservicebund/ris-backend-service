@@ -27,12 +27,9 @@ test.describe("edit pending proceeding", () => {
 
       // Aktenzeichen
       await test.step("fileNumbers can be added", async () => {
-        const fileNumber = page.getByLabel("Aktenzeichen", { exact: true })
-        await fileNumber.fill("abc")
+        await page.getByLabel("Aktenzeichen").getByRole("textbox").fill("abc")
         await page.keyboard.press("Enter")
-        await expect(
-          page.getByTestId("chips-input-wrapper_fileNumber").getByText("abc"),
-        ).toBeVisible()
+        await expect(page.getByRole("listitem", { name: "abc" })).toBeVisible()
       })
 
       //Mitteilungsdatum
@@ -64,16 +61,12 @@ test.describe("edit pending proceeding", () => {
 
       // Abweichende Dokumentnummer
       await test.step("deviating document numbers can be added", async () => {
-        const fileNumber = page.getByLabel("Abweichende Dokumentnummer", {
-          exact: true,
-        })
-        await fileNumber.fill("abc")
+        await page
+          .getByLabel("Abweichende Dokumentnummer")
+          .getByRole("textbox")
+          .fill("def")
         await page.keyboard.press("Enter")
-        await expect(
-          page
-            .getByTestId("chips-input-wrapper_deviatingDocumentNumbers")
-            .getByText("abc"),
-        ).toBeVisible()
+        await expect(page.getByRole("listitem", { name: "def" })).toBeVisible()
       })
 
       // Gerichtsbarkeit Finanzgerichtsbarkeit

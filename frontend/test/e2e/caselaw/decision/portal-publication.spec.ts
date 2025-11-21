@@ -2,6 +2,7 @@ import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   expectHistoryLogRow,
+  requestHtmlFromPortalApi,
   navigateToCategories,
   navigateToManagementData,
   navigateToPublication,
@@ -65,7 +66,7 @@ test.describe(
       {
         tag: ["@RISDEV-8456", "@RISDEV-8460"],
       },
-      async ({ page, prefilledDocumentUnit }) => {
+      async ({ page, prefilledDocumentUnit, baseURL, browser }) => {
         await navigateToPublication(page, prefilledDocumentUnit.documentNumber)
 
         await test.step("Anzeige einer unveröffentlichten Entscheidung mit allen Checks und ohne Fehler", async () => {
@@ -146,6 +147,22 @@ test.describe(
           ).toBeHidden()
         })
 
+        // Portal is not available in local environment
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (baseURL !== "http://127.0.0.1") {
+          await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
+            const portalResponse = await requestHtmlFromPortalApi(
+              browser,
+              prefilledDocumentUnit.documentNumber,
+            )
+
+            // eslint-disable-next-line playwright/no-conditional-expect
+            expect(portalResponse.status).toBe(200)
+            // eslint-disable-next-line playwright/no-conditional-expect
+            expect(portalResponse.content).toContain("testHeadline")
+          })
+        }
+
         await test.step("Eine veröffentlichte Dokumentationseinheit kann nicht gelöscht werden", async () => {
           await navigateToManagementData(
             page,
@@ -194,6 +211,20 @@ test.describe(
             `https://ris-portal.dev.ds4g.net/case-law/${prefilledDocumentUnit.documentNumber}`,
           )
         })
+
+        // Portal is not available in local environment
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (baseURL !== "http://127.0.0.1") {
+          await test.step("Die Entscheidung ist nicht mehr per Portal-API abrufbar", async () => {
+            const portalResponse = await requestHtmlFromPortalApi(
+              browser,
+              prefilledDocumentUnit.documentNumber,
+            )
+
+            // eslint-disable-next-line playwright/no-conditional-expect
+            expect(portalResponse.status).toBe(404)
+          })
+        }
 
         await test.step("Veröffentlichen und Zurückziehen wird in der Historie geloggt", async () => {
           await navigateToManagementData(
@@ -259,7 +290,7 @@ test.describe(
 
         await test.step("Anzeige wird nach dem Ausfüllen einer Rubrik geupdated", async () => {
           await page.getByLabel("Rubriken bearbeiten", { exact: true }).click()
-          await page.getByLabel("Aktenzeichen", { exact: true }).fill("abc")
+          await page.getByLabel("Aktenzeichen").getByRole("textbox").fill("abc")
           await page.keyboard.press("Enter")
           await save(page)
           await page.getByLabel("Veröffentlichen", { exact: true }).click()

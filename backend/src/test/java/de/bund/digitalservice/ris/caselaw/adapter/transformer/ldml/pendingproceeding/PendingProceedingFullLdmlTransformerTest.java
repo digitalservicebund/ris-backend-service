@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -381,7 +382,8 @@ class PendingProceedingFullLdmlTransformerTest {
                 .jobProfiles(List.of("jobProfile test"))
                 .dismissalGrounds(List.of("dismissalGround test"))
                 .dismissalTypes(List.of("dismissalType test"))
-                .collectiveAgreements(List.of("collectiveAgreement test"))
+                .collectiveAgreements(
+                    List.of(CollectiveAgreement.builder().name("collectiveAgreement test").build()))
                 .hasLegislativeMandate(true)
                 .build())
         .previousDecisions(List.of(previousDecision1, previousDecision2))

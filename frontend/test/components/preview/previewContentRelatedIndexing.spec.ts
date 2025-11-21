@@ -3,7 +3,9 @@ import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRelatedIndexing.vue"
 import ActiveCitation from "@/domain/activeCitation"
+import { AppealWithdrawal, PkhPlaintiff } from "@/domain/appeal"
 import { AppealAdmitter } from "@/domain/appealAdmitter"
+import { CollectiveAgreement } from "@/domain/collectiveAgreement"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { Decision } from "@/domain/decision"
 import Definition from "@/domain/definition"
@@ -78,7 +80,10 @@ describe("preview content related indexing", () => {
       jobProfiles: ["Handwerker", "Elektriker"],
       dismissalGrounds: ["Betriebsbedingte Kündigung"],
       dismissalTypes: ["Einführung neuer Technologien"],
-      collectiveAgreements: ["Normalvertrag Chor", "Stehende Bühnen"],
+      collectiveAgreements: [
+        new CollectiveAgreement({ name: "Normalvertrag Chor" }),
+        new CollectiveAgreement({ name: "Stehende Bühnen" }),
+      ],
       hasLegislativeMandate: true,
       foreignLanguageVersions: [
         new ForeignLanguageVersion({
@@ -386,7 +391,24 @@ describe("preview content related indexing", () => {
       activeCitations: [],
       fieldsOfLaw: [],
       jobProfiles: [],
-      collectiveAgreements: ["Normalvertrag Chor", "Stehende Bühnen"],
+      collectiveAgreements: [
+        new CollectiveAgreement({
+          name: "Normalvertrag Chor",
+          date: "2000",
+          norm: "§ 23",
+          industry: {
+            id: "290b39dc-9368-4d1c-9076-7f96e05cb575",
+            label: "Bühne, Theater, Orchester",
+          },
+        }),
+        new CollectiveAgreement({
+          name: "Stehende Bühnen",
+          industry: {
+            id: "290b39dc-9368-4d1c-9076-7f96e05cb575",
+            label: "Bühne, Theater, Orchester",
+          },
+        }),
+      ],
       dismissalGrounds: [],
       dismissalTypes: [],
       definitions: [],
@@ -394,8 +416,14 @@ describe("preview content related indexing", () => {
     })
 
     expect(await screen.findByText("Tarifvertrag")).toBeInTheDocument()
-    expect(await screen.findByText("Normalvertrag Chor")).toBeInTheDocument()
-    expect(await screen.findByText("Stehende Bühnen")).toBeInTheDocument()
+    expect(
+      await screen.findByText(
+        "Normalvertrag Chor, 2000, § 23 (Bühne, Theater, Orchester)",
+      ),
+    ).toBeInTheDocument()
+    expect(
+      await screen.findByText("Stehende Bühnen (Bühne, Theater, Orchester)"),
+    ).toBeInTheDocument()
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
@@ -634,6 +662,39 @@ describe("preview content related indexing", () => {
     })
   })
 
+  test("renders appeal", () => {
+    const { container } = renderComponent({
+      appeal: {
+        appellants: [{ id: "1", value: "Kläger" }],
+        revisionDefendantStatuses: [
+          { id: "1", value: "unbegründet" },
+          { id: "1", value: "unzulässig" },
+        ],
+        revisionPlaintiffStatuses: [{ id: "1", value: "unbegründet" }],
+        jointRevisionDefendantStatuses: [{ id: "1", value: "unbegründet" }],
+        jointRevisionPlaintiffStatuses: [{ id: "1", value: "unbegründet" }],
+        nzbDefendantStatuses: [{ id: "1", value: "unbegründet" }],
+        nzbPlaintiffStatuses: [{ id: "1", value: "unbegründet" }],
+        appealWithdrawal: AppealWithdrawal.JA,
+        pkhPlaintiff: PkhPlaintiff.NEIN,
+      },
+    })
+
+    expect(container).toHaveTextContent("RechtsmittelführerKläger")
+    expect(container).toHaveTextContent(
+      "Revision (Beklagter)unbegründet, unzulässig",
+    )
+    expect(container).toHaveTextContent("Revision (Kläger)unbegründet")
+    expect(container).toHaveTextContent(
+      "Anschlussrevision (Beklagter)unbegründet",
+    )
+    expect(container).toHaveTextContent("Anschlussrevision (Kläger)unbegründet")
+    expect(container).toHaveTextContent("NZB (Beklagter)unbegründet")
+    expect(container).toHaveTextContent("NZB (Kläger)unbegründet")
+    expect(container).toHaveTextContent("Zurücknahme der RevisionJa")
+    expect(container).toHaveTextContent("PKH-Antrag (Kläger)Nein")
+  })
+
   test("renders nothing when elements are empty", async () => {
     renderComponent({
       keywords: [],
@@ -649,6 +710,17 @@ describe("preview content related indexing", () => {
       evsf: "",
       definitions: [],
       appealAdmission: undefined,
+      appeal: {
+        appellants: [],
+        revisionDefendantStatuses: [],
+        revisionPlaintiffStatuses: [],
+        jointRevisionDefendantStatuses: [],
+        jointRevisionPlaintiffStatuses: [],
+        nzbDefendantStatuses: [],
+        nzbPlaintiffStatuses: [],
+        appealWithdrawal: undefined,
+        pkhPlaintiff: undefined,
+      },
     })
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
@@ -663,6 +735,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittel")).not.toBeInTheDocument()
   })
 
   test("renders nothing when elements are undefined", async () => {
@@ -680,6 +753,7 @@ describe("preview content related indexing", () => {
       evsf: undefined,
       definitions: undefined,
       appealAdmission: undefined,
+      appeal: undefined,
     })
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
@@ -694,5 +768,6 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittel")).not.toBeInTheDocument()
   })
 })

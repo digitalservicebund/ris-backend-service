@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.util.List;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.Builder;
  *
  * @param evsf Elektronische Vorschriftensammlung Bundesfinanzverwaltung
  * @param appealAdmission Rechtsmittelzulassung
+ * @param appeal Rechtsmittel
  */
 @Builder(toBuilder = true)
 public record ContentRelatedIndexing(
@@ -19,9 +21,10 @@ public record ContentRelatedIndexing(
     List<ActiveCitation> activeCitations,
     List<String> dismissalGrounds,
     List<String> dismissalTypes,
-    List<String> collectiveAgreements,
+    List<CollectiveAgreement> collectiveAgreements,
     List<Definition> definitions,
     List<ForeignLanguageVersion> foreignLanguageVersions,
     boolean hasLegislativeMandate,
     String evsf,
-    AppealAdmission appealAdmission) {}
+    AppealAdmission appealAdmission,
+    Appeal appeal) {}

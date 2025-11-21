@@ -96,7 +96,7 @@ test.describe("category import", () => {
       await test.step("disable import for empty source categories", async () => {
         await navigateToCategoryImport(page, documentNumber)
         await searchForDocumentUnitToImport(page, documentNumber)
-        await expect(page.getByText("Quellrubrik leer")).toHaveCount(28) // total number of importable categories
+        await expect(page.getByText("Quellrubrik leer")).toHaveCount(29) // total number of importable categories
       })
     },
   )
@@ -117,7 +117,7 @@ test.describe("category import", () => {
           prefilledDocumentUnitWithTexts.documentNumber,
         )
 
-        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(21) // number of non-importable categories, if target category already filled
+        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(23) // number of non-importable categories, if target category already filled
       })
     },
   )
@@ -637,9 +637,7 @@ test.describe("category import", () => {
     })
 
     await test.step("scroll to category", async () => {
-      await expect(
-        page.getByTestId("chips-input-wrapper_dismissalTypes"),
-      ).toBeInViewport()
+      await expect(page.getByTestId("dismissal-types")).toBeInViewport()
     })
   })
 
@@ -667,9 +665,7 @@ test.describe("category import", () => {
     })
 
     await test.step("scroll to category", async () => {
-      await expect(
-        page.getByTestId("chips-input-wrapper_dismissalGrounds"),
-      ).toBeInViewport()
+      await expect(page.getByTestId("dismissal-grounds")).toBeInViewport()
     })
   })
 
@@ -697,9 +693,7 @@ test.describe("category import", () => {
     })
 
     await test.step("scroll to category", async () => {
-      await expect(
-        page.getByTestId("chips-input-wrapper_jobProfiles"),
-      ).toBeInViewport()
+      await expect(page.getByTestId("job-profiles")).toBeInViewport()
     })
   })
 
@@ -886,6 +880,72 @@ test.describe("category import", () => {
     })
   })
 
+  // Rechtsmittel
+  test(
+    "import appeal",
+    {
+      tag: ["@RISDEV-8627"],
+    },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(page.getByLabel("Rechtsmittel übernehmen")).toBeVisible()
+        await page.getByLabel("Rechtsmittel übernehmen").click()
+
+        await expect(page.getByTestId("appellants")).toHaveText("Kläger")
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(page.getByTestId("appellants")).toBeInViewport()
+      })
+    },
+  )
+
+  // Rechtsmittel
+  test(
+    "import collective agreement",
+    {
+      tag: ["@RISDEV-6687"],
+    },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(page.getByLabel("Tarifvertrag übernehmen")).toBeVisible()
+        await page.getByLabel("Tarifvertrag übernehmen").click()
+
+        await expect(
+          page.getByText(
+            "Stehende Bühnen, 12.2002, § 23 (Bühne, Theater, Orchester)",
+          ),
+        ).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByRole("heading", { name: "Tarifvertrag" }),
+        ).toBeInViewport()
+      })
+    },
+  )
+
   // Short text categories
 
   // Entscheidungsname
@@ -906,10 +966,8 @@ test.describe("category import", () => {
         ).toBeVisible()
         await page.getByLabel("Entscheidungsnamen übernehmen").click()
         await expect(
-          page
-            .getByTestId("chips-input-wrapper_decisionNames")
-            .getByText("Test Entscheidungsname"),
-        ).toBeVisible()
+          page.getByLabel("Entscheidungsnamen").getByRole("listitem"),
+        ).toHaveText("Test Entscheidungsname")
       })
 
       await test.step("show success badge", async () => {

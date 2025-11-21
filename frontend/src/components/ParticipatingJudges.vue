@@ -22,11 +22,7 @@ const { documentUnit: decision } = storeToRefs(store) as {
   <div id="participatingJudges" class="ris-label2-regular mb-16">
     {{ label }}
   </div>
-  <div
-    aria-label="Mitwirkende Richter"
-    class="border-b-1 border-blue-300"
-    data-testid="Mitwirkende Richter"
-  >
+  <div aria-label="Mitwirkende Richter" data-testid="Mitwirkende Richter">
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList

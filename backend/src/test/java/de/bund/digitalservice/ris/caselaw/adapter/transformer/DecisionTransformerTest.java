@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementIndustryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DefinitionDTO;
@@ -40,9 +41,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
+import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
+import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreementIndustry;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
@@ -64,6 +68,9 @@ import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealWithdrawal;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.PkhPlaintiff;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
@@ -661,24 +668,6 @@ class DecisionTransformerTest {
         DecisionTransformer.transformToDTO(DecisionDTO.builder().build(), decision);
 
     assertThat(decisionDTO.getDismissalGrounds()).extracting("value").containsExactly("ground");
-  }
-
-  @Test
-  void testTransformToDTO_withSameCollectiveAgreements_shouldMakeCollectiveAgreementsDistinct() {
-    Decision decision =
-        generateSimpleDocumentationUnitBuilder()
-            .contentRelatedIndexing(
-                ContentRelatedIndexing.builder()
-                    .collectiveAgreements(List.of("agreement", "agreement"))
-                    .build())
-            .build();
-
-    DecisionDTO decisionDTO =
-        DecisionTransformer.transformToDTO(DecisionDTO.builder().build(), decision);
-
-    assertThat(decisionDTO.getCollectiveAgreements())
-        .extracting("value")
-        .containsExactly("agreement");
   }
 
   @Test
@@ -1502,13 +1491,32 @@ class DecisionTransformerTest {
     DecisionDTO decisionDTO =
         generateSimpleDTOBuilder()
             .collectiveAgreements(
-                List.of(CollectiveAgreementDTO.builder().value("agreement").build()))
+                List.of(
+                    CollectiveAgreementDTO.builder()
+                        .name("Stehende Bühnen")
+                        .date("21.2000")
+                        .norm("§ 23")
+                        .industry(
+                            CollectiveAgreementIndustryDTO.builder()
+                                .id(UUID.fromString("4512f151-6b7f-4080-bb07-91b16877a510"))
+                                .value(
+                                    "Eisen-, Stahl-, Metall-, und Elektroindustrie, Metallverarbeitung")
+                                .build())
+                        .build()))
             .build();
-
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
 
     assertThat(decision.contentRelatedIndexing().collectiveAgreements())
-        .containsExactly("agreement");
+        .containsExactly(
+            CollectiveAgreement.builder()
+                .name("Stehende Bühnen")
+                .date("21.2000")
+                .norm("§ 23")
+                .industry(
+                    new CollectiveAgreementIndustry(
+                        UUID.fromString("4512f151-6b7f-4080-bb07-91b16877a510"),
+                        "Eisen-, Stahl-, Metall-, und Elektroindustrie, Metallverarbeitung"))
+                .build());
   }
 
   @Test
@@ -1941,6 +1949,61 @@ class DecisionTransformerTest {
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
 
     assertThat(decision.contentRelatedIndexing().appealAdmission()).isNull();
+  }
+
+  @Test
+  void transformToDomain_withAppeal_shouldAddAppeal() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    decisionDTO.setAppeal(
+        AppealDTO.builder()
+            .appealWithdrawal(AppealWithdrawal.JA)
+            .pkhPlaintiff(PkhPlaintiff.JA)
+            .build());
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().appeal()).isNotNull();
+    assertThat(decision.contentRelatedIndexing().appeal().appealWithdrawal())
+        .isEqualTo(AppealWithdrawal.JA);
+    assertThat(decision.contentRelatedIndexing().appeal().pkhPlaintiff())
+        .isEqualTo(PkhPlaintiff.JA);
+  }
+
+  @Test
+  void transformToDomain_withoutAppeal_shouldNotAddAppeal() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().appeal()).isNull();
+  }
+
+  @Test
+  void transformToDTO_withAppeal_shouldAddAppeal() {
+    Decision decision =
+        Decision.builder()
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .appeal(Appeal.builder().appealWithdrawal(AppealWithdrawal.JA).build())
+                    .build())
+            .build();
+
+    DecisionDTO decisionDTO =
+        DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+    assertThat(decisionDTO.getAppeal()).isNotNull();
+    assertThat(decisionDTO.getAppeal().getAppealWithdrawal()).isEqualTo(AppealWithdrawal.JA);
+  }
+
+  @Test
+  void transformToDTO_withoutAppeal_shouldNotAddAppeal() {
+    Decision decision = Decision.builder().build();
+    DecisionDTO currentDTO = generateSimpleDTOBuilder().build();
+
+    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDTO, decision);
+
+    assertThat(decisionDTO.getAppeal()).isNull();
   }
 
   private Decision.DecisionBuilder generateSimpleDocumentationUnitBuilder() {
