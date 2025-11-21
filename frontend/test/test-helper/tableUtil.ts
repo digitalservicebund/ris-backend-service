@@ -12,7 +12,9 @@ export const clickTableBorderSubButton = async (subButtonLabel: string) => {
 export const clickTableCellAlignmentSubButton = async (
   subButtonLabel: string,
 ) => {
-  const tableBorderMenu = screen.getByLabelText("Zellenausrichtung")
+  const tableBorderMenu = screen.getByLabelText(
+    "Vertikale Ausrichtung in Tabellen",
+  )
   await userEvent.click(tableBorderMenu)
   const subButton = screen.getByLabelText(subButtonLabel)
   await userEvent.click(subButton)

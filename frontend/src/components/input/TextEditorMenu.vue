@@ -421,7 +421,7 @@ const buttons = computed(() => {
     {
       type: "menu",
       icon: IconVerticalAlignTop,
-      ariaLabel: "Zellenausrichtung",
+      ariaLabel: "Vertikale Ausrichtung in Tabellen",
       group: "Zellenausrichtung",
       isCollapsable: false,
       childButtons: [
