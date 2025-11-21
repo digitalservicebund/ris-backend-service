@@ -21,7 +21,6 @@ const emit = defineEmits<{
   "update:validationError": [value?: ValidationError]
 }>()
 
-const lastChip = ref<string | undefined>("")
 const formattedChips = ref<string[]>([])
 
 function isValidDate(value?: string) {
@@ -30,23 +29,26 @@ function isValidDate(value?: string) {
 function isInFuture(value?: string) {
   return value ? dayjs(value, "DD.MM.YYYY", true).isAfter(dayjs()) : false
 }
-function isDuplicate(value?: string, chipsArr: string[] = []) {
-  return value ? chipsArr.includes(value) : false
+function isDuplicate(value?: string, values: string[] = []) {
+  if (!value) return false
+  const firstIndex = values.indexOf(value)
+  const lastIndex = values.lastIndexOf(value)
+  return firstIndex !== -1 && firstIndex !== lastIndex
 }
 
 const chips = computed<string[]>({
   get: () => formattedChips.value,
-  set: (newValue: string[]) => {
+  set: (newValues: string[]) => {
     const oldLength = formattedChips.value.length
-    const newLength = newValue.length
+    const newLength = newValues.length
 
     if (newLength >= oldLength) {
-      lastChip.value = newValue.at(-1)
-
-      const isValid = validateInput(lastChip.value, newValue.slice(0, -1))
+      const isValid = newValues.every((value) =>
+        validateInput(value, newValues),
+      )
 
       if (isValid) {
-        const valuesInStandardFormat = newValue.map((value) =>
+        const valuesInStandardFormat = newValues.map((value) =>
           dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
         )
         emit("update:modelValue", valuesInStandardFormat)
@@ -54,7 +56,7 @@ const chips = computed<string[]>({
     } else if (newLength < oldLength) {
       clearValidationErrors()
 
-      const valuesInStandardFormat = newValue.map((value) =>
+      const valuesInStandardFormat = newValues.map((value) =>
         dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
       )
       emit("update:modelValue", valuesInStandardFormat)
@@ -62,22 +64,22 @@ const chips = computed<string[]>({
   },
 })
 
-function validateInput(oldValue?: string, newValue?: string[]) {
-  if (!isValidDate(oldValue)) {
+function validateInput(value?: string, allValues: string[] = []) {
+  if (!isValidDate(value)) {
     emit("update:validationError", {
       message: "Kein valides Datum",
       instance: props.id,
     })
     return false
-  } else if (isInFuture(oldValue)) {
+  } else if (isInFuture(value)) {
     emit("update:validationError", {
       message: props.ariaLabel + " darf nicht in der Zukunft liegen",
       instance: props.id,
     })
     return false
-  } else if (isDuplicate(oldValue, newValue)) {
+  } else if (isDuplicate(value, allValues)) {
     emit("update:validationError", {
-      message: oldValue + " bereits vorhanden",
+      message: value + " bereits vorhanden",
       instance: props.id,
     })
     return false

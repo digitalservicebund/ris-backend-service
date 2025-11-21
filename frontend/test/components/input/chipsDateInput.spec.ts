@@ -157,4 +157,32 @@ describe("ChipsDateInput", () => {
     await user.keyboard("{enter}")
     expect(onUpdate).toHaveBeenCalledWith(["2022-01-01"])
   })
+
+  it("validates the first chip after editing", async () => {
+    const id = "id"
+    const ariaLabel = "chip"
+    const onUpdate = vi.fn()
+    const onError = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      "onUpdate:validationError": onError,
+      modelValue: ["2020-01-01", "2020-01-02", "2020-01-03"],
+      id: id,
+      ariaLabel: ariaLabel,
+    })
+
+    const editButtons = screen.getAllByRole("button", {
+      name: /eintrag bearbeiten/i,
+    })
+    await user.dblClick(editButtons[0])
+    const input = screen.getByRole("textbox")
+    await user.keyboard("{backspace}{backspace}")
+    await user.type(input, "99")
+    await user.keyboard("{enter}")
+    expect(onUpdate).not.toHaveBeenCalledWith(["2022-01-99"])
+    expect(onError).toHaveBeenCalledWith({
+      message: ariaLabel + " darf nicht in der Zukunft liegen",
+      instance: id,
+    })
+  })
 })

@@ -2,7 +2,7 @@
 import { RisChipsInput } from "@digitalservicebund/ris-ui/components"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
-import { computed, ref } from "vue"
+import { computed } from "vue"
 import { ValidationError } from "@/components/input/types"
 
 interface Props {
@@ -22,61 +22,64 @@ const emit = defineEmits<{
 }>()
 
 const localChips = computed<string[]>(() => props.modelValue ?? [])
-const lastChip = ref<string | undefined>("")
-const isValidYear = computed(() => validateYear(lastChip.value))
-const isInFuture = computed(() =>
-  dayjs(lastChip.value, "YYYY", true).isAfter(dayjs()),
-)
-const isDuplicate = computed(
-  () => lastChip.value && localChips.value.includes(lastChip.value),
-)
+
+function isValidYear(value?: string) {
+  return value ? validateYear(value) : false
+}
+function isInFuture(value?: string) {
+  return value ? dayjs(value, "YYYY", true).isAfter(dayjs()) : false
+}
+function isDuplicate(value?: string, values: string[] = []) {
+  if (!value) return false
+  const firstIndex = values.indexOf(value)
+  const lastIndex = values.lastIndexOf(value)
+  return firstIndex !== -1 && firstIndex !== lastIndex
+}
 
 const chips = computed<string[]>({
   get: () => localChips.value,
 
-  set: (newValue: string[]) => {
+  set: (newValues: string[]) => {
     const oldLength = localChips.value.length
-    const newLength = newValue.length
+    const newLength = newValues.length
 
-    if (newLength === 0) {
-      emit("update:modelValue", [])
-      clearValidationErrors()
-      return
-    }
+    if (newLength >= oldLength) {
+      const isValid = newValues.every((value) =>
+        validateInput(value, newValues),
+      )
 
-    if (newLength > oldLength) {
-      lastChip.value = newValue.at(-1)
-
-      validateInput()
-      if (isValidYear.value && !isInFuture.value && !isDuplicate.value) {
-        emit("update:modelValue", newValue)
+      if (isValid) {
+        emit("update:modelValue", newValues)
       }
     } else if (newLength < oldLength) {
       clearValidationErrors()
-      emit("update:modelValue", newValue)
+      emit("update:modelValue", newValues)
     }
   },
 })
 
-function validateInput() {
-  if (!isValidYear.value && lastChip.value) {
+function validateInput(value?: string, allValues: string[] = []) {
+  if (!isValidYear(value)) {
     emit("update:validationError", {
       message: "Kein valides Jahr",
       instance: props.id,
     })
-  } else if (isInFuture.value) {
+    return false
+  } else if (isInFuture(value)) {
     emit("update:validationError", {
       message: props.ariaLabel + " darf nicht in der Zukunft liegen",
       instance: props.id,
     })
-    return
-  } else if (isDuplicate.value) {
+    return false
+  } else if (isDuplicate(value, allValues)) {
     emit("update:validationError", {
-      message: lastChip.value + " bereits vorhanden",
+      message: value + " bereits vorhanden",
       instance: props.id,
     })
+    return false
   } else {
     clearValidationErrors()
+    return true
   }
 }
 
