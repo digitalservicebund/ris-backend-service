@@ -7,7 +7,11 @@ import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
 import { longTextLabels } from "@/domain/decision"
-import { clickTableSubButton, insertTable } from "~/test-helper/tableUtil"
+import {
+  clickTableBorderSubButton,
+  clickTableCellAlignmentSubButton,
+  insertTable,
+} from "~/test-helper/tableUtil"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
 useFeatureToggleServiceMock()
@@ -304,7 +308,22 @@ describe("text editor", async () => {
       const editorField = screen.getByTestId("Gründe")
       await fireEvent.focus(editorField.firstElementChild!)
 
-      await clickTableSubButton("Alle Rahmen")
+      await clickTableBorderSubButton("Alle Rahmen")
+      await flushPromises()
+
+      expect(screen.getByText(WARNING_TEXT)).toBeInTheDocument()
+    })
+
+    test("should show warning when a cell alignment command is executed without cell selection", async () => {
+      await renderComponent({
+        value: "<p></p>",
+        ariaLabel: "Gründe",
+        editable: true,
+      })
+      const editorField = screen.getByTestId("Gründe")
+      await fireEvent.focus(editorField.firstElementChild!)
+
+      await clickTableCellAlignmentSubButton("Oben ausrichten")
       await flushPromises()
 
       expect(screen.getByText(WARNING_TEXT)).toBeInTheDocument()
@@ -319,7 +338,7 @@ describe("text editor", async () => {
       const editorField = screen.getByTestId("Gründe").firstElementChild
       await fireEvent.focus(editorField!)
 
-      await clickTableSubButton("Alle Rahmen")
+      await clickTableBorderSubButton("Alle Rahmen")
       expect(screen.getByText(WARNING_TEXT)).toBeInTheDocument()
 
       await insertTable()

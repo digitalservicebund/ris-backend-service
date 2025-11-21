@@ -2,8 +2,17 @@ import { userEvent } from "@testing-library/user-event"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 
-export const clickTableSubButton = async (subButtonLabel: string) => {
+export const clickTableBorderSubButton = async (subButtonLabel: string) => {
   const tableBorderMenu = screen.getByLabelText("Tabellenrahmen")
+  await userEvent.click(tableBorderMenu)
+  const subButton = screen.getByLabelText(subButtonLabel)
+  await userEvent.click(subButton)
+}
+
+export const clickTableCellAlignmentSubButton = async (
+  subButtonLabel: string,
+) => {
+  const tableBorderMenu = screen.getByLabelText("Zellenausrichtung")
   await userEvent.click(tableBorderMenu)
   const subButton = screen.getByLabelText(subButtonLabel)
   await userEvent.click(subButton)

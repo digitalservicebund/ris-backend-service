@@ -35,6 +35,9 @@ import IconBorderRight from "~icons/material-symbols/border-right"
 import IconBorderTop from "~icons/material-symbols/border-top"
 import IconParagraph from "~icons/material-symbols/format-paragraph"
 import IconSpellCheck from "~icons/material-symbols/spellcheck"
+import IconVerticalAlignBottom from "~icons/material-symbols/vertical-align-bottom"
+import IconVerticalAlignCenter from "~icons/material-symbols/vertical-align-center"
+import IconVerticalAlignTop from "~icons/material-symbols/vertical-align-top"
 import MdiTableColumnPlusAfter from "~icons/mdi/table-column-plus-after"
 import MdiTableColumnRemove from "~icons/mdi/table-column-remove"
 import MdiTablePlus from "~icons/mdi/table-plus"
@@ -410,6 +413,60 @@ const buttons = computed(() => {
                   ATTRIBUTE_BOTTOM,
                   borderValue ?? DEFAULT_BORDER_VALUE,
                 )
+                .run(),
+            ),
+        },
+      ],
+    },
+    {
+      type: "menu",
+      icon: IconVerticalAlignTop,
+      ariaLabel: "Zellenausrichtung",
+      group: "Zellenausrichtung",
+      isCollapsable: false,
+      childButtons: [
+        {
+          type: "alignTop",
+          icon: IconVerticalAlignTop,
+          ariaLabel: "Oben ausrichten",
+          group: "Zellenausrichtung",
+          isCollapsable: false,
+          callback: () =>
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute("textAlignValue", "top")
+                .run(),
+            ),
+        },
+        {
+          type: "alignCenter",
+          icon: IconVerticalAlignCenter,
+          ariaLabel: "Mittig ausrichten",
+          group: "Zellenausrichtung",
+          isCollapsable: false,
+          callback: () =>
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute("textAlignValue", "middle")
+                .run(),
+            ),
+        },
+        {
+          type: "alignBottom",
+          icon: IconVerticalAlignBottom,
+          ariaLabel: "Unten ausrichten",
+          group: "Zellenausrichtung",
+          isCollapsable: false,
+          callback: () =>
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute("textAlignValue", "bottom")
                 .run(),
             ),
         },

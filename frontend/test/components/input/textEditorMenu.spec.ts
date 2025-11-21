@@ -8,7 +8,8 @@ import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
 import { mockDocumentForProsemirror } from "~/test-helper/prosemirror-document-mock"
 import {
-  clickTableSubButton,
+  clickTableBorderSubButton,
+  clickTableCellAlignmentSubButton,
   getFirstCellHTML,
   insertTable,
 } from "~/test-helper/tableUtil"
@@ -189,7 +190,7 @@ describe("text editor toolbar", async () => {
       await userEvent.click(editorField.firstElementChild!)
       expect(editorField.firstElementChild).toHaveFocus()
       await insertTable()
-      await clickTableSubButton("Rahmen oben")
+      await clickTableBorderSubButton("Rahmen oben")
       const cellStyle = getFirstCellHTML()
 
       expect(cellStyle).toContain(`border-top: ${DEFAULT_BORDER_STYLE}`)
@@ -203,7 +204,7 @@ describe("text editor toolbar", async () => {
       await userEvent.click(editorField.firstElementChild!)
       expect(editorField.firstElementChild).toHaveFocus()
       await insertTable()
-      await clickTableSubButton("Alle Rahmen")
+      await clickTableBorderSubButton("Alle Rahmen")
       const cellStyle = getFirstCellHTML()
 
       expect(cellStyle).toContain(`border-top: ${DEFAULT_BORDER_STYLE}`)
@@ -220,7 +221,7 @@ describe("text editor toolbar", async () => {
       expect(editorField.firstElementChild).toHaveFocus()
       await insertTable()
 
-      await clickTableSubButton("Kein Rahmen")
+      await clickTableBorderSubButton("Kein Rahmen")
       const cellStyle = getFirstCellHTML()
 
       expect(cellStyle).not.toContain(`border-top`)
@@ -236,7 +237,7 @@ describe("text editor toolbar", async () => {
       await userEvent.click(editorField.firstElementChild!)
       expect(editorField.firstElementChild).toHaveFocus()
       await insertTable()
-      await clickTableSubButton("Rahmen links")
+      await clickTableBorderSubButton("Rahmen links")
       const cellStyle = getFirstCellHTML()
 
       expect(cellStyle).toContain(`border-left: ${DEFAULT_BORDER_STYLE}`)
@@ -250,7 +251,7 @@ describe("text editor toolbar", async () => {
       await userEvent.click(editorField.firstElementChild!)
       expect(editorField.firstElementChild).toHaveFocus()
       await insertTable()
-      await clickTableSubButton("Rahmen rechts")
+      await clickTableBorderSubButton("Rahmen rechts")
       const cellStyle = getFirstCellHTML()
 
       expect(cellStyle).toContain(`border-right: ${DEFAULT_BORDER_STYLE}`)
@@ -264,11 +265,52 @@ describe("text editor toolbar", async () => {
       await userEvent.click(editorField.firstElementChild!)
       expect(editorField.firstElementChild).toHaveFocus()
       await insertTable()
-      await clickTableSubButton("Rahmen unten")
+      await clickTableBorderSubButton("Rahmen unten")
       const cellStyle = getFirstCellHTML()
 
       expect(cellStyle).toContain(`border-bottom: ${DEFAULT_BORDER_STYLE}`)
       expect(cellStyle).not.toContain(`border-top:`)
+    })
+  })
+
+  describe("table cell alignemnt commands", () => {
+    test("should set vertical-align attribute on single cell when 'Oben ausrichten' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableCellAlignmentSubButton("Oben ausrichten")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).toContain(`vertical-align: top`)
+    })
+
+    test("should set vertical-align attribute on single cell when 'Mittig ausrichten' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableCellAlignmentSubButton("Mittig ausrichten")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).toContain(`vertical-align: middle`)
+    })
+
+    test("should set vertical-align attribute on single cell when 'Unten ausrichten' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableCellAlignmentSubButton("Unten ausrichten")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).toContain(`vertical-align: bottom`)
     })
   })
 })
