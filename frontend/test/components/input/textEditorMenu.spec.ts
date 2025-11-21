@@ -7,8 +7,15 @@ import { beforeAll, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
 import { mockDocumentForProsemirror } from "~/test-helper/prosemirror-document-mock"
+import {
+  clickTableSubButton,
+  getFirstCellHTML,
+  insertTable,
+} from "~/test-helper/tableUtil"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 import routes from "~pages"
+
+const DEFAULT_BORDER_STYLE = "1px solid black"
 
 beforeAll(() => {
   mockDocumentForProsemirror()
@@ -171,6 +178,97 @@ describe("text editor toolbar", async () => {
       expect(
         screen.queryByLabelText("Randnummern entfernen"),
       ).not.toBeInTheDocument()
+    })
+  })
+
+  describe("table border commands", () => {
+    test("should set borderTop attribute on single cell when 'Rahmen oben' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableSubButton("Rahmen oben")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).toContain(`border-top: ${DEFAULT_BORDER_STYLE}`)
+      expect(cellStyle).not.toContain(`border-left:`)
+    })
+
+    test("should set all four border attributes on cell when 'Rahmen' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableSubButton("Alle Rahmen")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).toContain(`border-top: ${DEFAULT_BORDER_STYLE}`)
+      expect(cellStyle).toContain(`border-right: ${DEFAULT_BORDER_STYLE}`)
+      expect(cellStyle).toContain(`border-bottom: ${DEFAULT_BORDER_STYLE}`)
+      expect(cellStyle).toContain(`border-left: ${DEFAULT_BORDER_STYLE}`)
+    })
+
+    test("should clear all border attributes when 'Kein Rahmen' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+
+      await clickTableSubButton("Kein Rahmen")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).not.toContain(`border-top`)
+      expect(cellStyle).not.toContain(`border-right: null`)
+      expect(cellStyle).not.toContain(`border-bottom: null`)
+      expect(cellStyle).not.toContain(`border-left: null`)
+    })
+
+    test("should set left border attribute when 'Rahmen links' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableSubButton("Rahmen links")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).toContain(`border-left: ${DEFAULT_BORDER_STYLE}`)
+      expect(cellStyle).not.toContain(`border-top:`)
+    })
+
+    test("should set right border attribute when 'Rahmen rechts' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableSubButton("Rahmen rechts")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).toContain(`border-right: ${DEFAULT_BORDER_STYLE}`)
+      expect(cellStyle).not.toContain(`border-top:`)
+    })
+
+    test("should set bottom border attribute when 'Rahmen unten' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableSubButton("Rahmen unten")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).toContain(`border-bottom: ${DEFAULT_BORDER_STYLE}`)
+      expect(cellStyle).not.toContain(`border-top:`)
     })
   })
 })

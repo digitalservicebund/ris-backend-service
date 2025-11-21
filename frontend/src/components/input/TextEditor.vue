@@ -9,8 +9,6 @@ import { History } from "@tiptap/extension-history"
 import { Italic } from "@tiptap/extension-italic"
 import { Strike } from "@tiptap/extension-strike"
 import { Table } from "@tiptap/extension-table"
-import { TableCell } from "@tiptap/extension-table-cell"
-import { TableHeader } from "@tiptap/extension-table-header"
 import { TableRow } from "@tiptap/extension-table-row"
 import { Text } from "@tiptap/extension-text"
 import { TextAlign } from "@tiptap/extension-text-align"
@@ -41,11 +39,14 @@ import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
+import { CustomTableCell } from "@/editor/tableCell"
+import { CustomTableHeader } from "@/editor/tableHeader"
 import { TableStyle } from "@/editor/tableStyle"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { Match } from "@/types/textCheck"
+import IconInfoOutline from "~icons/mdi/information-outline"
 
 interface Props {
   value?: string
@@ -114,8 +115,8 @@ const editor: Editor = new Editor({
       resizable: true,
       allowTableNodeSelection: true,
     }),
-    TableCell,
-    TableHeader,
+    CustomTableCell,
+    CustomTableHeader,
     TableRow,
     TableStyle,
     TextStyle,
@@ -156,6 +157,9 @@ const editor: Editor = new Editor({
     preserveWhitespace: "full",
   },
   onSelectionUpdate: () => {
+    if (editor.isActive("tableCell") || editor.isActive("tableHeader")) {
+      showNoCellSelectedWarning.value = false
+    }
     editor.commands.handleSelection()
     editor.commands.handleMatchSelection()
   },
@@ -164,6 +168,7 @@ const editor: Editor = new Editor({
 const containerWidth = ref<number>()
 
 const editorExpanded = ref(false)
+const showNoCellSelectedWarning = ref(false)
 const editorStyleClasses = computed(() => {
   const plainBorderNumberStyle = props.plainBorderNumbers
     ? "plain-border-number"
@@ -339,6 +344,9 @@ defineExpose({ jumpToMatch })
       :container-width="containerWidth"
       :editor="editor"
       :editor-expanded="editorExpanded"
+      @no-cell-selected="
+        (noCellSelected) => (showNoCellSelectedWarning = noCellSelected)
+      "
       @on-editor-expanded-changed="
         (isExpanded) => (editorExpanded = isExpanded)
       "
@@ -378,6 +386,12 @@ defineExpose({ jumpToMatch })
         :loading="textCheckService.loading.value"
         :response-error="textCheckService.responseError.value ?? undefined"
       />
+      <div v-if="showNoCellSelectedWarning" class="flex justify-end">
+        <div class="ris-body1-regular flex flex-row text-gray-900">
+          <span>Keine Tabellenzeile ausgewählt</span>
+          <IconInfoOutline class="mx-8 text-gray-900" />
+        </div>
+      </div>
     </TextEditorFooter>
   </div>
 </template>
