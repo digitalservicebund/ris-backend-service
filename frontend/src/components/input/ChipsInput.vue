@@ -6,7 +6,6 @@ interface Props {
   id: string
   modelValue?: string[]
   ariaLabel: string
-  hasError?: boolean
   readOnly?: boolean
   testId?: string
 }
@@ -45,7 +44,6 @@ const chips = computed<string[]>({
     v-model="chips"
     :aria-label="ariaLabel"
     :data-testid="testId"
-    :has-error="hasError"
     :input-id="id"
     :read-only="readOnly"
   />

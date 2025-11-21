@@ -2,7 +2,7 @@
 import { RisChipsInput } from "@digitalservicebund/ris-ui/components"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
-import { computed, ref } from "vue"
+import { computed } from "vue"
 import { ValidationError } from "@/components/input/types"
 
 interface Props {
@@ -22,62 +22,51 @@ const emit = defineEmits<{
 }>()
 
 const localChips = computed<string[]>(() => props.modelValue ?? [])
-const lastChip = ref<string | undefined>("")
-const isValidYear = computed(() => validateYear(lastChip.value))
-const isInFuture = computed(() =>
-  dayjs(lastChip.value, "YYYY", true).isAfter(dayjs()),
-)
-const isDuplicate = computed(
-  () => lastChip.value && localChips.value.includes(lastChip.value),
-)
+
+function isValidYear(value: string) {
+  return validateYear(value)
+}
+function isInFuture(value: string) {
+  return dayjs(value, "YYYY", true).isAfter(dayjs())
+}
+function isDuplicate(value: string, values: string[] = []) {
+  return values.filter((v) => v === value).length > 1
+}
 
 const chips = computed<string[]>({
   get: () => localChips.value,
 
-  set: (newValue: string[]) => {
-    const oldLength = localChips.value.length
-    const newLength = newValue.length
+  set: (newValues: string[]) => {
+    const isValid = newValues.every((value) => validateInput(value, newValues))
 
-    if (newLength === 0) {
-      emit("update:modelValue", [])
+    if (isValid) {
       clearValidationErrors()
-      return
-    }
-
-    if (newLength > oldLength) {
-      lastChip.value = newValue.at(-1)
-
-      validateInput()
-      if (isValidYear.value && !isInFuture.value && !isDuplicate.value) {
-        emit("update:modelValue", newValue)
-      }
-    } else if (newLength < oldLength) {
-      clearValidationErrors()
-      emit("update:modelValue", newValue)
+      emit("update:modelValue", newValues)
     }
   },
 })
 
-function validateInput() {
-  if (!isValidYear.value && lastChip.value) {
+function validateInput(value?: string, allValues: string[] = []) {
+  if (value && !isValidYear(value)) {
     emit("update:validationError", {
       message: "Kein valides Jahr",
       instance: props.id,
     })
-  } else if (isInFuture.value) {
+    return false
+  } else if (value && isInFuture(value)) {
     emit("update:validationError", {
       message: props.ariaLabel + " darf nicht in der Zukunft liegen",
       instance: props.id,
     })
-    return
-  } else if (isDuplicate.value) {
+    return false
+  } else if (value && isDuplicate(value, allValues)) {
     emit("update:validationError", {
-      message: lastChip.value + " bereits vorhanden",
+      message: value + " bereits vorhanden",
       instance: props.id,
     })
-  } else {
-    clearValidationErrors()
+    return false
   }
+  return true
 }
 
 function clearValidationErrors() {

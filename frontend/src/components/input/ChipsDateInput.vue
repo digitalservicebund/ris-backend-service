@@ -2,7 +2,7 @@
 import { RisChipsInput } from "@digitalservicebund/ris-ui/components"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
-import { computed, ref } from "vue"
+import { computed, ref, watch } from "vue"
 import { ValidationError } from "@/components/input/types"
 
 interface Props {
@@ -13,84 +13,62 @@ interface Props {
   readOnly?: boolean
   testId?: string
 }
+
 const props = defineProps<Props>()
+
 const emit = defineEmits<{
   "update:modelValue": [value?: string[]]
   "update:validationError": [value?: ValidationError]
 }>()
 
-const lastChip = ref<string | undefined>("")
-const formattedChips = computed<string[]>(() =>
-  props.modelValue
-    ? props.modelValue.map((value) =>
-        dayjs(value, "YYYY-MM-DD", true).format("DD.MM.YYYY"),
-      )
-    : [],
-)
+const formattedChips = ref<string[]>([])
 
-const isValidDate = computed(() =>
-  dayjs(lastChip.value, "DD.MM.YYYY", true).isValid(),
-)
-const isInFuture = computed(() =>
-  dayjs(lastChip.value, "DD.MM.YYYY", true).isAfter(dayjs()),
-)
-const isDuplicate = computed(
-  () => lastChip.value && formattedChips.value.includes(lastChip.value),
-)
+function isValidDate(value?: string) {
+  return dayjs(value, "DD.MM.YYYY", true).isValid()
+}
+function isInFuture(value: string) {
+  return dayjs(value, "DD.MM.YYYY", true).isAfter(dayjs())
+}
+function isDuplicate(value: string, values: string[] = []) {
+  return values.filter((v) => v === value).length > 1
+}
 
 const chips = computed<string[]>({
   get: () => formattedChips.value,
-  set: (newValue: string[]) => {
-    const oldLength = formattedChips.value.length
-    const newLength = newValue.length
+  set: (newValues: string[]) => {
+    const isValid = newValues.every((value) => validateInput(value, newValues))
 
-    if (newLength === 0) {
-      emit("update:modelValue", [])
-      clearValidationErrors()
-      return
-    }
-
-    if (newLength > oldLength) {
-      lastChip.value = newValue.at(-1)
-
-      validateInput()
-
-      if (isValidDate.value && !isInFuture.value && !isDuplicate.value) {
-        const valuesInStandardFormat = newValue.map((value) =>
-          dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
-        )
-        emit("update:modelValue", valuesInStandardFormat)
-      }
-    } else if (newLength < oldLength) {
-      clearValidationErrors()
-
-      const valuesInStandardFormat = newValue.map((value) =>
+    if (isValid) {
+      const valuesInStandardFormat = newValues.map((value) =>
         dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
       )
+      clearValidationErrors()
       emit("update:modelValue", valuesInStandardFormat)
     }
   },
 })
 
-function validateInput() {
-  if (!isValidDate.value && lastChip.value) {
+function validateInput(value?: string, allValues: string[] = []) {
+  if (value && !isValidDate(value)) {
     emit("update:validationError", {
       message: "Kein valides Datum",
       instance: props.id,
     })
-  } else if (isInFuture.value) {
+    return false
+  } else if (value && isInFuture(value)) {
     emit("update:validationError", {
       message: props.ariaLabel + " darf nicht in der Zukunft liegen",
       instance: props.id,
     })
-  } else if (isDuplicate.value) {
+    return false
+  } else if (value && isDuplicate(value, allValues)) {
     emit("update:validationError", {
-      message: lastChip.value + " bereits vorhanden",
+      message: value + " bereits vorhanden",
       instance: props.id,
     })
-  } else {
-    clearValidationErrors()
+    return false
   }
+  return true
 }
 
 function clearValidationErrors() {
@@ -98,6 +76,20 @@ function clearValidationErrors() {
 }
 
 dayjs.extend(customParseFormat)
+
+watch(
+  () => props.modelValue,
+  (newValue, oldValue) => {
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      formattedChips.value = newValue
+        ? newValue.map((value) =>
+            dayjs(value, "YYYY-MM-DD", true).format("DD.MM.YYYY"),
+          )
+        : []
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
