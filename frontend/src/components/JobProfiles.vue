@@ -18,6 +18,7 @@ const store = useDocumentUnitStore()
       id="jobProfiles"
       v-model="store.documentUnit!.contentRelatedIndexing.jobProfiles"
       aria-label="Berufsbild"
-    ></ChipsInput>
+      data-testid="job-profiles"
+    />
   </div>
 </template>

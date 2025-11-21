@@ -21,13 +21,6 @@ export default class Definition implements EditableListItem {
     }
   }
 
-  get renderSummary(): string {
-    return [
-      ...(this.definedTerm ? [this.definedTerm] : []),
-      ...(this.definingBorderNumber ? [this.definingBorderNumber] : []),
-    ].join(" | ")
-  }
-
   get hasMissingRequiredFields(): boolean {
     return this.missingRequiredFields.length > 0
   }

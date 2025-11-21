@@ -155,7 +155,8 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await navigateToCategories(pageWithExternalUser, documentNumber)
       await clickCategoryButton("Entscheidungsnamen", pageWithExternalUser)
       await pageWithExternalUser
-        .getByLabel("Entscheidungsname")
+        .getByLabel("Entscheidungsnamen")
+        .getByRole("textbox")
         .fill("ein Name")
       await save(pageWithExternalUser)
     })

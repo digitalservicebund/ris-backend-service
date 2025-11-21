@@ -15,8 +15,8 @@ import IconAlignCenter from "~icons/ic/sharp-format-align-center"
 import IconAlignLeft from "~icons/ic/sharp-format-align-left"
 import IconAlignRight from "~icons/ic/sharp-format-align-right"
 import IconBold from "~icons/ic/sharp-format-bold"
-import IndentDecrease from "~icons/ic/sharp-format-indent-decrease"
-import IndentIncrease from "~icons/ic/sharp-format-indent-increase"
+import IconIndentDecrease from "~icons/ic/sharp-format-indent-decrease"
+import IconIndentIncrease from "~icons/ic/sharp-format-indent-increase"
 import IconItalic from "~icons/ic/sharp-format-italic"
 import IconUnorderedList from "~icons/ic/sharp-format-list-bulleted"
 import IconOrderedList from "~icons/ic/sharp-format-list-numbered"
@@ -27,8 +27,17 @@ import IconRedo from "~icons/ic/sharp-redo"
 import IconSubscript from "~icons/ic/sharp-subscript"
 import IconSuperscript from "~icons/ic/sharp-superscript"
 import IconUndo from "~icons/ic/sharp-undo"
+import IconBorderAll from "~icons/material-symbols/border-all-outline"
+import IconBorderBottom from "~icons/material-symbols/border-bottom"
+import IconBorderClear from "~icons/material-symbols/border-clear"
+import IconBorderLeft from "~icons/material-symbols/border-left"
+import IconBorderRight from "~icons/material-symbols/border-right"
+import IconBorderTop from "~icons/material-symbols/border-top"
 import IconParagraph from "~icons/material-symbols/format-paragraph"
 import IconSpellCheck from "~icons/material-symbols/spellcheck"
+import IconVerticalAlignBottom from "~icons/material-symbols/vertical-align-bottom"
+import IconVerticalAlignCenter from "~icons/material-symbols/vertical-align-center"
+import IconVerticalAlignTop from "~icons/material-symbols/vertical-align-top"
 import MdiTableColumnPlusAfter from "~icons/mdi/table-column-plus-after"
 import MdiTableColumnRemove from "~icons/mdi/table-column-remove"
 import MdiTablePlus from "~icons/mdi/table-plus"
@@ -45,7 +54,11 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits<{ onEditorExpandedChanged: [boolean] }>()
+const emit = defineEmits<{
+  onEditorExpandedChanged: [boolean]
+  noCellSelected: [boolean]
+}>()
+
 const route = useRoute()
 const isPendingProceeding = computed(() =>
   route.path.includes("pending-proceeding"),
@@ -61,6 +74,27 @@ const borderNumberCategories = [
 const shouldShowAddBorderNumbersButton = computed(() =>
   borderNumberCategories.includes(props.ariaLabel),
 )
+
+const ATTRIBUTE_TOP = "borderTopValue"
+const ATTRIBUTE_BOTTOM = "borderBottomValue"
+const ATTRIBUTE_LEFT = "borderLeftValue"
+const ATTRIBUTE_RIGHT = "borderRightValue"
+
+const DEFAULT_BORDER_VALUE = "1px solid black"
+const REMOVE_BORDER_VALUE = null
+
+const validateCellSelection = (callback: () => unknown) => {
+  const isCellSelected =
+    props.editor.isActive("tableCell") || props.editor.isActive("tableHeader")
+
+  if (!isCellSelected) {
+    emit("noCellSelected", true)
+    return
+  }
+
+  emit("noCellSelected", false)
+  return callback()
+}
 
 const buttons = computed(() => {
   const buttons = [
@@ -189,7 +223,7 @@ const buttons = computed(() => {
     },
     {
       type: "outdent",
-      icon: IndentDecrease,
+      icon: IconIndentDecrease,
       ariaLabel: "Einzug verringern",
       group: "indent",
       isCollapsable: false,
@@ -197,7 +231,7 @@ const buttons = computed(() => {
     },
     {
       type: "indent",
-      icon: IndentIncrease,
+      icon: IconIndentIncrease,
       ariaLabel: "Einzug vergrößern",
       group: "indent",
       isCollapsable: false,
@@ -265,6 +299,178 @@ const buttons = computed(() => {
           .focus()
           .insertTable({ rows: 3, cols: 3, withHeaderRow: false })
           .run(),
+    },
+    {
+      type: "menu",
+      icon: IconBorderTop,
+      ariaLabel: "Tabellenrahmen",
+      group: "Tabellenrahmen",
+      isCollapsable: false,
+      childButtons: [
+        {
+          type: "borderAll",
+          icon: IconBorderAll,
+          ariaLabel: "Alle Rahmen",
+          group: "Tabellenrahmen",
+          isCollapsable: false,
+          callback: (borderValue?: string) =>
+            validateCellSelection(() => {
+              const value = borderValue ?? DEFAULT_BORDER_VALUE
+              return props.editor
+                .chain()
+                .focus()
+                .setCellAttribute(ATTRIBUTE_TOP, value)
+                .setCellAttribute(ATTRIBUTE_RIGHT, value)
+                .setCellAttribute(ATTRIBUTE_BOTTOM, value)
+                .setCellAttribute(ATTRIBUTE_LEFT, value)
+                .run()
+            }),
+        },
+        {
+          type: "borderClear",
+          icon: IconBorderClear,
+          ariaLabel: "Kein Rahmen",
+          group: "Tabellenrahmen",
+          isCollapsable: false,
+          callback: () =>
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute(ATTRIBUTE_TOP, REMOVE_BORDER_VALUE)
+                .setCellAttribute(ATTRIBUTE_RIGHT, REMOVE_BORDER_VALUE)
+                .setCellAttribute(ATTRIBUTE_BOTTOM, REMOVE_BORDER_VALUE)
+                .setCellAttribute(ATTRIBUTE_LEFT, REMOVE_BORDER_VALUE)
+                .run(),
+            ),
+        },
+        {
+          type: "borderLeft",
+          icon: IconBorderLeft,
+          ariaLabel: "Rahmen links",
+          group: "Tabellenrahmen",
+          isCollapsable: false,
+          callback: (borderValue?: string) =>
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute(
+                  ATTRIBUTE_LEFT,
+                  borderValue ?? DEFAULT_BORDER_VALUE,
+                )
+                .run(),
+            ),
+        },
+        {
+          type: "borderRight",
+          icon: IconBorderRight,
+          ariaLabel: "Rahmen rechts",
+          group: "Tabellenrahmen",
+          isCollapsable: false,
+          callback: (borderValue?: string) =>
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute(
+                  ATTRIBUTE_RIGHT,
+                  borderValue ?? DEFAULT_BORDER_VALUE,
+                )
+                .run(),
+            ),
+        },
+        {
+          type: "borderTop",
+          icon: IconBorderTop,
+          ariaLabel: "Rahmen oben",
+          group: "Tabellenrahmen",
+          isCollapsable: false,
+          callback: (borderValue?: string) =>
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute(
+                  ATTRIBUTE_TOP,
+                  borderValue ?? DEFAULT_BORDER_VALUE,
+                )
+                .run(),
+            ),
+        },
+        {
+          type: "border Bottom",
+          icon: IconBorderBottom,
+          ariaLabel: "Rahmen unten",
+          group: "Tabellenrahmen",
+          isCollapsable: false,
+          callback: (borderValue?: string) =>
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute(
+                  ATTRIBUTE_BOTTOM,
+                  borderValue ?? DEFAULT_BORDER_VALUE,
+                )
+                .run(),
+            ),
+        },
+      ],
+    },
+    {
+      type: "menu",
+      icon: IconVerticalAlignTop,
+      ariaLabel: "Vertikale Ausrichtung in Tabellen",
+      group: "Zellenausrichtung",
+      isCollapsable: false,
+      childButtons: [
+        {
+          type: "alignTop",
+          icon: IconVerticalAlignTop,
+          ariaLabel: "Oben ausrichten",
+          group: "Zellenausrichtung",
+          isCollapsable: false,
+          callback: () =>
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute("textAlignValue", "top")
+                .run(),
+            ),
+        },
+        {
+          type: "alignCenter",
+          icon: IconVerticalAlignCenter,
+          ariaLabel: "Mittig ausrichten",
+          group: "Zellenausrichtung",
+          isCollapsable: false,
+          callback: () =>
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute("textAlignValue", "middle")
+                .run(),
+            ),
+        },
+        {
+          type: "alignBottom",
+          icon: IconVerticalAlignBottom,
+          ariaLabel: "Unten ausrichten",
+          group: "Zellenausrichtung",
+          isCollapsable: false,
+          callback: () =>
+            validateCellSelection(() =>
+              props.editor
+                .chain()
+                .focus()
+                .setCellAttribute("textAlignValue", "bottom")
+                .run(),
+            ),
+        },
+      ],
     },
     {
       type: "blockquote",

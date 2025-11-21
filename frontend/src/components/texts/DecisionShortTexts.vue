@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import { RisChipsInput } from "@digitalservicebund/ris-ui/components"
 import { storeToRefs } from "pinia"
 import { Component, Ref, computed } from "vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
-import ChipsInput from "@/components/input/ChipsInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
@@ -19,7 +19,7 @@ const { documentUnit: decision } = storeToRefs(store) as {
   documentUnit: Ref<Decision | undefined>
 }
 const decisionNames = computed({
-  get: () => decision.value?.shortTexts.decisionNames,
+  get: () => decision.value?.shortTexts.decisionNames ?? [],
   set: (newValue) => {
     decision.value!.shortTexts.decisionNames = newValue
   },
@@ -90,13 +90,17 @@ const otherHeadnote = computed({
         :label="shortTextLabels.decisionNames"
         :should-show-button="!decision?.shortTexts?.decisionNames?.length"
       >
-        <InputField id="fileNumber" :label="shortTextLabels.decisionNames">
-          <ChipsInput
-            id="decisionNames"
+        <InputField
+          id="decisionNames"
+          v-slot="{ id }"
+          :label="shortTextLabels.decisionNames"
+        >
+          <RisChipsInput
             v-model="decisionNames"
             :aria-label="shortTextLabels.decisionNames"
             :data-testid="shortTextLabels.decisionNames"
-          ></ChipsInput>
+            :input-id="id"
+          />
         </InputField>
       </CategoryWrapper>
 

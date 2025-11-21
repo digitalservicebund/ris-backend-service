@@ -24,6 +24,7 @@ public record ContentRelatedIndexing(
     List<CollectiveAgreement> collectiveAgreements,
     List<Definition> definitions,
     List<ForeignLanguageVersion> foreignLanguageVersions,
+    List<OriginOfTranslation> originOfTranslations,
     boolean hasLegislativeMandate,
     String evsf,
     AppealAdmission appealAdmission,

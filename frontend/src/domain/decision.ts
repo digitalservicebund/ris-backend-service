@@ -11,6 +11,7 @@ import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
 import LegalForce from "@/domain/legalForce"
 import { ManagementData } from "@/domain/managementData"
 import NormReference from "@/domain/normReference"
+import OriginOfTranslation from "@/domain/originOfTranslation"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
 import PreviousDecision from "@/domain/previousDecision"
@@ -77,6 +78,7 @@ export const contentRelatedIndexingLabels: {
   definitions: "Definition",
   hasLegislativeMandate: "Gesetzgebungsauftrag",
   foreignLanguageVersions: "Fremdsprachige Fassung",
+  originOfTranslations: "Herkunft der Übersetzung",
   appealAdmission: "Rechtsmittelzulassung",
   appeal: "Rechtsmittel",
 }
@@ -215,10 +217,17 @@ export class Decision {
       data.literatureReferences = data.literatureReferences.map(
         (literatureReference) => new Reference({ ...literatureReference }),
       )
+
     if (data.contentRelatedIndexing?.foreignLanguageVersions)
       data.contentRelatedIndexing.foreignLanguageVersions =
           data.contentRelatedIndexing.foreignLanguageVersions.map(
               (foreignVersion) => new ForeignLanguageVersion({ ...foreignVersion }),
+          )
+
+    if (data.contentRelatedIndexing?.originOfTranslations)
+      data.contentRelatedIndexing.originOfTranslations =
+          data.contentRelatedIndexing.originOfTranslations.map(
+              (originOfTranslation) => new OriginOfTranslation({ ...originOfTranslation }),
           )
 
     Object.assign(this, data)
