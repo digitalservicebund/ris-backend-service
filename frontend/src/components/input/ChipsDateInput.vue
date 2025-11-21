@@ -24,13 +24,12 @@ const emit = defineEmits<{
 const formattedChips = ref<string[]>([])
 
 function isValidDate(value?: string) {
-  return value ? dayjs(value, "DD.MM.YYYY", true).isValid() : false
+  return dayjs(value, "DD.MM.YYYY", true).isValid()
 }
-function isInFuture(value?: string) {
-  return value ? dayjs(value, "DD.MM.YYYY", true).isAfter(dayjs()) : false
+function isInFuture(value: string) {
+  return dayjs(value, "DD.MM.YYYY", true).isAfter(dayjs())
 }
-function isDuplicate(value?: string, values: string[] = []) {
-  if (!value) return false
+function isDuplicate(value: string, values: string[] = []) {
   return values.filter((v) => v === value).length > 1
 }
 
@@ -43,34 +42,33 @@ const chips = computed<string[]>({
       const valuesInStandardFormat = newValues.map((value) =>
         dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
       )
+      clearValidationErrors()
       emit("update:modelValue", valuesInStandardFormat)
     }
   },
 })
 
 function validateInput(value?: string, allValues: string[] = []) {
-  if (!isValidDate(value)) {
+  if (value && !isValidDate(value)) {
     emit("update:validationError", {
       message: "Kein valides Datum",
       instance: props.id,
     })
     return false
-  } else if (isInFuture(value)) {
+  } else if (value && isInFuture(value)) {
     emit("update:validationError", {
       message: props.ariaLabel + " darf nicht in der Zukunft liegen",
       instance: props.id,
     })
     return false
-  } else if (isDuplicate(value, allValues)) {
+  } else if (value && isDuplicate(value, allValues)) {
     emit("update:validationError", {
       message: value + " bereits vorhanden",
       instance: props.id,
     })
     return false
-  } else {
-    clearValidationErrors()
-    return true
   }
+  return true
 }
 
 function clearValidationErrors() {

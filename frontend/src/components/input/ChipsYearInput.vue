@@ -23,14 +23,13 @@ const emit = defineEmits<{
 
 const localChips = computed<string[]>(() => props.modelValue ?? [])
 
-function isValidYear(value?: string) {
-  return value ? validateYear(value) : false
+function isValidYear(value: string) {
+  return validateYear(value)
 }
-function isInFuture(value?: string) {
-  return value ? dayjs(value, "YYYY", true).isAfter(dayjs()) : false
+function isInFuture(value: string) {
+  return dayjs(value, "YYYY", true).isAfter(dayjs())
 }
-function isDuplicate(value?: string, values: string[] = []) {
-  if (!value) return false
+function isDuplicate(value: string, values: string[] = []) {
   return values.filter((v) => v === value).length > 1
 }
 
@@ -41,34 +40,33 @@ const chips = computed<string[]>({
     const isValid = newValues.every((value) => validateInput(value, newValues))
 
     if (isValid) {
+      clearValidationErrors()
       emit("update:modelValue", newValues)
     }
   },
 })
 
 function validateInput(value?: string, allValues: string[] = []) {
-  if (!isValidYear(value)) {
+  if (value && !isValidYear(value)) {
     emit("update:validationError", {
       message: "Kein valides Jahr",
       instance: props.id,
     })
     return false
-  } else if (isInFuture(value)) {
+  } else if (value && isInFuture(value)) {
     emit("update:validationError", {
       message: props.ariaLabel + " darf nicht in der Zukunft liegen",
       instance: props.id,
     })
     return false
-  } else if (isDuplicate(value, allValues)) {
+  } else if (value && isDuplicate(value, allValues)) {
     emit("update:validationError", {
       message: value + " bereits vorhanden",
       instance: props.id,
     })
     return false
-  } else {
-    clearValidationErrors()
-    return true
   }
+  return true
 }
 
 function clearValidationErrors() {
