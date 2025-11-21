@@ -38,10 +38,27 @@ public ResponseEntity<Object> handleLdmlTransformationException(LdmlTransformati
 
 Common interface that every domain exception implements:
 ```java
-interface NeuRisException() {
-    public String getExceptionName();
-    public Map<String, String> getExceptionDetails()
-    public Doble getVersion();
+interface CaselawException() {
+   /**
+   * Detail message about the exception, written in english
+   */
+  String getMessage();
+
+  /**
+   * The type of exception starting with `/error/`
+   */
+  URI getType();
+
+  /**
+   * The title describing the exception, written in english
+   */
+  String getTitle();
+
+  /**
+   * Additional details about the exception that could be sent to the user.
+   * See "Extension Members" in RFC-9457
+   */
+  Map<String, Object> getProperties();
 }
 ```
 
