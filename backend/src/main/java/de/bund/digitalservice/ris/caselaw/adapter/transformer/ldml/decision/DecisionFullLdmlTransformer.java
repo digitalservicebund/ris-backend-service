@@ -30,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.R
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtsmittelzulassung;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Sachgebiete;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Tarifvertraege;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Vorgaenge;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
@@ -144,6 +145,50 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
                 builder.rechtsmittelzulassung(rechtsmittelzulassungBuilder.build());
               });
+
+      // Tarifvertrag
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.collectiveAgreements())) {
+        builder.tarifvertraege(
+            Tarifvertraege.builder()
+                .tarifvertraege(
+                    contentRelatedIndexing.collectiveAgreements().stream()
+                        .map(
+                            collectiveAgreement -> {
+                              var tarifvertragBuilder = Tarifvertraege.Tarifvertrag.builder();
+
+                              if (collectiveAgreement.name() != null) {
+                                tarifvertragBuilder.name(
+                                    Tarifvertraege.Tarifvertrag.TarifvertragName.builder()
+                                        .value(collectiveAgreement.name())
+                                        .build());
+                              }
+
+                              if (collectiveAgreement.date() != null) {
+                                tarifvertragBuilder.datum(
+                                    Tarifvertraege.Tarifvertrag.TarifvertragDatum.builder()
+                                        .value(collectiveAgreement.date())
+                                        .build());
+                              }
+
+                              if (collectiveAgreement.norm() != null) {
+                                tarifvertragBuilder.tarifnorm(
+                                    Tarifvertraege.Tarifvertrag.Tarifnorm.builder()
+                                        .value(collectiveAgreement.norm())
+                                        .build());
+                              }
+
+                              if (collectiveAgreement.industry() != null) {
+                                tarifvertragBuilder.branche(
+                                    Tarifvertraege.Tarifvertrag.TarifvertragBranche.builder()
+                                        .value(collectiveAgreement.industry().label())
+                                        .build());
+                              }
+
+                              return tarifvertragBuilder.build();
+                            })
+                        .toList())
+                .build());
+      }
 
       // Fremdsprachige Fassungen
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.foreignLanguageVersions())) {
