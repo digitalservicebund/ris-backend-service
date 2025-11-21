@@ -46,6 +46,14 @@ export const getBorderAttributes = () => {
       parseHTML: (element: { style: { borderLeft: string } }) =>
         element.style.borderLeft || null,
     },
+    textAlignValue: {
+      default: "top",
+      renderHTML: (attributes: { textAlignValue: string }) => {
+        const value = attributes.textAlignValue
+        if (!value) return null
+        return { style: `vertical-align: ${value}` }
+      },
+    },
   }
 }
 
