@@ -47,7 +47,7 @@ export const getBorderAttributes = () => {
         element.style.borderLeft || null,
     },
     textAlignValue: {
-      default: "top",
+      default: null,
       renderHTML: (attributes: { textAlignValue: string }) => {
         const value = attributes.textAlignValue
         if (!value) return null
