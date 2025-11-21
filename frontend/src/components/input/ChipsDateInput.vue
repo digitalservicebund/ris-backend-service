@@ -31,9 +31,7 @@ function isInFuture(value?: string) {
 }
 function isDuplicate(value?: string, values: string[] = []) {
   if (!value) return false
-  const firstIndex = values.indexOf(value)
-  const lastIndex = values.lastIndexOf(value)
-  return firstIndex !== -1 && firstIndex !== lastIndex
+  return values.filter((v) => v === value).length > 1
 }
 
 const chips = computed<string[]>({
