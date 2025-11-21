@@ -390,8 +390,7 @@ class DocxTableBuilderTest {
   }
 
   @Test
-  void
-      givenTableWithGlobalCellWidths_whenBuildingTable_thenValidateWidthsArePresent_GoogleDocsExport() {
+  void givenTableWithGlobalCellWidths_whenBuildingTable_thenValidateWidthsArePresent_GoogleDocs() {
     // given
     var firstColWidthInTwips = 500;
     var secondColWidthInTwips = 1000;
@@ -447,6 +446,48 @@ class DocxTableBuilderTest {
             "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; min-width: 5px; padding: 5px; width: 50px;\">")
         .contains(
             "<td style=\"border-left: 6px solid #000; border-top: 1.5px solid #mnopqr; min-width: 5px; padding: 5px; width: 133px;\">");
+  }
+
+  @Test
+  void givenTableWithLineStyles_whenBuildingTable_thenStylesShouldBePresent() {
+    // given
+    var row = new Tr();
+    var cell = generateTableCellWidthBorder("ABCDEF", 12);
+    var leftCtBorder = new CTBorder();
+    var rightCtBorder = new CTBorder();
+    leftCtBorder.setVal(STBorder.DASHED);
+    rightCtBorder.setVal(STBorder.DOTTED);
+    leftCtBorder.setSz(BigInteger.valueOf(24));
+    rightCtBorder.setSz(BigInteger.valueOf(24));
+    cell.getValue().getTcPr().getTcBorders().setLeft(leftCtBorder);
+    cell.getValue().getTcPr().getTcBorders().setRight(rightCtBorder);
+    row.getContent().add(cell);
+
+    var tableCtBorder = new CTBorder();
+    tableCtBorder.setVal(STBorder.SINGLE);
+    tableCtBorder.setSz(BigInteger.valueOf(48));
+    tableCtBorder.setColor("auto");
+
+    var tableBorders = new TblBorders();
+    tableBorders.setInsideV(tableCtBorder);
+    tableBorders.setInsideH(tableCtBorder);
+
+    var tblPr = new TblPr();
+    tblPr.setTblBorders(tableBorders);
+    var tbl = new Tbl();
+    tbl.setTblPr(tblPr);
+    tbl.getContent().add(row);
+
+    var builder = DocxTableBuilder.newInstance();
+    builder.setTable(tbl);
+
+    // when
+    var result = builder.build(new ArrayList<>()).toHtmlString();
+
+    // then
+    assertThat(result)
+        .contains(
+            "<td style=\"border-left: 3px dashed #000; border-right: 3px dotted #000; border-top: 1.5px solid #abcdef; min-width: 5px; padding: 5px;\">");
   }
 
   @SuppressWarnings("java:S5976") // Disable warning for tests that could be parametrized
