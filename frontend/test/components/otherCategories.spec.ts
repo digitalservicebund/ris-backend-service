@@ -10,6 +10,9 @@ import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { Decision } from "@/domain/decision"
 import Definition from "@/domain/definition"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
+import OriginOfTranslation, {
+  TranslationType,
+} from "@/domain/originOfTranslation"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import routes from "~/test-helper/routes"
 
@@ -396,6 +399,85 @@ describe("other categories", () => {
       expect(links[0]).toHaveAttribute("href", "http://link-to-translation.en")
       expect(links[1]).toHaveAttribute("href", "https://link-to-translation.fr")
       expect(links[2]).toHaveAttribute("href", "https://link-to-translation.es")
+    })
+  })
+
+  describe("Origin of Translation", () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: routes,
+    })
+
+    it("should display origin of translation button when no data", async () => {
+      // Arrange
+      mockSessionStore({
+        originOfTranslations: [],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(
+        screen.getByRole("button", { name: "Herkunft der Übersetzung" }),
+      ).toBeInTheDocument()
+    })
+
+    it("should display origin of translation", async () => {
+      // Arrange
+      mockSessionStore({
+        originOfTranslations: [
+          new OriginOfTranslation({
+            id: "1",
+            languageCode: {
+              id: "3",
+              label: "Englisch",
+            },
+            translationType: TranslationType.NICHT_AMTLICH,
+            translators: ["translator a", "translator b"],
+            borderNumbers: [23, 42],
+            urls: ["http://link-to-translation.en"],
+          }),
+          new OriginOfTranslation({
+            id: "2",
+            languageCode: {
+              id: "4",
+              label: "Französisch",
+            },
+            translationType: TranslationType.AMTLICH,
+            translators: ["translator c", "translator d"],
+            borderNumbers: [13, 99],
+            urls: ["https://link-to-translation.fr"],
+          }),
+        ],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(await screen.findByText("Herkunft der Übersetzung")).toBeVisible()
+
+      const links = screen.getAllByRole("link")
+      expect(links).toHaveLength(2)
+      expect(links[0]).toHaveAttribute("href", "http://link-to-translation.en")
+      expect(links[1]).toHaveAttribute("href", "https://link-to-translation.fr")
+
+      const summaries = screen.getAllByTestId("origin-of-translation-summary")
+      expect(summaries[0]).toHaveTextContent(
+        "Englisch, translator a, translator b: 23, 42, http://link-to-translation.en (nicht-amtlich)",
+      )
+      expect(summaries[1]).toHaveTextContent(
+        "Französisch, translator c, translator d: 13, 99, https://link-to-translation.fr (amtlich)",
+      )
     })
   })
 

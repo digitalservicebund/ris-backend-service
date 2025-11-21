@@ -8,6 +8,7 @@ interface Props {
   ariaLabel: string
   readOnly?: boolean
   testId?: string
+  placeholder?: string
 }
 
 const props = defineProps<Props>()
@@ -45,6 +46,7 @@ const chips = computed<string[]>({
     :aria-label="ariaLabel"
     :data-testid="testId"
     :input-id="id"
+    :placeholder="placeholder"
     :read-only="readOnly"
   />
 </template>
