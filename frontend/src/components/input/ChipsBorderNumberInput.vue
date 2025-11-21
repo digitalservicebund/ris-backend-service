@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { RisChipsInput } from "@digitalservicebund/ris-ui/components"
 import { storeToRefs } from "pinia"
-import { computed, ref } from "vue"
+import { computed } from "vue"
 import { ValidationError } from "@/components/input/types"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -22,71 +22,60 @@ const emit = defineEmits<{
 }>()
 
 const localChips = computed(() => props.modelValue ?? [])
-const lastChip = ref<number | undefined>()
 const { documentUnit } = storeToRefs(useDocumentUnitStore())
-const isValidBorderNumber = computed(() =>
-  documentUnit.value?.managementData.borderNumbers.includes(
-    `${lastChip.value}`,
-  ),
-)
-const isDuplicate = computed(
-  () => lastChip.value && localChips.value.includes(lastChip.value),
-)
+
+function isValidBorderNumber(value: number) {
+  return validateBorderNumber(value)
+}
+function isDuplicate(value: number, values: number[] = []) {
+  return values.filter((v) => v === value).length > 1
+}
 
 const chips = computed<string[]>({
   get: () => {
     return localChips.value.map((value) => value.toString())
   },
 
-  set: (newValue: string[]) => {
-    const oldLength = localChips.value.length
-    const newLength = newValue.length
+  set: (newValues: string[]) => {
+    const numberValues = newValues.map((value) => Number.parseInt(value))
 
-    if (newLength === 0) {
-      emit("update:modelValue", [])
+    const isValid = newValues.every((value) =>
+      validateInput(Number.parseInt(value), numberValues),
+    )
+
+    if (isValid) {
       clearValidationErrors()
-      return
-    }
-
-    const newNumber = newValue.at(-1)
-    if (newLength > oldLength && newNumber) {
-      lastChip.value = Number.parseInt(newNumber)
-
-      validateInput()
-      if (isValidBorderNumber.value && !isDuplicate.value) {
-        emit(
-          "update:modelValue",
-          newValue.map((value) => Number.parseInt(value)),
-        )
-      }
-    } else if (newLength < oldLength) {
-      clearValidationErrors()
-      emit(
-        "update:modelValue",
-        newValue.map((value) => Number.parseInt(value)),
-      )
+      emit("update:modelValue", numberValues)
     }
   },
 })
 
-function validateInput() {
-  if (!isValidBorderNumber.value && lastChip.value) {
+function validateInput(value?: number, allValues: number[] = []) {
+  if (value && !isValidBorderNumber(value)) {
     emit("update:validationError", {
       message: "Randnummer existiert nicht",
       instance: props.id,
     })
-  } else if (isDuplicate.value) {
+    return false
+  } else if (value && isDuplicate(value, allValues)) {
     emit("update:validationError", {
-      message: lastChip.value + " bereits vorhanden",
+      message: value + " bereits vorhanden",
       instance: props.id,
     })
-  } else {
-    clearValidationErrors()
+    return false
   }
+  return true
 }
 
 function clearValidationErrors() {
   emit("update:validationError", undefined)
+}
+
+function validateBorderNumber(value: number): boolean {
+  if (documentUnit.value?.managementData.borderNumbers) {
+    return documentUnit.value.managementData.borderNumbers.includes(`${value}`)
+  }
+  return false
 }
 </script>
 

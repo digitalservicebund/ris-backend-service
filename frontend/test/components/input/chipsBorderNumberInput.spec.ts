@@ -159,4 +159,50 @@ describe("ChipsBorderNumberInput", () => {
     await user.keyboard("{enter}")
     expect(onUpdate).toHaveBeenCalledWith([1])
   })
+
+  it("edits the chip on double click", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      modelValue: [1],
+    })
+
+    const editButton = screen.getByRole("button", {
+      name: /eintrag bearbeiten/i,
+    })
+    await user.dblClick(editButton)
+    const input = screen.getByRole("textbox")
+    await user.keyboard("{backspace}")
+    await user.type(input, "2")
+    await user.keyboard("{enter}")
+    expect(onUpdate).toHaveBeenCalledWith([2])
+  })
+
+  it("validates the first chip after editing", async () => {
+    const id = "id"
+    const ariaLabel = "chip"
+    const onUpdate = vi.fn()
+    const onError = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      "onUpdate:validationError": onError,
+      modelValue: [1, 2],
+      id: id,
+      ariaLabel: ariaLabel,
+    })
+
+    const editButtons = screen.getAllByRole("button", {
+      name: /eintrag bearbeiten/i,
+    })
+    await user.dblClick(editButtons[0])
+    const input = screen.getByRole("textbox")
+    await user.keyboard("{backspace}")
+    await user.type(input, "9")
+    await user.keyboard("{enter}")
+    expect(onUpdate).not.toHaveBeenCalledWith([9])
+    expect(onError).toHaveBeenCalledWith({
+      message: "Randnummer existiert nicht",
+      instance: id,
+    })
+  })
 })
