@@ -8,7 +8,7 @@ jobs:
   log-gradle-version-and-dependencies:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Get Gradle version
         working-directory: ./backend
         run: |
