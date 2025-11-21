@@ -5,10 +5,14 @@ import { vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import OtherCategories from "@/components/OtherCategories.vue"
 import { AppealWithdrawal } from "@/domain/appeal"
+import { CollectiveAgreement } from "@/domain/collectiveAgreement"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { Decision } from "@/domain/decision"
 import Definition from "@/domain/definition"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
+import OriginOfTranslation, {
+  TranslationType,
+} from "@/domain/originOfTranslation"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import routes from "~/test-helper/routes"
 
@@ -179,6 +183,11 @@ describe("other categories", () => {
   })
 
   describe("CollectiveAgreements", () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: routes,
+    })
+
     test("should not display collective agreements button when it is empty and not a labor court", async () => {
       // Arrange
       mockSessionStore({ collectiveAgreements: [] }, "BVerfG")
@@ -213,15 +222,24 @@ describe("other categories", () => {
 
     test("should display collective agreements when it is not empty without labor court", async () => {
       // Arrange
-      mockSessionStore({ collectiveAgreements: ["Stehende Bühnen"] }, "BVerfG")
+      mockSessionStore(
+        {
+          collectiveAgreements: [
+            new CollectiveAgreement({ name: "Stehende Bühnen", norm: "§ 23" }),
+          ],
+        },
+        "BVerfG",
+      )
 
       // Act
-      render(OtherCategories)
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
 
       // Assert
-      expect(
-        screen.getByRole("textbox", { name: "Tarifvertrag Input" }),
-      ).toHaveValue("Stehende Bühnen")
+      expect(screen.getByText("Stehende Bühnen, § 23")).toBeInTheDocument()
 
       expect(
         screen.queryByRole("button", { name: "Tarifvertrag" }),
@@ -381,6 +399,85 @@ describe("other categories", () => {
       expect(links[0]).toHaveAttribute("href", "http://link-to-translation.en")
       expect(links[1]).toHaveAttribute("href", "https://link-to-translation.fr")
       expect(links[2]).toHaveAttribute("href", "https://link-to-translation.es")
+    })
+  })
+
+  describe("Origin of Translation", () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: routes,
+    })
+
+    it("should display origin of translation button when no data", async () => {
+      // Arrange
+      mockSessionStore({
+        originOfTranslations: [],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(
+        screen.getByRole("button", { name: "Herkunft der Übersetzung" }),
+      ).toBeInTheDocument()
+    })
+
+    it("should display origin of translation", async () => {
+      // Arrange
+      mockSessionStore({
+        originOfTranslations: [
+          new OriginOfTranslation({
+            id: "1",
+            languageCode: {
+              id: "3",
+              label: "Englisch",
+            },
+            translationType: TranslationType.NICHT_AMTLICH,
+            translators: ["translator a", "translator b"],
+            borderNumbers: [23, 42],
+            urls: ["http://link-to-translation.en"],
+          }),
+          new OriginOfTranslation({
+            id: "2",
+            languageCode: {
+              id: "4",
+              label: "Französisch",
+            },
+            translationType: TranslationType.AMTLICH,
+            translators: ["translator c", "translator d"],
+            borderNumbers: [13, 99],
+            urls: ["https://link-to-translation.fr"],
+          }),
+        ],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(await screen.findByText("Herkunft der Übersetzung")).toBeVisible()
+
+      const links = screen.getAllByRole("link")
+      expect(links).toHaveLength(2)
+      expect(links[0]).toHaveAttribute("href", "http://link-to-translation.en")
+      expect(links[1]).toHaveAttribute("href", "https://link-to-translation.fr")
+
+      const summaries = screen.getAllByTestId("origin-of-translation-summary")
+      expect(summaries[0]).toHaveTextContent(
+        "Englisch, translator a, translator b: 23, 42, http://link-to-translation.en (nicht-amtlich)",
+      )
+      expect(summaries[1]).toHaveTextContent(
+        "Französisch, translator c, translator d: 13, 99, https://link-to-translation.fr (amtlich)",
+      )
     })
   })
 

@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
@@ -31,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.OriginOfTranslation;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
@@ -139,7 +141,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       addCollectiveAgreements(builder, contentRelatedIndexing);
       builder.hasLegislativeMandate(contentRelatedIndexing.hasLegislativeMandate());
       builder.evsf(contentRelatedIndexing.evsf());
-      addForeignLanguageVersions(currentDto, builder, contentRelatedIndexing);
+      addForeignLanguageVersions(builder, contentRelatedIndexing);
       if (contentRelatedIndexing.appealAdmission() == null) {
         builder.appealAdmitted(null);
         builder.appealAdmittedBy(null);
@@ -148,6 +150,7 @@ public class DecisionTransformer extends DocumentableTransformer {
         builder.appealAdmittedBy(contentRelatedIndexing.appealAdmission().by());
       }
       builder.appeal(AppealTransformer.transformToDTO(currentDto, contentRelatedIndexing.appeal()));
+      addOriginOfTranslations(builder, contentRelatedIndexing);
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -537,9 +540,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   }
 
   private static void addForeignLanguageVersions(
-      DecisionDTO currentDto,
-      DecisionDTOBuilder<?, ?> builder,
-      ContentRelatedIndexing contentRelatedIndexing) {
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
     if (contentRelatedIndexing.foreignLanguageVersions() == null) {
       return;
     }
@@ -550,17 +551,27 @@ public class DecisionTransformer extends DocumentableTransformer {
 
     for (int i = 0; i < foreignLanguageVersions.size(); i++) {
       foreignLanguageVersionDTOs.add(
-          ForeignLanguageVersionDTO.builder()
-              .documentationUnit(currentDto)
-              .url(foreignLanguageVersions.get(i).link())
-              .languageCode(
-                  LanguageCodeTransformer.transformToDTO(
-                      foreignLanguageVersions.get(i).languageCode()))
-              .rank(i + 1L)
-              .build());
+          ForeignLanguageTransformer.transformToDTO(foreignLanguageVersions.get(i), i));
     }
 
     builder.foreignLanguageVersions(foreignLanguageVersionDTOs);
+  }
+
+  private static void addOriginOfTranslations(
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.originOfTranslations() == null) {
+      return;
+    }
+
+    List<OriginOfTranslationDTO> originOfTranslationDTOS = new ArrayList<>();
+    List<OriginOfTranslation> originOfTranslations = contentRelatedIndexing.originOfTranslations();
+
+    for (int i = 0; i < originOfTranslations.size(); i++) {
+      originOfTranslationDTOS.add(
+          OriginOfTranslationTransformer.transformToDTO(originOfTranslations.get(i), i));
+    }
+
+    builder.originOfTranslations(originOfTranslationDTOS);
   }
 
   public static Decision transformToDomain(DecisionDTO decisionDTO) {
@@ -756,6 +767,14 @@ public class DecisionTransformer extends DocumentableTransformer {
 
     contentRelatedIndexingBuilder.appeal(
         AppealTransformer.transformToDomain(decisionDTO.getAppeal()));
+
+    if (decisionDTO.getOriginOfTranslations() != null) {
+      List<OriginOfTranslation> originOfTranslations =
+          decisionDTO.getOriginOfTranslations().stream()
+              .map(OriginOfTranslationTransformer::transformToDomain)
+              .toList();
+      contentRelatedIndexingBuilder.originOfTranslations(originOfTranslations);
+    }
 
     return contentRelatedIndexingBuilder.build();
   }

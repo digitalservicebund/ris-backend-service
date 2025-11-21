@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.CollectiveAgreemen
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreementIndustry;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreementIndustryRepository;
 import java.util.List;
-import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -18,18 +17,17 @@ public class PostgresCollectiveAgreementIndustryRepositoryImpl
   }
 
   @Override
-  public List<CollectiveAgreementIndustry> findAllBySearchStr(String searchStr, Integer size) {
+  public List<CollectiveAgreementIndustry> findAllBySearchStr(String searchStr) {
     return repository
-        .findCollectiveAgreementIndustryDTOByValueContainsIgnoreCase(
-            searchStr.trim(), Limit.of(size))
+        .findCollectiveAgreementIndustryDTOByValueContainsIgnoreCase(searchStr.trim())
         .stream()
         .map(CollectiveAgreementIndustryTransformer::transformToDomain)
         .toList();
   }
 
   @Override
-  public List<CollectiveAgreementIndustry> findAll(Integer size) {
-    return repository.findAllOrderByValueIgnoreCaseLimit(size).stream()
+  public List<CollectiveAgreementIndustry> findAll() {
+    return repository.findAllOrderByValueIgnoreCaseLimit().stream()
         .map(CollectiveAgreementIndustryTransformer::transformToDomain)
         .toList();
   }

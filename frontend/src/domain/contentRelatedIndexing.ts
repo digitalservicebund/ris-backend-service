@@ -1,13 +1,15 @@
 import ActiveCitation from "@/domain/activeCitation"
 import { Appeal } from "@/domain/appeal"
 import { AppealAdmission } from "@/domain/appealAdmission"
+import { CollectiveAgreement } from "@/domain/collectiveAgreement"
 import Definition from "@/domain/definition"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
 import NormReference from "@/domain/normReference"
+import OriginOfTranslation from "@/domain/originOfTranslation"
 
 export type ContentRelatedIndexing = {
-  collectiveAgreements?: string[]
+  collectiveAgreements?: CollectiveAgreement[]
   dismissalTypes?: string[]
   dismissalGrounds?: string[]
   keywords?: string[]
@@ -19,6 +21,7 @@ export type ContentRelatedIndexing = {
   evsf?: string
   definitions?: Definition[]
   foreignLanguageVersions?: ForeignLanguageVersion[]
+  originOfTranslations?: OriginOfTranslation[]
   appealAdmission?: AppealAdmission
   appeal?: Appeal
 }

@@ -14,7 +14,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@6ba5449b7dcda52941806a19f0cf626b6420191e
+        uses: actions/setup-java@46c56d6f92c88cf540acf95a12a4a41197499222
         with:
           java-version: "21.0"
           distribution: "temurin"

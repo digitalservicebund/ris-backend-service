@@ -31,7 +31,7 @@ const showErrorBadge = computed(() => {
           ? IconBaselineDescription
           : IconOutlineDescription
       "
-      :summary="props.data.renderSummary"
+      :summary="props.data.renderSummary ?? ''"
     ></DecisionSummary>
 
     <IconBadge

@@ -21,11 +21,16 @@ public class CollectiveAgreementIndustryController {
     this.service = service;
   }
 
+  /**
+   * Retrieves a list of possible options for the industry (Branche) of a collective agreement
+   * (Tarifvertrag)
+   *
+   * @return a list of all possible industries for collective agreements
+   */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public List<CollectiveAgreementIndustry> getDocumentTypes(
-      @RequestParam(value = "q", required = false) String searchStr,
-      @RequestParam(value = "sz", required = false, defaultValue = "200") Integer size) {
-    return service.getCollectiveAgreementIndustries(searchStr, size);
+  public List<CollectiveAgreementIndustry> getCollectiveAgreementIndustries(
+      @RequestParam(value = "q", required = false) String searchStr) {
+    return service.getCollectiveAgreementIndustries(searchStr);
   }
 }

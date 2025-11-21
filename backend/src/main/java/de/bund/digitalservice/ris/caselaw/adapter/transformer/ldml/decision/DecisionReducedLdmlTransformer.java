@@ -29,7 +29,7 @@ public class DecisionReducedLdmlTransformer extends DecisionCommonLdmlTransforme
     Meta.MetaBuilder builder = Meta.builder();
 
     return builder
-        .identification(buildIdentification(decision, false))
+        .identification(buildIdentification(decision))
         .references(buildReferences(decision))
         .proprietary(Proprietary.builder().meta(buildRisMeta(decision)).build())
         .analysis(buildAnalysis(decision))
@@ -55,5 +55,10 @@ public class DecisionReducedLdmlTransformer extends DecisionCommonLdmlTransforme
     paragraphs = buildCommonHeader(decision, paragraphs);
 
     return Header.builder().paragraphs(paragraphs).build();
+  }
+
+  @Override
+  public boolean isFullLDML() {
+    return false;
   }
 }

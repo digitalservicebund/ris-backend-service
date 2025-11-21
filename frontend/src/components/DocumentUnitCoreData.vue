@@ -65,8 +65,8 @@ const layoutClass = computed(() =>
  */
 const descendingPreviousProcedures = computed(() =>
   coreDataModel.value.previousProcedures
-    ? coreDataModel.value.previousProcedures.toReversed()
-    : undefined,
+    ? coreDataModel.value.previousProcedures.toReversed().join(", ")
+    : "",
 )
 
 const jurisdictionType = computed(() =>
@@ -153,6 +153,54 @@ const sources = computed<string[]>({
   },
 })
 
+const deviatingCourts = computed({
+  get: () => coreDataModel.value.deviatingCourts ?? [],
+  set: (newValue) => {
+    coreDataModel.value.deviatingCourts = newValue
+  },
+})
+const fileNumbers = computed({
+  get: () => coreDataModel.value.fileNumbers ?? [],
+  set: (newValue) => {
+    coreDataModel.value.fileNumbers = newValue
+  },
+})
+
+const deviatingFileNumbers = computed({
+  get: () => coreDataModel.value.deviatingFileNumbers ?? [],
+  set: (newValue) => {
+    coreDataModel.value.deviatingFileNumbers = newValue
+  },
+})
+
+const deviatingDocumentNumbers = computed({
+  get: () => coreDataModel.value.deviatingDocumentNumbers ?? [],
+  set: (newValue) => {
+    coreDataModel.value.deviatingDocumentNumbers = newValue
+  },
+})
+
+const deviatingEclis = computed({
+  get: () => coreDataModel.value.deviatingEclis ?? [],
+  set: (newValue) => {
+    coreDataModel.value.deviatingEclis = newValue
+  },
+})
+
+const inputTypes = computed({
+  get: () => coreDataModel.value.inputTypes ?? [],
+  set: (newValue) => {
+    coreDataModel.value.inputTypes = newValue
+  },
+})
+
+const leadingDecisionNormReferences = computed({
+  get: () => coreDataModel.value.leadingDecisionNormReferences ?? [],
+  set: (newValue) => {
+    coreDataModel.value.leadingDecisionNormReferences = newValue
+  },
+})
+
 onMounted(() => {
   if (!parentRef.value) return
   resizeObserver.observe(parentRef.value)
@@ -190,15 +238,16 @@ onBeforeUnmount(() => {
       <!-- Child  -->
       <template #children>
         <InputField
-          id="deviatingCourt"
+          id="deviatingCourts"
           v-slot="{ id }"
           label="Fehlerhaftes Gericht"
         >
           <ChipsInput
             :id="id"
-            v-model="coreDataModel.deviatingCourts"
+            v-model="deviatingCourts"
             aria-label="Fehlerhaftes Gericht"
-          ></ChipsInput>
+            data-testid="deviating-courts"
+          />
         </InputField>
       </template>
     </NestedComponent>
@@ -210,25 +259,27 @@ onBeforeUnmount(() => {
         class="w-full min-w-0"
         :is-open="!!coreDataModel.deviatingFileNumbers?.length"
       >
-        <InputField id="fileNumber" v-slot="{ id }" label="Aktenzeichen *">
+        <InputField id="fileNumberInput" v-slot="{ id }" label="Aktenzeichen *">
           <ChipsInput
             :id="id"
-            v-model="coreDataModel.fileNumbers"
+            v-model="fileNumbers"
             aria-label="Aktenzeichen"
-          ></ChipsInput>
+            data-testid="file-numbers"
+          />
         </InputField>
         <!-- Child  -->
         <template #children>
           <InputField
-            id="deviatingFileNumber"
+            id="deviatingFileNumbers"
             v-slot="{ id }"
             label="Abweichendes Aktenzeichen"
           >
             <ChipsInput
               :id="id"
-              v-model="coreDataModel.deviatingFileNumbers"
+              v-model="deviatingFileNumbers"
               aria-label="Abweichendes Aktenzeichen"
-            ></ChipsInput>
+              data-testid="deviating-file-numbers"
+            />
           </InputField>
         </template>
       </NestedComponent>
@@ -268,8 +319,8 @@ onBeforeUnmount(() => {
               :id="slotProps.id"
               v-model="coreDataModel.deviatingDecisionDates"
               aria-label="Abweichendes Entscheidungsdatum"
+              data-testid="deviating-decision-dates"
               :has-error="slotProps.hasError"
-              test-id="deviating-decision-dates"
               @focus="validationStore.remove('deviatingDecisionDates')"
               @update:validation-error="slotProps.updateValidationError"
             />
@@ -370,9 +421,10 @@ onBeforeUnmount(() => {
       >
         <ChipsInput
           :id="id"
-          v-model="coreDataModel.deviatingDocumentNumbers"
+          v-model="deviatingDocumentNumbers"
           aria-label="Abweichende Dokumentnummer"
-        ></ChipsInput>
+          data-testid="deviating-document-numbers"
+        />
       </InputField>
 
       <InputField
@@ -403,9 +455,9 @@ onBeforeUnmount(() => {
         class="w-full"
         :is-open="!!coreDataModel.deviatingEclis?.length"
       >
-        <InputField id="ecli" class="flex-col" label="ECLI">
+        <InputField id="ecli" v-slot="{ id }" class="flex-col" label="ECLI">
           <InputText
-            id="ecli"
+            :id="id"
             v-model="coreDataModel.ecli"
             aria-label="ECLI"
             fluid
@@ -421,9 +473,10 @@ onBeforeUnmount(() => {
           >
             <ChipsInput
               :id="id"
-              v-model="coreDataModel.deviatingEclis"
+              v-model="deviatingEclis"
               aria-label="Abweichender ECLI"
-            ></ChipsInput>
+              data-testid="deviating-eclis"
+            />
           </InputField>
         </template>
       </NestedComponent>
@@ -455,12 +508,13 @@ onBeforeUnmount(() => {
             v-slot="{ id }"
             label="Vorgangshistorie"
           >
-            <ChipsInput
+            <InputText
               :id="id"
               v-model="descendingPreviousProcedures"
               aria-label="Vorgangshistorie"
-              read-only
-            ></ChipsInput>
+              fluid
+              readonly
+            />
           </InputField>
         </template>
       </NestedComponent>
@@ -487,14 +541,14 @@ onBeforeUnmount(() => {
         :validation-error="validationStore.getByField('yearsOfDispute')"
       >
         <ChipsYearInput
-          id="yearOfDispute"
+          :id="slotProps.id"
           v-model="coreDataModel.yearsOfDispute"
           aria-label="Streitjahr"
-          data-testid="year-of-dispute"
           :has-error="slotProps.hasError"
+          test-id="year-of-dispute"
           @focus="validationStore.remove('yearsOfDispute')"
           @update:validation-error="slotProps.updateValidationError"
-        ></ChipsYearInput>
+        />
       </InputField>
     </div>
     <div v-if="!isPendingProceeding" :class="layoutClass">
@@ -518,13 +572,14 @@ onBeforeUnmount(() => {
           placeholder="Bitte auswählen"
         />
       </InputField>
-      <InputField id="inputTypes" label="Eingangsart">
+      <InputField id="inputTypes" v-slot="{ id }" label="Eingangsart">
         <div class="flex w-full flex-col">
           <ChipsInput
-            id="inputTypes"
-            v-model="coreDataModel.inputTypes"
+            :id="id"
+            v-model="inputTypes"
             aria-label="Eingangsart"
-          ></ChipsInput>
+            data-testid="input-types"
+          />
           <div class="ris-label3-regular pt-4">
             Papier, BLK-DB-Schnittstelle, EUR-LEX-Schnittstelle, E-Mail
           </div>
@@ -534,11 +589,12 @@ onBeforeUnmount(() => {
     <div :class="layoutClass">
       <InputField
         id="jurisdictionType"
+        v-slot="{ id }"
         class="flex-col"
         label="Gerichtsbarkeit"
       >
         <InputText
-          id="jurisdictionType"
+          :id="id"
           v-model="jurisdictionType"
           aria-label="Gerichtsbarkeit"
           data-testid="jurisdiction-type"
@@ -548,9 +604,9 @@ onBeforeUnmount(() => {
         />
       </InputField>
 
-      <InputField id="region" class="flex-col" label="Region">
+      <InputField id="region" v-slot="{ id }" class="flex-col" label="Region">
         <InputText
-          id="region"
+          :id="id"
           v-model="region"
           aria-label="Region"
           fluid
@@ -583,13 +639,15 @@ onBeforeUnmount(() => {
     >
       <InputField
         id="leadingDecisionNormReferences"
+        v-slot="{ id }"
         label="BGH Nachschlagewerk"
       >
         <ChipsInput
-          id="leadingDecisionNormReferences"
-          v-model="coreDataModel.leadingDecisionNormReferences"
+          :id="id"
+          v-model="leadingDecisionNormReferences"
           aria-label="BGH Nachschlagewerk"
-        ></ChipsInput>
+          data-testid="leading-decision-norm-references"
+        />
       </InputField>
     </div>
 

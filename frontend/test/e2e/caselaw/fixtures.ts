@@ -9,6 +9,7 @@ import { Decision } from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import { TranslationType } from "@/domain/originOfTranslation"
 import PendingProceeding from "@/domain/pendingProceeding"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { SourceValue } from "@/domain/source"
@@ -658,6 +659,20 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                 newEntry: true,
               },
             ],
+            originOfTranslations: [
+              {
+                languageCode: {
+                  id: "5a36047e-3b85-52a2-812b-02420b4a8499",
+                  label: "Französisch",
+                  isoCode: "fr",
+                },
+                translators: ["Maxi Muster"],
+                borderNumbers: [1],
+                urls: ["www.link-to-translation.fr"],
+                translationType: TranslationType.AMTLICH,
+                newEntry: true,
+              },
+            ],
             dismissalTypes: ["Test Kündigungsarten"],
             dismissalGrounds: ["Test Kündigungsgründe"],
             jobProfiles: ["Test Berufsbild"],
@@ -671,6 +686,19 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                 { id: "37213474-a727-4d85-8cc6-309d86944132", value: "Kläger" },
               ],
             },
+            collectiveAgreements: [
+              {
+                id: "24028dd6-7298-4a80-a9a0-91ea5886f90e",
+                newEntry: true,
+                name: "Stehende Bühnen",
+                norm: "§ 23",
+                date: "12.2002",
+                industry: {
+                  id: "290b39dc-9368-4d1c-9076-7f96e05cb575",
+                  label: "Bühne, Theater, Orchester",
+                },
+              },
+            ],
           },
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },

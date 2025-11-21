@@ -340,6 +340,7 @@
     |ris:dokumentarischeKurztexte|ris:orientierungssatz|ris:sonstigerOrientierungssatz|ris:entscheidungsnamen|ris:entscheidungsname|ris:titelzeile
     |ris:eingangsarten|ris:eingangsart|ris:definitionen|ris:definition|ris:definierterBegriff|ris:definierendeRandnummer|ris:fremdsprachigeFassungen|ris:fremdsprachigeFassung|ris:evsf|ris:rechtsmittelzulassung|ris:rechtsmittelZugelassen|ris:rechtsmittelZugelassenDurch
     |ris:documentNumber|ris:vorgehend|ris:nachgehend|ris:datum|ris:dokumentNummer|akn:otherReferences|ris:vermerk
+    |ris:norm|ris:abkuerzung|ris:einzelnorm|ris:bezeichnung|ris:gesetzeskraft|ris:geltungsbereich|ris:jahr|ris:titel
     |ris:decisionNames|ris:decisionName
     |ris:tarifvertraege|ris:tarifvertrag|ris:tarifvertragName|ris:tarifvertragDatum|ris:tarifvertragTarifnorm|ris:tarifvertragBranche
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@akn:refersTo|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan

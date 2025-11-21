@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
@@ -36,6 +37,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -293,17 +295,57 @@ class PendingProceedingFullLdmlTransformerTest {
                                 List.of(
                                     SingleNorm.builder()
                                         .singleNorm("singleNorm test")
+                                        .dateOfRelevance("2020")
+                                        .dateOfVersion(LocalDate.of(2021, 2, 5))
                                         .legalForce(
                                             LegalForce.builder()
+                                                .region(
+                                                    Region.builder()
+                                                        .code("legalForce region code")
+                                                        .longText("legalForce region longText")
+                                                        .build())
                                                 .type(
                                                     LegalForceType.builder()
-                                                        .label("legalForce test")
+                                                        .label("legalForceType label")
+                                                        .abbreviation("legalForceType abbreviation")
                                                         .build())
                                                 .build())
+                                        .build(),
+                                    SingleNorm.builder()
+                                        .singleNorm("singleNorm 2 test")
+                                        .dateOfRelevance("2022")
+                                        .dateOfVersion(LocalDate.of(2022, 3, 6))
                                         .build()))
                             .normAbbreviation(
                                 NormAbbreviation.builder()
                                     .abbreviation("normReference test")
+                                    .build())
+                            .build(),
+                        NormReference.builder()
+                            .normAbbreviation(
+                                NormAbbreviation.builder()
+                                    .abbreviation("normReference without SingleNorms")
+                                    .decisionDate(
+                                        LocalDate.of(2019, 4, 7)
+                                            .atStartOfDay()
+                                            .atZone(ZoneId.of("Europe/Berlin"))
+                                            .toInstant())
+                                    .documentId(123L)
+                                    .documentNumber("KORE12345")
+                                    .documentTypes(
+                                        List.of(
+                                            DocumentType.builder()
+                                                .label("documentType label")
+                                                .build()))
+                                    .source("Source")
+                                    .officialLongTitle("officialLongTitle")
+                                    .officialShortTitle("officialShortTitle")
+                                    .officialLetterAbbreviation("officialLetterAbbreviation")
+                                    .region(
+                                        Region.builder()
+                                            .code("region code")
+                                            .longText("region longtext")
+                                            .build())
                                     .build())
                             .build()))
                 .jobProfiles(List.of("jobProfile test"))

@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementIndustryDTO;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 
 public class CollectiveAgreementTransformer {
@@ -29,14 +28,14 @@ public class CollectiveAgreementTransformer {
 
     var builder =
         CollectiveAgreementDTO.builder()
-            .id(collectiveAgreement.id())
+            .id(collectiveAgreement.newEntry() ? null : collectiveAgreement.id())
             .name(collectiveAgreement.name())
             .norm(collectiveAgreement.norm())
             .date(collectiveAgreement.date());
 
     if (collectiveAgreement.industry() != null) {
       builder.industry(
-          CollectiveAgreementIndustryDTO.builder().id(collectiveAgreement.industry().id()).build());
+          CollectiveAgreementIndustryTransformer.transformToDto(collectiveAgreement.industry()));
     }
 
     return builder.build();

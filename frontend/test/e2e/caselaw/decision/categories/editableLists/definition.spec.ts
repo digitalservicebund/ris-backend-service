@@ -132,9 +132,11 @@ test.describe(
         )
       })
 
-      const deleteDefinitionButton = page.getByRole("button", {
-        name: "Eintrag löschen",
-      })
+      const deleteDefinitionButton = page
+        .getByTestId("Definitionen")
+        .getByRole("button", {
+          name: "Eintrag löschen",
+        })
       await test.step("Der erste Eintrag kann gelöscht werden", async () => {
         await page
           .getByTestId("Definitionen")

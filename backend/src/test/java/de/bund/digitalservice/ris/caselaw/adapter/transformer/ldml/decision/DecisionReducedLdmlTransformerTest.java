@@ -37,6 +37,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
@@ -46,6 +47,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Year;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -136,7 +138,7 @@ class DecisionReducedLdmlTransformerTest {
     if (diff.hasDifferences()) {
       StringBuilder differences = new StringBuilder();
       diff.getDifferences().forEach(d -> differences.append(d.toString()).append("\n"));
-      Assertions.fail("XMLs differ:\n" + differences.toString());
+      Assertions.fail("XMLs differ:\n" + differences);
     }
   }
 
@@ -274,17 +276,58 @@ class DecisionReducedLdmlTransformerTest {
                                     List.of(
                                         SingleNorm.builder()
                                             .singleNorm("singleNorm test")
+                                            .dateOfRelevance("2020")
+                                            .dateOfVersion(LocalDate.of(2021, 2, 5))
                                             .legalForce(
                                                 LegalForce.builder()
+                                                    .region(
+                                                        Region.builder()
+                                                            .code("legalForce region code")
+                                                            .longText("legalForce region longText")
+                                                            .build())
                                                     .type(
                                                         LegalForceType.builder()
-                                                            .label("legalForce test")
+                                                            .label("legalForceType label")
+                                                            .abbreviation(
+                                                                "legalForceType abbreviation")
                                                             .build())
                                                     .build())
+                                            .build(),
+                                        SingleNorm.builder()
+                                            .singleNorm("singleNorm 2 test")
+                                            .dateOfRelevance("2022")
+                                            .dateOfVersion(LocalDate.of(2022, 3, 6))
                                             .build()))
                                 .normAbbreviation(
                                     NormAbbreviation.builder()
                                         .abbreviation("normReference test")
+                                        .build())
+                                .build(),
+                            NormReference.builder()
+                                .normAbbreviation(
+                                    NormAbbreviation.builder()
+                                        .abbreviation("normReference without SingleNorms")
+                                        .decisionDate(
+                                            LocalDate.of(2019, 4, 7)
+                                                .atStartOfDay()
+                                                .atZone(ZoneId.of("Europe/Berlin"))
+                                                .toInstant())
+                                        .documentId(123L)
+                                        .documentNumber("KORE12345")
+                                        .documentTypes(
+                                            List.of(
+                                                DocumentType.builder()
+                                                    .label("documentType label")
+                                                    .build()))
+                                        .source("Source")
+                                        .officialLongTitle("officialLongTitle")
+                                        .officialShortTitle("officialShortTitle")
+                                        .officialLetterAbbreviation("officialLetterAbbreviation")
+                                        .region(
+                                            Region.builder()
+                                                .code("region code")
+                                                .longText("region longtext")
+                                                .build())
                                         .build())
                                 .build()))
                     .jobProfiles(List.of("jobProfile test"))
@@ -390,27 +433,38 @@ class DecisionReducedLdmlTransformerTest {
               <ris:aktenzeichenListe domainTerm="Liste der Aktenzeichen">
                 <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">fileNumber test</ris:aktenzeichen>
               </ris:aktenzeichenListe>
-               """),
+              """),
         Arguments.of(
             "'appraisalBody/judicialBody' (Spruchkörper)",
             """
                 <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBody test</ris:spruchkoerper>
                """),
-        // Fixme: should be included -->
-        //        Arguments.of(
-        //            "'region' (Region)",
-        //            """
-        //                <ris:region>region test</ris:region>
-        //               """),
+        Arguments.of(
+            "'region' (Region)",
+            """
+            <ris:regionen domainTerm="Regionen">
+              <ris:region domainTerm="Region">NW</ris:region>
+            </ris:regionen>
+            """),
         // Normen -->
-        // Fixme: Add elements for single norm and norm abbreviation once they are also transformed
-        //        Arguments.of(
-        //            "'normReferences' (Normen)",
-        //            """
-        //              <ris:legalForces>
-        //                 <ris:legalForce>legalForce test</ris:legalForce>
-        //              </ris:legalForces>
-        //               """),
+        Arguments.of(
+            "'normReferences' (Normen)",
+            """
+               <akn:implicitReference ris:domainTerm="Norm">
+                  <ris:norm domainTerm="Norm">
+                     <ris:abkuerzung domainTerm="Abkürzung">normReference test</ris:abkuerzung>
+                     <ris:einzelnorm domainTerm="Einzelnorm">
+                        <ris:bezeichnung domainTerm="Bezeichnung">singleNorm test</ris:bezeichnung>
+                        <ris:datum domainTerm="Fassungsdatum">2021-02-05</ris:datum>
+                        <ris:jahr domainTerm="Jahr">2020</ris:jahr>
+                     </ris:einzelnorm>
+                     <ris:einzelnorm domainTerm="Einzelnorm">
+                        <ris:bezeichnung domainTerm="Bezeichnung">singleNorm 2 test</ris:bezeichnung>
+                        <ris:datum domainTerm="Fassungsdatum">2022-03-06</ris:datum>
+                        <ris:jahr domainTerm="Jahr">2022</ris:jahr>
+                     </ris:einzelnorm>
+                  </ris:norm>
+               """),
         // PreviousDecisions -->
         Arguments.of(
             "'previousDecisions' (Vorgehende Entscheidungen)",
@@ -439,7 +493,7 @@ class DecisionReducedLdmlTransformerTest {
                          </ris:gericht>
                      </ris:vorgehend>
                  </akn:implicitReference>
-                       """),
+                 """),
         // EnsuingDecisions -->
         Arguments.of(
             "'ensuingDecisions' (Nachgehende Entscheidungen)",
@@ -467,7 +521,7 @@ class DecisionReducedLdmlTransformerTest {
                         <ris:vermerk domainTerm="Vermerk">ensuing decision note</ris:vermerk>
                     </ris:nachgehend>
                 </akn:implicitReference>
-                      """),
+                """),
         // LongTexts/Langtexte -->
         Arguments.of(
             "'dissentingOpinion' (Abweichende Meinung)",
@@ -553,7 +607,7 @@ class DecisionReducedLdmlTransformerTest {
             <ris:decisionNames>
                <ris:decisionNames>decisionNames test</ris:decisionNames>
             </ris:decisionNames>
-               """),
+            """),
         Arguments.of(
             "'keywords' (Schlagworte)",
             """
@@ -562,7 +616,7 @@ class DecisionReducedLdmlTransformerTest {
                          showAs="attributsemantik-noch-undefiniert"
                          value="keyword test"/>
          </akn:classification>
-            """),
+        """),
         Arguments.of(
             "'headnote' (Orientierungssatz)",
             """
@@ -597,7 +651,7 @@ class DecisionReducedLdmlTransformerTest {
             <ris:procedures>
               <ris:procedure>previous procedure test</ris:procedure>
            </ris:procedures>
-            """),
+           """),
         Arguments.of(
             "'fieldsOfLaw' (Sachgebiete)",
             """

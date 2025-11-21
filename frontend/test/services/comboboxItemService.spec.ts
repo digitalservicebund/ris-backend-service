@@ -2,6 +2,7 @@ import { waitFor } from "@testing-library/vue"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { ref } from "vue"
+import { CollectiveAgreementIndustry } from "@/domain/collectiveAgreementIndustry"
 import { Court } from "@/domain/court"
 import { DocumentType } from "@/domain/documentType"
 import { DocumentTypeCategory } from "@/domain/documentTypeCategory"
@@ -29,6 +30,10 @@ const dependentLiteratureDoctype: DocumentType = {
 }
 const normAbbreviation = { id: "id", abbreviation: "BGB" }
 const languageCode: LanguageCode = { id: "id", label: "Englisch" }
+const collectiveAgreementIndustry: CollectiveAgreementIndustry = {
+  id: "290b39dc-9368-4d1c-9076-7f96e05cb575",
+  label: "Bühne, Theater, Orchester",
+}
 
 const server = setupServer(
   http.get("/api/v1/caselaw/courts", () => HttpResponse.json([court])),
@@ -52,6 +57,9 @@ const server = setupServer(
   }),
   http.get("/api/v1/caselaw/languagecodes", () => {
     return HttpResponse.json([languageCode])
+  }),
+  http.get("/api/v1/caselaw/collective-agreement-industries", () => {
+    return HttpResponse.json([collectiveAgreementIndustry])
   }),
 )
 
@@ -120,6 +128,16 @@ describe("comboboxItemService", () => {
     await waitFor(() => {
       expect(data.value?.[0].label).toEqual("Englisch")
       expect(data.value?.[0].value).toEqual(languageCode)
+    })
+  })
+
+  it("should fetch collective agreement industries from lookup table", async () => {
+    const { data, execute } = service.getCollectiveAgreementIndustries(ref())
+
+    await execute()
+    await waitFor(() => {
+      expect(data.value?.[0].label).toEqual("Bühne, Theater, Orchester")
+      expect(data.value?.[0].value).toEqual(collectiveAgreementIndustry)
     })
   })
 })
