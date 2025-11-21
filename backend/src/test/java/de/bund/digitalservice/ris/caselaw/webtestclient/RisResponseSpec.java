@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.webtestclient;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.test.web.servlet.ResultActions;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 public class RisResponseSpec {
   private final ResultActions resultActions;

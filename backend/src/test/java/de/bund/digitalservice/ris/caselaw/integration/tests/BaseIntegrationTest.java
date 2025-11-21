@@ -49,7 +49,10 @@ import org.testcontainers.utility.DockerImageName;
       "management.endpoint.health.probes.enabled=true",
       "management.health.livenessState.enabled=true",
       "management.health.readinessState.enabled=true",
-      "management.endpoint.health.group.readiness.include=readinessState,db,redis",
+      "management.endpoint.health.group.readiness.include=readinessState,db", // TODO: (Malte
+      // Laukötter,
+      // 2025-12-15) include
+      // redis again
       "spring.security.oauth2.client.provider.keycloak.issuer-uri=localhost",
     })
 @AutoConfigureMockMvc

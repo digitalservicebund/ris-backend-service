@@ -16,6 +16,7 @@ import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
 public class ConverterConfig {
@@ -57,17 +58,22 @@ public class ConverterConfig {
 
   @Bean
   @Primary
-  public ObjectMapper objectMapper() {
-    var objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new JavaTimeModule());
-    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    objectMapper.registerModule(YearJsonConverter.yearJsonConverter());
-    return objectMapper;
+  public JsonMapper jsonMapper() {
+    return JsonMapper.builder().build();
   }
 
   @Bean
   public XmlExporter jurisXmlExporter() {
-    return new JurisXmlExporterWrapper(objectMapper(), transformerFactory());
+    return new JurisXmlExporterWrapper(jsonMapper(), transformerFactory());
+  }
+
+  @Bean
+  @Primary
+  public ObjectMapper legacyObjectMapper() {
+    var objectMapper = new ObjectMapper();
+    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    objectMapper.registerModule(new JavaTimeModule());
+    return objectMapper;
   }
 
   // @Bean

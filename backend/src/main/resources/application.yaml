@@ -16,7 +16,7 @@ management:
       show-details: always
       group:
         readiness:
-          include: readinessState,redis,db
+          include: readinessState,db # TODO: (Malte Laukötter, 2025-12-15) readd redis
   endpoints:
     web:
       exposure:
