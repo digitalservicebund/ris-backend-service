@@ -31,6 +31,8 @@ import org.docx4j.wml.STVerticalAlignRun;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.TblBorders;
+import org.docx4j.wml.TblGrid;
+import org.docx4j.wml.TblGridCol;
 import org.docx4j.wml.TblPr;
 import org.docx4j.wml.TblWidth;
 import org.docx4j.wml.Tc;
@@ -341,7 +343,7 @@ class DocxTableBuilderTest {
   }
 
   @Test
-  void givenTableWithCellWidths_whenBuildingTable_thenValidateWidthsArePresent() {
+  void givenTableWithCellWidths_whenBuildingTable_thenValidateWidthsArePresent_MsWord() {
     // given
     var firstColWidthInTwips = 500;
     var secondColWidthInTwips = 1000;
@@ -368,6 +370,66 @@ class DocxTableBuilderTest {
     var tbl = new Tbl();
     tbl.setTblPr(tblPr);
     tbl.getContent().add(row);
+
+    var builder = DocxTableBuilder.newInstance();
+    builder.setTable(tbl);
+
+    // when
+    var result = builder.build(new ArrayList<>()).toHtmlString();
+
+    // then
+    assertThat(result)
+        .contains(
+            "<td style=\"border-right: 6px solid #000; border-top: 1.5px solid #abcdef; min-width: 5px; padding: 5px; width: 33px;\">")
+        .contains(
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; min-width: 5px; padding: 5px; width: 66px;\">")
+        .contains(
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; min-width: 5px; padding: 5px; width: 50px;\">")
+        .contains(
+            "<td style=\"border-left: 6px solid #000; border-top: 1.5px solid #mnopqr; min-width: 5px; padding: 5px; width: 133px;\">");
+  }
+
+  @Test
+  void
+      givenTableWithGlobalCellWidths_whenBuildingTable_thenValidateWidthsArePresent_GoogleDocsExport() {
+    // given
+    var firstColWidthInTwips = 500;
+    var secondColWidthInTwips = 1000;
+    var thirdColWidthInTwips = 750;
+    var fourthColWidthInTwips = 2000;
+
+    var row = new Tr();
+    row.getContent().add(generateTableCellWidthBorder("ABCDEF", 12));
+    row.getContent().add(generateTableCellWidthBorder("GHIJKL", 12));
+    row.getContent().add(generateTableCellWidthBorder("GHIJKL", 12));
+    row.getContent().add(generateTableCellWidthBorder("MNOPQR", 12));
+
+    var tableCtBorder = new CTBorder();
+    tableCtBorder.setVal(STBorder.SINGLE);
+    tableCtBorder.setSz(BigInteger.valueOf(48));
+    tableCtBorder.setColor("auto");
+
+    var tableBorders = new TblBorders();
+    tableBorders.setInsideV(tableCtBorder);
+    tableBorders.setInsideH(tableCtBorder);
+
+    var tblPr = new TblPr();
+    tblPr.setTblBorders(tableBorders);
+    var tbl = new Tbl();
+    tbl.setTblPr(tblPr);
+    tbl.getContent().add(row);
+
+    var tableGrid = new TblGrid();
+    var colOne = new TblGridCol();
+    colOne.setW(BigInteger.valueOf(firstColWidthInTwips));
+    var colTwo = new TblGridCol();
+    colTwo.setW(BigInteger.valueOf(secondColWidthInTwips));
+    var colThree = new TblGridCol();
+    colThree.setW(BigInteger.valueOf(thirdColWidthInTwips));
+    var colFour = new TblGridCol();
+    colFour.setW(BigInteger.valueOf(fourthColWidthInTwips));
+    tableGrid.getGridCol().addAll(List.of(colOne, colTwo, colThree, colFour));
+    tbl.setTblGrid(tableGrid);
 
     var builder = DocxTableBuilder.newInstance();
     builder.setTable(tbl);
