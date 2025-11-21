@@ -608,18 +608,7 @@ public class DocxTableBuilder extends DocxBuilder {
     }
 
     if (tcPr.getTcBorders() != null) {
-      if (tcPr.getTcBorders().getBottom() != null) {
-        cellElement.setBottomBorder(parseCtBorder(tcPr.getTcBorders().getBottom()));
-      }
-      if (tcPr.getTcBorders().getTop() != null) {
-        cellElement.setTopBorder(parseCtBorder(tcPr.getTcBorders().getTop()));
-      }
-      if (tcPr.getTcBorders().getLeft() != null) {
-        cellElement.setLeftBorder(parseCtBorder(tcPr.getTcBorders().getLeft()));
-      }
-      if (tcPr.getTcBorders().getRight() != null) {
-        cellElement.setRightBorder(parseCtBorder(tcPr.getTcBorders().getRight()));
-      }
+      setBorders(cellElement, tcPr);
     }
 
     if (tcPr.getGridSpan() != null) {
@@ -628,6 +617,21 @@ public class DocxTableBuilder extends DocxBuilder {
 
     if (tcPr.getShd() != null) {
       cellElement.setBackgroundColor(parseCTShd(tcPr.getShd()));
+    }
+  }
+
+  private void setBorders(TableCellElement cellElement, TcPr tcPr) {
+    if (tcPr.getTcBorders().getBottom() != null) {
+      cellElement.setBottomBorder(parseCtBorder(tcPr.getTcBorders().getBottom()));
+    }
+    if (tcPr.getTcBorders().getTop() != null) {
+      cellElement.setTopBorder(parseCtBorder(tcPr.getTcBorders().getTop()));
+    }
+    if (tcPr.getTcBorders().getLeft() != null) {
+      cellElement.setLeftBorder(parseCtBorder(tcPr.getTcBorders().getLeft()));
+    }
+    if (tcPr.getTcBorders().getRight() != null) {
+      cellElement.setRightBorder(parseCtBorder(tcPr.getTcBorders().getRight()));
     }
   }
 
