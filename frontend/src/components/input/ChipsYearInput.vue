@@ -38,19 +38,9 @@ const chips = computed<string[]>({
   get: () => localChips.value,
 
   set: (newValues: string[]) => {
-    const oldLength = localChips.value.length
-    const newLength = newValues.length
+    const isValid = newValues.every((value) => validateInput(value, newValues))
 
-    if (newLength >= oldLength) {
-      const isValid = newValues.every((value) =>
-        validateInput(value, newValues),
-      )
-
-      if (isValid) {
-        emit("update:modelValue", newValues)
-      }
-    } else if (newLength < oldLength) {
-      clearValidationErrors()
+    if (isValid) {
       emit("update:modelValue", newValues)
     }
   },

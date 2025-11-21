@@ -37,23 +37,9 @@ function isDuplicate(value?: string, values: string[] = []) {
 const chips = computed<string[]>({
   get: () => formattedChips.value,
   set: (newValues: string[]) => {
-    const oldLength = formattedChips.value.length
-    const newLength = newValues.length
+    const isValid = newValues.every((value) => validateInput(value, newValues))
 
-    if (newLength >= oldLength) {
-      const isValid = newValues.every((value) =>
-        validateInput(value, newValues),
-      )
-
-      if (isValid) {
-        const valuesInStandardFormat = newValues.map((value) =>
-          dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
-        )
-        emit("update:modelValue", valuesInStandardFormat)
-      }
-    } else if (newLength < oldLength) {
-      clearValidationErrors()
-
+    if (isValid) {
       const valuesInStandardFormat = newValues.map((value) =>
         dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
       )
