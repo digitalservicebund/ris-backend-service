@@ -414,12 +414,6 @@ const buttons = computed(() => {
             ),
         },
       ],
-      callback: () =>
-        props.editor
-          .chain()
-          .focus()
-          .insertTable({ rows: 3, cols: 3, withHeaderRow: false })
-          .run(),
     },
     {
       type: "blockquote",
