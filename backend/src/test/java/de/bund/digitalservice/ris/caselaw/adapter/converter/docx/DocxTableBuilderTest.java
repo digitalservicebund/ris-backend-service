@@ -32,6 +32,7 @@ import org.docx4j.wml.Style;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.TblBorders;
 import org.docx4j.wml.TblPr;
+import org.docx4j.wml.TblWidth;
 import org.docx4j.wml.Tc;
 import org.docx4j.wml.TcPr;
 import org.docx4j.wml.TcPrInner;
@@ -339,6 +340,53 @@ class DocxTableBuilderTest {
                 + "</table>");
   }
 
+  @Test
+  void givenTableWithCellWidths_whenBuildingTable_thenValidateWidthsArePresent() {
+    // given
+    var firstColWidthInTwips = 500;
+    var secondColWidthInTwips = 1000;
+    var thirdColWidthInTwips = 750;
+    var fourthColWidthInTwips = 2000;
+
+    var row = new Tr();
+    row.getContent().add(generateTableCellWidthBorderAndWidth("ABCDEF", 12, firstColWidthInTwips));
+    row.getContent().add(generateTableCellWidthBorderAndWidth("GHIJKL", 12, secondColWidthInTwips));
+    row.getContent().add(generateTableCellWidthBorderAndWidth("GHIJKL", 12, thirdColWidthInTwips));
+    row.getContent().add(generateTableCellWidthBorderAndWidth("MNOPQR", 12, fourthColWidthInTwips));
+
+    var tableCtBorder = new CTBorder();
+    tableCtBorder.setVal(STBorder.SINGLE);
+    tableCtBorder.setSz(BigInteger.valueOf(48));
+    tableCtBorder.setColor("auto");
+
+    var tableBorders = new TblBorders();
+    tableBorders.setInsideV(tableCtBorder);
+    tableBorders.setInsideH(tableCtBorder);
+
+    var tblPr = new TblPr();
+    tblPr.setTblBorders(tableBorders);
+    var tbl = new Tbl();
+    tbl.setTblPr(tblPr);
+    tbl.getContent().add(row);
+
+    var builder = DocxTableBuilder.newInstance();
+    builder.setTable(tbl);
+
+    // when
+    var result = builder.build(new ArrayList<>()).toHtmlString();
+
+    // then
+    assertThat(result)
+        .contains(
+            "<td style=\"border-right: 6px solid #000; border-top: 1.5px solid #abcdef; min-width: 5px; padding: 5px; width: 33px;\">")
+        .contains(
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; min-width: 5px; padding: 5px; width: 66px;\">")
+        .contains(
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; min-width: 5px; padding: 5px; width: 50px;\">")
+        .contains(
+            "<td style=\"border-left: 6px solid #000; border-top: 1.5px solid #mnopqr; min-width: 5px; padding: 5px; width: 133px;\">");
+  }
+
   @SuppressWarnings("java:S5976") // Disable warning for tests that could be parametrized
   @Nested
   class TestBuildWithExternalTableStyleContainsTableStyleProperties {
@@ -530,6 +578,33 @@ class DocxTableBuilderTest {
         .add(
             TestDocxBuilder.newParagraphBuilder()
                 .addRunElement(TestDocxBuilder.buildTextRunElement("foo"))
+                .build());
+    return new JAXBElement<>(new QName("tc"), Tc.class, tc);
+  }
+
+  private JAXBElement<Tc> generateTableCellWidthBorderAndWidth(
+      String color, Integer borderWidth, Integer cellWidth) {
+    var ctBorder = new CTBorder();
+    ctBorder.setVal(STBorder.SINGLE);
+    ctBorder.setSz(BigInteger.valueOf(borderWidth));
+    ctBorder.setColor(color);
+
+    var tcBorders = new TcPrInner.TcBorders();
+    tcBorders.setTop(ctBorder);
+
+    var tblWidth = new TblWidth();
+    tblWidth.setW(BigInteger.valueOf(cellWidth));
+
+    var tcPr = new TcPr();
+    tcPr.setTcBorders(tcBorders);
+    tcPr.setTcW(tblWidth);
+
+    var tc = new Tc();
+    tc.setTcPr(tcPr);
+    tc.getContent()
+        .add(
+            TestDocxBuilder.newParagraphBuilder()
+                .addRunElement(TestDocxBuilder.buildTextRunElement("foobar"))
                 .build());
     return new JAXBElement<>(new QName("tc"), Tc.class, tc);
   }

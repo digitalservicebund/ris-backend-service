@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public class DocxTableBuilder extends DocxBuilder {
   private static final Logger LOGGER = LoggerFactory.getLogger(DocxTableBuilder.class);
   private Tbl table;
-  private List<Integer> columnWitdhsPx = Collections.emptyList();
+  private List<Integer> columnWidthsPx = Collections.emptyList();
 
   private DocxTableBuilder() {}
 
@@ -48,7 +48,7 @@ public class DocxTableBuilder extends DocxBuilder {
 
   public DocxTableBuilder setTable(Tbl table) {
     this.table = table;
-    this.columnWitdhsPx = getColumnWidthsPxFromGrid(table);
+    this.columnWidthsPx = getColumnWidthsPxFromGrid(table);
 
     return this;
   }
@@ -656,13 +656,13 @@ public class DocxTableBuilder extends DocxBuilder {
         var widthPx = DocxUnitConverter.convertTwipToPixel(tcPr.getTcW().getW().longValue());
         cellElement.setWidthPx(widthPx);
       } else {
-        if (columnWitdhsPx != null && !columnWitdhsPx.isEmpty()) {
+        if (columnWidthsPx != null && !columnWidthsPx.isEmpty()) {
           var columnIndex = colIndex.get();
           var finalWidth = 0;
           for (int i = 0; i < span; i++) {
             var colPos = columnIndex + i;
-            if (colPos < columnWitdhsPx.size()) {
-              finalWidth += columnWitdhsPx.get(colPos);
+            if (colPos < columnWidthsPx.size()) {
+              finalWidth += columnWidthsPx.get(colPos);
             }
           }
           if (finalWidth > 0) {
