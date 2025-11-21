@@ -165,4 +165,50 @@ describe("ChipsYearInput", () => {
     await user.keyboard("{enter}")
     expect(onUpdate).toHaveBeenCalledWith(["2020"])
   })
+
+  it("edits the chip on double click", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      modelValue: ["2020"],
+    })
+
+    const editButton = screen.getByRole("button", {
+      name: /eintrag bearbeiten/i,
+    })
+    await user.dblClick(editButton)
+    const input = screen.getByRole("textbox")
+    await user.keyboard("{backspace}")
+    await user.type(input, "2")
+    await user.keyboard("{enter}")
+    expect(onUpdate).toHaveBeenCalledWith(["2022"])
+  })
+
+  it("validates the first chip after editing", async () => {
+    const id = "id"
+    const ariaLabel = "chip"
+    const onUpdate = vi.fn()
+    const onError = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      "onUpdate:validationError": onError,
+      modelValue: ["2021", "2022", "2023"],
+      id: id,
+      ariaLabel: ariaLabel,
+    })
+
+    const editButtons = screen.getAllByRole("button", {
+      name: /eintrag bearbeiten/i,
+    })
+    await user.dblClick(editButtons[0])
+    const input = screen.getByRole("textbox")
+    await user.keyboard("{backspace}{backspace}")
+    await user.type(input, "99")
+    await user.keyboard("{enter}")
+    expect(onUpdate).not.toHaveBeenCalledWith(["2099"])
+    expect(onError).toHaveBeenCalledWith({
+      message: ariaLabel + " darf nicht in der Zukunft liegen",
+      instance: id,
+    })
+  })
 })
