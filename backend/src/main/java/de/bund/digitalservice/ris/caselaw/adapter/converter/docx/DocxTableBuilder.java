@@ -431,7 +431,10 @@ public class DocxTableBuilder extends DocxBuilder {
       switch (border.getVal()) {
         case SINGLE:
           break;
-        case DASHED:
+        case DOTTED:
+          type = "dotted";
+          break;
+        case DASHED, DASH_SMALL_GAP:
           type = "dashed";
           break;
         case NONE, NIL:
@@ -668,6 +671,7 @@ public class DocxTableBuilder extends DocxBuilder {
 
   private void setCellWidthFromGlobal(
       TableCellElement cellElement, int span, AtomicInteger colIndex) {
+
     if (columnWidthsPx != null && !columnWidthsPx.isEmpty()) {
       var columnIndex = colIndex.get();
       var finalWidth = 0;
