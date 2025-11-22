@@ -76,7 +76,7 @@
     "tippy.js": "^6.3.7",
     "vue": "^3.5.24",
     "vue-router": "4.6.3",
-    "vue-tsc": "3.1.4"
+    "vue-tsc": "3.1.5"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",
@@ -98,7 +98,7 @@
     "@types/node": "^24.10.1",
     "@typescript-eslint/eslint-plugin": "^8.47.0",
     "@typescript-eslint/parser": "^8.47.0",
-    "@types/lodash": "^4.17.20",
+    "@types/lodash": "^4.17.21",
     "@vitejs/plugin-vue": "^6.0.2",
     "@vitest/coverage-istanbul": "^4.0.13",
     "@vue/eslint-config-prettier": "^10.2.0",
@@ -114,7 +114,7 @@
     "eslint-plugin-playwright": "^2.3.0",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-testing-library": "7.6.3",
-    "eslint-plugin-vue": "^10.5.1",
+    "eslint-plugin-vue": "^10.6.0",
     "eslint-plugin-vue-scoped-css": "^2.12.0",
     "eslint-plugin-vuejs-accessibility": "^2.4.1",
     "globals": "^16.5.0",
