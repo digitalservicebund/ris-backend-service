@@ -1,7 +1,11 @@
-import { Extension } from "@tiptap/core"
+import { Table } from "@tiptap/extension-table"
 import "../styles/tables.css"
 
-export const TableStyle = Extension.create({
+/**
+ * Erweitert die Tiptap Table Extension, um die Logik für die 'invisible-table'-Klasse
+ * auf Tabellenknoten, Header und Zellen anzuwenden.
+ */
+export const CustomTable = Table.extend({
   addGlobalAttributes() {
     return [
       {
@@ -47,5 +51,13 @@ export const TableStyle = Extension.create({
         },
       },
     ]
+  },
+
+  addOptions() {
+    return {
+      ...this.parent?.(),
+      resizable: true,
+      allowTableNodeSelection: true,
+    }
   },
 })
