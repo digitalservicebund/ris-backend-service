@@ -527,4 +527,34 @@ describe("other categories", () => {
       expect(screen.getByTestId("appellants")).toBeInTheDocument()
     })
   })
+
+  describe("JobProfiles", () => {
+    test("should display job profile button when it is undefined", async () => {
+      // Arrange
+      mockSessionStore({ jobProfiles: undefined })
+
+      // Act
+      render(OtherCategories)
+
+      // Assert
+      expect(
+        screen.getByRole("button", { name: "Berufsbild" }),
+      ).toBeInTheDocument()
+      expect(screen.queryByTestId("job-profiles")).not.toBeInTheDocument()
+    })
+
+    test("should display job profiles when it is not undefined", async () => {
+      // Arrange
+      mockSessionStore({ jobProfiles: ["job profile 1", "job profile 2"] })
+
+      // Act
+      render(OtherCategories)
+
+      // Assert
+      expect(
+        screen.queryByRole("button", { name: "Berufsbild" }),
+      ).not.toBeInTheDocument()
+      expect(screen.getByTestId("job-profiles")).toBeInTheDocument()
+    })
+  })
 })
