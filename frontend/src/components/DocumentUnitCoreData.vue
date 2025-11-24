@@ -245,6 +245,7 @@ onBeforeUnmount(() => {
       </InputField>
       <!-- Child  -->
       <template #children>
+        <div :class="layoutClass">
         <InputField
           id="deviatingCourts"
           v-slot="slotProps"
@@ -260,6 +261,11 @@ onBeforeUnmount(() => {
             @update:validation-error="slotProps.updateValidationError"
           />
         </InputField>
+          <CourtBranchLocation
+            v-model="coreDataModel.courtBranchLocation"
+            :court="coreDataModel.court"
+          />
+        </div>
       </template>
     </NestedComponent>
 
