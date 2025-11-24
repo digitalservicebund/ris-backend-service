@@ -1,33 +1,27 @@
-import { Extension } from "@tiptap/core"
+import { Table } from "@tiptap/extension-table"
 import "../styles/tables.css"
+import { hasAllBorders } from "./tableUtil"
 
-export const TableStyle = Extension.create({
+/**
+ * Erweitert die Tiptap Table Extension, um die Logik für die 'invisible-table'-Klasse
+ * auf Tabellenknoten, Header und Zellen anzuwenden.
+ */
+export const CustomTable = Table.extend({
   addGlobalAttributes() {
     return [
       {
+        // apply to table container + cells + headers
         types: ["table", "tableCell", "tableHeader"],
         attributes: {
           style: {
             renderHTML: (attributes) => {
               const existingStyle = attributes.style || ""
 
-              // Split the style string into individual declarations
-              const styles: string[] = existingStyle.split(";")
-
-              const hasBorderStyle = styles.some((style) => {
-                const trimmedStyle = style.trim()
-                return (
-                  trimmedStyle.startsWith("border") &&
-                  !trimmedStyle.includes("none")
-                )
-              })
-
-              const invisibleTableClass = hasBorderStyle
-                ? ""
-                : "invisible-table"
+              const allBorders = hasAllBorders(existingStyle)
+              const invisibleClass = allBorders ? "" : "invisible-table-cell"
 
               return {
-                class: invisibleTableClass,
+                class: invisibleClass,
                 style: existingStyle,
               }
             },
@@ -47,5 +41,13 @@ export const TableStyle = Extension.create({
         },
       },
     ]
+  },
+
+  addOptions() {
+    return {
+      ...this.parent?.(),
+      resizable: true,
+      allowTableNodeSelection: true,
+    }
   },
 })

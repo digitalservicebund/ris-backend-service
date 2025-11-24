@@ -8,7 +8,6 @@ import { HardBreak } from "@tiptap/extension-hard-break"
 import { History } from "@tiptap/extension-history"
 import { Italic } from "@tiptap/extension-italic"
 import { Strike } from "@tiptap/extension-strike"
-import { Table } from "@tiptap/extension-table"
 import { TableRow } from "@tiptap/extension-table-row"
 import { Text } from "@tiptap/extension-text"
 import { TextAlign } from "@tiptap/extension-text-align"
@@ -39,9 +38,9 @@ import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
+import { CustomTable } from "@/editor/table"
 import { CustomTableCell } from "@/editor/tableCell"
 import { CustomTableHeader } from "@/editor/tableHeader"
-import { TableStyle } from "@/editor/tableStyle"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -111,14 +110,10 @@ const editor: Editor = new Editor({
     Strike,
     CustomSubscript,
     CustomSuperscript,
-    Table.configure({
-      resizable: true,
-      allowTableNodeSelection: true,
-    }),
+    CustomTable,
     CustomTableCell,
     CustomTableHeader,
     TableRow,
-    TableStyle,
     TextStyle,
     HardBreak,
     InvisibleCharacters,

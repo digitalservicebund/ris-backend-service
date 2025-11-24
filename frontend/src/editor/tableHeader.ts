@@ -1,16 +1,20 @@
 import { TableHeader } from "@tiptap/extension-table-header"
-import { getBorderAttributes } from "./tableCell"
+import { createCellCommands } from "./tableUtil"
 
-/**
- * Erweitert die Standard-TableHeader Extension und verwendet die getBorderAttributes Logik.
- */
 export const CustomTableHeader = TableHeader.extend({
   addAttributes() {
-    const parentAttributes = this.parent?.() || {}
-
     return {
-      ...parentAttributes,
-      ...getBorderAttributes(),
+      ...this.parent?.(),
+      style: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("style") || null,
+        renderHTML: (attributes) =>
+          attributes.style ? { style: attributes.style } : {},
+      },
     }
+  },
+
+  addCommands() {
+    return createCellCommands()
   },
 })

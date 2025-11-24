@@ -1,4 +1,5 @@
-div.tiptap:has(.ProseMirror-widget.invisible) .invisible-table {
+div.tiptap:has(.ProseMirror-widget.invisible) th.invisible-table-cell,
+div.tiptap:has(.ProseMirror-widget.invisible) td.invisible-table-cell {
   border: 1px dashed #4466ff;
   box-sizing: border-box;
 }

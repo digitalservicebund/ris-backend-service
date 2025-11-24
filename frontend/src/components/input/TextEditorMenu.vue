@@ -75,13 +75,7 @@ const shouldShowAddBorderNumbersButton = computed(() =>
   borderNumberCategories.includes(props.ariaLabel),
 )
 
-const ATTRIBUTE_TOP = "borderTopValue"
-const ATTRIBUTE_BOTTOM = "borderBottomValue"
-const ATTRIBUTE_LEFT = "borderLeftValue"
-const ATTRIBUTE_RIGHT = "borderRightValue"
-
 const DEFAULT_BORDER_VALUE = "1px solid black"
-const REMOVE_BORDER_VALUE = null
 
 const validateCellSelection = (callback: () => unknown) => {
   const isCellSelected =
@@ -314,17 +308,11 @@ const buttons = computed(() => {
           group: "Tabellenrahmen",
           isCollapsable: false,
           callback: (borderValue?: string) =>
-            validateCellSelection(() => {
-              const value = borderValue ?? DEFAULT_BORDER_VALUE
-              return props.editor
-                .chain()
-                .focus()
-                .setCellAttribute(ATTRIBUTE_TOP, value)
-                .setCellAttribute(ATTRIBUTE_RIGHT, value)
-                .setCellAttribute(ATTRIBUTE_BOTTOM, value)
-                .setCellAttribute(ATTRIBUTE_LEFT, value)
-                .run()
-            }),
+            validateCellSelection(() =>
+              props.editor.commands.setBorderAll(
+                borderValue ?? DEFAULT_BORDER_VALUE,
+              ),
+            ),
         },
         {
           type: "borderClear",
@@ -334,14 +322,7 @@ const buttons = computed(() => {
           isCollapsable: false,
           callback: () =>
             validateCellSelection(() =>
-              props.editor
-                .chain()
-                .focus()
-                .setCellAttribute(ATTRIBUTE_TOP, REMOVE_BORDER_VALUE)
-                .setCellAttribute(ATTRIBUTE_RIGHT, REMOVE_BORDER_VALUE)
-                .setCellAttribute(ATTRIBUTE_BOTTOM, REMOVE_BORDER_VALUE)
-                .setCellAttribute(ATTRIBUTE_LEFT, REMOVE_BORDER_VALUE)
-                .run(),
+              props.editor.commands.clearCellBorders(),
             ),
         },
         {
@@ -352,14 +333,10 @@ const buttons = computed(() => {
           isCollapsable: false,
           callback: (borderValue?: string) =>
             validateCellSelection(() =>
-              props.editor
-                .chain()
-                .focus()
-                .setCellAttribute(
-                  ATTRIBUTE_LEFT,
-                  borderValue ?? DEFAULT_BORDER_VALUE,
-                )
-                .run(),
+              props.editor.commands.setBorder(
+                "left",
+                borderValue ?? DEFAULT_BORDER_VALUE,
+              ),
             ),
         },
         {
@@ -370,14 +347,10 @@ const buttons = computed(() => {
           isCollapsable: false,
           callback: (borderValue?: string) =>
             validateCellSelection(() =>
-              props.editor
-                .chain()
-                .focus()
-                .setCellAttribute(
-                  ATTRIBUTE_RIGHT,
-                  borderValue ?? DEFAULT_BORDER_VALUE,
-                )
-                .run(),
+              props.editor.commands.setBorder(
+                "right",
+                borderValue ?? DEFAULT_BORDER_VALUE,
+              ),
             ),
         },
         {
@@ -388,32 +361,24 @@ const buttons = computed(() => {
           isCollapsable: false,
           callback: (borderValue?: string) =>
             validateCellSelection(() =>
-              props.editor
-                .chain()
-                .focus()
-                .setCellAttribute(
-                  ATTRIBUTE_TOP,
-                  borderValue ?? DEFAULT_BORDER_VALUE,
-                )
-                .run(),
+              props.editor.commands.setBorder(
+                "top",
+                borderValue ?? DEFAULT_BORDER_VALUE,
+              ),
             ),
         },
         {
-          type: "border Bottom",
+          type: "borderBottom",
           icon: IconBorderBottom,
           ariaLabel: "Rahmen unten",
           group: "Tabellenrahmen",
           isCollapsable: false,
           callback: (borderValue?: string) =>
             validateCellSelection(() =>
-              props.editor
-                .chain()
-                .focus()
-                .setCellAttribute(
-                  ATTRIBUTE_BOTTOM,
-                  borderValue ?? DEFAULT_BORDER_VALUE,
-                )
-                .run(),
+              props.editor.commands.setBorder(
+                "bottom",
+                borderValue ?? DEFAULT_BORDER_VALUE,
+              ),
             ),
         },
       ],
@@ -433,26 +398,18 @@ const buttons = computed(() => {
           isCollapsable: false,
           callback: () =>
             validateCellSelection(() =>
-              props.editor
-                .chain()
-                .focus()
-                .setCellAttribute("textAlignValue", "top")
-                .run(),
+              props.editor.commands.setVerticalAlign("top"),
             ),
         },
         {
-          type: "alignCenter",
+          type: "alignMiddle",
           icon: IconVerticalAlignCenter,
           ariaLabel: "Mittig ausrichten",
           group: "Zellenausrichtung",
           isCollapsable: false,
           callback: () =>
             validateCellSelection(() =>
-              props.editor
-                .chain()
-                .focus()
-                .setCellAttribute("textAlignValue", "middle")
-                .run(),
+              props.editor.commands.setVerticalAlign("middle"),
             ),
         },
         {
@@ -463,11 +420,7 @@ const buttons = computed(() => {
           isCollapsable: false,
           callback: () =>
             validateCellSelection(() =>
-              props.editor
-                .chain()
-                .focus()
-                .setCellAttribute("textAlignValue", "bottom")
-                .run(),
+              props.editor.commands.setVerticalAlign("bottom"),
             ),
         },
       ],
