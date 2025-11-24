@@ -75,6 +75,9 @@ public class RisMeta {
   @XmlElement(name = "fremdsprachigeFassungen", namespace = CaseLawLdml.RIS_NS)
   private FremdsprachigeFassungen fremdsprachigeFassungen;
 
+  @XmlElement(name = "herkunftDerUebersetzungen", namespace = CaseLawLdml.RIS_NS)
+  private HerkunftDerUebersetzungen herkunftDerUebersetzungen;
+
   @XmlElement(name = "evsf", namespace = CaseLawLdml.RIS_NS)
   private Evsf evsf;
 

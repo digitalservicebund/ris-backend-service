@@ -209,6 +209,24 @@
                                                showAs="Französisch"/>
                         </ris:fremdsprachigeFassung>
                     </ris:fremdsprachigeFassungen>
+                    <ris:herkunftDerUebersetzungen domainTerm="Herkunft der Übersetzungen">
+                        <ris:herkunftDerUebersetzung domainTerm="Herkunft der Übersetzung">
+                            <akn:FRBRlanguage ris:domainTerm="Originalsprache" language="eng"/>
+                            <ris:uebersetzerinnen domainTerm="Übersetzer:innen">
+                                <ris:uebersetzerin domainTerm="Übersetzer:in">Maxi Muster</ris:uebersetzerin>
+                                <ris:uebersetzerin domainTerm="Übersetzer:in">Ursel Meier</ris:uebersetzerin>
+                            </ris:uebersetzerinnen>
+                            <ris:interneVerlinkungen domainTerm="Interne Verlinkungen">
+                                <ris:interneVerlinkung domainTerm="Interne Verlinkung" akn:refersTo="#randnummer-2">2</ris:interneVerlinkung>
+                            </ris:interneVerlinkungen>
+                            <ris:externeVerlinkungen domainTerm="Externe Verlinkungen">
+                                <ris:externeVerlinkung domainTerm="Externe Verlinkung">
+                                    <akn:documentRef href="https://ihre-url-zur-englischen-übersetzung" showAs="Englisch"/>
+                                </ris:externeVerlinkung>
+                            </ris:externeVerlinkungen>
+                            <ris:art domainTerm="Übersetzungsart">Amtlich</ris:art>
+                        </ris:herkunftDerUebersetzung>
+                    </ris:herkunftDerUebersetzungen>
                     <ris:evsf domainTerm="Elektronische Vorschriftensammlung Bundesfinanzverwaltung (E-VSF)">evsf test</ris:evsf>
                     <ris:rechtsmittelzulassung domainTerm="Rechtsmittelzulassung">
                         <ris:rechtsmittelZugelassen domainTerm="Rechtsmittel zugelassen">true</ris:rechtsmittelZugelassen>

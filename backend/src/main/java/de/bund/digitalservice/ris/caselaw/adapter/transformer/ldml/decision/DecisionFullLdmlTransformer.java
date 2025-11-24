@@ -25,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.E
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Evsf;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FehlerhafteGerichte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FremdsprachigeFassungen;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.HerkunftDerUebersetzungen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtskraft;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtsmittelzulassung;
@@ -109,6 +110,11 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       // Fremdsprachige Fassungen
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.foreignLanguageVersions())) {
         buildFremdsprachigeFassung(builder, contentRelatedIndexing);
+      }
+
+      // Herkunft der Übersetzungen
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.originOfTranslations())) {
+        buildHerkunftDerUebersetzungen(builder, contentRelatedIndexing);
       }
     }
 
@@ -367,6 +373,80 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                                     new FrbrLanguage(version.languageCode().isoCode3Letters()))
                                 .build())
                     .toList())
+            .build());
+  }
+
+  private void buildHerkunftDerUebersetzungen(
+      RisMeta.RisMetaBuilder builder, ContentRelatedIndexing contentRelatedIndexing) {
+
+    var herkunftDerUebersetzungen =
+        contentRelatedIndexing.originOfTranslations().stream()
+            .filter(translation -> translation.languageCode() != null)
+            .map(
+                translation -> {
+                  var language = new FrbrLanguage(translation.languageCode().isoCode3Letters());
+                  language.setDomainTerm("Originalsprache");
+
+                  var translators =
+                      Optional.ofNullable(translation.translators()).orElseGet(List::of).stream()
+                          .map(
+                              translator ->
+                                  HerkunftDerUebersetzungen.Uebersetzerin.builder()
+                                      .value(translator)
+                                      .build())
+                          .toList();
+
+                  var borderNumbers =
+                      Optional.ofNullable(translation.borderNumbers()).orElseGet(List::of).stream()
+                          .map(
+                              internal ->
+                                  HerkunftDerUebersetzungen.InterneVerlinkung.builder()
+                                      .refersTo("#randnummer-" + internal)
+                                      .value(String.valueOf(internal))
+                                      .build())
+                          .toList();
+
+                  var urls =
+                      Optional.ofNullable(translation.urls()).orElseGet(List::of).stream()
+                          .map(
+                              url ->
+                                  HerkunftDerUebersetzungen.ExterneVerlinkung.builder()
+                                      .documentRef(
+                                          DocumentRef.builder()
+                                              .href(url)
+                                              .showAs(translation.languageCode().label())
+                                              .build())
+                                      .build())
+                          .toList();
+
+                  var uebersetzungsartBuilder =
+                      HerkunftDerUebersetzungen.Uebersetzungsart.builder();
+                  if (translation.translationType() != null) {
+                    uebersetzungsartBuilder.value(translation.translationType().toString());
+                  }
+
+                  return HerkunftDerUebersetzungen.HerkunftDerUebersetzung.builder()
+                      .frbrLanguage(language)
+                      .uebersetzerinnen(
+                          HerkunftDerUebersetzungen.Uebersetzerinnen.builder()
+                              .uebersetzerinnen(translators)
+                              .build())
+                      .interneVerlinkungen(
+                          HerkunftDerUebersetzungen.InterneVerlinkungen.builder()
+                              .interneVerlinkungen(borderNumbers)
+                              .build())
+                      .externeVerlinkungen(
+                          HerkunftDerUebersetzungen.ExterneVerlinkungen.builder()
+                              .externeVerlinkungen(urls)
+                              .build())
+                      .uebersetzungsart(uebersetzungsartBuilder.build())
+                      .build();
+                })
+            .toList();
+
+    builder.herkunftDerUebersetzungen(
+        HerkunftDerUebersetzungen.builder()
+            .herkunftDerUebersetzungen(herkunftDerUebersetzungen)
             .build());
   }
 
