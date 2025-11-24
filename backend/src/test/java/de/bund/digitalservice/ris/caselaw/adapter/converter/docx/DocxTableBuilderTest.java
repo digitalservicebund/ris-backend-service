@@ -343,6 +343,39 @@ class DocxTableBuilderTest {
   }
 
   @Test
+  void testBuild_withExternalTableStyleX() {
+    Tbl table = generateTable(List.of(List.of("table cell")));
+    TblPr tblPr = new TblPr();
+    TblStyle tblStyle = new TblStyle();
+    tblStyle.setVal("external-style");
+    tblPr.setTblStyle(tblStyle);
+    table.setTblPr(tblPr);
+
+    Map<String, Style> styles = new HashMap<>();
+    Style style = new Style();
+    putOtherTableStylePrToStyle(style);
+    styles.put("external-style", style);
+
+    var converter = new DocxConverter();
+    converter.setStyles(styles);
+    var result =
+        DocxTableBuilder.newInstance()
+            .setTable(table)
+            .setConverter(converter)
+            .build(new ArrayList<>());
+
+    assertThat(result).isInstanceOf(TableElement.class);
+    TableElement tableElement = (TableElement) result;
+    assertThat(tableElement.toHtmlString())
+        .isEqualTo(
+            "<table style=\"border-collapse: collapse;\">"
+                + "<tr>"
+                + "<td style=\"border-left: 0.25px solid #000; display: table-cell; min-width: 5px; padding: 5px;\"><p>table cell</p></td>"
+                + "</tr>"
+                + "</table>");
+  }
+
+  @Test
   void givenTableWithCellWidths_whenBuildingTable_thenValidateWidthsArePresent_MsWord() {
     // given
     var firstColWidthInTwips = 500;
@@ -599,6 +632,48 @@ class DocxTableBuilderTest {
     style
         .getTblStylePr()
         .add(generateTableStylePr(STTblStyleOverrideType.SW_CELL, "26", null, null, null));
+  }
+
+  private void putOtherTableStylePrToStyle(Style style) {
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.SW_CELL, "26", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.SE_CELL, "24", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.NW_CELL, "22", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.NE_CELL, "20", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.LAST_ROW, "18", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.FIRST_ROW, "16", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.LAST_COL, "14", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.FIRST_COL, "12", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.BAND_2_HORZ, "10", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.BAND_1_HORZ, "8", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.BAND_2_VERT, "6", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.BAND_1_VERT, "4", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.WHOLE_TABLE, "2", null, null, null));
   }
 
   private CTTblStylePr generateTableStylePr(
