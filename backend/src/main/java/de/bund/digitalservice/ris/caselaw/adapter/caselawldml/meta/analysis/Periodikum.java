@@ -57,7 +57,6 @@ public class Periodikum {
   @AllArgsConstructor
   @Getter
   @Builder
-  @XmlType(name = "TitelPeriodikum") // Avoid conflict with inner classes with same name
   public static class Titel {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Titel";
