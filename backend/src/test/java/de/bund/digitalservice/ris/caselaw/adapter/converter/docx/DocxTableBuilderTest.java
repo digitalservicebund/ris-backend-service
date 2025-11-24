@@ -21,6 +21,7 @@ import org.docx4j.wml.CTTblPrBase;
 import org.docx4j.wml.CTTblPrBase.TblStyle;
 import org.docx4j.wml.CTTblStylePr;
 import org.docx4j.wml.CTVerticalAlignRun;
+import org.docx4j.wml.CTVerticalJc;
 import org.docx4j.wml.Color;
 import org.docx4j.wml.HpsMeasure;
 import org.docx4j.wml.RPr;
@@ -28,6 +29,7 @@ import org.docx4j.wml.STBorder;
 import org.docx4j.wml.STShd;
 import org.docx4j.wml.STTblStyleOverrideType;
 import org.docx4j.wml.STVerticalAlignRun;
+import org.docx4j.wml.STVerticalJc;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.TblBorders;
@@ -384,8 +386,20 @@ class DocxTableBuilderTest {
     var fourthColWidthInTwips = 2000;
 
     var row = new Tr();
-    row.getContent().add(generateTableCellWidthBorderAndWidth("ABCDEF", 12, firstColWidthInTwips));
-    row.getContent().add(generateTableCellWidthBorderAndWidth("GHIJKL", 12, secondColWidthInTwips));
+    var cellWithVerticalCenterAlignment =
+        generateTableCellWidthBorderAndWidth("ABCDEF", 12, firstColWidthInTwips);
+    var vAlignCenter = new CTVerticalJc();
+    vAlignCenter.setVal(STVerticalJc.CENTER);
+    cellWithVerticalCenterAlignment.getValue().getTcPr().setVAlign(vAlignCenter);
+    row.getContent().add(cellWithVerticalCenterAlignment);
+
+    var cellWithBottomVerticalAlignment =
+        generateTableCellWidthBorderAndWidth("GHIJKL", 12, secondColWidthInTwips);
+    var vAlignBottom = new CTVerticalJc();
+    vAlignBottom.setVal(STVerticalJc.BOTTOM);
+    cellWithBottomVerticalAlignment.getValue().getTcPr().setVAlign(vAlignBottom);
+
+    row.getContent().add(cellWithBottomVerticalAlignment);
     row.getContent().add(generateTableCellWidthBorderAndWidth("GHIJKL", 12, thirdColWidthInTwips));
     row.getContent().add(generateTableCellWidthBorderAndWidth("MNOPQR", 12, fourthColWidthInTwips));
 
@@ -413,9 +427,9 @@ class DocxTableBuilderTest {
     // then
     assertThat(result)
         .contains(
-            "<td style=\"border-right: 6px solid #000; border-top: 1.5px solid #abcdef; display: table-cell; min-width: 5px; padding: 5px; width: 33px;\">")
+            "<td style=\"border-right: 6px solid #000; border-top: 1.5px solid #abcdef; display: table-cell; min-width: 5px; padding: 5px; vertical-align: middle; width: 33px;\">")
         .contains(
-            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; display: table-cell; min-width: 5px; padding: 5px; width: 66px;\">")
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; display: table-cell; min-width: 5px; padding: 5px; vertical-align: bottom; width: 66px;\">")
         .contains(
             "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; display: table-cell; min-width: 5px; padding: 5px; width: 50px;\">")
         .contains(
