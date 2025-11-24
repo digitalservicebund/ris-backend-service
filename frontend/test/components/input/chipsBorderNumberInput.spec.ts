@@ -208,12 +208,69 @@ describe("ChipsBorderNumberInput", () => {
 
   it("does not add a chip when input is only whitespaces", async () => {
     const onUpdate = vi.fn()
-    const { user } = renderComponent({ "onUpdate:modelValue": onUpdate })
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      modelValue: [1, 2],
+    })
     const input = screen.getByRole<HTMLInputElement>("textbox")
     expect(input).toHaveValue("")
 
     await user.type(input, "   {enter}")
 
-    expect(onUpdate).toHaveBeenCalledWith([])
+    expect(onUpdate).toHaveBeenCalledWith([1, 2])
+  })
+
+  it("does not accept valid number when documentationUnit is undefined", async () => {
+    const store = useDocumentUnitStore()
+    const { documentUnit } = storeToRefs(store)
+    documentUnit.value = undefined
+    const id = "id"
+    const onError = vi.fn()
+    const onUpdate = vi.fn()
+
+    const { user } = renderComponent({
+      id: id,
+      "onUpdate:modelValue": onUpdate,
+      "onUpdate:validationError": onError,
+    })
+    const input = screen.getByRole<HTMLInputElement>("textbox")
+    expect(input).toHaveValue("")
+
+    await user.type(input, "1{enter}")
+
+    expect(onUpdate).not.toHaveBeenCalledWith([1])
+    expect(onError).toHaveBeenCalledWith({
+      message: "Randnummer existiert nicht",
+      instance: id,
+    })
+  })
+
+  it("does not accept number when documentationUnit doesn't contain borderNumbers", async () => {
+    const store = useDocumentUnitStore()
+    const { documentUnit } = storeToRefs(store)
+    documentUnit.value = {
+      ...store.documentUnit,
+      managementData: {
+        borderNumbers: [],
+      },
+    } as unknown as Decision
+    const onError = vi.fn()
+    const onUpdate = vi.fn()
+
+    const { user } = renderComponent({
+      id: "id",
+      "onUpdate:modelValue": onUpdate,
+      "onUpdate:validationError": onError,
+    })
+    const input = screen.getByRole<HTMLInputElement>("textbox")
+    expect(input).toHaveValue("")
+
+    await user.type(input, "1{enter}")
+
+    expect(onUpdate).not.toHaveBeenCalledWith([1])
+    expect(onError).toHaveBeenCalledWith({
+      message: "Randnummer existiert nicht",
+      instance: "id",
+    })
   })
 })
