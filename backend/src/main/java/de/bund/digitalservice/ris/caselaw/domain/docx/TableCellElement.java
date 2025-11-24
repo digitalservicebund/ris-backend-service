@@ -19,6 +19,10 @@ public class TableCellElement extends BlockElement implements DocumentationUnitD
     this.columnSpan = columnSpan;
   }
 
+  public void setWidthPx(Integer widthPx) {
+    addStyle("width", widthPx + "px");
+  }
+
   public Integer getUsedStyles() {
     return usedStyles;
   }
