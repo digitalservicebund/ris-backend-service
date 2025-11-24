@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
+  clickCategoryButton,
   navigateToCategories,
   navigateToHandover,
   navigateToPreview,
@@ -35,6 +36,25 @@ test.describe(
         await categoryButton.click()
         await expect(page.getByText("Art der Eintragung")).toBeVisible()
       })
+
+      await test.step("Eintrag mit nicht existierender Randnummer erzeugt Warnung", async () => {
+        await page
+          .getByLabel("Randnummern der Änderung")
+          .getByRole("textbox")
+          .fill("1")
+        await page.keyboard.press("Enter")
+        await expect(page.getByText("Randnummer existiert nicht")).toBeVisible()
+      })
+
+      await test.step("Füge Randnummer zu Gründe hinzu", async () => {
+        await clickCategoryButton("Gründe", page)
+        const reasons = page.getByTestId("Gründe")
+        await reasons.click()
+        await page.keyboard.type(`Some Dummy Text with border number`)
+        await page.keyboard.press(`ControlOrMeta+Alt+.`)
+        await save(page)
+      })
+
       await test.step("Berichtigung kann ausgefüllt werden", async () => {
         await page
           .getByRole("combobox", {
@@ -54,13 +74,12 @@ test.describe(
             name: "Datum der Änderung",
           })
           .fill("24.12.2024")
-        const borderNumberInput = page.getByRole("textbox", {
+        const borderNumberInput = page.getByRole("group", {
           name: "Randnummern der Änderung",
         })
-        await borderNumberInput.fill("1")
-        await borderNumberInput.press("Enter")
-        await borderNumberInput.fill("2")
-        await borderNumberInput.press("Enter")
+        await expect(borderNumberInput).toBeVisible()
+        await borderNumberInput.getByRole("textbox").fill("1")
+        await page.keyboard.press("Enter")
 
         const textField = page.getByTestId("correctionContent-editor")
         await textField.click()
@@ -74,7 +93,7 @@ test.describe(
           .getByRole("button", { name: "Berichtigung speichern" })
           .click()
         await expect(page.getByText("Schreibfehlerberichtigung")).toHaveText(
-          " Schreibfehlerberichtigung , Hauffen -> Haufen, 24.12.2024|12",
+          " Schreibfehlerberichtigung , Hauffen -> Haufen, 24.12.2024|1",
         )
       })
 
@@ -90,7 +109,7 @@ test.describe(
 
         await expect(
           page.getByText(
-            " Schreibfehlerberichtigung , Hauffen -> Haufen, 24.12.2024|12",
+            " Schreibfehlerberichtigung , Hauffen -> Haufen, 24.12.2024|1",
           ),
         ).toBeVisible()
         await expect(

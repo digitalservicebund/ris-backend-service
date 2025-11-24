@@ -2,8 +2,8 @@
 import Button from "primevue/button"
 import InputText from "primevue/inputtext"
 import InputSelect from "primevue/select"
-import { type Component, computed, onMounted, ref, watch } from "vue"
-import ChipsInput from "@/components/input/ChipsInput.vue"
+import { type Component, onMounted, ref, watch } from "vue"
+import ChipsBorderNumberInput from "@/components/input/ChipsBorderNumberInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
@@ -64,20 +64,6 @@ watch(
 onMounted(() => {
   correction.value = new Correction({ ...props.modelValue })
 })
-
-const borderNumbers = computed({
-  get: () => {
-    return correction.value.borderNumbers?.map((a) => `${a}`)
-  },
-  set: (e) => {
-    // remove duplicates and only keep numbers
-    correction.value.borderNumbers = [
-      ...new Set(
-        e?.map((a) => Number.parseInt(a, 10)).filter((a) => !Number.isNaN(a)),
-      ),
-    ]
-  },
-})
 </script>
 
 <template>
@@ -130,13 +116,19 @@ const borderNumbers = computed({
       </InputField>
       <InputField
         id="correctionBorderNumbersInput"
+        v-slot="slotProps"
         label="Randnummern der Änderung"
       >
-        <ChipsInput
-          id="correctionBorderNumbers"
-          v-model="borderNumbers"
+        <ChipsBorderNumberInput
+          :id="slotProps.id"
+          v-model="correction.borderNumbers"
           aria-label="Randnummern der Änderung"
-        ></ChipsInput>
+          class="w-full"
+          :has-error="slotProps.hasError"
+          size="small"
+          @focus="validationStore.remove('borderNumbers')"
+          @update:validation-error="slotProps.updateValidationError"
+        />
       </InputField>
     </div>
     <div class="flex flex-col">
