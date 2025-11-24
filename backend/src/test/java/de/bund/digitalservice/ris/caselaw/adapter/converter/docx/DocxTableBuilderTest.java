@@ -182,9 +182,9 @@ class DocxTableBuilderTest {
     // cell should take insideV from table
     assertThat(result)
         .contains(
-            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; min-width: 5px; padding: 5px;\">")
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; display: table-cell; min-width: 5px; padding: 5px;\">")
         .contains(
-            "<td colspan=\"2\" style=\"background-color: #111222; border-left: 6px solid #000; border-right: 3px solid #foo; border-top: 1.5px solid #mnopqr; min-width: 5px; padding: 5px;\"><p>foo</p></td>");
+            "<td colspan=\"2\" style=\"background-color: #111222; border-left: 6px solid #000; border-right: 3px solid #foo; border-top: 1.5px solid #mnopqr; display: table-cell; min-width: 5px; padding: 5px;\"><p>foo</p></td>");
   }
 
   @Test
@@ -337,7 +337,7 @@ class DocxTableBuilderTest {
         .isEqualTo(
             "<table style=\"border-collapse: collapse;\">"
                 + "<tr>"
-                + "<td style=\"border-left: 0.25px solid #000; min-width: 5px; padding: 5px;\"><p>table cell</p></td>"
+                + "<td style=\"border-left: 0.25px solid #000; display: table-cell; min-width: 5px; padding: 5px;\"><p>table cell</p></td>"
                 + "</tr>"
                 + "</table>");
   }
@@ -380,13 +380,13 @@ class DocxTableBuilderTest {
     // then
     assertThat(result)
         .contains(
-            "<td style=\"border-right: 6px solid #000; border-top: 1.5px solid #abcdef; min-width: 5px; padding: 5px; width: 33px;\">")
+            "<td style=\"border-right: 6px solid #000; border-top: 1.5px solid #abcdef; display: table-cell; min-width: 5px; padding: 5px; width: 33px;\">")
         .contains(
-            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; min-width: 5px; padding: 5px; width: 66px;\">")
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; display: table-cell; min-width: 5px; padding: 5px; width: 66px;\">")
         .contains(
-            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; min-width: 5px; padding: 5px; width: 50px;\">")
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; display: table-cell; min-width: 5px; padding: 5px; width: 50px;\">")
         .contains(
-            "<td style=\"border-left: 6px solid #000; border-top: 1.5px solid #mnopqr; min-width: 5px; padding: 5px; width: 133px;\">");
+            "<td style=\"border-left: 6px solid #000; border-top: 1.5px solid #mnopqr; display: table-cell; min-width: 5px; padding: 5px; width: 133px;\">");
   }
 
   @Test
@@ -439,13 +439,13 @@ class DocxTableBuilderTest {
     // then
     assertThat(result)
         .contains(
-            "<td style=\"border-right: 6px solid #000; border-top: 1.5px solid #abcdef; min-width: 5px; padding: 5px; width: 33px;\">")
+            "<td style=\"border-right: 6px solid #000; border-top: 1.5px solid #abcdef; display: table-cell; min-width: 5px; padding: 5px; width: 33px;\">")
         .contains(
-            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; min-width: 5px; padding: 5px; width: 66px;\">")
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; display: table-cell; min-width: 5px; padding: 5px; width: 66px;\">")
         .contains(
-            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; min-width: 5px; padding: 5px; width: 50px;\">")
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; display: table-cell; min-width: 5px; padding: 5px; width: 50px;\">")
         .contains(
-            "<td style=\"border-left: 6px solid #000; border-top: 1.5px solid #mnopqr; min-width: 5px; padding: 5px; width: 133px;\">");
+            "<td style=\"border-left: 6px solid #000; border-top: 1.5px solid #mnopqr; display: table-cell; min-width: 5px; padding: 5px; width: 133px;\">");
   }
 
   @Test
@@ -487,7 +487,7 @@ class DocxTableBuilderTest {
     // then
     assertThat(result)
         .contains(
-            "<td style=\"border-left: 3px dashed #000; border-right: 3px dotted #000; border-top: 1.5px solid #abcdef; min-width: 5px; padding: 5px;\">");
+            "<td style=\"border-left: 3px dashed #000; border-right: 3px dotted #000; border-top: 1.5px solid #abcdef; display: table-cell; min-width: 5px; padding: 5px;\">");
   }
 
   @SuppressWarnings("java:S5976") // Disable warning for tests that could be parametrized
@@ -497,7 +497,7 @@ class DocxTableBuilderTest {
       return String.format(
           "<table style=\"border-collapse: collapse;\">"
               + "<tr>"
-              + "<td style=\"border-left: %spx solid #000; min-width: 5px; padding: 5px;\"><p>table cell</p></td>"
+              + "<td style=\"border-left: %spx solid #000; display: table-cell; min-width: 5px; padding: 5px;\"><p>table cell</p></td>"
               + "</tr>"
               + "</table>",
           borderLeft);
