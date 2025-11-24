@@ -1,6 +1,10 @@
 import { Extension } from "@tiptap/core"
 import { Plugin, PluginKey } from "@tiptap/pm/state"
 
+// TODO: This is a temporary trailing node solution for Tiptap v2.
+// It ensures the cursor can leave a table and continue typing below.
+// Remove this and use the official TrailingNode extension once we upgrade to v3.
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function nodeEqualsType({ types, node }: any) {
   return (
