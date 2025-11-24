@@ -399,10 +399,10 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                   var borderNumbers =
                       Optional.ofNullable(translation.borderNumbers()).orElseGet(List::of).stream()
                           .map(
-                              internal ->
+                              borderNumber ->
                                   HerkunftDerUebersetzungen.InterneVerlinkung.builder()
-                                      .refersTo("#randnummer-" + internal)
-                                      .value(String.valueOf(internal))
+                                      .refersTo("#randnummer-" + borderNumber)
+                                      .value(String.valueOf(borderNumber))
                                       .build())
                           .toList();
 
