@@ -21,7 +21,7 @@ const validationStore = useValidationStore<["jobProfiles"][number]>()
       :label="label"
     >
       <ChipsInput
-        :id="slotProps.id"
+        id="jobProfiles"
         v-model="store.documentUnit!.contentRelatedIndexing.jobProfiles"
         aria-label="Berufsbild"
         data-testid="job-profiles"
