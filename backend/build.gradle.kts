@@ -164,7 +164,7 @@ dependencies {
     }
     implementation("org.springframework.security:spring-security-oauth2-resource-server:7.0.0")
 
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:5.0.0")
 
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:4.33.1")
