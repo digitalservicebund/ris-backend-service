@@ -2,6 +2,7 @@
 import { computed } from "vue"
 import BorderNumberLinkView from "@/components/BorderNumberLinkView.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
+import OriginOfTranslationSummaryPreview from "@/components/OriginOfTranslationSummaryPreview.vue"
 import FieldOfLawNodeView from "@/components/preview/FieldOfLawNodeView.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
@@ -84,6 +85,13 @@ const hasForeignLanguageVersions = computed(() => {
   return (
     props.contentRelatedIndexing.foreignLanguageVersions &&
     props.contentRelatedIndexing.foreignLanguageVersions?.length > 0
+  )
+})
+
+const hasOriginOfTranslations = computed(() => {
+  return (
+    props.contentRelatedIndexing.originOfTranslations &&
+    props.contentRelatedIndexing.originOfTranslations?.length > 0
   )
 })
 
@@ -264,6 +272,19 @@ const hasAppeal = computed(() => {
             {{ foreignLanguageVersion.link }}
           </a>
         </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasOriginOfTranslations">
+      <PreviewCategory>{{
+        contentRelatedIndexingLabels.originOfTranslations
+      }}</PreviewCategory>
+      <PreviewContent data-testid="Herkunft der Übersetzung">
+        <span
+          v-for="originOfTranslation in props.contentRelatedIndexing
+            .originOfTranslations"
+          :key="originOfTranslation.id"
+          ><OriginOfTranslationSummaryPreview :data="originOfTranslation"
+        /></span>
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="hasLegislativeMandate">

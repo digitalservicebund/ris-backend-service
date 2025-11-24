@@ -11,6 +11,9 @@ import { Decision } from "@/domain/decision"
 import Definition from "@/domain/definition"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
 import NormReference from "@/domain/normReference"
+import OriginOfTranslation, {
+  TranslationType,
+} from "@/domain/originOfTranslation"
 import SingleNorm from "@/domain/singleNorm"
 
 function renderComponent(contentRelatedIndexing?: ContentRelatedIndexing) {
@@ -99,6 +102,30 @@ describe("preview content related indexing", () => {
           link: "www.link-to-translation.es",
         }),
       ],
+      originOfTranslations: [
+        new OriginOfTranslation({
+          id: "1",
+          languageCode: {
+            id: "3",
+            label: "Englisch",
+          },
+          translationType: TranslationType.NICHT_AMTLICH,
+          translators: ["translator a", "translator b"],
+          borderNumbers: [23, 42],
+          urls: ["http://link-to-translation.en"],
+        }),
+        new OriginOfTranslation({
+          id: "2",
+          languageCode: {
+            id: "4",
+            label: "Französisch",
+          },
+          translationType: TranslationType.AMTLICH,
+          translators: ["translator c", "translator d"],
+          borderNumbers: [13, 99],
+          urls: ["https://link-to-translation.fr"],
+        }),
+      ],
       evsf: "X 00 00-0-0",
       definitions: [
         new Definition({ definedTerm: "Finanzkraft" }),
@@ -126,6 +153,9 @@ describe("preview content related indexing", () => {
     expect(
       await screen.findByText("Fremdsprachige Fassung"),
     ).toBeInTheDocument()
+    expect(
+      await screen.findByText("Herkunft der Übersetzung"),
+    ).toBeInTheDocument()
     expect(await screen.findByText("E-VSF")).toBeInTheDocument()
     expect(await screen.findByText("Definition")).toBeInTheDocument()
   })
@@ -142,6 +172,7 @@ describe("preview content related indexing", () => {
       hasLegislativeMandate: false,
       collectiveAgreements: [],
       definitions: [],
+      originOfTranslations: [],
       appealAdmission: undefined,
     })
 
@@ -157,6 +188,9 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Herkunft der Übersetzung"),
+    ).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
@@ -189,6 +223,7 @@ describe("preview content related indexing", () => {
       hasLegislativeMandate: false,
       collectiveAgreements: [],
       definitions: [],
+      originOfTranslations: [],
       appealAdmission: undefined,
     })
 
@@ -205,6 +240,9 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Herkunft der Übersetzung"),
+    ).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
@@ -246,6 +284,7 @@ describe("preview content related indexing", () => {
       hasLegislativeMandate: false,
       collectiveAgreements: [],
       definitions: [],
+      originOfTranslations: [],
       appealAdmission: undefined,
     })
 
@@ -265,6 +304,9 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Herkunft der Übersetzung"),
+    ).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
@@ -325,6 +367,7 @@ describe("preview content related indexing", () => {
       hasLegislativeMandate: false,
       collectiveAgreements: [],
       definitions: [],
+      originOfTranslations: [],
       appealAdmission: undefined,
     })
 
@@ -347,6 +390,9 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Herkunft der Übersetzung"),
+    ).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
@@ -364,6 +410,7 @@ describe("preview content related indexing", () => {
       dismissalTypes: [],
       hasLegislativeMandate: false,
       definitions: [],
+      originOfTranslations: [],
       appealAdmission: undefined,
     })
 
@@ -379,6 +426,9 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Herkunft der Übersetzung"),
+    ).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
@@ -412,6 +462,7 @@ describe("preview content related indexing", () => {
       dismissalGrounds: [],
       dismissalTypes: [],
       definitions: [],
+      originOfTranslations: [],
       appealAdmission: undefined,
     })
 
@@ -433,6 +484,9 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Herkunft der Übersetzung"),
+    ).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
@@ -450,6 +504,7 @@ describe("preview content related indexing", () => {
       collectiveAgreements: [],
       hasLegislativeMandate: true,
       definitions: [],
+      originOfTranslations: [],
       appealAdmission: undefined,
     })
 
@@ -466,6 +521,9 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Herkunft der Übersetzung"),
+    ).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
   })
 
@@ -481,6 +539,7 @@ describe("preview content related indexing", () => {
       collectiveAgreements: [],
       hasLegislativeMandate: false,
       definitions: [],
+      originOfTranslations: [],
       appealAdmission: undefined,
     })
 
@@ -494,6 +553,9 @@ describe("preview content related indexing", () => {
     expect(await screen.findByText("Kündigungsgründe")).toBeInTheDocument()
     expect(await screen.findByText("Kündigungsarten")).toBeInTheDocument()
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Herkunft der Übersetzung"),
+    ).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
   })
 
@@ -522,6 +584,7 @@ describe("preview content related indexing", () => {
           link: "www.link-to-translation.es",
         }),
       ],
+      originOfTranslations: [],
       appealAdmission: undefined,
     })
 
@@ -546,6 +609,68 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Herkunft der Übersetzung"),
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
+    expect(screen.queryByText("Definition")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
+  })
+
+  test("renders origin of translation and nothing else", async () => {
+    renderComponent({
+      keywords: [],
+      norms: [],
+      activeCitations: [],
+      fieldsOfLaw: [],
+      jobProfiles: [],
+      dismissalGrounds: [],
+      dismissalTypes: [],
+      collectiveAgreements: [],
+      hasLegislativeMandate: false,
+      foreignLanguageVersions: [],
+      originOfTranslations: [
+        new OriginOfTranslation({
+          id: "1",
+          languageCode: {
+            id: "3",
+            label: "Englisch",
+          },
+          translationType: TranslationType.NICHT_AMTLICH,
+          translators: ["translator a", "translator b"],
+          borderNumbers: [23, 42],
+          urls: ["http://link-to-translation.en"],
+        }),
+        new OriginOfTranslation({
+          id: "2",
+          languageCode: {
+            id: "4",
+            label: "Französisch",
+          },
+          translationType: TranslationType.AMTLICH,
+          translators: ["translator c", "translator d"],
+          borderNumbers: [13, 99],
+          urls: ["https://link-to-translation.fr"],
+        }),
+      ],
+      appealAdmission: undefined,
+    })
+
+    expect(screen.getByText("Herkunft der Übersetzung")).toBeInTheDocument()
+    expect(screen.getByTestId("Herkunft der Übersetzung")).toHaveTextContent(
+      "Englisch, translator a, translator b: 23, 42, http://link-to-translation.en (nicht-amtlich)" +
+        "Französisch, translator c, translator d: 13, 99, https://link-to-translation.fr (amtlich)",
+    )
+    expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
+    expect(screen.queryByText("Normen")).not.toBeInTheDocument()
+    expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
+    expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
@@ -570,6 +695,7 @@ describe("preview content related indexing", () => {
       dismissalTypes: [],
       collectiveAgreements: [],
       hasLegislativeMandate: false,
+      originOfTranslations: [],
       evsf: "X 00 00-0-0",
       definitions: [],
       appealAdmission: undefined,
@@ -584,6 +710,9 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Herkunft der Übersetzung"),
+    ).not.toBeInTheDocument()
     expect(await screen.findByText("E-VSF")).toBeInTheDocument()
     expect(await screen.findByText("X 00 00-0-0")).toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
@@ -601,6 +730,7 @@ describe("preview content related indexing", () => {
       dismissalTypes: [],
       collectiveAgreements: [],
       hasLegislativeMandate: false,
+      originOfTranslations: [],
       definitions: [
         new Definition({ definedTerm: "Finanzkraft" }),
         new Definition({
@@ -624,6 +754,9 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Herkunft der Übersetzung"),
+    ).not.toBeInTheDocument()
     expect(container).toHaveTextContent(
       "DefinitionFinanzkraftRichtige Randnummer | 1Kündigungsfrist (falsche Randnummer) | 3",
     )
@@ -640,6 +773,7 @@ describe("preview content related indexing", () => {
 
       expect(container).toHaveTextContent("RechtsmittelzulassungNein")
     })
+
     test("yes, without appeal admitter", async () => {
       const { container } = renderComponent({
         appealAdmission: {
@@ -650,6 +784,7 @@ describe("preview content related indexing", () => {
 
       expect(container).toHaveTextContent("RechtsmittelzulassungJa")
     })
+
     test("yes, with appeal admitter", async () => {
       const { container } = renderComponent({
         appealAdmission: {
@@ -707,6 +842,7 @@ describe("preview content related indexing", () => {
       collectiveAgreements: [],
       hasLegislativeMandate: undefined,
       foreignLanguageVersions: [],
+      originOfTranslations: [],
       evsf: "",
       definitions: [],
       appealAdmission: undefined,
@@ -732,6 +868,9 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Herkunft der Übersetzung"),
+    ).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
@@ -750,6 +889,7 @@ describe("preview content related indexing", () => {
       dismissalTypes: undefined,
       collectiveAgreements: undefined,
       foreignLanguageVersions: undefined,
+      originOfTranslations: undefined,
       evsf: undefined,
       definitions: undefined,
       appealAdmission: undefined,
@@ -767,6 +907,9 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Herkunft der Übersetzung"),
+    ).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittel")).not.toBeInTheDocument()
   })

@@ -343,6 +343,7 @@
     |ris:norm|ris:abkuerzung|ris:einzelnorm|ris:bezeichnung|ris:gesetzeskraft|ris:geltungsbereich|ris:jahr|ris:titel
     |ris:fundstelle|ris:zitatstelle|ris:zitatstelle|ris:titel|ris:untertitel|ris:periodikum|ris:fundstelleLiteraturSelbststaendig|ris:fundstelleLiteraturUnselbststaendig
     |ris:decisionNames|ris:decisionName
+    |ris:tarifvertraege|ris:tarifvertrag|ris:tarifvertragName|ris:tarifvertragDatum|ris:tarifvertragTarifnorm|ris:tarifvertragBranche
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@akn:refersTo|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
     |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId|@akn:eId|@type|@by|@domainTerm|@notation|@ris:domainTerm|@art">
 

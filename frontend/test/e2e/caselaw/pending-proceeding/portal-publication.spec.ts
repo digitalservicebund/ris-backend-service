@@ -4,6 +4,7 @@ import {
   expectHistoryLogRow,
   navigateToManagementData,
   navigateToPublication,
+  requestHtmlFromPortalApi,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe(
@@ -47,7 +48,7 @@ test.describe(
       {
         tag: ["@RISDEV-7896", "@RISDEV-8460"],
       },
-      async ({ page, prefilledPendingProceeding }) => {
+      async ({ page, prefilledPendingProceeding, baseURL, browser }) => {
         await navigateToPublication(
           page,
           prefilledPendingProceeding.documentNumber,
@@ -83,6 +84,22 @@ test.describe(
             page.getByRole("button", { name: "Zurückziehen" }),
           ).toBeVisible()
         })
+
+        // Portal is not available in local environment
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (baseURL !== "http://127.0.0.1") {
+          await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
+            const portalResponse = await requestHtmlFromPortalApi(
+              browser,
+              prefilledPendingProceeding.documentNumber,
+            )
+
+            // eslint-disable-next-line playwright/no-conditional-expect
+            expect(portalResponse.status).toBe(200)
+            // eslint-disable-next-line playwright/no-conditional-expect
+            expect(portalResponse.content).toContain("test headline")
+          })
+        }
 
         await test.step("Eine veröffentlichte Dokumentationseinheit kann nicht gelöscht werden", async () => {
           await navigateToManagementData(
@@ -121,6 +138,20 @@ test.describe(
             page.getByRole("button", { name: "Zurückziehen" }),
           ).toBeHidden()
         })
+
+        // Portal is not available in local environment
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (baseURL !== "http://127.0.0.1") {
+          await test.step("Die Entscheidung ist nicht per Portal-API abrufbar", async () => {
+            const portalResponse = await requestHtmlFromPortalApi(
+              browser,
+              prefilledPendingProceeding.documentNumber,
+            )
+
+            // eslint-disable-next-line playwright/no-conditional-expect
+            expect(portalResponse.status).toBe(404)
+          })
+        }
 
         await test.step("Veröffentlichen und Zurückziehen wird in der Historie geloggt", async () => {
           await navigateToManagementData(

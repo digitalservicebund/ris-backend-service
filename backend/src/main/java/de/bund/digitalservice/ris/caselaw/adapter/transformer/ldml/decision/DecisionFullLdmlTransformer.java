@@ -31,7 +31,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.R
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtsmittelzulassung;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Sachgebiete;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Tarifvertraege;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Vorgaenge;
+import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import java.util.ArrayList;
@@ -86,7 +89,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         .toList();
   }
 
-  @SuppressWarnings({"java:S6541", "java:S3776"})
+  @SuppressWarnings({"java:S3776"})
   private RisMeta buildRisMeta(Decision decision) {
     var builder = buildCommonRisMeta(decision);
 
@@ -94,43 +97,12 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     if (contentRelatedIndexing != null) {
       // Sachgebiete
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.fieldsOfLaw())) {
-        Sachgebiete sachgebiete =
-            Sachgebiete.builder()
-                .sachgebiete(
-                    contentRelatedIndexing.fieldsOfLaw().stream()
-                        .map(
-                            sachgebiet ->
-                                Sachgebiete.Sachgebiet.builder()
-                                    .value(sachgebiet.text())
-                                    .notation(sachgebiet.notation())
-                                    .build())
-                        .toList())
-                .build();
-        builder.sachgebiete(sachgebiete);
+        buildSachgebiete(contentRelatedIndexing, builder);
       }
 
       // Definitionen
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.definitions())) {
-        var defs =
-            contentRelatedIndexing.definitions().stream()
-                .map(
-                    definition ->
-                        Definitionen.Definition.builder()
-                            .definierterBegriff(
-                                Definitionen.Definition.DefinierterBegriff.builder()
-                                    .value(definition.definedTerm())
-                                    .build())
-                            .definierendeRandnummer(
-                                definition.definingBorderNumber() == null
-                                    ? null
-                                    : Definitionen.Definition.DefinierendeRandnummer.builder()
-                                        .refersTo(
-                                            "#randnummer-" + definition.definingBorderNumber())
-                                        .value(String.valueOf(definition.definingBorderNumber()))
-                                        .build())
-                            .build())
-                .toList();
-        builder.definitionen(Definitionen.builder().definitionen(defs).build());
+        buildDefinitionen(contentRelatedIndexing, builder);
       }
 
       // EVSF
@@ -138,133 +110,47 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
           .ifPresent(value -> builder.evsf(Evsf.builder().value(value).build()));
 
       // Rechtsmittelzulassung
-      Optional.ofNullable(contentRelatedIndexing.appealAdmission())
-          .ifPresent(
-              value -> {
-                var rechtsmittelzulassungBuilder =
-                    Rechtsmittelzulassung.builder()
-                        .rechtsmittelZugelassen(
-                            new Rechtsmittelzulassung.RechtsmittelZugelassen(value.admitted()));
+      buildRechtsmittelzulassung(contentRelatedIndexing, builder);
 
-                Optional.ofNullable(value.by())
-                    .ifPresent(
-                        appealAdmitter ->
-                            rechtsmittelzulassungBuilder.rechtsmittelZugelassenDurch(
-                                new Rechtsmittelzulassung.RechtsmittelZugelassenDurch(
-                                    appealAdmitter.name())));
-
-                builder.rechtsmittelzulassung(rechtsmittelzulassungBuilder.build());
-              });
+      // Tarifvertrag
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.collectiveAgreements())) {
+        buildTarifvertrag(builder, contentRelatedIndexing);
+      }
 
       // Fremdsprachige Fassungen
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.foreignLanguageVersions())) {
-        builder.fremdsprachigeFassungen(
-            FremdsprachigeFassungen.builder()
-                .fremdsprachigeFassungen(
-                    contentRelatedIndexing.foreignLanguageVersions().stream()
-                        .map(
-                            version ->
-                                FremdsprachigeFassungen.FremdsprachigeFassung.builder()
-                                    .documentRef(
-                                        DocumentRef.builder()
-                                            .href(version.link())
-                                            .showAs(version.languageCode().label())
-                                            .build())
-                                    .frbrLanguage(
-                                        new FrbrLanguage(version.languageCode().isoCode3Letters()))
-                                    .build())
-                        .toList())
-                .build());
+        buildFremdsprachigeFassung(builder, contentRelatedIndexing);
       }
     }
 
     var coreData = decision.coreData();
     if (coreData != null) {
-
+      // Abweichende Aktenzeichen
       if (!CollectionUtils.isEmpty(coreData.deviatingFileNumbers())) {
         // Aktenzeichenliste is already set in CommonTransformer
-        AktenzeichenListe aktenzeichenListe = builder.build().getAktenzeichenListe();
-        List<AktenzeichenListe.Aktenzeichen> aktenzeichen = aktenzeichenListe.getAktenzeichen();
-        if (aktenzeichen != null) {
-          coreData
-              .deviatingFileNumbers()
-              .forEach(
-                  fileNumber ->
-                      aktenzeichen.add(
-                          AktenzeichenListe.Aktenzeichen.builder()
-                              .domainTerm("Abweichendes Aktenzeichen")
-                              .value(fileNumber)
-                              .build()));
-          builder.aktenzeichenListe(
-              aktenzeichenListe.toBuilder().aktenzeichen(aktenzeichen).build());
-        }
+        buildAbweichendeAktenzeichen(builder, coreData);
       }
 
       // Fehlerhafte Gerichte
       if (!CollectionUtils.isEmpty(coreData.deviatingCourts())) {
-        builder.fehlerhafteGerichte(
-            FehlerhafteGerichte.builder()
-                .fehlerhafteGerichte(
-                    coreData.deviatingCourts().stream()
-                        .map(
-                            court ->
-                                FehlerhafteGerichte.FehlerhaftesGericht.builder()
-                                    .value(court)
-                                    .build())
-                        .toList())
-                .build());
+        buildFehlerhafteGerichte(builder, coreData);
       }
       // Daten der mündlichen Verhandlung
       if (!CollectionUtils.isEmpty(coreData.oralHearingDates())) {
-        builder.datenDerMuendlichenVerhandlung(
-            DatenDerMuendlichenVerhandlung.builder()
-                .daten(
-                    coreData.oralHearingDates().stream()
-                        .map(
-                            date ->
-                                DatenDerMuendlichenVerhandlung.DatumDerMuendlichenVerhandlung
-                                    .builder()
-                                    .value(DateUtils.toDateString(date))
-                                    .build())
-                        .toList())
-                .build());
+        buildDatumDerMuendlichenVerhandlung(builder, coreData);
       }
 
       // Abweichende Daten
       if (!CollectionUtils.isEmpty(coreData.deviatingDecisionDates())) {
-        builder.abweichendeDaten(
-            AbweichendeDaten.builder()
-                .daten(
-                    coreData.deviatingDecisionDates().stream()
-                        .map(
-                            date ->
-                                AbweichendeDaten.AbweichendesDatum.builder()
-                                    .value(DateUtils.toDateString(date))
-                                    .build())
-                        .toList())
-                .build());
+        buildAbweichendeDaten(builder, coreData);
       }
       // Abweichende Dokumentnummern
       if (!CollectionUtils.isEmpty(coreData.deviatingDocumentNumbers())) {
-        builder.abweichendeDokumentnummern(
-            AbweichendeDokumentnummern.builder()
-                .dokumentnummern(
-                    coreData.deviatingDocumentNumbers().stream()
-                        .map(
-                            docNumber ->
-                                AbweichendeDokumentnummern.AbweichendeDokumentnummer.builder()
-                                    .value(docNumber)
-                                    .build())
-                        .toList())
-                .build());
+        buildAbweichendeDokumentnummern(builder, coreData);
       }
       // Abweichende ECLIs
       if (!CollectionUtils.isEmpty(coreData.deviatingEclis())) {
-        var abweichendeEclis =
-            coreData.deviatingEclis().stream()
-                .map(ecli -> AbweichendeEclis.AbweichenderEcli.builder().value(ecli).build())
-                .toList();
-        builder.abweichendeEclis(AbweichendeEclis.builder().eclis(abweichendeEclis).build());
+        buildAbweichendeEclis(coreData, builder);
       }
 
       // Rechtskraft (map from legalEffect yes/no)
@@ -275,29 +161,12 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
       // Vorgänge (previous procedures + current label)
       if (coreData.procedure() != null) {
-        List<String> all = new ArrayList<>();
-        all.add(coreData.procedure().label());
-        if (coreData.previousProcedures() != null) {
-          all.addAll(coreData.previousProcedures());
-        }
-        builder.vorgaenge(
-            Vorgaenge.builder()
-                .vorgaenge(
-                    all.stream().map(v -> Vorgaenge.Vorgang.builder().value(v).build()).toList())
-                .build());
+        buildVorgaenge(coreData, builder);
       }
 
       // Eingangsarten
       if (!CollectionUtils.isEmpty(coreData.inputTypes())) {
-        builder.eingangsarten(
-            Eingangsarten.builder()
-                .eingangsarten(
-                    coreData.inputTypes().stream()
-                        .map(
-                            eingangsart ->
-                                Eingangsarten.Eingangsart.builder().content(eingangsart).build())
-                        .toList())
-                .build());
+        buildEingangsarten(builder, coreData);
       }
     }
 
@@ -384,5 +253,235 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
   @Override
   public boolean isFullLDML() {
     return true;
+  }
+
+  private void buildSachgebiete(
+      ContentRelatedIndexing contentRelatedIndexing, RisMeta.RisMetaBuilder builder) {
+    Sachgebiete sachgebiete =
+        Sachgebiete.builder()
+            .sachgebiete(
+                contentRelatedIndexing.fieldsOfLaw().stream()
+                    .map(
+                        sachgebiet ->
+                            Sachgebiete.Sachgebiet.builder()
+                                .value(sachgebiet.text())
+                                .notation(sachgebiet.notation())
+                                .build())
+                    .toList())
+            .build();
+    builder.sachgebiete(sachgebiete);
+  }
+
+  private void buildDefinitionen(
+      ContentRelatedIndexing contentRelatedIndexing, RisMeta.RisMetaBuilder builder) {
+    var defs =
+        contentRelatedIndexing.definitions().stream()
+            .map(
+                definition ->
+                    Definitionen.Definition.builder()
+                        .definierterBegriff(
+                            Definitionen.Definition.DefinierterBegriff.builder()
+                                .value(definition.definedTerm())
+                                .build())
+                        .definierendeRandnummer(
+                            definition.definingBorderNumber() == null
+                                ? null
+                                : Definitionen.Definition.DefinierendeRandnummer.builder()
+                                    .refersTo("#randnummer-" + definition.definingBorderNumber())
+                                    .value(String.valueOf(definition.definingBorderNumber()))
+                                    .build())
+                        .build())
+            .toList();
+    builder.definitionen(Definitionen.builder().definitionen(defs).build());
+  }
+
+  private void buildRechtsmittelzulassung(
+      ContentRelatedIndexing contentRelatedIndexing, RisMeta.RisMetaBuilder builder) {
+    Optional.ofNullable(contentRelatedIndexing.appealAdmission())
+        .ifPresent(
+            value -> {
+              var rechtsmittelzulassungBuilder =
+                  Rechtsmittelzulassung.builder()
+                      .rechtsmittelZugelassen(
+                          new Rechtsmittelzulassung.RechtsmittelZugelassen(value.admitted()));
+
+              Optional.ofNullable(value.by())
+                  .ifPresent(
+                      appealAdmitter ->
+                          rechtsmittelzulassungBuilder.rechtsmittelZugelassenDurch(
+                              new Rechtsmittelzulassung.RechtsmittelZugelassenDurch(
+                                  appealAdmitter.name())));
+
+              builder.rechtsmittelzulassung(rechtsmittelzulassungBuilder.build());
+            });
+  }
+
+  private void buildTarifvertrag(
+      RisMeta.RisMetaBuilder builder, ContentRelatedIndexing contentRelatedIndexing) {
+    builder.tarifvertraege(
+        Tarifvertraege.builder()
+            .tarifvertraege(
+                contentRelatedIndexing.collectiveAgreements().stream()
+                    .map(
+                        collectiveAgreement -> {
+                          var tarifvertragBuilder = Tarifvertraege.Tarifvertrag.builder();
+
+                          if (collectiveAgreement.name() != null) {
+                            tarifvertragBuilder.name(
+                                Tarifvertraege.Tarifvertrag.TarifvertragName.builder()
+                                    .value(collectiveAgreement.name())
+                                    .build());
+                          }
+
+                          if (collectiveAgreement.date() != null) {
+                            tarifvertragBuilder.datum(
+                                Tarifvertraege.Tarifvertrag.TarifvertragDatum.builder()
+                                    .value(collectiveAgreement.date())
+                                    .build());
+                          }
+
+                          if (collectiveAgreement.norm() != null) {
+                            tarifvertragBuilder.tarifnorm(
+                                Tarifvertraege.Tarifvertrag.Tarifnorm.builder()
+                                    .value(collectiveAgreement.norm())
+                                    .build());
+                          }
+
+                          if (collectiveAgreement.industry() != null) {
+                            tarifvertragBuilder.branche(
+                                Tarifvertraege.Tarifvertrag.TarifvertragBranche.builder()
+                                    .value(collectiveAgreement.industry().label())
+                                    .build());
+                          }
+
+                          return tarifvertragBuilder.build();
+                        })
+                    .toList())
+            .build());
+  }
+
+  private void buildFremdsprachigeFassung(
+      RisMeta.RisMetaBuilder builder, ContentRelatedIndexing contentRelatedIndexing) {
+    builder.fremdsprachigeFassungen(
+        FremdsprachigeFassungen.builder()
+            .fremdsprachigeFassungen(
+                contentRelatedIndexing.foreignLanguageVersions().stream()
+                    .map(
+                        version ->
+                            FremdsprachigeFassungen.FremdsprachigeFassung.builder()
+                                .documentRef(
+                                    DocumentRef.builder()
+                                        .href(version.link())
+                                        .showAs(version.languageCode().label())
+                                        .build())
+                                .frbrLanguage(
+                                    new FrbrLanguage(version.languageCode().isoCode3Letters()))
+                                .build())
+                    .toList())
+            .build());
+  }
+
+  private void buildAbweichendeAktenzeichen(RisMeta.RisMetaBuilder builder, CoreData coreData) {
+    AktenzeichenListe aktenzeichenListe = builder.build().getAktenzeichenListe();
+    List<AktenzeichenListe.Aktenzeichen> aktenzeichen = aktenzeichenListe.getAktenzeichen();
+    if (aktenzeichen != null) {
+      coreData
+          .deviatingFileNumbers()
+          .forEach(
+              fileNumber ->
+                  aktenzeichen.add(
+                      AktenzeichenListe.Aktenzeichen.builder()
+                          .domainTerm("Abweichendes Aktenzeichen")
+                          .value(fileNumber)
+                          .build()));
+      builder.aktenzeichenListe(aktenzeichenListe.toBuilder().aktenzeichen(aktenzeichen).build());
+    }
+  }
+
+  private void buildFehlerhafteGerichte(RisMeta.RisMetaBuilder builder, CoreData coreData) {
+    builder.fehlerhafteGerichte(
+        FehlerhafteGerichte.builder()
+            .fehlerhafteGerichte(
+                coreData.deviatingCourts().stream()
+                    .map(
+                        court ->
+                            FehlerhafteGerichte.FehlerhaftesGericht.builder().value(court).build())
+                    .toList())
+            .build());
+  }
+
+  private void buildDatumDerMuendlichenVerhandlung(
+      RisMeta.RisMetaBuilder builder, CoreData coreData) {
+    builder.datenDerMuendlichenVerhandlung(
+        DatenDerMuendlichenVerhandlung.builder()
+            .daten(
+                coreData.oralHearingDates().stream()
+                    .map(
+                        date ->
+                            DatenDerMuendlichenVerhandlung.DatumDerMuendlichenVerhandlung.builder()
+                                .value(DateUtils.toDateString(date))
+                                .build())
+                    .toList())
+            .build());
+  }
+
+  private void buildAbweichendeDaten(RisMeta.RisMetaBuilder builder, CoreData coreData) {
+    builder.abweichendeDaten(
+        AbweichendeDaten.builder()
+            .daten(
+                coreData.deviatingDecisionDates().stream()
+                    .map(
+                        date ->
+                            AbweichendeDaten.AbweichendesDatum.builder()
+                                .value(DateUtils.toDateString(date))
+                                .build())
+                    .toList())
+            .build());
+  }
+
+  private void buildAbweichendeDokumentnummern(RisMeta.RisMetaBuilder builder, CoreData coreData) {
+    builder.abweichendeDokumentnummern(
+        AbweichendeDokumentnummern.builder()
+            .dokumentnummern(
+                coreData.deviatingDocumentNumbers().stream()
+                    .map(
+                        docNumber ->
+                            AbweichendeDokumentnummern.AbweichendeDokumentnummer.builder()
+                                .value(docNumber)
+                                .build())
+                    .toList())
+            .build());
+  }
+
+  private void buildAbweichendeEclis(CoreData coreData, RisMeta.RisMetaBuilder builder) {
+    var abweichendeEclis =
+        coreData.deviatingEclis().stream()
+            .map(ecli -> AbweichendeEclis.AbweichenderEcli.builder().value(ecli).build())
+            .toList();
+    builder.abweichendeEclis(AbweichendeEclis.builder().eclis(abweichendeEclis).build());
+  }
+
+  private void buildVorgaenge(CoreData coreData, RisMeta.RisMetaBuilder builder) {
+    List<String> all = new ArrayList<>();
+    all.add(coreData.procedure().label());
+    if (coreData.previousProcedures() != null) {
+      all.addAll(coreData.previousProcedures());
+    }
+    builder.vorgaenge(
+        Vorgaenge.builder()
+            .vorgaenge(all.stream().map(v -> Vorgaenge.Vorgang.builder().value(v).build()).toList())
+            .build());
+  }
+
+  private void buildEingangsarten(RisMeta.RisMetaBuilder builder, CoreData coreData) {
+    builder.eingangsarten(
+        Eingangsarten.builder()
+            .eingangsarten(
+                coreData.inputTypes().stream()
+                    .map(
+                        eingangsart ->
+                            Eingangsarten.Eingangsart.builder().content(eingangsart).build())
+                    .toList())
+            .build());
   }
 }

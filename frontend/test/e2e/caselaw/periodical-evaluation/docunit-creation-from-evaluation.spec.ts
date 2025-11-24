@@ -30,7 +30,9 @@ async function verifyDocUnitOpensInEditMode(
   await expect(
     newTab.getByLabel("Entscheidungsdatum", { exact: true }),
   ).toHaveValue(formattedDate)
-  await expect(newTab.getByTestId("chip-value")).toHaveText(randomFileNumber)
+  await expect(
+    newTab.getByLabel("Aktenzeichen").getByRole("listitem"),
+  ).toHaveText(randomFileNumber)
   await expect(newTab.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
     "Anerkenntnisurteil",
   )
@@ -242,9 +244,9 @@ test.describe(
           await expect(
             newTab.getByLabel("Entscheidungsdatum", { exact: true }),
           ).toHaveValue(formattedDate)
-          await expect(newTab.getByTestId("chip-value")).toHaveText(
-            "some new value",
-          )
+          await expect(
+            newTab.getByLabel("Aktenzeichen").getByRole("listitem"),
+          ).toHaveText("some new value")
           await expect(
             newTab.getByLabel("Dokumenttyp", { exact: true }),
           ).toHaveValue("Anerkenntnisurteil")

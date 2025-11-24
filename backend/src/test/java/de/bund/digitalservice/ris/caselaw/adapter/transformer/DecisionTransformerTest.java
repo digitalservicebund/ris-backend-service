@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import static de.bund.digitalservice.ris.caselaw.domain.TranslationType.KEINE_ANGABE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,6 +36,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEd
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationBorderNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationTranslatorDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationUrlDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ParticipatingJudgeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
@@ -60,6 +65,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
+import de.bund.digitalservice.ris.caselaw.domain.OriginOfTranslation;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
@@ -1888,6 +1894,137 @@ class DecisionTransformerTest {
     }
   }
 
+  @Nested
+  class OriginOfTranslations {
+    @Test
+    void testTransformToDomain_withOriginOfTranslations_shouldAddData() {
+      // Arrange
+      DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+      var translatorId = UUID.randomUUID();
+      var borderNumberId = UUID.randomUUID();
+      var urlId = UUID.randomUUID();
+      var englisch =
+          OriginOfTranslationDTO.builder()
+              .languageCode(LanguageCodeDTO.builder().isoCode("en").value("Englisch").build())
+              .translationType(KEINE_ANGABE)
+              .translators(
+                  List.of(
+                      OriginOfTranslationTranslatorDTO.builder()
+                          .id(translatorId)
+                          .translatorName("Max Mustermann")
+                          .rank(1L)
+                          .build()))
+              .borderNumbers(
+                  List.of(
+                      OriginOfTranslationBorderNumberDTO.builder()
+                          .id(borderNumberId)
+                          .borderNumber(23L)
+                          .rank(1L)
+                          .build()))
+              .urls(
+                  List.of(
+                      OriginOfTranslationUrlDTO.builder()
+                          .id(urlId)
+                          .url("www.some-url.de")
+                          .rank(1L)
+                          .build()))
+              .rank(1L)
+              .build();
+      decisionDTO.setOriginOfTranslations(List.of(englisch));
+
+      // Act
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+      // Assert
+      assertThat(decision.contentRelatedIndexing().originOfTranslations()).hasSize(1);
+      assertThat(decision.contentRelatedIndexing().originOfTranslations().getFirst())
+          .isEqualTo(
+              OriginOfTranslation.builder()
+                  .languageCode(LanguageCode.builder().isoCode("en").label("Englisch").build())
+                  .translationType(KEINE_ANGABE)
+                  .translators(List.of("Max Mustermann"))
+                  .borderNumbers(List.of(23L))
+                  .urls(List.of("www.some-url.de"))
+                  .build());
+    }
+
+    @Test
+    void testTransformToDomain_withoutOriginOfTranslations_shouldNotAddData() {
+      // Arrange
+      DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+      // Act
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+      // Assert
+      assertThat(decision.contentRelatedIndexing().originOfTranslations()).isEmpty();
+    }
+
+    @Test
+    void testTransformToDTO_withOriginOfTranslations_shouldAddData() {
+      // Arrange
+      var englisch =
+          OriginOfTranslation.builder()
+              .languageCode(LanguageCode.builder().isoCode("en").label("Englisch").build())
+              .translationType(KEINE_ANGABE)
+              .translators(List.of("Max Mustermann"))
+              .borderNumbers(List.of(23L))
+              .urls(List.of("www.some-url.de"))
+              .build();
+
+      Decision decision =
+          Decision.builder()
+              .contentRelatedIndexing(
+                  ContentRelatedIndexing.builder().originOfTranslations(List.of(englisch)).build())
+              .build();
+
+      // Act
+      DecisionDTO decisionDTO =
+          DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+      // Assert
+      assertThat(decisionDTO.getOriginOfTranslations()).hasSize(1);
+      assertThat(decisionDTO.getOriginOfTranslations().getFirst().getRank()).isEqualTo(1L);
+      assertThat(decisionDTO.getOriginOfTranslations().getFirst().getTranslationType())
+          .isEqualTo(KEINE_ANGABE);
+      assertThat(decisionDTO.getOriginOfTranslations().getFirst().getLanguageCode().getValue())
+          .isEqualTo("Englisch");
+      assertThat(decisionDTO.getOriginOfTranslations().getFirst().getLanguageCode().getIsoCode())
+          .isEqualTo("en");
+      assertThat(
+              decisionDTO
+                  .getOriginOfTranslations()
+                  .getFirst()
+                  .getTranslators()
+                  .getFirst()
+                  .getTranslatorName())
+          .isEqualTo("Max Mustermann");
+      assertThat(
+              decisionDTO
+                  .getOriginOfTranslations()
+                  .getFirst()
+                  .getBorderNumbers()
+                  .getFirst()
+                  .getBorderNumber())
+          .isEqualTo(23L);
+      assertThat(decisionDTO.getOriginOfTranslations().getFirst().getUrls().getFirst().getUrl())
+          .isEqualTo("www.some-url.de");
+    }
+
+    @Test
+    void testTransformToDTO_withoutOriginOfTranslation_shouldNotAddData() {
+      // Arrange
+      Decision decision = generateSimpleDocumentationUnitBuilder().build();
+
+      // Act
+      DecisionDTO decisionDTO =
+          DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+      // Assert
+      assertThat(decisionDTO.getOriginOfTranslations()).isEmpty();
+    }
+  }
+
   @Test
   void testTransformToDomain_withCelex_resultShouldHaveCelex() {
     DecisionDTO decisionDTO = generateSimpleDTOBuilder().celexNumber("62023CJ0538").build();
@@ -2035,6 +2172,7 @@ class DecisionTransformerTest {
                 .hasLegislativeMandate(false)
                 .evsf(null)
                 .foreignLanguageVersions(Collections.emptyList())
+                .originOfTranslations(Collections.emptyList())
                 .build())
         .caselawReferences(Collections.emptyList())
         .literatureReferences(Collections.emptyList())
