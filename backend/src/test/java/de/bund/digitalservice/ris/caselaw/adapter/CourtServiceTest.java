@@ -5,11 +5,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtBranchLocationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtBranchLocationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresCourtRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.domain.CourtService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.CourtBranchLocationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +31,7 @@ class CourtServiceTest {
   @MockitoSpyBean private CourtService service;
 
   @MockitoBean private CourtRepository courtRepository;
-  @MockitoBean private DatabaseCourtBranchLocationRepository databaseCourtBranchLocationRepository;
+  @MockitoBean private CourtBranchLocationRepository courtBranchLocationRepository;
 
   @Test
   void testGetTwoDifferentCourts() {
@@ -88,17 +87,14 @@ class CourtServiceTest {
     String courtLocation = "München";
     UUID courtId = UUID.randomUUID();
     Court court = Court.builder().type(courtType).location(courtLocation).id(courtId).build();
-    CourtBranchLocationDTO courtBranchLocationDTO =
-        CourtBranchLocationDTO.builder().value("Augsburg").build();
     when(courtRepository.findByTypeAndLocation(courtType, courtLocation))
         .thenReturn(Optional.of(court));
-    when(databaseCourtBranchLocationRepository.findAllByCourtId(courtId))
-        .thenReturn(List.of(courtBranchLocationDTO));
+    when(courtBranchLocationRepository.findAllByCourtId(courtId)).thenReturn(List.of("Augsburg"));
 
     List<String> branchLocations = service.getBranchLocationsForCourt(courtType, courtLocation);
 
     verify(courtRepository).findByTypeAndLocation(courtType, courtLocation);
-    verify(databaseCourtBranchLocationRepository).findAllByCourtId(courtId);
+    verify(courtBranchLocationRepository).findAllByCourtId(courtId);
     assertThat(branchLocations).isEqualTo(List.of("Augsburg"));
   }
 
@@ -110,12 +106,12 @@ class CourtServiceTest {
     Court court = Court.builder().type(courtType).location(courtLocation).id(courtId).build();
     when(courtRepository.findByTypeAndLocation(courtType, courtLocation))
         .thenReturn(Optional.of(court));
-    when(databaseCourtBranchLocationRepository.findAllByCourtId(courtId)).thenReturn(List.of());
+    when(courtBranchLocationRepository.findAllByCourtId(courtId)).thenReturn(List.of());
 
     List<String> branchLocations = service.getBranchLocationsForCourt(courtType, courtLocation);
 
     verify(courtRepository).findByTypeAndLocation(courtType, courtLocation);
-    verify(databaseCourtBranchLocationRepository).findAllByCourtId(courtId);
+    verify(courtBranchLocationRepository).findAllByCourtId(courtId);
     assertThat(branchLocations).isEmpty();
   }
 
@@ -130,7 +126,7 @@ class CourtServiceTest {
     List<String> branchLocations = service.getBranchLocationsForCourt(courtType, courtLocation);
 
     verify(courtRepository).findByTypeAndLocation(courtType, courtLocation);
-    verify(databaseCourtBranchLocationRepository, never()).findAllByCourtId(courtId);
+    verify(courtBranchLocationRepository, never()).findAllByCourtId(courtId);
     assertThat(branchLocations).isEmpty();
   }
 }

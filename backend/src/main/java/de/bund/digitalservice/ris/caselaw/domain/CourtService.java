@@ -1,8 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtBranchLocationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtBranchLocationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.CourtBranchLocationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import java.util.Collections;
 import java.util.List;
@@ -14,13 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class CourtService {
   private final CourtRepository courtRepository;
-  private final DatabaseCourtBranchLocationRepository databaseCourtBranchLocationRepository;
+  private final CourtBranchLocationRepository courtBranchLocationRepository;
 
   public CourtService(
       CourtRepository courtRepository,
-      DatabaseCourtBranchLocationRepository databaseCourtBranchLocationRepository) {
+      CourtBranchLocationRepository courtBranchLocationRepository) {
     this.courtRepository = courtRepository;
-    this.databaseCourtBranchLocationRepository = databaseCourtBranchLocationRepository;
+    this.courtBranchLocationRepository = courtBranchLocationRepository;
   }
 
   @Transactional(readOnly = true)
@@ -35,9 +34,7 @@ public class CourtService {
   public List<String> getBranchLocationsForCourt(String courtType, String courtLocation) {
     var court = courtRepository.findByTypeAndLocation(courtType, courtLocation).orElse(null);
     if (court != null) {
-      return databaseCourtBranchLocationRepository.findAllByCourtId(court.id()).stream()
-          .map(CourtBranchLocationDTO::getValue)
-          .toList();
+      return courtBranchLocationRepository.findAllByCourtId(court.id());
     } else {
       return Collections.emptyList();
     }
