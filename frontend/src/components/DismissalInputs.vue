@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
+import InputField from "@/components/input/InputField.vue"
+import { useValidationStore } from "@/composables/useValidationStore"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const store = useDocumentUnitStore()
@@ -17,27 +19,45 @@ const dismissalGrounds = computed({
     store.documentUnit!.contentRelatedIndexing.dismissalGrounds = newValues
   },
 })
+const validationStore =
+  useValidationStore<["dismissalTypes", "dismissalGrounds"][number]>()
 </script>
 
 <template>
   <div class="flex flex-row gap-24">
     <div class="basis-1/2 gap-0">
-      <div class="ris-label2-regular mb-4">Kündigungsarten</div>
-      <ChipsInput
+      <InputField
         id="dismissalTypes"
-        v-model="dismissalTypes"
-        aria-label="Kündigungsarten"
-        data-testid="dismissal-types"
-      />
+        v-slot="slotProps"
+        label="Kündigungsarten"
+      >
+        <ChipsInput
+          :id="slotProps.id"
+          v-model="dismissalTypes"
+          aria-label="Kündigungsarten"
+          data-testid="dismissal-types"
+          :has-error="slotProps.hasError"
+          @focus="validationStore.remove('dismissalTypes')"
+          @update:validation-error="slotProps.updateValidationError"
+        />
+      </InputField>
     </div>
     <div class="basis-1/2 gap-0">
-      <div class="ris-label2-regular mb-4">Kündigungsgründe</div>
-      <ChipsInput
+      <InputField
         id="dismissalGrounds"
-        v-model="dismissalGrounds"
-        aria-label="Kündigungsgründe"
-        data-testid="dismissal-grounds"
-      />
+        v-slot="slotProps"
+        label="Kündigungsgründe"
+      >
+        <ChipsInput
+          :id="slotProps.id"
+          v-model="dismissalGrounds"
+          aria-label="Kündigungsgründe"
+          data-testid="dismissal-grounds"
+          :has-error="slotProps.hasError"
+          @focus="validationStore.remove('dismissalGrounds')"
+          @update:validation-error="slotProps.updateValidationError"
+        />
+      </InputField>
     </div>
   </div>
 </template>
