@@ -659,6 +659,14 @@ public class DocxTableBuilder extends DocxBuilder {
         cellElement.setBackgroundColor(parseCTShd(tcPr.getShd()));
       }
 
+      if (tcPr.getVAlign() != null) {
+        var alignment = tcPr.getVAlign().getVal().toString().toLowerCase();
+        if (alignment.equals("center")) {
+          alignment = "middle";
+        }
+        cellElement.addStyle("vertical-align", alignment);
+      }
+
       if (tcPr.getTcW() != null && tcPr.getTcW().getW() != null) {
         var widthPx = DocxUnitConverter.convertTwipToPixel(tcPr.getTcW().getW().longValue());
         cellElement.setWidthPx(widthPx);
