@@ -205,4 +205,15 @@ describe("ChipsBorderNumberInput", () => {
       instance: id,
     })
   })
+
+  it("does not add a chip when input is only whitespaces", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({ "onUpdate:modelValue": onUpdate })
+    const input = screen.getByRole<HTMLInputElement>("textbox")
+    expect(input).toHaveValue("")
+
+    await user.type(input, "   {enter}")
+
+    expect(onUpdate).toHaveBeenCalledWith([])
+  })
 })
