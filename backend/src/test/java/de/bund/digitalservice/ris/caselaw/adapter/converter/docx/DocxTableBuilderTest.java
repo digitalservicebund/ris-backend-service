@@ -345,7 +345,7 @@ class DocxTableBuilderTest {
   }
 
   @Test
-  void testBuild_withExternalTableStyleX() {
+  void testBuild_withExternalTableStyleInReversedOrder() {
     Tbl table = generateTable(List.of(List.of("table cell")));
     TblPr tblPr = new TblPr();
     TblStyle tblStyle = new TblStyle();
@@ -355,7 +355,7 @@ class DocxTableBuilderTest {
 
     Map<String, Style> styles = new HashMap<>();
     Style style = new Style();
-    putOtherTableStylePrToStyle(style);
+    putReverseTableStylePrToStyle(style);
     styles.put("external-style", style);
 
     var converter = new DocxConverter();
@@ -648,7 +648,7 @@ class DocxTableBuilderTest {
         .add(generateTableStylePr(STTblStyleOverrideType.SW_CELL, "26", null, null, null));
   }
 
-  private void putOtherTableStylePrToStyle(Style style) {
+  private void putReverseTableStylePrToStyle(Style style) {
     style
         .getTblStylePr()
         .add(generateTableStylePr(STTblStyleOverrideType.SW_CELL, "26", null, null, null));
