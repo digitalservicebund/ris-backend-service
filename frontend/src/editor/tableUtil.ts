@@ -212,7 +212,7 @@ export function createCellCommands() {
 }
 
 export function hasAllBorders(style: string): boolean {
-  const s = style.replace(/\s+/g, "")
+  const s = style.replaceAll(/\s+/g, "")
 
   return (
     s.includes("border-top:") &&
