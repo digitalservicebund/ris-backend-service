@@ -12,6 +12,7 @@ import InputField from "@/components/input/InputField.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ActiveCitation from "@/domain/activeCitation"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
+import Correction from "@/domain/correction"
 import {
   allLabels,
   contentRelatedIndexingLabels,
@@ -263,7 +264,7 @@ const handleImport = async (key: keyof typeof allLabels) => {
       importAppeal()
       break
     case "corrections":
-      // TODO: (Malte Laukötter, 2025-11-20) include import for corrections
+      importCorrections()
       break
     default: {
       // The never type ensures all keys are handled in the switch.
@@ -539,6 +540,21 @@ function importAppeal() {
         ...source,
         id: undefined,
       }
+    }
+  }
+}
+
+function importCorrections() {
+  if (
+    isDecision(targetDocumentUnit.value) &&
+    isDecision(sourceDocumentUnit.value)
+  ) {
+    const source = sourceDocumentUnit.value?.longTexts.corrections
+
+    if (targetDocumentUnit.value) {
+      targetDocumentUnit.value.longTexts.corrections = source?.map(
+        (correction) => new Correction({ ...correction, id: undefined }),
+      )
     }
   }
 }

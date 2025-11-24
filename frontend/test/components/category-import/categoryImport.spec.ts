@@ -7,6 +7,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import CategoryImport from "@/components/category-import/CategoryImport.vue"
 import { AppealWithdrawal, PkhPlaintiff } from "@/domain/appeal"
 import { AppealAdmitter } from "@/domain/appealAdmitter"
+import Correction from "@/domain/correction"
 import {
   allLabels,
   contentRelatedIndexingLabels,
@@ -316,6 +317,90 @@ describe("CategoryImport", () => {
     await fireEvent.click(screen.getByLabelText("Titelzeile übernehmen"))
 
     expect(store.documentUnit?.shortTexts.headline).toEqual("headline")
+  })
+
+  it("should import a list (decision names) from short texts", async () => {
+    const target = new Decision("uuid", {
+      documentNumber: "XXRE123456789",
+      kind: Kind.DECISION,
+    })
+    const source = new Decision("456", {
+      kind: Kind.DECISION,
+      documentNumber: "TARGET3456789",
+      shortTexts: { decisionNames: ["foo", "bar"] },
+    })
+    vi.spyOn(documentUnitService, "getByDocumentNumber").mockResolvedValueOnce({
+      status: 200,
+      data: source,
+    })
+    const store = mockSessionStore(target)
+
+    const { user } = renderComponent()
+
+    await user.type(
+      screen.getByLabelText("Dokumentnummer Eingabefeld"),
+      "TARGET3456789",
+    )
+
+    await fireEvent.click(
+      screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
+    )
+
+    await fireEvent.click(
+      screen.getByLabelText("Entscheidungsnamen übernehmen"),
+    )
+
+    expect((store.documentUnit as Decision)?.shortTexts.decisionNames).toEqual([
+      "foo",
+      "bar",
+    ])
+  })
+
+  it("should import corrections", async () => {
+    const target = new Decision("uuid", {
+      documentNumber: "XXRE123456789",
+      kind: Kind.DECISION,
+    })
+    const source = new Decision("456", {
+      kind: Kind.DECISION,
+      documentNumber: "TARGET3456789",
+      longTexts: {
+        corrections: [
+          new Correction({
+            id: "a4ba90c3-bb99-4c67-b5dd-b0b37a80c9de",
+            type: "Unrichtigkeiten",
+          }),
+        ],
+      },
+    })
+    vi.spyOn(documentUnitService, "getByDocumentNumber").mockResolvedValueOnce({
+      status: 200,
+      data: source,
+    })
+    const store = mockSessionStore(target)
+
+    const { user } = renderComponent()
+
+    await user.type(
+      screen.getByLabelText("Dokumentnummer Eingabefeld"),
+      "TARGET3456789",
+    )
+
+    await fireEvent.click(
+      screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
+    )
+
+    await fireEvent.click(screen.getByLabelText("Berichtigung übernehmen"))
+
+    expect((store.documentUnit as Decision).longTexts.corrections).toHaveLength(
+      1,
+    )
+    expect(
+      (store.documentUnit as Decision).longTexts.corrections?.[0].type,
+    ).toEqual("Unrichtigkeiten")
+    expect(
+      (store.documentUnit as Decision).longTexts.corrections?.[0].newEntry,
+    ).toBe(true)
   })
 
   it("displays core data when document unit found", async () => {
