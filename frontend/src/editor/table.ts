@@ -3,7 +3,7 @@ import "../styles/tables.css"
 import { hasAllBorders } from "./tableUtil"
 
 /**
- * Erweitert die Tiptap Table Extension, um die Logik für die 'invisible-table'-Klasse
+ * Erweitert die Tiptap Table Extension, um die Logik für die 'invisible-table-cell'-Klasse
  * auf Tabellenknoten, Header und Zellen anzuwenden.
  */
 export const CustomTable = Table.extend({
