@@ -225,9 +225,9 @@ describe("text editor toolbar", async () => {
       const cellStyle = getFirstCellHTML()
 
       expect(cellStyle).not.toContain(`border-top`)
-      expect(cellStyle).not.toContain(`border-right: null`)
-      expect(cellStyle).not.toContain(`border-bottom: null`)
-      expect(cellStyle).not.toContain(`border-left: null`)
+      expect(cellStyle).not.toContain(`border-right`)
+      expect(cellStyle).not.toContain(`border-bottom`)
+      expect(cellStyle).not.toContain(`border-left`)
     })
 
     test("should set left border attribute when 'Rahmen links' is clicked", async () => {

@@ -1,6 +1,6 @@
 import { CommandProps } from "@tiptap/core"
 import { Node as ProseMirrorNode } from "@tiptap/pm/model"
-import { EditorState } from "@tiptap/pm/state"
+import { EditorState, Transaction } from "@tiptap/pm/state"
 import { CellSelection } from "@tiptap/pm/tables"
 
 type BorderSide = "top" | "right" | "bottom" | "left"
@@ -24,7 +24,6 @@ declare module "@tiptap/core" {
 function getCellSelection(state: EditorState): CellSelection | null {
   const sel = state.selection
 
-  // Already a valid CellSelection
   if (sel instanceof CellSelection) {
     return sel
   }
@@ -36,20 +35,101 @@ function getCellSelection(state: EditorState): CellSelection | null {
     const node = $pos.node(depth)
     if (!node) continue
 
-    // Check if this depth is a table cell or table header
     const nodeName = node.type?.name
     if (nodeName === "tableCell" || nodeName === "tableHeader") {
-      // Correct: cell position, not cursor position!
       const cellPos = $pos.before(depth)
       const $cell = state.doc.resolve(cellPos)
 
-      // Correct: always use the resolved cell node
+      // Always use the resolved cell node, not $pos
       return new CellSelection($cell, $cell)
     }
   }
-
-  // No cell found
   return null
+}
+
+// --- Cell Processing Helpers ---
+
+function processClearCellBorders(
+  node: ProseMirrorNode,
+  pos: number,
+  tr: Transaction,
+): void {
+  const cleanedStyles = (node.attrs.style || "")
+    .split(";")
+    .map((s: string) => s.trim())
+    .filter(Boolean)
+    .filter((s: string) => !s.startsWith("border"))
+
+  tr.setNodeMarkup(pos, undefined, {
+    ...node.attrs,
+    style: cleanedStyles.join("; "),
+  })
+}
+
+function processSetBorder(
+  node: ProseMirrorNode,
+  pos: number,
+  tr: Transaction,
+  side: BorderSide,
+  value: string,
+): void {
+  const styles = (node.attrs.style || "")
+    .split(";")
+    .map((s: string) => s.trim())
+    .filter(Boolean)
+    .filter((s: string) => !s.startsWith(`border-${side}`))
+
+  styles.push(`border-${side}: ${value}`)
+
+  tr.setNodeMarkup(pos, undefined, {
+    ...node.attrs,
+    style: styles.join("; "),
+  })
+}
+
+function processSetBorderAll(
+  node: ProseMirrorNode,
+  pos: number,
+  tr: Transaction,
+  value: string,
+): void {
+  const styles = (node.attrs.style || "")
+    .split(";")
+    .map((s: string) => s.trim())
+    .filter(Boolean)
+    .filter((s: string) => !s.startsWith("border"))
+
+  styles.push(
+    `border-top: ${value}`,
+    `border-right: ${value}`,
+    `border-bottom: ${value}`,
+    `border-left: ${value}`,
+  )
+
+  tr.setNodeMarkup(pos, undefined, {
+    ...node.attrs,
+    style: styles.join("; "),
+  })
+}
+
+function processSetVerticalAlign(
+  node: ProseMirrorNode,
+  pos: number,
+  tr: Transaction,
+  value: VerticalAlign,
+): void {
+  const styles = (node.attrs.style || "")
+    .split(";")
+    .map((s: string) => s.trim())
+    .filter(Boolean)
+    .filter((s: string) => !s.startsWith("vertical-align"))
+
+  styles.push(`vertical-align: ${value}`)
+
+  tr.setNodeMarkup(pos, undefined, {
+    ...node.attrs,
+    style: styles.join("; "),
+  })
 }
 
 /**
@@ -64,17 +144,7 @@ export function createCellCommands() {
         if (!selection) return false
 
         selection.forEachCell((node: ProseMirrorNode, pos: number) => {
-          const cleanedStyle = (node.attrs.style || "")
-            .split(";")
-            .map((s: string) => s.trim())
-            .filter(Boolean)
-            .filter((s: string) => !s.startsWith("border"))
-            .join("; ")
-
-          tr.setNodeMarkup(pos, undefined, {
-            ...node.attrs,
-            style: cleanedStyle,
-          })
+          processClearCellBorders(node, pos, tr)
         })
 
         if (tr.docChanged && dispatch) {
@@ -92,18 +162,7 @@ export function createCellCommands() {
         if (!selection) return false
 
         selection.forEachCell((node: ProseMirrorNode, pos: number) => {
-          const styles = (node.attrs.style || "")
-            .split(";")
-            .map((s: string) => s.trim())
-            .filter(Boolean)
-            .filter((s: string) => !s.startsWith(`border-${side}`))
-
-          styles.push(`border-${side}: ${value}`)
-
-          tr.setNodeMarkup(pos, undefined, {
-            ...node.attrs,
-            style: styles.join("; "),
-          })
+          processSetBorder(node, pos, tr, side, value)
         })
 
         if (tr.docChanged && dispatch) {
@@ -121,23 +180,7 @@ export function createCellCommands() {
         if (!selection) return false
 
         selection.forEachCell((node: ProseMirrorNode, pos: number) => {
-          const styles = (node.attrs.style || "")
-            .split(";")
-            .map((s: string) => s.trim())
-            .filter(Boolean)
-            .filter((s: string) => !s.startsWith("border"))
-
-          styles.push(
-            `border-top: ${value}`,
-            `border-right: ${value}`,
-            `border-bottom: ${value}`,
-            `border-left: ${value}`,
-          )
-
-          tr.setNodeMarkup(pos, undefined, {
-            ...node.attrs,
-            style: styles.join("; "),
-          })
+          processSetBorderAll(node, pos, tr, value)
         })
 
         if (tr.docChanged && dispatch) {
@@ -155,18 +198,7 @@ export function createCellCommands() {
         if (!selection) return false
 
         selection.forEachCell((node: ProseMirrorNode, pos: number) => {
-          const styles = (node.attrs.style || "")
-            .split(";")
-            .map((s: string) => s.trim())
-            .filter(Boolean)
-            .filter((s: string) => !s.startsWith("vertical-align"))
-
-          styles.push(`vertical-align: ${value}`)
-
-          tr.setNodeMarkup(pos, undefined, {
-            ...node.attrs,
-            style: styles.join("; "),
-          })
+          processSetVerticalAlign(node, pos, tr, value)
         })
 
         if (tr.docChanged && dispatch) {
@@ -180,7 +212,7 @@ export function createCellCommands() {
 }
 
 export function hasAllBorders(style: string): boolean {
-  const s = style.replace(/\s+/g, "")
+  const s = style.replaceAll(/\s+/g, "")
 
   return (
     s.includes("border-top:") &&
