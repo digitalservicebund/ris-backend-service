@@ -9,6 +9,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Classification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Keyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.ImplicitReference;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.OtherReferences;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDaten;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDokumentnummern;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
@@ -21,6 +23,8 @@ import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
@@ -158,6 +162,24 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
     }
 
     return Header.builder().paragraphs(paragraphs).build();
+  }
+
+  @Nullable
+  @Override
+  protected OtherReferences buildOtherReferences(PendingProceeding pendingProceeding) {
+    List<ImplicitReference> implicitReferences =
+        Stream.concat(
+                buildCommonImplicitReferences(pendingProceeding).stream(),
+                buildFundstellen(pendingProceeding).stream())
+            .toList();
+    OtherReferences otherReferences =
+        OtherReferences.builder().implicitReferences(implicitReferences).build();
+
+    if (!otherReferences.isEmpty()) {
+      return otherReferences;
+    } else {
+      return null;
+    }
   }
 
   @Override
