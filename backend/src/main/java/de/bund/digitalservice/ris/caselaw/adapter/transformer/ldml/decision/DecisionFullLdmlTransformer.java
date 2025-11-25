@@ -95,7 +95,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       // Definitionen
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.definitions())) {
         var definitionen = buildDefinitionen(contentRelatedIndexing);
-        builder.definitionen(Definitionen.builder().definitionen(definitionen).build());
+        builder.definitionen(definitionen);
       }
 
       // EVSF
@@ -121,10 +121,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       // Herkunft der Übersetzungen
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.originOfTranslations())) {
         var herkunftDerUebersetzungen = buildHerkunftDerUebersetzungen(contentRelatedIndexing);
-        builder.herkunftDerUebersetzungen(
-            HerkunftDerUebersetzungen.builder()
-                .herkunftDerUebersetzungen(herkunftDerUebersetzungen)
-                .build());
+        builder.herkunftDerUebersetzungen(herkunftDerUebersetzungen);
       }
     }
 
@@ -282,25 +279,28 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         .build();
   }
 
-  private List<Definitionen.Definition> buildDefinitionen(
-      ContentRelatedIndexing contentRelatedIndexing) {
-    return contentRelatedIndexing.definitions().stream()
-        .map(
-            definition ->
-                Definitionen.Definition.builder()
-                    .definierterBegriff(
-                        Definitionen.Definition.DefinierterBegriff.builder()
-                            .value(definition.definedTerm())
+  private Definitionen buildDefinitionen(ContentRelatedIndexing contentRelatedIndexing) {
+    return Definitionen.builder()
+        .definitionen(
+            contentRelatedIndexing.definitions().stream()
+                .map(
+                    definition ->
+                        Definitionen.Definition.builder()
+                            .definierterBegriff(
+                                Definitionen.Definition.DefinierterBegriff.builder()
+                                    .value(definition.definedTerm())
+                                    .build())
+                            .definierendeRandnummer(
+                                definition.definingBorderNumber() == null
+                                    ? null
+                                    : Definitionen.Definition.DefinierendeRandnummer.builder()
+                                        .refersTo(
+                                            "#randnummer-" + definition.definingBorderNumber())
+                                        .value(String.valueOf(definition.definingBorderNumber()))
+                                        .build())
                             .build())
-                    .definierendeRandnummer(
-                        definition.definingBorderNumber() == null
-                            ? null
-                            : Definitionen.Definition.DefinierendeRandnummer.builder()
-                                .refersTo("#randnummer-" + definition.definingBorderNumber())
-                                .value(String.valueOf(definition.definingBorderNumber()))
-                                .build())
-                    .build())
-        .toList();
+                .toList())
+        .build();
   }
 
   private Rechtsmittelzulassung buildRechtsmittelzulassung(
@@ -391,71 +391,75 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         .build();
   }
 
-  private List<HerkunftDerUebersetzungen.HerkunftDerUebersetzung> buildHerkunftDerUebersetzungen(
+  private HerkunftDerUebersetzungen buildHerkunftDerUebersetzungen(
       ContentRelatedIndexing contentRelatedIndexing) {
 
-    return contentRelatedIndexing.originOfTranslations().stream()
-        .filter(translation -> translation.languageCode() != null)
-        .map(
-            translation -> {
-              var language = new FrbrLanguage(translation.languageCode().isoCode3Letters());
-              language.setDomainTerm("Originalsprache");
+    var herkunftList =
+        contentRelatedIndexing.originOfTranslations().stream()
+            .filter(translation -> translation.languageCode() != null)
+            .map(
+                translation -> {
+                  var language = new FrbrLanguage(translation.languageCode().isoCode3Letters());
+                  language.setDomainTerm("Originalsprache");
 
-              var translators =
-                  Optional.ofNullable(translation.translators()).orElseGet(List::of).stream()
-                      .map(
-                          translator ->
-                              HerkunftDerUebersetzungen.Uebersetzerin.builder()
-                                  .value(translator)
-                                  .build())
-                      .toList();
+                  var translators =
+                      Optional.ofNullable(translation.translators()).orElseGet(List::of).stream()
+                          .map(
+                              translator ->
+                                  HerkunftDerUebersetzungen.Uebersetzerin.builder()
+                                      .value(translator)
+                                      .build())
+                          .toList();
 
-              var borderNumbers =
-                  Optional.ofNullable(translation.borderNumbers()).orElseGet(List::of).stream()
-                      .map(
-                          borderNumber ->
-                              HerkunftDerUebersetzungen.InterneVerlinkung.builder()
-                                  .refersTo("#randnummer-" + borderNumber)
-                                  .value(String.valueOf(borderNumber))
-                                  .build())
-                      .toList();
+                  var borderNumbers =
+                      Optional.ofNullable(translation.borderNumbers()).orElseGet(List::of).stream()
+                          .map(
+                              borderNumber ->
+                                  HerkunftDerUebersetzungen.InterneVerlinkung.builder()
+                                      .refersTo("#randnummer-" + borderNumber)
+                                      .value(String.valueOf(borderNumber))
+                                      .build())
+                          .toList();
 
-              var urls =
-                  Optional.ofNullable(translation.urls()).orElseGet(List::of).stream()
-                      .map(
-                          url ->
-                              HerkunftDerUebersetzungen.ExterneVerlinkung.builder()
-                                  .documentRef(
-                                      DocumentRef.builder()
-                                          .href(url)
-                                          .showAs(translation.languageCode().label())
-                                          .build())
-                                  .build())
-                      .toList();
+                  var urls =
+                      Optional.ofNullable(translation.urls()).orElseGet(List::of).stream()
+                          .map(
+                              url ->
+                                  HerkunftDerUebersetzungen.ExterneVerlinkung.builder()
+                                      .documentRef(
+                                          DocumentRef.builder()
+                                              .href(url)
+                                              .showAs(translation.languageCode().label())
+                                              .build())
+                                      .build())
+                          .toList();
 
-              var uebersetzungsartBuilder = HerkunftDerUebersetzungen.Uebersetzungsart.builder();
-              if (translation.translationType() != null) {
-                uebersetzungsartBuilder.value(translation.translationType().toString());
-              }
+                  var uebersetzungsartBuilder =
+                      HerkunftDerUebersetzungen.Uebersetzungsart.builder();
+                  if (translation.translationType() != null) {
+                    uebersetzungsartBuilder.value(translation.translationType().toString());
+                  }
 
-              return HerkunftDerUebersetzungen.HerkunftDerUebersetzung.builder()
-                  .frbrLanguage(language)
-                  .uebersetzerinnen(
-                      HerkunftDerUebersetzungen.Uebersetzerinnen.builder()
-                          .uebersetzerinnen(translators)
-                          .build())
-                  .interneVerlinkungen(
-                      HerkunftDerUebersetzungen.InterneVerlinkungen.builder()
-                          .interneVerlinkungen(borderNumbers)
-                          .build())
-                  .externeVerlinkungen(
-                      HerkunftDerUebersetzungen.ExterneVerlinkungen.builder()
-                          .externeVerlinkungen(urls)
-                          .build())
-                  .uebersetzungsart(uebersetzungsartBuilder.build())
-                  .build();
-            })
-        .toList();
+                  return HerkunftDerUebersetzungen.HerkunftDerUebersetzung.builder()
+                      .frbrLanguage(language)
+                      .uebersetzerinnen(
+                          HerkunftDerUebersetzungen.Uebersetzerinnen.builder()
+                              .uebersetzerinnen(translators)
+                              .build())
+                      .interneVerlinkungen(
+                          HerkunftDerUebersetzungen.InterneVerlinkungen.builder()
+                              .interneVerlinkungen(borderNumbers)
+                              .build())
+                      .externeVerlinkungen(
+                          HerkunftDerUebersetzungen.ExterneVerlinkungen.builder()
+                              .externeVerlinkungen(urls)
+                              .build())
+                      .uebersetzungsart(uebersetzungsartBuilder.build())
+                      .build();
+                })
+            .toList();
+
+    return HerkunftDerUebersetzungen.builder().herkunftDerUebersetzungen(herkunftList).build();
   }
 
   private AktenzeichenListe buildAbweichendeAktenzeichen(
