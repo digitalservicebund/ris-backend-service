@@ -640,33 +640,45 @@ public class DocxTableBuilder extends DocxBuilder {
 
   private void addTcStyle(TableCellElement cellElement, TcPr tcPr, AtomicInteger colIndex) {
     int span = 1;
-    if (tcPr != null) {
-      if (tcPr.getTcBorders() != null) {
-        var tcBorders = tcPr.getTcBorders();
-        cellElement.setInitialBorders(
-            parseCtBorder(tcBorders.getTop()),
-            parseCtBorder(tcBorders.getRight()),
-            parseCtBorder(tcBorders.getBottom()),
-            parseCtBorder(tcBorders.getLeft()));
-      }
 
-      if (tcPr.getGridSpan() != null) {
-        span = tcPr.getGridSpan().getVal().intValue();
-        cellElement.setColumnSpan(span);
-      }
-
-      if (tcPr.getShd() != null) {
-        cellElement.setBackgroundColor(parseCTShd(tcPr.getShd()));
-      }
-
-      if (tcPr.getTcW() != null && tcPr.getTcW().getW() != null) {
-        var widthPx = DocxUnitConverter.convertTwipToPixel(tcPr.getTcW().getW().longValue());
-        cellElement.setWidthPx(widthPx);
-      } else {
-        setCellWidthFromGlobal(cellElement, span, colIndex);
-      }
-      colIndex.addAndGet(span);
+    if (tcPr == null) {
+      return;
     }
+
+    if (tcPr.getTcBorders() != null) {
+      var tcBorders = tcPr.getTcBorders();
+      cellElement.setInitialBorders(
+          parseCtBorder(tcBorders.getTop()),
+          parseCtBorder(tcBorders.getRight()),
+          parseCtBorder(tcBorders.getBottom()),
+          parseCtBorder(tcBorders.getLeft()));
+    }
+
+    if (tcPr.getGridSpan() != null) {
+      span = tcPr.getGridSpan().getVal().intValue();
+      cellElement.setColumnSpan(span);
+    }
+
+    if (tcPr.getShd() != null) {
+      cellElement.setBackgroundColor(parseCTShd(tcPr.getShd()));
+    }
+
+    if (tcPr.getVAlign() != null) {
+      var alignment = tcPr.getVAlign().getVal().toString().toLowerCase();
+      if (alignment.equals("center")) {
+        alignment = "middle";
+      }
+      cellElement.addStyle("vertical-align", alignment);
+    }
+
+    if (tcPr.getTcW() != null && tcPr.getTcW().getW() != null) {
+      var widthPx = DocxUnitConverter.convertTwipToPixel(tcPr.getTcW().getW().longValue());
+      cellElement.setWidthPx(widthPx);
+    } else {
+      setCellWidthFromGlobal(cellElement, span, colIndex);
+    }
+
+    colIndex.addAndGet(span);
   }
 
   private void setCellWidthFromGlobal(
