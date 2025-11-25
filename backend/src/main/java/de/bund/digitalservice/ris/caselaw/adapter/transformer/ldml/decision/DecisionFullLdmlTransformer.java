@@ -29,6 +29,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.F
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FremdsprachigeFassungen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gesetzgebungsauftrag;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.HerkunftDerUebersetzungen;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Kuendigungsarten;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Kuendigungsgruende;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Notiz;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtskraft;
@@ -130,6 +132,18 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.jobProfiles())) {
         var berufsbilder = buildBerufsbilder(contentRelatedIndexing);
         builder.berufsbilder(berufsbilder);
+      }
+
+      // Kündigungsart
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.dismissalTypes())) {
+        var kuendigungsarten = buildKuendigungsarten(contentRelatedIndexing);
+        builder.kuendigungsarten(kuendigungsarten);
+      }
+
+      // Kündigungsgrund
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.dismissalGrounds())) {
+        var kuendigungsgruende = buildKuendigungsgruende(contentRelatedIndexing);
+        builder.kuendigungsgruende(kuendigungsgruende);
       }
 
       // Fremdsprachige Fassungen
@@ -407,6 +421,31 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         .berufsbilder(
             contentRelatedIndexing.jobProfiles().stream()
                 .map(jobProfile -> Berufsbilder.Berufsbild.builder().value(jobProfile).build())
+                .toList())
+        .build();
+  }
+
+  private Kuendigungsarten buildKuendigungsarten(ContentRelatedIndexing contentRelatedIndexing) {
+    return Kuendigungsarten.builder()
+        .kuendigungsarten(
+            contentRelatedIndexing.dismissalTypes().stream()
+                .map(
+                    dismissalType ->
+                        Kuendigungsarten.Kuendigungsart.builder().value(dismissalType).build())
+                .toList())
+        .build();
+  }
+
+  private Kuendigungsgruende buildKuendigungsgruende(
+      ContentRelatedIndexing contentRelatedIndexing) {
+    return Kuendigungsgruende.builder()
+        .kuendigungsgruende(
+            contentRelatedIndexing.dismissalGrounds().stream()
+                .map(
+                    dismissalGround ->
+                        Kuendigungsgruende.Kuendigungsgrund.builder()
+                            .value(dismissalGround)
+                            .build())
                 .toList())
         .build();
   }

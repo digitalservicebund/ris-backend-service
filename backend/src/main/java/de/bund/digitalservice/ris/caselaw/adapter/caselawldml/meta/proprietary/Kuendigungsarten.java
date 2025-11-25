@@ -14,21 +14,21 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Builder
-public class Berufsbilder {
+public class Kuendigungsarten {
   @XmlAttribute(name = "domainTerm")
-  private static final String DOMAIN_TERM = "Berufsbilder";
+  private static final String DOMAIN_TERM = "Kündigungsarten";
 
   @SuppressWarnings("java:S1700")
-  @XmlElement(name = "berufsbild", namespace = CaseLawLdml.RIS_NS)
-  private List<Berufsbild> berufsbilder;
+  @XmlElement(name = "kuendigungsart", namespace = CaseLawLdml.RIS_NS)
+  private List<Kuendigungsart> kuendigungsarten;
 
   @NoArgsConstructor
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class Berufsbild {
+  public static class Kuendigungsart {
     @XmlAttribute(name = "domainTerm")
-    private static final String DOMAIN_TERM = "Berufsbild";
+    private static final String DOMAIN_TERM = "Kündigungsart";
 
     @XmlValue private String value;
   }
