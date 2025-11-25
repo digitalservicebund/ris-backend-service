@@ -267,6 +267,9 @@
                       <ris:quelle domainTerm="Quelle">S</ris:quelle>
                       <ris:quelle domainTerm="Quelle">sourceRawValue test 2</ris:quelle>
                     </ris:quellen>
+                    <ris:streitjahre domainTerm="Streitjahre">
+                      <ris:streitjahr domainTerm="Streitjahr">2024</ris:streitjahr>
+                    </ris:streitjahre>
                     <ris:berufsbilder domainTerm="Berufsbilder">
                       <ris:berufsbild domainTerm="Berufsbild">jobProfile test</ris:berufsbild>
                     </ris:berufsbilder>

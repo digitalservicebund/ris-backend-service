@@ -38,6 +38,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.R
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtsmittelzulassung;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Sachgebiete;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Streitjahre;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Tarifvertraege;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Vorgaenge;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -218,6 +219,12 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       if (!CollectionUtils.isEmpty(coreData.sources())) {
         var quellen = buildQuellen(coreData);
         builder.quellen(quellen);
+      }
+
+      // Streitjahr
+      if (!CollectionUtils.isEmpty(coreData.yearsOfDispute())) {
+        var streitjahre = buildStreitjahre(coreData);
+        builder.streitjahre(streitjahre);
       }
 
       // Gesetzgebungsauftrag
@@ -650,6 +657,17 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         .quellen(
             coreData.sources().stream()
                 .map(source -> Quellen.Quelle.builder().value(source.toString()).build())
+                .toList())
+        .build();
+  }
+
+  private Streitjahre buildStreitjahre(CoreData coreData) {
+    return Streitjahre.builder()
+        .streitjahre(
+            coreData.yearsOfDispute().stream()
+                .map(
+                    yearOfDispute ->
+                        Streitjahre.Streitjahr.builder().value(yearOfDispute.toString()).build())
                 .toList())
         .build();
   }

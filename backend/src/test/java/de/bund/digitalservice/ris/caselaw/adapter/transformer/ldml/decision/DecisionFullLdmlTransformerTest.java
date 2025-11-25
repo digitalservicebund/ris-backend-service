@@ -957,7 +957,7 @@ class DecisionFullLdmlTransformerTest {
                 .deviatingFileNumbers(List.of("deviating fileNumber"))
                 .deviatingDocumentNumbers(List.of("deviating documentNumber"))
                 .deviatingDecisionDates(List.of(LocalDate.of(2010, 5, 12)))
-                .yearsOfDispute(List.of(Year.now()))
+                .yearsOfDispute(List.of(Year.of(2024)))
                 .leadingDecisionNormReferences(List.of("leadingDecisionNormReference test"))
                 .build())
         .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())

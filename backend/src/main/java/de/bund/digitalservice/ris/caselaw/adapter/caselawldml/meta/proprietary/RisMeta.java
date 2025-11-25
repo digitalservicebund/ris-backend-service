@@ -91,6 +91,9 @@ public class RisMeta {
   @XmlElement(name = "quellen", namespace = CaseLawLdml.RIS_NS)
   private Quellen quellen;
 
+  @XmlElement(name = "streitjahre", namespace = CaseLawLdml.RIS_NS)
+  private Streitjahre streitjahre;
+
   @XmlElement(name = "berufsbilder", namespace = CaseLawLdml.RIS_NS)
   private Berufsbilder berufsbilder;
 

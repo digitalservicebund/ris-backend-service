@@ -347,6 +347,7 @@
     |ris:interneVerlinkungen|ris:interneVerlinkung|ris:externeVerlinkungen|ris:externeVerlinkung|ris:art
     |ris:tarifvertraege|ris:tarifvertrag|ris:tarifvertragName|ris:tarifvertragDatum|ris:tarifvertragTarifnorm|ris:tarifvertragBranche|ris:notiz
     |ris:berufsbilder|ris:berufsbild|ris:gesetzgebungsauftrag|ris:kuendigungsarten|ris:kuendigungsart|ris:kuendigungsgruende|ris:kuendigungsgrund|ris:quellen|ris:quelle
+    |ris:streitjahre|ris:streitjahr
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@akn:refersTo|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
     |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId|@akn:eId|@type|@by|@domainTerm|@notation|@ris:domainTerm|@art">
 
