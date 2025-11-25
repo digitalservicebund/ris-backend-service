@@ -25,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LanguageCode;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
+import de.bund.digitalservice.ris.caselaw.domain.OriginOfTranslation;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -35,6 +36,7 @@ import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.TranslationType;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
@@ -1089,6 +1091,22 @@ class DecisionFullLdmlTransformerTest {
                                     .isoCode3Letters("fra")
                                     .build())
                             .link("https://ihre-url-zur-französischen-übersetzung")
+                            .build()))
+                .originOfTranslations(
+                    List.of(
+                        OriginOfTranslation.builder()
+                            .id(UUID.randomUUID())
+                            .languageCode(
+                                LanguageCode.builder()
+                                    .id(UUID.randomUUID())
+                                    .label("Englisch")
+                                    .isoCode("en")
+                                    .isoCode3Letters("eng")
+                                    .build())
+                            .translators(List.of("Maxi Muster", "Ursel Meier"))
+                            .borderNumbers(List.of(2L))
+                            .urls(List.of("https://ihre-url-zur-englischen-übersetzung"))
+                            .translationType(TranslationType.AMTLICH)
                             .build()))
                 .definitions(
                     List.of(
