@@ -346,6 +346,10 @@
     |ris:decisionNames|ris:decisionName|ris:herkunftDerUebersetzungen|ris:herkunftDerUebersetzung|ris:uebersetzerinnen|ris:uebersetzerin
     |ris:interneVerlinkungen|ris:interneVerlinkung|ris:externeVerlinkungen|ris:externeVerlinkung|ris:art
     |ris:tarifvertraege|ris:tarifvertrag|ris:tarifvertragName|ris:tarifvertragDatum|ris:tarifvertragTarifnorm|ris:tarifvertragBranche
+    |ris:rechtsmittel|ris:rechtsmittelfuehrerListe|ris:rechtsmittelfuehrer|ris:revisionKlaegerListe|ris:revisionKlaeger
+    |ris:revisionBeklagterListe|ris:revisionBeklagter|ris:anschlussRevisionKlaegerListe|ris:anschlussRevisionKlaeger
+    |ris:anschlussRevisionBeklagterListe|ris:anschlussRevisionBeklagter|ris:nzbKlaegerListe|ris:nzbKlaeger|ris:nzbBeklagterListe
+    |ris:nzbBeklagter|ris:zuruecknahmeDerRevision|ris:pkhAntragKlaeger
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@akn:refersTo|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
     |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId|@akn:eId|@type|@by|@domainTerm|@notation|@ris:domainTerm|@art">
 
