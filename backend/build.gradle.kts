@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.1.0"
-    id("org.flywaydb.flyway") version "11.17.1"
+    id("org.flywaydb.flyway") version "11.17.2"
     id("io.sentry.jvm.gradle") version "5.12.2"
 }
 
@@ -179,7 +179,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.39.2"))
+    implementation(platform("software.amazon.awssdk:bom:2.39.3"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -229,10 +229,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.4")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.17.1"
+    val flywayCore = "org.flywaydb:flyway-core:11.17.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.17.1")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.17.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -249,7 +249,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.36.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.37.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
