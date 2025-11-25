@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { RisChipsInput } from "@digitalservicebund/ris-ui/components"
 import { storeToRefs } from "pinia"
 import { Component, Ref, computed } from "vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
+import ChipsInput from "@/components/input/ChipsInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
+import { useValidationStore } from "@/composables/useValidationStore"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
 import { Decision, shortTextLabels } from "@/domain/decision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -18,6 +19,9 @@ const store = useDocumentUnitStore()
 const { documentUnit: decision } = storeToRefs(store) as {
   documentUnit: Ref<Decision | undefined>
 }
+
+const validationStore = useValidationStore<["decisionNames"][number]>()
+
 const decisionNames = computed({
   get: () => decision.value?.shortTexts.decisionNames ?? [],
   set: (newValue) => {
@@ -92,14 +96,17 @@ const otherHeadnote = computed({
       >
         <InputField
           id="decisionNames"
-          v-slot="{ id }"
+          v-slot="slotProps"
           :label="shortTextLabels.decisionNames"
         >
-          <RisChipsInput
+          <ChipsInput
+            :id="slotProps.id"
             v-model="decisionNames"
             :aria-label="shortTextLabels.decisionNames"
             :data-testid="shortTextLabels.decisionNames"
-            :input-id="id"
+            :has-error="slotProps.hasError"
+            @focus="validationStore.remove('decisionNames')"
+            @update:validation-error="slotProps.updateValidationError"
           />
         </InputField>
       </CategoryWrapper>

@@ -23,7 +23,8 @@ const emit = defineEmits<{
   removeEntry: [value?: boolean]
 }>()
 
-const validationStore = useValidationStore<["borderNumber"][number]>()
+const validationStore =
+  useValidationStore<["borderNumber", "translators", "urls"][number]>()
 
 const lastSavedModelValue = ref(
   new OriginOfTranslation({ ...props.modelValue }),
@@ -81,6 +82,7 @@ onMounted(() => {
       <div class="basis-1/2">
         <InputField
           id="originOfTranslationTranslators"
+          v-slot="slotProps"
           data-testid="origin-of-translation-translators"
           label="Übersetzer:innen"
         >
@@ -90,8 +92,10 @@ onMounted(() => {
             aria-label="Übersetzer:innen"
             class="w-full"
             data-testid="origin-of-translation-translators-input"
+            :has-error="slotProps.hasError"
             placeholder="Name"
-            size="small"
+            @focus="validationStore.remove('translators')"
+            @update:validation-error="slotProps.updateValidationError"
           ></ChipsInput>
         </InputField>
       </div>
@@ -120,6 +124,7 @@ onMounted(() => {
       <div class="basis-1/2">
         <InputField
           id="originOfTranslationUrls"
+          v-slot="slotProps"
           data-testid="origin-of-translation-urls"
           label="Fundstelle: Externe Verlinkung"
         >
@@ -129,8 +134,10 @@ onMounted(() => {
             aria-label="Fundstelle: Externe Verlinkung"
             class="w-full"
             data-testid="origin-of-translation-urls-input"
+            :has-error="slotProps.hasError"
             placeholder="URL Website"
-            size="small"
+            @focus="validationStore.remove('urls')"
+            @update:validation-error="slotProps.updateValidationError"
           ></ChipsInput>
         </InputField>
       </div>

@@ -16,6 +16,7 @@ function renderComponent(props?: Partial<ChipsInputProps>) {
     "onUpdate:modelValue":
       props?.["onUpdate:modelValue"] ??
       ((val: string[] | undefined) => (modelValue = val)),
+    "onUpdate:validationError": props?.["onUpdate:validationError"],
     ariaLabel: props?.ariaLabel ?? "aria-label",
     readOnly: props?.readOnly,
   }
@@ -100,23 +101,89 @@ describe("Chips Input", () => {
 
     await user.type(input, "   {enter}")
 
-    expect(onUpdate).not.toHaveBeenCalled()
+    expect(onUpdate).toHaveBeenCalledWith([])
   })
 
   it("does not add chips if input already exists", async () => {
     const id = "id"
-    const modelValue: ChipsInputProps["modelValue"] = ["foo", "bar"]
+    const ariaLabel = "chip"
 
+    const onError = vi.fn()
     const onUpdate = vi.fn()
     const { user } = renderComponent({
       id: id,
-      modelValue: modelValue,
+      ariaLabel: ariaLabel,
       "onUpdate:modelValue": onUpdate,
+      "onUpdate:validationError": onError,
+      modelValue: ["foo", "bar"],
     })
 
-    const input = screen.getByRole<HTMLInputElement>("textbox")
-    await user.type(input, "foo{enter}")
+    const input = screen.getByRole("textbox")
+    await user.type(input, "bar{enter}")
 
     expect(onUpdate).not.toHaveBeenCalled()
+    expect(onError).toHaveBeenCalledWith({
+      message: "bar bereits vorhanden",
+      instance: id,
+    })
+  })
+
+  it("deletes the chip on button click", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      modelValue: ["foo", "bar"],
+    })
+
+    const chips = screen.getAllByLabelText("Eintrag löschen")
+    await user.click(chips[1])
+    await user.keyboard("{enter}")
+    expect(onUpdate).toHaveBeenCalledWith(["foo"])
+  })
+
+  it("edits the chip on double click", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      modelValue: ["f"],
+    })
+
+    const editButton = screen.getByRole("button", {
+      name: /eintrag bearbeiten/i,
+    })
+    await user.dblClick(editButton)
+    const input = screen.getByRole("textbox")
+    await user.keyboard("{backspace}")
+    await user.type(input, "b")
+    await user.keyboard("{enter}")
+    expect(onUpdate).toHaveBeenCalledWith(["b"])
+  })
+
+  it("validates the first chip after editing", async () => {
+    const id = "id"
+    const ariaLabel = "chip"
+    const onUpdate = vi.fn()
+    const onError = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      "onUpdate:validationError": onError,
+      modelValue: ["foo", "bar"],
+      id: id,
+      ariaLabel: ariaLabel,
+    })
+
+    const editButtons = screen.getAllByRole("button", {
+      name: /eintrag bearbeiten/i,
+    })
+    await user.dblClick(editButtons[0])
+    const input = screen.getByRole("textbox")
+    await user.keyboard("{backspace}{backspace}{backspace}")
+    await user.type(input, "bar")
+    await user.keyboard("{enter}")
+    expect(onUpdate).not.toHaveBeenCalledWith(["bar"])
+    expect(onError).toHaveBeenCalledWith({
+      message: "bar bereits vorhanden",
+      instance: id,
+    })
   })
 })

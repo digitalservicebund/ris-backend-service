@@ -180,7 +180,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.39.1"))
+    implementation(platform("software.amazon.awssdk:bom:2.39.2"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -204,9 +204,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.108")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.110")
     // for local development:
-//     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.108.jar"))
+//     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.110.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.20.1")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.20.1")
@@ -224,8 +224,8 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.14.0")
     implementation("org.jsoup:jsoup:1.21.2")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:7.1.0")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.1.0")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:7.2.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.2.0")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.4")
