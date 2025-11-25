@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Keyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.DokumentarischeKurztexte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Entscheidungsnamen;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.ImplicitReference;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrLanguage;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDaten;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDokumentnummern;
@@ -42,6 +43,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -78,6 +81,14 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         .analysis(buildAnalysis(decision))
         .proprietary(Proprietary.builder().meta(buildRisMeta(decision)).build())
         .build();
+  }
+
+  @Override
+  @Nonnull
+  protected List<ImplicitReference> buildImplicitReferences(Decision decision) {
+    return Stream.concat(
+            super.buildImplicitReferences(decision).stream(), buildFundstellen(decision).stream())
+        .toList();
   }
 
   @SuppressWarnings({"java:S3776"})

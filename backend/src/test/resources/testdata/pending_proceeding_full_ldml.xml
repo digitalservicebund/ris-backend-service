@@ -83,6 +83,26 @@
                                 <ris:typ domainTerm="Gerichtstyp">previous decision court type</ris:typ>
                             </ris:gericht>
                         </ris:vorgehend>
+               </akn:implicitReference>
+               <akn:implicitReference ris:domainTerm="Fundstelle">
+                  <ris:fundstelle domainTerm="Fundstelle">
+                     <ris:periodikum domainTerm="Periodikum">
+                        <ris:abkuerzung domainTerm="Abkürzung">LegalPeriodical abbreviation</ris:abkuerzung>
+                        <ris:typ domainTerm="Art der Fundstelle">amtlich</ris:typ>
+                        <ris:titel domainTerm="Titel">LegalPeriodical Title</ris:titel>
+                        <ris:untertitel domainTerm="Untertitel">LegalPeriodical Subtitle</ris:untertitel>
+                     </ris:periodikum>
+                     <ris:zitatstelle domainTerm="Zitatstelle">citation</ris:zitatstelle>
+                  </ris:fundstelle>
+               </akn:implicitReference>
+               <akn:implicitReference ris:domainTerm="Fundstelle">
+                  <ris:fundstelleLiteraturUnselbststaendig domainTerm="Fundstelle unselbstständige Literatur">
+                     <ris:periodikum domainTerm="Periodikum">
+                        <ris:abkuerzung domainTerm="Abkürzung">LegalPeriodical RawValue</ris:abkuerzung>
+                        <ris:typ domainTerm="Art der Fundstelle">nicht-amtlich</ris:typ>
+                     </ris:periodikum>
+                     <ris:zitatstelle domainTerm="Zitatstelle">citation</ris:zitatstelle>
+                  </ris:fundstelleLiteraturUnselbststaendig>
                     </akn:implicitReference>
                 </akn:otherReferences>
             </akn:analysis>

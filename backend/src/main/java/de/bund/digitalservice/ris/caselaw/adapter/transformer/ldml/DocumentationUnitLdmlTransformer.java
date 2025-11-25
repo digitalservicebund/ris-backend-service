@@ -15,8 +15,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.DocType;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.EmbeddedStructure;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.ShortTitle;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Fundstelle;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.ImplicitReference;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Norm;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Periodikum;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Rechtszug;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrAlias;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrAuthor;
@@ -37,6 +39,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import jakarta.xml.bind.ValidationException;
@@ -58,11 +61,6 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
   CaseLawLdml transformToLdml(T documentationUnit);
 
   default Identification buildIdentification(DocumentationUnit documentationUnit) {
-    return buildIdentification(documentationUnit, true);
-  }
-
-  default Identification buildIdentification(
-      DocumentationUnit documentationUnit, boolean isFullLdml) {
     String uniqueId = documentationUnit.documentNumber();
     FrbrDate frbrDecisionDate =
         new FrbrDate(
@@ -271,6 +269,103 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
             buildNormen(documentationUnit).stream(),
             buildVorgehendeEntscheidungen(documentationUnit).stream())
         .toList();
+  }
+
+  @Nonnull
+  default List<ImplicitReference> buildFundstellen(DocumentationUnit documentationUnit) {
+    List<ImplicitReference> fundstellen = new ArrayList<>();
+
+    List<Reference> caselawRefs =
+        Optional.ofNullable(documentationUnit.caselawReferences()).orElse(List.of());
+    List<Reference> literatureRefs =
+        Optional.ofNullable(documentationUnit.literatureReferences()).orElse(List.of());
+
+    for (Reference ref : caselawRefs) {
+      if (ref == null) continue;
+      fundstellen.add(buildFundstelleRechtsprechung(ref));
+    }
+
+    for (Reference ref : literatureRefs) {
+      if (ref == null) continue;
+      fundstellen.add(buildFundstelleLiteraturUnselbststaendig(ref));
+    }
+
+    return fundstellen;
+  }
+
+  @Nonnull
+  private ImplicitReference buildFundstelleLiteraturUnselbststaendig(Reference ref) {
+    var builder = Fundstelle.builder().domainTerm("Fundstelle unselbstständige Literatur");
+
+    Periodikum periodikum = buildPeriodikum(ref);
+    builder.periodikum(periodikum);
+
+    if (isNotBlank(ref.citation())) {
+      var zitatstelle = Fundstelle.Zitatstelle.builder().value(ref.citation()).build();
+      builder.zitatstelle(zitatstelle);
+    }
+
+    var fundstelle = builder.build();
+    return ImplicitReference.builder()
+        .domainTerm(Fundstelle.DOMAIN_TERM)
+        .fundstelleLiteraturUnselbststaendig(fundstelle)
+        .build();
+  }
+
+  private ImplicitReference buildFundstelleRechtsprechung(Reference ref) {
+    Fundstelle.FundstelleBuilder builder = Fundstelle.builder();
+
+    Periodikum periodikum = buildPeriodikum(ref);
+    builder.periodikum(periodikum);
+
+    if (isNotBlank(ref.citation())) {
+      var zitatstelle = Fundstelle.Zitatstelle.builder().value(ref.citation()).build();
+      builder.zitatstelle(zitatstelle);
+    }
+
+    Fundstelle fundstelle = builder.build();
+    return ImplicitReference.builder()
+        .domainTerm(Fundstelle.DOMAIN_TERM)
+        .fundstelle(fundstelle)
+        .build();
+  }
+
+  @Nonnull
+  default Periodikum buildPeriodikum(@Nonnull Reference ref) {
+    Periodikum.PeriodikumBuilder builder = Periodikum.builder();
+
+    String abbreviation = null;
+    String title = null;
+    String subtitle = null;
+    Boolean isPrimary = ref.primaryReference();
+
+    if (ref.legalPeriodical() != null) {
+      abbreviation = ref.legalPeriodical().abbreviation();
+      title = ref.legalPeriodical().title();
+      subtitle = ref.legalPeriodical().subtitle();
+      if (isPrimary != null) {
+        builder.typ(
+            Periodikum.Typ.builder().value(isPrimary ? "amtlich" : "nicht-amtlich").build());
+      }
+    } else if (isNotBlank(ref.legalPeriodicalRawValue())) {
+      abbreviation = ref.legalPeriodicalRawValue();
+      if (isPrimary != null) {
+        builder.typ(
+            Periodikum.Typ.builder().value(isPrimary ? "amtlich" : "nicht-amtlich").build());
+      }
+    }
+
+    if (isNotBlank(abbreviation)) {
+      builder.abkuerzung(Periodikum.Abkuerzung.builder().value(abbreviation).build());
+    }
+    if (isNotBlank(title)) {
+      builder.titel(Periodikum.Titel.builder().value(title).build());
+    }
+    if (isNotBlank(subtitle)) {
+      builder.untertitel(Periodikum.Untertitel.builder().value(subtitle).build());
+    }
+
+    return builder.build();
   }
 
   @Nonnull
