@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.A
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDokumentnummern;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeEclis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Berufsbilder;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DatenDerMuendlichenVerhandlung;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Definitionen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentRef;
@@ -122,6 +123,12 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.collectiveAgreements())) {
         var tarifvertraege = buildTarifvertraege(contentRelatedIndexing);
         builder.tarifvertraege(tarifvertraege);
+      }
+
+      // Berufsbild
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.jobProfiles())) {
+        var berufsbilder = buildBerufsbilder(contentRelatedIndexing);
+        builder.berufsbilder(berufsbilder);
       }
 
       // Fremdsprachige Fassungen
@@ -384,6 +391,15 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
                       return tarifvertragBuilder.build();
                     })
+                .toList())
+        .build();
+  }
+
+  private Berufsbilder buildBerufsbilder(ContentRelatedIndexing contentRelatedIndexing) {
+    return Berufsbilder.builder()
+        .berufsbilder(
+            contentRelatedIndexing.jobProfiles().stream()
+                .map(jobProfile -> Berufsbilder.Berufsbild.builder().value(jobProfile).build())
                 .toList())
         .build();
   }

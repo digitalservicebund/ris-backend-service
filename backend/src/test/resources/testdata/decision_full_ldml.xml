@@ -263,6 +263,9 @@
                             <ris:tarifvertragBranche domainTerm="Branche">Bühne, Theater, Orchester</ris:tarifvertragBranche>
                         </ris:tarifvertrag>
                     </ris:tarifvertraege>
+                    <ris:berufsbilder domainTerm="Berufsbilder">
+                      <ris:berufsbilder domainTerm="Berufsbild">jobProfile test</ris:berufsbilder>
+                    </ris:berufsbilder>
                     <ris:notiz domainTerm="Notiz">note test</ris:notiz>
                 </ris:meta>
             </akn:proprietary>

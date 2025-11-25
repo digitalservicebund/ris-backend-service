@@ -88,6 +88,9 @@ public class RisMeta {
   @XmlElement(name = "tarifvertraege", namespace = CaseLawLdml.RIS_NS)
   private Tarifvertraege tarifvertraege;
 
+  @XmlElement(name = "berufsbilder", namespace = CaseLawLdml.RIS_NS)
+  private Berufsbilder berufsbilder;
+
   @XmlElement(name = "notiz", namespace = CaseLawLdml.RIS_NS)
   private Notiz notiz;
 }
