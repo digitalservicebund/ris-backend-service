@@ -50,7 +50,6 @@ watch(
   async () => {
     await loadOptions()
     if (!props.court) {
-      console.log("clear sitz der aussenstelle field: ", props.court, " -")
       emit("update:modelValue", undefined)
     }
   },
