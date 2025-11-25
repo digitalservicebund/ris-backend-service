@@ -60,7 +60,7 @@
         "frontend-updates",
         "renovate"
       ],
-      "automerge": true,
+      "automerge": false,
     },
     {
       "groupName": "all-backend-non-major-dependencies",
@@ -104,7 +104,7 @@
         "pinDigest",
         "digest"
       ],
-      "automerge": true,
+      "automerge": false,
     },
     {
       "groupName": "neuris-languagetool-docker-image",

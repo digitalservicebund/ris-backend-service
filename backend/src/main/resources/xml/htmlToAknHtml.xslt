@@ -338,11 +338,13 @@
     |ris:abweichendeDokumentnummern|ris:abweichendeDokumentnummer|ris:abweichendeEclis|ris:abweichenderEcli
     |ris:spruchkoerper|ris:sachgebiete|ris:sachgebiet|ris:rechtskraft|ris:vorgaenge|ris:vorgang
     |ris:dokumentarischeKurztexte|ris:orientierungssatz|ris:sonstigerOrientierungssatz|ris:entscheidungsnamen|ris:entscheidungsname|ris:titelzeile
-    |ris:eingangsarten|ris:eingangsart|ris:definitionen|ris:definition|ris:definierterBegriff|ris:definierendeRandnummer|ris:fremdsprachigeFassungen|ris:fremdsprachigeFassung|ris:evsf|ris:rechtsmittelzulassung|ris:rechtsmittelZugelassen|ris:rechtsmittelZugelassenDurch
+    |ris:eingangsarten|ris:eingangsart|ris:definitionen|ris:definition|ris:definierterBegriff|ris:definierendeRandnummer
+    |ris:fremdsprachigeFassungen|ris:fremdsprachigeFassung|ris:evsf|ris:rechtsmittelzulassung|ris:rechtsmittelZugelassen|ris:rechtsmittelZugelassenDurch
     |ris:documentNumber|ris:vorgehend|ris:nachgehend|ris:datum|ris:dokumentNummer|akn:otherReferences|ris:vermerk
     |ris:norm|ris:abkuerzung|ris:einzelnorm|ris:bezeichnung|ris:gesetzeskraft|ris:geltungsbereich|ris:jahr|ris:titel
     |ris:fundstelle|ris:zitatstelle|ris:zitatstelle|ris:titel|ris:untertitel|ris:periodikum|ris:fundstelleLiteraturSelbststaendig|ris:fundstelleLiteraturUnselbststaendig
-    |ris:decisionNames|ris:decisionName
+    |ris:decisionNames|ris:decisionName|ris:herkunftDerUebersetzungen|ris:herkunftDerUebersetzung|ris:uebersetzerinnen|ris:uebersetzerin
+    |ris:interneVerlinkungen|ris:interneVerlinkung|ris:externeVerlinkungen|ris:externeVerlinkung|ris:art
     |ris:tarifvertraege|ris:tarifvertrag|ris:tarifvertragName|ris:tarifvertragDatum|ris:tarifvertragTarifnorm|ris:tarifvertragBranche
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@akn:refersTo|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
     |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId|@akn:eId|@type|@by|@domainTerm|@notation|@ris:domainTerm|@art">
