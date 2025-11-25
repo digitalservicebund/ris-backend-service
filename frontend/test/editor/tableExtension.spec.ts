@@ -1,11 +1,10 @@
 import { Document } from "@tiptap/extension-document"
-import { Table } from "@tiptap/extension-table"
 import { TableCell } from "@tiptap/extension-table-cell"
 import { TableHeader } from "@tiptap/extension-table-header"
 import { TableRow } from "@tiptap/extension-table-row"
 import { Text } from "@tiptap/extension-text"
 import { Editor } from "@tiptap/vue-3"
-import { TableStyle } from "@/editor/tableStyle"
+import { CustomTable } from "@/editor/table"
 
 describe("TableStyle extension", () => {
   test("should not transform inline styling for table tag", async () => {
@@ -14,13 +13,12 @@ describe("TableStyle extension", () => {
       content:
         '<table style="border: 1px solid red"><tr><td>foo</td></tr></table>',
       extensions: [
+        CustomTable,
         Document,
         Text,
-        Table,
         TableCell,
         TableHeader,
         TableRow,
-        TableStyle,
       ],
     })
 
@@ -33,13 +31,12 @@ describe("TableStyle extension", () => {
       content:
         '<table><tr style="border: 1px solid red"><td>foo</td></tr></table>',
       extensions: [
+        CustomTable,
         Document,
         Text,
-        Table,
         TableCell,
         TableHeader,
         TableRow,
-        TableStyle,
       ],
     })
 
@@ -52,13 +49,12 @@ describe("TableStyle extension", () => {
       content:
         '<table><tr><td style="border: 1px solid red">foo</td></tr></table>',
       extensions: [
+        CustomTable,
         Document,
         Text,
-        Table,
         TableCell,
         TableHeader,
         TableRow,
-        TableStyle,
       ],
     })
 

@@ -37,6 +37,17 @@ const chips = computed<string[]>({
   },
 
   set: (newValues: string[]) => {
+    const hasValueWithWhitespaces = newValues.some(
+      (value) => value.trim() === "",
+    )
+    if (hasValueWithWhitespaces) {
+      newValues = newValues.filter((value) => value.trim() !== "")
+      emit(
+        "update:modelValue",
+        newValues.map((value) => Number.parseInt(value)),
+      )
+      return
+    }
     const numberValues = newValues.map((value) => Number.parseInt(value))
 
     const isValid = newValues.every((value) =>

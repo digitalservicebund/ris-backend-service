@@ -40,6 +40,13 @@ watch(
 const validationStore =
   useValidationStore<
     [
+      "deviatingCourts",
+      "fileNumbers",
+      "deviatingFileNumbers",
+      "deviatingDocumentNumbers",
+      "deviatingEclis",
+      "inputTypes",
+      "leadingDecisionNormReferences",
       "decisionDate",
       "yearsOfDispute",
       "deviatingDecisionDates",
@@ -239,14 +246,17 @@ onBeforeUnmount(() => {
       <template #children>
         <InputField
           id="deviatingCourts"
-          v-slot="{ id }"
+          v-slot="slotProps"
           label="Fehlerhaftes Gericht"
         >
           <ChipsInput
-            :id="id"
+            :id="slotProps.id"
             v-model="deviatingCourts"
             aria-label="Fehlerhaftes Gericht"
             data-testid="deviating-courts"
+            :has-error="slotProps.hasError"
+            @focus="validationStore.remove('deviatingCourts')"
+            @update:validation-error="slotProps.updateValidationError"
           />
         </InputField>
       </template>
@@ -259,26 +269,36 @@ onBeforeUnmount(() => {
         class="w-full min-w-0"
         :is-open="!!coreDataModel.deviatingFileNumbers?.length"
       >
-        <InputField id="fileNumberInput" v-slot="{ id }" label="Aktenzeichen *">
+        <InputField
+          id="fileNumberInput"
+          v-slot="slotProps"
+          label="Aktenzeichen *"
+        >
           <ChipsInput
-            :id="id"
+            :id="slotProps.id"
             v-model="fileNumbers"
             aria-label="Aktenzeichen"
             data-testid="file-numbers"
+            :has-error="slotProps.hasError"
+            @focus="validationStore.remove('fileNumbers')"
+            @update:validation-error="slotProps.updateValidationError"
           />
         </InputField>
         <!-- Child  -->
         <template #children>
           <InputField
             id="deviatingFileNumbers"
-            v-slot="{ id }"
+            v-slot="slotProps"
             label="Abweichendes Aktenzeichen"
           >
             <ChipsInput
-              :id="id"
+              :id="slotProps.id"
               v-model="deviatingFileNumbers"
               aria-label="Abweichendes Aktenzeichen"
               data-testid="deviating-file-numbers"
+              :has-error="slotProps.hasError"
+              @focus="validationStore.remove('deviatingFileNumbers')"
+              @update:validation-error="slotProps.updateValidationError"
             />
           </InputField>
         </template>
@@ -416,14 +436,17 @@ onBeforeUnmount(() => {
     <div :class="layoutClass">
       <InputField
         id="deviatingDocumentNumbers"
-        v-slot="{ id }"
+        v-slot="slotProps"
         label="Abweichende Dokumentnummer"
       >
         <ChipsInput
-          :id="id"
+          :id="slotProps.id"
           v-model="deviatingDocumentNumbers"
           aria-label="Abweichende Dokumentnummer"
           data-testid="deviating-document-numbers"
+          :has-error="slotProps.hasError"
+          @focus="validationStore.remove('deviatingDocumentNumbers')"
+          @update:validation-error="slotProps.updateValidationError"
         />
       </InputField>
 
@@ -468,14 +491,17 @@ onBeforeUnmount(() => {
         <template #children>
           <InputField
             id="deviatingEclis"
-            v-slot="{ id }"
+            v-slot="slotProps"
             label="Abweichender ECLI"
           >
             <ChipsInput
-              :id="id"
+              :id="slotProps.id"
               v-model="deviatingEclis"
               aria-label="Abweichender ECLI"
               data-testid="deviating-eclis"
+              :has-error="slotProps.hasError"
+              @focus="validationStore.remove('deviatingEclis')"
+              @update:validation-error="slotProps.updateValidationError"
             />
           </InputField>
         </template>
@@ -572,13 +598,16 @@ onBeforeUnmount(() => {
           placeholder="Bitte auswählen"
         />
       </InputField>
-      <InputField id="inputTypes" v-slot="{ id }" label="Eingangsart">
+      <InputField id="inputTypes" v-slot="slotProps" label="Eingangsart">
         <div class="flex w-full flex-col">
           <ChipsInput
-            :id="id"
+            :id="slotProps.id"
             v-model="inputTypes"
             aria-label="Eingangsart"
             data-testid="input-types"
+            :has-error="slotProps.hasError"
+            @focus="validationStore.remove('inputTypes')"
+            @update:validation-error="slotProps.updateValidationError"
           />
           <div class="ris-label3-regular pt-4">
             Papier, BLK-DB-Schnittstelle, EUR-LEX-Schnittstelle, E-Mail
@@ -639,14 +668,17 @@ onBeforeUnmount(() => {
     >
       <InputField
         id="leadingDecisionNormReferences"
-        v-slot="{ id }"
+        v-slot="slotProps"
         label="BGH Nachschlagewerk"
       >
         <ChipsInput
-          :id="id"
+          :id="slotProps.id"
           v-model="leadingDecisionNormReferences"
           aria-label="BGH Nachschlagewerk"
           data-testid="leading-decision-norm-references"
+          :has-error="slotProps.hasError"
+          @focus="validationStore.remove('leadingDecisionNormReferences')"
+          @update:validation-error="slotProps.updateValidationError"
         />
       </InputField>
     </div>

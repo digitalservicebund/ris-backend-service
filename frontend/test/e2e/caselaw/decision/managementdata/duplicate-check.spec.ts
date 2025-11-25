@@ -359,7 +359,7 @@ async function setDeviatingFileNumberToMatchDocUnit(
     await page
       .getByLabel("Abweichendes Aktenzeichen")
       .getByRole("textbox")
-      .pressSequentially(docUnit.coreData.fileNumbers?.[0] ?? "")
+      .fill(docUnit.coreData.fileNumbers?.[0] ?? "")
     await page.keyboard.press("Enter")
   })
 }
@@ -382,7 +382,7 @@ async function setDeviatingDecisionDateToMatchDocUnit(
     await page
       .getByLabel("Abweichendes Entscheidungsdatum")
       .getByRole("textbox")
-      .pressSequentially(date)
+      .fill(date)
     await page.keyboard.press("Enter")
   })
 }
