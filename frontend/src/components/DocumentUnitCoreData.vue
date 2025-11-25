@@ -249,21 +249,21 @@ onBeforeUnmount(() => {
       <!-- Child  -->
       <template #children>
         <div :class="layoutClass">
-        <InputField
-          id="deviatingCourts"
-          v-slot="slotProps"
-          label="Fehlerhaftes Gericht"
-        >
-          <ChipsInput
-            :id="slotProps.id"
-            v-model="deviatingCourts"
-            aria-label="Fehlerhaftes Gericht"
-            data-testid="deviating-courts"
-            :has-error="slotProps.hasError"
-            @focus="validationStore.remove('deviatingCourts')"
-            @update:validation-error="slotProps.updateValidationError"
-          />
-        </InputField>
+          <InputField
+            id="deviatingCourts"
+            v-slot="slotProps"
+            label="Fehlerhaftes Gericht"
+          >
+            <ChipsInput
+              :id="slotProps.id"
+              v-model="deviatingCourts"
+              aria-label="Fehlerhaftes Gericht"
+              data-testid="deviating-courts"
+              :has-error="slotProps.hasError"
+              @focus="validationStore.remove('deviatingCourts')"
+              @update:validation-error="slotProps.updateValidationError"
+            />
+          </InputField>
           <CourtBranchLocation
             v-model="coreDataModel.courtBranchLocation"
             :court="coreDataModel.court"
