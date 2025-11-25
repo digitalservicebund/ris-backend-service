@@ -262,7 +262,8 @@
                             <ris:tarifvertragDatum domainTerm="Datum">12.2001</ris:tarifvertragDatum>
                             <ris:tarifvertragBranche domainTerm="Branche">Bühne, Theater, Orchester</ris:tarifvertragBranche>
                         </ris:tarifvertrag>
-                   </ris:tarifvertraege>
+                    </ris:tarifvertraege>
+                    <ris:notiz domainTerm="Notiz">note test</ris:notiz>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>

@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.E
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FehlerhafteGerichte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FremdsprachigeFassungen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.HerkunftDerUebersetzungen;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Notiz;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtskraft;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtsmittelzulassung;
@@ -189,6 +190,11 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         var eingangsarten = buildEingangsarten(coreData);
         builder.eingangsarten(eingangsarten);
       }
+    }
+
+    // Notiz
+    if (isNotBlank(decision.note())) {
+      builder.notiz(Notiz.builder().content(decision.note()).build());
     }
 
     return builder.build();

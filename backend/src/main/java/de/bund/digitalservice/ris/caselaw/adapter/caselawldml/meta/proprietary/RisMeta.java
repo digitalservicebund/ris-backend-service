@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Builder
+@SuppressWarnings("java:S6539") // Monster class depends on more than 20 classes
 public class RisMeta {
   @XmlElementWrapper(name = "decisionNames", namespace = CaseLawLdml.RIS_NS)
   @XmlElement(name = "decisionName", namespace = CaseLawLdml.RIS_NS)
@@ -86,4 +87,7 @@ public class RisMeta {
 
   @XmlElement(name = "tarifvertraege", namespace = CaseLawLdml.RIS_NS)
   private Tarifvertraege tarifvertraege;
+
+  @XmlElement(name = "notiz", namespace = CaseLawLdml.RIS_NS)
+  private Notiz notiz;
 }

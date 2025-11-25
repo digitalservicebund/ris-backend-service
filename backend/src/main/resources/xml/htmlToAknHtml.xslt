@@ -345,7 +345,7 @@
     |ris:fundstelle|ris:zitatstelle|ris:zitatstelle|ris:titel|ris:untertitel|ris:periodikum|ris:fundstelleLiteraturSelbststaendig|ris:fundstelleLiteraturUnselbststaendig
     |ris:decisionNames|ris:decisionName|ris:herkunftDerUebersetzungen|ris:herkunftDerUebersetzung|ris:uebersetzerinnen|ris:uebersetzerin
     |ris:interneVerlinkungen|ris:interneVerlinkung|ris:externeVerlinkungen|ris:externeVerlinkung|ris:art
-    |ris:tarifvertraege|ris:tarifvertrag|ris:tarifvertragName|ris:tarifvertragDatum|ris:tarifvertragTarifnorm|ris:tarifvertragBranche
+    |ris:tarifvertraege|ris:tarifvertrag|ris:tarifvertragName|ris:tarifvertragDatum|ris:tarifvertragTarifnorm|ris:tarifvertragBranche|ris:notiz
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@akn:refersTo|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
     |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId|@akn:eId|@type|@by|@domainTerm|@notation|@ris:domainTerm|@art">
 
