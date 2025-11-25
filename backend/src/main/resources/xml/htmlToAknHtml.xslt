@@ -346,7 +346,7 @@
     |ris:decisionNames|ris:decisionName|ris:herkunftDerUebersetzungen|ris:herkunftDerUebersetzung|ris:uebersetzerinnen|ris:uebersetzerin
     |ris:interneVerlinkungen|ris:interneVerlinkung|ris:externeVerlinkungen|ris:externeVerlinkung|ris:art
     |ris:tarifvertraege|ris:tarifvertrag|ris:tarifvertragName|ris:tarifvertragDatum|ris:tarifvertragTarifnorm|ris:tarifvertragBranche|ris:notiz
-    |ris:berufsbilder|ris:berufsbild
+    |ris:berufsbilder|ris:berufsbild|ris:gesetzgebungsauftrag
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@akn:refersTo|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
     |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId|@akn:eId|@type|@by|@domainTerm|@notation|@ris:domainTerm|@art">
 

@@ -91,6 +91,9 @@ public class RisMeta {
   @XmlElement(name = "berufsbilder", namespace = CaseLawLdml.RIS_NS)
   private Berufsbilder berufsbilder;
 
+  @XmlElement(name = "gesetzgebungsauftrag", namespace = CaseLawLdml.RIS_NS)
+  private Gesetzgebungsauftrag gesetzgebungsauftrag;
+
   @XmlElement(name = "notiz", namespace = CaseLawLdml.RIS_NS)
   private Notiz notiz;
 }
