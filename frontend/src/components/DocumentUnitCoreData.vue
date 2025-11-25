@@ -231,7 +231,10 @@ onBeforeUnmount(() => {
     <NestedComponent
       aria-label="Fehlerhaftes Gericht"
       class="w-full"
-      :is-open="!!coreDataModel.deviatingCourts?.length"
+      :is-open="
+        !!coreDataModel.deviatingCourts?.length ||
+        !!coreDataModel.courtBranchLocation
+      "
     >
       <InputField id="court" v-slot="slotProps" label="Gericht *">
         <ComboboxInput

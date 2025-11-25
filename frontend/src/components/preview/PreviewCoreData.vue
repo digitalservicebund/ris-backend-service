@@ -47,6 +47,12 @@ const dateLabel = computed(() => {
         {{ coreData.deviatingCourts.join(", ") }}
       </PreviewContent>
     </PreviewRow>
+    <PreviewRow v-if="coreData.courtBranchLocation">
+      <PreviewCategory>Sitz der Außenstelle</PreviewCategory>
+      <PreviewContent>
+        {{ coreData.courtBranchLocation }}
+      </PreviewContent>
+    </PreviewRow>
     <PreviewRow v-if="coreData.fileNumbers && coreData.fileNumbers.length > 0">
       <PreviewCategory> Aktenzeichen</PreviewCategory>
       <PreviewContent>
