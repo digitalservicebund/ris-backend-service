@@ -291,14 +291,14 @@
                         </ris:tarifvertrag>
                     </ris:tarifvertraege>
                     <ris:quellen domainTerm="Quellen">
-                      <ris:quelle domainTerm="Quelle">Sonstige</ris:quelle>
-                      <ris:quelle domainTerm="Quelle">sourceRawValue test 2</ris:quelle>
+                        <ris:quelle domainTerm="Quelle">Sonstige</ris:quelle>
+                        <ris:quelle domainTerm="Quelle">sourceRawValue test 2</ris:quelle>
                     </ris:quellen>
                     <ris:streitjahre domainTerm="Streitjahre">
-                      <ris:streitjahr domainTerm="Streitjahr">2024</ris:streitjahr>
+                        <ris:streitjahr domainTerm="Streitjahr">2024</ris:streitjahr>
                     </ris:streitjahre>
                     <ris:berufsbilder domainTerm="Berufsbilder">
-                      <ris:berufsbild domainTerm="Berufsbild">jobProfile test</ris:berufsbild>
+                        <ris:berufsbild domainTerm="Berufsbild">jobProfile test</ris:berufsbild>
                     </ris:berufsbilder>
                     <ris:kuendigungsgruende domainTerm="Kündigungsgründe">
                         <ris:kuendigungsgrund domainTerm="Kündigungsgrund">dismissalGround test</ris:kuendigungsgrund>
@@ -315,6 +315,23 @@
                             <ris:gegenstandswertVerfahren domainTerm="Verfahren">Organstreitverfahren</ris:gegenstandswertVerfahren>
                         </ris:gegenstandswert>
                     </ris:gegenstandswerte>
+                    <ris:berichtigungen domainTerm="Berichtigungen">
+                       <ris:berichtigung domainTerm="Berichtigung">
+                           <ris:berichtigungArtDerEintragung domainTerm="Art der Eintragung">Berichtigungsbeschluss</ris:berichtigungArtDerEintragung>
+                       </ris:berichtigung>
+                       <ris:berichtigung domainTerm="Berichtigung">
+                           <ris:berichtigungArtDerEintragung domainTerm="Art der Eintragung">Schreibfehlerberichtigung</ris:berichtigungArtDerEintragung>
+                           <ris:berichtigungArtDerAenderung domainTerm="Art der Änderung">Hauffen -&gt; Haufen</ris:berichtigungArtDerAenderung>
+                           <ris:berichtigungDatumDerAenderung domainTerm="Datum der Änderung">2020-01-20</ris:berichtigungDatumDerAenderung>
+                           <ris:berichtigungRandnummern domainTerm="Randnummern">
+                               <ris:berichtigungRandnummer domainTerm="Randnummer" akn:refersTo="#randnummer-1">1</ris:berichtigungRandnummer>
+                               <ris:berichtigungRandnummer domainTerm="Randnummer" akn:refersTo="#randnummer-3">3</ris:berichtigungRandnummer>
+                           </ris:berichtigungRandnummern>
+                           <ris:berichtigungInhaltDerAenderung domainTerm="Inhalt der Änderung">
+                               <akn:p>Ersetzen von 'Hauffen' mit 'Haufen'</akn:p>
+                           </ris:berichtigungInhaltDerAenderung>
+                       </ris:berichtigung>
+                   </ris:berichtigungen>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>
