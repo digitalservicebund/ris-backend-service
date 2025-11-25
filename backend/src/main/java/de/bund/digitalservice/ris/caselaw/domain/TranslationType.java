@@ -8,9 +8,9 @@ public enum TranslationType {
   @Override
   public String toString() {
     return switch (this) {
-      case AMTLICH -> "Amtlich";
-      case NICHT_AMTLICH -> "Nicht-amtlich";
-      case KEINE_ANGABE -> "Keine Angabe";
+      case AMTLICH -> "amtlich";
+      case NICHT_AMTLICH -> "nicht-amtlich";
+      case KEINE_ANGABE -> "keine Angabe";
     };
   }
 }

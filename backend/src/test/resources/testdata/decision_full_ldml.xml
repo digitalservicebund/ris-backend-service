@@ -224,7 +224,7 @@
                                     <akn:documentRef href="https://ihre-url-zur-englischen-übersetzung" showAs="Englisch"/>
                                 </ris:externeVerlinkung>
                             </ris:externeVerlinkungen>
-                            <ris:art domainTerm="Übersetzungsart">Amtlich</ris:art>
+                            <ris:art domainTerm="Übersetzungsart">amtlich</ris:art>
                         </ris:herkunftDerUebersetzung>
                     </ris:herkunftDerUebersetzungen>
                     <ris:evsf domainTerm="Elektronische Vorschriftensammlung Bundesfinanzverwaltung (E-VSF)">evsf test</ris:evsf>
