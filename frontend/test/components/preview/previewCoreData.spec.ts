@@ -29,6 +29,7 @@ describe("preview core data", () => {
       },
       leadingDecisionNormReferences: ["NSW WEG $ 14 (BGH-intern)"],
       deviatingCourts: ["BGH"],
+      courtBranchLocation: "Augsburg",
       deviatingDocumentNumbers: ["XXRE123456789"],
       fileNumbers: ["abc-123"],
       deviatingFileNumbers: ["cde-456"],
@@ -59,6 +60,7 @@ describe("preview core data", () => {
 
     expect(await screen.findByText("Gericht")).toBeInTheDocument()
     expect(await screen.findByText("Fehlerhaftes Gericht")).toBeInTheDocument()
+    expect(await screen.findByText("Sitz der Außenstelle")).toBeInTheDocument()
     expect(await screen.findByText("Aktenzeichen")).toBeInTheDocument()
     expect(
       await screen.findByText("Abweichendes Aktenzeichen"),
@@ -193,6 +195,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -218,6 +221,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -243,6 +247,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -268,6 +273,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -293,6 +299,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -318,6 +325,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -344,6 +352,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -369,6 +378,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -392,6 +402,9 @@ describe("preview core data", () => {
         "Region",
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -417,6 +430,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -442,6 +456,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -467,6 +482,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -492,6 +508,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -523,6 +540,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -548,6 +566,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -573,6 +592,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -597,6 +617,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -621,6 +642,7 @@ describe("preview core data", () => {
         "BGH Nachschlagewerk",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -645,6 +667,7 @@ describe("preview core data", () => {
         "Gerichtsbarkeit",
         "Quelle",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -675,6 +698,7 @@ describe("preview core data", () => {
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
         "Eingangsart",
+        "Sitz der Außenstelle",
       ],
     ],
     [
@@ -701,6 +725,34 @@ describe("preview core data", () => {
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
         "Quelle",
+        "Sitz der Außenstelle",
+      ],
+    ],
+    [
+      "Sitz der Außenstelle",
+      {
+        courtBranchLocation: "Augsburg",
+      },
+      [
+        "Fehlerhaftes Gericht",
+        "Aktenzeichen",
+        "Abweichendes Aktenzeichen",
+        "Entscheidungsdatum",
+        "Abweichendes Entscheidungsdatum",
+        "Spruchkörper",
+        "Dokumenttyp",
+        "Abweichende Dokumentnummer",
+        "CELEX-Nummer",
+        "ECLI",
+        "Abweichender ECLI",
+        "Vorgang",
+        "Vorgangshistorie",
+        "Rechtskraft",
+        "Region",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
   ])(

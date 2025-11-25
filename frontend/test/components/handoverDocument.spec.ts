@@ -487,6 +487,7 @@ describe("HandoverDocumentationUnitView:", () => {
               location: "location",
               label: "label",
             },
+            courtBranchLocation: "Augsburg",
             decisionDate: "2022-02-01",
             legalEffect: "legalEffect",
             documentType: {
@@ -527,6 +528,7 @@ describe("HandoverDocumentationUnitView:", () => {
       ).toBeInTheDocument()
       expect(screen.getByText("Rechtsmittelzulassung")).toBeInTheDocument()
       expect(screen.getByText("Rechtsmittel")).toBeInTheDocument()
+      expect(screen.getByText("Sitz der Außenstelle")).toBeInTheDocument()
       const handoverButton = screen.getByRole("button", {
         name: "Dokumentationseinheit an jDV übergeben",
       })
