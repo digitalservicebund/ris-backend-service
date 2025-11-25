@@ -332,7 +332,7 @@
     |akn:analysis|akn:otherAnalysis|akn:implicitReference
     |akn:FRBRWork|akn:FRBRExpression|akn:FRBRManifestation|akn:p
     |akn:FRBRthis|akn:FRBRuri|akn:FRBRalias|akn:FRBRdate|akn:FRBRauthor|akn:FRBRcountry|akn:FRBRlanguage|akn:documentRef
-    |ris:meta|ris:fileNumber|ris:dokumentTyp|ris:courtType|ris:gericht|ris:typ|ris:ort
+    |ris:meta|ris:fileNumber|ris:dokumentTyp|ris:courtType|ris:gericht|ris:typ|ris:ort|ris:gerichtsbarkeit
     |ris:fehlerhafteGerichte|ris:fehlerhaftesGericht|ris:regionen|ris:region|ris:dokumentationsstelle
     |ris:aktenzeichenListe|ris:aktenzeichen|ris:abweichendeDaten|ris:abweichendesDatum|ris:datenDerMuendlichenVerhandlung|ris:datumDerMuendlichenVerhandlung
     |ris:abweichendeDokumentnummern|ris:abweichendeDokumentnummer|ris:abweichendeEclis|ris:abweichenderEcli

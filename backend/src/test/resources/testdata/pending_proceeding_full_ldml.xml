@@ -118,6 +118,7 @@
                     <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
                         <ris:typ domainTerm="Gerichtstyp">courtType</ris:typ>
                         <ris:ort domainTerm="Gerichtsort">courtLocation</ris:ort>
+                        <ris:gerichtsbarkeit domainTerm="Gerichtsbarkeit">jurisdictionType</ris:gerichtsbarkeit>
                     </ris:gericht>
                     <ris:fehlerhafteGerichte domainTerm="Fehlerhafte Gerichte">
                         <ris:fehlerhaftesGericht domainTerm="Fehlerhaftes Gericht">Abweichendes Gericht</ris:fehlerhaftesGericht>

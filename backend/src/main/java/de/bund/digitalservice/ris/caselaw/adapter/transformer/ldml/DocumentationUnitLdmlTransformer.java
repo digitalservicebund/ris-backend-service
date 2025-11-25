@@ -42,6 +42,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -434,19 +435,26 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
       builder.aktenzeichen(
           AktenzeichenListe.Aktenzeichen.builder().value(relatedDocUnit.getFileNumber()).build());
     }
-    if (relatedDocUnit.getCourt() != null) {
-      Gericht.GerichtBuilder gerichtBuilder = Gericht.builder();
-      if (isNotBlank(relatedDocUnit.getCourt().type())) {
-        gerichtBuilder.typ(
-            Gericht.GerichtTyp.builder().value(relatedDocUnit.getCourt().type()).build());
-      }
-      if (isNotBlank(relatedDocUnit.getCourt().location())) {
-        gerichtBuilder.ort(
-            Gericht.GerichtOrt.builder().value(relatedDocUnit.getCourt().location()).build());
-      }
 
-      builder.gericht(gerichtBuilder.build());
+    Court court = relatedDocUnit.getCourt();
+    if (court != null) {
+      builder.gericht(buildGericht(court));
     }
+  }
+
+  default Gericht buildGericht(Court court) {
+    Gericht.GerichtBuilder gerichtBuilder = Gericht.builder();
+    if (isNotBlank(court.type())) {
+      gerichtBuilder.typ(Gericht.GerichtTyp.builder().value(court.type()).build());
+    }
+    if (isNotBlank(court.location())) {
+      gerichtBuilder.ort(Gericht.GerichtOrt.builder().value(court.location()).build());
+    }
+    if (isFullLDML() && isNotBlank(court.jurisdictionType())) {
+      gerichtBuilder.gerichtsbarkeit(
+          Gericht.Gerichtsbarkeit.builder().value(court.jurisdictionType()).build());
+    }
+    return gerichtBuilder.build();
   }
 
   default Norm buildNorm(NormReference normRef) {
