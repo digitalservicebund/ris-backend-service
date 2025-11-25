@@ -33,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.K
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Kuendigungsgruende;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Notiz;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Quellen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtskraft;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtsmittelzulassung;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
@@ -211,6 +212,12 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       if (!CollectionUtils.isEmpty(coreData.inputTypes())) {
         var eingangsarten = buildEingangsarten(coreData);
         builder.eingangsarten(eingangsarten);
+      }
+
+      // Quelle
+      if (!CollectionUtils.isEmpty(coreData.sources())) {
+        var quellen = buildQuellen(coreData);
+        builder.quellen(quellen);
       }
 
       // Gesetzgebungsauftrag
@@ -634,6 +641,15 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
             coreData.inputTypes().stream()
                 .map(
                     eingangsart -> Eingangsarten.Eingangsart.builder().content(eingangsart).build())
+                .toList())
+        .build();
+  }
+
+  private Quellen buildQuellen(CoreData coreData) {
+    return Quellen.builder()
+        .quellen(
+            coreData.sources().stream()
+                .map(source -> Quellen.Quelle.builder().value(source.toString()).build())
                 .toList())
         .build();
   }

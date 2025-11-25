@@ -933,7 +933,8 @@ class DecisionFullLdmlTransformerTest {
                         Source.builder()
                             .sourceRawValue("sourceRawValue test")
                             .value(SourceValue.S)
-                            .build()))
+                            .build(),
+                        Source.builder().sourceRawValue("sourceRawValue test 2").build()))
                 .documentType(DocumentType.builder().label("documentType test").build())
                 .legalEffect("Ja")
                 .fileNumbers(List.of("fileNumber test"))

@@ -263,8 +263,12 @@
                             <ris:tarifvertragBranche domainTerm="Branche">Bühne, Theater, Orchester</ris:tarifvertragBranche>
                         </ris:tarifvertrag>
                     </ris:tarifvertraege>
+                    <ris:quellen domainTerm="Quellen">
+                      <ris:quelle domainTerm="Quelle">S</ris:quelle>
+                      <ris:quelle domainTerm="Quelle">sourceRawValue test 2</ris:quelle>
+                    </ris:quellen>
                     <ris:berufsbilder domainTerm="Berufsbilder">
-                  <ris:berufsbild domainTerm="Berufsbild">jobProfile test</ris:berufsbild>
+                      <ris:berufsbild domainTerm="Berufsbild">jobProfile test</ris:berufsbild>
                     </ris:berufsbilder>
                     <ris:kuendigungsgruende domainTerm="Kündigungsgründe">
                   <ris:kuendigungsgrund domainTerm="Kündigungsgrund">dismissalGround test</ris:kuendigungsgrund>
