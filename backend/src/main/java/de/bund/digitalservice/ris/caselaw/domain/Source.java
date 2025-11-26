@@ -9,6 +9,6 @@ public record Source(SourceValue value, String sourceRawValue, Reference referen
   @NotNull
   @Override
   public String toString() {
-    return Optional.ofNullable(value).map(Enum::name).orElse(sourceRawValue);
+    return Optional.ofNullable(value).map(SourceValue::getLabel).orElse(sourceRawValue);
   }
 }
