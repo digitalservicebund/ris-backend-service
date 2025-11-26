@@ -276,82 +276,86 @@ test.describe("court", () => {
     await expect(dropdown).toHaveText("Keine Angabe")
   })
 
-  test("court branch location", async ({ page, documentNumber }) => {
-    await navigateToCategories(page, documentNumber)
-
-    await test.step("select court with branch location options", async () => {
-      await selectCourt(page, "ArbG Bremen-Bremerhaven")
-    })
-
-    await test.step("pick branch location from dropdown", async () => {
-      await page
-        .getByLabel("Fehlerhaftes Gericht anzeigen", { exact: true })
-        .click()
-
-      await page.getByLabel("Sitz der Außenstelle").click()
-
-      await expect(page.getByText("Kammern Bremen")).toBeVisible()
-      await expect(page.getByText("Kammern Bremeverhaven")).toBeVisible()
-      await page.getByText("Kammern Bremen").click()
-      await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
-        "Kammern Bremen",
-      )
-      await expect(page.getByText("Kammern Bremeverhaven")).toBeHidden()
-
-      await save(page)
-    })
-
-    await test.step("persists after reload", async () => {
-      await page.reload()
-      await expect(page.getByText("Kammern Bremen")).toBeVisible()
-    })
-
-    await test.step("show in preview", async () => {
-      await navigateToPreview(page, documentNumber)
-      await expect(
-        page.getByText("Sitz der AußenstelleKammern Bremen"),
-      ).toBeVisible()
-    })
-
-    await test.step("show warning in handover page", async () => {
-      await navigateToHandover(page, documentNumber)
-
-      await expect(
-        page.getByText(
-          "Folgende Rubriken sind befüllt und können nicht an die jDV exportiert werden",
-        ),
-      ).toBeVisible()
-      await expect(page.getByText("Sitz der Außenstelle")).toBeVisible()
-    })
-
-    await test.step("changing court removes court branch location and disables dropdown", async () => {
+  test(
+    "court branch location",
+    { tag: ["@RISDEV-3081"] },
+    async ({ page, documentNumber }) => {
       await navigateToCategories(page, documentNumber)
-      await selectCourt(page, "BGH")
-      await save(page)
 
-      await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
-        "Bitte auswählen",
-      )
-      await expect(page.getByLabel("Sitz der Außenstelle")).toBeDisabled()
-    })
+      await test.step("select court with branch location options", async () => {
+        await selectCourt(page, "ArbG Bremen-Bremerhaven")
+      })
 
-    await test.step("remove court branch location", async () => {
-      await selectCourt(page, "FG München")
-      await page.getByLabel("Sitz der Außenstelle").click()
-      await expect(page.getByText("Augsburg")).toBeVisible()
-      await page.getByText("Augsburg").click()
-      await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
-        "Augsburg",
-      )
+      await test.step("pick branch location from dropdown", async () => {
+        await page
+          .getByLabel("Fehlerhaftes Gericht anzeigen", { exact: true })
+          .click()
 
-      await save(page)
+        await page.getByLabel("Sitz der Außenstelle").click()
 
-      await page.locator("#branchLocation svg").first().click() // delete icon
-      await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
-        "Bitte auswählen",
-      )
-    })
-  })
+        await expect(page.getByText("Kammern Bremen")).toBeVisible()
+        await expect(page.getByText("Kammern Bremeverhaven")).toBeVisible()
+        await page.getByText("Kammern Bremen").click()
+        await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
+          "Kammern Bremen",
+        )
+        await expect(page.getByText("Kammern Bremeverhaven")).toBeHidden()
+
+        await save(page)
+      })
+
+      await test.step("persists after reload", async () => {
+        await page.reload()
+        await expect(page.getByText("Kammern Bremen")).toBeVisible()
+      })
+
+      await test.step("show in preview", async () => {
+        await navigateToPreview(page, documentNumber)
+        await expect(
+          page.getByText("Sitz der AußenstelleKammern Bremen"),
+        ).toBeVisible()
+      })
+
+      await test.step("show warning in handover page", async () => {
+        await navigateToHandover(page, documentNumber)
+
+        await expect(
+          page.getByText(
+            "Folgende Rubriken sind befüllt und können nicht an die jDV exportiert werden",
+          ),
+        ).toBeVisible()
+        await expect(page.getByText("Sitz der Außenstelle")).toBeVisible()
+      })
+
+      await test.step("changing court removes court branch location and disables dropdown", async () => {
+        await navigateToCategories(page, documentNumber)
+        await selectCourt(page, "BGH")
+        await save(page)
+
+        await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
+          "Bitte auswählen",
+        )
+        await expect(page.getByLabel("Sitz der Außenstelle")).toBeDisabled()
+      })
+
+      await test.step("remove court branch location", async () => {
+        await selectCourt(page, "FG München")
+        await page.getByLabel("Sitz der Außenstelle").click()
+        await expect(page.getByText("Augsburg")).toBeVisible()
+        await page.getByText("Augsburg").click()
+        await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
+          "Augsburg",
+        )
+
+        await save(page)
+
+        await page.locator("#branchLocation svg").first().click() // delete icon
+        await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
+          "Bitte auswählen",
+        )
+      })
+    },
+  )
 
   async function selectCourt(page: Page, courtName: string) {
     await page.getByLabel("Gericht", { exact: true }).fill(courtName)
