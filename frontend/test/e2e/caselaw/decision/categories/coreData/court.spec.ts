@@ -294,12 +294,12 @@ test.describe("court", () => {
         await page.getByLabel("Sitz der Außenstelle").click()
 
         await expect(page.getByText("Kammern Bremen")).toBeVisible()
-        await expect(page.getByText("Kammern Bremeverhaven")).toBeVisible()
+        await expect(page.getByText("Kammern Bremerhaven")).toBeVisible()
         await page.getByText("Kammern Bremen").click()
         await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
           "Kammern Bremen",
         )
-        await expect(page.getByText("Kammern Bremeverhaven")).toBeHidden()
+        await expect(page.getByText("Kammern Bremerhaven")).toBeHidden()
 
         await save(page)
       })
