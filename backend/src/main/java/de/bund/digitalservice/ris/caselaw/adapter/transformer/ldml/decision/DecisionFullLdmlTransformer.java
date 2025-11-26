@@ -374,7 +374,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
               .map(status -> new Rechtsmittel.AnschlussRevisionKlaeger(status.value()))
               .toList());
     }
-    if (!CollectionUtils.isEmpty(appeal.jointRevisionPlaintiffStatuses())) {
+    if (!CollectionUtils.isEmpty(appeal.jointRevisionDefendantStatuses())) {
       builder.anschlussRevisionBeklagte(
           appeal.jointRevisionDefendantStatuses().stream()
               .map(status -> new Rechtsmittel.AnschlussRevisionBeklagter(status.value()))
