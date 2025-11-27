@@ -255,6 +255,32 @@
                         <ris:rechtsmittelZugelassen domainTerm="Rechtsmittel zugelassen">true</ris:rechtsmittelZugelassen>
                         <ris:rechtsmittelZugelassenDurch domainTerm="Rechtsmittel zugelassen durch">FG</ris:rechtsmittelZugelassenDurch>
                     </ris:rechtsmittelzulassung>
+                    <ris:rechtsmittel domainTerm="Rechtsmittel">
+                        <ris:rechtsmittelfuehrerListe>
+                            <ris:rechtsmittelfuehrer domainTerm="Rechtsmittelführer">Kläger</ris:rechtsmittelfuehrer>
+                            <ris:rechtsmittelfuehrer domainTerm="Rechtsmittelführer">Beklagter</ris:rechtsmittelfuehrer>
+                        </ris:rechtsmittelfuehrerListe>
+                        <ris:revisionKlaegerListe>
+                            <ris:revisionKlaeger domainTerm="Revision (Kläger)">unzulässig</ris:revisionKlaeger>
+                        </ris:revisionKlaegerListe>
+                        <ris:revisionBeklagterListe>
+                            <ris:revisionBeklagter domainTerm="Revision (Beklagter)">unzulässig</ris:revisionBeklagter>
+                        </ris:revisionBeklagterListe>
+                        <ris:anschlussRevisionKlaegerListe>
+                            <ris:anschlussRevisionKlaeger domainTerm="Anschlussrevision (Kläger)">unzulässig</ris:anschlussRevisionKlaeger>
+                        </ris:anschlussRevisionKlaegerListe>
+                        <ris:anschlussRevisionBeklagterListe>
+                            <ris:anschlussRevisionBeklagter domainTerm="Anschlussrevision (Beklagter)">unzulässig</ris:anschlussRevisionBeklagter>
+                        </ris:anschlussRevisionBeklagterListe>
+                        <ris:nzbKlaegerListe>
+                            <ris:nzbKlaeger domainTerm="NZB (Kläger)">unzulässig</ris:nzbKlaeger>
+                        </ris:nzbKlaegerListe>
+                        <ris:nzbBeklagterListe>
+                            <ris:nzbBeklagter domainTerm="NZB (Beklagter)">unzulässig</ris:nzbBeklagter>
+                        </ris:nzbBeklagterListe>
+                        <ris:zuruecknahmeDerRevision domainTerm="Zurücknahme der Revision">Ja</ris:zuruecknahmeDerRevision>
+                        <ris:pkhAntragKlaeger domainTerm="PKH-Antrag (Kläger)">Nein</ris:pkhAntragKlaeger>
+                    </ris:rechtsmittel>
                     <ris:tarifvertraege domainTerm="Tarifverträge">
                         <ris:tarifvertrag domainTerm="Tarifvertrag">
                             <ris:tarifvertragName domainTerm="Bezeichnung des Tarifvertrag">Stehende Bühnen</ris:tarifvertragName>
