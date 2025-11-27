@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.springframework.data.annotation.Immutable;
 
 @Getter
 @Setter
@@ -27,6 +28,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity
+@Immutable
 @Table(name = "court", schema = "incremental_migration")
 public class CourtDTO {
   @Id @GeneratedValue private UUID id;
@@ -60,4 +62,8 @@ public class CourtDTO {
   @ManyToOne
   @JoinColumn(name = "jurisdiction_type_id")
   private JurisdictionTypeDTO jurisdictionType;
+
+  @OneToMany
+  @JoinColumn(name = "court_id")
+  private List<CourtBranchLocationDTO> courtBranchLocations;
 }

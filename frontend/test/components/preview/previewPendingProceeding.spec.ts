@@ -33,6 +33,7 @@ function renderComponent() {
                         jurisdictionType: "Verfassungsgerichtsbarkeit",
                         regions: ["DEU"],
                       },
+                      courtBranchLocation: { value: "Augsburg", id: "1" },
                       leadingDecisionNormReferences: [
                         "NSW WEG $ 14 (BGH-intern)",
                       ],
@@ -86,6 +87,7 @@ describe("preview", () => {
 
     expect(await screen.findByText("Gericht")).toBeInTheDocument()
     expect(await screen.findByText("Fehlerhaftes Gericht")).toBeInTheDocument()
+    expect(await screen.findByText("Sitz der Außenstelle")).toBeInTheDocument()
     expect(await screen.findByText("Aktenzeichen")).toBeInTheDocument()
     expect(
       await screen.findByText("Abweichendes Aktenzeichen"),

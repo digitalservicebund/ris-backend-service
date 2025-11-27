@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtBranchLocationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDocumentNumberDTO;
@@ -25,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.CourtBranchLocation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -445,6 +447,59 @@ class PendingProceedingTransformerTest {
             generateSimpleDTOBuilder().build(), pendingProceeding);
 
     assertThat(pendingProceedingDTO.getDeviatingDocumentNumbers()).isEmpty();
+  }
+
+  @Test
+  void transformToDomain_withCourtBranchLocation_shouldAddCourtBranchLocation() {
+    PendingProceedingDTO pendingProceedingDTO = generateSimpleDTOBuilder().build();
+
+    pendingProceedingDTO.setCourtBranchLocation(
+        CourtBranchLocationDTO.builder().value("Augsburg").build());
+
+    PendingProceeding pendingProceeding =
+        PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
+
+    assertThat(pendingProceeding.coreData().courtBranchLocation()).isNotNull();
+    assertThat(pendingProceeding.coreData().courtBranchLocation().value()).isEqualTo("Augsburg");
+  }
+
+  @Test
+  void transformToDomain_withoutCourtBranchLocation_shouldNotAddCourtBranchLocation() {
+    PendingProceedingDTO pendingProceedingDTO = generateSimpleDTOBuilder().build();
+
+    PendingProceeding pendingProceeding =
+        PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
+
+    assertThat(pendingProceeding.coreData().courtBranchLocation()).isNull();
+  }
+
+  @Test
+  void transformToDTO_withCourtBranchLocation_shouldAddCourtBranchLocation() {
+    PendingProceeding pendingProceeding =
+        PendingProceeding.builder()
+            .coreData(
+                CoreData.builder()
+                    .courtBranchLocation(CourtBranchLocation.builder().value("Augsburg").build())
+                    .build())
+            .build();
+
+    PendingProceedingDTO pendingProceedingDTO =
+        PendingProceedingTransformer.transformToDTO(
+            generateSimpleDTOBuilder().build(), pendingProceeding);
+
+    assertThat(pendingProceedingDTO.getCourtBranchLocation()).isNotNull();
+    assertThat(pendingProceedingDTO.getCourtBranchLocation().getValue()).isEqualTo("Augsburg");
+  }
+
+  @Test
+  void transformToDTO_withoutCourtBranchLocation_shouldNotAddCourtBranchLocation() {
+    PendingProceeding pendingProceeding = PendingProceeding.builder().build();
+    PendingProceedingDTO currentDTO = generateSimpleDTOBuilder().build();
+
+    PendingProceedingDTO pendingProceedingDTO =
+        PendingProceedingTransformer.transformToDTO(currentDTO, pendingProceeding);
+
+    assertThat(pendingProceedingDTO.getCourtBranchLocation()).isNull();
   }
 
   private PendingProceedingDTO.PendingProceedingDTOBuilder<?, ?> generateSimpleDTOBuilder() {

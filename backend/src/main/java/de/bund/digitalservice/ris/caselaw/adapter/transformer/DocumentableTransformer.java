@@ -280,7 +280,7 @@ public class DocumentableTransformer {
     builder.deviatingDates(deviatingDateDTOs);
   }
 
-  static void addDeviationCourts(
+  static void addDeviatingCourts(
       DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder, CoreData coreData) {
     if (coreData.deviatingCourts() == null) {
       return;
@@ -298,6 +298,16 @@ public class DocumentableTransformer {
     }
 
     builder.deviatingCourts(deviatingCourtDTOs);
+  }
+
+  static void addCourtBranchLocation(
+      DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder, CoreData coreData) {
+    if (coreData.courtBranchLocation() == null) {
+      builder.courtBranchLocation(null);
+    } else {
+      builder.courtBranchLocation(
+          CourtBranchLocationTransformer.transformToDTO(coreData.courtBranchLocation()));
+    }
   }
 
   static void addFileNumbers(
@@ -327,6 +337,9 @@ public class DocumentableTransformer {
     CoreDataBuilder coreDataBuilder =
         CoreData.builder()
             .court(CourtTransformer.transformToDomain(documentationUnitDTO.getCourt()))
+            .courtBranchLocation(
+                CourtBranchLocationTransformer.transformToDomain(
+                    documentationUnitDTO.getCourtBranchLocation()))
             .documentationOffice(
                 DocumentationOfficeTransformer.transformToDomain(
                     documentationUnitDTO.getDocumentationOffice()))

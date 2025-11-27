@@ -38,6 +38,12 @@ public class CourtTransformer {
                         .map(RegionDTO::getCode)
                         .toList()
                     : List.of())
+            .courtBranchLocations(
+                courtDTO.getCourtBranchLocations() != null
+                    ? courtDTO.getCourtBranchLocations().stream()
+                        .map(CourtBranchLocationTransformer::transformToDomain)
+                        .toList()
+                    : List.of())
             .isSuperiorCourt(courtDTO.isSuperiorCourt())
             .isForeignCourt(courtDTO.isForeignCourt())
             .revoked(revoked);

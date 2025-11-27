@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementIndustryDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtBranchLocationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DefinitionDTO;
@@ -78,6 +79,7 @@ import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealWithdrawal;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.PkhPlaintiff;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.CourtBranchLocation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
@@ -2141,6 +2143,54 @@ class DecisionTransformerTest {
     DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDTO, decision);
 
     assertThat(decisionDTO.getAppeal()).isNull();
+  }
+
+  @Test
+  void transformToDomain_withCourtBranchLocation_shouldAddCourtBranchLocation() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    decisionDTO.setCourtBranchLocation(CourtBranchLocationDTO.builder().value("Augsburg").build());
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.coreData().courtBranchLocation()).isNotNull();
+    assertThat(decision.coreData().courtBranchLocation().value()).isEqualTo("Augsburg");
+  }
+
+  @Test
+  void transformToDomain_withoutCourtBranchLocation_shouldNotAddCourtBranchLocation() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.coreData().courtBranchLocation()).isNull();
+  }
+
+  @Test
+  void transformToDTO_withCourtBranchLocation_shouldAddCourtBranchLocation() {
+    Decision decision =
+        Decision.builder()
+            .coreData(
+                CoreData.builder()
+                    .courtBranchLocation(CourtBranchLocation.builder().value("Augsburg").build())
+                    .build())
+            .build();
+
+    DecisionDTO decisionDTO =
+        DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+    assertThat(decisionDTO.getCourtBranchLocation()).isNotNull();
+    assertThat(decisionDTO.getCourtBranchLocation().getValue()).isEqualTo("Augsburg");
+  }
+
+  @Test
+  void transformToDTO_withoutCourtBranchLocation_shouldNotAddCourtBranchLocation() {
+    Decision decision = Decision.builder().build();
+    DecisionDTO currentDTO = generateSimpleDTOBuilder().build();
+
+    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDTO, decision);
+
+    assertThat(decisionDTO.getCourtBranchLocation()).isNull();
   }
 
   private Decision.DecisionBuilder generateSimpleDocumentationUnitBuilder() {

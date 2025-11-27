@@ -1,8 +1,10 @@
-import { expect } from "@playwright/test"
+import { expect, Page } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   fillCombobox,
   navigateToCategories,
+  navigateToHandover,
+  navigateToPreview,
   save,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
@@ -273,4 +275,115 @@ test.describe("court", () => {
 
     await expect(dropdown).toHaveText("Keine Angabe")
   })
+
+  test(
+    "court branch location",
+    { tag: ["@RISDEV-8805"] },
+    async ({ page, documentNumber }) => {
+      await navigateToCategories(page, documentNumber)
+
+      await test.step("select court with branch location options", async () => {
+        await selectCourt(page, "ArbG Bremen-Bremerhaven")
+      })
+
+      await test.step("pick branch location from dropdown", async () => {
+        await page
+          .getByLabel("Fehlerhaftes Gericht anzeigen", { exact: true })
+          .click()
+
+        await page.getByLabel("Sitz der Außenstelle").click()
+
+        await expect(page.getByText("Kammern Bremen")).toBeVisible()
+        await expect(page.getByText("Kammern Bremerhaven")).toBeVisible()
+        await page.getByText("Kammern Bremen").click()
+        await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
+          "Kammern Bremen",
+        )
+        await expect(page.getByText("Kammern Bremerhaven")).toBeHidden()
+
+        await save(page)
+      })
+
+      await test.step("persists after reload", async () => {
+        await page.reload()
+        await expect(page.getByText("Kammern Bremen")).toBeVisible()
+      })
+
+      await test.step("show in preview", async () => {
+        await navigateToPreview(page, documentNumber)
+        await expect(
+          page.getByText("Sitz der AußenstelleKammern Bremen"),
+        ).toBeVisible()
+      })
+
+      await test.step("show warning in handover page", async () => {
+        await navigateToHandover(page, documentNumber)
+
+        await expect(
+          page.getByText(
+            "Folgende Rubriken sind befüllt und können nicht an die jDV exportiert werden",
+          ),
+        ).toBeVisible()
+        await expect(page.getByText("Sitz der Außenstelle")).toBeVisible()
+      })
+
+      await test.step("changing to court without branch locations does not remove branch location, shows warning", async () => {
+        await navigateToCategories(page, documentNumber)
+        await selectCourt(page, "BGH")
+        await save(page)
+
+        await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
+          "Kammern Bremen",
+        )
+        await expect(
+          page.getByText("Gehört nicht zum ausgewählten Gericht"),
+        ).toBeVisible()
+      })
+
+      await test.step("changing to different court with other branch locations does not remove branch location, shows warning", async () => {
+        await selectCourt(page, "VG Hannover")
+        await save(page)
+
+        await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
+          "Kammern Bremen",
+        )
+        await expect(
+          page.getByText("Gehört nicht zum ausgewählten Gericht"),
+        ).toBeVisible()
+
+        await page.getByLabel("Sitz der Außenstelle").click()
+        await expect(
+          page.getByRole("option", { name: "Kammern Bremen" }),
+        ).toBeVisible()
+        await expect(
+          page.getByRole("option", { name: "Hildesheim" }),
+        ).toBeVisible()
+        await expect(
+          page.getByRole("option", { name: "Osnabrück" }),
+        ).toBeVisible()
+      })
+
+      await test.step("remove court branch location", async () => {
+        await page.locator("#branchLocation svg").first().click() // delete icon
+        await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
+          "Bitte auswählen",
+        )
+      })
+    },
+  )
+
+  async function selectCourt(page: Page, courtName: string) {
+    await page.getByLabel("Gericht", { exact: true }).fill(courtName)
+    await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+      courtName,
+    )
+    await expect(page.getByText(courtName, { exact: true })).toBeVisible()
+    await page.getByText(courtName, { exact: true }).click()
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+      courtName,
+    )
+
+    await save(page)
+  }
 })

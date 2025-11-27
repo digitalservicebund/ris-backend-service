@@ -15,5 +15,6 @@ public record Court(
     String jurisdictionType,
     List<String> regions,
     DocumentationOffice responsibleDocOffice,
+    List<CourtBranchLocation> courtBranchLocations,
     Boolean isSuperiorCourt,
     Boolean isForeignCourt) {}
