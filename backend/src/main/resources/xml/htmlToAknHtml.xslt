@@ -332,7 +332,7 @@
     |akn:analysis|akn:otherAnalysis|akn:implicitReference
     |akn:FRBRWork|akn:FRBRExpression|akn:FRBRManifestation|akn:p
     |akn:FRBRthis|akn:FRBRuri|akn:FRBRalias|akn:FRBRdate|akn:FRBRauthor|akn:FRBRcountry|akn:FRBRlanguage|akn:documentRef
-    |ris:meta|ris:fileNumber|ris:dokumentTyp|ris:courtType|ris:gericht|ris:typ|ris:ort
+    |ris:meta|ris:fileNumber|ris:dokumentTyp|ris:courtType|ris:gericht|ris:typ|ris:ort|ris:gerichtsbarkeit
     |ris:fehlerhafteGerichte|ris:fehlerhaftesGericht|ris:regionen|ris:region|ris:dokumentationsstelle
     |ris:aktenzeichenListe|ris:aktenzeichen|ris:abweichendeDaten|ris:abweichendesDatum|ris:datenDerMuendlichenVerhandlung|ris:datumDerMuendlichenVerhandlung
     |ris:abweichendeDokumentnummern|ris:abweichendeDokumentnummer|ris:abweichendeEclis|ris:abweichenderEcli
@@ -345,7 +345,9 @@
     |ris:fundstelle|ris:zitatstelle|ris:zitatstelle|ris:titel|ris:untertitel|ris:periodikum|ris:fundstelleLiteraturSelbststaendig|ris:fundstelleLiteraturUnselbststaendig
     |ris:decisionNames|ris:decisionName|ris:herkunftDerUebersetzungen|ris:herkunftDerUebersetzung|ris:uebersetzerinnen|ris:uebersetzerin
     |ris:interneVerlinkungen|ris:interneVerlinkung|ris:externeVerlinkungen|ris:externeVerlinkung|ris:art
-    |ris:tarifvertraege|ris:tarifvertrag|ris:tarifvertragName|ris:tarifvertragDatum|ris:tarifvertragTarifnorm|ris:tarifvertragBranche
+    |ris:tarifvertraege|ris:tarifvertrag|ris:tarifvertragName|ris:tarifvertragDatum|ris:tarifvertragTarifnorm|ris:tarifvertragBranche|ris:notiz
+    |ris:berufsbilder|ris:berufsbild|ris:gesetzgebungsauftrag|ris:kuendigungsarten|ris:kuendigungsart|ris:kuendigungsgruende|ris:kuendigungsgrund|ris:quellen|ris:quelle
+    |ris:streitjahre|ris:streitjahr
     |ris:rechtsmittel|ris:rechtsmittelfuehrerListe|ris:rechtsmittelfuehrer|ris:revisionKlaegerListe|ris:revisionKlaeger
     |ris:revisionBeklagterListe|ris:revisionBeklagter|ris:anschlussRevisionKlaegerListe|ris:anschlussRevisionKlaeger
     |ris:anschlussRevisionBeklagterListe|ris:anschlussRevisionBeklagter|ris:nzbKlaegerListe|ris:nzbKlaeger|ris:nzbBeklagterListe

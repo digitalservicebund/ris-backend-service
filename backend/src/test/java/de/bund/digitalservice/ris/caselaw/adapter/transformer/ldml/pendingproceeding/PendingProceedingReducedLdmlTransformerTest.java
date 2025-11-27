@@ -212,6 +212,7 @@ class PendingProceedingReducedLdmlTransformerTest {
                         .type("courtType")
                         .location("courtLocation")
                         .label("courtType courtLocation")
+                        .jurisdictionType("jurisdictionType")
                         .regions(List.of("NW"))
                         .build())
                 .documentType(DocumentType.builder().label("Anhängiges Verfahren").build())

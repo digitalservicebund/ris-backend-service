@@ -115,7 +115,13 @@ class DecisionFullLdmlTransformerTest {
             .coreData(
                 CoreData.builder()
                     .ecli("testecli")
-                    .court(Court.builder().type("AG").location("Aachen").label("AG Aachen").build())
+                    .court(
+                        Court.builder()
+                            .type("AG")
+                            .location("Aachen")
+                            .jurisdictionType("Ordentliche Gerichtsbarkeit")
+                            .label("AG Aachen")
+                            .build())
                     .documentType(
                         DocumentType.builder().label("testDocumentTypeAbbreviation").build())
                     .legalEffect("Ja")
@@ -495,6 +501,7 @@ class DecisionFullLdmlTransformerTest {
           """
           <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
              <ris:typ domainTerm="Gerichtstyp">BGH</ris:typ>
+             <ris:gerichtsbarkeit domainTerm="Gerichtsbarkeit">Ordentliche Gerichtsbarkeit</ris:gerichtsbarkeit>
          </ris:gericht>
          """;
       Decision decision =
@@ -588,6 +595,7 @@ class DecisionFullLdmlTransformerTest {
           <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
              <ris:typ domainTerm="Gerichtstyp">AG</ris:typ>
              <ris:ort domainTerm="Gerichtsort">Aachen</ris:ort>
+             <ris:gerichtsbarkeit domainTerm="Gerichtsbarkeit">Ordentliche Gerichtsbarkeit</ris:gerichtsbarkeit>
          </ris:gericht>
          """;
       Decision decision =
@@ -876,6 +884,7 @@ class DecisionFullLdmlTransformerTest {
                 Court.builder()
                     .type("previous decision court type")
                     .location("previous decision court location")
+                    .jurisdictionType("previous decision jurisdiction type")
                     .build())
             .documentType(DocumentType.builder().label("previous decision document type").build())
             .fileNumber("previous decision file number")
@@ -921,6 +930,7 @@ class DecisionFullLdmlTransformerTest {
                         .label("courtLabel test")
                         .type("courtType")
                         .location("courtLocation")
+                        .jurisdictionType("jurisdictionType")
                         .regions(List.of("NW"))
                         .build())
                 .sources(
@@ -928,7 +938,8 @@ class DecisionFullLdmlTransformerTest {
                         Source.builder()
                             .sourceRawValue("sourceRawValue test")
                             .value(SourceValue.S)
-                            .build()))
+                            .build(),
+                        Source.builder().sourceRawValue("sourceRawValue test 2").build()))
                 .documentType(DocumentType.builder().label("documentType test").build())
                 .legalEffect("Ja")
                 .fileNumbers(List.of("fileNumber test"))
@@ -951,7 +962,7 @@ class DecisionFullLdmlTransformerTest {
                 .deviatingFileNumbers(List.of("deviating fileNumber"))
                 .deviatingDocumentNumbers(List.of("deviating documentNumber"))
                 .deviatingDecisionDates(List.of(LocalDate.of(2010, 5, 12)))
-                .yearsOfDispute(List.of(Year.now()))
+                .yearsOfDispute(List.of(Year.of(2024)))
                 .leadingDecisionNormReferences(List.of("leadingDecisionNormReference test"))
                 .build())
         .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())

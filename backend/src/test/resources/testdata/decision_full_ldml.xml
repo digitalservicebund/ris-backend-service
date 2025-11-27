@@ -71,6 +71,7 @@
                             <ris:gericht domainTerm="Gericht">
                                 <ris:typ domainTerm="Gerichtstyp">previous decision court type</ris:typ>
                                 <ris:ort domainTerm="Gerichtsort">previous decision court location</ris:ort>
+                                <ris:gerichtsbarkeit domainTerm="Gerichtsbarkeit">previous decision jurisdiction type</ris:gerichtsbarkeit>
                             </ris:gericht>
                         </ris:vorgehend>
                     </akn:implicitReference>
@@ -83,6 +84,7 @@
                             <ris:gericht domainTerm="Gericht">
                                 <ris:typ domainTerm="Gerichtstyp">previous decision court type</ris:typ>
                                 <ris:ort domainTerm="Gerichtsort">previous decision court location</ris:ort>
+                                <ris:gerichtsbarkeit domainTerm="Gerichtsbarkeit">previous decision jurisdiction type</ris:gerichtsbarkeit>
                             </ris:gericht>
                         </ris:vorgehend>
                     </akn:implicitReference>
@@ -101,12 +103,12 @@
                         <ris:nachgehend domainTerm="Nachgehende Entscheidung" art="anhängig">
                             <ris:dokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:dokumentTyp>
                             <ris:datum domainTerm="Entscheidungsdatum">2022-10-01</ris:datum>
-                     <ris:dokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 2</ris:dokumentNummer>
+                            <ris:dokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 2</ris:dokumentNummer>
                             <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
                             <ris:gericht domainTerm="Gericht">
                                 <ris:typ domainTerm="Gerichtstyp">ensuing decision court type</ris:typ>
                             </ris:gericht>
-                     <ris:vermerk domainTerm="Vermerk">ensuing decision note</ris:vermerk>
+                            <ris:vermerk domainTerm="Vermerk">ensuing decision note</ris:vermerk>
                         </ris:nachgehend>
                     </akn:implicitReference>
                <akn:implicitReference ris:domainTerm="Fundstelle">
@@ -168,7 +170,8 @@
                     <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
                         <ris:typ domainTerm="Gerichtstyp">courtType</ris:typ>
                         <ris:ort domainTerm="Gerichtsort">courtLocation</ris:ort>
-                         <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBody test</ris:spruchkoerper>
+                        <ris:gerichtsbarkeit domainTerm="Gerichtsbarkeit">jurisdictionType</ris:gerichtsbarkeit>
+                        <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBody test</ris:spruchkoerper>
                     </ris:gericht>
                     <ris:fehlerhafteGerichte domainTerm="Fehlerhafte Gerichte">
                         <ris:fehlerhaftesGericht domainTerm="Fehlerhaftes Gericht">deviating court 1</ris:fehlerhaftesGericht>
@@ -285,7 +288,25 @@
                             <ris:tarifvertragDatum domainTerm="Datum">12.2001</ris:tarifvertragDatum>
                             <ris:tarifvertragBranche domainTerm="Branche">Bühne, Theater, Orchester</ris:tarifvertragBranche>
                         </ris:tarifvertrag>
-                   </ris:tarifvertraege>
+                    </ris:tarifvertraege>
+                    <ris:quellen domainTerm="Quellen">
+                      <ris:quelle domainTerm="Quelle">Sonstige</ris:quelle>
+                      <ris:quelle domainTerm="Quelle">sourceRawValue test 2</ris:quelle>
+                    </ris:quellen>
+                    <ris:streitjahre domainTerm="Streitjahre">
+                      <ris:streitjahr domainTerm="Streitjahr">2024</ris:streitjahr>
+                    </ris:streitjahre>
+                    <ris:berufsbilder domainTerm="Berufsbilder">
+                      <ris:berufsbild domainTerm="Berufsbild">jobProfile test</ris:berufsbild>
+                    </ris:berufsbilder>
+                    <ris:kuendigungsgruende domainTerm="Kündigungsgründe">
+                  <ris:kuendigungsgrund domainTerm="Kündigungsgrund">dismissalGround test</ris:kuendigungsgrund>
+                    </ris:kuendigungsgruende>
+                    <ris:kuendigungsarten domainTerm="Kündigungsarten">
+                  <ris:kuendigungsart domainTerm="Kündigungsart">dismissalType test</ris:kuendigungsart>
+                    </ris:kuendigungsarten>
+                    <ris:gesetzgebungsauftrag domainTerm="Gesetzgebungsauftrag">Ja</ris:gesetzgebungsauftrag>
+                    <ris:notiz domainTerm="Notiz">note test</ris:notiz>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>

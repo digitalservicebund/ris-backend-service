@@ -195,16 +195,11 @@ public abstract class DecisionCommonLdmlTransformer
       // Dokumenttyp
       builder.dokumentTyp(DokumentTyp.builder().value(coreData.documentType().label()).build());
 
-      // Gericht (Gerichtstyp + Ort)
+      // Gericht
       Court court = coreData.court();
       if (court != null) {
         Gericht.GerichtBuilder gerichtBuilder =
-            Gericht.builder()
-                .refersTo("#gericht")
-                .typ(Gericht.GerichtTyp.builder().value(court.type()).build());
-        if (Boolean.FALSE.equals(court.isSuperiorCourt()) && court.location() != null) {
-          gerichtBuilder.ort(Gericht.GerichtOrt.builder().value(court.location()).build());
-        }
+            buildGericht(court).toBuilder().refersTo("#gericht");
         if (isNotBlank(coreData.appraisalBody())) {
           gerichtBuilder.spruchkoerper(
               Gericht.Spruchkoerper.builder().value(coreData.appraisalBody()).build());

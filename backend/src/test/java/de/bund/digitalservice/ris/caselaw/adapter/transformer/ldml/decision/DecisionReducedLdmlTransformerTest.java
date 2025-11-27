@@ -203,6 +203,7 @@ class DecisionReducedLdmlTransformerTest {
                             .isForeignCourt(false)
                             .label("courtLabel test")
                             .type("courtType")
+                            .jurisdictionType("jurisdictionType")
                             .location("courtLocation")
                             .regions(List.of("NW"))
                             .build())

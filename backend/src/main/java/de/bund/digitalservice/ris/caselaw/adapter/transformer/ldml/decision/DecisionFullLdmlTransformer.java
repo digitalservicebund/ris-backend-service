@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.A
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDokumentnummern;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeEclis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Berufsbilder;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DatenDerMuendlichenVerhandlung;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Definitionen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentRef;
@@ -26,13 +27,19 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.E
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Evsf;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FehlerhafteGerichte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FremdsprachigeFassungen;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gesetzgebungsauftrag;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.HerkunftDerUebersetzungen;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Kuendigungsarten;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Kuendigungsgruende;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Notiz;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Quellen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtskraft;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtsmittel;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtsmittelzulassung;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Sachgebiete;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Streitjahre;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Tarifvertraege;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Vorgaenge;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -131,6 +138,24 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         builder.tarifvertraege(tarifvertraege);
       }
 
+      // Berufsbild
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.jobProfiles())) {
+        var berufsbilder = buildBerufsbilder(contentRelatedIndexing);
+        builder.berufsbilder(berufsbilder);
+      }
+
+      // Kündigungsart
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.dismissalTypes())) {
+        var kuendigungsarten = buildKuendigungsarten(contentRelatedIndexing);
+        builder.kuendigungsarten(kuendigungsarten);
+      }
+
+      // Kündigungsgrund
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.dismissalGrounds())) {
+        var kuendigungsgruende = buildKuendigungsgruende(contentRelatedIndexing);
+        builder.kuendigungsgruende(kuendigungsgruende);
+      }
+
       // Fremdsprachige Fassungen
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.foreignLanguageVersions())) {
         var fremdsprachigeFassungen = buildFremdsprachigeFassung(contentRelatedIndexing);
@@ -197,6 +222,29 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         var eingangsarten = buildEingangsarten(coreData);
         builder.eingangsarten(eingangsarten);
       }
+
+      // Quelle
+      if (!CollectionUtils.isEmpty(coreData.sources())) {
+        var quellen = buildQuellen(coreData);
+        builder.quellen(quellen);
+      }
+
+      // Streitjahr
+      if (!CollectionUtils.isEmpty(coreData.yearsOfDispute())) {
+        var streitjahre = buildStreitjahre(coreData);
+        builder.streitjahre(streitjahre);
+      }
+
+      // Gesetzgebungsauftrag
+      if (isNotBlank(coreData.legalEffect())) {
+        builder.gesetzgebungsauftrag(
+            Gesetzgebungsauftrag.builder().value(coreData.legalEffect()).build());
+      }
+    }
+
+    // Notiz
+    if (isNotBlank(decision.note())) {
+      builder.notiz(Notiz.builder().content(decision.note()).build());
     }
 
     return builder.build();
@@ -445,6 +493,40 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         .build();
   }
 
+  private Berufsbilder buildBerufsbilder(ContentRelatedIndexing contentRelatedIndexing) {
+    return Berufsbilder.builder()
+        .berufsbilder(
+            contentRelatedIndexing.jobProfiles().stream()
+                .map(jobProfile -> Berufsbilder.Berufsbild.builder().value(jobProfile).build())
+                .toList())
+        .build();
+  }
+
+  private Kuendigungsarten buildKuendigungsarten(ContentRelatedIndexing contentRelatedIndexing) {
+    return Kuendigungsarten.builder()
+        .kuendigungsarten(
+            contentRelatedIndexing.dismissalTypes().stream()
+                .map(
+                    dismissalType ->
+                        Kuendigungsarten.Kuendigungsart.builder().value(dismissalType).build())
+                .toList())
+        .build();
+  }
+
+  private Kuendigungsgruende buildKuendigungsgruende(
+      ContentRelatedIndexing contentRelatedIndexing) {
+    return Kuendigungsgruende.builder()
+        .kuendigungsgruende(
+            contentRelatedIndexing.dismissalGrounds().stream()
+                .map(
+                    dismissalGround ->
+                        Kuendigungsgruende.Kuendigungsgrund.builder()
+                            .value(dismissalGround)
+                            .build())
+                .toList())
+        .build();
+  }
+
   private FremdsprachigeFassungen buildFremdsprachigeFassung(
       ContentRelatedIndexing contentRelatedIndexing) {
     return FremdsprachigeFassungen.builder()
@@ -629,6 +711,26 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
             coreData.inputTypes().stream()
                 .map(
                     eingangsart -> Eingangsarten.Eingangsart.builder().content(eingangsart).build())
+                .toList())
+        .build();
+  }
+
+  private Quellen buildQuellen(CoreData coreData) {
+    return Quellen.builder()
+        .quellen(
+            coreData.sources().stream()
+                .map(source -> Quellen.Quelle.builder().value(source.toString()).build())
+                .toList())
+        .build();
+  }
+
+  private Streitjahre buildStreitjahre(CoreData coreData) {
+    return Streitjahre.builder()
+        .streitjahre(
+            coreData.yearsOfDispute().stream()
+                .map(
+                    yearOfDispute ->
+                        Streitjahre.Streitjahr.builder().value(yearOfDispute.toString()).build())
                 .toList())
         .build();
   }

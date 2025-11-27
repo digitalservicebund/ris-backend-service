@@ -18,7 +18,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Othe
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DokumentTyp;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumentationsstelle;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gericht;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Regionen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
@@ -109,12 +108,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
       // Gericht (Gerichtstyp + Ort)
       Court court = coreData.court();
       if (court != null) {
-        builder.gericht(
-            Gericht.builder()
-                .refersTo("#gericht")
-                .typ(Gericht.GerichtTyp.builder().value(court.type()).build())
-                .ort(Gericht.GerichtOrt.builder().value(court.location()).build())
-                .build());
+        builder.gericht(buildGericht(court).toBuilder().refersTo("#gericht").build());
       }
 
       // Regionen
