@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -494,6 +494,25 @@ class PortalPublicationServiceTest {
         verify(documentationUnitRepository)
             .updatePortalPublicationStatus(
                 testDocumentUnit.uuid(), PortalPublicationStatus.WITHDRAWN);
+        verify(documentationUnitRepository, never())
+            .savePublicationDateTime(testDocumentUnit.uuid());
+      }
+
+      @Test
+      void withdraw_withNonExistingDocUnit_shouldDeleteFromBucket()
+          throws DocumentationUnitNotExistsException {
+        when(documentationUnitRepository.findByDocumentNumber(testDocumentUnit.documentNumber()))
+            .thenThrow(DocumentationUnitNotExistsException.class);
+        when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+            .thenReturn(List.of(withPrefix(testDocumentNumber)));
+
+        var result = subject.withdrawDocumentationUnit(testDocumentNumber);
+
+        assertThat(result.changedPaths()).isEmpty();
+        assertThat(result.deletedPaths()).containsExactly(withPrefix(testDocumentNumber));
+
+        verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
+        verify(documentationUnitRepository, never()).updatePortalPublicationStatus(any(), any());
         verify(documentationUnitRepository, never())
             .savePublicationDateTime(testDocumentUnit.uuid());
       }
