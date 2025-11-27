@@ -129,10 +129,18 @@ public class PortalPublicationService {
    */
   public PortalPublicationResult withdrawDocumentationUnit(String documentNumber)
       throws DocumentationUnitNotExistsException {
-    DocumentationUnit documentationUnit =
-        documentationUnitRepository.findByDocumentNumber(documentNumber);
     var result = withdraw(documentNumber);
-    updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.WITHDRAWN, null);
+    try {
+      DocumentationUnit documentationUnit =
+          documentationUnitRepository.findByDocumentNumber(documentNumber);
+      updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.WITHDRAWN, null);
+    } catch (DocumentationUnitNotExistsException e) {
+      log.atInfo()
+          .setMessage(
+              "Withdrawn documentation unit cannot be found in database. Likely, it was deleted by the migration or manually in the database. Portal publication status update skipped.")
+          .addKeyValue("documentNumber", documentNumber)
+          .log();
+    }
     return result;
   }
 
