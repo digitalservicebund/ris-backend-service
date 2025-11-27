@@ -47,7 +47,9 @@ describe("ObjectValueInput", () => {
 
     expect(screen.getByTestId("object-value-amount")).toBeInTheDocument()
     expect(screen.getByTestId("object-value-currency")).toBeInTheDocument()
-    expect(screen.getByTestId("object-value-proceeding")).toBeInTheDocument()
+    expect(
+      screen.getByTestId("object-value-proceeding-type"),
+    ).toBeInTheDocument()
   })
 
   it("disables 'Übernehmen' button with empty input", async () => {
@@ -70,12 +72,8 @@ describe("ObjectValueInput", () => {
       } as ObjectValue,
     })
 
-    const amount = screen.getByRole("textbox", {
-      name: /betrag/i,
-    })
-    const currency = screen.getByRole("textbox", {
-      name: /währung/i,
-    })
+    const amount = screen.getByLabelText("Betrag", { exact: true })
+    const currency = screen.getByLabelText("Währung", { exact: true })
 
     // Assert
     expect(amount).toHaveValue("")
@@ -99,15 +97,12 @@ describe("ObjectValueInput", () => {
         } as CurrencyCode,
       } as ObjectValue,
     })
-    const amount = screen.getByRole("textbox", {
-      name: /betrag/i,
-    })
-    const currency = screen.getByRole("textbox", {
-      name: /währung/i,
-    })
+
+    const amount = screen.getByLabelText("Betrag", { exact: true })
+    const currency = screen.getByLabelText("Währung", { exact: true })
 
     // Assert
-    expect(amount).toHaveValue("10000")
+    expect(amount).toHaveValue("10.000")
     expect(currency).toHaveValue("Euro (EUR)")
     expect(
       screen.getByRole("button", {
@@ -145,6 +140,7 @@ describe("ObjectValueInput", () => {
     const { user, emitted } = renderComponent({
       modelValue: {
         id: "id",
+        amount: 10000,
         currencyCode: {
           id: "id",
           label: "Euro (EUR)",

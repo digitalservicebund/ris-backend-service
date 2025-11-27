@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
+import InputNumber, { InputNumberInputEvent } from "primevue/inputnumber"
 import InputSelect from "primevue/select"
 import { computed, onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import MonetaryInput from "@/components/input/MonetaryInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { proceedingType } from "@/data/proceedingType"
 import ObjectValue from "@/domain/objectValue"
@@ -40,10 +40,12 @@ function validate() {
   if (objectValue.value.isEmpty) {
     validationStore.reset()
   } else {
-    if (objectValue.value.amount && isSixDigitNumber.value) {
-      validationStore.remove("amount")
-    } else if (objectValue.value.amount && !isSixDigitNumber.value) {
-      validationStore.add("Max. 6 Zeichen", "amount")
+    if (objectValue.value.amount) {
+      if (isSixDigitNumber.value) {
+        validationStore.remove("amount")
+      } else {
+        validationStore.add("Max. 6 Zeichen", "amount")
+      }
     } else {
       validationStore.add("Pflichtfeld nicht befüllt", "amount")
     }
@@ -53,6 +55,10 @@ function validate() {
       validationStore.add("Pflichtfeld nicht befüllt", "currencyCode")
     }
   }
+}
+
+function onInput(event: InputNumberInputEvent) {
+  objectValue.value.amount = event.value as number
 }
 
 watch(objectValue, () => validate(), { deep: true })
@@ -83,7 +89,7 @@ onMounted(() => {
 <template>
   <div class="flex flex-col gap-24">
     <div class="flex flex-row gap-24">
-      <div>
+      <div class="basis-1/3">
         <InputField
           id="objectValueAmount"
           v-slot="slotProps"
@@ -91,14 +97,21 @@ onMounted(() => {
           label="Betrag *"
           :validation-error="validationStore.getByField('amount')"
         >
-          <MonetaryInput
+          <InputNumber
             :id="slotProps.id"
             v-model="objectValue.amount"
             aria-label="Betrag"
-            :has-error="slotProps.hasError"
+            class="w-full"
+            data-testid="object-value-amount-input"
+            fluid
+            input-class="w-full"
+            :invalid="slotProps.hasError"
+            locale="de"
+            :min="1"
             @blur="validate"
             @focus="validationStore.remove('amount')"
-          ></MonetaryInput>
+            @input="onInput"
+          />
         </InputField>
       </div>
       <div class="basis-1/3">
@@ -131,6 +144,7 @@ onMounted(() => {
             :id="id"
             v-model="objectValue.proceedingType"
             aria-label="Verfahren"
+            data-testid="object-value-proceeding-type-input"
             fluid
             option-label="label"
             option-value="value"

@@ -40,7 +40,7 @@ test.describe(
         "object-value-currency-input",
       )
       const proceedingInput = otherCategoriesContainer.getByTestId(
-        "object-value-proceeding-input",
+        "object-value-proceeding-type-input",
       )
 
       const acceptButton = otherCategoriesContainer.getByLabel(
@@ -74,9 +74,13 @@ test.describe(
       })
 
       await test.step("'Betrag *' und 'Währung *' ausfüllen", async () => {
-        await fillCombobox(page, "Währung", "Euro (EUR)")
-        await amountInput.locator("input").fill("10000")
+        const input = page.getByLabel("Betrag", { exact: true })
+        await input.fill("10000")
         await page.keyboard.press("Enter")
+        await expect(page.getByLabel("Betrag", { exact: true })).toHaveValue(
+          "10.000",
+        )
+        await fillCombobox(page, "Währung", "Euro (EUR)")
       })
 
       await test.step("Mit Pflichtfeldern kann übernommen werden", async () => {
@@ -90,7 +94,7 @@ test.describe(
       await test.step("Zusammenfassung wird angezeigt", async () => {
         await expect(
           otherCategoriesContainer.getByText(
-            "10.000 EUR, Verfassungsbeschwerde",
+            "10.000 Euro (EUR), Verfassungsbeschwerde",
           ),
         ).toBeVisible()
       })
@@ -99,7 +103,7 @@ test.describe(
         await navigateToPreview(page, prefilledDocumentUnit.documentNumber)
         await expect(page.getByText("Gegenstandswert")).toBeVisible()
         await expect(
-          page.getByText("10.000 EUR, Verfassungsbeschwerde"),
+          page.getByText("10.000 Euro (EUR), Verfassungsbeschwerde"),
         ).toBeVisible()
       })
 
