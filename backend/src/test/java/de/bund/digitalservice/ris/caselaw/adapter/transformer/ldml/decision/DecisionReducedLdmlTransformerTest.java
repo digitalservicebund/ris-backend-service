@@ -34,6 +34,11 @@ import de.bund.digitalservice.ris.caselaw.domain.Source;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.TranslationType;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealStatus;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealWithdrawal;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.Appellant;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.PkhPlaintiff;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
@@ -389,6 +394,27 @@ class DecisionReducedLdmlTransformerTest {
                     .evsf("evsf test")
                     .appealAdmission(
                         AppealAdmission.builder().admitted(true).by(AppealAdmitter.FG).build())
+                    .appeal(
+                        Appeal.builder()
+                            .appellants(
+                                List.of(
+                                    Appellant.builder().value("Kläger").build(),
+                                    Appellant.builder().value("Beklagter").build()))
+                            .revisionPlaintiffStatuses(
+                                List.of(AppealStatus.builder().value("unzulässig").build()))
+                            .revisionDefendantStatuses(
+                                List.of(AppealStatus.builder().value("unzulässig").build()))
+                            .jointRevisionPlaintiffStatuses(
+                                List.of(AppealStatus.builder().value("unzulässig").build()))
+                            .jointRevisionDefendantStatuses(
+                                List.of(AppealStatus.builder().value("unzulässig").build()))
+                            .nzbPlaintiffStatuses(
+                                List.of(AppealStatus.builder().value("unzulässig").build()))
+                            .nzbDefendantStatuses(
+                                List.of(AppealStatus.builder().value("unzulässig").build()))
+                            .appealWithdrawal(AppealWithdrawal.JA)
+                            .pkhPlaintiff(PkhPlaintiff.NEIN)
+                            .build())
                     .build())
             .previousDecisions(List.of(previousDecision1, previousDecision2))
             .ensuingDecisions(List.of(ensuingDecision1, ensuingDecision2))

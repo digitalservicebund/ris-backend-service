@@ -29,6 +29,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.F
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.HerkunftDerUebersetzungen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtskraft;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtsmittel;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Rechtsmittelzulassung;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Sachgebiete;
@@ -38,6 +39,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -116,6 +118,12 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       // Rechtsmittelzulassung
       var rechtsmittelzulassung = buildRechtsmittelzulassung(contentRelatedIndexing);
       builder.rechtsmittelzulassung(rechtsmittelzulassung);
+
+      // Rechtsmittel
+      if (contentRelatedIndexing.appeal() != null) {
+        var rechtsmittel = buildRechtsmittel(contentRelatedIndexing.appeal());
+        builder.rechtsmittel(rechtsmittel);
+      }
 
       // Tarifvertrag
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.collectiveAgreements())) {
@@ -338,6 +346,61 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
             });
 
     return result.get();
+  }
+
+  private Rechtsmittel buildRechtsmittel(Appeal appeal) {
+    var builder = Rechtsmittel.builder();
+    if (!CollectionUtils.isEmpty(appeal.appellants())) {
+      builder.rechtsmittelfuehrer(
+          appeal.appellants().stream()
+              .map(appellant -> new Rechtsmittel.Rechtsmittelfuehrer(appellant.value()))
+              .toList());
+    }
+    if (!CollectionUtils.isEmpty(appeal.revisionPlaintiffStatuses())) {
+      builder.revisionKlaeger(
+          appeal.revisionPlaintiffStatuses().stream()
+              .map(status -> new Rechtsmittel.RevisionKlaeger(status.value()))
+              .toList());
+    }
+    if (!CollectionUtils.isEmpty(appeal.revisionDefendantStatuses())) {
+      builder.revisionBeklagte(
+          appeal.revisionDefendantStatuses().stream()
+              .map(status -> new Rechtsmittel.RevisionBeklagter(status.value()))
+              .toList());
+    }
+    if (!CollectionUtils.isEmpty(appeal.jointRevisionPlaintiffStatuses())) {
+      builder.anschlussRevisionKlaeger(
+          appeal.jointRevisionPlaintiffStatuses().stream()
+              .map(status -> new Rechtsmittel.AnschlussRevisionKlaeger(status.value()))
+              .toList());
+    }
+    if (!CollectionUtils.isEmpty(appeal.jointRevisionDefendantStatuses())) {
+      builder.anschlussRevisionBeklagte(
+          appeal.jointRevisionDefendantStatuses().stream()
+              .map(status -> new Rechtsmittel.AnschlussRevisionBeklagter(status.value()))
+              .toList());
+    }
+    if (!CollectionUtils.isEmpty(appeal.nzbPlaintiffStatuses())) {
+      builder.nzbKlaeger(
+          appeal.nzbPlaintiffStatuses().stream()
+              .map(status -> new Rechtsmittel.NzbKlaeger(status.value()))
+              .toList());
+    }
+    if (!CollectionUtils.isEmpty(appeal.nzbDefendantStatuses())) {
+      builder.nzbBeklagte(
+          appeal.nzbDefendantStatuses().stream()
+              .map(status -> new Rechtsmittel.NzbBeklagter(status.value()))
+              .toList());
+    }
+    if (appeal.appealWithdrawal() != null) {
+      builder.zuruecknahmeDerRevision(
+          new Rechtsmittel.ZuruecknahmeDerRevision(appeal.appealWithdrawal().humanReadable));
+    }
+    if (appeal.pkhPlaintiff() != null) {
+      builder.pkhAntragKlaeger(
+          new Rechtsmittel.PkhAntragKlaeger(appeal.pkhPlaintiff().humanReadable));
+    }
+    return builder.build();
   }
 
   private Tarifvertraege buildTarifvertraege(ContentRelatedIndexing contentRelatedIndexing) {
