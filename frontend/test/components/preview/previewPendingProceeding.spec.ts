@@ -33,7 +33,7 @@ function renderComponent() {
                         jurisdictionType: "Verfassungsgerichtsbarkeit",
                         regions: ["DEU"],
                       },
-                      courtBranchLocation: "Augsburg",
+                      courtBranchLocation: { value: "Augsburg", id: "1" },
                       leadingDecisionNormReferences: [
                         "NSW WEG $ 14 (BGH-intern)",
                       ],

@@ -29,7 +29,7 @@ describe("preview core data", () => {
       },
       leadingDecisionNormReferences: ["NSW WEG $ 14 (BGH-intern)"],
       deviatingCourts: ["BGH"],
-      courtBranchLocation: "Augsburg",
+      courtBranchLocation: { value: "Augsburg", id: "1" },
       deviatingDocumentNumbers: ["XXRE123456789"],
       fileNumbers: ["abc-123"],
       deviatingFileNumbers: ["cde-456"],
@@ -731,7 +731,7 @@ describe("preview core data", () => {
     [
       "Sitz der Außenstelle",
       {
-        courtBranchLocation: "Augsburg",
+        courtBranchLocation: { value: "Augsburg", id: "1" },
       },
       [
         "Fehlerhaftes Gericht",

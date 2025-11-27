@@ -1,4 +1,5 @@
 import { Court } from "@/domain/court"
+import { CourtBranchLocation } from "@/domain/courtBranchLocation"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentType } from "@/domain/documentType"
 import { Procedure } from "@/domain/procedure"
@@ -11,7 +12,7 @@ export type CoreData = {
   deviatingFileNumbers?: string[]
   court?: Court
   deviatingCourts?: string[]
-  courtBranchLocation?: string
+  courtBranchLocation?: CourtBranchLocation
   documentType?: DocumentType
   procedure?: Procedure
   previousProcedures?: string[]

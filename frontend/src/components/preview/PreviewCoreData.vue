@@ -50,7 +50,7 @@ const dateLabel = computed(() => {
     <PreviewRow v-if="coreData.courtBranchLocation">
       <PreviewCategory>Sitz der Außenstelle</PreviewCategory>
       <PreviewContent>
-        {{ coreData.courtBranchLocation }}
+        {{ coreData.courtBranchLocation?.value }}
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="coreData.fileNumbers && coreData.fileNumbers.length > 0">

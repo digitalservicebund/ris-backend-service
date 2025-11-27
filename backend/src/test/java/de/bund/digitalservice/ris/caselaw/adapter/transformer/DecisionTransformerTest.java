@@ -79,6 +79,7 @@ import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealWithdrawal;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.PkhPlaintiff;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.CourtBranchLocation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
@@ -2153,7 +2154,7 @@ class DecisionTransformerTest {
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
 
     assertThat(decision.coreData().courtBranchLocation()).isNotNull();
-    assertThat(decision.coreData().courtBranchLocation()).isEqualTo("Augsburg");
+    assertThat(decision.coreData().courtBranchLocation().value()).isEqualTo("Augsburg");
   }
 
   @Test
@@ -2169,7 +2170,10 @@ class DecisionTransformerTest {
   void transformToDTO_withCourtBranchLocation_shouldAddCourtBranchLocation() {
     Decision decision =
         Decision.builder()
-            .coreData(CoreData.builder().courtBranchLocation("Augsburg").build())
+            .coreData(
+                CoreData.builder()
+                    .courtBranchLocation(CourtBranchLocation.builder().value("Augsburg").build())
+                    .build())
             .build();
 
     DecisionDTO decisionDTO =

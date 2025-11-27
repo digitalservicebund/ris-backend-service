@@ -1,24 +1,38 @@
 <script lang="ts" setup>
 import InputSelect from "primevue/select"
-import { computed, onMounted, ref, watch } from "vue"
+import { computed } from "vue"
 import InputField from "@/components/input/InputField.vue"
 import { coreDataLabels } from "@/domain/coreData"
-import { Court } from "@/domain/court"
-import courtService from "@/services/courtService"
+import { CourtBranchLocation } from "@/domain/courtBranchLocation"
 
 const props = defineProps<{
-  court?: Court
-  modelValue?: string
+  courtBranchLocations?: CourtBranchLocation[]
+  modelValue?: CourtBranchLocation
 }>()
 
 const emit = defineEmits<{
-  "update:modelValue": [value?: string]
+  "update:modelValue": [value?: CourtBranchLocation]
 }>()
-
-const options = ref<string[] | undefined>()
 
 const hasOptions = computed(
   () => options.value !== undefined && options.value.length > 0,
+)
+
+const options = computed(() => {
+  if (hasInvalidOptionSelected.value) {
+    return props.courtBranchLocations
+      ? [...props.courtBranchLocations, props.modelValue]
+      : [props.modelValue]
+  } else return props.courtBranchLocations
+})
+
+const hasInvalidOptionSelected = computed(
+  () =>
+    props.modelValue &&
+    (!props.courtBranchLocations ||
+      !props.courtBranchLocations.some(
+        (option) => option.id === props.modelValue?.id,
+      )),
 )
 
 const branchLocation = computed({
@@ -26,37 +40,9 @@ const branchLocation = computed({
     return props.modelValue
   },
 
-  set: (newValue: string) => {
+  set: (newValue: CourtBranchLocation) => {
     emit("update:modelValue", newValue)
   },
-})
-
-async function loadOptions() {
-  if (props.court?.type) {
-    const branchLocationsResponse = await courtService.getBranchLocations(
-      props.court.type,
-      props.court.location,
-    )
-    if (branchLocationsResponse.data) {
-      options.value = branchLocationsResponse.data
-    }
-  } else {
-    options.value = undefined
-  }
-}
-
-watch(
-  () => props.court,
-  async () => {
-    await loadOptions()
-    if (!props.court) {
-      emit("update:modelValue", undefined)
-    }
-  },
-)
-
-onMounted(async () => {
-  await loadOptions()
 })
 </script>
 
@@ -65,6 +51,14 @@ onMounted(async () => {
     id="branchLocation"
     v-slot="{ id }"
     :label="coreDataLabels.courtBranchLocation"
+    :validation-error="
+      hasInvalidOptionSelected
+        ? {
+            message: 'Gehört nicht zum ausgewählten Gericht',
+            instance: 'branchLocation',
+          }
+        : undefined
+    "
   >
     <InputSelect
       :id="id"
@@ -72,6 +66,7 @@ onMounted(async () => {
       :aria-label="coreDataLabels.courtBranchLocation"
       :disabled="!hasOptions"
       fluid
+      option-label="value"
       :options="options"
       placeholder="Bitte auswählen"
       :show-clear="branchLocation !== undefined"

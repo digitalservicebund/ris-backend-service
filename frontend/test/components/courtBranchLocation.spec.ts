@@ -1,134 +1,107 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { http, HttpResponse } from "msw"
-import { setupServer } from "msw/node"
-import { describe, vi } from "vitest"
-import { createRouter, createWebHistory } from "vue-router"
+import { describe } from "vitest"
+import CourtBranchLocationComponent from "@/components/CourtBranchLocation.vue"
+import { CourtBranchLocation } from "@/domain/courtBranchLocation"
 
-import CourtBranchLocation from "@/components/CourtBranchLocation.vue"
-import { Court } from "@/domain/court"
-import routes from "~/test-helper/routes"
-
-const server = setupServer(
-  http.get("/api/v1/caselaw/courts/branchlocations", ({ request }) => {
-    const type = new URL(request.url).searchParams.get("type")
-    if (type === "FG") {
-      return HttpResponse.json(["Augsburg", "Kammer Ingolstadt"])
-    } else {
-      return HttpResponse.json([])
-    }
-  }),
-)
-
-function renderComponent(court?: Court, modelValue?: string) {
+function renderComponent(
+  courtBranchLocations?: CourtBranchLocation[],
+  modelValue?: CourtBranchLocation,
+) {
   const user = userEvent.setup()
 
-  const router = createRouter({
-    history: createWebHistory(),
-    routes: routes,
-  })
   return {
     user,
-    ...render(CourtBranchLocation, {
-      props: { court: court, modelValue: modelValue ?? "" },
-      global: {
-        plugins: [[router]],
+    ...render(CourtBranchLocationComponent, {
+      props: {
+        courtBranchLocations: courtBranchLocations,
+        modelValue: modelValue,
       },
     }),
   }
 }
 
 describe("court branch location", () => {
-  beforeAll(() => server.listen())
-  afterAll(() => server.close())
-  beforeEach(() => {
-    vi.resetModules()
-    vi.resetAllMocks()
-  })
-  describe("without court", () => {
-    it("should show placeholder, be disabled and emit undefined model value", async () => {
-      const { emitted } = renderComponent()
-      // Need to wait for Wertetabelle to be loaded in OnMounted
-      await new Promise((resolve) => setTimeout(resolve, 0))
-
-      expect(
-        screen.getByRole("combobox", { name: "Sitz der Außenstelle" }),
-      ).toHaveTextContent("Bitte auswählen")
-
-      expect(
-        screen.getByRole("combobox", { name: "Sitz der Außenstelle" }),
-      ).toHaveAttribute("aria-disabled", "true")
-
-      expect(emitted()["update:modelValue"]).toBeUndefined()
-    })
-  })
-
-  describe("with court that has branch locations", () => {
-    it("display options in dropdown and select one", async () => {
-      const { user, emitted } = renderComponent({
-        label: "FG München",
-        type: "FG",
-        location: "München",
+  describe("with branch locations", () => {
+    describe("with model value", () => {
+      it("display model value without warning", async () => {
+        renderComponent([{ value: "Augsburg", id: "1" }], {
+          value: "Augsburg",
+          id: "1",
+        })
+        expect(
+          screen.getByRole("combobox", { name: "Sitz der Außenstelle" }),
+        ).toHaveTextContent("Augsburg")
       })
-      // Need to wait for Wertetabelle to be loaded in OnMounted
-      await new Promise((resolve) => setTimeout(resolve, 0))
 
-      expect(
-        screen.getByRole("combobox", { name: "Sitz der Außenstelle" }),
-      ).toHaveTextContent("Bitte auswählen")
-
-      await user.click(
-        screen.getByRole("combobox", { name: "Sitz der Außenstelle" }),
-      )
-      expect(screen.getByLabelText("Augsburg")).toBeInTheDocument()
-      expect(screen.getByLabelText("Kammer Ingolstadt")).toBeInTheDocument()
-
-      await user.click(screen.getByLabelText("Augsburg"))
-
-      expect(screen.queryByLabelText("Sitz der Außenstelle")).toHaveTextContent(
-        "Augsburg",
-      )
-      expect(emitted()["update:modelValue"]).toEqual([["Augsburg"]])
-    })
-  })
-
-  describe("with court that has no branch locations", () => {
-    it("should show placeholder, be disabled and emit undefined model value", async () => {
-      const { emitted } = renderComponent({
-        label: "BFH",
-        type: "BFH",
+      it("display model value with warning if not part of branch locations", async () => {
+        renderComponent([{ value: "Ingolstadt", id: "2" }], {
+          value: "Augsburg",
+          id: "1",
+        })
+        expect(
+          screen.getByRole("combobox", { name: "Sitz der Außenstelle" }),
+        ).toHaveTextContent("Augsburg")
+        expect(
+          screen.getByText("Gehört nicht zum ausgewählten Gericht"),
+        ).toBeVisible()
       })
-      // Need to wait for Wertetabelle to be loaded in OnMounted
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
 
-      expect(
-        screen.getByRole("combobox", { name: "Sitz der Außenstelle" }),
-      ).toHaveTextContent("Bitte auswählen")
+    describe("without model value", () => {
+      it("display options in dropdown and select one", async () => {
+        const { user, emitted } = renderComponent([
+          { value: "Augsburg", id: "1" },
+          { value: "Kammer Ingolstadt", id: "2" },
+        ])
 
-      expect(
-        screen.getByRole("combobox", { name: "Sitz der Außenstelle" }),
-      ).toHaveAttribute("aria-disabled", "true")
+        expect(
+          screen.getByRole("combobox", { name: "Sitz der Außenstelle" }),
+        ).toHaveTextContent("Bitte auswählen")
 
-      expect(emitted()["update:modelValue"]).toBeUndefined()
+        await user.click(
+          screen.getByRole("combobox", { name: "Sitz der Außenstelle" }),
+        )
+        expect(screen.getByLabelText("Augsburg")).toBeInTheDocument()
+        expect(screen.getByLabelText("Kammer Ingolstadt")).toBeInTheDocument()
+
+        await user.click(screen.getByLabelText("Augsburg"))
+
+        expect(
+          screen.queryByLabelText("Sitz der Außenstelle"),
+        ).toHaveTextContent("Augsburg")
+        expect(emitted()["update:modelValue"]).toEqual([
+          [{ value: "Augsburg", id: "1" }],
+        ])
+      })
     })
   })
 
-  describe("with model value", () => {
-    it("display model value", async () => {
-      renderComponent(
-        {
-          label: "FG München",
-          type: "FG",
-          location: "München",
-        },
-        "Augsburg",
-      )
-      // Need to wait for Wertetabelle to be loaded in OnMounted
-      await new Promise((resolve) => setTimeout(resolve, 0))
+  describe("without branch locations", () => {
+    describe("with model value", () => {
+      it("display model value with warning", async () => {
+        renderComponent([], { value: "Augsburg", id: "1" })
+        expect(
+          screen.getByRole("combobox", { name: "Sitz der Außenstelle" }),
+        ).toHaveTextContent("Augsburg")
+        expect(
+          screen.getByText("Gehört nicht zum ausgewählten Gericht"),
+        ).toBeVisible()
+      })
+    })
+    describe("without model value", () => {
+      it("show placeholder, be disabled and emit undefined model value", async () => {
+        const { emitted } = renderComponent()
+        expect(
+          screen.getByRole("combobox", { name: "Sitz der Außenstelle" }),
+        ).toHaveTextContent("Bitte auswählen")
 
-      expect(
-        screen.getByRole("combobox", { name: "Sitz der Außenstelle" }),
-      ).toHaveTextContent("Augsburg")
+        expect(
+          screen.getByRole("combobox", { name: "Sitz der Außenstelle" }),
+        ).toHaveAttribute("aria-disabled", "true")
+
+        expect(emitted()["update:modelValue"]).toBeUndefined()
+      })
     })
   })
 })

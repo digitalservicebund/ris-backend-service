@@ -487,7 +487,7 @@ describe("HandoverDocumentationUnitView:", () => {
               location: "location",
               label: "label",
             },
-            courtBranchLocation: "Augsburg",
+            courtBranchLocation: { value: "Augsburg", id: "1" },
             decisionDate: "2022-02-01",
             legalEffect: "legalEffect",
             documentType: {

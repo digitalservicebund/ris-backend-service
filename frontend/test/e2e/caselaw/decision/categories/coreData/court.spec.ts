@@ -278,7 +278,7 @@ test.describe("court", () => {
 
   test(
     "court branch location",
-    { tag: ["@RISDEV-3081"] },
+    { tag: ["@RISDEV-8805"] },
     async ({ page, documentNumber }) => {
       await navigateToCategories(page, documentNumber)
 
@@ -327,28 +327,43 @@ test.describe("court", () => {
         await expect(page.getByText("Sitz der Außenstelle")).toBeVisible()
       })
 
-      await test.step("changing court removes court branch location and disables dropdown", async () => {
+      await test.step("changing to court without branch locations does not remove branch location, shows warning", async () => {
         await navigateToCategories(page, documentNumber)
         await selectCourt(page, "BGH")
         await save(page)
 
         await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
-          "Bitte auswählen",
+          "Kammern Bremen",
         )
-        await expect(page.getByLabel("Sitz der Außenstelle")).toBeDisabled()
+        await expect(
+          page.getByText("Gehört nicht zum ausgewählten Gericht"),
+        ).toBeVisible()
+      })
+
+      await test.step("changing to different court with other branch locations does not remove branch location, shows warning", async () => {
+        await selectCourt(page, "VG Hannover")
+        await save(page)
+
+        await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
+          "Kammern Bremen",
+        )
+        await expect(
+          page.getByText("Gehört nicht zum ausgewählten Gericht"),
+        ).toBeVisible()
+
+        await page.getByLabel("Sitz der Außenstelle").click()
+        await expect(
+          page.getByRole("option", { name: "Kammern Bremen" }),
+        ).toBeVisible()
+        await expect(
+          page.getByRole("option", { name: "Hildesheim" }),
+        ).toBeVisible()
+        await expect(
+          page.getByRole("option", { name: "Osnabrück" }),
+        ).toBeVisible()
       })
 
       await test.step("remove court branch location", async () => {
-        await selectCourt(page, "FG München")
-        await page.getByLabel("Sitz der Außenstelle").click()
-        await expect(page.getByText("Augsburg")).toBeVisible()
-        await page.getByText("Augsburg").click()
-        await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
-          "Augsburg",
-        )
-
-        await save(page)
-
         await page.locator("#branchLocation svg").first().click() // delete icon
         await expect(page.getByLabel("Sitz der Außenstelle")).toHaveText(
           "Bitte auswählen",
@@ -363,8 +378,8 @@ test.describe("court", () => {
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
       courtName,
     )
-    await expect(page.getByText(courtName)).toBeVisible()
-    await page.getByText(courtName).click()
+    await expect(page.getByText(courtName, { exact: true })).toBeVisible()
+    await page.getByText(courtName, { exact: true }).click()
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
       courtName,
     )

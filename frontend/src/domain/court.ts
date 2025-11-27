@@ -1,3 +1,4 @@
+import { CourtBranchLocation } from "@/domain/courtBranchLocation"
 import DocumentationOffice from "@/domain/documentationOffice"
 
 export type Court = {
@@ -10,5 +11,5 @@ export type Court = {
   responsibleDocOffice?: DocumentationOffice
   isSuperiorCourt?: boolean
   isForeignCourt?: boolean
-  branchLocations?: string[]
+  courtBranchLocations?: CourtBranchLocation[]
 }

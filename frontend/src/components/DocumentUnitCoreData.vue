@@ -266,7 +266,7 @@ onBeforeUnmount(() => {
           </InputField>
           <CourtBranchLocation
             v-model="coreDataModel.courtBranchLocation"
-            :court="coreDataModel.court"
+            :court-branch-locations="coreDataModel.court?.courtBranchLocations"
           />
         </div>
       </template>

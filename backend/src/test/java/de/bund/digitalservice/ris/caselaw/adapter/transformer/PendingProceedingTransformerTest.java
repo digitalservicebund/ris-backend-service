@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.CourtBranchLocation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -459,7 +460,7 @@ class PendingProceedingTransformerTest {
         PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
 
     assertThat(pendingProceeding.coreData().courtBranchLocation()).isNotNull();
-    assertThat(pendingProceeding.coreData().courtBranchLocation()).isEqualTo("Augsburg");
+    assertThat(pendingProceeding.coreData().courtBranchLocation().value()).isEqualTo("Augsburg");
   }
 
   @Test
@@ -476,7 +477,10 @@ class PendingProceedingTransformerTest {
   void transformToDTO_withCourtBranchLocation_shouldAddCourtBranchLocation() {
     PendingProceeding pendingProceeding =
         PendingProceeding.builder()
-            .coreData(CoreData.builder().courtBranchLocation("Augsburg").build())
+            .coreData(
+                CoreData.builder()
+                    .courtBranchLocation(CourtBranchLocation.builder().value("Augsburg").build())
+                    .build())
             .build();
 
     PendingProceedingDTO pendingProceedingDTO =

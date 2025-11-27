@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtBranchLocationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDocumentNumberDTO;
@@ -307,7 +306,7 @@ public class DocumentableTransformer {
       builder.courtBranchLocation(null);
     } else {
       builder.courtBranchLocation(
-          CourtBranchLocationDTO.builder().value(coreData.courtBranchLocation()).build());
+          CourtBranchLocationTransformer.transformToDTO(coreData.courtBranchLocation()));
     }
   }
 
@@ -339,9 +338,8 @@ public class DocumentableTransformer {
         CoreData.builder()
             .court(CourtTransformer.transformToDomain(documentationUnitDTO.getCourt()))
             .courtBranchLocation(
-                documentationUnitDTO.getCourtBranchLocation() != null
-                    ? documentationUnitDTO.getCourtBranchLocation().getValue()
-                    : null)
+                CourtBranchLocationTransformer.transformToDomain(
+                    documentationUnitDTO.getCourtBranchLocation()))
             .documentationOffice(
                 DocumentationOfficeTransformer.transformToDomain(
                     documentationUnitDTO.getDocumentationOffice()))
