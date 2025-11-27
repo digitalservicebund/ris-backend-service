@@ -842,7 +842,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(container).toHaveTextContent(
-      "Gegenstandswert1000 Euro (EUR), Verfassungsbeschwerde",
+      "Gegenstandswert1.000 Euro (EUR), Verfassungsbeschwerde",
     )
   })
 

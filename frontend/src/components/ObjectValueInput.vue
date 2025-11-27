@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
 import InputSelect from "primevue/select"
-import { onMounted, ref, watch } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import MonetaryInput from "@/components/input/MonetaryInput.vue"
@@ -22,15 +22,40 @@ const emit = defineEmits<{
   removeEntry: [value?: boolean]
 }>()
 
-const validationStore = useValidationStore<["amount"][number]>()
+type ObjectValueField = (typeof ObjectValue.fields)[number]
+const validationStore = useValidationStore<ObjectValueField>()
 
 const lastSavedModelValue = ref(new ObjectValue({ ...props.modelValue }))
 const objectValue = ref(new ObjectValue({ ...props.modelValue }))
-
+const isSixDigitNumber = computed(() => {
+  return !!objectValue.value.amount && objectValue.value.amount <= 999999
+})
 async function addObjectValue() {
+  validate()
   emit("update:modelValue", objectValue.value as ObjectValue)
   emit("addEntry")
 }
+
+function validate() {
+  if (objectValue.value.isEmpty) {
+    validationStore.reset()
+  } else {
+    if (objectValue.value.amount && isSixDigitNumber.value) {
+      validationStore.remove("amount")
+    } else if (objectValue.value.amount && !isSixDigitNumber.value) {
+      validationStore.add("Max. 6 Zeichen", "amount")
+    } else {
+      validationStore.add("Pflichtfeld nicht befüllt", "amount")
+    }
+    if (objectValue.value.currencyCode) {
+      validationStore.remove("currencyCode")
+    } else {
+      validationStore.add("Pflichtfeld nicht befüllt", "currencyCode")
+    }
+  }
+}
+
+watch(objectValue, () => validate(), { deep: true })
 
 watch(
   () => props.modelValue,
@@ -41,10 +66,14 @@ watch(
     lastSavedModelValue.value = new ObjectValue({
       ...props.modelValue,
     })
+    if (lastSavedModelValue.value.isEmpty) validationStore.reset()
   },
 )
 
 onMounted(() => {
+  if (!props.modelValue?.isEmpty) {
+    validate()
+  }
   objectValue.value = new ObjectValue({
     ...props.modelValue,
   })
@@ -60,14 +89,15 @@ onMounted(() => {
           v-slot="slotProps"
           data-testid="object-value-amount"
           label="Betrag *"
+          :validation-error="validationStore.getByField('amount')"
         >
           <MonetaryInput
             :id="slotProps.id"
             v-model="objectValue.amount"
             aria-label="Betrag"
             :has-error="slotProps.hasError"
+            @blur="validate"
             @focus="validationStore.remove('amount')"
-            @update:validation-error="slotProps.updateValidationError"
           ></MonetaryInput>
         </InputField>
       </div>
@@ -77,6 +107,7 @@ onMounted(() => {
           v-slot="slotProps"
           data-testid="object-value-currency"
           label="Währung *"
+          :validation-error="validationStore.getByField('currencyCode')"
         >
           <ComboboxInput
             id="objectValueCurrencyInputText"
@@ -113,7 +144,7 @@ onMounted(() => {
         <div class="flex gap-16">
           <Button
             aria-label="Gegenstandswert speichern"
-            :disabled="objectValue.isEmpty"
+            :disabled="!validationStore.isValid() || objectValue.isEmpty"
             label="Übernehmen"
             severity="secondary"
             size="small"

@@ -51,7 +51,9 @@ export default class ObjectValue implements EditableListItem {
 
   get renderSummary(): string {
     return (
-      [this.amount, this.currencyCode?.label].filter(Boolean).join(` `) +
+      [this.amount?.toLocaleString("de-DE"), this.currencyCode?.label]
+        .filter(Boolean)
+        .join(` `) +
       (this.proceedingType
         ? `, ${ProceedingTypeLabels[this.proceedingType]}`
         : "")
