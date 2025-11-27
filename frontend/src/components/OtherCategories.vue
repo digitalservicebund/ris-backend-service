@@ -6,6 +6,7 @@ import CollectiveAgreements from "@/components/CollectiveAgreements.vue"
 import DefinitionList from "@/components/DefinitionList.vue"
 import DismissalInputs from "@/components/DismissalInputs.vue"
 import ForeignLanguageVersions from "@/components/ForeignLanguageVersions.vue"
+import IncomeTypes from "@/components/IncomeTypes.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
 import ObjectValues from "@/components/ObjectValues.vue"
@@ -84,6 +85,12 @@ const hasObjectValues = computed(() => {
     : false
 })
 
+const hasIncomeTypes = computed(() => {
+  return contentRelatedIndexing.value.incomeTypes
+    ? contentRelatedIndexing.value.incomeTypes?.length > 0
+    : false
+})
+
 const shouldDisplayLegislativeMandateCategory = computed(() => {
   return (
     constitutionalCourtTypes.items.includes(
@@ -116,6 +123,10 @@ const shouldDisplayEvsf = computed(() => isFinanceCourt.value || evsf.value)
 
 const shouldDisplayAppeal = computed(
   () => isFinanceCourt.value || hasAppeal.value,
+)
+
+const shouldDisplayIncomeType = computed(
+  () => isFinanceCourt.value || hasIncomeTypes.value,
 )
 </script>
 
@@ -189,6 +200,13 @@ const shouldDisplayAppeal = computed(
         :should-show-button="!hasObjectValues"
       >
         <ObjectValues :label="contentRelatedIndexingLabels.objectValues" />
+      </CategoryWrapper>
+      <CategoryWrapper
+        v-if="shouldDisplayIncomeType"
+        :label="contentRelatedIndexingLabels.incomeTypes"
+        :should-show-button="!hasIncomeTypes"
+      >
+        <IncomeTypes :label="contentRelatedIndexingLabels.incomeTypes" />
       </CategoryWrapper>
     </div>
   </div>

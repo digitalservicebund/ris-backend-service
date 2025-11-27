@@ -86,6 +86,7 @@ export const contentRelatedIndexingLabels: {
   appealAdmission: "Rechtsmittelzulassung",
   appeal: "Rechtsmittel",
   objectValues: "Gegenstandswert",
+  incomeTypes: "Einkunftsart",
 }
 export const allLabels = {
   caselawReferences: "Rechtsprechungsfundstellen",
