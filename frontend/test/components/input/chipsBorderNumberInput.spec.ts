@@ -103,6 +103,15 @@ describe("ChipsBorderNumberInput", () => {
     expect(onUpdate).toHaveBeenCalledWith([1])
   })
 
+  it("trims user input", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({ "onUpdate:modelValue": onUpdate })
+
+    const input = screen.getByRole("textbox")
+    await user.type(input, "1   {enter}")
+    expect(onUpdate).toHaveBeenCalledWith([1])
+  })
+
   it("does not accept incorrect border number", async () => {
     const id = "id"
     const onError = vi.fn()
@@ -216,6 +225,34 @@ describe("ChipsBorderNumberInput", () => {
     expect(input).toHaveValue("")
 
     await user.type(input, "   {enter}")
+
+    expect(onUpdate).toHaveBeenCalledWith([1, 2])
+  })
+
+  it("does not add a chip when input is only characters", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      modelValue: [1, 2],
+    })
+    const input = screen.getByRole<HTMLInputElement>("textbox")
+    expect(input).toHaveValue("")
+
+    await user.type(input, "ab'&%   {enter}")
+
+    expect(onUpdate).toHaveBeenCalledWith([1, 2])
+  })
+
+  it("does not add a chip when input contains a character", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      modelValue: [1, 2],
+    })
+    const input = screen.getByRole<HTMLInputElement>("textbox")
+    expect(input).toHaveValue("")
+
+    await user.type(input, "1a{enter}")
 
     expect(onUpdate).toHaveBeenCalledWith([1, 2])
   })
