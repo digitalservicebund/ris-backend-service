@@ -121,7 +121,7 @@ public class DocumentationUnitService {
           "DocumentationUnit is neither decision nor pending proceeding.");
     }
     log.atInfo()
-        .addKeyValue("documentationNumber", newDocUnit.documentNumber())
+        .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, newDocUnit.documentNumber())
         .addKeyValue("id", newDocUnit.uuid())
         .setMessage("New documentation unit created.")
         .log();

@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.LdmlTransformationResult;
+import de.bund.digitalservice.ris.caselaw.domain.LoggingKeys;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -83,11 +84,6 @@ public class PortalPublicationService {
     try {
       DocumentationUnit documentationUnit =
           documentationUnitRepository.findByUuid(documentationUnitId);
-      log.atInfo()
-          .setMessage("Publishing doc unit...")
-          .addKeyValue("documentNumber", documentationUnit.documentNumber())
-          .addKeyValue("id", documentationUnitId)
-          .log();
       var result = publishToBucket(documentationUnit);
       uploadChangelogWithdrawOnFailure(documentationUnit, result);
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, user);
@@ -138,7 +134,7 @@ public class PortalPublicationService {
       log.atInfo()
           .setMessage(
               "Withdrawn documentation unit cannot be found in database. Likely, it was deleted by the migration or manually in the database. Portal publication status update skipped.")
-          .addKeyValue("documentNumber", documentNumber)
+          .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentNumber)
           .log();
     }
     return result;
@@ -148,6 +144,12 @@ public class PortalPublicationService {
     try {
       var deletableFiles = portalBucket.getAllFilenamesByPath(documentNumber + "/");
       deletableFiles.forEach(portalBucket::delete);
+
+      log.atInfo()
+          .setMessage("Documentation unit withdrawn from portal bucket.")
+          .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentNumber)
+          .log();
+
       return new PortalPublicationResult(List.of(), deletableFiles);
     } catch (BucketException e) {
       throw new PublishException("Could not delete LDML from bucket.", e);
@@ -172,11 +174,6 @@ public class PortalPublicationService {
       var result = withdraw(documentationUnit.documentNumber());
       uploadDeletionChangelog(result.deletedPaths());
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.WITHDRAWN, user);
-      log.atInfo()
-          .setMessage("Documentation unit withdrawn from portal.")
-          .addKeyValue("documentNumber", documentationUnit.documentNumber())
-          .addKeyValue("id", documentationUnitId)
-          .log();
     } catch (Exception e) {
       historyLogService.saveHistoryLog(
           documentationUnitId,
@@ -257,8 +254,15 @@ public class PortalPublicationService {
       throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);
     }
 
-    return saveToBucket(
-        ldml.getUniqueId() + "/", ldml.getFileName(), fileContent.get(), attachments);
+    var result =
+        saveToBucket(ldml.getUniqueId() + "/", ldml.getFileName(), fileContent.get(), attachments);
+
+    log.atInfo()
+        .setMessage("Doc unit published to portal bucket.")
+        .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentationUnit.documentNumber())
+        .log();
+
+    return result;
   }
 
   private PortalPublicationResult saveToBucket(
