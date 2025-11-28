@@ -117,7 +117,7 @@ test.describe("category import", () => {
           prefilledDocumentUnitWithTexts.documentNumber,
         )
 
-        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(24) // number of non-importable categories, if target category already filled
+        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(25) // number of non-importable categories, if target category already filled
       })
     },
   )
