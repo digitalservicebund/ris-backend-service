@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ForeignLanguageVe
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ObjectValueDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
@@ -32,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.ObjectValue;
 import de.bund.digitalservice.ris.caselaw.domain.OriginOfTranslation;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
@@ -151,6 +153,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       }
       builder.appeal(AppealTransformer.transformToDTO(currentDto, contentRelatedIndexing.appeal()));
       addOriginOfTranslations(builder, contentRelatedIndexing);
+      addObjectValues(builder, contentRelatedIndexing);
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -574,6 +577,22 @@ public class DecisionTransformer extends DocumentableTransformer {
     builder.originOfTranslations(originOfTranslationDTOS);
   }
 
+  private static void addObjectValues(
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.objectValues() == null) {
+      return;
+    }
+
+    List<ObjectValueDTO> objectValueDTOS = new ArrayList<>();
+    List<ObjectValue> objectValues = contentRelatedIndexing.objectValues();
+
+    for (int i = 0; i < objectValues.size(); i++) {
+      objectValueDTOS.add(ObjectValueTransformer.transformToDTO(objectValues.get(i), i));
+    }
+
+    builder.objectValues(objectValueDTOS);
+  }
+
   public static Decision transformToDomain(DecisionDTO decisionDTO) {
     return transformToDomain(decisionDTO, null);
   }
@@ -774,6 +793,14 @@ public class DecisionTransformer extends DocumentableTransformer {
               .map(OriginOfTranslationTransformer::transformToDomain)
               .toList();
       contentRelatedIndexingBuilder.originOfTranslations(originOfTranslations);
+    }
+
+    if (decisionDTO.getObjectValues() != null) {
+      List<ObjectValue> objectValues =
+          decisionDTO.getObjectValues().stream()
+              .map(ObjectValueTransformer::transformToDomain)
+              .toList();
+      contentRelatedIndexingBuilder.objectValues(objectValues);
     }
 
     return contentRelatedIndexingBuilder.build();
