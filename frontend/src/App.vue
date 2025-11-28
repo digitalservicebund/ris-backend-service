@@ -26,19 +26,3 @@ useSeoMeta({
     <Toast position="bottom-right" />
   </div>
 </template>
-
-<style>
-.ProseMirror ol {
-  list-style-type: decimal;
-  padding-left: 1.5rem;
-}
-
-.ProseMirror ul {
-  list-style-type: disc;
-  padding-left: 1.5rem;
-}
-
-.ProseMirror li {
-  margin-bottom: 0.25rem;
-}
-</style>
