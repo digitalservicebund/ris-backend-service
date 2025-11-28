@@ -627,33 +627,32 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
   private Gegenstandswerte buildGegenstandswerte(ContentRelatedIndexing contentRelatedIndexing) {
 
-    var genstandswerte =
+    var gegenstandswerte =
         contentRelatedIndexing.objectValues().stream()
             .map(
-                objectValue -> {
-                  return Gegenstandswerte.Gegenstandswert.builder()
-                      .betrag(
-                          Gegenstandswerte.Betrag.builder()
-                              .value(String.valueOf(objectValue.amount()))
-                              .build())
-                      .waehrung(
-                          Gegenstandswerte.Waehrung.builder()
-                              .value(objectValue.currencyCode().label())
-                              .build())
-                      .verfahren(
-                          Gegenstandswerte.Verfahren.builder()
-                              .value(objectValue.proceedingType().toString())
-                              .build())
-                      .build();
-                })
+                objectValue ->
+                    Gegenstandswerte.Gegenstandswert.builder()
+                        .betrag(
+                            Gegenstandswerte.Betrag.builder()
+                                .value(String.valueOf(objectValue.amount()))
+                                .build())
+                        .waehrung(
+                            Gegenstandswerte.Waehrung.builder()
+                                .value(objectValue.currencyCode().label())
+                                .build())
+                        .verfahren(
+                            Gegenstandswerte.Verfahren.builder()
+                                .value(objectValue.proceedingType().toString())
+                                .build())
+                        .build())
             .toList();
 
-    return Gegenstandswerte.builder().gegenstandswerte(genstandswerte).build();
+    return Gegenstandswerte.builder().gegenstandswerte(gegenstandswerte).build();
   }
 
   private AktenzeichenListe buildAbweichendeAktenzeichen(
       RisMeta.RisMetaBuilder builder, CoreData coreData) {
-    AktenzeichenListe aktenzeichenListe = builder.build().getAktenzeichenListe();
+    AktenzeichenListe aktenzeichenListe = builder.build().getAktenzeichenListe(); // NOSONAR
     List<AktenzeichenListe.Aktenzeichen> aktenzeichen = aktenzeichenListe.getAktenzeichen();
     if (aktenzeichen != null) {
       coreData
