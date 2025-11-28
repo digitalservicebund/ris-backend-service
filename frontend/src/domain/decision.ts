@@ -169,6 +169,12 @@ export class Decision {
           (judge) => new ParticipatingJudge({ ...judge }),
         )
 
+    if (data.longTexts?.corrections)
+      data.longTexts.corrections =
+        data.longTexts.corrections.map(
+          (data) => new Correction({ ...data }),
+        )
+
     if (data.previousDecisions)
       data.previousDecisions = data.previousDecisions.map(
         (decision) => new PreviousDecision({ ...decision }),
