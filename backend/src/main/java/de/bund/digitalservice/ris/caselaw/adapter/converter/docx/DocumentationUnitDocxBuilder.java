@@ -145,7 +145,8 @@ public class DocumentationUnitDocxBuilder extends DocxBuilder {
     }
 
     if (ppr.getPStyle() != null
-        && "Listenabsatz".equals(ppr.getPStyle().getVal())
+        && ("Listenabsatz".equals(ppr.getPStyle().getVal())
+            || "ListParagraph".equals(ppr.getPStyle().getVal()))
         && ppr.getFramePr() != null) {
       return true;
     }
