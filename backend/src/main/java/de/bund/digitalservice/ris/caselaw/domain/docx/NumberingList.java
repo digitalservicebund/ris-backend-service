@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class NumberingList implements DocumentationUnitDocx {
 
+  public static final String CLOSING_LIST_ITEM = "</li>";
   // this should be a list containing either NumberingListEntry's or NumberingList's
   // so that a tree structure that can recursively be traversed
   private final List<NumberingListEntry> entries = new ArrayList<>();
@@ -45,7 +46,7 @@ public class NumberingList implements DocumentationUnitDocx {
             // because for sub-lists the last list item
             // should remain open.
             if (isListItemOpen[0]) {
-              sb.append("</li>");
+              sb.append(CLOSING_LIST_ITEM);
               isListItemOpen[0] = false;
             }
 
@@ -53,7 +54,7 @@ public class NumberingList implements DocumentationUnitDocx {
               sb.append(closeTags.removeFirst());
               // If closing sub list, also close parent list
               if (!closeTags.isEmpty()) {
-                sb.append("</li>");
+                sb.append(CLOSING_LIST_ITEM);
               }
             }
 
@@ -66,7 +67,7 @@ public class NumberingList implements DocumentationUnitDocx {
           while (lvl < cLvl[0]) {
             // Close item
             if (isListItemOpen[0]) {
-              sb.append("</li>");
+              sb.append(CLOSING_LIST_ITEM);
               isListItemOpen[0] = false;
             }
 
@@ -74,14 +75,14 @@ public class NumberingList implements DocumentationUnitDocx {
             sb.append(closeTags.removeFirst());
 
             // Closing parent list item that contained this sub list
-            sb.append("</li>");
+            sb.append(CLOSING_LIST_ITEM);
 
             cLvl[0]--;
           }
 
           // If still open, then close it
           if (lvl == cLvl[0] && isListItemOpen[0]) {
-            sb.append("</li>");
+            sb.append(CLOSING_LIST_ITEM);
             isListItemOpen[0] = false;
           }
 
@@ -95,7 +96,7 @@ public class NumberingList implements DocumentationUnitDocx {
           if (entry.numberingListEntryIndex().isLgl()) {
             sb.append("<li style=\"list-style-type:decimal\">");
           } else {
-            sb.append("<li>");
+            sb.append(CLOSING_LIST_ITEM);
           }
 
           sb.append(entry.toHtmlString());
@@ -112,7 +113,7 @@ public class NumberingList implements DocumentationUnitDocx {
 
     // Final list close
     if (isListItemOpen[0]) {
-      sb.append("</li>");
+      sb.append(CLOSING_LIST_ITEM);
     }
 
     /* Close all list/sub-list tag when last element*/
@@ -121,7 +122,7 @@ public class NumberingList implements DocumentationUnitDocx {
 
       // Closing parent list item that contained this sub list
       if (!closeTags.isEmpty()) {
-        sb.append("</li>");
+        sb.append(CLOSING_LIST_ITEM);
       }
     }
     return sb.toString();
