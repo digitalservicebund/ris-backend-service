@@ -48,7 +48,7 @@ jobs:
       - name: Install node modules
         if: steps.cache-node.outputs.cache-hit != 'true'
         run: |
-          npm ci
+          npm ci --ignore-scripts
         working-directory: ./frontend
       - name: Get Playwright version
         working-directory: ./frontend
