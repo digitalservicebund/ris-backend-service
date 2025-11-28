@@ -94,11 +94,8 @@ public class NumberingList implements DocumentationUnitDocx {
 
           if (entry.numberingListEntryIndex().isLgl()) {
             sb.append("<li style=\"list-style-type:decimal\">");
-            //                .append(entry.toHtmlString())
-            //                .append("</li>");
           } else {
             sb.append("<li>");
-            //            .append(entry.toHtmlString()).append("</li>");
           }
 
           sb.append(entry.toHtmlString());
