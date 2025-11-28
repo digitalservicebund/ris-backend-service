@@ -367,11 +367,8 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                             .definierendeRandnummer(
                                 definition.definingBorderNumber() == null
                                     ? null
-                                    : Definitionen.Definition.DefinierendeRandnummer.builder()
-                                        .refersTo(
-                                            "#randnummer-" + definition.definingBorderNumber())
-                                        .value(String.valueOf(definition.definingBorderNumber()))
-                                        .build())
+                                    : new Definitionen.Definition.DefinierendeRandnummer(
+                                        String.valueOf(definition.definingBorderNumber())))
                             .build())
                 .toList())
         .build();
@@ -574,14 +571,12 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                                       .build())
                           .toList();
 
-                  var borderNumbers =
+                  List<HerkunftDerUebersetzungen.InterneVerlinkung> borderNumbers =
                       Optional.ofNullable(translation.borderNumbers()).orElseGet(List::of).stream()
                           .map(
                               borderNumber ->
-                                  HerkunftDerUebersetzungen.InterneVerlinkung.builder()
-                                      .refersTo("#randnummer-" + borderNumber)
-                                      .value(String.valueOf(borderNumber))
-                                      .build())
+                                  new HerkunftDerUebersetzungen.InterneVerlinkung(
+                                      String.valueOf(borderNumber)))
                           .toList();
 
                   var urls =
@@ -779,10 +774,8 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                             .forEach(
                                 borderNumber ->
                                     randnummernBuilder.value(
-                                        Berichtigungen.Berichtigung.Randnummern.Randnummer.builder()
-                                            .refersTo("#randnummer-" + borderNumber)
-                                            .value(String.valueOf(borderNumber))
-                                            .build()));
+                                        new Berichtigungen.Berichtigung.Randnummern.Randnummer(
+                                            String.valueOf(borderNumber))));
 
                         builder.randnummern(randnummernBuilder.build());
                       }

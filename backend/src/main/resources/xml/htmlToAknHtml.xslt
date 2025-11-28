@@ -329,7 +329,7 @@
     |akn:courtType|akn:docTitle|akn:shortTitle|akn:docType|akn:introduction
     |akn:identification|akn:references|akn:TLCOrganization|akn:TLCPerson|akn:TLCLocation|akn:classification|akn:proprietary|akn:block
     |akn:keyword|akn:background|akn:decision|akn:motivation|akn:opinion|akn:embeddedStructure|akn:subFlow
-    |akn:analysis|akn:otherAnalysis|akn:implicitReference
+    |akn:analysis|akn:otherAnalysis|akn:implicitReference|akn:ref
     |akn:FRBRWork|akn:FRBRExpression|akn:FRBRManifestation|akn:p
     |akn:FRBRthis|akn:FRBRuri|akn:FRBRalias|akn:FRBRdate|akn:FRBRauthor|akn:FRBRcountry|akn:FRBRlanguage|akn:documentRef
     |ris:meta|ris:fileNumber|ris:dokumentTyp|ris:courtType|ris:gericht|ris:typ|ris:ort|ris:gerichtsbarkeit
