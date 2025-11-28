@@ -2,7 +2,7 @@ import EditableListItem from "./editableListItem"
 
 export const CORRECTION_TYPES = [
   "Berichtigungsbeschluss",
-  "Ergänzungsbeschuss",
+  "Ergänzungsbeschluss",
   "Ergänzungsurteil",
   "Unrichtigkeiten",
   "Schreibfehlerberichtigung",

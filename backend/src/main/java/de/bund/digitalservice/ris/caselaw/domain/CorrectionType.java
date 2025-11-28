@@ -7,7 +7,7 @@ import lombok.Getter;
 
 public enum CorrectionType {
   BERICHTIGUNGSBESCHLUSS("Berichtigungsbeschluss"),
-  ERGAENZUNGSBESCHUSS("Ergänzungsbeschuss"),
+  ERGAENZUNGSBESCHLUSS("Ergänzungsbeschluss"),
   ERGAENZUNGSURTEIL("Ergänzungsurteil"),
   UNRICHTIGKEITEN("Unrichtigkeiten"),
   SCHREIBFEHLERBERICHTIGUNG("Schreibfehlerberichtigung");
