@@ -12,6 +12,7 @@ import InputField from "@/components/input/InputField.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ActiveCitation from "@/domain/activeCitation"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
+import Correction from "@/domain/correction"
 import {
   allLabels,
   contentRelatedIndexingLabels,
@@ -261,6 +262,9 @@ const handleImport = async (key: keyof typeof allLabels) => {
       break
     case "appeal":
       importAppeal()
+      break
+    case "corrections":
+      importCorrections()
       break
     default: {
       // The never type ensures all keys are handled in the switch.
@@ -540,8 +544,27 @@ function importAppeal() {
   }
 }
 
-// By narrowing the type of key to exclude "participatingJudges", TypeScript no longer considers the possibility of assigning a non-string value to documentUnit.value.longTexts[key].
-type LongTextStringKeys = keyof Omit<LongTexts, "participatingJudges">
+function importCorrections() {
+  if (
+    isDecision(targetDocumentUnit.value) &&
+    isDecision(sourceDocumentUnit.value)
+  ) {
+    const source = sourceDocumentUnit.value?.longTexts.corrections
+
+    if (targetDocumentUnit.value) {
+      targetDocumentUnit.value.longTexts.corrections = source?.map(
+        (correction) => new Correction({ ...correction, id: undefined }),
+      )
+    }
+  }
+}
+
+type KeysOfType<Type, TypeOfValue> = keyof {
+  [Key in keyof Type as Type[Key] extends TypeOfValue ? Key : never]: unknown
+}
+
+// Narrowing the type of key to exclude non string values
+type LongTextStringKeys = KeysOfType<LongTexts, string | undefined>
 
 function importLongTexts(key: LongTextStringKeys) {
   if (

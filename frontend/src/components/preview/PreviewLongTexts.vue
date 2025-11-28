@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import dayjs from "dayjs"
+import BorderNumberLinkView from "@/components/BorderNumberLinkView.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
@@ -8,6 +10,10 @@ import { longTextLabels, LongTexts } from "@/domain/decision"
 defineProps<{
   longTexts: LongTexts
 }>()
+
+function formatDate(date: string) {
+  return dayjs(date, "YYYY-MM-DD", true).format("DD.MM.YYYY")
+}
 </script>
 
 <template>
@@ -102,6 +108,37 @@ defineProps<{
         :key="participatingJudge.id"
       >
         {{ participatingJudge.renderSummary }}
+      </div>
+    </PreviewContent>
+  </PreviewRow>
+  <PreviewRow v-if="longTexts.corrections?.length">
+    <PreviewCategory>Berichtigung</PreviewCategory>
+    <PreviewContent>
+      <div v-for="correction in longTexts.corrections" :key="correction.id">
+        <div class="flex flex-row items-center">
+          {{ correction.type }}
+          <span v-if="correction.description"
+            >, {{ correction.description }}</span
+          >
+          <span v-if="correction.date"
+            >, {{ formatDate(correction.date) }}</span
+          >
+          <span v-if="correction.borderNumbers?.length" class="mx-4">|</span>
+          <span v-if="correction.borderNumbers" class="flex flex-row gap-4">
+            <BorderNumberLinkView
+              v-for="borderNumber in correction.borderNumbers"
+              :key="borderNumber"
+              :border-number="borderNumber"
+            />
+          </span>
+        </div>
+        <TextEditor
+          v-if="correction.content"
+          aria-label="Vorschau"
+          field-size="max"
+          preview
+          :value="correction.content"
+        />
       </div>
     </PreviewContent>
   </PreviewRow>

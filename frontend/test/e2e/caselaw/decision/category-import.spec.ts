@@ -96,7 +96,7 @@ test.describe("category import", () => {
       await test.step("disable import for empty source categories", async () => {
         await navigateToCategoryImport(page, documentNumber)
         await searchForDocumentUnitToImport(page, documentNumber)
-        await expect(page.getByText("Quellrubrik leer")).toHaveCount(30) // total number of importable categories
+        await expect(page.getByText("Quellrubrik leer")).toHaveCount(31) // total number of importable categories
       })
     },
   )
@@ -1405,6 +1405,38 @@ test.describe("category import", () => {
       await test.step("scroll to category", async () => {
         await expect(
           page.getByLabel("Langtexte").getByText("Gliederung", { exact: true }),
+        ).toBeInViewport()
+      })
+    },
+  )
+
+  // Berichtigung
+  test(
+    "import correction",
+    { tag: ["@RISDEV-8622"] },
+    async ({ page, documentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, documentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(page.getByLabel("Berichtigung übernehmen")).toBeVisible()
+        await page.getByLabel("Berichtigung übernehmen").click()
+
+        await expect(page.getByText("Hauffen -> Haufen")).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page
+            .getByLabel("Langtexte")
+            .getByText("Berichtigung", { exact: true }),
         ).toBeInViewport()
       })
     },
