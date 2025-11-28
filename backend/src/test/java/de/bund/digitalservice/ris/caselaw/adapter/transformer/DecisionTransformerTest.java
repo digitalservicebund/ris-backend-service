@@ -12,6 +12,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementIndustryDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CorrectionBorderNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CorrectionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DefinitionDTO;
@@ -55,6 +57,8 @@ import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreementIndustry;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
+import de.bund.digitalservice.ris.caselaw.domain.Correction;
+import de.bund.digitalservice.ris.caselaw.domain.CorrectionType;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.Definition;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -2141,6 +2145,80 @@ class DecisionTransformerTest {
     DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDTO, decision);
 
     assertThat(decisionDTO.getAppeal()).isNull();
+  }
+
+  @Test
+  void transformToDTO_correction() {
+    Decision decision =
+        Decision.builder()
+            .longTexts(
+                LongTexts.builder()
+                    .corrections(
+                        List.of(
+                            Correction.builder()
+                                .id(UUID.fromString("e41a1601-f7b7-43e5-8cec-7316e6163283"))
+                                .content("a long text")
+                                .type(CorrectionType.BERICHTIGUNGSBESCHLUSS)
+                                .borderNumbers(List.of(2L))
+                                .description("a short description")
+                                .date(LocalDate.parse("2020-01-01"))
+                                .build()))
+                    .build())
+            .build();
+
+    DecisionDTO decisionDTO =
+        DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+    assertThat(decisionDTO.getCorrections()).isNotNull();
+    assertThat(decisionDTO.getCorrections()).hasSize(1);
+
+    CorrectionDTO correctionDTO = decisionDTO.getCorrections().getFirst();
+    assertThat(correctionDTO.getId())
+        .isEqualTo(UUID.fromString("e41a1601-f7b7-43e5-8cec-7316e6163283"));
+    assertThat(correctionDTO.getContent()).isEqualTo("a long text");
+    assertThat(correctionDTO.getType()).isEqualTo(CorrectionType.BERICHTIGUNGSBESCHLUSS);
+    assertThat(correctionDTO.getDescription()).isEqualTo("a short description");
+    assertThat(correctionDTO.getDate()).isEqualTo(LocalDate.parse("2020-01-01"));
+    assertThat(correctionDTO.getRank()).isEqualTo(1L);
+
+    assertThat(correctionDTO.getBorderNumbers()).hasSize(1);
+    assertThat(correctionDTO.getBorderNumbers().getFirst().getBorderNumber()).isEqualTo(2L);
+    assertThat(correctionDTO.getBorderNumbers().getFirst().getRank()).isEqualTo(1L);
+  }
+
+  @Test
+  void transformToDomain_correction() {
+    DecisionDTO decisionDto =
+        DecisionDTO.builder()
+            .corrections(
+                List.of(
+                    CorrectionDTO.builder()
+                        .id(UUID.fromString("e41a1601-f7b7-43e5-8cec-7316e6163283"))
+                        .content("a long text")
+                        .type(CorrectionType.BERICHTIGUNGSBESCHLUSS)
+                        .borderNumber(
+                            CorrectionBorderNumberDTO.builder()
+                                .borderNumber(2L)
+                                .rank(1L)
+                                .id(UUID.fromString("00d2a44e-4051-4269-be9a-32e4a87245fe"))
+                                .build())
+                        .description("a short description")
+                        .date(LocalDate.parse("2020-01-01"))
+                        .build()))
+            .build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDto);
+
+    assertThat(decision.longTexts().corrections()).isNotNull();
+    assertThat(decision.longTexts().corrections()).hasSize(1);
+
+    Correction correction = decision.longTexts().corrections().getFirst();
+    assertThat(correction.id()).isEqualTo(UUID.fromString("e41a1601-f7b7-43e5-8cec-7316e6163283"));
+    assertThat(correction.content()).isEqualTo("a long text");
+    assertThat(correction.type()).isEqualTo(CorrectionType.BERICHTIGUNGSBESCHLUSS);
+    assertThat(correction.borderNumbers()).containsExactly(2L);
+    assertThat(correction.description()).isEqualTo("a short description");
+    assertThat(correction.date()).isEqualTo(LocalDate.parse("2020-01-01"));
   }
 
   private Decision.DecisionBuilder generateSimpleDocumentationUnitBuilder() {

@@ -14,10 +14,14 @@ public record LongTexts(
     String dissentingOpinion,
     List<ParticipatingJudge> participatingJudges,
     String otherLongText,
-    String outline) {
+    String outline,
+    List<Correction> corrections) {
   public LongTexts {
     if (participatingJudges == null) {
       participatingJudges = new ArrayList<>();
+    }
+    if (corrections == null) {
+      corrections = new ArrayList<>();
     }
   }
 }
