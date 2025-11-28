@@ -11,7 +11,6 @@ import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
 import LegalForce from "@/domain/legalForce"
 import { ManagementData } from "@/domain/managementData"
 import NormReference from "@/domain/normReference"
-import ObjectValue from "@/domain/objectValue"
 import OriginOfTranslation from "@/domain/originOfTranslation"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
@@ -82,7 +81,6 @@ export const contentRelatedIndexingLabels: {
   originOfTranslations: "Herkunft der Übersetzung",
   appealAdmission: "Rechtsmittelzulassung",
   appeal: "Rechtsmittel",
-  objectValues: "Gegenstandswert",
 }
 export const allLabels = {
   caselawReferences: "Rechtsprechungsfundstellen",
@@ -230,12 +228,6 @@ export class Decision {
       data.contentRelatedIndexing.originOfTranslations =
           data.contentRelatedIndexing.originOfTranslations.map(
               (originOfTranslation) => new OriginOfTranslation({ ...originOfTranslation }),
-          )
-
-    if (data.contentRelatedIndexing?.objectValues)
-      data.contentRelatedIndexing.objectValues =
-          data.contentRelatedIndexing.objectValues.map(
-              (objectValue) => new ObjectValue({ ...objectValue }),
           )
 
     Object.assign(this, data)

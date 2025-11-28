@@ -14,7 +14,6 @@ import { LanguageCode } from "@/domain/foreignLanguageVersion"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
-import { CurrencyCode } from "@/domain/objectValue"
 import { Procedure } from "@/domain/procedure"
 import { User } from "@/domain/user"
 import errorMessages from "@/i18n/errors.json"
@@ -33,7 +32,6 @@ enum Endpoint {
   languageCodes = `languagecodes`,
   usersForDocOffice = "users",
   collectiveAgreementIndustries = "collective-agreement-industries",
-  currencyCodes = `currencycodes`,
 }
 
 function formatDropdownItems(
@@ -126,12 +124,6 @@ function formatDropdownItems(
     }
     case Endpoint.collectiveAgreementIndustries: {
       return (responseData as CollectiveAgreementIndustry[]).map((item) => ({
-        label: item.label,
-        value: item,
-      }))
-    }
-    case Endpoint.currencyCodes: {
-      return (responseData as CurrencyCode[]).map((item) => ({
         label: item.label,
         value: item,
       }))
@@ -238,8 +230,6 @@ const service: ComboboxItemService = {
     fetchFromEndpoint(Endpoint.languageCodes, filter),
   getUsersForDocOffice: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.usersForDocOffice, filter),
-  getCurrencyCodes: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.currencyCodes, filter),
 }
 
 export default service

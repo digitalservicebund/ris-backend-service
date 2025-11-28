@@ -10,7 +10,6 @@ import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { Decision } from "@/domain/decision"
 import Definition from "@/domain/definition"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
-import ObjectValue, { ProceedingType } from "@/domain/objectValue"
 import OriginOfTranslation, {
   TranslationType,
 } from "@/domain/originOfTranslation"
@@ -556,61 +555,6 @@ describe("other categories", () => {
         screen.queryByRole("button", { name: "Berufsbild" }),
       ).not.toBeInTheDocument()
       expect(screen.getByTestId("job-profiles")).toBeInTheDocument()
-    })
-  })
-
-  describe("ObjectValues (Gegenstandswert)", () => {
-    const router = createRouter({
-      history: createWebHistory(),
-      routes: routes,
-    })
-
-    it("should display 'Gegenstandswert' button when no data", async () => {
-      // Arrange
-      mockSessionStore({
-        objectValues: [],
-      })
-
-      // Act
-      render(OtherCategories, {
-        global: {
-          plugins: [[router]],
-        },
-      })
-
-      // Assert
-      expect(
-        screen.getByRole("button", { name: "Gegenstandswert" }),
-      ).toBeInTheDocument()
-    })
-
-    it("should display 'Gegenstandswert'", async () => {
-      // Arrange
-      mockSessionStore({
-        objectValues: [
-          new ObjectValue({
-            id: "1",
-            amount: 500,
-            currencyCode: {
-              id: "3",
-              label: "Euro (EUR)",
-            },
-            proceedingType: ProceedingType.VERFASSUNGSBESCHWERDE,
-          }),
-        ],
-      })
-
-      // Act
-      render(OtherCategories, {
-        global: {
-          plugins: [[router]],
-        },
-      })
-
-      // Assert
-      expect(await screen.findByText("Gegenstandswert")).toBeVisible()
-      const summary = screen.getByTestId("object-value-summary")
-      expect(summary).toHaveTextContent("500 Euro (EUR), Verfassungsbeschwerde")
     })
   })
 })

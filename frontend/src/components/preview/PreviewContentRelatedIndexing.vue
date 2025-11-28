@@ -103,13 +103,6 @@ const hasDefinitions = computed(() => {
   return !!props.contentRelatedIndexing.definitions?.length
 })
 
-const hasObjectValues = computed(() => {
-  return (
-    props.contentRelatedIndexing.objectValues &&
-    props.contentRelatedIndexing.objectValues.length > 0
-  )
-})
-
 const hasAppeal = computed(() => {
   return (
     props.contentRelatedIndexing.appeal?.appellants?.length ||
@@ -319,7 +312,6 @@ const hasAppeal = computed(() => {
         </div>
       </PreviewContent>
     </PreviewRow>
-
     <div v-if="hasAppeal" class="pb-8">
       <PreviewCategory>Rechsmittel</PreviewCategory>
       <PreviewRow
@@ -462,16 +454,5 @@ const hasAppeal = computed(() => {
         </PreviewContent>
       </PreviewRow>
     </div>
-    <PreviewRow v-if="hasObjectValues">
-      <PreviewCategory>Gegenstandswert</PreviewCategory>
-      <PreviewContent data-testid="Gegenstandswert">
-        <div
-          v-for="objectValue in props.contentRelatedIndexing.objectValues"
-          :key="objectValue.id"
-        >
-          {{ objectValue.renderSummary }}
-        </div>
-      </PreviewContent>
-    </PreviewRow>
   </FlexContainer>
 </template>
