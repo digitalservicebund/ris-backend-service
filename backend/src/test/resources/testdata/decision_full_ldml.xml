@@ -300,13 +300,20 @@
                       <ris:berufsbild domainTerm="Berufsbild">jobProfile test</ris:berufsbild>
                     </ris:berufsbilder>
                     <ris:kuendigungsgruende domainTerm="Kündigungsgründe">
-                  <ris:kuendigungsgrund domainTerm="Kündigungsgrund">dismissalGround test</ris:kuendigungsgrund>
+                        <ris:kuendigungsgrund domainTerm="Kündigungsgrund">dismissalGround test</ris:kuendigungsgrund>
                     </ris:kuendigungsgruende>
                     <ris:kuendigungsarten domainTerm="Kündigungsarten">
-                  <ris:kuendigungsart domainTerm="Kündigungsart">dismissalType test</ris:kuendigungsart>
+                        <ris:kuendigungsart domainTerm="Kündigungsart">dismissalType test</ris:kuendigungsart>
                     </ris:kuendigungsarten>
                     <ris:gesetzgebungsauftrag domainTerm="Gesetzgebungsauftrag">Ja</ris:gesetzgebungsauftrag>
                     <ris:notiz domainTerm="Notiz">note test</ris:notiz>
+                    <ris:gegenstandswerte domainTerm="Gegenstandswerte">
+                        <ris:gegenstandswert domainTerm="Gegenstandswert">
+                            <ris:betrag domainTerm="Betrag">9635</ris:betrag>
+                            <ris:waehrung domainTerm="Währung">Euro (EUR)</ris:waehrung>
+                            <ris:verfahren domainTerm="Verfahren">Organstreitverfahren</ris:verfahren>
+                        </ris:gegenstandswert>
+                    </ris:gegenstandswerte>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>

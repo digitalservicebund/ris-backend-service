@@ -111,4 +111,7 @@ public class RisMeta {
 
   @XmlElement(name = "notiz", namespace = CaseLawLdml.RIS_NS)
   private Notiz notiz;
+
+  @XmlElement(name = "gegenstandswerte", namespace = CaseLawLdml.RIS_NS)
+  private Gegenstandswerte gegenstandswerte;
 }
