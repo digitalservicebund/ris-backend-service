@@ -8,9 +8,6 @@ updates:
       timezone: "Europe/Berlin"
     cooldown:
       default-days: 3
-    labels:
-      - renovate
-      - frontend-updates
     groups:
       all-frontend-non-major-dependencies:
         update-types:
@@ -51,9 +48,6 @@ updates:
       timezone: "Europe/Berlin"
     cooldown:
       default-days: 3
-    labels:
-      - renovate
-      - backend-updates
     groups:
       all-backend-non-major-dependencies:
         update-types:
