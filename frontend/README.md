@@ -13,7 +13,7 @@ the server.
 Install dependencies:
 
 ```bash
-npm install
+npm ci
 ```
 
 For E2E and a11y testing with [Playwright](https://playwright.dev/docs/intro) you will need to install the supported
