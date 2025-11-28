@@ -30,6 +30,7 @@ public class NumberingList implements DocumentationUnitDocx {
     StringBuilder sb = new StringBuilder();
     LinkedList<String> closeTags = new LinkedList<>();
     int[] cLvl = {-1};
+    final boolean[] isListItemOpen = {false};
     List<DocumentationUnitNumberingListNumberFormat> currentNumberFormat = new ArrayList<>();
 
     entries.forEach(
@@ -37,37 +38,73 @@ public class NumberingList implements DocumentationUnitDocx {
           /*Get level of list entry*/
           int lvl = stringToInt(entry.numberingListEntryIndex().iLvl(), 0);
 
-          /*Open new List if change number format at lv 0*/
+          // Open a new list if change in number format at level 0
           if (shouldCreateNewList(
               cLvl[0], lvl, currentNumberFormat, entry.numberingListEntryIndex().numberFormat())) {
+            // Check if the last list item is still open
+            // because for sub-lists the last list item
+            // should remain open.
+            if (isListItemOpen[0]) {
+              sb.append("</li>");
+              isListItemOpen[0] = false;
+            }
+
             while (!closeTags.isEmpty()) {
               sb.append(closeTags.removeFirst());
+              // If closing sub list, also close parent list
+              if (!closeTags.isEmpty()) {
+                sb.append("</li>");
+              }
             }
+
             sb.append(getOpenListTag(entry.numberingListEntryIndex()));
             closeTags.addFirst(getCloseListTag(entry.numberingListEntryIndex().numberFormat()));
             cLvl[0] = lvl;
           }
 
-          /* Open list/sub-list Tag*/
+          // Close list/sub-list Tag
+          while (lvl < cLvl[0]) {
+            // Close item
+            if (isListItemOpen[0]) {
+              sb.append("</li>");
+              isListItemOpen[0] = false;
+            }
+
+            // Close sub list
+            sb.append(closeTags.removeFirst());
+
+            // Closing parent list item that contained this sub list
+            sb.append("</li>");
+
+            cLvl[0]--;
+          }
+
+          // If still open, then close it
+          if (lvl == cLvl[0] && isListItemOpen[0]) {
+            sb.append("</li>");
+            isListItemOpen[0] = false;
+          }
+
+          // Open list/sub-list Tag
           while (lvl > cLvl[0]) {
             sb.append(getOpenListTag(entry.numberingListEntryIndex()));
             closeTags.addFirst(getCloseListTag(entry.numberingListEntryIndex().numberFormat()));
             cLvl[0]++;
           }
 
-          /* Close list/sub-list Tag*/
-          while (lvl < cLvl[0]) {
-            sb.append(closeTags.removeFirst());
-            cLvl[0]--;
+          if (entry.numberingListEntryIndex().isLgl()) {
+            sb.append("<li style=\"list-style-type:decimal\">");
+            //                .append(entry.toHtmlString())
+            //                .append("</li>");
+          } else {
+            sb.append("<li>");
+            //            .append(entry.toHtmlString()).append("</li>");
           }
 
-          if (entry.numberingListEntryIndex().isLgl()) {
-            sb.append("<li style=\"list-style-type:decimal\">")
-                .append(entry.toHtmlString())
-                .append("</li>");
-          } else {
-            sb.append("<li>").append(entry.toHtmlString()).append("</li>");
-          }
+          sb.append(entry.toHtmlString());
+
+          // Leaving list open for later closing.
+          isListItemOpen[0] = true;
 
           if (!currentNumberFormat.isEmpty()) {
             currentNumberFormat.remove(0);
@@ -76,9 +113,19 @@ public class NumberingList implements DocumentationUnitDocx {
           cLvl[0] = lvl;
         });
 
+    // Final list close
+    if (isListItemOpen[0]) {
+      sb.append("</li>");
+    }
+
     /* Close all list/sub-list tag when last element*/
     while (!closeTags.isEmpty()) {
       sb.append(closeTags.removeFirst());
+
+      // Closing parent list item that contained this sub list
+      if (!closeTags.isEmpty()) {
+        sb.append("</li>");
+      }
     }
     return sb.toString();
   }
