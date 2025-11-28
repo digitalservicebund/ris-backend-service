@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RandnummernRef;
 import jakarta.xml.bind.annotation.XmlAnyElement;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -93,22 +94,14 @@ public class Berichtigungen {
       private String domainTerm = "Randnummern";
 
       @Singular
-      @XmlElement(name = "berichtigungRandnummer", namespace = CaseLawLdml.RIS_NS)
+      @XmlElement(name = "ref", namespace = CaseLawLdml.AKN_NS)
       private List<Randnummer> values;
 
       @NoArgsConstructor
-      @AllArgsConstructor
-      @Getter
-      @Builder
-      public static class Randnummer {
-        @Builder.Default
-        @XmlAttribute(name = "domainTerm")
-        private String domainTerm = "Randnummer";
-
-        @XmlAttribute(namespace = CaseLawLdml.AKN_NS, name = "refersTo")
-        private String refersTo;
-
-        @XmlValue private String value;
+      public static class Randnummer extends RandnummernRef {
+        public Randnummer(String randnummer) {
+          super("Randnummer", randnummer);
+        }
       }
     }
 
