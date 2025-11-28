@@ -108,8 +108,8 @@ spotless {
             "**/gradle.properties",
             "**/gradle-wrapper.properties",
             "**/jaxb.properties",
-            "**/sentry-debug-meta.properties"
-        )
+            "**/sentry-debug-meta.properties",
+            )
         // spotless:off
         prettier(
             mapOf(
@@ -144,6 +144,7 @@ sonar {
             "sonar.coverage.exclusions",
             "**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/*Exception.java"
         )
+        property("sonar.cpd.exclusions", "**/DecisionCommonLdmlTransformer.java, **/PendingProceedingCommonLdmlTransformer.java")
         property("sonar.sources", "src/main/java")
     }
 }
@@ -203,7 +204,7 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.110")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.111")
     // for local development:
 //     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.110.jar"))
 

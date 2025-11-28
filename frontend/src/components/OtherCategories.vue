@@ -8,6 +8,7 @@ import DismissalInputs from "@/components/DismissalInputs.vue"
 import ForeignLanguageVersions from "@/components/ForeignLanguageVersions.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
+import ObjectValues from "@/components/ObjectValues.vue"
 import OriginOfTranslations from "@/components/OriginOfTranslations.vue"
 import TextInputCategory from "@/components/texts/TextInputCategory.vue"
 import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
@@ -75,6 +76,12 @@ const hasAppeal = computed(() => {
     contentRelatedIndexing.value.appeal?.appealWithdrawal ||
     contentRelatedIndexing.value.appeal?.pkhPlaintiff
   )
+})
+
+const hasObjectValues = computed(() => {
+  return contentRelatedIndexing.value.objectValues?.length
+    ? contentRelatedIndexing.value.objectValues?.length > 0
+    : false
 })
 
 const shouldDisplayLegislativeMandateCategory = computed(() => {
@@ -176,6 +183,12 @@ const shouldDisplayAppeal = computed(
         :should-show-button="!hasAppeal"
       >
         <Appeal :label="contentRelatedIndexingLabels.appeal" />
+      </CategoryWrapper>
+      <CategoryWrapper
+        label="Gegenstandswert"
+        :should-show-button="!hasObjectValues"
+      >
+        <ObjectValues :label="contentRelatedIndexingLabels.objectValues" />
       </CategoryWrapper>
     </div>
   </div>

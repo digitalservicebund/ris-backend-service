@@ -7,6 +7,7 @@ import { Court } from "@/domain/court"
 import { DocumentType } from "@/domain/documentType"
 import { DocumentTypeCategory } from "@/domain/documentTypeCategory"
 import { LanguageCode } from "@/domain/foreignLanguageVersion"
+import { CurrencyCode } from "@/domain/objectValue"
 import service from "@/services/comboboxItemService"
 
 const court: Court = {
@@ -30,6 +31,7 @@ const dependentLiteratureDoctype: DocumentType = {
 }
 const normAbbreviation = { id: "id", abbreviation: "BGB" }
 const languageCode: LanguageCode = { id: "id", label: "Englisch" }
+const currencyCode: CurrencyCode = { id: "id", label: "Euro (EUR)" }
 const collectiveAgreementIndustry: CollectiveAgreementIndustry = {
   id: "290b39dc-9368-4d1c-9076-7f96e05cb575",
   label: "Bühne, Theater, Orchester",
@@ -60,6 +62,9 @@ const server = setupServer(
   }),
   http.get("/api/v1/caselaw/collective-agreement-industries", () => {
     return HttpResponse.json([collectiveAgreementIndustry])
+  }),
+  http.get("/api/v1/caselaw/currencycodes", () => {
+    return HttpResponse.json([currencyCode])
   }),
 )
 
@@ -128,6 +133,16 @@ describe("comboboxItemService", () => {
     await waitFor(() => {
       expect(data.value?.[0].label).toEqual("Englisch")
       expect(data.value?.[0].value).toEqual(languageCode)
+    })
+  })
+
+  it("should fetch currency code from lookup table", async () => {
+    const { data, execute } = service.getCurrencyCodes(ref())
+
+    await execute()
+    await waitFor(() => {
+      expect(data.value?.[0].label).toEqual("Euro (EUR)")
+      expect(data.value?.[0].value).toEqual(currencyCode)
     })
   })
 

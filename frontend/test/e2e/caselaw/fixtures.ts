@@ -699,6 +699,15 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                 },
               },
             ],
+            objectValues: [
+              {
+                id: "99028dd6-8998-4a80-a9a0-91ea5886f90e",
+                newEntry: true,
+                amount: 123,
+                currency: "Dollar (USD)",
+                proceeding: "Verfassungsbeschwerde",
+              },
+            ],
           },
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },

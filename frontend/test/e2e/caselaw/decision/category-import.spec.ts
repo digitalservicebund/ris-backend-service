@@ -96,7 +96,7 @@ test.describe("category import", () => {
       await test.step("disable import for empty source categories", async () => {
         await navigateToCategoryImport(page, documentNumber)
         await searchForDocumentUnitToImport(page, documentNumber)
-        await expect(page.getByText("Quellrubrik leer")).toHaveCount(30) // total number of importable categories
+        await expect(page.getByText("Quellrubrik leer")).toHaveCount(31) // total number of importable categories
       })
     },
   )
@@ -117,7 +117,7 @@ test.describe("category import", () => {
           prefilledDocumentUnitWithTexts.documentNumber,
         )
 
-        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(24) // number of non-importable categories, if target category already filled
+        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(25) // number of non-importable categories, if target category already filled
       })
     },
   )
@@ -976,6 +976,40 @@ test.describe("category import", () => {
       await test.step("scroll to category", async () => {
         await expect(
           page.getByRole("heading", { name: "Tarifvertrag" }),
+        ).toBeInViewport()
+      })
+    },
+  )
+
+  // Gegenstandswert
+  test(
+    "import objectValues (Gegenstandswert)",
+    { tag: ["@RISDEV-8810"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(
+          page.getByLabel("Gegenstandswert übernehmen"),
+        ).toBeVisible()
+        await page.getByLabel("Gegenstandswert übernehmen").click()
+
+        await expect(
+          page.getByText("123 Dollar (USD), Verfassungsbeschwerde"),
+        ).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByText("123 Dollar (USD), Verfassungsbeschwerde"),
         ).toBeInViewport()
       })
     },
