@@ -16,6 +16,9 @@ updates:
         update-types:
           - minor
           - patch
+      tiptap:
+        patterns:
+          - @tiptap/*
     ignore:
       # 1.53.0 breaks border-number, border-number-link and text-check e2e in chrome
       - dependency-name: "playwright"
