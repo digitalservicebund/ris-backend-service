@@ -6,6 +6,7 @@ import Definition from "@/domain/definition"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
 import NormReference from "@/domain/normReference"
+import ObjectValue from "@/domain/objectValue"
 import OriginOfTranslation from "@/domain/originOfTranslation"
 
 export type ContentRelatedIndexing = {
@@ -24,4 +25,5 @@ export type ContentRelatedIndexing = {
   originOfTranslations?: OriginOfTranslation[]
   appealAdmission?: AppealAdmission
   appeal?: Appeal
+  objectValues?: ObjectValue[]
 }

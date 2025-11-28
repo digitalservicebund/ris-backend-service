@@ -245,6 +245,7 @@ const handleImport = async (key: keyof typeof allLabels) => {
     case "foreignLanguageVersions":
     case "appealAdmission":
     case "originOfTranslations":
+    case "objectValues":
       importContextRelatedIndexing(key)
       break
     case "tenor":
