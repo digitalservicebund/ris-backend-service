@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 public class NumberingList implements DocumentationUnitDocx {
 
   public static final String CLOSING_LIST_ITEM = "</li>";
+  public static final String OPENING_LIST_ITEM = "<li>";
   // this should be a list containing either NumberingListEntry's or NumberingList's
   // so that a tree structure that can recursively be traversed
   private final List<NumberingListEntry> entries = new ArrayList<>();
@@ -96,7 +97,7 @@ public class NumberingList implements DocumentationUnitDocx {
           if (entry.numberingListEntryIndex().isLgl()) {
             sb.append("<li style=\"list-style-type:decimal\">");
           } else {
-            sb.append(CLOSING_LIST_ITEM);
+            sb.append(OPENING_LIST_ITEM);
           }
 
           sb.append(entry.toHtmlString());
