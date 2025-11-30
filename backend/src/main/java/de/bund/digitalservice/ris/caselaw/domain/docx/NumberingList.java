@@ -31,18 +31,21 @@ public class NumberingList implements DocumentationUnitDocx {
   public String toHtmlString() {
     StringBuilder sb = new StringBuilder();
     LinkedList<String> closeTags = new LinkedList<>();
-    int[] cLvl = {-1};
+    int[] currentLevel = {-1};
     final boolean[] isListItemOpen = {false};
     List<DocumentationUnitNumberingListNumberFormat> currentNumberFormat = new ArrayList<>();
 
     entries.forEach(
         entry -> {
           /*Get level of list entry*/
-          int lvl = stringToInt(entry.numberingListEntryIndex().iLvl(), 0);
+          int targetLevel = stringToInt(entry.numberingListEntryIndex().iLvl(), 0);
 
           // Open a new list if change in number format at level 0
           if (shouldCreateNewList(
-              cLvl[0], lvl, currentNumberFormat, entry.numberingListEntryIndex().numberFormat())) {
+              currentLevel[0],
+              targetLevel,
+              currentNumberFormat,
+              entry.numberingListEntryIndex().numberFormat())) {
             // Check if the last list item is still open
             // because for sub-lists the last list item
             // should remain open.
@@ -61,44 +64,25 @@ public class NumberingList implements DocumentationUnitDocx {
 
             sb.append(getOpenListTag(entry.numberingListEntryIndex()));
             closeTags.addFirst(getCloseListTag(entry.numberingListEntryIndex().numberFormat()));
-            cLvl[0] = lvl;
+            currentLevel[0] = targetLevel;
           }
 
-          // Close list/sub-list Tag
-          while (lvl < cLvl[0]) {
-            // Close item
-            if (isListItemOpen[0]) {
-              sb.append(CLOSING_LIST_ITEM);
-              isListItemOpen[0] = false;
-            }
-
-            // Close sub list
-            sb.append(closeTags.removeFirst());
-
-            // Closing parent list item that contained this sub list
-            sb.append(CLOSING_LIST_ITEM);
-
-            cLvl[0]--;
-          }
+          closeSubList(targetLevel, closeTags, sb, currentLevel, isListItemOpen);
 
           // If still open, then close it
-          if (lvl == cLvl[0] && isListItemOpen[0]) {
+          if (targetLevel == currentLevel[0] && isListItemOpen[0]) {
             sb.append(CLOSING_LIST_ITEM);
             isListItemOpen[0] = false;
           }
 
           // Open list/sub-list Tag
-          while (lvl > cLvl[0]) {
+          while (targetLevel > currentLevel[0]) {
             sb.append(getOpenListTag(entry.numberingListEntryIndex()));
             closeTags.addFirst(getCloseListTag(entry.numberingListEntryIndex().numberFormat()));
-            cLvl[0]++;
+            currentLevel[0]++;
           }
 
-          if (entry.numberingListEntryIndex().isLgl()) {
-            sb.append("<li style=\"list-style-type:decimal\">");
-          } else {
-            sb.append(OPENING_LIST_ITEM);
-          }
+          openList(entry, sb);
 
           sb.append(entry.toHtmlString());
 
@@ -106,10 +90,10 @@ public class NumberingList implements DocumentationUnitDocx {
           isListItemOpen[0] = true;
 
           if (!currentNumberFormat.isEmpty()) {
-            currentNumberFormat.remove(0);
+            currentNumberFormat.removeFirst();
           }
           currentNumberFormat.add(entry.numberingListEntryIndex().numberFormat());
-          cLvl[0] = lvl;
+          currentLevel[0] = targetLevel;
         });
 
     // Final list close
@@ -117,7 +101,43 @@ public class NumberingList implements DocumentationUnitDocx {
       sb.append(CLOSING_LIST_ITEM);
     }
 
-    /* Close all list/sub-list tag when last element*/
+    closeAllLists(closeTags, sb);
+
+    return sb.toString();
+  }
+
+  private void closeSubList(
+      int targetLevel,
+      LinkedList<String> closeTags,
+      StringBuilder sb,
+      int[] currentLevel,
+      boolean[] isListItemOpen) {
+    while (targetLevel < currentLevel[0]) {
+      // Close item
+      if (isListItemOpen[0]) {
+        sb.append(CLOSING_LIST_ITEM);
+        isListItemOpen[0] = false;
+      }
+
+      // Close sub list
+      sb.append(closeTags.removeFirst());
+
+      // Closing parent list item that contained this sub list
+      sb.append(CLOSING_LIST_ITEM);
+
+      currentLevel[0]--;
+    }
+  }
+
+  private void openList(NumberingListEntry entry, StringBuilder sb) {
+    if (entry.numberingListEntryIndex().isLgl()) {
+      sb.append("<li style=\"list-style-type:decimal\">");
+    } else {
+      sb.append(OPENING_LIST_ITEM);
+    }
+  }
+
+  private void closeAllLists(LinkedList<String> closeTags, StringBuilder sb) {
     while (!closeTags.isEmpty()) {
       sb.append(closeTags.removeFirst());
 
@@ -126,7 +146,6 @@ public class NumberingList implements DocumentationUnitDocx {
         sb.append(CLOSING_LIST_ITEM);
       }
     }
-    return sb.toString();
   }
 
   public enum DocumentationUnitNumberingListNumberFormat {
