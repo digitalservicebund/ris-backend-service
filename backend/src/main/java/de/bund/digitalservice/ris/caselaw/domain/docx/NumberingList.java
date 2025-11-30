@@ -46,6 +46,7 @@ public class NumberingList implements DocumentationUnitDocx {
               targetLevel,
               currentNumberFormat,
               entry.numberingListEntryIndex().numberFormat())) {
+
             // Check if the last list item is still open
             // because for sub-lists the last list item
             // should remain open.
@@ -54,13 +55,7 @@ public class NumberingList implements DocumentationUnitDocx {
               isListItemOpen[0] = false;
             }
 
-            while (!closeTags.isEmpty()) {
-              sb.append(closeTags.removeFirst());
-              // If closing sub list, also close parent list
-              if (!closeTags.isEmpty()) {
-                sb.append(CLOSING_LIST_ITEM);
-              }
-            }
+            handleListClosing(closeTags, sb);
 
             sb.append(getOpenListTag(entry.numberingListEntryIndex()));
             closeTags.addFirst(getCloseListTag(entry.numberingListEntryIndex().numberFormat()));
@@ -126,6 +121,16 @@ public class NumberingList implements DocumentationUnitDocx {
       sb.append(CLOSING_LIST_ITEM);
 
       currentLevel[0]--;
+    }
+  }
+
+  private void handleListClosing(LinkedList<String> closeTags, StringBuilder sb) {
+    while (!closeTags.isEmpty()) {
+      sb.append(closeTags.removeFirst());
+      // If closing sub list, also close parent list
+      if (!closeTags.isEmpty()) {
+        sb.append(CLOSING_LIST_ITEM);
+      }
     }
   }
 
