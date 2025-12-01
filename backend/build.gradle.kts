@@ -4,6 +4,7 @@ import com.github.jk1.license.filter.DependencyFilter
 import com.github.jk1.license.filter.LicenseBundleNormalizer
 import com.github.jk1.license.render.CsvReportRenderer
 import com.github.jk1.license.render.ReportRenderer
+import org.flywaydb.gradle.task.AbstractFlywayTask
 import org.flywaydb.gradle.task.FlywayMigrateTask
 import java.io.Serializable
 
@@ -254,11 +255,26 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
+buildscript {
+    dependencies {
+        classpath("org.flywaydb:flyway-database-postgresql:11.17.1")
+    }
+}
+
 project.tasks.sonar {
     dependsOn("jacocoTestReport")
 }
 
 tasks {
+    withType<AbstractFlywayTask> {
+        url = System.getenv("DB_URL")
+        user = System.getenv("DB_USER")
+        password = System.getenv("DB_PASSWORD")
+        locations = arrayOf("classpath:db/migration")
+        defaultSchema = "incremental_migration"
+        dependsOn("compileMigrationJava")
+    }
+
     register<FlywayMigrateTask>("migrateDatabaseForERD") {
         url = System.getenv("DB_URL")
         user = System.getenv("DB_USER")
