@@ -59,6 +59,7 @@ const countryWithLabel = computed({
       : undefined,
   set: (newValue: FieldOfLaw) => {
     currentValue.value.country = newValue
+    currentValue.value.legacyValue = undefined
   },
 })
 
