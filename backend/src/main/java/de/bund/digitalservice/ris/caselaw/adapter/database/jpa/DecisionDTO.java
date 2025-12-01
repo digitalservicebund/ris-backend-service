@@ -278,6 +278,14 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @Builder.Default
   private List<OriginOfTranslationDTO> originOfTranslations = new ArrayList<>();
 
+  /** Gegenstandswert */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "decision_id", nullable = false)
+  @OrderBy("rank")
+  @Builder.Default
+  private List<ObjectValueDTO> objectValues = new ArrayList<>();
+
+  /** Berichtigung */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "decision_id", nullable = false)
   @Builder.Default

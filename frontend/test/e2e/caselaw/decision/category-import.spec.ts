@@ -981,6 +981,40 @@ test.describe("category import", () => {
     },
   )
 
+  // Gegenstandswert
+  test(
+    "import objectValues (Gegenstandswert)",
+    { tag: ["@RISDEV-8810"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(
+          page.getByLabel("Gegenstandswert übernehmen"),
+        ).toBeVisible()
+        await page.getByLabel("Gegenstandswert übernehmen").click()
+
+        await expect(
+          page.getByText("123 Dollar (USD), Verfassungsbeschwerde"),
+        ).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByText("123 Dollar (USD), Verfassungsbeschwerde"),
+        ).toBeInViewport()
+      })
+    },
+  )
+
   // Short text categories
 
   // Entscheidungsname
