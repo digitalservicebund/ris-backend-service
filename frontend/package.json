@@ -28,7 +28,8 @@
     "stylelint:fix": "f() { stylelint  --cache --cache-location .cache/stylelint/ ${@:-.} --fix; }; f",
     "style:check": "f() { npm run type:check && npm run prettier:check $@ && npm run eslint:check $@ && npm run stylelint:check $@; }; f",
     "style:fix": "f() { npm run type:check && npm run prettier:fix $@ && npm run eslint:fix $@ && npm run stylelint:fix $@; }; f",
-    "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow \"$(. ./parseAllowedLicences.sh)\" --csv --out ./frontend-licence-report.csv"
+    "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow \"$(. ./parseAllowedLicences.sh)\" --csv --out ./frontend-licence-report.csv",
+    "preinstall": "echo 'Please disable script execution: npm config set ignore-scripts true' && exit 1"
   },
   "dependencies": {
     "@braintree/sanitize-url": "^7.1.1",
