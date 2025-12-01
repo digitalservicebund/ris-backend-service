@@ -299,6 +299,13 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @Builder.Default
   private List<AbuseFeeDTO> abuseFees = new ArrayList<>();
 
+  /** Herkunftsland */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @OrderBy("rank")
+  @Builder.Default
+  private List<CountryOfOriginDto> countriesOfOrigin = new ArrayList<>();
+
   @Override
   @SuppressWarnings("java:S2097") // Class type check is not recognized by Sonar
   public final boolean equals(Object o) {
