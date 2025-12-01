@@ -77,7 +77,7 @@ public class NumberingList implements DocumentationUnitDocx {
             currentLevel[0]++;
           }
 
-          openList(entry, sb);
+          openListItemWithStyle(entry, sb);
 
           sb.append(entry.toHtmlString());
 
@@ -134,7 +134,7 @@ public class NumberingList implements DocumentationUnitDocx {
     }
   }
 
-  private void openList(NumberingListEntry entry, StringBuilder sb) {
+  private void openListItemWithStyle(NumberingListEntry entry, StringBuilder sb) {
     if (entry.numberingListEntryIndex().isLgl()) {
       sb.append("<li style=\"list-style-type:decimal\">");
     } else {
