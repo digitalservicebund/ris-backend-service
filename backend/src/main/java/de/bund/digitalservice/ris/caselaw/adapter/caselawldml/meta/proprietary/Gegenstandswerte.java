@@ -18,6 +18,7 @@ public class Gegenstandswerte {
   @XmlAttribute(name = "domainTerm")
   private static final String DOMAIN_TERM = "Gegenstandswerte";
 
+  @SuppressWarnings("java:S1700")
   @XmlElement(name = "gegenstandswert", namespace = CaseLawLdml.RIS_NS)
   private List<Gegenstandswert> gegenstandswerte;
 
