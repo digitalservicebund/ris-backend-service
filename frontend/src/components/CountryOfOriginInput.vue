@@ -89,7 +89,9 @@ const fieldOfLawWithLabel = computed({
             aria-label="Landbezeichnung"
             class="w-full"
             :invalid="slotProps.hasError"
-            :item-service="ComboboxItemService.getFieldOfLawSearchByIdentifier"
+            :item-service="
+              ComboboxItemService.getCountryFieldOfLawSearchByIdentifier
+            "
           ></ComboboxInput>
         </InputField>
       </div>

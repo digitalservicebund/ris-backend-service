@@ -193,6 +193,9 @@ type ComboboxItemService = {
   getDependentLiteratureDocumentTypes: (
     filter: Ref<string | undefined>,
   ) => UseFetchReturn<ComboboxItem[]>
+  getCountryFieldOfLawSearchByIdentifier: (
+    filter: Ref<string | undefined>,
+  ) => UseFetchReturn<ComboboxItem[]>
 }
 
 const service: ComboboxItemService = {
@@ -220,6 +223,11 @@ const service: ComboboxItemService = {
     ),
   getFieldOfLawSearchByIdentifier: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter),
+  getCountryFieldOfLawSearchByIdentifier: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(
+      Endpoint.fieldOfLawSearchByIdentifier,
+      computed(() => `RE-07-${filter.value?.replace("RE-07-", "") ?? ""}`),
+    ),
   getRisAbbreviations: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.risAbbreviations, filter, 30),
   getCitationTypes: (filter: Ref<string | undefined>) =>
