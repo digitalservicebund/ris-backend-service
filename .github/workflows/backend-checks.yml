@@ -4,7 +4,7 @@ on:
       SLACK_WEBHOOK_URL:
         required: false
       SONAR_TOKEN:
-        required: true
+        required: false
       GH_PACKAGES_REPOSITORY_USER:
         required: true
       GH_PACKAGES_REPOSITORY_TOKEN:
@@ -26,7 +26,7 @@ jobs:
   backend-unit-tests:
     needs: scan-backend-changes
     # Disabled as tests run in sonar job
-    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main' && false  }}
+    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main' && github.actor == 'dependabot[bot]'  }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -60,7 +60,7 @@ jobs:
   backend-integration-tests:
     needs: scan-backend-changes
     # Disabled as tests run in sonar job
-    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main' && false  }}
+    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main'  && github.actor == 'dependabot[bot]'  }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -94,7 +94,7 @@ jobs:
 
   backend-tests-and-code-quality:
     needs: scan-backend-changes
-    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' }}
+    if: ${{ needs.scan-backend-changes.outputs.backend == 'true'  && github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

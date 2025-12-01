@@ -4,6 +4,7 @@ import ActiveCitation from "@/domain/activeCitation"
 import Attachment from "@/domain/attachment"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { CoreData } from "@/domain/coreData"
+import Correction from "@/domain/correction"
 import Definition from "@/domain/definition"
 import { Kind } from "@/domain/documentationUnitKind"
 import EnsuingDecision from "@/domain/ensuingDecision"
@@ -51,6 +52,7 @@ export type LongTexts = {
   participatingJudges?: ParticipatingJudge[]
   otherLongText?: string
   outline?: string
+  corrections?: Correction[]
 }
 export const longTextLabels: {
   [longTextKey in keyof Required<LongTexts>]: string
@@ -63,6 +65,7 @@ export const longTextLabels: {
   participatingJudges: "Mitwirkende Richter",
   otherLongText: "Sonstiger Langtext",
   outline: "Gliederung",
+  corrections: "Berichtigung",
 }
 export const contentRelatedIndexingLabels: {
   [contentRelatedIndexingKey in keyof Required<ContentRelatedIndexing>]: string
@@ -166,6 +169,12 @@ export class Decision {
       data.longTexts.participatingJudges =
         data.longTexts.participatingJudges.map(
           (judge) => new ParticipatingJudge({ ...judge }),
+        )
+
+    if (data.longTexts?.corrections)
+      data.longTexts.corrections =
+        data.longTexts.corrections.map(
+          (data) => new Correction({ ...data }),
         )
 
     if (data.previousDecisions)

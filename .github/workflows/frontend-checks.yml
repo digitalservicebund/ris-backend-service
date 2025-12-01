@@ -4,7 +4,7 @@ on:
       SLACK_WEBHOOK_URL:
         required: false
       SONAR_TOKEN:
-        required: true
+        required: false
 
 jobs:
   scan-frontend-changes:
@@ -43,7 +43,7 @@ jobs:
       - name: Install dependencies
         if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: |
-          npm ci
+          npm ci --ignore-scripts
         working-directory: ./frontend
       - name: Run tests
         run: |
@@ -90,7 +90,7 @@ jobs:
       - name: Install dependencies
         if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: |
-          npm ci
+          npm ci --ignore-scripts
         working-directory: ./frontend
       - name: Check style
         run: npm run style:check
@@ -119,15 +119,17 @@ jobs:
           cache: npm
           cache-dependency-path: ./frontend/package-lock.json
       - name: Run coverage
+        if: ${{  github.actor != 'dependabot[bot]' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          npm install
+          npm ci --ignore-scripts
           npm run coverage
         working-directory: ./frontend
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@40f5b61913e891f9d316696628698051136015be
+        if: ${{  github.actor != 'dependabot[bot]' }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
@@ -136,6 +138,7 @@ jobs:
             -Dsonar.qualitygate.wait=true
       - name: Check SonarQube Quality Gate
         uses: sonarsource/sonarqube-quality-gate-action@cb3ed20f9fec62b4c3b8ad9e77656c6adaade913
+        if: ${{  github.actor != 'dependabot[bot]' }}
         with:
           scanMetadataReportFile: frontend/.scannerwork/report-task.txt
         timeout-minutes: 3
