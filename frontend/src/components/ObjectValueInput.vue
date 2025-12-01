@@ -28,7 +28,7 @@ const validationStore = useValidationStore<ObjectValueField>()
 const lastSavedModelValue = ref(new ObjectValue({ ...props.modelValue }))
 const objectValue = ref(new ObjectValue({ ...props.modelValue }))
 const isSixDigitNumber = computed(() => {
-  return !!objectValue.value.amount && objectValue.value.amount <= 999999
+  return objectValue.value.amount != null && objectValue.value.amount <= 999999
 })
 async function addObjectValue() {
   validate()
@@ -40,14 +40,12 @@ function validate() {
   if (objectValue.value.isEmpty) {
     validationStore.reset()
   } else {
-    if (objectValue.value.amount) {
-      if (isSixDigitNumber.value) {
-        validationStore.remove("amount")
-      } else {
-        validationStore.add("Max. 6 Zeichen", "amount")
-      }
-    } else {
+    if (null == objectValue.value.amount) {
       validationStore.add("Pflichtfeld nicht befüllt", "amount")
+    } else if (isSixDigitNumber.value) {
+      validationStore.remove("amount")
+    } else {
+      validationStore.add("Max. 6 Zeichen", "amount")
     }
     if (objectValue.value.currencyCode) {
       validationStore.remove("currencyCode")
@@ -107,7 +105,7 @@ onMounted(() => {
             input-class="w-full"
             :invalid="slotProps.hasError"
             locale="de"
-            :min="1"
+            :min="0"
             @blur="validate"
             @focus="validationStore.remove('amount')"
             @input="onInput"
