@@ -580,7 +580,7 @@ const ariaLabel = props.ariaLabel ? props.ariaLabel : null
   <div
     ref="menuBar"
     :aria-label="ariaLabel + ' Button Leiste'"
-    class="flex flex-row flex-wrap justify-between ps-8 pe-8 pt-8 pb-4"
+    class="flex flex-row flex-wrap justify-between gap-2 ps-8 pe-8 pt-8 pb-4"
     :tabindex="
       menuBar?.matches(':focus-within') || props.buttonsDisabled ? -1 : 0
     "
@@ -588,7 +588,7 @@ const ariaLabel = props.ariaLabel ? props.ariaLabel : null
     @keydown.left.stop.prevent="focusPreviousButton"
     @keydown.right.stop.prevent="focusNextButton"
   >
-    <div class="flex flex-row">
+    <div class="flex min-w-0 flex-1 flex-row flex-wrap gap-1">
       <TextEditorButton
         v-for="(button, index) in collapsedButtons"
         :key="index"
@@ -599,7 +599,7 @@ const ariaLabel = props.ariaLabel ? props.ariaLabel : null
         @toggle="handleButtonClick"
       />
     </div>
-    <div class="flex flex-row">
+    <div class="flex flex-shrink-0 flex-row gap-1">
       <TextEditorButton
         v-for="(button, index) in fixButtons"
         :key="index"

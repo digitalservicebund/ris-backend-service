@@ -258,7 +258,8 @@ public class DecisionTransformer extends DocumentableTransformer {
         .participatingJudges(
             ParticipatingJudgeTransformer.transformToDTO(longTexts.participatingJudges()))
         .otherLongText(longTexts.otherLongText())
-        .outline(longTexts.outline());
+        .outline(longTexts.outline())
+        .corrections(CorrectionTransformer.transformToDTOs(longTexts.corrections()));
   }
 
   private static void addShortTexts(
@@ -659,6 +660,12 @@ public class DecisionTransformer extends DocumentableTransformer {
             ParticipatingJudgeTransformer.transformToDomain(decisionDTO.getParticipatingJudges()))
         .otherLongText(decisionDTO.getOtherLongText())
         .outline(decisionDTO.getOutline())
+        .corrections(
+            decisionDTO.getCorrections() != null
+                ? decisionDTO.getCorrections().stream()
+                    .map(CorrectionTransformer::transformToDomain)
+                    .toList()
+                : null)
         .build();
   }
 

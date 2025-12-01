@@ -628,6 +628,13 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             participatingJudges: [{ name: "Test Richter" }],
             otherLongText: "Test Sonstiger Langtext",
             outline: "Test Gliederung",
+            corrections: [
+              {
+                type: "Berichtigungsbeschluss",
+                description: "Hauffen -> Haufen",
+                newEntry: true,
+              },
+            ],
           },
           contentRelatedIndexing: {
             evsf: "Test E-VSF",

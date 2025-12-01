@@ -2,6 +2,7 @@
 import { storeToRefs } from "pinia"
 import { type Component, computed, Ref } from "vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
+import CorrectionsInput from "@/components/CorrectionsInput.vue"
 import ParticipatingJudges from "@/components/ParticipatingJudges.vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
@@ -106,6 +107,16 @@ const outline = computed({
           :should-show-button="!decision?.longTexts?.outline?.length"
         />
       </div>
+
+      <CategoryWrapper
+        label="Berichtigung"
+        :should-show-button="!decision?.longTexts?.corrections?.length"
+      >
+        <CorrectionsInput
+          v-bind="{ registerTextEditorRef }"
+          label="Berichtigung"
+        />
+      </CategoryWrapper>
     </div>
   </div>
 </template>

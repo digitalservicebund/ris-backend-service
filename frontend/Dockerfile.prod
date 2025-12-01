@@ -1,7 +1,7 @@
 FROM node:24.11.1 AS builder
 WORKDIR /usr/src/app
 COPY . .
-RUN npm install && npx vite build
+RUN npm ci --ignore-scripts && npx vite build
 
 FROM cgr.dev/chainguard/nginx@sha256:50b986b188c26457d060c9e16665b51d2e5e252019ba4e921cb990c71cd24802
 EXPOSE 8081
