@@ -3,6 +3,7 @@ import { UseFetchReturn } from "@vueuse/core"
 import Button from "primevue/button"
 import { computed, onMounted, Ref, ref, shallowRef, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import CountryOfOriginSummary from "@/components/CountryOfOriginSummary.vue"
 import InputField from "@/components/input/InputField.vue"
 import { ComboboxItem } from "@/components/input/types"
 import CountryOfOrigin from "@/domain/countryOfOrigin"
@@ -104,12 +105,15 @@ const fieldOfLawWithoutCountriesService = (
 
 <template>
   <div class="flex flex-col gap-24">
+    <div v-if="lastSavedModelValue.legacyValue" class="flex flex-row">
+      <CountryOfOriginSummary :data="lastSavedModelValue" />
+    </div>
     <div class="flex flex-row gap-24">
       <div class="basis-1/2">
         <InputField
           id="countryOfOriginCountryInput"
           v-slot="slotProps"
-          label="Landbezeichnung"
+          label="Landbezeichnung *"
         >
           <ComboboxInput
             id="countryOfOriginCountryInputText"
