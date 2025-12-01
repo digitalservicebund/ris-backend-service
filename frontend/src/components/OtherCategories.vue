@@ -4,6 +4,7 @@ import AbuseFees from "./AbuseFees.vue"
 import Appeal from "@/components/Appeal.vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import CollectiveAgreements from "@/components/CollectiveAgreements.vue"
+import CountriesOfOrigin from "@/components/CountriesOfOrigin.vue"
 import DefinitionList from "@/components/DefinitionList.vue"
 import DismissalInputs from "@/components/DismissalInputs.vue"
 import ForeignLanguageVersions from "@/components/ForeignLanguageVersions.vue"
@@ -60,6 +61,12 @@ const hasForeignLanguageVersion = computed(() => {
 const hasOriginOfTranslations = computed(() => {
   return contentRelatedIndexing.value.originOfTranslations
     ? contentRelatedIndexing.value.originOfTranslations?.length > 0
+    : false
+})
+
+const hasCountriesOfOrigin = computed(() => {
+  return contentRelatedIndexing.value.countriesOfOrigin
+    ? contentRelatedIndexing.value.countriesOfOrigin?.length > 0
     : false
 })
 
@@ -202,6 +209,14 @@ const shouldDisplayAppeal = computed(
         :should-show-button="!hasAbuseFees"
       >
         <AbuseFees :label="contentRelatedIndexingLabels.abuseFees" />
+      </CategoryWrapper>
+      <CategoryWrapper
+        :label="contentRelatedIndexingLabels.countriesOfOrigin"
+        :should-show-button="!hasCountriesOfOrigin"
+      >
+        <CountriesOfOrigin
+          :label="contentRelatedIndexingLabels.countriesOfOrigin"
+        />
       </CategoryWrapper>
     </div>
   </div>

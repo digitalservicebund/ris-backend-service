@@ -88,6 +88,7 @@ export const contentRelatedIndexingLabels: {
   appeal: "Rechtsmittel",
   objectValues: "Gegenstandswert",
   abuseFees: "Missbrauchsgebühr",
+  countriesOfOrigin: "Herkunftsland",
 }
 export const allLabels = {
   caselawReferences: "Rechtsprechungsfundstellen",

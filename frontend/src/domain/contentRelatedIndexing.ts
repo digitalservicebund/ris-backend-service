@@ -3,6 +3,7 @@ import ActiveCitation from "@/domain/activeCitation"
 import { Appeal } from "@/domain/appeal"
 import { AppealAdmission } from "@/domain/appealAdmission"
 import { CollectiveAgreement } from "@/domain/collectiveAgreement"
+import CountryOfOrigin from "@/domain/countryOfOrigin"
 import Definition from "@/domain/definition"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
@@ -28,4 +29,5 @@ export type ContentRelatedIndexing = {
   appeal?: Appeal
   objectValues?: ObjectValue[]
   abuseFees?: AbuseFee[]
+  countriesOfOrigin?: CountryOfOrigin[]
 }
