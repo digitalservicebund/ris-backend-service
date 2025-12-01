@@ -620,7 +620,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
   private AktenzeichenListe buildAbweichendeAktenzeichen(
       RisMeta.RisMetaBuilder builder, CoreData coreData) {
-    AktenzeichenListe aktenzeichenListe = builder.build().getAktenzeichenListe();
+    AktenzeichenListe aktenzeichenListe = builder.build().getAktenzeichenListe(); // NOSONAR
     List<AktenzeichenListe.Aktenzeichen> aktenzeichen = aktenzeichenListe.getAktenzeichen();
     if (aktenzeichen != null) {
       coreData
