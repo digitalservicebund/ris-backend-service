@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.E
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Evsf;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FehlerhafteGerichte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FremdsprachigeFassungen;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gegenstandswerte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gesetzgebungsauftrag;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.HerkunftDerUebersetzungen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Kuendigungsarten;
@@ -166,6 +167,12 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.originOfTranslations())) {
         var herkunftDerUebersetzungen = buildHerkunftDerUebersetzungen(contentRelatedIndexing);
         builder.herkunftDerUebersetzungen(herkunftDerUebersetzungen);
+      }
+
+      // Gegenstandswerte
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.objectValues())) {
+        var gegenstandswerte = buildGegenstandswerte(contentRelatedIndexing);
+        builder.gegenstandswerte(gegenstandswerte);
       }
     }
 
@@ -616,6 +623,31 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
             .toList();
 
     return HerkunftDerUebersetzungen.builder().herkunftDerUebersetzungen(herkunftList).build();
+  }
+
+  private Gegenstandswerte buildGegenstandswerte(ContentRelatedIndexing contentRelatedIndexing) {
+
+    var gegenstandswerte =
+        contentRelatedIndexing.objectValues().stream()
+            .map(
+                objectValue ->
+                    Gegenstandswerte.Gegenstandswert.builder()
+                        .gegenstandswertBetrag(
+                            Gegenstandswerte.GegenstandswertBetrag.builder()
+                                .value(String.valueOf(objectValue.amount()))
+                                .build())
+                        .gegenstandswertWaehrung(
+                            Gegenstandswerte.GegenstandswertWaehrung.builder()
+                                .value(objectValue.currencyCode().isoCode())
+                                .build())
+                        .gegenstandswertVerfahren(
+                            Gegenstandswerte.GegenstandswertVerfahren.builder()
+                                .value(objectValue.proceedingType().toString())
+                                .build())
+                        .build())
+            .toList();
+
+    return Gegenstandswerte.builder().gegenstandswerte(gegenstandswerte).build();
   }
 
   private AktenzeichenListe buildAbweichendeAktenzeichen(
