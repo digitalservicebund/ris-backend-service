@@ -39,7 +39,7 @@
     "@sentry/vue": "^10.27.0",
     "@tailwindcss/postcss": "^4.1.17",
     "@tiptap/extension-blockquote": "^2.27.1",
-    "@tiptap/extension-bold": "^2.27.1",
+    "@tiptap/extension-bold": "^3.11.1",
     "@tiptap/extension-bullet-list": "^2.27.1",
     "@tiptap/extension-color": "^2.27.1",
     "@tiptap/extension-document": "^2.27.1",
