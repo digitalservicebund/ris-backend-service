@@ -1,8 +1,10 @@
 <script lang="ts" setup>
+import { UseFetchReturn } from "@vueuse/core"
 import Button from "primevue/button"
-import { computed, onMounted, Ref, ref, watch } from "vue"
+import { computed, onMounted, Ref, ref, shallowRef, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
+import { ComboboxItem } from "@/components/input/types"
 import CountryOfOrigin from "@/domain/countryOfOrigin"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -72,6 +74,31 @@ const fieldOfLawWithLabel = computed({
     currentValue.value.fieldOfLaw = newValue
   },
 })
+
+const fieldOfLawWithoutCountriesService = (
+  filter: Ref<string | undefined>,
+): UseFetchReturn<ComboboxItem[]> => {
+  const useFetchReturn =
+    ComboboxItemService.getFieldOfLawSearchByIdentifier(filter)
+
+  const data = shallowRef<ComboboxItem[] | null>(null)
+
+  watch(
+    useFetchReturn.data,
+    () => {
+      data.value =
+        useFetchReturn.data.value?.filter(
+          (item) => !item.label.startsWith("RE-07-"),
+        ) ?? null
+    },
+    { immediate: true },
+  )
+
+  return {
+    ...useFetchReturn,
+    data,
+  }
+}
 </script>
 
 <template>
@@ -107,7 +134,7 @@ const fieldOfLawWithLabel = computed({
             aria-label="Rechtlicher Rahmen"
             class="w-full"
             :invalid="slotProps.hasError"
-            :item-service="ComboboxItemService.getFieldOfLawSearchByIdentifier"
+            :item-service="fieldOfLawWithoutCountriesService"
           ></ComboboxInput>
         </InputField>
       </div>
