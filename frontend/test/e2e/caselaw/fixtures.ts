@@ -9,6 +9,7 @@ import { Decision } from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import { ProceedingType } from "@/domain/objectValue"
 import { TranslationType } from "@/domain/originOfTranslation"
 import PendingProceeding from "@/domain/pendingProceeding"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
@@ -711,8 +712,12 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                 id: "99028dd6-8998-4a80-a9a0-91ea5886f90e",
                 newEntry: true,
                 amount: 123,
-                currency: "Dollar (USD)",
-                proceeding: "Verfassungsbeschwerde",
+                currencyCode: {
+                  id: "c7a92695-5171-459a-bd79-5cc741064a25",
+                  label: "Dollar (USD)",
+                  isoCode: "USD",
+                },
+                proceedingType: ProceedingType.VERFASSUNGSBESCHWERDE,
               },
             ],
           },
