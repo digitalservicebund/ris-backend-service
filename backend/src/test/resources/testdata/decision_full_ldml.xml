@@ -309,9 +309,9 @@
                     <ris:notiz domainTerm="Notiz">note test</ris:notiz>
                     <ris:gegenstandswerte domainTerm="Gegenstandswerte">
                         <ris:gegenstandswert domainTerm="Gegenstandswert">
-                            <ris:betrag domainTerm="Betrag">9635</ris:betrag>
-                            <ris:waehrung domainTerm="Währung">Euro (EUR)</ris:waehrung>
-                            <ris:verfahren domainTerm="Verfahren">Organstreitverfahren</ris:verfahren>
+                            <ris:gegenstandswertBetrag domainTerm="Betrag">9635</ris:gegenstandswertBetrag>
+                            <ris:gegenstandswertWaehrung domainTerm="Währung">EUR</ris:gegenstandswertWaehrung>
+                            <ris:gegenstandswertVerfahren domainTerm="Verfahren">Organstreitverfahren</ris:gegenstandswertVerfahren>
                         </ris:gegenstandswert>
                     </ris:gegenstandswerte>
                 </ris:meta>

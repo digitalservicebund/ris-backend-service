@@ -632,16 +632,16 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
             .map(
                 objectValue ->
                     Gegenstandswerte.Gegenstandswert.builder()
-                        .betrag(
-                            Gegenstandswerte.Betrag.builder()
+                        .gegenstandswertBetrag(
+                            Gegenstandswerte.GegenstandswertBetrag.builder()
                                 .value(String.valueOf(objectValue.amount()))
                                 .build())
-                        .waehrung(
-                            Gegenstandswerte.Waehrung.builder()
-                                .value(objectValue.currencyCode().label())
+                        .gegenstandswertWaehrung(
+                            Gegenstandswerte.GegenstandswertWaehrung.builder()
+                                .value(objectValue.currencyCode().isoCode())
                                 .build())
-                        .verfahren(
-                            Gegenstandswerte.Verfahren.builder()
+                        .gegenstandswertVerfahren(
+                            Gegenstandswerte.GegenstandswertVerfahren.builder()
                                 .value(objectValue.proceedingType().toString())
                                 .build())
                         .build())
