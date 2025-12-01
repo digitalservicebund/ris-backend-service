@@ -12,7 +12,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementIndustryDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CorrectionBorderNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CorrectionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CurrencyCodeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DefinitionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
@@ -35,6 +38,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ObjectValueDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationBorderNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationDTO;
@@ -55,6 +59,9 @@ import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreementIndustry;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
+import de.bund.digitalservice.ris.caselaw.domain.Correction;
+import de.bund.digitalservice.ris.caselaw.domain.CorrectionType;
+import de.bund.digitalservice.ris.caselaw.domain.CurrencyCode;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.Definition;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -65,9 +72,11 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
+import de.bund.digitalservice.ris.caselaw.domain.ObjectValue;
 import de.bund.digitalservice.ris.caselaw.domain.OriginOfTranslation;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.ProceedingType;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
@@ -85,6 +94,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -2025,6 +2035,135 @@ class DecisionTransformerTest {
     }
   }
 
+  @Nested
+  class ObjectValues {
+    @Test
+    void testTransformToDomain_withObjectValues_shouldAddData() {
+      // Arrange
+      DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+      var objectValue =
+          ObjectValueDTO.builder()
+              .amount(10000)
+              .currencyCode(
+                  CurrencyCodeDTO.builder()
+                      .isoCode("EUR")
+                      .currency("Euro")
+                      .value("Euro (EUR)")
+                      .build())
+              .proceedingType(ProceedingType.ABSTRAKTE_NORMENKONTROLLE)
+              .rank(1L)
+              .build();
+
+      decisionDTO.setObjectValues(List.of(objectValue));
+
+      // Act
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+      // Assert
+      assertThat(decision.contentRelatedIndexing().objectValues()).hasSize(1);
+      assertThat(decision.contentRelatedIndexing().objectValues().getFirst())
+          .isEqualTo(
+              ObjectValue.builder()
+                  .amount(10000)
+                  .currencyCode(CurrencyCode.builder().isoCode("EUR").label("Euro (EUR)").build())
+                  .proceedingType(ProceedingType.ABSTRAKTE_NORMENKONTROLLE)
+                  .build());
+    }
+
+    @Test
+    void testTransformToDomain_withoutObjectValues_shouldNotAddData() {
+      // Arrange
+      DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+      // Act
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+      // Assert
+      assertThat(decision.contentRelatedIndexing().objectValues()).isEmpty();
+    }
+
+    @Test
+    void testTransformToDomain_withNullObjectValues_shouldAddNull() {
+      // Arrange
+      DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+      List<ObjectValueDTO> objectValuesDTOs = new ArrayList<>();
+      objectValuesDTOs.add(null);
+      decisionDTO.setObjectValues(objectValuesDTOs);
+
+      // Act
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+      // Assert
+      List<ObjectValue> objectValues = new ArrayList<>();
+      objectValues.add(null);
+      assertThat(decision.contentRelatedIndexing().objectValues()).isEqualTo(objectValues);
+    }
+
+    @Test
+    void testTransformToDTO_withObjectValues_shouldAddData() {
+      // Arrange
+      var objectValue =
+          ObjectValue.builder()
+              .amount(10000)
+              .currencyCode(CurrencyCode.builder().isoCode("EUR").label("Euro (EUR)").build())
+              .proceedingType(ProceedingType.ABSTRAKTE_NORMENKONTROLLE)
+              .build();
+
+      Decision decision =
+          Decision.builder()
+              .contentRelatedIndexing(
+                  ContentRelatedIndexing.builder().objectValues(List.of(objectValue)).build())
+              .build();
+
+      // Act
+      DecisionDTO decisionDTO =
+          DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+      // Assert
+      assertThat(decisionDTO.getObjectValues()).hasSize(1);
+      assertThat(decisionDTO.getObjectValues().getFirst().getRank()).isEqualTo(1L);
+      assertThat(decisionDTO.getObjectValues().getFirst().getProceedingType())
+          .isEqualTo(ProceedingType.ABSTRAKTE_NORMENKONTROLLE);
+      assertThat(decisionDTO.getObjectValues().getFirst().getAmount()).isEqualTo(10000);
+      assertThat(decisionDTO.getObjectValues().getFirst().getCurrencyCode().getValue())
+          .isEqualTo("Euro (EUR)");
+    }
+
+    @Test
+    void testTransformToDTO_withoutObjectValues_shouldNotAddData() {
+      // Arrange
+      Decision decision = generateSimpleDocumentationUnitBuilder().build();
+
+      // Act
+      DecisionDTO decisionDTO =
+          DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+      // Assert
+      assertThat(decisionDTO.getObjectValues()).isEmpty();
+    }
+
+    @Test
+    void testTransformToDTO_withNullObjectValues_shouldAddNull() {
+      // Arrange
+      List<ObjectValue> objectValues = new ArrayList<>();
+      objectValues.add(null);
+      Decision decision =
+          Decision.builder()
+              .contentRelatedIndexing(
+                  ContentRelatedIndexing.builder().objectValues(objectValues).build())
+              .build();
+      // Act
+      DecisionDTO decisionDTO =
+          DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+      // Assert
+
+      List<ObjectValueDTO> objectValueDTOs = new ArrayList<>();
+      objectValueDTOs.add(null);
+      assertThat(decisionDTO.getObjectValues()).isEqualTo(objectValueDTOs);
+    }
+  }
+
   @Test
   void testTransformToDomain_withCelex_resultShouldHaveCelex() {
     DecisionDTO decisionDTO = generateSimpleDTOBuilder().celexNumber("62023CJ0538").build();
@@ -2143,6 +2282,80 @@ class DecisionTransformerTest {
     assertThat(decisionDTO.getAppeal()).isNull();
   }
 
+  @Test
+  void transformToDTO_correction() {
+    Decision decision =
+        Decision.builder()
+            .longTexts(
+                LongTexts.builder()
+                    .corrections(
+                        List.of(
+                            Correction.builder()
+                                .id(UUID.fromString("e41a1601-f7b7-43e5-8cec-7316e6163283"))
+                                .content("a long text")
+                                .type(CorrectionType.BERICHTIGUNGSBESCHLUSS)
+                                .borderNumbers(List.of(2L))
+                                .description("a short description")
+                                .date(LocalDate.parse("2020-01-01"))
+                                .build()))
+                    .build())
+            .build();
+
+    DecisionDTO decisionDTO =
+        DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+    assertThat(decisionDTO.getCorrections()).isNotNull();
+    assertThat(decisionDTO.getCorrections()).hasSize(1);
+
+    CorrectionDTO correctionDTO = decisionDTO.getCorrections().getFirst();
+    assertThat(correctionDTO.getId())
+        .isEqualTo(UUID.fromString("e41a1601-f7b7-43e5-8cec-7316e6163283"));
+    assertThat(correctionDTO.getContent()).isEqualTo("a long text");
+    assertThat(correctionDTO.getType()).isEqualTo(CorrectionType.BERICHTIGUNGSBESCHLUSS);
+    assertThat(correctionDTO.getDescription()).isEqualTo("a short description");
+    assertThat(correctionDTO.getDate()).isEqualTo(LocalDate.parse("2020-01-01"));
+    assertThat(correctionDTO.getRank()).isEqualTo(1L);
+
+    assertThat(correctionDTO.getBorderNumbers()).hasSize(1);
+    assertThat(correctionDTO.getBorderNumbers().getFirst().getBorderNumber()).isEqualTo(2L);
+    assertThat(correctionDTO.getBorderNumbers().getFirst().getRank()).isEqualTo(1L);
+  }
+
+  @Test
+  void transformToDomain_correction() {
+    DecisionDTO decisionDto =
+        DecisionDTO.builder()
+            .corrections(
+                List.of(
+                    CorrectionDTO.builder()
+                        .id(UUID.fromString("e41a1601-f7b7-43e5-8cec-7316e6163283"))
+                        .content("a long text")
+                        .type(CorrectionType.BERICHTIGUNGSBESCHLUSS)
+                        .borderNumber(
+                            CorrectionBorderNumberDTO.builder()
+                                .borderNumber(2L)
+                                .rank(1L)
+                                .id(UUID.fromString("00d2a44e-4051-4269-be9a-32e4a87245fe"))
+                                .build())
+                        .description("a short description")
+                        .date(LocalDate.parse("2020-01-01"))
+                        .build()))
+            .build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDto);
+
+    assertThat(decision.longTexts().corrections()).isNotNull();
+    assertThat(decision.longTexts().corrections()).hasSize(1);
+
+    Correction correction = decision.longTexts().corrections().getFirst();
+    assertThat(correction.id()).isEqualTo(UUID.fromString("e41a1601-f7b7-43e5-8cec-7316e6163283"));
+    assertThat(correction.content()).isEqualTo("a long text");
+    assertThat(correction.type()).isEqualTo(CorrectionType.BERICHTIGUNGSBESCHLUSS);
+    assertThat(correction.borderNumbers()).containsExactly(2L);
+    assertThat(correction.description()).isEqualTo("a short description");
+    assertThat(correction.date()).isEqualTo(LocalDate.parse("2020-01-01"));
+  }
+
   private Decision.DecisionBuilder generateSimpleDocumentationUnitBuilder() {
     return Decision.builder()
         .portalPublicationStatus(PortalPublicationStatus.UNPUBLISHED)
@@ -2173,6 +2386,7 @@ class DecisionTransformerTest {
                 .evsf(null)
                 .foreignLanguageVersions(Collections.emptyList())
                 .originOfTranslations(Collections.emptyList())
+                .objectValues(Collections.emptyList())
                 .build())
         .caselawReferences(Collections.emptyList())
         .literatureReferences(Collections.emptyList())

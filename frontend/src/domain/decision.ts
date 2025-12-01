@@ -4,6 +4,7 @@ import ActiveCitation from "@/domain/activeCitation"
 import Attachment from "@/domain/attachment"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { CoreData } from "@/domain/coreData"
+import Correction from "@/domain/correction"
 import Definition from "@/domain/definition"
 import { Kind } from "@/domain/documentationUnitKind"
 import EnsuingDecision from "@/domain/ensuingDecision"
@@ -11,6 +12,7 @@ import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
 import LegalForce from "@/domain/legalForce"
 import { ManagementData } from "@/domain/managementData"
 import NormReference from "@/domain/normReference"
+import ObjectValue from "@/domain/objectValue"
 import OriginOfTranslation from "@/domain/originOfTranslation"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
@@ -50,6 +52,7 @@ export type LongTexts = {
   participatingJudges?: ParticipatingJudge[]
   otherLongText?: string
   outline?: string
+  corrections?: Correction[]
 }
 export const longTextLabels: {
   [longTextKey in keyof Required<LongTexts>]: string
@@ -62,6 +65,7 @@ export const longTextLabels: {
   participatingJudges: "Mitwirkende Richter",
   otherLongText: "Sonstiger Langtext",
   outline: "Gliederung",
+  corrections: "Berichtigung",
 }
 export const contentRelatedIndexingLabels: {
   [contentRelatedIndexingKey in keyof Required<ContentRelatedIndexing>]: string
@@ -81,6 +85,7 @@ export const contentRelatedIndexingLabels: {
   originOfTranslations: "Herkunft der Übersetzung",
   appealAdmission: "Rechtsmittelzulassung",
   appeal: "Rechtsmittel",
+  objectValues: "Gegenstandswert",
 }
 export const allLabels = {
   caselawReferences: "Rechtsprechungsfundstellen",
@@ -166,6 +171,12 @@ export class Decision {
           (judge) => new ParticipatingJudge({ ...judge }),
         )
 
+    if (data.longTexts?.corrections)
+      data.longTexts.corrections =
+        data.longTexts.corrections.map(
+          (data) => new Correction({ ...data }),
+        )
+
     if (data.previousDecisions)
       data.previousDecisions = data.previousDecisions.map(
         (decision) => new PreviousDecision({ ...decision }),
@@ -228,6 +239,12 @@ export class Decision {
       data.contentRelatedIndexing.originOfTranslations =
           data.contentRelatedIndexing.originOfTranslations.map(
               (originOfTranslation) => new OriginOfTranslation({ ...originOfTranslation }),
+          )
+
+    if (data.contentRelatedIndexing?.objectValues)
+      data.contentRelatedIndexing.objectValues =
+          data.contentRelatedIndexing.objectValues.map(
+              (objectValue) => new ObjectValue({ ...objectValue }),
           )
 
     Object.assign(this, data)

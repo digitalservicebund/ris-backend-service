@@ -16,7 +16,11 @@ import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
 import { coreDataLabels } from "@/domain/coreData"
-import { contentRelatedIndexingLabels, Decision } from "@/domain/decision"
+import {
+  contentRelatedIndexingLabels,
+  Decision,
+  longTextLabels,
+} from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
 import EnsuingDecision, {
   ensuingDecisionFieldLabels,
@@ -169,12 +173,16 @@ const fieldsWithoutJdvExport = computed<string[]>(() => {
     fieldLabels.push(contentRelatedIndexingLabels.appealAdmission)
   if (decision.value?.contentRelatedIndexing?.appeal != null)
     fieldLabels.push(contentRelatedIndexingLabels.appeal)
+  if (decision.value?.contentRelatedIndexing?.objectValues?.length)
+    fieldLabels.push(contentRelatedIndexingLabels.objectValues)
   if (decision.value?.coreData?.celexNumber)
     fieldLabels.push(coreDataLabels.celexNumber)
   if (decision.value?.coreData?.hasDeliveryDate)
     fieldLabels.push(coreDataLabels.hasDeliveryDate)
   if (decision.value?.coreData?.oralHearingDates?.length)
     fieldLabels.push(coreDataLabels.oralHearingDates)
+  if (decision.value?.longTexts?.corrections?.length)
+    fieldLabels.push(longTextLabels.corrections)
   return fieldLabels
 })
 

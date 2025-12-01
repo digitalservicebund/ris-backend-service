@@ -473,6 +473,7 @@ describe("borderNumberService", () => {
       Object.keys(longTextLabels).forEach(
         (key) =>
           key !== "participatingJudges" &&
+          key !== "corrections" &&
           expect(store.documentUnit?.longTexts[key as keyof LongTexts]).toEqual(
             borderNumberLink("entfernt", { valid: false }),
           ),
