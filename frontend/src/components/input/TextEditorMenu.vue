@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { commands, selectActiveState } from "@guardian/prosemirror-invisibles"
 import { Editor } from "@tiptap/vue-3"
-import { computed, ref } from "vue"
+import { computed, ref, markRaw, h } from "vue"
 import { useRoute } from "vue-router"
 import TextEditorButton, {
   EditorButton,
@@ -38,11 +38,6 @@ import IconSpellCheck from "~icons/material-symbols/spellcheck"
 import IconVerticalAlignBottom from "~icons/material-symbols/vertical-align-bottom"
 import IconVerticalAlignCenter from "~icons/material-symbols/vertical-align-center"
 import IconVerticalAlignTop from "~icons/material-symbols/vertical-align-top"
-import IconNumeric from "~icons/mdi/numeric"
-import MdiRomanNumeral1 from "~icons/mdi/roman-numeral-1"
-import MdiRomanNumeral2 from "~icons/mdi/roman-numeral-2"
-import IconAlphaUpper from "~icons/mdi/sort-alphabetical-ascending"
-import IconAlphaLower from "~icons/mdi/sort-alphabetical-variant"
 import MdiTableColumnPlusAfter from "~icons/mdi/table-column-plus-after"
 import MdiTableColumnRemove from "~icons/mdi/table-column-remove"
 import MdiTablePlus from "~icons/mdi/table-plus"
@@ -93,6 +88,29 @@ const validateCellSelection = (callback: () => unknown) => {
 
   emit("noCellSelected", false)
   return callback()
+}
+
+const createTextIcon = (text: string) => {
+  return markRaw({
+    render: () =>
+      h(
+        "span",
+        {
+          style: {
+            fontFamily: "var(--font-sans)",
+            fontSize: "16pt",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            lineHeight: "1",
+            width: "24px",
+            height: "24px",
+          },
+          class: "text-blue-800",
+        },
+        text,
+      ),
+  })
 }
 
 const buttons = computed(() => {
@@ -211,7 +229,7 @@ const buttons = computed(() => {
       childButtons: [
         {
           type: "numericList",
-          icon: IconNumeric,
+          icon: createTextIcon("1."),
           ariaLabel: "Numerisch (1, 2, 3)",
           group: "orderedListGroup",
           isCollapsable: false,
@@ -220,7 +238,7 @@ const buttons = computed(() => {
         },
         {
           type: "lowercaseAlphabeticalList",
-          icon: IconAlphaLower,
+          icon: createTextIcon("a."),
           ariaLabel: "Lateinisch klein (a, b, c)",
           group: "orderedListGroup",
           isCollapsable: false,
@@ -228,7 +246,7 @@ const buttons = computed(() => {
         },
         {
           type: "uppercaseAlphabeticalList",
-          icon: IconAlphaUpper,
+          icon: createTextIcon("A."),
           ariaLabel: "Lateinisch groß (A, B, C)",
           group: "orderedListGroup",
           isCollapsable: false,
@@ -236,7 +254,7 @@ const buttons = computed(() => {
         },
         {
           type: "lowercaseRomanList",
-          icon: MdiRomanNumeral1,
+          icon: createTextIcon("i."),
           ariaLabel: "Römisch klein (i, ii, iii)",
           group: "orderedListGroup",
           isCollapsable: false,
@@ -244,7 +262,7 @@ const buttons = computed(() => {
         },
         {
           type: "uppercaseRomanList",
-          icon: MdiRomanNumeral2,
+          icon: createTextIcon("I."),
           ariaLabel: "Römisch groß (I, II, III)",
           group: "orderedListGroup",
           isCollapsable: false,
