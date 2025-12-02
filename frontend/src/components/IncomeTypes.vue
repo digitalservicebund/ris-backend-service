@@ -15,7 +15,7 @@ const { documentUnit: decision } = storeToRefs(store)
 </script>
 
 <template>
-  <div id="income-type" class="ris-label2-regular mb-16">
+  <div id="incomeTypes" class="ris-label2-regular mb-16">
     {{ label }}
   </div>
   <div aria-label="Einkunftsart" data-testid="Einkunftsart">
