@@ -97,6 +97,7 @@ class DocumentationUnitListItemTransformerTest {
                 .label("LG Berlin")
                 .jurisdictionType("")
                 .regions(List.of())
+                .courtBranchLocations(List.of())
                 .build());
     assertThat(documentationUnitListItem.documentType())
         .isEqualTo(DocumentType.builder().jurisShortcut("Urt").build());
@@ -164,6 +165,7 @@ class DocumentationUnitListItemTransformerTest {
                 .label("LG Berlin")
                 .jurisdictionType("")
                 .regions(List.of())
+                .courtBranchLocations(List.of())
                 .build());
     assertThat(documentationUnitListItem.documentType())
         .isEqualTo(DocumentType.builder().jurisShortcut("Urt").build());

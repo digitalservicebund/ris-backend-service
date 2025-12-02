@@ -271,6 +271,10 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @Column(name = "portal_publication_status", nullable = false, insertable = false)
   PortalPublicationStatus portalPublicationStatus = PortalPublicationStatus.UNPUBLISHED;
 
+  @OneToOne
+  @JoinColumn(name = "court_branch_location_id")
+  private CourtBranchLocationDTO courtBranchLocation;
+
   @Override
   @Nullable
   /*

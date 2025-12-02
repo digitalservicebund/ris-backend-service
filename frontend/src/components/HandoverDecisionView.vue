@@ -183,6 +183,8 @@ const fieldsWithoutJdvExport = computed<string[]>(() => {
     fieldLabels.push(coreDataLabels.oralHearingDates)
   if (decision.value?.longTexts?.corrections?.length)
     fieldLabels.push(longTextLabels.corrections)
+  if (decision.value?.coreData?.courtBranchLocation)
+    fieldLabels.push(coreDataLabels.courtBranchLocation)
   return fieldLabels
 })
 

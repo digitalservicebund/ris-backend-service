@@ -111,7 +111,8 @@ public class DecisionTransformer extends DocumentableTransformer {
 
       addDeviatingDocumentNumbers(builder, coreData, currentDto);
       addFileNumbers(builder, coreData, currentDto);
-      addDeviationCourts(builder, coreData);
+      addDeviatingCourts(builder, coreData);
+      addCourtBranchLocation(builder, coreData);
       addDeviatingDecisionDates(builder, coreData);
       addDeviatingFileNumbers(builder, coreData, currentDto);
       addSources(currentDto, builder, updatedDomainObject);

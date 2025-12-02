@@ -6,6 +6,7 @@ import InputSelect from "primevue/select"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { DropdownItem } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import CourtBranchLocation from "@/components/CourtBranchLocation.vue"
 import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
 import ChipsYearInput from "@/components/input/ChipsYearInput.vue"
@@ -230,7 +231,10 @@ onBeforeUnmount(() => {
     <NestedComponent
       aria-label="Fehlerhaftes Gericht"
       class="w-full"
-      :is-open="!!coreDataModel.deviatingCourts?.length"
+      :is-open="
+        !!coreDataModel.deviatingCourts?.length ||
+        !!coreDataModel.courtBranchLocation
+      "
     >
       <InputField id="court" v-slot="slotProps" label="Gericht *">
         <ComboboxInput
@@ -244,21 +248,27 @@ onBeforeUnmount(() => {
       </InputField>
       <!-- Child  -->
       <template #children>
-        <InputField
-          id="deviatingCourts"
-          v-slot="slotProps"
-          label="Fehlerhaftes Gericht"
-        >
-          <ChipsInput
-            :id="slotProps.id"
-            v-model="deviatingCourts"
-            aria-label="Fehlerhaftes Gericht"
-            data-testid="deviating-courts"
-            :has-error="slotProps.hasError"
-            @focus="validationStore.remove('deviatingCourts')"
-            @update:validation-error="slotProps.updateValidationError"
+        <div :class="layoutClass">
+          <InputField
+            id="deviatingCourts"
+            v-slot="slotProps"
+            label="Fehlerhaftes Gericht"
+          >
+            <ChipsInput
+              :id="slotProps.id"
+              v-model="deviatingCourts"
+              aria-label="Fehlerhaftes Gericht"
+              data-testid="deviating-courts"
+              :has-error="slotProps.hasError"
+              @focus="validationStore.remove('deviatingCourts')"
+              @update:validation-error="slotProps.updateValidationError"
+            />
+          </InputField>
+          <CourtBranchLocation
+            v-model="coreDataModel.courtBranchLocation"
+            :court-branch-locations="coreDataModel.court?.courtBranchLocations"
           />
-        </InputField>
+        </div>
       </template>
     </NestedComponent>
 
