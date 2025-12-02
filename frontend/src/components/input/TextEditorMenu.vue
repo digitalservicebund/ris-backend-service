@@ -234,7 +234,7 @@ const buttons = computed(() => {
           group: "orderedListGroup",
           isCollapsable: false,
           callback: () =>
-            props.editor.chain().focus().toggleOrderedList().run(),
+            props.editor.chain().focus().toggleOrderedList("numeric").run(),
         },
         {
           type: "lowercaseAlphabeticalList",
@@ -242,7 +242,8 @@ const buttons = computed(() => {
           ariaLabel: "Lateinisch klein (a, b, c)",
           group: "orderedListGroup",
           isCollapsable: false,
-          callback: () => {},
+          callback: () =>
+            props.editor.chain().focus().toggleOrderedList("smallLatin").run(),
         },
         {
           type: "uppercaseAlphabeticalList",
@@ -250,7 +251,12 @@ const buttons = computed(() => {
           ariaLabel: "Lateinisch groß (A, B, C)",
           group: "orderedListGroup",
           isCollapsable: false,
-          callback: () => {},
+          callback: () =>
+            props.editor
+              .chain()
+              .focus()
+              .toggleOrderedList("capitalLatin")
+              .run(),
         },
         {
           type: "lowercaseRomanList",
@@ -258,7 +264,8 @@ const buttons = computed(() => {
           ariaLabel: "Römisch klein (i, ii, iii)",
           group: "orderedListGroup",
           isCollapsable: false,
-          callback: () => {},
+          callback: () =>
+            props.editor.chain().focus().toggleOrderedList("smallRoman").run(),
         },
         {
           type: "uppercaseRomanList",
@@ -266,7 +273,12 @@ const buttons = computed(() => {
           ariaLabel: "Römisch groß (I, II, III)",
           group: "orderedListGroup",
           isCollapsable: false,
-          callback: () => {},
+          callback: () =>
+            props.editor
+              .chain()
+              .focus()
+              .toggleOrderedList("capitalRoman")
+              .run(),
         },
       ],
     },
