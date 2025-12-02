@@ -98,8 +98,9 @@ const createTextIcon = (text: string) => {
         {
           style: {
             fontFamily: "var(--font-sans)",
-            fontSize: "16pt",
+            fontSize: "14pt",
             display: "flex",
+            fontWeight: "bold",
             alignItems: "center",
             justifyContent: "center",
             lineHeight: "1",
