@@ -38,6 +38,11 @@ import IconSpellCheck from "~icons/material-symbols/spellcheck"
 import IconVerticalAlignBottom from "~icons/material-symbols/vertical-align-bottom"
 import IconVerticalAlignCenter from "~icons/material-symbols/vertical-align-center"
 import IconVerticalAlignTop from "~icons/material-symbols/vertical-align-top"
+import IconNumeric from "~icons/mdi/numeric"
+import MdiRomanNumeral1 from "~icons/mdi/roman-numeral-1"
+import MdiRomanNumeral2 from "~icons/mdi/roman-numeral-2"
+import IconAlphaUpper from "~icons/mdi/sort-alphabetical-ascending"
+import IconAlphaLower from "~icons/mdi/sort-alphabetical-variant"
 import MdiTableColumnPlusAfter from "~icons/mdi/table-column-plus-after"
 import MdiTableColumnRemove from "~icons/mdi/table-column-remove"
 import MdiTablePlus from "~icons/mdi/table-plus"
@@ -198,13 +203,54 @@ const buttons = computed(() => {
       callback: () => props.editor.chain().focus().setTextAlign("right").run(),
     },
     {
-      type: "orderedList",
+      type: "menu",
       icon: IconOrderedList,
       ariaLabel: "Nummerierte Liste",
-      shortcut: "Strg + ⇧ + 7",
-      group: "indent",
+      group: "orderedListGroup",
       isCollapsable: false,
-      callback: () => props.editor.chain().focus().toggleOrderedList().run(),
+      childButtons: [
+        {
+          type: "numericList",
+          icon: IconNumeric,
+          ariaLabel: "Numerisch (1, 2, 3)",
+          group: "orderedListGroup",
+          isCollapsable: false,
+          callback: () =>
+            props.editor.chain().focus().toggleOrderedList().run(),
+        },
+        {
+          type: "lowercaseAlphabeticalList",
+          icon: IconAlphaLower,
+          ariaLabel: "Lateinisch klein (a, b, c)",
+          group: "orderedListGroup",
+          isCollapsable: false,
+          callback: () => {},
+        },
+        {
+          type: "uppercaseAlphabeticalList",
+          icon: IconAlphaUpper,
+          ariaLabel: "Lateinisch groß (A, B, C)",
+          group: "orderedListGroup",
+          isCollapsable: false,
+          callback: () => {},
+        },
+        {
+          type: "lowercaseRomanList",
+          icon: MdiRomanNumeral1,
+          ariaLabel: "Römisch klein (i, ii, iii)",
+          group: "orderedListGroup",
+          isCollapsable: false,
+          callback: () => {},
+        },
+        {
+          type: "uppercaseRomanList",
+          icon: MdiRomanNumeral2,
+          ariaLabel: "Römisch groß (I, II, III)",
+          group: "orderedListGroup",
+          isCollapsable: false,
+          callback: () => {},
+        },
+      ],
     },
     {
       type: "bulletList",
