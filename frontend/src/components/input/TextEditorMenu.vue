@@ -107,7 +107,7 @@ const createTextIcon = (text: string) => {
             width: "24px",
             height: "24px",
           },
-          class: "text-blue-800",
+          class: "text-blue-900",
         },
         text,
       ),
