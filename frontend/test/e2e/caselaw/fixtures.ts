@@ -794,7 +794,16 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             fileNumbers: [generateString()],
             decisionDate: "2020-01-01",
           },
-        },
+          contentRelatedIndexing: {
+            countriesOfOrigin: [
+              {
+                id: "b86036b8-8ceb-4655-8392-bb6252b13994",
+                newEntry: true,
+                legacyValue: "legacy value",
+              },
+            ],
+          },
+        } as Decision,
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
       },
     )
