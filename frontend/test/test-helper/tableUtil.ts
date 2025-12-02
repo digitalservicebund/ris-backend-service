@@ -37,3 +37,32 @@ export const getFirstCellHTML = () => {
 
   return firstCell.getAttribute("style") || ""
 }
+
+export const clickOrderedListSubButton = async (subButtonLabel: string) => {
+  const orderedListMenu = screen.getByLabelText("Nummerierte Liste")
+  await userEvent.click(orderedListMenu)
+  const subButton = screen.getByLabelText(subButtonLabel)
+  await userEvent.click(subButton)
+  await flushPromises()
+}
+
+export const getOrderedListHTML = () => {
+  const editorContent = screen.getByTestId("Gründe")
+  const orderedList = editorContent.querySelector("ol")
+  if (!orderedList) throw new Error("No ordered list found in the document.")
+
+  return orderedList.getAttribute("style") || ""
+}
+
+export const getOrderedListType = () => {
+  const editorContent = screen.getByTestId("Gründe")
+  const orderedList = editorContent.querySelector("ol")
+  if (!orderedList) throw new Error("No ordered list found in the document.")
+
+  return orderedList.getAttribute("type") || ""
+}
+
+export const hasOrderedList = () => {
+  const editorContent = screen.getByTestId("Gründe")
+  return !!editorContent.querySelector("ol")
+}
