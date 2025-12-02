@@ -204,6 +204,14 @@ public abstract class DecisionCommonLdmlTransformer
           gerichtBuilder.spruchkoerper(
               Gericht.Spruchkoerper.builder().value(coreData.appraisalBody()).build());
         }
+        if (isFullLDML()
+            && coreData.courtBranchLocation() != null
+            && StringUtils.isNotBlank(coreData.courtBranchLocation().value())) {
+          gerichtBuilder.sitzDerAussenstelle(
+              Gericht.SitzDerAussenstelle.builder()
+                  .value(coreData.courtBranchLocation().value())
+                  .build());
+        }
         builder.gericht(gerichtBuilder.build());
       }
 

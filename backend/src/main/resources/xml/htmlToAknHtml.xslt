@@ -351,7 +351,7 @@
     |ris:rechtsmittel|ris:rechtsmittelfuehrerListe|ris:rechtsmittelfuehrer|ris:revisionKlaegerListe|ris:revisionKlaeger
     |ris:revisionBeklagterListe|ris:revisionBeklagter|ris:anschlussRevisionKlaegerListe|ris:anschlussRevisionKlaeger
     |ris:anschlussRevisionBeklagterListe|ris:anschlussRevisionBeklagter|ris:nzbKlaegerListe|ris:nzbKlaeger|ris:nzbBeklagterListe
-    |ris:nzbBeklagter|ris:zuruecknahmeDerRevision|ris:pkhAntragKlaeger
+    |ris:nzbBeklagter|ris:zuruecknahmeDerRevision|ris:pkhAntragKlaeger|ris:sitzDerAussenstelle
     |ris:gegenstandswerte|ris:gegenstandswert|ris:gegenstandswertBetrag|ris:gegenstandswertWaehrung|ris:gegenstandswertVerfahren
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@akn:refersTo|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
     |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId|@akn:eId|@type|@by|@domainTerm|@notation|@ris:domainTerm|@art">
