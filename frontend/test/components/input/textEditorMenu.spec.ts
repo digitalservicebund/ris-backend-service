@@ -453,5 +453,41 @@ describe("text editor toolbar", async () => {
       expect(listStyle).toContain("list-style-type: upper-roman")
       expect(listType).toBe("I")
     })
+
+    test("should create lowercase Greek list when 'Griechisch klein (α, β, γ)' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await clickOrderedListSubButton("Griechisch klein (α, β, γ)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+      const listType = getOrderedListType()
+
+      expect(listStyle).toContain("list-style-type: lower-greek")
+      expect(listType).toBe("α")
+    })
+
+    test("should change list style when switching from Latin to Greek", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+
+      await clickOrderedListSubButton("Lateinisch klein (a, b, c)")
+      expect(getOrderedListType()).toBe("a")
+
+      await clickOrderedListSubButton("Griechisch klein (α, β, γ)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+      const listType = getOrderedListType()
+
+      expect(listStyle).toContain("list-style-type: lower-greek")
+      expect(listType).toBe("α")
+    })
   })
 })
