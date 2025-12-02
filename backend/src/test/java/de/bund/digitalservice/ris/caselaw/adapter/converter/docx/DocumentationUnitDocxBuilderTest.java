@@ -136,6 +136,7 @@ class DocumentationUnitDocxBuilderTest {
     PPrBase.PStyle pStyle = new PPrBase.PStyle();
     pStyle.setVal("ListParagraph");
     pPr.setPStyle(pStyle);
+    pPr.setFramePr(new CTFramePr());
     paragraph.setPPr(pPr);
 
     var result = builder.setParagraph(paragraph).build(new ArrayList<>());

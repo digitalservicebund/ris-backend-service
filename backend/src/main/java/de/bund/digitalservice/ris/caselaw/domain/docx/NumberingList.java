@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 public class NumberingList implements DocumentationUnitDocx {
 
+  public static final String CLOSING_LIST_ITEM = "</li>";
+  public static final String OPENING_LIST_ITEM = "<li>";
   // this should be a list containing either NumberingListEntry's or NumberingList's
   // so that a tree structure that can recursively be traversed
   private final List<NumberingListEntry> entries = new ArrayList<>();
@@ -29,58 +31,126 @@ public class NumberingList implements DocumentationUnitDocx {
   public String toHtmlString() {
     StringBuilder sb = new StringBuilder();
     LinkedList<String> closeTags = new LinkedList<>();
-    int[] cLvl = {-1};
+    int[] currentLevel = {-1};
+    final boolean[] isListItemOpen = {false};
     List<DocumentationUnitNumberingListNumberFormat> currentNumberFormat = new ArrayList<>();
 
     entries.forEach(
         entry -> {
           /*Get level of list entry*/
-          int lvl = stringToInt(entry.numberingListEntryIndex().iLvl(), 0);
+          int targetLevel = stringToInt(entry.numberingListEntryIndex().iLvl(), 0);
 
-          /*Open new List if change number format at lv 0*/
+          // Open a new list if change in number format at level 0
           if (shouldCreateNewList(
-              cLvl[0], lvl, currentNumberFormat, entry.numberingListEntryIndex().numberFormat())) {
-            while (!closeTags.isEmpty()) {
-              sb.append(closeTags.removeFirst());
+              currentLevel[0],
+              targetLevel,
+              currentNumberFormat,
+              entry.numberingListEntryIndex().numberFormat())) {
+
+            // Check if the last list item is still open
+            // because for sub-lists the last list item
+            // should remain open.
+            if (isListItemOpen[0]) {
+              sb.append(CLOSING_LIST_ITEM);
+              isListItemOpen[0] = false;
             }
+
+            handleListClosing(closeTags, sb);
+
             sb.append(getOpenListTag(entry.numberingListEntryIndex()));
             closeTags.addFirst(getCloseListTag(entry.numberingListEntryIndex().numberFormat()));
-            cLvl[0] = lvl;
+            currentLevel[0] = targetLevel;
           }
 
-          /* Open list/sub-list Tag*/
-          while (lvl > cLvl[0]) {
+          closeSubList(targetLevel, closeTags, sb, currentLevel, isListItemOpen);
+
+          // If still open, then close it
+          if (targetLevel == currentLevel[0] && isListItemOpen[0]) {
+            sb.append(CLOSING_LIST_ITEM);
+            isListItemOpen[0] = false;
+          }
+
+          // Open list/sub-list Tag
+          while (targetLevel > currentLevel[0]) {
             sb.append(getOpenListTag(entry.numberingListEntryIndex()));
             closeTags.addFirst(getCloseListTag(entry.numberingListEntryIndex().numberFormat()));
-            cLvl[0]++;
+            currentLevel[0]++;
           }
 
-          /* Close list/sub-list Tag*/
-          while (lvl < cLvl[0]) {
-            sb.append(closeTags.removeFirst());
-            cLvl[0]--;
-          }
+          openListItemWithStyle(entry, sb);
 
-          if (entry.numberingListEntryIndex().isLgl()) {
-            sb.append("<li style=\"list-style-type:decimal\">")
-                .append(entry.toHtmlString())
-                .append("</li>");
-          } else {
-            sb.append("<li>").append(entry.toHtmlString()).append("</li>");
-          }
+          sb.append(entry.toHtmlString());
+
+          // Leaving list open for later closing.
+          isListItemOpen[0] = true;
 
           if (!currentNumberFormat.isEmpty()) {
-            currentNumberFormat.remove(0);
+            currentNumberFormat.removeFirst();
           }
           currentNumberFormat.add(entry.numberingListEntryIndex().numberFormat());
-          cLvl[0] = lvl;
+          currentLevel[0] = targetLevel;
         });
 
-    /* Close all list/sub-list tag when last element*/
+    // Final list close
+    if (isListItemOpen[0]) {
+      sb.append(CLOSING_LIST_ITEM);
+    }
+
+    closeAllLists(closeTags, sb);
+
+    return sb.toString();
+  }
+
+  private void closeSubList(
+      int targetLevel,
+      LinkedList<String> closeTags,
+      StringBuilder sb,
+      int[] currentLevel,
+      boolean[] isListItemOpen) {
+    while (targetLevel < currentLevel[0]) {
+      // Close item
+      if (isListItemOpen[0]) {
+        sb.append(CLOSING_LIST_ITEM);
+        isListItemOpen[0] = false;
+      }
+
+      // Close sub list
+      sb.append(closeTags.removeFirst());
+
+      // Closing parent list item that contained this sub list
+      sb.append(CLOSING_LIST_ITEM);
+
+      currentLevel[0]--;
+    }
+  }
+
+  private void handleListClosing(LinkedList<String> closeTags, StringBuilder sb) {
     while (!closeTags.isEmpty()) {
       sb.append(closeTags.removeFirst());
+      // If closing sub list, also close parent list
+      if (!closeTags.isEmpty()) {
+        sb.append(CLOSING_LIST_ITEM);
+      }
     }
-    return sb.toString();
+  }
+
+  private void openListItemWithStyle(NumberingListEntry entry, StringBuilder sb) {
+    if (entry.numberingListEntryIndex().isLgl()) {
+      sb.append("<li style=\"list-style-type:decimal\">");
+    } else {
+      sb.append(OPENING_LIST_ITEM);
+    }
+  }
+
+  private void closeAllLists(LinkedList<String> closeTags, StringBuilder sb) {
+    while (!closeTags.isEmpty()) {
+      sb.append(closeTags.removeFirst());
+
+      // Closing parent list item that contained this sub list
+      if (!closeTags.isEmpty()) {
+        sb.append(CLOSING_LIST_ITEM);
+      }
+    }
   }
 
   public enum DocumentationUnitNumberingListNumberFormat {

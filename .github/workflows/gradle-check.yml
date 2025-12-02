@@ -8,13 +8,13 @@ jobs:
   log-gradle-version-and-dependencies:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Get Gradle version
         working-directory: ./backend
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@46c56d6f92c88cf540acf95a12a4a41197499222
+        uses: actions/setup-java@4e7e684fbb6e33f88ecb2cf1e6b3797739cf499b
         with:
           java-version: "21.0"
           distribution: "temurin"

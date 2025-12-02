@@ -4,6 +4,7 @@ import com.github.jk1.license.filter.DependencyFilter
 import com.github.jk1.license.filter.LicenseBundleNormalizer
 import com.github.jk1.license.render.CsvReportRenderer
 import com.github.jk1.license.render.ReportRenderer
+import org.flywaydb.gradle.task.AbstractFlywayTask
 import org.flywaydb.gradle.task.FlywayMigrateTask
 import java.io.Serializable
 
@@ -19,7 +20,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.1.0"
-    id("org.flywaydb.flyway") version "11.17.1"
+    id("org.flywaydb.flyway") version "11.18.0"
     id("io.sentry.jvm.gradle") version "5.12.2"
 }
 
@@ -180,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.39.2"))
+    implementation(platform("software.amazon.awssdk:bom:2.39.5"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -230,10 +231,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.4")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.17.1"
+    val flywayCore = "org.flywaydb:flyway-core:11.18.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.17.1")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.18.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -255,11 +256,26 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
+buildscript {
+    dependencies {
+        classpath("org.flywaydb:flyway-database-postgresql:11.18.0")
+    }
+}
+
 project.tasks.sonar {
     dependsOn("jacocoTestReport")
 }
 
 tasks {
+    withType<AbstractFlywayTask> {
+        url = System.getenv("DB_URL")
+        user = System.getenv("DB_USER")
+        password = System.getenv("DB_PASSWORD")
+        locations = arrayOf("classpath:db/migration")
+        defaultSchema = "incremental_migration"
+        dependsOn("compileMigrationJava")
+    }
+
     register<FlywayMigrateTask>("migrateDatabaseForERD") {
         url = System.getenv("DB_URL")
         user = System.getenv("DB_USER")

@@ -55,6 +55,7 @@ public class EntityBuilderTestUtil {
         .label("BGH Berlin")
         .location("Berlin")
         .regions(List.of("BE"))
+        .courtBranchLocations(List.of())
         .build();
   }
 
@@ -66,6 +67,7 @@ public class EntityBuilderTestUtil {
             .location("Berlin")
             .jurisdictionType(JurisdictionTypeDTO.builder().build())
             .jurisId(0)
+            .courtBranchLocations(List.of())
             .build();
     var region = RegionDTO.builder().code("BE").build();
     var courtRegion = CourtRegionDTO.builder().court(court).region(region).build();
