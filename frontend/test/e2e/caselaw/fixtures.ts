@@ -734,6 +734,17 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                 addressee: Addressee.BEVOLLMAECHTIGTER,
               },
             ],
+            countriesOfOrigin: [
+              {
+                id: "9323f4ae-dd79-4952-9bb1-6a33d4b334d3",
+                newEntry: true,
+                country: {
+                  id: "74692dc3-86ea-45ce-b18b-9cc3de94b275",
+                  identifier: "RE-07-DEU",
+                  text: "Deutschland",
+                },
+              },
+            ],
           },
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
