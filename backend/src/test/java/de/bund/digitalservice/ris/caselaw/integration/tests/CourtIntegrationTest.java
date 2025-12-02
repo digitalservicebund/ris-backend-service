@@ -2,7 +2,9 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtBranchLocationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtBranchLocationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JurisdictionTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -18,9 +20,11 @@ class CourtIntegrationTest extends BaseIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
+  @Autowired private DatabaseCourtBranchLocationRepository courtBranchLocationRepository;
 
   @AfterEach
   void cleanUp() {
+    courtBranchLocationRepository.deleteAll();
     databaseCourtRepository.deleteAll();
   }
 
@@ -151,6 +155,45 @@ class CourtIntegrationTest extends BaseIntegrationTest {
               for (int i = 0; i < expectedOrder.size(); i++) {
                 assertThat(response.getResponseBody()[i].label()).isEqualTo(expectedOrder.get(i));
               }
+            });
+  }
+
+  @Test
+  void testGetCourtBranchLocations() {
+    CourtDTO courtDTO1 =
+        CourtDTO.builder()
+            .jurisId(0)
+            .type("FG")
+            .location("München")
+            .isForeignCourt(false)
+            .isSuperiorCourt(false)
+            .build();
+    courtDTO1 = databaseCourtRepository.save(courtDTO1);
+
+    CourtBranchLocationDTO courtBranchLocationDTO1 =
+        CourtBranchLocationDTO.builder().value("Augsburg").courtId(courtDTO1.getId()).build();
+    CourtBranchLocationDTO courtBranchLocationDTO2 =
+        CourtBranchLocationDTO.builder().value("Freiburg").courtId(courtDTO1.getId()).build();
+
+    courtBranchLocationRepository.save(courtBranchLocationDTO1);
+    courtBranchLocationRepository.save(courtBranchLocationDTO2);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/courts/branchlocations?type=FG&location=München")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String[].class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).hasSize(2);
+              var court1 = response.getResponseBody()[0];
+              assertThat(court1).isEqualTo("Augsburg");
+
+              var court2 = response.getResponseBody()[1];
+              assertThat(court2).isEqualTo("Freiburg");
             });
   }
 }
