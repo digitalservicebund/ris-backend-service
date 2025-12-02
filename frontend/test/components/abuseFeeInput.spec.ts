@@ -48,7 +48,7 @@ describe("AbuseFeeInput", () => {
 
     expect(screen.getByTestId("abuse-fee-amount")).toBeInTheDocument()
     expect(screen.getByTestId("abuse-fee-currency")).toBeInTheDocument()
-    expect(screen.getByTestId("abuse-fee-proceeding-type")).toBeInTheDocument()
+    expect(screen.getByTestId("abuse-fee-addressee")).toBeInTheDocument()
   })
 
   it("disables 'Übernehmen' button with empty input", async () => {
@@ -58,7 +58,7 @@ describe("AbuseFeeInput", () => {
     // Assert
     expect(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühr  speichern",
+        name: "Missbrauchsgebühr speichern",
       }),
     ).toBeDisabled()
   })
@@ -79,7 +79,7 @@ describe("AbuseFeeInput", () => {
     expect(currency).toHaveValue("")
     expect(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühr  speichern",
+        name: "Missbrauchsgebühr speichern",
       }),
     ).toBeDisabled()
   })
@@ -105,7 +105,7 @@ describe("AbuseFeeInput", () => {
     expect(currency).toHaveValue("Euro (EUR)")
     expect(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühr  speichern",
+        name: "Missbrauchsgebühr speichern",
       }),
     ).toBeEnabled()
   })
@@ -126,7 +126,7 @@ describe("AbuseFeeInput", () => {
     // Act
     await user.click(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühr  speichern",
+        name: "Missbrauchsgebühr speichern",
       }),
     )
 
@@ -150,7 +150,7 @@ describe("AbuseFeeInput", () => {
     // Act
     await user.click(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühr  speichern",
+        name: "Missbrauchsgebühr speichern",
       }),
     )
 

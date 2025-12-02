@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
-import InputNumber, { InputNumberInputEvent } from "primevue/inputnumber"
 import InputSelect from "primevue/select"
 import { computed, onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
+import MonetaryInput from "@/components/input/MonetaryInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { proceedingType } from "@/data/proceedingType"
 import ObjectValue from "@/domain/objectValue"
@@ -55,10 +55,6 @@ function validate() {
   }
 }
 
-function onInput(event: InputNumberInputEvent) {
-  objectValue.value.amount = event.value as number
-}
-
 watch(objectValue, () => validate(), { deep: true })
 
 watch(
@@ -95,20 +91,11 @@ onMounted(() => {
           label="Betrag *"
           :validation-error="validationStore.getByField('amount')"
         >
-          <InputNumber
+          <MonetaryInput
             :id="slotProps.id"
             v-model="objectValue.amount"
-            aria-label="Betrag"
-            class="w-full"
-            data-testid="object-value-amount-input"
-            fluid
-            input-class="w-full"
-            :invalid="slotProps.hasError"
-            locale="de"
-            :min="0"
-            @blur="validate"
-            @focus="validationStore.remove('amount')"
-            @input="onInput"
+            data-test-id="object-value-amount-input"
+            :has-error="slotProps.hasError"
           />
         </InputField>
       </div>
