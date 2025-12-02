@@ -4,6 +4,7 @@ import { setActivePinia } from "pinia"
 import { vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import OtherCategories from "@/components/OtherCategories.vue"
+import AbuseFee, { Addressee } from "@/domain/abuseFee"
 import { AppealWithdrawal } from "@/domain/appeal"
 import { CollectiveAgreement } from "@/domain/collectiveAgreement"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
@@ -611,6 +612,61 @@ describe("other categories", () => {
       expect(await screen.findByText("Gegenstandswert")).toBeVisible()
       const summary = screen.getByTestId("object-value-summary")
       expect(summary).toHaveTextContent("500 Euro (EUR), Verfassungsbeschwerde")
+    })
+  })
+
+  describe("AbuseFees (Missbrauchsgebühr)", () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: routes,
+    })
+
+    it("should display 'Missbrauchsgebühr' button when no data", async () => {
+      // Arrange
+      mockSessionStore({
+        abuseFees: [],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(
+        screen.getByRole("button", { name: "Missbrauchsgebühr" }),
+      ).toBeInTheDocument()
+    })
+
+    it("should display 'Missbrauchsgebühr'", async () => {
+      // Arrange
+      mockSessionStore({
+        abuseFees: [
+          new AbuseFee({
+            id: "1",
+            amount: 500,
+            currencyCode: {
+              id: "3",
+              label: "Euro (EUR)",
+            },
+            addressee: Addressee.BEVOLLMAECHTIGTER,
+          }),
+        ],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(await screen.findByText("Missbrauchsgebühr")).toBeVisible()
+      const summary = screen.getByTestId("abuse-fee-summary")
+      expect(summary).toHaveTextContent("500 Euro (EUR), Bevollmächtigter")
     })
   })
 })

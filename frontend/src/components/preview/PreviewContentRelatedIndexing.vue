@@ -110,6 +110,13 @@ const hasObjectValues = computed(() => {
   )
 })
 
+const hasAbuseFees = computed(() => {
+  return (
+    props.contentRelatedIndexing.abuseFees &&
+    props.contentRelatedIndexing.abuseFees.length > 0
+  )
+})
+
 const hasAppeal = computed(() => {
   return (
     props.contentRelatedIndexing.appeal?.appellants?.length ||
@@ -470,6 +477,17 @@ const hasAppeal = computed(() => {
           :key="objectValue.id"
         >
           {{ objectValue.renderSummary }}
+        </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasAbuseFees">
+      <PreviewCategory>Missbrauchsgebühr</PreviewCategory>
+      <PreviewContent data-testid="Missbrauchsgebühr">
+        <div
+          v-for="abuseFee in props.contentRelatedIndexing.abuseFees"
+          :key="abuseFee.id"
+        >
+          {{ abuseFee.renderSummary }}
         </div>
       </PreviewContent>
     </PreviewRow>

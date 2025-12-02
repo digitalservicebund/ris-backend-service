@@ -1,5 +1,6 @@
 import dayjs from "dayjs"
 import DocumentationUnitProcessStep from "./documentationUnitProcessStep"
+import AbuseFee from "@/domain/abuseFee"
 import ActiveCitation from "@/domain/activeCitation"
 import Attachment from "@/domain/attachment"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
@@ -86,6 +87,7 @@ export const contentRelatedIndexingLabels: {
   appealAdmission: "Rechtsmittelzulassung",
   appeal: "Rechtsmittel",
   objectValues: "Gegenstandswert",
+  abuseFees: "Missbrauchsgebühr",
 }
 export const allLabels = {
   caselawReferences: "Rechtsprechungsfundstellen",
@@ -245,6 +247,12 @@ export class Decision {
       data.contentRelatedIndexing.objectValues =
           data.contentRelatedIndexing.objectValues.map(
               (objectValue) => new ObjectValue({ ...objectValue }),
+          )
+
+    if (data.contentRelatedIndexing?.abuseFees)
+      data.contentRelatedIndexing.abuseFees =
+          data.contentRelatedIndexing.abuseFees.map(
+              (abuseFee) => new AbuseFee({ ...abuseFee }),
           )
 
     Object.assign(this, data)
