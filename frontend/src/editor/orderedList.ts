@@ -6,6 +6,7 @@ const LIST_STYLES: Record<string, string> = {
   capitalLatin: "A",
   smallRoman: "i",
   capitalRoman: "I",
+  smallGreek: "α",
 }
 
 const TYPE_TO_STYLE: Record<string, string> = {
@@ -14,6 +15,7 @@ const TYPE_TO_STYLE: Record<string, string> = {
   A: "upper-alpha",
   i: "lower-roman",
   I: "upper-roman",
+  α: "lower-greek",
 }
 
 declare module "@tiptap/core" {

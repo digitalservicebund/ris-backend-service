@@ -257,6 +257,12 @@ const buttons = computed(() => {
           ariaLabel: "Römisch groß (I, II, III)",
           style: "capitalRoman",
         },
+        {
+          type: "lowercaseGreekList",
+          icon: "ε.",
+          ariaLabel: "Griechisch klein (α, β, γ)",
+          style: "smallGreek",
+        },
       ].map(({ type, icon, ariaLabel, style }) => ({
         type,
         icon: createTextIcon(icon),
