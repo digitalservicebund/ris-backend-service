@@ -26,4 +26,22 @@ export default class CountryOfOrigin implements EditableListItem {
   equals(entry: CountryOfOrigin): boolean {
     return this.id === entry.id
   }
+
+  get renderSummary(): string {
+    let summary = ""
+
+    if (this.legacyValue) {
+      summary += `${this.legacyValue} `
+    }
+
+    summary += [this.country, this.fieldOfLaw]
+      .filter((fieldOfLaw) => fieldOfLaw != undefined)
+      .map(
+        (fieldOfLaw: FieldOfLaw) =>
+          `${fieldOfLaw.identifier} ${fieldOfLaw.text}`,
+      )
+      .join(", ")
+
+    return summary
+  }
 }

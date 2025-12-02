@@ -132,6 +132,13 @@ const hasAppeal = computed(() => {
     props.contentRelatedIndexing.appeal?.pkhPlaintiff
   )
 })
+
+const hasCountriesOfOrigin = computed(() => {
+  return (
+    props.contentRelatedIndexing.countriesOfOrigin &&
+    props.contentRelatedIndexing.countriesOfOrigin.length > 0
+  )
+})
 </script>
 
 <template>
@@ -488,6 +495,18 @@ const hasAppeal = computed(() => {
           :key="abuseFee.id"
         >
           {{ abuseFee.renderSummary }}
+        </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasCountriesOfOrigin">
+      <PreviewCategory>Herkunftsland</PreviewCategory>
+      <PreviewContent>
+        <div
+          v-for="countryOfOrigin in props.contentRelatedIndexing
+            .countriesOfOrigin"
+          :key="countryOfOrigin.id"
+        >
+          {{ countryOfOrigin.renderSummary }}
         </div>
       </PreviewContent>
     </PreviewRow>
