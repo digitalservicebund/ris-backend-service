@@ -229,58 +229,43 @@ const buttons = computed(() => {
       childButtons: [
         {
           type: "numericList",
-          icon: createTextIcon("1."),
+          icon: "1.",
           ariaLabel: "Numerisch (1, 2, 3)",
-          group: "orderedListGroup",
-          isCollapsable: false,
-          callback: () =>
-            props.editor.chain().focus().toggleOrderedList("numeric").run(),
+          style: "numeric",
         },
         {
           type: "lowercaseAlphabeticalList",
-          icon: createTextIcon("a."),
+          icon: "a.",
           ariaLabel: "Lateinisch klein (a, b, c)",
-          group: "orderedListGroup",
-          isCollapsable: false,
-          callback: () =>
-            props.editor.chain().focus().toggleOrderedList("smallLatin").run(),
+          style: "smallLatin",
         },
         {
           type: "uppercaseAlphabeticalList",
-          icon: createTextIcon("A."),
+          icon: "A.",
           ariaLabel: "Lateinisch groß (A, B, C)",
-          group: "orderedListGroup",
-          isCollapsable: false,
-          callback: () =>
-            props.editor
-              .chain()
-              .focus()
-              .toggleOrderedList("capitalLatin")
-              .run(),
+          style: "capitalLatin",
         },
         {
           type: "lowercaseRomanList",
-          icon: createTextIcon("i."),
+          icon: "i.",
           ariaLabel: "Römisch klein (i, ii, iii)",
-          group: "orderedListGroup",
-          isCollapsable: false,
-          callback: () =>
-            props.editor.chain().focus().toggleOrderedList("smallRoman").run(),
+          style: "smallRoman",
         },
         {
           type: "uppercaseRomanList",
-          icon: createTextIcon("I."),
+          icon: "I.",
           ariaLabel: "Römisch groß (I, II, III)",
-          group: "orderedListGroup",
-          isCollapsable: false,
-          callback: () =>
-            props.editor
-              .chain()
-              .focus()
-              .toggleOrderedList("capitalRoman")
-              .run(),
+          style: "capitalRoman",
         },
-      ],
+      ].map(({ type, icon, ariaLabel, style }) => ({
+        type,
+        icon: createTextIcon(icon),
+        ariaLabel,
+        group: "orderedListGroup",
+        isCollapsable: false,
+        callback: () =>
+          props.editor.chain().focus().toggleOrderedList(style).run(),
+      })),
     },
     {
       type: "bulletList",
