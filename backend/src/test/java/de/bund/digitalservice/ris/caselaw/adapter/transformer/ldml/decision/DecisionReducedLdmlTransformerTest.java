@@ -7,12 +7,16 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
+import de.bund.digitalservice.ris.caselaw.domain.AbuseFee;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.Addressee;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Correction;
+import de.bund.digitalservice.ris.caselaw.domain.CorrectionType;
 import de.bund.digitalservice.ris.caselaw.domain.CurrencyCode;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.Definition;
@@ -264,6 +268,18 @@ class DecisionReducedLdmlTransformerTest {
                                 .name("Richterin Maxima Mustermann")
                                 .referencedOpinions("referenced opinions test 2")
                                 .build()))
+                    .corrections(
+                        List.of(
+                            Correction.builder()
+                                .type(CorrectionType.BERICHTIGUNGSBESCHLUSS)
+                                .build(),
+                            Correction.builder()
+                                .type(CorrectionType.SCHREIBFEHLERBERICHTIGUNG)
+                                .description("Hauffen -> Haufen")
+                                .date(LocalDate.of(2020, 1, 20))
+                                .borderNumbers(List.of(1L, 3L))
+                                .content("<p>Ersetzen von 'Hauffen' mit 'Haufen'</p>")
+                                .build()))
                     .build())
             .shortTexts(
                 ShortTexts.builder()
@@ -433,6 +449,18 @@ class DecisionReducedLdmlTransformerTest {
                                         .build())
                                 .amount(9635)
                                 .proceedingType(ProceedingType.ORGANSTREITVERFAHREN)
+                                .build()))
+                    .abuseFees(
+                        List.of(
+                            AbuseFee.builder()
+                                .currencyCode(
+                                    CurrencyCode.builder()
+                                        .id(UUID.randomUUID())
+                                        .isoCode("USD")
+                                        .label("Dollar (USD)")
+                                        .build())
+                                .amount(1234)
+                                .addressee(Addressee.BESCHWERDEFUEHRER_ANTRAGSTELLER)
                                 .build()))
                     .build())
             .previousDecisions(List.of(previousDecision1, previousDecision2))

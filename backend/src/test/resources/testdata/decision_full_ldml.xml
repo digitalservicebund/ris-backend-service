@@ -332,6 +332,13 @@
                            </ris:berichtigungInhaltDerAenderung>
                        </ris:berichtigung>
                    </ris:berichtigungen>
+                    <ris:missbrauchsgebuehren domainTerm="Missbrauchsgebühren">
+                        <ris:missbrauchsgebuehr domainTerm="Missbrauchsgebühr">
+                            <ris:missbrauchsgebuehrBetrag domainTerm="Betrag">1234</ris:missbrauchsgebuehrBetrag>
+                            <ris:missbrauchsgebuehrWaehrung domainTerm="Währung">USD</ris:missbrauchsgebuehrWaehrung>
+                            <ris:missbrauchsgebuehrAdressat domainTerm="Adressat">Beschwerdeführer / Antragsteller</ris:missbrauchsgebuehrAdressat>
+                        </ris:missbrauchsgebuehr>
+                    </ris:missbrauchsgebuehren>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>
