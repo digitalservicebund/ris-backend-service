@@ -154,7 +154,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     const citationType = await citationTypeResponse.json()
 
     const fieldsOfLawResponse = await request.get(
-      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01`,
+      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01&sz=200&pg=0`,
     )
     const fieldsOfLaw = await fieldsOfLawResponse.json()
     const documentTypeResponse = await request.get(
@@ -251,7 +251,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     const normAbbreviation = await normAbbreviationResponse.json()
 
     const fieldsOfLawResponse = await request.get(
-      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01`,
+      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01&sz=200&pg=0`,
     )
     const fieldsOfLaw = await fieldsOfLawResponse.json()
     const documentTypeResponse = await request.get(
