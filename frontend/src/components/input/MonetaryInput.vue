@@ -5,7 +5,6 @@ import { ref } from "vue"
 const props = defineProps<{
   id: string
   modelValue?: number
-  dataTestId?: string
   hasError?: boolean
 }>()
 const emit = defineEmits<{
@@ -31,7 +30,6 @@ function valueChanged(value: number) {
     v-model="amountRef"
     aria-label="Betrag"
     class="w-full"
-    :data-testid="dataTestId"
     fluid
     input-class="w-full"
     :invalid="hasError"

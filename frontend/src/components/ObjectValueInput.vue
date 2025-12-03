@@ -87,14 +87,12 @@ onMounted(() => {
         <InputField
           id="objectValueAmount"
           v-slot="slotProps"
-          data-testid="object-value-amount"
           label="Betrag *"
           :validation-error="validationStore.getByField('amount')"
         >
           <MonetaryInput
             :id="slotProps.id"
             v-model="objectValue.amount"
-            data-test-id="object-value-amount-input"
             :has-error="slotProps.hasError"
           />
         </InputField>

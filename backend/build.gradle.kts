@@ -145,7 +145,7 @@ sonar {
             "sonar.coverage.exclusions",
             "**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/*Exception.java"
         )
-        property("sonar.cpd.exclusions", "**/AbuseFeeDTO.java")
+        property("sonar.cpd.exclusions", "**/AbuseFeeDTO.java") // Exclude duplication warning caused by ObjectValueDTO
         property("sonar.sources", "src/main/java")
     }
 }

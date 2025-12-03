@@ -33,15 +33,9 @@ test.describe(
         exact: true,
       })
 
-      const amountInput = otherCategoriesContainer.getByTestId(
-        "abuse-fee-amount-input",
-      )
-      const currencyInput = otherCategoriesContainer.getByTestId(
-        "abuse-fee-currency-input",
-      )
-      const addresseeInput = otherCategoriesContainer.getByTestId(
-        "abuse-fee-addressee-input",
-      )
+      const amountInput = otherCategoriesContainer.getByLabel("Betrag")
+      const currencyInput = otherCategoriesContainer.getByLabel("Währung")
+      const addresseeInput = otherCategoriesContainer.getByLabel("Adressat")
 
       const acceptButton = otherCategoriesContainer.getByLabel(
         "Missbrauchsgebühr speichern",

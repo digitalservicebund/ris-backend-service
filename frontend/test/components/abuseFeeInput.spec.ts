@@ -46,9 +46,9 @@ describe("AbuseFeeInput", () => {
   it("renders currency combobox and chips inputs", () => {
     renderComponent()
 
-    expect(screen.getByTestId("abuse-fee-amount")).toBeInTheDocument()
-    expect(screen.getByTestId("abuse-fee-currency")).toBeInTheDocument()
-    expect(screen.getByTestId("abuse-fee-addressee")).toBeInTheDocument()
+    expect(screen.getByText("Betrag *")).toBeInTheDocument()
+    expect(screen.getByText("Währung *")).toBeInTheDocument()
+    expect(screen.getByText("Adressat")).toBeInTheDocument()
   })
 
   it("disables 'Übernehmen' button with empty input", async () => {

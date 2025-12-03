@@ -1,12 +1,12 @@
-import { Addressee } from "@/domain/abuseFee"
+import { Addressee, AddresseeLabels } from "@/domain/abuseFee"
 
 export const addressee = [
   {
-    label: "Bevollmächtigter",
+    label: AddresseeLabels.BEVOLLMAECHTIGTER,
     value: Addressee.BEVOLLMAECHTIGTER,
   },
   {
-    label: "Beschwerdeführer / Antragsteller",
+    label: AddresseeLabels.BESCHWERDEFUEHRER_ANTRAGSTELLER,
     value: Addressee.BESCHWERDEFUEHRER_ANTRAGSTELLER,
   },
 ]
