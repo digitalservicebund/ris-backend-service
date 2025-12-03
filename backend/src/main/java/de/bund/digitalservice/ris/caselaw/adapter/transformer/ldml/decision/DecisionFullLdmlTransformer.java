@@ -33,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.G
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.HerkunftDerUebersetzungen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Kuendigungsarten;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Kuendigungsgruende;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Missbrauchsgebuehren;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Notiz;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Quellen;
@@ -175,6 +176,12 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.objectValues())) {
         var gegenstandswerte = buildGegenstandswerte(contentRelatedIndexing);
         builder.gegenstandswerte(gegenstandswerte);
+      }
+
+      // Missbrauchsgebühren
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.abuseFees())) {
+        var missbrauchsgebuehren = buildMissbrauchsgebuehren(contentRelatedIndexing);
+        builder.missbrauchsgebuehren(missbrauchsgebuehren);
       }
     }
 
@@ -651,6 +658,32 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
             .toList();
 
     return Gegenstandswerte.builder().gegenstandswerte(gegenstandswerte).build();
+  }
+
+  private Missbrauchsgebuehren buildMissbrauchsgebuehren(
+      ContentRelatedIndexing contentRelatedIndexing) {
+
+    var missbrauchsgebuehren =
+        contentRelatedIndexing.abuseFees().stream()
+            .map(
+                abuseFee ->
+                    Missbrauchsgebuehren.Missbrauchsgebuehr.builder()
+                        .missbrauchsgebuehrBetrag(
+                            Missbrauchsgebuehren.MissbrauchsgebuehrBetrag.builder()
+                                .value(String.valueOf(abuseFee.amount()))
+                                .build())
+                        .missbrauchsgebuehrWaehrung(
+                            Missbrauchsgebuehren.MissbrauchsgebuehrWaehrung.builder()
+                                .value(abuseFee.currencyCode().isoCode())
+                                .build())
+                        .missbrauchsgebuehrAdressat(
+                            Missbrauchsgebuehren.MissbrauchsgebuehrAdressat.builder()
+                                .value(abuseFee.addressee().toString())
+                                .build())
+                        .build())
+            .toList();
+
+    return Missbrauchsgebuehren.builder().missbrauchsgebuehren(missbrauchsgebuehren).build();
   }
 
   private AktenzeichenListe buildAbweichendeAktenzeichen(
