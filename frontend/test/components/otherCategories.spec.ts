@@ -610,8 +610,9 @@ describe("other categories", () => {
 
       // Assert
       expect(await screen.findByText("Gegenstandswert")).toBeVisible()
-      const summary = screen.getByTestId("object-value-summary")
-      expect(summary).toHaveTextContent("500 Euro (EUR), Verfassungsbeschwerde")
+      expect(
+        await screen.findByText("500 Euro (EUR), Verfassungsbeschwerde"),
+      ).toBeVisible()
     })
   })
 
@@ -665,8 +666,9 @@ describe("other categories", () => {
 
       // Assert
       expect(await screen.findByText("Missbrauchsgebühr")).toBeVisible()
-      const summary = screen.getByTestId("abuse-fee-summary")
-      expect(summary).toHaveTextContent("500 Euro (EUR), Bevollmächtigter")
+      expect(
+        await screen.findByText("500 Euro (EUR), Bevollmächtigter"),
+      ).toBeVisible()
     })
   })
 })
