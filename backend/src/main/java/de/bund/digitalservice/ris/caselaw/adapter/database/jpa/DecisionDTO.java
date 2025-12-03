@@ -292,6 +292,13 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   private List<CorrectionDTO> corrections = new ArrayList<>();
 
+  /** Nichtanwendungsgesetz */
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "decision_id", nullable = false)
+  @Builder.Default
+  @OrderBy("rank")
+  private List<NonApplicationNormDTO> nonApplicationNorms = new ArrayList<>();
+
   @Override
   @SuppressWarnings("java:S2097") // Class type check is not recognized by Sonar
   public final boolean equals(Object o) {

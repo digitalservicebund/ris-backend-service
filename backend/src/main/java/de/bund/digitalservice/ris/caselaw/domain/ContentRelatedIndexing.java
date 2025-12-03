@@ -26,6 +26,7 @@ public record ContentRelatedIndexing(
     List<ForeignLanguageVersion> foreignLanguageVersions,
     List<OriginOfTranslation> originOfTranslations,
     List<ObjectValue> objectValues,
+    List<NonApplicationNorm> nonApplicationNorms,
     boolean hasLegislativeMandate,
     String evsf,
     AppealAdmission appealAdmission,

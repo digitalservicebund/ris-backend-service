@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ForeignLanguageVe
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NonApplicationNormDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ObjectValueDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationDTO;
@@ -33,6 +34,7 @@ import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.NonApplicationNorm;
 import de.bund.digitalservice.ris.caselaw.domain.ObjectValue;
 import de.bund.digitalservice.ris.caselaw.domain.OriginOfTranslation;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
@@ -155,6 +157,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       builder.appeal(AppealTransformer.transformToDTO(currentDto, contentRelatedIndexing.appeal()));
       addOriginOfTranslations(builder, contentRelatedIndexing);
       addObjectValues(builder, contentRelatedIndexing);
+      addNonApplicationNorms(builder, contentRelatedIndexing);
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -595,6 +598,28 @@ public class DecisionTransformer extends DocumentableTransformer {
     builder.objectValues(objectValueDTOS);
   }
 
+  private static void addNonApplicationNorms(
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.nonApplicationNorms() == null) {
+      return;
+    }
+
+    AtomicInteger i = new AtomicInteger(1);
+    List<NonApplicationNormDTO> nonApplicationNormDTOS = new ArrayList<>();
+    contentRelatedIndexing
+        .nonApplicationNorms()
+        .forEach(
+            norm -> {
+              List<NonApplicationNormDTO> flattened =
+                  NonApplicationNormTransformer.transformToDTO(norm);
+              flattened.forEach(
+                  nonApplicationNormDTO -> nonApplicationNormDTO.setRank(i.getAndIncrement()));
+              nonApplicationNormDTOS.addAll(flattened);
+            });
+
+    builder.nonApplicationNorms(nonApplicationNormDTOS);
+  }
+
   public static Decision transformToDomain(DecisionDTO decisionDTO) {
     return transformToDomain(decisionDTO, null);
   }
@@ -811,6 +836,11 @@ public class DecisionTransformer extends DocumentableTransformer {
       contentRelatedIndexingBuilder.objectValues(objectValues);
     }
 
+    if (decisionDTO.getNonApplicationNorms() != null) {
+      contentRelatedIndexingBuilder.nonApplicationNorms(
+          transformNonApplicationNormsToDomain(decisionDTO));
+    }
+
     return contentRelatedIndexingBuilder.build();
   }
 
@@ -921,5 +951,47 @@ public class DecisionTransformer extends DocumentableTransformer {
                   .build();
             })
         .toList();
+  }
+
+  private static List<NonApplicationNorm> transformNonApplicationNormsToDomain(
+      DecisionDTO decisionDTO) {
+    List<NonApplicationNorm> nonApplicationNorms = new ArrayList<>();
+
+    decisionDTO
+        .getNonApplicationNorms()
+        .forEach(
+            nonApplicationNormDTO -> {
+              NonApplicationNorm nonApplicationNorm =
+                  NonApplicationNormTransformer.transformToDomain(nonApplicationNormDTO);
+
+              if (nonApplicationNormDTO.getNormAbbreviation() != null) {
+                NonApplicationNorm existingNorm =
+                    nonApplicationNorms.stream()
+                        .filter(
+                            existing ->
+                                existing.normAbbreviation() != null
+                                    && existing
+                                        .normAbbreviation()
+                                        .id()
+                                        .equals(
+                                            nonApplicationNormDTO.getNormAbbreviation().getId()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (existingNorm != null) {
+                  existingNorm
+                      .singleNorms()
+                      .add(SingleNormTransformer.transformToDomain(nonApplicationNormDTO));
+                } else {
+                  nonApplicationNorms.add(nonApplicationNorm);
+                }
+
+              } else {
+                nonApplicationNorms.add(
+                    NonApplicationNormTransformer.transformToDomain(nonApplicationNormDTO));
+              }
+            });
+
+    return nonApplicationNorms;
   }
 }
