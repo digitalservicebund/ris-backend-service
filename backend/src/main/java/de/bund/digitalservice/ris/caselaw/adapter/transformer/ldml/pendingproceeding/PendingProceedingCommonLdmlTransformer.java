@@ -18,6 +18,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Othe
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DokumentTyp;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumentationsstelle;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gericht;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Regionen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
@@ -32,6 +33,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -108,7 +110,17 @@ public abstract class PendingProceedingCommonLdmlTransformer
       // Gericht (Gerichtstyp + Ort)
       Court court = coreData.court();
       if (court != null) {
-        builder.gericht(buildGericht(court).toBuilder().refersTo("#gericht").build());
+        Gericht.GerichtBuilder gerichtBuilder =
+            buildGericht(court).toBuilder().refersTo("#gericht");
+        if (isFullLDML()
+            && coreData.courtBranchLocation() != null
+            && StringUtils.isNotBlank(coreData.courtBranchLocation().value())) {
+          gerichtBuilder.sitzDerAussenstelle(
+              Gericht.SitzDerAussenstelle.builder()
+                  .value(coreData.courtBranchLocation().value())
+                  .build());
+        }
+        builder.gericht(gerichtBuilder.build());
       }
 
       // Regionen

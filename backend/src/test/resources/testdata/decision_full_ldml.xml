@@ -172,6 +172,7 @@
                         <ris:ort domainTerm="Gerichtsort">courtLocation</ris:ort>
                         <ris:gerichtsbarkeit domainTerm="Gerichtsbarkeit">jurisdictionType</ris:gerichtsbarkeit>
                         <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBody test</ris:spruchkoerper>
+                        <ris:sitzDerAussenstelle domainTerm="Sitz der Außenstelle">court branch location</ris:sitzDerAussenstelle>
                     </ris:gericht>
                     <ris:fehlerhafteGerichte domainTerm="Fehlerhafte Gerichte">
                         <ris:fehlerhaftesGericht domainTerm="Fehlerhaftes Gericht">deviating court 1</ris:fehlerhaftesGericht>

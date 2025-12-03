@@ -46,6 +46,7 @@ import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealWithdrawal;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.Appellant;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.PkhPlaintiff;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.CourtBranchLocation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
@@ -936,6 +937,8 @@ class DecisionFullLdmlTransformerTest {
                         .jurisdictionType("jurisdictionType")
                         .regions(List.of("NW"))
                         .build())
+                .courtBranchLocation(
+                    CourtBranchLocation.builder().value("court branch location").build())
                 .sources(
                     List.of(
                         Source.builder()

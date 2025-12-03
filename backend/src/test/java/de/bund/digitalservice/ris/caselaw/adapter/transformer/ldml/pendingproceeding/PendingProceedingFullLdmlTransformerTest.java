@@ -24,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.CourtBranchLocation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
@@ -255,6 +256,8 @@ class PendingProceedingFullLdmlTransformerTest {
                         .jurisdictionType("jurisdictionType")
                         .regions(List.of("NW"))
                         .build())
+                .courtBranchLocation(
+                    CourtBranchLocation.builder().value("court branch location").build())
                 .documentType(DocumentType.builder().label("Anhängiges Verfahren").build())
                 .fileNumbers(List.of("Aktenzeichen"))
                 .decisionDate(LocalDate.of(2020, 1, 1))
