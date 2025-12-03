@@ -332,6 +332,15 @@
                            </ris:berichtigungInhaltDerAenderung>
                        </ris:berichtigung>
                    </ris:berichtigungen>
+                   <ris:herkunftslaender domainTerm="Herkunftsländer">
+                      <ris:herkunftsland domainTerm="Herkunftsland">
+                         <ris:herkunftslandAltwert domainTerm="Altwert">legacy value</ris:herkunftslandAltwert>
+                      </ris:herkunftsland>
+                      <ris:herkunftsland domainTerm="Herkunftsland">
+                         <ris:herkunftslandLandbezeichnung domainTerm="Landbezeichnung" notation="RE-07-DEU">Deutschland</ris:herkunftslandLandbezeichnung>
+                         <ris:herkunftslandRechtlicherRahmen domainTerm="Rechtlicher Rahmen" notation="AR-01-01-01">Verschulden bei Vertragsschluss (culpa in contrahendo)</ris:herkunftslandRechtlicherRahmen>
+                      </ris:herkunftsland>
+                   </ris:herkunftslaender>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>

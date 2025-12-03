@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.CountryOfOrigin;
 import de.bund.digitalservice.ris.caselaw.domain.CurrencyCode;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.Definition;
@@ -434,6 +435,26 @@ class DecisionReducedLdmlTransformerTest {
                                 .amount(9635)
                                 .proceedingType(ProceedingType.ORGANSTREITVERFAHREN)
                                 .build()))
+                    .countriesOfOrigin(
+                        List.of(
+                            CountryOfOrigin.builder()
+                                .id(UUID.fromString("8bab996b-3e44-46c5-b588-52d4189d3da9"))
+                                .legacyValue("legacy value")
+                                .build(),
+                            CountryOfOrigin.builder()
+                                .id(UUID.fromString("5b202af2-6f77-47e0-8a9b-64e652845240"))
+                                .country(
+                                    FieldOfLaw.builder()
+                                        .notation("RE-07-DEU")
+                                        .text("Deutschland")
+                                        .build())
+                                .fieldOfLaw(
+                                    FieldOfLaw.builder()
+                                        .notation("AR-01-01-01")
+                                        .text(
+                                            "Verschulden bei Vertragsschluss (culpa in contrahendo)")
+                                        .build())
+                                .build()))
                     .build())
             .previousDecisions(List.of(previousDecision1, previousDecision2))
             .ensuingDecisions(List.of(ensuingDecision1, ensuingDecision2))
@@ -783,6 +804,7 @@ class DecisionReducedLdmlTransformerTest {
                  <ris:berichtigungArtDerEintragung domainTerm="Art der Eintragung">Berichtigungsbeschluss</ris:berichtigungArtDerEintragung>
              </ris:berichtigung>
           </ris:berichtigungen>
-        """));
+        """),
+        Arguments.of("'herkunftslaender' (Herkunftsländer)", "ris:herkunftslaender"));
   }
 }
