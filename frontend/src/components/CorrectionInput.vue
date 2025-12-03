@@ -145,6 +145,7 @@ onMounted(() => {
         data-testid="correctionContent-editor"
         editable
         field-size="big"
+        hide-text-check
         :value="correction.content"
         @update-value="correction.content = $event"
       />
