@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbuseFeeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
@@ -52,7 +53,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealDTO;
+import de.bund.digitalservice.ris.caselaw.domain.AbuseFee;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.Addressee;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
@@ -2166,6 +2169,134 @@ class DecisionTransformerTest {
     }
   }
 
+  @Nested
+  class AbuseFees {
+    @Test
+    void testTransformToDomain_withAbuseFees_shouldAddData() {
+      // Arrange
+      DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+      var abuseFee =
+          AbuseFeeDTO.builder()
+              .amount(10000)
+              .currencyCode(
+                  CurrencyCodeDTO.builder()
+                      .isoCode("EUR")
+                      .currency("Euro")
+                      .value("Euro (EUR)")
+                      .build())
+              .addressee(Addressee.BESCHWERDEFUEHRER_ANTRAGSTELLER)
+              .rank(1L)
+              .build();
+
+      decisionDTO.setAbuseFees(List.of(abuseFee));
+
+      // Act
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+      // Assert
+      assertThat(decision.contentRelatedIndexing().abuseFees()).hasSize(1);
+      assertThat(decision.contentRelatedIndexing().abuseFees().getFirst())
+          .isEqualTo(
+              AbuseFee.builder()
+                  .amount(10000)
+                  .currencyCode(CurrencyCode.builder().isoCode("EUR").label("Euro (EUR)").build())
+                  .addressee(Addressee.BESCHWERDEFUEHRER_ANTRAGSTELLER)
+                  .build());
+    }
+
+    @Test
+    void testTransformToDomain_withoutAbuseFees_shouldNotAddData() {
+      // Arrange
+      DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+      // Act
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+      // Assert
+      assertThat(decision.contentRelatedIndexing().abuseFees()).isEmpty();
+    }
+
+    @Test
+    void testTransformToDomain_withNullAbuseFees_shouldAddNull() {
+      // Arrange
+      DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+      List<AbuseFeeDTO> abuseFeesDTOs = new ArrayList<>();
+      abuseFeesDTOs.add(null);
+      decisionDTO.setAbuseFees(abuseFeesDTOs);
+
+      // Act
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+      // Assert
+      List<AbuseFee> abuseFees = new ArrayList<>();
+      abuseFees.add(null);
+      assertThat(decision.contentRelatedIndexing().abuseFees()).isEqualTo(abuseFees);
+    }
+
+    @Test
+    void testTransformToDTO_withAbuseFees_shouldAddData() {
+      // Arrange
+      var abuseFee =
+          AbuseFee.builder()
+              .amount(10000)
+              .currencyCode(CurrencyCode.builder().isoCode("EUR").label("Euro (EUR)").build())
+              .addressee(Addressee.BEVOLLMAECHTIGTER)
+              .build();
+
+      Decision decision =
+          Decision.builder()
+              .contentRelatedIndexing(
+                  ContentRelatedIndexing.builder().abuseFees(List.of(abuseFee)).build())
+              .build();
+
+      // Act
+      DecisionDTO decisionDTO =
+          DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+      // Assert
+      assertThat(decisionDTO.getAbuseFees()).hasSize(1);
+      assertThat(decisionDTO.getAbuseFees().getFirst().getRank()).isEqualTo(1L);
+      assertThat(decisionDTO.getAbuseFees().getFirst().getAddressee())
+          .isEqualTo(Addressee.BEVOLLMAECHTIGTER);
+      assertThat(decisionDTO.getAbuseFees().getFirst().getAmount()).isEqualTo(10000);
+      assertThat(decisionDTO.getAbuseFees().getFirst().getCurrencyCode().getValue())
+          .isEqualTo("Euro (EUR)");
+    }
+
+    @Test
+    void testTransformToDTO_withoutAbuseFees_shouldNotAddData() {
+      // Arrange
+      Decision decision = generateSimpleDocumentationUnitBuilder().build();
+
+      // Act
+      DecisionDTO decisionDTO =
+          DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+      // Assert
+      assertThat(decisionDTO.getAbuseFees()).isEmpty();
+    }
+
+    @Test
+    void testTransformToDTO_withNullAbuseFees_shouldAddNull() {
+      // Arrange
+      List<AbuseFee> abuseFees = new ArrayList<>();
+      abuseFees.add(null);
+      Decision decision =
+          Decision.builder()
+              .contentRelatedIndexing(ContentRelatedIndexing.builder().abuseFees(abuseFees).build())
+              .build();
+      // Act
+      DecisionDTO decisionDTO =
+          DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+      // Assert
+
+      List<AbuseFeeDTO> abuseFeeDTOs = new ArrayList<>();
+      abuseFeeDTOs.add(null);
+      assertThat(decisionDTO.getAbuseFees()).isEqualTo(abuseFeeDTOs);
+    }
+  }
+
   @Test
   void testTransformToDomain_withCelex_resultShouldHaveCelex() {
     DecisionDTO decisionDTO = generateSimpleDTOBuilder().celexNumber("62023CJ0538").build();
@@ -2437,6 +2568,7 @@ class DecisionTransformerTest {
                 .foreignLanguageVersions(Collections.emptyList())
                 .originOfTranslations(Collections.emptyList())
                 .objectValues(Collections.emptyList())
+                .abuseFees(Collections.emptyList())
                 .build())
         .caselawReferences(Collections.emptyList())
         .literatureReferences(Collections.emptyList())

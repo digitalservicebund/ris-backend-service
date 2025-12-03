@@ -1,3 +1,4 @@
+import AbuseFee from "@/domain/abuseFee"
 import ActiveCitation from "@/domain/activeCitation"
 import { Appeal } from "@/domain/appeal"
 import { AppealAdmission } from "@/domain/appealAdmission"
@@ -26,4 +27,5 @@ export type ContentRelatedIndexing = {
   appealAdmission?: AppealAdmission
   appeal?: Appeal
   objectValues?: ObjectValue[]
+  abuseFees?: AbuseFee[]
 }

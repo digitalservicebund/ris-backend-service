@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import ObjectValue from "@/domain/objectValue"
+import Abusefee from "@/domain/abuseFee"
 import Payment from "~icons/ic/round-payments"
 
 defineProps<{
-  data: ObjectValue
+  data: Abusefee
 }>()
 </script>
 

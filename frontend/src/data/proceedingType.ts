@@ -1,33 +1,36 @@
-import { ProceedingType } from "@/domain/objectValue"
+import { ProceedingType, ProceedingTypeLabels } from "@/domain/objectValue"
 
 export const proceedingType = [
   {
-    label: "Verfassungsbeschwerde",
+    label: ProceedingTypeLabels.VERFASSUNGSBESCHWERDE,
     value: ProceedingType.VERFASSUNGSBESCHWERDE,
   },
-  { label: "Organstreitverfahren", value: ProceedingType.ORGANSTREITVERFAHREN },
   {
-    label: "Konkrete Normenkontrolle",
+    label: ProceedingTypeLabels.ORGANSTREITVERFAHREN,
+    value: ProceedingType.ORGANSTREITVERFAHREN,
+  },
+  {
+    label: ProceedingTypeLabels.KONKRETE_NORMENKONTROLLE,
     value: ProceedingType.KONKRETE_NORMENKONTROLLE,
   },
   {
-    label: "Abstrakte Normenkontrolle",
+    label: ProceedingTypeLabels.ABSTRAKTE_NORMENKONTROLLE,
     value: ProceedingType.ABSTRAKTE_NORMENKONTROLLE,
   },
   {
-    label: "Bund-Länder-Streitigkeit",
+    label: ProceedingTypeLabels.BUND_LAENDER_STREITIGKEIT,
     value: ProceedingType.BUND_LAENDER_STREITIGKEIT,
   },
   {
-    label: "Wahlprüfungsverfahren",
+    label: ProceedingTypeLabels.WAHLPRUEFUNGSVERFAHREN,
     value: ProceedingType.WAHLPRUEFUNGSVERFAHREN,
   },
   {
-    label: "Einstweiliger Rechtsschutz",
+    label: ProceedingTypeLabels.EINSTWEILIGER_RECHTSSCHUTZ,
     value: ProceedingType.EINSTWEILIGER_RECHTSSCHUTZ,
   },
   {
-    label: "Sonstige Verfahren",
+    label: ProceedingTypeLabels.SONSTIGE_VERFAHREN,
     value: ProceedingType.SONSTIGE_VERFAHREN,
   },
 ]
