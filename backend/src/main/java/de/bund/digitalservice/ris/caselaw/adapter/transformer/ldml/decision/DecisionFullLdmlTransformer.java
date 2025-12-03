@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.A
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeDokumentnummern;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AbweichendeEclis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Berichtigungen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Berufsbilder;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DatenDerMuendlichenVerhandlung;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Definitionen;
@@ -45,6 +46,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.T
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Vorgaenge;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Correction;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
@@ -254,6 +256,12 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       builder.notiz(Notiz.builder().content(decision.note()).build());
     }
 
+    // Berichtigung
+    if (decision.longTexts() != null
+        && !CollectionUtils.isEmpty(decision.longTexts().corrections())) {
+      builder.berichtigungen(buildBerichtigungen(decision.longTexts().corrections()));
+    }
+
     return builder.build();
   }
 
@@ -367,11 +375,8 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                             .definierendeRandnummer(
                                 definition.definingBorderNumber() == null
                                     ? null
-                                    : Definitionen.Definition.DefinierendeRandnummer.builder()
-                                        .refersTo(
-                                            "#randnummer-" + definition.definingBorderNumber())
-                                        .value(String.valueOf(definition.definingBorderNumber()))
-                                        .build())
+                                    : new Definitionen.Definition.DefinierendeRandnummer(
+                                        String.valueOf(definition.definingBorderNumber())))
                             .build())
                 .toList())
         .build();
@@ -574,14 +579,12 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                                       .build())
                           .toList();
 
-                  var borderNumbers =
+                  List<HerkunftDerUebersetzungen.InterneVerlinkung> borderNumbers =
                       Optional.ofNullable(translation.borderNumbers()).orElseGet(List::of).stream()
                           .map(
                               borderNumber ->
-                                  HerkunftDerUebersetzungen.InterneVerlinkung.builder()
-                                      .refersTo("#randnummer-" + borderNumber)
-                                      .value(String.valueOf(borderNumber))
-                                      .build())
+                                  new HerkunftDerUebersetzungen.InterneVerlinkung(
+                                      String.valueOf(borderNumber)))
                           .toList();
 
                   var urls =
@@ -763,6 +766,66 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                 .map(
                     yearOfDispute ->
                         Streitjahre.Streitjahr.builder().value(yearOfDispute.toString()).build())
+                .toList())
+        .build();
+  }
+
+  private Berichtigungen buildBerichtigungen(List<Correction> corrections) {
+    return Berichtigungen.builder()
+        .values(
+            corrections.stream()
+                .map(
+                    correction -> {
+                      var builder = Berichtigungen.Berichtigung.builder();
+
+                      if (correction.type() != null) {
+                        builder.artDerEintragung(
+                            Berichtigungen.Berichtigung.ArtDerEintragung.builder()
+                                .value(correction.type().getLabel())
+                                .build());
+                      }
+
+                      if (correction.description() != null) {
+                        builder.artDerAenderung(
+                            Berichtigungen.Berichtigung.ArtDerAenderung.builder()
+                                .value(correction.description())
+                                .build());
+                      }
+
+                      if (correction.date() != null) {
+                        builder.datumDerAenderung(
+                            Berichtigungen.Berichtigung.DatumDerAenderung.builder()
+                                .value(DateUtils.toDateString(correction.date()))
+                                .build());
+                      }
+
+                      if (correction.borderNumbers() != null) {
+                        var randnummernBuilder = Berichtigungen.Berichtigung.Randnummern.builder();
+
+                        correction
+                            .borderNumbers()
+                            .forEach(
+                                borderNumber ->
+                                    randnummernBuilder.value(
+                                        new Berichtigungen.Berichtigung.Randnummern.Randnummer(
+                                            String.valueOf(borderNumber))));
+
+                        builder.randnummern(randnummernBuilder.build());
+                      }
+
+                      if (correction.content() != null) {
+                        var content = correction.content();
+
+                        if (isNotBlank(content)) {
+                          builder.inhaltDerAenderung(
+                              Berichtigungen.Berichtigung.InhaltDerAenderung.builder()
+                                  .content(htmlTransformer.htmlStringToObjectList(content))
+                                  .build());
+                        }
+                      }
+
+                      return builder.build();
+                    })
                 .toList())
         .build();
   }

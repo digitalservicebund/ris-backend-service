@@ -774,6 +774,15 @@ class DecisionReducedLdmlTransformerTest {
               <ris:deviatingDocumentNumbers>
                   <ris:deviatingDocumentNumber>deviating document number test</ris:deviatingDocumentNumber>
                </ris:deviatingDocumentNumbers>
-            """));
+            """),
+        Arguments.of(
+            "'berichtigung' (Berichtigungen)",
+            """
+          <ris:berichtigungen domainTerm="Berichtigungen">
+             <ris:berichtigung domainTerm="Berichtigung">
+                 <ris:berichtigungArtDerEintragung domainTerm="Art der Eintragung">Berichtigungsbeschluss</ris:berichtigungArtDerEintragung>
+             </ris:berichtigung>
+          </ris:berichtigungen>
+        """));
   }
 }

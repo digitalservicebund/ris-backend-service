@@ -16,6 +16,8 @@ import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreementIndustry;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Correction;
+import de.bund.digitalservice.ris.caselaw.domain.CorrectionType;
 import de.bund.digitalservice.ris.caselaw.domain.CurrencyCode;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.Definition;
@@ -991,6 +993,16 @@ class DecisionFullLdmlTransformerTest {
                         ParticipatingJudge.builder()
                             .name("Richterin Maxima Mustermann")
                             .referencedOpinions("referenced opinions test 2")
+                            .build()))
+                .corrections(
+                    List.of(
+                        Correction.builder().type(CorrectionType.BERICHTIGUNGSBESCHLUSS).build(),
+                        Correction.builder()
+                            .type(CorrectionType.SCHREIBFEHLERBERICHTIGUNG)
+                            .description("Hauffen -> Haufen")
+                            .date(LocalDate.of(2020, 1, 20))
+                            .borderNumbers(List.of(1L, 3L))
+                            .content("<p>Ersetzen von 'Hauffen' mit 'Haufen'</p>")
                             .build()))
                 .build())
         .shortTexts(

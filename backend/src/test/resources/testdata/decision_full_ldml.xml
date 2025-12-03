@@ -216,7 +216,7 @@
                     <ris:definitionen ris:domainTerm="Definitionen">
                         <ris:definition ris:domainTerm="Definition">
                             <ris:definierterBegriff domainTerm="Definierter Begriff">indirekte Steuern</ris:definierterBegriff>
-                            <ris:definierendeRandnummer domainTerm="Definierende Randnummer" akn:refersTo="#randnummer-2">2</ris:definierendeRandnummer>
+                            <akn:ref ris:domainTerm="Definierende Randnummer" href="#randnummer-2">2</akn:ref>
                         </ris:definition>
                         <ris:definition ris:domainTerm="Definition">
                             <ris:definierterBegriff domainTerm="Definierter Begriff">Sachgesamtheit</ris:definierterBegriff>
@@ -241,7 +241,7 @@
                                 <ris:uebersetzerin domainTerm="Übersetzer:in">Ursel Meier</ris:uebersetzerin>
                             </ris:uebersetzerinnen>
                             <ris:interneVerlinkungen domainTerm="Interne Verlinkungen">
-                                <ris:interneVerlinkung domainTerm="Interne Verlinkung" akn:refersTo="#randnummer-2">2</ris:interneVerlinkung>
+                                <akn:ref ris:domainTerm="Interne Verlinkung" href="#randnummer-2">2</akn:ref>
                             </ris:interneVerlinkungen>
                             <ris:externeVerlinkungen domainTerm="Externe Verlinkungen">
                                 <ris:externeVerlinkung domainTerm="Externe Verlinkung">
@@ -291,14 +291,14 @@
                         </ris:tarifvertrag>
                     </ris:tarifvertraege>
                     <ris:quellen domainTerm="Quellen">
-                      <ris:quelle domainTerm="Quelle">Sonstige</ris:quelle>
-                      <ris:quelle domainTerm="Quelle">sourceRawValue test 2</ris:quelle>
+                        <ris:quelle domainTerm="Quelle">Sonstige</ris:quelle>
+                        <ris:quelle domainTerm="Quelle">sourceRawValue test 2</ris:quelle>
                     </ris:quellen>
                     <ris:streitjahre domainTerm="Streitjahre">
-                      <ris:streitjahr domainTerm="Streitjahr">2024</ris:streitjahr>
+                        <ris:streitjahr domainTerm="Streitjahr">2024</ris:streitjahr>
                     </ris:streitjahre>
                     <ris:berufsbilder domainTerm="Berufsbilder">
-                      <ris:berufsbild domainTerm="Berufsbild">jobProfile test</ris:berufsbild>
+                        <ris:berufsbild domainTerm="Berufsbild">jobProfile test</ris:berufsbild>
                     </ris:berufsbilder>
                     <ris:kuendigungsgruende domainTerm="Kündigungsgründe">
                         <ris:kuendigungsgrund domainTerm="Kündigungsgrund">dismissalGround test</ris:kuendigungsgrund>
@@ -315,6 +315,23 @@
                             <ris:gegenstandswertVerfahren domainTerm="Verfahren">Organstreitverfahren</ris:gegenstandswertVerfahren>
                         </ris:gegenstandswert>
                     </ris:gegenstandswerte>
+                    <ris:berichtigungen domainTerm="Berichtigungen">
+                       <ris:berichtigung domainTerm="Berichtigung">
+                           <ris:berichtigungArtDerEintragung domainTerm="Art der Eintragung">Berichtigungsbeschluss</ris:berichtigungArtDerEintragung>
+                       </ris:berichtigung>
+                       <ris:berichtigung domainTerm="Berichtigung">
+                           <ris:berichtigungArtDerEintragung domainTerm="Art der Eintragung">Schreibfehlerberichtigung</ris:berichtigungArtDerEintragung>
+                           <ris:berichtigungArtDerAenderung domainTerm="Art der Änderung">Hauffen -&gt; Haufen</ris:berichtigungArtDerAenderung>
+                           <ris:berichtigungDatumDerAenderung domainTerm="Datum der Änderung">2020-01-20</ris:berichtigungDatumDerAenderung>
+                           <ris:berichtigungRandnummern domainTerm="Randnummern">
+                               <akn:ref ris:domainTerm="Randnummer" href="#randnummer-1">1</akn:ref>
+                               <akn:ref ris:domainTerm="Randnummer" href="#randnummer-3">3</akn:ref>
+                           </ris:berichtigungRandnummern>
+                           <ris:berichtigungInhaltDerAenderung domainTerm="Inhalt der Änderung">
+                               <akn:p>Ersetzen von 'Hauffen' mit 'Haufen'</akn:p>
+                           </ris:berichtigungInhaltDerAenderung>
+                       </ris:berichtigung>
+                   </ris:berichtigungen>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>
