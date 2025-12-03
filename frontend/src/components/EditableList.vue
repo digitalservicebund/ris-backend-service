@@ -191,6 +191,7 @@ defineExpose({
         <Tooltip text="Eintrag bearbeiten">
           <Button
             id="editable-list-select-button"
+            aria-label="Eintrag bearbeiten"
             :data-testid="`list-entry-${index}`"
             size="small"
             text

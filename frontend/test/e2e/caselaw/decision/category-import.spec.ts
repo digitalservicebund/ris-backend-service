@@ -96,7 +96,7 @@ test.describe("category import", () => {
       await test.step("disable import for empty source categories", async () => {
         await navigateToCategoryImport(page, documentNumber)
         await searchForDocumentUnitToImport(page, documentNumber)
-        await expect(page.getByText("Quellrubrik leer")).toHaveCount(33) // total number of importable categories
+        await expect(page.getByText("Quellrubrik leer")).toHaveCount(34) // total number of importable categories
       })
     },
   )
@@ -117,7 +117,7 @@ test.describe("category import", () => {
           prefilledDocumentUnitWithTexts.documentNumber,
         )
 
-        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(27) // number of non-importable categories, if target category already filled
+        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(28) // number of non-importable categories, if target category already filled
       })
     },
   )
@@ -1045,6 +1045,34 @@ test.describe("category import", () => {
         await expect(
           page.getByText("223 Dollar (USD), Bevollmächtigter"),
         ).toBeInViewport()
+      })
+    },
+  )
+
+  // Herkunftsland
+  test(
+    "import country of origin (Herkunftsland)",
+    { tag: ["@RISDEV-9884"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(page.getByLabel("Herkunftsland übernehmen")).toBeVisible()
+        await page.getByLabel("Herkunftsland übernehmen").click()
+
+        await expect(page.getByText("RE-07-DEU Deutschland")).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(page.getByText("RE-07-DEU Deutschland")).toBeInViewport()
       })
     },
   )

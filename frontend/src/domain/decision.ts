@@ -6,6 +6,7 @@ import Attachment from "@/domain/attachment"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { CoreData } from "@/domain/coreData"
 import Correction from "@/domain/correction"
+import CountryOfOrigin from "@/domain/countryOfOrigin"
 import Definition from "@/domain/definition"
 import { Kind } from "@/domain/documentationUnitKind"
 import EnsuingDecision from "@/domain/ensuingDecision"
@@ -88,6 +89,7 @@ export const contentRelatedIndexingLabels: {
   appeal: "Rechtsmittel",
   objectValues: "Gegenstandswert",
   abuseFees: "Missbrauchsgebühr",
+  countriesOfOrigin: "Herkunftsland",
 }
 export const allLabels = {
   caselawReferences: "Rechtsprechungsfundstellen",
@@ -254,6 +256,12 @@ export class Decision {
           data.contentRelatedIndexing.abuseFees.map(
               (abuseFee) => new AbuseFee({ ...abuseFee }),
           )
+
+    if (data.contentRelatedIndexing?.countriesOfOrigin)
+      data.contentRelatedIndexing.countriesOfOrigin =
+        data.contentRelatedIndexing.countriesOfOrigin.map(
+          (value) => new CountryOfOrigin({ ...value }),
+        )
 
     Object.assign(this, data)
   }

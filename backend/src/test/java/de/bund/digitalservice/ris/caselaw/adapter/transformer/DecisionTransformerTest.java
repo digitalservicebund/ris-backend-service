@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreeme
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementIndustryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CorrectionBorderNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CorrectionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CountryOfOriginDto;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtBranchLocationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CurrencyCodeDTO;
@@ -31,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ForeignLanguageVersionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
@@ -65,6 +67,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.Correction;
 import de.bund.digitalservice.ris.caselaw.domain.CorrectionType;
+import de.bund.digitalservice.ris.caselaw.domain.CountryOfOrigin;
 import de.bund.digitalservice.ris.caselaw.domain.CurrencyCode;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.Definition;
@@ -96,6 +99,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
@@ -2537,6 +2541,95 @@ class DecisionTransformerTest {
     assertThat(decisionDTO.getCourtBranchLocation()).isNull();
   }
 
+  @Test
+  void transformToDomain_withCountriesOfOrigin_shouldAddCountriesOfOrigin() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    decisionDTO.setCountriesOfOrigin(
+        List.of(
+            CountryOfOriginDto.builder()
+                .country(
+                    FieldOfLawDTO.builder()
+                        .id(UUID.fromString("188b845c-1abd-4157-9031-58ae5198294b"))
+                        .build())
+                .fieldOfLaw(
+                    FieldOfLawDTO.builder()
+                        .id(UUID.fromString("bc89cb5a-a03d-4e3c-a809-34c9070506dd"))
+                        .build())
+                .legacyValue("legacy value")
+                .id(UUID.fromString("bad688ff-1ffe-48f8-98cf-6eade3da17d8"))
+                .rank(1L)
+                .build()));
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().countriesOfOrigin()).hasSize(1);
+
+    var countryOfOrigin = decision.contentRelatedIndexing().countriesOfOrigin().getFirst();
+    assertThat(countryOfOrigin.legacyValue()).isEqualTo("legacy value");
+    assertThat(countryOfOrigin.country().id()).hasToString("188b845c-1abd-4157-9031-58ae5198294b");
+    assertThat(countryOfOrigin.fieldOfLaw().id())
+        .hasToString("bc89cb5a-a03d-4e3c-a809-34c9070506dd");
+    assertThat(countryOfOrigin.rank()).isEqualTo(1L);
+    assertThat(countryOfOrigin.id()).hasToString("bad688ff-1ffe-48f8-98cf-6eade3da17d8");
+  }
+
+  @Test
+  void transformToDomain_withoutCountriesOfOrigin_shouldNotAddCountriesOfOrigin() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().countriesOfOrigin()).isEmpty();
+  }
+
+  @Test
+  void transformToDTO_withCountriesOfOrigin_shouldAddCountriesOfOrigin() {
+    Decision decision =
+        Decision.builder()
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .countriesOfOrigin(
+                        List.of(
+                            CountryOfOrigin.builder()
+                                .country(
+                                    FieldOfLaw.builder()
+                                        .id(UUID.fromString("188b845c-1abd-4157-9031-58ae5198294b"))
+                                        .build())
+                                .fieldOfLaw(
+                                    FieldOfLaw.builder()
+                                        .id(UUID.fromString("bc89cb5a-a03d-4e3c-a809-34c9070506dd"))
+                                        .build())
+                                .legacyValue("legacy value")
+                                .id(UUID.fromString("bad688ff-1ffe-48f8-98cf-6eade3da17d8"))
+                                .rank(1L)
+                                .build()))
+                    .build())
+            .build();
+
+    DecisionDTO decisionDTO =
+        DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+    assertThat(decisionDTO.getCountriesOfOrigin()).hasSize(1);
+
+    var dto = decisionDTO.getCountriesOfOrigin().getFirst();
+    assertThat(dto.getLegacyValue()).isEqualTo("legacy value");
+    assertThat(dto.getCountry().getId()).hasToString("188b845c-1abd-4157-9031-58ae5198294b");
+    assertThat(dto.getFieldOfLaw().getId()).hasToString("bc89cb5a-a03d-4e3c-a809-34c9070506dd");
+    assertThat(dto.getRank()).isEqualTo(1L);
+    assertThat(dto.getId()).hasToString("bad688ff-1ffe-48f8-98cf-6eade3da17d8");
+  }
+
+  @Test
+  void transformToDTO_withoutCountriesOfOrigin_shouldNotAddCountriesOfOrigin() {
+    Decision decision = Decision.builder().build();
+    DecisionDTO currentDTO = generateSimpleDTOBuilder().build();
+
+    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDTO, decision);
+
+    assertThat(decisionDTO.getCountriesOfOrigin()).isEmpty();
+  }
+
   private Decision.DecisionBuilder generateSimpleDocumentationUnitBuilder() {
     return Decision.builder()
         .portalPublicationStatus(PortalPublicationStatus.UNPUBLISHED)
@@ -2569,6 +2662,7 @@ class DecisionTransformerTest {
                 .originOfTranslations(Collections.emptyList())
                 .objectValues(Collections.emptyList())
                 .abuseFees(Collections.emptyList())
+                .countriesOfOrigin(Collections.emptyList())
                 .build())
         .caselawReferences(Collections.emptyList())
         .literatureReferences(Collections.emptyList())

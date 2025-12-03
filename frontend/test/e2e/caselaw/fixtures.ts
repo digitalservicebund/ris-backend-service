@@ -154,7 +154,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     const citationType = await citationTypeResponse.json()
 
     const fieldsOfLawResponse = await request.get(
-      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01`,
+      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01&sz=200&pg=0`,
     )
     const fieldsOfLaw = await fieldsOfLawResponse.json()
     const documentTypeResponse = await request.get(
@@ -251,7 +251,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     const normAbbreviation = await normAbbreviationResponse.json()
 
     const fieldsOfLawResponse = await request.get(
-      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01`,
+      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01&sz=200&pg=0`,
     )
     const fieldsOfLaw = await fieldsOfLawResponse.json()
     const documentTypeResponse = await request.get(
@@ -734,6 +734,17 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                 addressee: Addressee.BEVOLLMAECHTIGTER,
               },
             ],
+            countriesOfOrigin: [
+              {
+                id: "9323f4ae-dd79-4952-9bb1-6a33d4b334d3",
+                newEntry: true,
+                country: {
+                  id: "74692dc3-86ea-45ce-b18b-9cc3de94b275",
+                  identifier: "RE-07-DEU",
+                  text: "Deutschland",
+                },
+              },
+            ],
           },
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
@@ -783,7 +794,16 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             fileNumbers: [generateString()],
             decisionDate: "2020-01-01",
           },
-        },
+          contentRelatedIndexing: {
+            countriesOfOrigin: [
+              {
+                id: "b86036b8-8ceb-4655-8392-bb6252b13994",
+                newEntry: true,
+                legacyValue: "legacy value",
+              },
+            ],
+          },
+        } as Decision,
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
       },
     )
