@@ -713,126 +713,29 @@ class DecisionReducedLdmlTransformerTest {
 
   static Stream<Arguments> testCasesForExcludedAttributes() {
     return Stream.of(
-        Arguments.of(
-            "'decisionNames' (Entscheidungsnamen)",
-            """
-            <ris:decisionNames>
-               <ris:decisionNames>decisionNames test</ris:decisionNames>
-            </ris:decisionNames>
-            """),
-        Arguments.of(
-            "'keywords' (Schlagworte)",
-            """
-        <akn:classification source="attributsemantik-noch-undefiniert">
-            <akn:keyword dictionary="attributsemantik-noch-undefiniert"
-                         showAs="attributsemantik-noch-undefiniert"
-                         value="keyword test"/>
-         </akn:classification>
-        """),
-        Arguments.of(
-            "'headnote' (Orientierungssatz)",
-            """
-                    <akn:block name="Orientierungssatz">
-                       <akn:embeddedStructure>
-                          <akn:p>headNote test</akn:p>
-                       </akn:embeddedStructure>
-                    </akn:block>
-                    """),
-        Arguments.of(
-            "'inputType' (Eingangsart)",
-            """
-            inputType test
-            """),
-        Arguments.of(
-            "'legalEffect' (Rechtskraft)",
-            """
-                <ris:legalEffect>ja</ris:legalEffect>
-                """),
-        Arguments.of(
-            "'otherHeadNote' (Sonstiger Orientierungssatz)",
-            """
-                    <akn:block name="Sonstiger Orientierungssatz">
-                       <akn:embeddedStructure>
-                          <akn:p>otherHeadNote test</akn:p>
-                       </akn:embeddedStructure>
-                    </akn:block>
-                    """),
-        Arguments.of(
-            "'procedures' (Vorgänge)",
-            """
-            <ris:procedures>
-              <ris:procedure>previous procedure test</ris:procedure>
-           </ris:procedures>
-           """),
-        Arguments.of(
-            "'fieldsOfLaw' (Sachgebiete)",
-            """
-            <ris:fieldOfLaws/>
-            """),
-        Arguments.of(
-            "'source' (Quelle)",
-            """
-            sourceRawValue test
-            """),
-        Arguments.of(
-            "'documentationOffice' (Dokumentationsstelle)",
-            """
-            <ris:documentationOffice>documentationOffice</ris:documentationOffice>
-            """),
+        Arguments.of("'decisionNames' (Entscheidungsnamen)", "ris:decisionNames"),
+        Arguments.of("'keywords' (Schlagworte)", "akn:keyword"),
+        Arguments.of("'headnote' (Orientierungssatz)", "headNote test"),
+        Arguments.of("'inputType' (Eingangsart)", "inputType test"),
+        Arguments.of("'legalEffect' (Rechtskraft)", "ris:legalEffect"),
+        Arguments.of("'otherHeadNote' (Sonstiger Orientierungssatz)", "otherHeadNote test"),
+        Arguments.of("'procedures' (Vorgänge)", "ris:procedures"),
+        Arguments.of("'fieldsOfLaw' (Sachgebiete)", "ris:fieldOfLaws"),
+        Arguments.of("'source' (Quelle)", "sourceRawValue test"),
+        Arguments.of("'documentationOffice' (Dokumentationsstelle)", "ris:documentationOffice"),
         Arguments.of(
             "'creatingDocumentationOffice' (erstellende Dokumentationsstelle)",
-            """
-            creatingDocumentationOffice
-            """),
+            "creatingDocumentationOffice"),
+        Arguments.of("'activeCitations' (Aktivzitierung)", "citation test"),
+        Arguments.of("'deviatingCourts' (Abweichende Gerichte)", "ris:deviatingCourts"),
+        Arguments.of("'deviatingDates' (Abweichende Entscheidungsdatum)", "ris:deviatingDates"),
+        Arguments.of("'deviatingEclis' (Abweichende Eclis)", "ris:deviatingEclis"),
         Arguments.of(
-            "'activeCitations' (Aktivzitierung)",
-            """
-                 citation test
-                """),
-        Arguments.of(
-            "'deviatingCourts' (Abweichende Gerichte)",
-            """
-              <ris:deviatingCourts>
-                <ris:deviatingCourt>deviating court</ris:deviatingCourt>
-              </ris:deviatingCourts>
-            """),
-        Arguments.of(
-            "'deviatingDates' (Abweichende Entscheidungsdatum)",
-            """
-              <ris:deviatingDates>
-                  <ris:deviatingDate>2010-05-12</ris:deviatingDate>
-               </ris:deviatingDates>
-            """),
-        Arguments.of(
-            "'deviatingEclis' (Abweichende Eclis)",
-            """
-              <ris:deviatingEclis>
-                  <ris:deviatingEcli>deviating ecli test</ris:deviatingEcli>
-               </ris:deviatingEclis>
-            """),
-        Arguments.of(
-            "'deviatingFileNumbers' (Abweichende Aktenzeichen)",
-            """
-              <ris:deviatingFileNumbers>
-                  <ris:deviatingFileNumber>deviating fileNumber</ris:deviatingFileNumber>
-               </ris:deviatingFileNumbers>
-            """),
+            "'deviatingFileNumbers' (Abweichende Aktenzeichen)", "ris:deviatingFileNumbers"),
         Arguments.of(
             "'deviatingDocumentNumbers' (Abweichende Dokumentnummer)",
-            """
-              <ris:deviatingDocumentNumbers>
-                  <ris:deviatingDocumentNumber>deviating document number test</ris:deviatingDocumentNumber>
-               </ris:deviatingDocumentNumbers>
-            """),
-        Arguments.of(
-            "'berichtigung' (Berichtigungen)",
-            """
-          <ris:berichtigungen domainTerm="Berichtigungen">
-             <ris:berichtigung domainTerm="Berichtigung">
-                 <ris:berichtigungArtDerEintragung domainTerm="Art der Eintragung">Berichtigungsbeschluss</ris:berichtigungArtDerEintragung>
-             </ris:berichtigung>
-          </ris:berichtigungen>
-        """),
+            "ris:deviatingDocumentNumbers"),
+        Arguments.of("'berichtigung' (Berichtigungen)", "ris:berichtigungen"),
         Arguments.of("'herkunftslaender' (Herkunftsländer)", "ris:herkunftslaender"));
   }
 }
