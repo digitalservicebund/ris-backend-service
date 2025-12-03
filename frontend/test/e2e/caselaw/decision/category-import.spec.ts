@@ -96,7 +96,7 @@ test.describe("category import", () => {
       await test.step("disable import for empty source categories", async () => {
         await navigateToCategoryImport(page, documentNumber)
         await searchForDocumentUnitToImport(page, documentNumber)
-        await expect(page.getByText("Quellrubrik leer")).toHaveCount(32) // total number of importable categories
+        await expect(page.getByText("Quellrubrik leer")).toHaveCount(33) // total number of importable categories
       })
     },
   )
@@ -117,7 +117,7 @@ test.describe("category import", () => {
           prefilledDocumentUnitWithTexts.documentNumber,
         )
 
-        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(26) // number of non-importable categories, if target category already filled
+        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(27) // number of non-importable categories, if target category already filled
       })
     },
   )
@@ -1010,6 +1010,40 @@ test.describe("category import", () => {
       await test.step("scroll to category", async () => {
         await expect(
           page.getByText("123 Dollar (USD), Verfassungsbeschwerde"),
+        ).toBeInViewport()
+      })
+    },
+  )
+
+  // Missbrauchsgebühr
+  test(
+    "import abuseFees (Missbrauchsgebühr)",
+    { tag: ["@RISDEV-9959"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(
+          page.getByLabel("Missbrauchsgebühr übernehmen"),
+        ).toBeVisible()
+        await page.getByLabel("Missbrauchsgebühr übernehmen").click()
+
+        await expect(
+          page.getByText("223 Dollar (USD), Bevollmächtigter"),
+        ).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByText("223 Dollar (USD), Bevollmächtigter"),
         ).toBeInViewport()
       })
     },

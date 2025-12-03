@@ -1,7 +1,16 @@
-import { TranslationType } from "@/domain/originOfTranslation"
+import {
+  TranslationType,
+  TranslationTypeLabels,
+} from "@/domain/originOfTranslation"
 
 export const translationType = [
-  { label: "Amtlich", value: TranslationType.AMTLICH },
-  { label: "Nicht-amtlich", value: TranslationType.NICHT_AMTLICH },
-  { label: "Keine Angabe", value: TranslationType.KEINE_ANGABE },
+  { label: TranslationTypeLabels.AMTLICH, value: TranslationType.AMTLICH },
+  {
+    label: TranslationTypeLabels.NICHT_AMTLICH,
+    value: TranslationType.NICHT_AMTLICH,
+  },
+  {
+    label: TranslationTypeLabels.KEINE_ANGABE,
+    value: TranslationType.KEINE_ANGABE,
+  },
 ]

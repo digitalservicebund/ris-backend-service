@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbuseFeeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO.DecisionDTOBuilder;
@@ -21,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslati
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
+import de.bund.digitalservice.ris.caselaw.domain.AbuseFee;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
@@ -155,6 +157,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       builder.appeal(AppealTransformer.transformToDTO(currentDto, contentRelatedIndexing.appeal()));
       addOriginOfTranslations(builder, contentRelatedIndexing);
       addObjectValues(builder, contentRelatedIndexing);
+      addAbuseFees(builder, contentRelatedIndexing);
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -595,6 +598,22 @@ public class DecisionTransformer extends DocumentableTransformer {
     builder.objectValues(objectValueDTOS);
   }
 
+  private static void addAbuseFees(
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.abuseFees() == null) {
+      return;
+    }
+
+    List<AbuseFeeDTO> abuseFeeDTOS = new ArrayList<>();
+    List<AbuseFee> abuseFees = contentRelatedIndexing.abuseFees();
+
+    for (int i = 0; i < abuseFees.size(); i++) {
+      abuseFeeDTOS.add(AbuseFeeTransformer.transformToDTO(abuseFees.get(i), i));
+    }
+
+    builder.abuseFees(abuseFeeDTOS);
+  }
+
   public static Decision transformToDomain(DecisionDTO decisionDTO) {
     return transformToDomain(decisionDTO, null);
   }
@@ -809,6 +828,12 @@ public class DecisionTransformer extends DocumentableTransformer {
               .map(ObjectValueTransformer::transformToDomain)
               .toList();
       contentRelatedIndexingBuilder.objectValues(objectValues);
+    }
+
+    if (decisionDTO.getAbuseFees() != null) {
+      List<AbuseFee> abuseFees =
+          decisionDTO.getAbuseFees().stream().map(AbuseFeeTransformer::transformToDomain).toList();
+      contentRelatedIndexingBuilder.abuseFees(abuseFees);
     }
 
     return contentRelatedIndexingBuilder.build();
