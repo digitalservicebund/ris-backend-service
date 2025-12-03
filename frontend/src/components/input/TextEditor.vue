@@ -129,17 +129,12 @@ const extensions: AnyExtension[] = [
   Indent.configure({
     names: ["listItem", "paragraph"],
   }),
+  IgnoreOnceMark,
+  TextCheckMark,
+  TextCheckExtension.configure({
+    service: textCheckService,
+  }),
 ]
-
-if (!props.hideTextCheck) {
-  extensions.push(
-    IgnoreOnceMark,
-    TextCheckMark,
-    TextCheckExtension.configure({
-      service: textCheckService,
-    }),
-  )
-}
 
 const editor: Editor = new Editor({
   editorProps: {

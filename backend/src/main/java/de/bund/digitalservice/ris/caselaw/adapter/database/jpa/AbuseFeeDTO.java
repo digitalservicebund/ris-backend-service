@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.domain.ProceedingType;
+import de.bund.digitalservice.ris.caselaw.domain.Addressee;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -26,8 +26,8 @@ import org.hibernate.type.SqlTypes;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "object_value")
-public class ObjectValueDTO {
+@Table(schema = "incremental_migration", name = "abuse_fee")
+public class AbuseFeeDTO {
   @Id @GeneratedValue private UUID id;
 
   @Column @NotNull private Long rank;
@@ -41,8 +41,8 @@ public class ObjectValueDTO {
   @Column(name = "amount")
   private int amount;
 
-  @Column(name = "proceeding")
+  @Column(name = "addressee")
   @Enumerated(EnumType.STRING)
   @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-  private ProceedingType proceedingType;
+  private Addressee addressee;
 }

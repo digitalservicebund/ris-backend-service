@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
+import AbuseFees from "./AbuseFees.vue"
 import Appeal from "@/components/Appeal.vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import CollectiveAgreements from "@/components/CollectiveAgreements.vue"
@@ -81,6 +82,12 @@ const hasAppeal = computed(() => {
 const hasObjectValues = computed(() => {
   return contentRelatedIndexing.value.objectValues?.length
     ? contentRelatedIndexing.value.objectValues?.length > 0
+    : false
+})
+
+const hasAbuseFees = computed(() => {
+  return contentRelatedIndexing.value.abuseFees?.length
+    ? contentRelatedIndexing.value.abuseFees?.length > 0
     : false
 })
 
@@ -189,6 +196,12 @@ const shouldDisplayAppeal = computed(
         :should-show-button="!hasObjectValues"
       >
         <ObjectValues :label="contentRelatedIndexingLabels.objectValues" />
+      </CategoryWrapper>
+      <CategoryWrapper
+        label="Missbrauchsgebühr"
+        :should-show-button="!hasAbuseFees"
+      >
+        <AbuseFees :label="contentRelatedIndexingLabels.abuseFees" />
       </CategoryWrapper>
     </div>
   </div>

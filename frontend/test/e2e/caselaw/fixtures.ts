@@ -4,6 +4,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import jsonPatch from "fast-json-patch"
 import { Page as Pagination } from "@/components/Pagination.vue"
+import { Addressee } from "@/domain/abuseFee"
 import { AppealAdmitter } from "@/domain/appealAdmitter"
 import { Decision } from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
@@ -718,6 +719,19 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                   isoCode: "USD",
                 },
                 proceedingType: ProceedingType.VERFASSUNGSBESCHWERDE,
+              },
+            ],
+            abuseFees: [
+              {
+                id: "77028aa6-7898-5b80-b8b1-91ea5886f90e",
+                newEntry: true,
+                amount: 223,
+                currencyCode: {
+                  id: "c7a92695-5171-459a-bd79-5cc741064a25",
+                  label: "Dollar (USD)",
+                  isoCode: "USD",
+                },
+                addressee: Addressee.BEVOLLMAECHTIGTER,
               },
             ],
           },

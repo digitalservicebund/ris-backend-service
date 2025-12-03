@@ -145,7 +145,8 @@ sonar {
             "sonar.coverage.exclusions",
             "**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/*Exception.java"
         )
-        property("sonar.cpd.exclusions", "**/DecisionCommonLdmlTransformer.java, **/PendingProceedingCommonLdmlTransformer.java")
+        // ↓ Exclude duplication warning caused by LDML-Transformer and ObjectValueDTO
+        property("sonar.cpd.exclusions", "**/DecisionCommonLdmlTransformer.java, **/PendingProceedingCommonLdmlTransformer.java, **/AbuseFeeDTO.java")
         property("sonar.sources", "src/main/java")
     }
 }
