@@ -14,6 +14,10 @@ public class FieldOfLawTransformer {
 
   public static FieldOfLaw transformToDomain(
       FieldOfLawDTO fieldOfLawDTO, boolean withChildren, boolean withNorms) {
+    if (fieldOfLawDTO == null) {
+      return null;
+    }
+
     FieldOfLawBuilder builder =
         FieldOfLaw.builder()
             .id(fieldOfLawDTO.getId())
