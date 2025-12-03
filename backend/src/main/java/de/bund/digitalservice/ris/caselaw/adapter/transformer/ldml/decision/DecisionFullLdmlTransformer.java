@@ -256,6 +256,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       builder.notiz(Notiz.builder().content(decision.note()).build());
     }
 
+    // Berichtigung
     if (decision.longTexts() != null
         && !CollectionUtils.isEmpty(decision.longTexts().corrections())) {
       builder.berichtigungen(buildBerichtigungen(decision.longTexts().corrections()));
