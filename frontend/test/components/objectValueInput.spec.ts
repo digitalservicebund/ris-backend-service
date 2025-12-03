@@ -45,8 +45,8 @@ describe("ObjectValueInput", () => {
   it("renders currency combobox and chips inputs", () => {
     renderComponent()
 
-    expect(screen.getByText("Betrag")).toBeInTheDocument()
-    expect(screen.getByText("Währung")).toBeInTheDocument()
+    expect(screen.getByText("Betrag *")).toBeInTheDocument()
+    expect(screen.getByText("Währung *")).toBeInTheDocument()
     expect(screen.getByText("Verfahren")).toBeInTheDocument()
   })
 
