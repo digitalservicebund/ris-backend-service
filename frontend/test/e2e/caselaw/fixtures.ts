@@ -37,6 +37,7 @@ type MyFixtures = {
   prefilledDocumentUnitWithReferences: Decision
   prefilledDocumentUnitWithTexts: Decision
   prefilledDocumentUnitWithManyReferences: Decision
+  prefilledDocumentUnitWithLegacyCountryOfOrigin: Decision
   pendingProceeding: PendingProceeding
   prefilledPendingProceeding: PendingProceeding
   /** Define fixture option "decisionsToBeCreated" to define the decisions to be generated */
@@ -761,6 +762,66 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     )
   },
 
+  prefilledDocumentUnitWithLegacyCountryOfOrigin: async (
+    { request, context },
+    use,
+  ) => {
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+    const response = await context.request.put(
+      `/api/v1/caselaw/documentunits/new`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+    const documentUnit = await response.json()
+
+    const courtResponse = await context.request.get(
+      `api/v1/caselaw/courts?q=AG+Aachen`,
+    )
+    const court = await courtResponse.json()
+
+    const documentTypeResponse = await context.request.get(
+      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
+    )
+    const documentType = await documentTypeResponse.json()
+
+    const updateResponse = await context.request.put(
+      `/api/v1/caselaw/documentunits/${documentUnit.uuid}`,
+      {
+        data: {
+          ...documentUnit,
+          coreData: {
+            ...documentUnit.coreData,
+            court: court?.[0],
+            documentType: documentType?.[0],
+            fileNumbers: [generateString()],
+            decisionDate: "2020-01-01",
+          },
+          contentRelatedIndexing: {
+            countriesOfOrigin: [
+              {
+                id: "b86036b8-8ceb-4655-8392-bb6252b13994",
+                newEntry: true,
+                legacyValue: "legacy value",
+              },
+            ],
+          },
+        } as Decision,
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    await use(await updateResponse.json())
+
+    await deleteWithRetry(
+      request,
+      documentUnit.uuid,
+      csrfToken,
+      documentUnit.documentNumber,
+    )
+  },
+
   secondPrefilledDocumentUnit: async ({ request, context }, use) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
@@ -793,15 +854,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             documentType: documentType?.[0],
             fileNumbers: [generateString()],
             decisionDate: "2020-01-01",
-          },
-          contentRelatedIndexing: {
-            countriesOfOrigin: [
-              {
-                id: "b86036b8-8ceb-4655-8392-bb6252b13994",
-                newEntry: true,
-                legacyValue: "legacy value",
-              },
-            ],
           },
         } as Decision,
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },

@@ -111,11 +111,11 @@ test.describe(
 
     test("Altwerte werden angezeigt und gelöscht", async ({
       page,
-      secondPrefilledDocumentUnit,
+      prefilledDocumentUnitWithLegacyCountryOfOrigin,
     }) => {
       await navigateToCategories(
         page,
-        secondPrefilledDocumentUnit.documentNumber,
+        prefilledDocumentUnitWithLegacyCountryOfOrigin.documentNumber,
       )
 
       const otherCategoriesContainer = page.getByLabel("Weitere Rubriken")
@@ -136,7 +136,7 @@ test.describe(
       await test.step("Altwert erscheint in der Vorschau", async () => {
         await navigateToPreview(
           page,
-          secondPrefilledDocumentUnit.documentNumber,
+          prefilledDocumentUnitWithLegacyCountryOfOrigin.documentNumber,
         )
         await expect(page.getByText("Herkunftsland")).toBeVisible()
         await expect(page.getByText("legacy value")).toBeVisible()
@@ -145,7 +145,7 @@ test.describe(
       await test.step("Landbezeichnung ausfüllen", async () => {
         await navigateToCategories(
           page,
-          secondPrefilledDocumentUnit.documentNumber,
+          prefilledDocumentUnitWithLegacyCountryOfOrigin.documentNumber,
         )
 
         await otherCategoriesContainer
