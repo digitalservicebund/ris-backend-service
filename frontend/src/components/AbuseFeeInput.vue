@@ -101,7 +101,6 @@ onMounted(() => {
         <InputField
           id="abuseFeeCurrencyInput"
           v-slot="slotProps"
-          data-testid="abuse-fee-currency"
           label="Währung *"
           :validation-error="validationStore.getByField('currencyCode')"
         >
@@ -110,24 +109,17 @@ onMounted(() => {
             v-model="abuseFee.currencyCode"
             aria-label="Währung"
             class="w-full"
-            data-testid="abuse-fee-currency-input"
             :invalid="slotProps.hasError"
             :item-service="ComboboxItemService.getCurrencyCodes"
           ></ComboboxInput>
         </InputField>
       </div>
       <div class="basis-1/3">
-        <InputField
-          id="abuseFeeAddressee"
-          v-slot="{ id }"
-          data-testid="abuse-fee-addressee"
-          label="Adressat"
-        >
+        <InputField id="abuseFeeAddressee" v-slot="{ id }" label="Adressat">
           <InputSelect
             :id="id"
             v-model="abuseFee.addressee"
             aria-label="Adressat"
-            data-testid="abuse-fee-addressee-input"
             fluid
             option-label="label"
             option-value="value"

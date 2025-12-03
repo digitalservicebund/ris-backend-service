@@ -471,7 +471,7 @@ const hasAppeal = computed(() => {
     </div>
     <PreviewRow v-if="hasObjectValues">
       <PreviewCategory>Gegenstandswert</PreviewCategory>
-      <PreviewContent data-testid="Gegenstandswert">
+      <PreviewContent>
         <div
           v-for="objectValue in props.contentRelatedIndexing.objectValues"
           :key="objectValue.id"
@@ -482,7 +482,7 @@ const hasAppeal = computed(() => {
     </PreviewRow>
     <PreviewRow v-if="hasAbuseFees">
       <PreviewCategory>Missbrauchsgebühr</PreviewCategory>
-      <PreviewContent data-testid="Missbrauchsgebühr">
+      <PreviewContent>
         <div
           v-for="abuseFee in props.contentRelatedIndexing.abuseFees"
           :key="abuseFee.id"

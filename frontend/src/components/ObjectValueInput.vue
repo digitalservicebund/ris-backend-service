@@ -101,7 +101,6 @@ onMounted(() => {
         <InputField
           id="objectValueCurrencyInput"
           v-slot="slotProps"
-          data-testid="object-value-currency"
           label="Währung *"
           :validation-error="validationStore.getByField('currencyCode')"
         >
@@ -110,7 +109,6 @@ onMounted(() => {
             v-model="objectValue.currencyCode"
             aria-label="Währung"
             class="w-full"
-            data-testid="object-value-currency-input"
             :invalid="slotProps.hasError"
             :item-service="ComboboxItemService.getCurrencyCodes"
           ></ComboboxInput>
@@ -120,14 +118,12 @@ onMounted(() => {
         <InputField
           id="objectValueProceedingType"
           v-slot="{ id }"
-          data-testid="object-value-proceeding-type"
           label="Verfahren"
         >
           <InputSelect
             :id="id"
             v-model="objectValue.proceedingType"
             aria-label="Verfahren"
-            data-testid="object-value-proceeding-type-input"
             fluid
             option-label="label"
             option-value="value"
