@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RandnummernRef;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RandnummerRef;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlValue;
@@ -49,7 +49,7 @@ public class Definitionen {
     }
 
     @NoArgsConstructor
-    public static class DefinierendeRandnummer extends RandnummernRef {
+    public static class DefinierendeRandnummer extends RandnummerRef {
       public DefinierendeRandnummer(String randnummer) {
         super("Definierende Randnummer", randnummer);
       }

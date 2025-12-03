@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RandnummernRef;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RandnummerRef;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrLanguage;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -86,7 +86,7 @@ public class HerkunftDerUebersetzungen {
   }
 
   @NoArgsConstructor
-  public static class InterneVerlinkung extends RandnummernRef {
+  public static class InterneVerlinkung extends RandnummerRef {
     public InterneVerlinkung(String randnummer) {
       super("Interne Verlinkung", randnummer);
     }
