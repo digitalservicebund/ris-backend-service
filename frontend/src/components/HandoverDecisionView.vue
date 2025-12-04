@@ -179,6 +179,8 @@ const fieldsWithoutJdvExport = computed<string[]>(() => {
     fieldLabels.push(contentRelatedIndexingLabels.abuseFees)
   if (decision.value?.contentRelatedIndexing?.countriesOfOrigin?.length)
     fieldLabels.push(contentRelatedIndexingLabels.countriesOfOrigin)
+  if (decision.value?.contentRelatedIndexing?.incomeTypes?.length)
+    fieldLabels.push(contentRelatedIndexingLabels.incomeTypes)
   if (decision.value?.coreData?.celexNumber)
     fieldLabels.push(coreDataLabels.celexNumber)
   if (decision.value?.coreData?.hasDeliveryDate)

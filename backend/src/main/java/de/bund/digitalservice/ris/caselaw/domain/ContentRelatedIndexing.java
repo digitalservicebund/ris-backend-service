@@ -28,6 +28,7 @@ public record ContentRelatedIndexing(
     List<OriginOfTranslation> originOfTranslations,
     List<ObjectValue> objectValues,
     List<AbuseFee> abuseFees,
+    List<IncomeType> incomeTypes,
     boolean hasLegislativeMandate,
     String evsf,
     AppealAdmission appealAdmission,

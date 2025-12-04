@@ -96,7 +96,7 @@ test.describe("category import", () => {
       await test.step("disable import for empty source categories", async () => {
         await navigateToCategoryImport(page, documentNumber)
         await searchForDocumentUnitToImport(page, documentNumber)
-        await expect(page.getByText("Quellrubrik leer")).toHaveCount(34) // total number of importable categories
+        await expect(page.getByText("Quellrubrik leer")).toHaveCount(35) // total number of importable categories
       })
     },
   )
@@ -117,7 +117,7 @@ test.describe("category import", () => {
           prefilledDocumentUnitWithTexts.documentNumber,
         )
 
-        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(28) // number of non-importable categories, if target category already filled
+        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(29) // number of non-importable categories, if target category already filled
       })
     },
   )
@@ -1015,9 +1015,9 @@ test.describe("category import", () => {
     },
   )
 
-  // Missbrauchsgebühr
+  // Missbrauchsgebühren
   test(
-    "import abuseFees (Missbrauchsgebühr)",
+    "import abuseFees (Missbrauchsgebühren)",
     { tag: ["@RISDEV-9959"] },
     async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
       await navigateToCategoryImport(page, linkedDocumentNumber)
@@ -1028,9 +1028,9 @@ test.describe("category import", () => {
           prefilledDocumentUnitWithTexts.documentNumber,
         )
         await expect(
-          page.getByLabel("Missbrauchsgebühr übernehmen"),
+          page.getByLabel("Missbrauchsgebühren übernehmen"),
         ).toBeVisible()
-        await page.getByLabel("Missbrauchsgebühr übernehmen").click()
+        await page.getByLabel("Missbrauchsgebühren übernehmen").click()
 
         await expect(
           page.getByText("223 Dollar (USD), Bevollmächtigter"),
@@ -1073,6 +1073,38 @@ test.describe("category import", () => {
 
       await test.step("scroll to category", async () => {
         await expect(page.getByText("RE-07-DEU Deutschland")).toBeInViewport()
+      })
+    },
+  )
+
+  // Einkunftsart
+  test(
+    "import income types (Einkunftsart)",
+    { tag: ["@RISDEV-8712"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(page.getByLabel("Einkunftsart übernehmen")).toBeVisible()
+        await page.getByLabel("Einkunftsart übernehmen").click()
+
+        await expect(
+          page.getByText("Gewerbebetrieb, Programmierer"),
+        ).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByText("Gewerbebetrieb, Programmierer"),
+        ).toBeInViewport()
       })
     },
   )

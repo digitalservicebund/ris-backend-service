@@ -7,6 +7,7 @@ import CountryOfOrigin from "@/domain/countryOfOrigin"
 import Definition from "@/domain/definition"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
+import IncomeType from "@/domain/incomeType"
 import NormReference from "@/domain/normReference"
 import ObjectValue from "@/domain/objectValue"
 import OriginOfTranslation from "@/domain/originOfTranslation"
@@ -31,5 +32,6 @@ export type ContentRelatedIndexing = {
   objectValues?: ObjectValue[]
   abuseFees?: AbuseFee[]
   countriesOfOrigin?: CountryOfOrigin[]
+  incomeTypes?: IncomeType[]
   relatedPendingProceedings?: RelatedPendingProceeding[]
 }

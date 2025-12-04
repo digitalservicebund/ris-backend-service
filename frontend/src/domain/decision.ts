@@ -89,8 +89,9 @@ export const contentRelatedIndexingLabels: {
   appealAdmission: "Rechtsmittelzulassung",
   appeal: "Rechtsmittel",
   objectValues: "Gegenstandswert",
-  abuseFees: "Missbrauchsgebühr",
+  abuseFees: "Missbrauchsgebühren",
   countriesOfOrigin: "Herkunftsland",
+  incomeTypes: "Einkunftsart",
   relatedPendingProceedings: "Verknüpfung anhängiges Verfahren",
 }
 export const allLabels = {

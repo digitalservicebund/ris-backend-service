@@ -34,6 +34,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ForeignLanguageVersionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.IncomeTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LanguageCodeDTO;
@@ -75,6 +76,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Definition;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
+import de.bund.digitalservice.ris.caselaw.domain.IncomeType;
 import de.bund.digitalservice.ris.caselaw.domain.LanguageCode;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
@@ -92,6 +94,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
+import de.bund.digitalservice.ris.caselaw.domain.TypeOfIncome;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealWithdrawal;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.PkhPlaintiff;
@@ -2632,6 +2635,96 @@ class DecisionTransformerTest {
     assertThat(decisionDTO.getCountriesOfOrigin()).isEmpty();
   }
 
+  @Test
+  void transformToDomain_withIncomeTypes_shouldAddIncomeTypes() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    decisionDTO.setIncomeTypes(
+        List.of(
+            IncomeTypeDTO.builder()
+                .typeOfIncome(TypeOfIncome.ESTG)
+                .terminology("Begrifflichkeit1")
+                .rank(1L)
+                .build(),
+            IncomeTypeDTO.builder()
+                .typeOfIncome(TypeOfIncome.LAND_UND_FORTWIRTSCHAFT)
+                .terminology("Begrifflichkeit2")
+                .rank(2L)
+                .build()));
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().incomeTypes()).isNotNull().hasSize(2);
+    assertThat(decision.contentRelatedIndexing().incomeTypes())
+        .satisfiesExactly(
+            incomeType -> {
+              assertThat(incomeType.typeOfIncome()).isEqualTo(TypeOfIncome.ESTG);
+              assertThat(incomeType.terminology()).isEqualTo("Begrifflichkeit1");
+            },
+            incomeType -> {
+              assertThat(incomeType.typeOfIncome()).isEqualTo(TypeOfIncome.LAND_UND_FORTWIRTSCHAFT);
+              assertThat(incomeType.terminology()).isEqualTo("Begrifflichkeit2");
+            });
+  }
+
+  @Test
+  void transformToDomain_withoutIncomeTypes_shouldNotAddIncomeTypes() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().incomeTypes()).isEmpty();
+  }
+
+  @Test
+  void transformToDTO_withIncomeTypes_shouldAddIncomeTypes() {
+    Decision decision =
+        Decision.builder()
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .incomeTypes(
+                        List.of(
+                            IncomeType.builder()
+                                .typeOfIncome(TypeOfIncome.ESTG)
+                                .terminology("Begrifflichkeit")
+                                .build(),
+                            IncomeType.builder()
+                                .typeOfIncome(TypeOfIncome.LAND_UND_FORTWIRTSCHAFT)
+                                .terminology("Begrifflichkeit2")
+                                .build()))
+                    .build())
+            .build();
+
+    DecisionDTO decisionDTO =
+        DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+    assertThat(decisionDTO.getIncomeTypes())
+        .isNotNull()
+        .hasSize(2)
+        .satisfiesExactly(
+            incomeType -> {
+              assertThat(incomeType.getRank()).isEqualTo(1L);
+              assertThat(incomeType.getTypeOfIncome()).isEqualTo(TypeOfIncome.ESTG);
+              assertThat(incomeType.getTerminology()).isEqualTo("Begrifflichkeit");
+            },
+            incomeType -> {
+              assertThat(incomeType.getRank()).isEqualTo(2L);
+              assertThat(incomeType.getTypeOfIncome())
+                  .isEqualTo(TypeOfIncome.LAND_UND_FORTWIRTSCHAFT);
+              assertThat(incomeType.getTerminology()).isEqualTo("Begrifflichkeit2");
+            });
+  }
+
+  @Test
+  void transformToDTO_withoutIncomeTypes_shouldNotAddIncomeTypes() {
+    Decision decision = Decision.builder().build();
+    DecisionDTO currentDTO = generateSimpleDTOBuilder().build();
+
+    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDTO, decision);
+
+    assertThat(decisionDTO.getIncomeTypes()).isEmpty();
+  }
+
   @Nested
   class RelatedPendingProceedings {
 
@@ -2728,6 +2821,7 @@ class DecisionTransformerTest {
                 .objectValues(Collections.emptyList())
                 .abuseFees(Collections.emptyList())
                 .countriesOfOrigin(Collections.emptyList())
+                .incomeTypes(Collections.emptyList())
                 .relatedPendingProceedings(Collections.emptyList())
                 .build())
         .caselawReferences(Collections.emptyList())

@@ -2,6 +2,7 @@
 import { computed } from "vue"
 import BorderNumberLinkView from "@/components/BorderNumberLinkView.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
+import IncomeTypeSummaryBasic from "@/components/IncomeTypeSummaryBasic.vue"
 import OriginOfTranslationSummaryPreview from "@/components/OriginOfTranslationSummaryPreview.vue"
 import FieldOfLawNodeView from "@/components/preview/FieldOfLawNodeView.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
@@ -137,6 +138,13 @@ const hasCountriesOfOrigin = computed(() => {
   return (
     props.contentRelatedIndexing.countriesOfOrigin &&
     props.contentRelatedIndexing.countriesOfOrigin.length > 0
+  )
+})
+
+const hasIncomeTypes = computed(() => {
+  return (
+    props.contentRelatedIndexing.incomeTypes &&
+    props.contentRelatedIndexing.incomeTypes?.length > 0
   )
 })
 </script>
@@ -488,7 +496,7 @@ const hasCountriesOfOrigin = computed(() => {
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="hasAbuseFees">
-      <PreviewCategory>Missbrauchsgebühr</PreviewCategory>
+      <PreviewCategory>Missbrauchsgebühren</PreviewCategory>
       <PreviewContent>
         <div
           v-for="abuseFee in props.contentRelatedIndexing.abuseFees"
@@ -508,6 +516,19 @@ const hasCountriesOfOrigin = computed(() => {
         >
           {{ countryOfOrigin.renderSummary }}
         </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasIncomeTypes">
+      <PreviewCategory>{{
+        contentRelatedIndexingLabels.incomeTypes
+      }}</PreviewCategory>
+      <PreviewContent data-testid="Einkunftsart">
+        <span
+          v-for="incomeType in props.contentRelatedIndexing.incomeTypes"
+          :key="incomeType.id"
+        >
+          <IncomeTypeSummaryBasic :data="incomeType" />
+        </span>
       </PreviewContent>
     </PreviewRow>
   </FlexContainer>
