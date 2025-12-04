@@ -294,7 +294,7 @@ public class DecisionDTO extends DocumentationUnitDTO {
 
   /** Nichtanwendungsgesetz */
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinColumn(name = "decision_id", nullable = false)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
   @OrderBy("rank")
   private List<NonApplicationNormDTO> nonApplicationNorms = new ArrayList<>();

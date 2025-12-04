@@ -2437,6 +2437,7 @@ class DecisionTransformerTest {
                 .foreignLanguageVersions(Collections.emptyList())
                 .originOfTranslations(Collections.emptyList())
                 .objectValues(Collections.emptyList())
+                .nonApplicationNorms(Collections.emptyList())
                 .build())
         .caselawReferences(Collections.emptyList())
         .literatureReferences(Collections.emptyList())
