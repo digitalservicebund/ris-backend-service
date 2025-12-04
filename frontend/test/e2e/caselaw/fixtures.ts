@@ -603,6 +603,11 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     )
     const documentType = await documentTypeResponse.json()
 
+    const fieldsOfLawResponse = await request.get(
+      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=RE-07-DEU&sz=200&pg=0`,
+    )
+    const country = await fieldsOfLawResponse.json()
+
     const updateResponse = await request.put(
       `/api/v1/caselaw/documentunits/${prefilledDocumentUnitWithLongTexts.uuid}`,
       {
@@ -740,11 +745,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               {
                 id: "9323f4ae-dd79-4952-9bb1-6a33d4b334d3",
                 newEntry: true,
-                country: {
-                  id: "a214ce79-cee9-452f-81b4-0497bf9c4162",
-                  identifier: "RE-07-DEU",
-                  text: "Deutschland",
-                },
+                country: country?.[0],
               },
             ],
             incomeTypes: [
