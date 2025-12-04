@@ -1,10 +1,12 @@
 import dayjs from "dayjs"
 import DocumentationUnitProcessStep from "./documentationUnitProcessStep"
+import AbuseFee from "@/domain/abuseFee"
 import ActiveCitation from "@/domain/activeCitation"
 import Attachment from "@/domain/attachment"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { CoreData } from "@/domain/coreData"
 import Correction from "@/domain/correction"
+import CountryOfOrigin from "@/domain/countryOfOrigin"
 import Definition from "@/domain/definition"
 import { Kind } from "@/domain/documentationUnitKind"
 import EnsuingDecision from "@/domain/ensuingDecision"
@@ -86,6 +88,8 @@ export const contentRelatedIndexingLabels: {
   appealAdmission: "Rechtsmittelzulassung",
   appeal: "Rechtsmittel",
   objectValues: "Gegenstandswert",
+  abuseFees: "Missbrauchsgebühren",
+  countriesOfOrigin: "Herkunftsland",
   incomeTypes: "Einkunftsart",
 }
 export const allLabels = {
@@ -247,6 +251,18 @@ export class Decision {
           data.contentRelatedIndexing.objectValues.map(
               (objectValue) => new ObjectValue({ ...objectValue }),
           )
+
+    if (data.contentRelatedIndexing?.abuseFees)
+      data.contentRelatedIndexing.abuseFees =
+          data.contentRelatedIndexing.abuseFees.map(
+              (abuseFee) => new AbuseFee({ ...abuseFee }),
+          )
+
+    if (data.contentRelatedIndexing?.countriesOfOrigin)
+      data.contentRelatedIndexing.countriesOfOrigin =
+        data.contentRelatedIndexing.countriesOfOrigin.map(
+          (value) => new CountryOfOrigin({ ...value }),
+        )
 
     Object.assign(this, data)
   }

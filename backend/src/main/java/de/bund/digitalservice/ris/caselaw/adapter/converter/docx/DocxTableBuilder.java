@@ -671,8 +671,12 @@ public class DocxTableBuilder extends DocxBuilder {
       cellElement.addStyle("vertical-align", alignment);
     }
 
+    int widthPx = 0;
     if (tcPr.getTcW() != null && tcPr.getTcW().getW() != null) {
-      var widthPx = DocxUnitConverter.convertTwipToPixel(tcPr.getTcW().getW().longValue());
+      widthPx = DocxUnitConverter.convertTwipToPixel(tcPr.getTcW().getW().longValue());
+    }
+
+    if (widthPx > 0) {
       cellElement.setWidthPx(widthPx);
     } else {
       setCellWidthFromGlobal(cellElement, span, colIndex);

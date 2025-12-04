@@ -10,56 +10,56 @@ import {
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe(
-  "object value (Gegenstandswert)",
+  "abuse fee (Missbrauchsgebühren)",
   {
     annotation: {
       type: "story",
       description:
-        "https://digitalservicebund.atlassian.net/browse/RISDEV-8810",
+        "https://digitalservicebund.atlassian.net/browse/RISDEV-9959",
     },
-    tag: ["@RISDEV-8810"],
+    tag: ["@RISDEV-9959"],
   },
   () => {
-    test("Gegenstandswert", async ({ page, prefilledDocumentUnit }) => {
+    test("Missbrauchsgebühren", async ({ page, prefilledDocumentUnit }) => {
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
       const otherCategoriesContainer = page.getByLabel("Weitere Rubriken")
-      const objectValueButton = otherCategoriesContainer.getByRole("button", {
-        name: "Gegenstandswert",
+      const abuseFeeButton = otherCategoriesContainer.getByRole("button", {
+        name: "Missbrauchsgebühren",
       })
       const amountLabel = otherCategoriesContainer.getByText("Betrag *")
       const currencyLabel = otherCategoriesContainer.getByText("Währung *")
-      const proceedingLabel = otherCategoriesContainer.getByText("Verfahren", {
+      const addresseeLabel = otherCategoriesContainer.getByText("Adressat", {
         exact: true,
       })
 
       const amountInput = otherCategoriesContainer.getByLabel("Betrag")
       const currencyInput = otherCategoriesContainer.getByLabel("Währung")
-      const proceedingInput = otherCategoriesContainer.getByLabel("Verfahren")
+      const addresseeInput = otherCategoriesContainer.getByLabel("Adressat")
 
       const acceptButton = otherCategoriesContainer.getByLabel(
-        "Gegenstandswert speichern",
+        "Missbrauchsgebühren speichern",
       )
 
-      await test.step("Gegenstandswert wird als Kategorie-Button angezeigt", async () => {
-        await expect(objectValueButton).toBeVisible()
+      await test.step("Missbrauchsgebühren wird als Kategorie-Button angezeigt", async () => {
+        await expect(abuseFeeButton).toBeVisible()
         await expect(amountLabel).toBeHidden()
         await expect(currencyLabel).toBeHidden()
-        await expect(proceedingLabel).toBeHidden()
+        await expect(addresseeLabel).toBeHidden()
       })
 
       await test.step("Klicke auf Kategorie-Button", async () => {
-        await objectValueButton.click()
+        await abuseFeeButton.click()
       })
 
-      await test.step("Gegenstandswert besteht aus drei Inputfeldern", async () => {
+      await test.step("Missbrauchsgebühren besteht aus drei Inputfeldern", async () => {
         await expect(amountInput).toBeVisible()
         await expect(currencyInput).toBeVisible()
-        await expect(proceedingInput).toBeVisible()
+        await expect(addresseeInput).toBeVisible()
       })
 
-      await test.step("Nur 'Verfahren' ausfüllen", async () => {
-        await fillSelect(page, "Verfahren", "Verfassungsbeschwerde")
+      await test.step("Nur 'Adressat' ausfüllen", async () => {
+        await fillSelect(page, "Adressat", "Bevollmächtigter")
       })
 
       await test.step("Ohne Pflichtfelder kann nicht übernommen werden", async () => {
@@ -88,16 +88,16 @@ test.describe(
       await test.step("Zusammenfassung wird angezeigt", async () => {
         await expect(
           otherCategoriesContainer.getByText(
-            "10.000 Euro (EUR), Verfassungsbeschwerde",
+            "10.000 Euro (EUR), Bevollmächtigter",
           ),
         ).toBeVisible()
       })
 
-      await test.step("Gegenstandswert erscheint in der Vorschau", async () => {
+      await test.step("Missbrauchsgebühren erscheint in der Vorschau", async () => {
         await navigateToPreview(page, prefilledDocumentUnit.documentNumber)
-        await expect(page.getByText("Gegenstandswert")).toBeVisible()
+        await expect(page.getByText("Missbrauchsgebühren")).toBeVisible()
         await expect(
-          page.getByText("10.000 Euro (EUR), Verfassungsbeschwerde"),
+          page.getByText("10.000 Euro (EUR), Bevollmächtigter"),
         ).toBeVisible()
       })
 
@@ -108,7 +108,7 @@ test.describe(
             "Folgende Rubriken sind befüllt und können nicht an die jDV exportiert werden",
           ),
         ).toBeVisible()
-        await expect(page.getByText("Gegenstandswert")).toBeVisible()
+        await expect(page.getByText("Missbrauchsgebühren")).toBeVisible()
         await page
           .getByRole("button", {
             name: "Dokumentationseinheit an jDV übergeben",

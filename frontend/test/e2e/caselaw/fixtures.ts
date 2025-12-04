@@ -4,6 +4,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import jsonPatch from "fast-json-patch"
 import { Page as Pagination } from "@/components/Pagination.vue"
+import { Addressee } from "@/domain/abuseFee"
 import { AppealAdmitter } from "@/domain/appealAdmitter"
 import { Decision } from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
@@ -37,6 +38,7 @@ type MyFixtures = {
   prefilledDocumentUnitWithReferences: Decision
   prefilledDocumentUnitWithTexts: Decision
   prefilledDocumentUnitWithManyReferences: Decision
+  prefilledDocumentUnitWithLegacyCountryOfOrigin: Decision
   pendingProceeding: PendingProceeding
   prefilledPendingProceeding: PendingProceeding
   /** Define fixture option "decisionsToBeCreated" to define the decisions to be generated */
@@ -154,7 +156,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     const citationType = await citationTypeResponse.json()
 
     const fieldsOfLawResponse = await request.get(
-      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01`,
+      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01&sz=200&pg=0`,
     )
     const fieldsOfLaw = await fieldsOfLawResponse.json()
     const documentTypeResponse = await request.get(
@@ -251,7 +253,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     const normAbbreviation = await normAbbreviationResponse.json()
 
     const fieldsOfLawResponse = await request.get(
-      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01`,
+      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01&sz=200&pg=0`,
     )
     const fieldsOfLaw = await fieldsOfLawResponse.json()
     const documentTypeResponse = await request.get(
@@ -721,6 +723,30 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                 proceedingType: ProceedingType.VERFASSUNGSBESCHWERDE,
               },
             ],
+            abuseFees: [
+              {
+                id: "77028aa6-7898-5b80-b8b1-91ea5886f90e",
+                newEntry: true,
+                amount: 223,
+                currencyCode: {
+                  id: "c7a92695-5171-459a-bd79-5cc741064a25",
+                  label: "Dollar (USD)",
+                  isoCode: "USD",
+                },
+                addressee: Addressee.BEVOLLMAECHTIGTER,
+              },
+            ],
+            countriesOfOrigin: [
+              {
+                id: "9323f4ae-dd79-4952-9bb1-6a33d4b334d3",
+                newEntry: true,
+                country: {
+                  id: "a214ce79-cee9-452f-81b4-0497bf9c4162",
+                  identifier: "RE-07-DEU",
+                  text: "Deutschland",
+                },
+              },
+            ],
             incomeTypes: [
               {
                 id: "aa9add9a-8655-4dbe-a187-1e3b4c2b15ad",
@@ -742,6 +768,66 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
       prefilledDocumentUnitWithLongTexts.uuid,
       csrfToken,
       prefilledDocumentUnitWithLongTexts.documentNumber,
+    )
+  },
+
+  prefilledDocumentUnitWithLegacyCountryOfOrigin: async (
+    { request, context },
+    use,
+  ) => {
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+    const response = await context.request.put(
+      `/api/v1/caselaw/documentunits/new`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+    const documentUnit = await response.json()
+
+    const courtResponse = await context.request.get(
+      `api/v1/caselaw/courts?q=AG+Aachen`,
+    )
+    const court = await courtResponse.json()
+
+    const documentTypeResponse = await context.request.get(
+      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
+    )
+    const documentType = await documentTypeResponse.json()
+
+    const updateResponse = await context.request.put(
+      `/api/v1/caselaw/documentunits/${documentUnit.uuid}`,
+      {
+        data: {
+          ...documentUnit,
+          coreData: {
+            ...documentUnit.coreData,
+            court: court?.[0],
+            documentType: documentType?.[0],
+            fileNumbers: [generateString()],
+            decisionDate: "2020-01-01",
+          },
+          contentRelatedIndexing: {
+            countriesOfOrigin: [
+              {
+                id: "b86036b8-8ceb-4655-8392-bb6252b13994",
+                newEntry: true,
+                legacyValue: "legacy value",
+              },
+            ],
+          },
+        } as Decision,
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    await use(await updateResponse.json())
+
+    await deleteWithRetry(
+      request,
+      documentUnit.uuid,
+      csrfToken,
+      documentUnit.documentNumber,
     )
   },
 
@@ -778,7 +864,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             fileNumbers: [generateString()],
             decisionDate: "2020-01-01",
           },
-        },
+        } as Decision,
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
       },
     )

@@ -5,8 +5,9 @@ import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { setActivePinia } from "pinia"
 import { beforeEach } from "vitest"
-import ObjectValueInput from "@/components/ObjectValueInput.vue"
-import ObjectValue, { CurrencyCode } from "@/domain/objectValue"
+import AbuseFeeInput from "@/components/AbuseFeeInput.vue"
+import AbuseFee from "@/domain/abuseFee"
+import { CurrencyCode } from "@/domain/objectValue"
 
 const server = setupServer(
   http.get("/api/v1/caselaw/currencycodes", () => {
@@ -16,20 +17,20 @@ const server = setupServer(
 )
 
 function renderComponent(options?: {
-  modelValue?: ObjectValue
-  modelValueList?: ObjectValue[]
+  modelValue?: AbuseFee
+  modelValueList?: AbuseFee[]
 }) {
   const user = userEvent.setup()
-  const utils = render(ObjectValueInput, {
+  const utils = render(AbuseFeeInput, {
     props: {
-      modelValue: new ObjectValue({ ...options?.modelValue }),
+      modelValue: new AbuseFee({ ...options?.modelValue }),
       modelValueList: options?.modelValueList,
     },
   })
   return { user, ...utils }
 }
 
-describe("ObjectValueInput", () => {
+describe("AbuseFeeInput", () => {
   beforeEach(() => {
     setActivePinia(createTestingPinia())
 
@@ -47,7 +48,7 @@ describe("ObjectValueInput", () => {
 
     expect(screen.getByText("Betrag *")).toBeInTheDocument()
     expect(screen.getByText("Währung *")).toBeInTheDocument()
-    expect(screen.getByText("Verfahren")).toBeInTheDocument()
+    expect(screen.getByText("Adressat")).toBeInTheDocument()
   })
 
   it("disables 'Übernehmen' button with empty input", async () => {
@@ -57,7 +58,7 @@ describe("ObjectValueInput", () => {
     // Assert
     expect(
       screen.getByRole("button", {
-        name: "Gegenstandswert speichern",
+        name: "Missbrauchsgebühren speichern",
       }),
     ).toBeDisabled()
   })
@@ -67,7 +68,7 @@ describe("ObjectValueInput", () => {
     renderComponent({
       modelValue: {
         id: "id",
-      } as ObjectValue,
+      } as AbuseFee,
     })
 
     const amount = screen.getByLabelText("Betrag", { exact: true })
@@ -78,7 +79,7 @@ describe("ObjectValueInput", () => {
     expect(currency).toHaveValue("")
     expect(
       screen.getByRole("button", {
-        name: "Gegenstandswert speichern",
+        name: "Missbrauchsgebühren speichern",
       }),
     ).toBeDisabled()
   })
@@ -93,7 +94,7 @@ describe("ObjectValueInput", () => {
           id: "id",
           label: "Euro (EUR)",
         } as CurrencyCode,
-      } as ObjectValue,
+      } as AbuseFee,
     })
 
     const amount = screen.getByLabelText("Betrag", { exact: true })
@@ -104,7 +105,7 @@ describe("ObjectValueInput", () => {
     expect(currency).toHaveValue("Euro (EUR)")
     expect(
       screen.getByRole("button", {
-        name: "Gegenstandswert speichern",
+        name: "Missbrauchsgebühren speichern",
       }),
     ).toBeEnabled()
   })
@@ -119,13 +120,13 @@ describe("ObjectValueInput", () => {
           id: "id",
           label: "Euro (EUR)",
         } as CurrencyCode,
-      } as ObjectValue,
+      } as AbuseFee,
     })
 
     // Act
     await user.click(
       screen.getByRole("button", {
-        name: "Gegenstandswert speichern",
+        name: "Missbrauchsgebühren speichern",
       }),
     )
 
@@ -143,13 +144,13 @@ describe("ObjectValueInput", () => {
           id: "id",
           label: "Euro (EUR)",
         } as CurrencyCode,
-      } as ObjectValue,
+      } as AbuseFee,
     })
 
     // Act
     await user.click(
       screen.getByRole("button", {
-        name: "Gegenstandswert speichern",
+        name: "Missbrauchsgebühren speichern",
       }),
     )
 
@@ -167,7 +168,7 @@ describe("ObjectValueInput", () => {
           id: "id",
           label: "Euro (EUR)",
         } as CurrencyCode,
-      } as ObjectValue,
+      } as AbuseFee,
     })
 
     // Act
@@ -186,7 +187,7 @@ describe("ObjectValueInput", () => {
           id: "id",
           label: "Euro (EUR)",
         } as CurrencyCode,
-      } as ObjectValue,
+      } as AbuseFee,
     })
 
     // Act

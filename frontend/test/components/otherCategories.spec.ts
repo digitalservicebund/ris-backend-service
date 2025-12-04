@@ -4,6 +4,7 @@ import { setActivePinia } from "pinia"
 import { vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import OtherCategories from "@/components/OtherCategories.vue"
+import AbuseFee, { Addressee } from "@/domain/abuseFee"
 import { AppealWithdrawal } from "@/domain/appeal"
 import { CollectiveAgreement } from "@/domain/collectiveAgreement"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
@@ -609,8 +610,65 @@ describe("other categories", () => {
 
       // Assert
       expect(await screen.findByText("Gegenstandswert")).toBeVisible()
-      const summary = screen.getByTestId("object-value-summary")
-      expect(summary).toHaveTextContent("500 Euro (EUR), Verfassungsbeschwerde")
+      expect(
+        await screen.findByText("500 Euro (EUR), Verfassungsbeschwerde"),
+      ).toBeVisible()
+    })
+  })
+
+  describe("AbuseFees (Missbrauchsgebühren)", () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: routes,
+    })
+
+    it("should display 'Missbrauchsgebühren' button when no data", async () => {
+      // Arrange
+      mockSessionStore({
+        abuseFees: [],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(
+        screen.getByRole("button", { name: "Missbrauchsgebühren" }),
+      ).toBeInTheDocument()
+    })
+
+    it("should display 'Missbrauchsgebühren'", async () => {
+      // Arrange
+      mockSessionStore({
+        abuseFees: [
+          new AbuseFee({
+            id: "1",
+            amount: 500,
+            currencyCode: {
+              id: "3",
+              label: "Euro (EUR)",
+            },
+            addressee: Addressee.BEVOLLMAECHTIGTER,
+          }),
+        ],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(await screen.findByText("Missbrauchsgebühren")).toBeVisible()
+      expect(
+        await screen.findByText("500 Euro (EUR), Bevollmächtigter"),
+      ).toBeVisible()
     })
   })
 })

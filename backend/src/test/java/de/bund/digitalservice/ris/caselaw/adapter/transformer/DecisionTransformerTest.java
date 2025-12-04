@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbuseFeeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
@@ -14,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreeme
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementIndustryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CorrectionBorderNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CorrectionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CountryOfOriginDto;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtBranchLocationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CurrencyCodeDTO;
@@ -30,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ForeignLanguageVersionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.IncomeTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
@@ -53,7 +56,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealDTO;
+import de.bund.digitalservice.ris.caselaw.domain.AbuseFee;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.Addressee;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
@@ -63,6 +68,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.Correction;
 import de.bund.digitalservice.ris.caselaw.domain.CorrectionType;
+import de.bund.digitalservice.ris.caselaw.domain.CountryOfOrigin;
 import de.bund.digitalservice.ris.caselaw.domain.CurrencyCode;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.Definition;
@@ -96,6 +102,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
@@ -2169,6 +2176,134 @@ class DecisionTransformerTest {
     }
   }
 
+  @Nested
+  class AbuseFees {
+    @Test
+    void testTransformToDomain_withAbuseFees_shouldAddData() {
+      // Arrange
+      DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+      var abuseFee =
+          AbuseFeeDTO.builder()
+              .amount(10000)
+              .currencyCode(
+                  CurrencyCodeDTO.builder()
+                      .isoCode("EUR")
+                      .currency("Euro")
+                      .value("Euro (EUR)")
+                      .build())
+              .addressee(Addressee.BESCHWERDEFUEHRER_ANTRAGSTELLER)
+              .rank(1L)
+              .build();
+
+      decisionDTO.setAbuseFees(List.of(abuseFee));
+
+      // Act
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+      // Assert
+      assertThat(decision.contentRelatedIndexing().abuseFees()).hasSize(1);
+      assertThat(decision.contentRelatedIndexing().abuseFees().getFirst())
+          .isEqualTo(
+              AbuseFee.builder()
+                  .amount(10000)
+                  .currencyCode(CurrencyCode.builder().isoCode("EUR").label("Euro (EUR)").build())
+                  .addressee(Addressee.BESCHWERDEFUEHRER_ANTRAGSTELLER)
+                  .build());
+    }
+
+    @Test
+    void testTransformToDomain_withoutAbuseFees_shouldNotAddData() {
+      // Arrange
+      DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+      // Act
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+      // Assert
+      assertThat(decision.contentRelatedIndexing().abuseFees()).isEmpty();
+    }
+
+    @Test
+    void testTransformToDomain_withNullAbuseFees_shouldAddNull() {
+      // Arrange
+      DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+      List<AbuseFeeDTO> abuseFeesDTOs = new ArrayList<>();
+      abuseFeesDTOs.add(null);
+      decisionDTO.setAbuseFees(abuseFeesDTOs);
+
+      // Act
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+      // Assert
+      List<AbuseFee> abuseFees = new ArrayList<>();
+      abuseFees.add(null);
+      assertThat(decision.contentRelatedIndexing().abuseFees()).isEqualTo(abuseFees);
+    }
+
+    @Test
+    void testTransformToDTO_withAbuseFees_shouldAddData() {
+      // Arrange
+      var abuseFee =
+          AbuseFee.builder()
+              .amount(10000)
+              .currencyCode(CurrencyCode.builder().isoCode("EUR").label("Euro (EUR)").build())
+              .addressee(Addressee.BEVOLLMAECHTIGTER)
+              .build();
+
+      Decision decision =
+          Decision.builder()
+              .contentRelatedIndexing(
+                  ContentRelatedIndexing.builder().abuseFees(List.of(abuseFee)).build())
+              .build();
+
+      // Act
+      DecisionDTO decisionDTO =
+          DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+      // Assert
+      assertThat(decisionDTO.getAbuseFees()).hasSize(1);
+      assertThat(decisionDTO.getAbuseFees().getFirst().getRank()).isEqualTo(1L);
+      assertThat(decisionDTO.getAbuseFees().getFirst().getAddressee())
+          .isEqualTo(Addressee.BEVOLLMAECHTIGTER);
+      assertThat(decisionDTO.getAbuseFees().getFirst().getAmount()).isEqualTo(10000);
+      assertThat(decisionDTO.getAbuseFees().getFirst().getCurrencyCode().getValue())
+          .isEqualTo("Euro (EUR)");
+    }
+
+    @Test
+    void testTransformToDTO_withoutAbuseFees_shouldNotAddData() {
+      // Arrange
+      Decision decision = generateSimpleDocumentationUnitBuilder().build();
+
+      // Act
+      DecisionDTO decisionDTO =
+          DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+      // Assert
+      assertThat(decisionDTO.getAbuseFees()).isEmpty();
+    }
+
+    @Test
+    void testTransformToDTO_withNullAbuseFees_shouldAddNull() {
+      // Arrange
+      List<AbuseFee> abuseFees = new ArrayList<>();
+      abuseFees.add(null);
+      Decision decision =
+          Decision.builder()
+              .contentRelatedIndexing(ContentRelatedIndexing.builder().abuseFees(abuseFees).build())
+              .build();
+      // Act
+      DecisionDTO decisionDTO =
+          DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+      // Assert
+
+      List<AbuseFeeDTO> abuseFeeDTOs = new ArrayList<>();
+      abuseFeeDTOs.add(null);
+      assertThat(decisionDTO.getAbuseFees()).isEqualTo(abuseFeeDTOs);
+    }
+  }
+
   @Test
   void testTransformToDomain_withCelex_resultShouldHaveCelex() {
     DecisionDTO decisionDTO = generateSimpleDTOBuilder().celexNumber("62023CJ0538").build();
@@ -2410,6 +2545,95 @@ class DecisionTransformerTest {
   }
 
   @Test
+  void transformToDomain_withCountriesOfOrigin_shouldAddCountriesOfOrigin() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    decisionDTO.setCountriesOfOrigin(
+        List.of(
+            CountryOfOriginDto.builder()
+                .country(
+                    FieldOfLawDTO.builder()
+                        .id(UUID.fromString("188b845c-1abd-4157-9031-58ae5198294b"))
+                        .build())
+                .fieldOfLaw(
+                    FieldOfLawDTO.builder()
+                        .id(UUID.fromString("bc89cb5a-a03d-4e3c-a809-34c9070506dd"))
+                        .build())
+                .legacyValue("legacy value")
+                .id(UUID.fromString("bad688ff-1ffe-48f8-98cf-6eade3da17d8"))
+                .rank(1L)
+                .build()));
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().countriesOfOrigin()).hasSize(1);
+
+    var countryOfOrigin = decision.contentRelatedIndexing().countriesOfOrigin().getFirst();
+    assertThat(countryOfOrigin.legacyValue()).isEqualTo("legacy value");
+    assertThat(countryOfOrigin.country().id()).hasToString("188b845c-1abd-4157-9031-58ae5198294b");
+    assertThat(countryOfOrigin.fieldOfLaw().id())
+        .hasToString("bc89cb5a-a03d-4e3c-a809-34c9070506dd");
+    assertThat(countryOfOrigin.rank()).isEqualTo(1L);
+    assertThat(countryOfOrigin.id()).hasToString("bad688ff-1ffe-48f8-98cf-6eade3da17d8");
+  }
+
+  @Test
+  void transformToDomain_withoutCountriesOfOrigin_shouldNotAddCountriesOfOrigin() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().countriesOfOrigin()).isEmpty();
+  }
+
+  @Test
+  void transformToDTO_withCountriesOfOrigin_shouldAddCountriesOfOrigin() {
+    Decision decision =
+        Decision.builder()
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .countriesOfOrigin(
+                        List.of(
+                            CountryOfOrigin.builder()
+                                .country(
+                                    FieldOfLaw.builder()
+                                        .id(UUID.fromString("188b845c-1abd-4157-9031-58ae5198294b"))
+                                        .build())
+                                .fieldOfLaw(
+                                    FieldOfLaw.builder()
+                                        .id(UUID.fromString("bc89cb5a-a03d-4e3c-a809-34c9070506dd"))
+                                        .build())
+                                .legacyValue("legacy value")
+                                .id(UUID.fromString("bad688ff-1ffe-48f8-98cf-6eade3da17d8"))
+                                .rank(1L)
+                                .build()))
+                    .build())
+            .build();
+
+    DecisionDTO decisionDTO =
+        DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+    assertThat(decisionDTO.getCountriesOfOrigin()).hasSize(1);
+
+    var dto = decisionDTO.getCountriesOfOrigin().getFirst();
+    assertThat(dto.getLegacyValue()).isEqualTo("legacy value");
+    assertThat(dto.getCountry().getId()).hasToString("188b845c-1abd-4157-9031-58ae5198294b");
+    assertThat(dto.getFieldOfLaw().getId()).hasToString("bc89cb5a-a03d-4e3c-a809-34c9070506dd");
+    assertThat(dto.getRank()).isEqualTo(1L);
+    assertThat(dto.getId()).hasToString("bad688ff-1ffe-48f8-98cf-6eade3da17d8");
+  }
+
+  @Test
+  void transformToDTO_withoutCountriesOfOrigin_shouldNotAddCountriesOfOrigin() {
+    Decision decision = Decision.builder().build();
+    DecisionDTO currentDTO = generateSimpleDTOBuilder().build();
+
+    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDTO, decision);
+
+    assertThat(decisionDTO.getCountriesOfOrigin()).isEmpty();
+  }
+
+  @Test
   void transformToDomain_withIncomeTypes_shouldAddIncomeTypes() {
     DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
 
@@ -2530,6 +2754,8 @@ class DecisionTransformerTest {
                 .foreignLanguageVersions(Collections.emptyList())
                 .originOfTranslations(Collections.emptyList())
                 .objectValues(Collections.emptyList())
+                .abuseFees(Collections.emptyList())
+                .countriesOfOrigin(Collections.emptyList())
                 .incomeTypes(Collections.emptyList())
                 .build())
         .caselawReferences(Collections.emptyList())
