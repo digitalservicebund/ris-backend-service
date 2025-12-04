@@ -10,6 +10,7 @@ import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
 import NormReference from "@/domain/normReference"
 import ObjectValue from "@/domain/objectValue"
 import OriginOfTranslation from "@/domain/originOfTranslation"
+import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
 
 export type ContentRelatedIndexing = {
   collectiveAgreements?: CollectiveAgreement[]
@@ -30,4 +31,5 @@ export type ContentRelatedIndexing = {
   objectValues?: ObjectValue[]
   abuseFees?: AbuseFee[]
   countriesOfOrigin?: CountryOfOrigin[]
+  relatedPendingProceedings?: RelatedPendingProceeding[]
 }

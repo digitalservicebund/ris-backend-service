@@ -189,6 +189,8 @@ const fieldsWithoutJdvExport = computed<string[]>(() => {
     fieldLabels.push(longTextLabels.corrections)
   if (decision.value?.coreData?.courtBranchLocation)
     fieldLabels.push(coreDataLabels.courtBranchLocation)
+  if (decision.value?.contentRelatedIndexing.relatedPendingProceedings?.length)
+    fieldLabels.push(contentRelatedIndexingLabels.relatedPendingProceedings)
   return fieldLabels
 })
 
