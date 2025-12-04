@@ -205,6 +205,20 @@ export class Decision {
           }),
       )
 
+    if (data.contentRelatedIndexing?.nonApplicationNorms)
+      data.contentRelatedIndexing.nonApplicationNorms = data.contentRelatedIndexing.nonApplicationNorms.map(
+        (norm) =>
+          new NormReference({
+            ...norm,
+            singleNorms: norm.singleNorms?.map(
+              (norm) =>
+                new SingleNorm({
+                  ...norm,
+                }),
+            ),
+          }),
+      )
+
     if (data.contentRelatedIndexing?.activeCitations)
       data.contentRelatedIndexing.activeCitations =
         data.contentRelatedIndexing.activeCitations.map(

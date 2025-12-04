@@ -9,6 +9,7 @@ import ForeignLanguageVersions from "@/components/ForeignLanguageVersions.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
 import NonApplicationNorms from "@/components/NonApplicationNorms.vue"
+import NonApplicationNormReferences from "@/components/norms/NonApplicationNormReferences.vue"
 import ObjectValues from "@/components/ObjectValues.vue"
 import OriginOfTranslations from "@/components/OriginOfTranslations.vue"
 import TextInputCategory from "@/components/texts/TextInputCategory.vue"
@@ -206,7 +207,7 @@ const shouldDisplayNonApplicationNorms = computed(
         :label="contentRelatedIndexingLabels.nonApplicationNorms"
         :should-show-button="!hasNonApplicationNorms"
       >
-        <NonApplicationNorms />
+        <NonApplicationNormReferences />
       </CategoryWrapper>
     </div>
   </div>

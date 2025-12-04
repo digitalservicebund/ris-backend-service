@@ -1,35 +1,24 @@
 <script lang="ts" setup>
-import * as Sentry from "@sentry/vue"
 import dayjs from "dayjs"
-import { computed } from "vue"
+import { watch } from "vue"
 import EditableList from "@/components/EditableList.vue"
-import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
-import NormReferenceInput from "@/components/NormReferenceInput.vue"
-import NormReferenceSummary from "@/components/NormReferenceSummary.vue"
+import NormReferenceInput from "@/components/norms/NormReferenceInput.vue"
+import NormReferenceSummary from "@/components/norms/NormReferenceSummary.vue"
 import NormReference from "@/domain/normReference"
 
 import SingleNorm from "@/domain/singleNorm"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-const store = useDocumentUnitStore()
+defineProps<{
+  label: string
+  id: string
+}>()
 
-const norms = computed({
-  get: () => store.documentUnit!.contentRelatedIndexing.norms,
-  set: async (newValues) => {
-    store.documentUnit!.contentRelatedIndexing.norms = newValues?.filter(
-      (value) => {
-        if (Object.keys(value).length === 0) {
-          Sentry.captureMessage(
-            "NormReference list contains empty objects",
-            "error",
-          )
-          return false
-        }
-        removeDuplicateSingleNorms(value as NormReference)
-        return true // Keep the value in the norms array
-      },
-    )
-  },
+const norms = defineModel<NormReference[]>()
+
+watch(norms, () => {
+  norms.value.forEach((norm) =>
+    removeDuplicateSingleNorms(norm as unknown as NormReference),
+  )
 })
 
 function removeDuplicateSingleNorms(norm: NormReference): void {
@@ -62,9 +51,9 @@ function generateUniqueSingleNormKey(singleNorm: SingleNorm): string {
 }
 </script>
 <template>
-  <div aria-label="Norm">
-    <h2 :id="DocumentUnitCategoriesEnum.NORMS" class="ris-label1-bold mb-16">
-      Normen
+  <div :aria-label="label">
+    <h2 :id="id" class="ris-label1-bold mb-16">
+      {{ label }}
     </h2>
     <div class="flex flex-row">
       <div class="flex-1">

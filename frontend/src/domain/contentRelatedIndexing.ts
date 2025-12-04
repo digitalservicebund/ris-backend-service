@@ -5,7 +5,6 @@ import { CollectiveAgreement } from "@/domain/collectiveAgreement"
 import Definition from "@/domain/definition"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
-import NonApplicationNorm from "@/domain/nonApplicationNorm"
 import NormReference from "@/domain/normReference"
 import ObjectValue from "@/domain/objectValue"
 import OriginOfTranslation from "@/domain/originOfTranslation"
@@ -27,5 +26,5 @@ export type ContentRelatedIndexing = {
   appealAdmission?: AppealAdmission
   appeal?: Appeal
   objectValues?: ObjectValue[]
-  nonApplicationNorms?: NonApplicationNorm[]
+  nonApplicationNorms?: NormReference[]
 }

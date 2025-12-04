@@ -1,23 +1,24 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
 import { computed, ref, watch } from "vue"
-import { ValidationError } from "./input/types"
+import { ValidationError } from "../input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import SingleNormInput from "@/components/SingleNormInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
-import NonApplicationNorm from "@/domain/nonApplicationNorm"
+import LegalForce from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
+import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
 import ComboboxItemService from "@/services/comboboxItemService"
 import IconAdd from "~icons/ic/baseline-add"
 
 const props = defineProps<{
-  modelValue?: NonApplicationNorm
-  modelValueList?: NonApplicationNorm[]
+  modelValue?: NormReference
+  modelValueList?: NormReference[]
 }>()
 const emit = defineEmits<{
-  "update:modelValue": [value: NonApplicationNorm]
+  "update:modelValue": [value: NormReference]
   addEntry: [void]
   cancelEdit: [void]
   removeEntry: [void]
@@ -33,8 +34,8 @@ const validationStore =
     ][number]
   >()
 
-const norm = ref(new NonApplicationNorm({ ...props.modelValue }))
-const lastSavedModelValue = ref(new NonApplicationNorm({ ...props.modelValue }))
+const norm = ref(new NormReference({ ...props.modelValue }))
+const lastSavedModelValue = ref(new NormReference({ ...props.modelValue }))
 
 const singleNorms = ref(
   props.modelValue?.singleNorms
@@ -61,8 +62,8 @@ const normAbbreviation = computed({
       validationStore.remove("normAbbreviation")
       // Check if newValue.abbreviation is already in singleNorms
       const isAbbreviationPresent = props.modelValueList?.some(
-        (nonApplicationNorm) =>
-          nonApplicationNorm.normAbbreviation?.abbreviation ===
+        (norm) =>
+          norm.normAbbreviation?.abbreviation ===
           newNormAbbreviation.abbreviation,
       )
       if (isAbbreviationPresent) {
@@ -78,23 +79,32 @@ const normAbbreviation = computed({
 })
 
 /**
- * If there are no format validation errors, the new non-application norm is emitted
- * to the parent and a new emtpy entry is automatically added to the list
+ * If there are no format validations, the new norm references is emitted to the parent and automatically
+ * sa new emtpy entry is added to the list
  */
-async function addNonApplicationNorm() {
+async function addNormReference() {
   if (
     !validationStore.getByField("singleNorm") &&
     !validationStore.getByField("dateOfVersion") &&
     !validationStore.getByField("dateOfRelevance") &&
     !validationStore.getByMessage("RIS-Abkürzung bereits eingegeben").length
   ) {
-    const nonApplicationNorm = new NonApplicationNorm({
+    const normRef = new NormReference({
       ...norm.value,
-      singleNorms: singleNorms.value.filter(
-        (singleNorm) => singleNorm !== null,
-      ) as SingleNorm[],
+      singleNorms: singleNorms.value
+        .map((singleNorm) =>
+          !singleNorm.isEmpty
+            ? new SingleNorm({
+                ...singleNorm,
+                legalForce: singleNorm.legalForce
+                  ? new LegalForce({ ...singleNorm.legalForce })
+                  : undefined,
+              })
+            : null,
+        )
+        .filter((norm) => norm !== null) as SingleNorm[],
     })
-    emit("update:modelValue", nonApplicationNorm)
+    emit("update:modelValue", normRef)
     emit("addEntry")
   }
 }
@@ -103,7 +113,7 @@ async function addNonApplicationNorm() {
  * Emits to the editable list to removes the current norm reference and empties the local single norm list. The truthy
  * boolean value indicates, that the edit index should be resetted to undefined, ergo show all list items in summary mode.
  */
-function removeNonApplicationNorm() {
+function removeNormReference() {
   singleNorms.value = []
   norm.value.normAbbreviation = undefined
   emit("removeEntry")
@@ -125,8 +135,8 @@ function removeSingleNormEntry(index: number) {
 }
 
 function cancelEdit() {
-  if (new NonApplicationNorm({ ...props.modelValue }).isEmpty) {
-    removeNonApplicationNorm()
+  if (new NormReference({ ...props.modelValue }).isEmpty) {
+    removeNormReference()
     addSingleNormEntry()
   }
   emit("cancelEdit")
@@ -161,15 +171,18 @@ function updateFormatValidation(
 /**
  * This updates the local norm with the updated model value from the props. It also stores a copy of the last saved
  * model value, because the local norm might change in between. When the new model value is empty, all validation
- * errors are resetted. When the list of single norms is empty, a new empty single norm entry is added.
+ * errors are resetted. If it has an amiguous norm reference, the validation store is updated. When the list of
+ * single norms is empty, a new empty single norm entry is added.
  */
 watch(
   () => props.modelValue,
   () => {
-    norm.value = new NonApplicationNorm({ ...props.modelValue })
-    lastSavedModelValue.value = new NonApplicationNorm({ ...props.modelValue })
+    norm.value = new NormReference({ ...props.modelValue })
+    lastSavedModelValue.value = new NormReference({ ...props.modelValue })
     if (lastSavedModelValue.value.isEmpty) {
       validationStore.reset()
+    } else if (lastSavedModelValue.value.hasAmbiguousNormReference) {
+      validationStore.add("Mehrdeutiger Verweis", "normAbbreviation")
     }
     if (singleNorms.value?.length == 0 || !singleNorms.value)
       addSingleNormEntry()
@@ -197,7 +210,7 @@ watch(
         @focus="validationStore.remove('normAbbreviation')"
       ></ComboboxInput>
     </InputField>
-    <div v-if="normAbbreviation">
+    <div v-if="normAbbreviation || norm.normAbbreviationRawValue">
       <SingleNormInput
         v-for="(_, index) in singleNorms"
         :key="index"
@@ -226,7 +239,7 @@ watch(
               aria-label="Norm speichern"
               label="Übernehmen"
               size="small"
-              @click.stop="addNonApplicationNorm"
+              @click.stop="addNormReference"
             ></Button>
             <Button
               aria-label="Abbrechen"
@@ -243,7 +256,7 @@ watch(
           label="Eintrag löschen"
           severity="danger"
           size="small"
-          @click.stop="removeNonApplicationNorm"
+          @click.stop="removeNormReference"
         ></Button>
       </div>
     </div>
