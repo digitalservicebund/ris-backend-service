@@ -136,9 +136,10 @@ onMounted(() => {
           <InputText
             id="pendingProceedingDocumentNumberInput"
             v-model="pendingProceeding.documentNumber"
-            aria-label="Dokumentnummer Anhängiges Verfahren"
+            aria-label="Dokumentnummer anhängiges Verfahren"
             fluid
             :invalid="slotProps.hasError"
+            :readonly="pendingProceeding.isReadOnly"
           />
         </InputField>
       </div>
@@ -151,9 +152,10 @@ onMounted(() => {
           <InputText
             id="pendingProceedingFileNumberInput"
             v-model="pendingProceeding.fileNumber"
-            aria-label="Aktenzeichen Anhängiges Verfahren"
+            aria-label="Aktenzeichen anhängiges Verfahren"
             fluid
             :invalid="slotProps.hasError"
+            :readonly="pendingProceeding.isReadOnly"
           />
         </InputField>
       </div>
@@ -162,6 +164,7 @@ onMounted(() => {
       <div>
         <div class="flex gap-16">
           <Button
+            v-if="!pendingProceeding.isReadOnly"
             aria-label="Nach angängigem Verfahren suchen"
             label="Suchen"
             size="small"

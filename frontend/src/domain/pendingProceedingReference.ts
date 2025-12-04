@@ -1,4 +1,3 @@
-import dayjs from "dayjs"
 import EditableListItem from "./editableListItem"
 import RelatedDocumentation from "./relatedDocumentation"
 
@@ -17,14 +16,13 @@ export default class RelatedPendingProceeding
     }
   }
 
-  get renderSummary(): string {
-    return [
-      ...(this.court ? [`${this.court?.label}`] : []),
-      ...(this.decisionDate
-        ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
-        : []),
-      ...(this.fileNumber ? [this.fileNumber] : []),
-    ].join(", ")
+  get isReadOnly(): boolean {
+    return (
+      this.documentNumber != null &&
+      this.fileNumber != null &&
+      this.court != null &&
+      this.decisionDate != null
+    )
   }
 
   get id() {
@@ -35,10 +33,6 @@ export default class RelatedPendingProceeding
     return RelatedPendingProceeding.fields.every((field) =>
       this.fieldIsEmpty(this[field]),
     )
-  }
-
-  get isReadOnly(): boolean {
-    return false
   }
 
   equals(entry: RelatedPendingProceeding): boolean {
