@@ -52,6 +52,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ParticipatingJudg
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RelatedPendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.appeal.AppealDTO;
@@ -86,6 +87,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingType;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
@@ -2628,6 +2630,63 @@ class DecisionTransformerTest {
     DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDTO, decision);
 
     assertThat(decisionDTO.getCountriesOfOrigin()).isEmpty();
+  }
+
+  @Nested
+  class RelatedPendingProceedings {
+
+    @Test
+    void transformToDomain_shouldAddRelatedPendingProceedings() {
+      DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+      decisionDTO.setRelatedPendingProceedings(
+          List.of(RelatedPendingProceedingDTO.builder().documentNumber("XXRE000012225").build()));
+
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+      assertThat(decision.relatedPendingProceedings()).hasSize(1);
+
+      var relatedPendingProceeding = decision.relatedPendingProceedings().getFirst();
+      assertThat(relatedPendingProceeding.getDocumentNumber()).isEqualTo("XXRE000012225");
+    }
+
+    @Test
+    void transformToDomain_withoutValues_shouldAddNone() {
+      DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+      assertThat(decision.relatedPendingProceedings()).isEmpty();
+    }
+
+    @Test
+    void transformToDTO_shouldAddRelatedPendingProceedings() {
+      Decision decision =
+          Decision.builder()
+              .relatedPendingProceedings(
+                  List.of(
+                      RelatedPendingProceeding.builder().documentNumber("XXRE000012225").build()))
+              .build();
+
+      DecisionDTO decisionDTO =
+          DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+      assertThat(decisionDTO.getRelatedPendingProceedings()).hasSize(1);
+
+      var dto = decisionDTO.getRelatedPendingProceedings().getFirst();
+      assertThat(dto.getDocumentNumber()).isEqualTo("XXRE000012225");
+      assertThat(dto.getRank()).isEqualTo(1);
+    }
+
+    @Test
+    void transformToDTO_withoutValues_shouldAddNone() {
+      Decision decision = Decision.builder().build();
+      DecisionDTO currentDTO = generateSimpleDTOBuilder().build();
+
+      DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDTO, decision);
+
+      assertThat(decisionDTO.getRelatedPendingProceedings()).isEmpty();
+    }
   }
 
   private Decision.DecisionBuilder generateSimpleDocumentationUnitBuilder() {
