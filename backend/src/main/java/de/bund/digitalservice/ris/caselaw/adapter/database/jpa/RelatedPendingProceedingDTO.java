@@ -12,7 +12,4 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Entity
 @DiscriminatorValue(Values.PENDING_PROCEEDING)
-public class RelatedPendingProceedingDTO extends RelatedDocumentationDTO {
-
-  // TODO: (Malte Laukötter, 2025-12-03) add properties
-}
+public class RelatedPendingProceedingDTO extends RelatedDocumentationDTO {}
