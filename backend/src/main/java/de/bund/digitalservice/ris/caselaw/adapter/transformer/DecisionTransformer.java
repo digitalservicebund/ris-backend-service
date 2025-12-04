@@ -990,12 +990,10 @@ public class DecisionTransformer extends DocumentableTransformer {
 
   static void addRelatedPendingProceedings(
       Decision updatedDomainObject, DecisionDTO.DecisionDTOBuilder<?, ?> builder) {
-    List<RelatedPendingProceeding> relatedPendingProceedings =
-        updatedDomainObject.relatedPendingProceedings(); // NOSONAR
-    if (relatedPendingProceedings != null) {
+    if (updatedDomainObject.relatedPendingProceedings() != null) {
       AtomicInteger i = new AtomicInteger(1);
       builder.relatedPendingProceedings(
-          relatedPendingProceedings.stream()
+          updatedDomainObject.relatedPendingProceedings().stream()
               .map(RelatedPendingProceedingTransformer::transformToDTO)
               .filter(Objects::nonNull)
               .map(
