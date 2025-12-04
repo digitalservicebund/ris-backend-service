@@ -8,6 +8,7 @@ import DismissalInputs from "@/components/DismissalInputs.vue"
 import ForeignLanguageVersions from "@/components/ForeignLanguageVersions.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
+import NonApplicationNorms from "@/components/NonApplicationNorms.vue"
 import ObjectValues from "@/components/ObjectValues.vue"
 import OriginOfTranslations from "@/components/OriginOfTranslations.vue"
 import TextInputCategory from "@/components/texts/TextInputCategory.vue"
@@ -84,6 +85,12 @@ const hasObjectValues = computed(() => {
     : false
 })
 
+const hasNonApplicationNorms = computed(() => {
+  return contentRelatedIndexing.value.nonApplicationNorms?.length
+    ? contentRelatedIndexing.value.nonApplicationNorms?.length > 0
+    : false
+})
+
 const shouldDisplayLegislativeMandateCategory = computed(() => {
   return (
     constitutionalCourtTypes.items.includes(
@@ -116,6 +123,10 @@ const shouldDisplayEvsf = computed(() => isFinanceCourt.value || evsf.value)
 
 const shouldDisplayAppeal = computed(
   () => isFinanceCourt.value || hasAppeal.value,
+)
+
+const shouldDisplayNonApplicationNorms = computed(
+  () => isFinanceCourt.value || hasNonApplicationNorms.value,
 )
 </script>
 
@@ -189,6 +200,13 @@ const shouldDisplayAppeal = computed(
         :should-show-button="!hasObjectValues"
       >
         <ObjectValues :label="contentRelatedIndexingLabels.objectValues" />
+      </CategoryWrapper>
+      <CategoryWrapper
+        v-if="shouldDisplayNonApplicationNorms"
+        :label="contentRelatedIndexingLabels.nonApplicationNorms"
+        :should-show-button="!hasNonApplicationNorms"
+      >
+        <NonApplicationNorms />
       </CategoryWrapper>
     </div>
   </div>

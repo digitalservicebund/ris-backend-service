@@ -985,10 +985,6 @@ public class DecisionTransformer extends DocumentableTransformer {
                 } else {
                   nonApplicationNorms.add(nonApplicationNorm);
                 }
-
-              } else {
-                nonApplicationNorms.add(
-                    NonApplicationNormTransformer.transformToDomain(nonApplicationNormDTO));
               }
             });
 

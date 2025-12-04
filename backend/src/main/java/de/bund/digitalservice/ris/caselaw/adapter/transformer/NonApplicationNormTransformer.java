@@ -60,7 +60,7 @@ public class NonApplicationNormTransformer {
 
     if (nonApplicationNorm.normAbbreviation() == null) {
       throw new DocumentationUnitTransformerException(
-          "Norm reference has no norm abbreviation, but is required.");
+          "Non-application norm has no norm abbreviation, but is required.");
     }
 
     NormAbbreviationDTO normAbbreviationDTO =
