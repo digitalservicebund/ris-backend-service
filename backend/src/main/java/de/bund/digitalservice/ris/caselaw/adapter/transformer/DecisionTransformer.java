@@ -86,7 +86,6 @@ public class DecisionTransformer extends DocumentableTransformer {
         .inboxStatus(updatedDomainObject.inboxStatus());
 
     addPreviousDecisions(updatedDomainObject, builder);
-    addRelatedPendingProceedings(updatedDomainObject, builder);
 
     builder.note(
         StringUtils.isNullOrBlank(updatedDomainObject.note()) ? null : updatedDomainObject.note());
@@ -163,6 +162,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       addObjectValues(builder, contentRelatedIndexing);
       addAbuseFees(builder, contentRelatedIndexing);
       addCountriesOfOrigin(builder, contentRelatedIndexing);
+      addRelatedPendingProceedings(builder, contentRelatedIndexing);
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -695,7 +695,6 @@ public class DecisionTransformer extends DocumentableTransformer {
             decisionDTO.getProcessSteps().stream()
                 .map(DocumentationUnitProcessStepTransformer::toDomain)
                 .toList())
-        .relatedPendingProceedings(getRelatedPendingProceedings(decisionDTO))
         .build();
   }
 
@@ -866,6 +865,11 @@ public class DecisionTransformer extends DocumentableTransformer {
               .toList());
     }
 
+    if (decisionDTO.getRelatedPendingProceedings() != null) {
+      contentRelatedIndexingBuilder.relatedPendingProceedings(
+          getRelatedPendingProceedings(decisionDTO));
+    }
+
     return contentRelatedIndexingBuilder.build();
   }
 
@@ -989,7 +993,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   }
 
   static void addRelatedPendingProceedings(
-      Decision updatedDomainObject, DecisionDTO.DecisionDTOBuilder<?, ?> builder) {
+      DecisionDTO.DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing updatedDomainObject) {
     if (updatedDomainObject.relatedPendingProceedings() != null) {
       AtomicInteger i = new AtomicInteger(1);
       builder.relatedPendingProceedings(

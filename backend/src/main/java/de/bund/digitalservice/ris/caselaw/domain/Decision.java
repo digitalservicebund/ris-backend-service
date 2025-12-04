@@ -37,7 +37,6 @@ public record Decision(
     @Valid CoreData coreData,
     List<PreviousDecision> previousDecisions,
     List<EnsuingDecision> ensuingDecisions,
-    List<RelatedPendingProceeding> relatedPendingProceedings,
     ShortTexts shortTexts,
     LongTexts longTexts,
     @Valid ManagementData managementData,

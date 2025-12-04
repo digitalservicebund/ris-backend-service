@@ -2644,9 +2644,10 @@ class DecisionTransformerTest {
 
       Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
 
-      assertThat(decision.relatedPendingProceedings()).hasSize(1);
+      assertThat(decision.contentRelatedIndexing().relatedPendingProceedings()).hasSize(1);
 
-      var relatedPendingProceeding = decision.relatedPendingProceedings().getFirst();
+      var relatedPendingProceeding =
+          decision.contentRelatedIndexing().relatedPendingProceedings().getFirst();
       assertThat(relatedPendingProceeding.getDocumentNumber()).isEqualTo("XXRE000012225");
     }
 
@@ -2656,16 +2657,21 @@ class DecisionTransformerTest {
 
       Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
 
-      assertThat(decision.relatedPendingProceedings()).isEmpty();
+      assertThat(decision.contentRelatedIndexing().relatedPendingProceedings()).isEmpty();
     }
 
     @Test
     void transformToDTO_shouldAddRelatedPendingProceedings() {
       Decision decision =
           Decision.builder()
-              .relatedPendingProceedings(
-                  List.of(
-                      RelatedPendingProceeding.builder().documentNumber("XXRE000012225").build()))
+              .contentRelatedIndexing(
+                  ContentRelatedIndexing.builder()
+                      .relatedPendingProceedings(
+                          List.of(
+                              RelatedPendingProceeding.builder()
+                                  .documentNumber("XXRE000012225")
+                                  .build()))
+                      .build())
               .build();
 
       DecisionDTO decisionDTO =
@@ -2694,7 +2700,6 @@ class DecisionTransformerTest {
         .portalPublicationStatus(PortalPublicationStatus.UNPUBLISHED)
         .previousDecisions(Collections.emptyList())
         .ensuingDecisions(Collections.emptyList())
-        .relatedPendingProceedings(Collections.emptyList())
         .shortTexts(ShortTexts.builder().decisionNames(Collections.emptyList()).build())
         .longTexts(LongTexts.builder().build())
         .managementData(
@@ -2723,6 +2728,7 @@ class DecisionTransformerTest {
                 .objectValues(Collections.emptyList())
                 .abuseFees(Collections.emptyList())
                 .countriesOfOrigin(Collections.emptyList())
+                .relatedPendingProceedings(Collections.emptyList())
                 .build())
         .caselawReferences(Collections.emptyList())
         .literatureReferences(Collections.emptyList())
