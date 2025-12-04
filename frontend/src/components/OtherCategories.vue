@@ -205,7 +205,7 @@ const shouldDisplayAppeal = computed(
         <ObjectValues :label="contentRelatedIndexingLabels.objectValues" />
       </CategoryWrapper>
       <CategoryWrapper
-        label="Missbrauchsgebühr"
+        label="Missbrauchsgebühren"
         :should-show-button="!hasAbuseFees"
       >
         <AbuseFees :label="contentRelatedIndexingLabels.abuseFees" />

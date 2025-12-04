@@ -132,7 +132,7 @@ onMounted(() => {
       <div>
         <div class="flex gap-16">
           <Button
-            aria-label="Missbrauchsgebühr speichern"
+            aria-label="Missbrauchsgebühren speichern"
             :disabled="!validationStore.isValid() || abuseFee.isEmpty"
             label="Übernehmen"
             severity="secondary"

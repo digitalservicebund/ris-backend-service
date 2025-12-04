@@ -616,13 +616,13 @@ describe("other categories", () => {
     })
   })
 
-  describe("AbuseFees (Missbrauchsgebühr)", () => {
+  describe("AbuseFees (Missbrauchsgebühren)", () => {
     const router = createRouter({
       history: createWebHistory(),
       routes: routes,
     })
 
-    it("should display 'Missbrauchsgebühr' button when no data", async () => {
+    it("should display 'Missbrauchsgebühren' button when no data", async () => {
       // Arrange
       mockSessionStore({
         abuseFees: [],
@@ -637,11 +637,11 @@ describe("other categories", () => {
 
       // Assert
       expect(
-        screen.getByRole("button", { name: "Missbrauchsgebühr" }),
+        screen.getByRole("button", { name: "Missbrauchsgebühren" }),
       ).toBeInTheDocument()
     })
 
-    it("should display 'Missbrauchsgebühr'", async () => {
+    it("should display 'Missbrauchsgebühren'", async () => {
       // Arrange
       mockSessionStore({
         abuseFees: [
@@ -665,7 +665,7 @@ describe("other categories", () => {
       })
 
       // Assert
-      expect(await screen.findByText("Missbrauchsgebühr")).toBeVisible()
+      expect(await screen.findByText("Missbrauchsgebühren")).toBeVisible()
       expect(
         await screen.findByText("500 Euro (EUR), Bevollmächtigter"),
       ).toBeVisible()

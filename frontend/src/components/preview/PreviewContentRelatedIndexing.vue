@@ -488,7 +488,7 @@ const hasCountriesOfOrigin = computed(() => {
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="hasAbuseFees">
-      <PreviewCategory>Missbrauchsgebühr</PreviewCategory>
+      <PreviewCategory>Missbrauchsgebühren</PreviewCategory>
       <PreviewContent>
         <div
           v-for="abuseFee in props.contentRelatedIndexing.abuseFees"
