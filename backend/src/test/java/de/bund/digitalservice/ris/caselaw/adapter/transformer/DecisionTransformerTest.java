@@ -2635,6 +2635,7 @@ class DecisionTransformerTest {
         .portalPublicationStatus(PortalPublicationStatus.UNPUBLISHED)
         .previousDecisions(Collections.emptyList())
         .ensuingDecisions(Collections.emptyList())
+        .relatedPendingProceedings(Collections.emptyList())
         .shortTexts(ShortTexts.builder().decisionNames(Collections.emptyList()).build())
         .longTexts(LongTexts.builder().build())
         .managementData(
