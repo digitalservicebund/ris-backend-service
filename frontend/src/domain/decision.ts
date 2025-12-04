@@ -90,6 +90,7 @@ export const contentRelatedIndexingLabels: {
   objectValues: "Gegenstandswert",
   abuseFees: "Missbrauchsgebühren",
   countriesOfOrigin: "Herkunftsland",
+  incomeTypes: "Einkunftsart",
 }
 export const allLabels = {
   caselawReferences: "Rechtsprechungsfundstellen",

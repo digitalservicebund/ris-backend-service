@@ -9,6 +9,7 @@ import { AppealAdmitter } from "@/domain/appealAdmitter"
 import { Decision } from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import { TypeOfIncome } from "@/domain/incomeType"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import { ProceedingType } from "@/domain/objectValue"
 import { TranslationType } from "@/domain/originOfTranslation"
@@ -744,6 +745,14 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                   identifier: "RE-07-DEU",
                   text: "Deutschland",
                 },
+              },
+            ],
+            incomeTypes: [
+              {
+                id: "aa9add9a-8655-4dbe-a187-1e3b4c2b15ad",
+                newEntry: true,
+                terminology: "Programmierer",
+                typeOfIncome: TypeOfIncome.GEWERBEBETRIEB,
               },
             ],
           },

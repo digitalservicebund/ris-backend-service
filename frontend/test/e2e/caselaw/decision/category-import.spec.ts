@@ -1077,6 +1077,38 @@ test.describe("category import", () => {
     },
   )
 
+  // Einkunftsart
+  test(
+    "import income types (Einkunftsart)",
+    { tag: ["@RISDEV-8712"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(page.getByLabel("Einkunftsart übernehmen")).toBeVisible()
+        await page.getByLabel("Einkunftsart übernehmen").click()
+
+        await expect(
+          page.getByText("Gewerbebetrieb, Programmierer"),
+        ).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByText("Gewerbebetrieb, Programmierer"),
+        ).toBeInViewport()
+      })
+    },
+  )
+
   // Short text categories
 
   // Entscheidungsname

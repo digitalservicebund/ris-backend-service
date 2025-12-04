@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ForeignLanguageVersionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.IncomeTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
@@ -35,6 +36,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.Definition;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
+import de.bund.digitalservice.ris.caselaw.domain.IncomeType;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ObjectValue;
@@ -161,6 +163,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       addObjectValues(builder, contentRelatedIndexing);
       addAbuseFees(builder, contentRelatedIndexing);
       addCountriesOfOrigin(builder, contentRelatedIndexing);
+      addIncomeTypes(builder, contentRelatedIndexing);
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -634,6 +637,29 @@ public class DecisionTransformer extends DocumentableTransformer {
     builder.countriesOfOrigin(dtos);
   }
 
+  private static void addIncomeTypes(
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.incomeTypes() == null) {
+      return;
+    }
+
+    List<IncomeTypeDTO> incomeTypeDTOS = new ArrayList<>();
+    List<IncomeType> incomeTypes = contentRelatedIndexing.incomeTypes();
+
+    for (int i = 0; i < incomeTypes.size(); i++) {
+      var incomeType = incomeTypes.get(i);
+      incomeTypeDTOS.add(
+          IncomeTypeDTO.builder()
+              .typeOfIncome(incomeType.typeOfIncome())
+              .terminology(incomeType.terminology())
+              .rank(i + 1L)
+              .id(incomeType.newEntry() ? null : incomeType.id())
+              .build());
+    }
+
+    builder.incomeTypes(incomeTypeDTOS);
+  }
+
   public static Decision transformToDomain(DecisionDTO decisionDTO) {
     return transformToDomain(decisionDTO, null);
   }
@@ -861,6 +887,20 @@ public class DecisionTransformer extends DocumentableTransformer {
           decisionDTO.getCountriesOfOrigin().stream()
               .map(CountryOfOriginTransformer::transformToDomain)
               .toList());
+    }
+
+    if (decisionDTO.getIncomeTypes() != null) {
+      List<IncomeType> incomeTypes =
+          decisionDTO.getIncomeTypes().stream()
+              .map(
+                  it ->
+                      IncomeType.builder()
+                          .typeOfIncome(it.getTypeOfIncome())
+                          .terminology(it.getTerminology())
+                          .id(it.getId())
+                          .build())
+              .toList();
+      contentRelatedIndexingBuilder.incomeTypes(incomeTypes);
     }
 
     return contentRelatedIndexingBuilder.build();
