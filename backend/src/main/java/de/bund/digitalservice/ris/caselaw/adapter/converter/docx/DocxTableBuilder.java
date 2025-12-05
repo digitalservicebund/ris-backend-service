@@ -54,7 +54,7 @@ public class DocxTableBuilder extends DocxBuilder {
   }
 
   public DocumentationUnitDocx build(List<UnhandledElement> unhandledElements) {
-    var tableElement = new TableElement(parseTable(table, unhandledElements));
+    var tableElement = new TableElement(parseTable(table, unhandledElements), this.columnWidthsPx);
     addTableStyleProperties(tableElement);
     addTableProperties(tableElement);
 
@@ -676,10 +676,8 @@ public class DocxTableBuilder extends DocxBuilder {
       widthPx = DocxUnitConverter.convertTwipToPixel(tcPr.getTcW().getW().longValue());
     }
 
-    if (widthPx > 0) {
+    if (widthPx > 0 && this.columnWidthsPx == null) {
       cellElement.setWidthPx(widthPx);
-    } else {
-      setCellWidthFromGlobal(cellElement, span, colIndex);
     }
 
     colIndex.addAndGet(span);
