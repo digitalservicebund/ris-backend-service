@@ -1032,7 +1032,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     if (documentNumber != null) {
       conditions =
           criteriaBuilder.and(
-              conditions, criteriaBuilder.like(root.get("documentNumber"), documentNumber));
+              conditions,
+              criteriaBuilder.like(
+                  criteriaBuilder.upper(root.get("documentNumber")),
+                  "%" + documentNumber.trim().toUpperCase() + "%"));
     }
 
     Predicate publicationStatusPredicate =

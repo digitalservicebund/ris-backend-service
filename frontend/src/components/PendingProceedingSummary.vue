@@ -10,7 +10,7 @@ defineProps<{
 <template>
   <div class="flex w-full justify-between">
     <div class="flex flex-row items-center">
-      <DocumentationUnitSummary :data="data"> </DocumentationUnitSummary>
+      <DocumentationUnitSummary :data="data" />
     </div>
   </div>
 </template>
