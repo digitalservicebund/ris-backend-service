@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { commands, selectActiveState } from "@guardian/prosemirror-invisibles"
 import { Editor } from "@tiptap/vue-3"
-import { computed, ref } from "vue"
+import { computed, ref, markRaw, h } from "vue"
 import { useRoute } from "vue-router"
 import TextEditorButton, {
   EditorButton,
@@ -89,6 +89,30 @@ const validateCellSelection = (callback: () => unknown) => {
 
   emit("noCellSelected", false)
   return callback()
+}
+
+const createTextIcon = (text: string) => {
+  return markRaw({
+    render: () =>
+      h(
+        "span",
+        {
+          style: {
+            fontFamily: "var(--font-sans)",
+            fontSize: "14pt",
+            display: "flex",
+            fontWeight: "bold",
+            alignItems: "center",
+            justifyContent: "center",
+            lineHeight: "1",
+            width: "24px",
+            height: "24px",
+          },
+          class: "text-blue-900",
+        },
+        text,
+      ),
+  })
 }
 
 const buttons = computed(() => {
@@ -199,13 +223,57 @@ const buttons = computed(() => {
       callback: () => props.editor.chain().focus().setTextAlign("right").run(),
     },
     {
-      type: "orderedList",
+      type: "menu",
       icon: IconOrderedList,
       ariaLabel: "Nummerierte Liste",
-      shortcut: "Strg + ⇧ + 7",
-      group: "indent",
+      group: "orderedListGroup",
       isCollapsable: false,
-      callback: () => props.editor.chain().focus().toggleOrderedList().run(),
+      childButtons: [
+        {
+          type: "numericList",
+          icon: "1.",
+          ariaLabel: "Numerisch (1, 2, 3)",
+          style: "numeric",
+        },
+        {
+          type: "lowercaseAlphabeticalList",
+          icon: "a.",
+          ariaLabel: "Lateinisch klein (a, b, c)",
+          style: "smallLatin",
+        },
+        {
+          type: "uppercaseAlphabeticalList",
+          icon: "A.",
+          ariaLabel: "Lateinisch groß (A, B, C)",
+          style: "capitalLatin",
+        },
+        {
+          type: "lowercaseRomanList",
+          icon: "i.",
+          ariaLabel: "Römisch klein (i, ii, iii)",
+          style: "smallRoman",
+        },
+        {
+          type: "uppercaseRomanList",
+          icon: "I.",
+          ariaLabel: "Römisch groß (I, II, III)",
+          style: "capitalRoman",
+        },
+        {
+          type: "lowercaseGreekList",
+          icon: "ε.",
+          ariaLabel: "Griechisch klein (α, β, γ)",
+          style: "smallGreek",
+        },
+      ].map(({ type, icon, ariaLabel, style }) => ({
+        type,
+        icon: createTextIcon(icon),
+        ariaLabel,
+        group: "orderedListGroup",
+        isCollapsable: false,
+        callback: () =>
+          props.editor.chain().focus().toggleOrderedList(style).run(),
+      })),
     },
     {
       type: "bulletList",
