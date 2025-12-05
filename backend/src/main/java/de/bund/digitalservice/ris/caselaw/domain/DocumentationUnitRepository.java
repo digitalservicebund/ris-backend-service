@@ -153,6 +153,7 @@ public interface DocumentationUnitRepository {
    * @param documentationOffice the documentation office of the current user
    * @param documentNumberToExclude the document number (e.g. from the documentation unit that is
    *     edited) to exclude from the search
+   * @param onlyPendingProceedings only return pending proceedings
    * @param pageable the pageable to use for the search
    * @return the search result
    */
@@ -160,6 +161,7 @@ public interface DocumentationUnitRepository {
       RelatedDocumentationUnit relatedDocumentationUnit,
       DocumentationOffice documentationOffice,
       String documentNumberToExclude,
+      boolean onlyPendingProceedings,
       Pageable pageable);
 
   /**

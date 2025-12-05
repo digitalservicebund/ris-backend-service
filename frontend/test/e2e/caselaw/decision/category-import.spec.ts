@@ -96,7 +96,7 @@ test.describe("category import", () => {
       await test.step("disable import for empty source categories", async () => {
         await navigateToCategoryImport(page, documentNumber)
         await searchForDocumentUnitToImport(page, documentNumber)
-        await expect(page.getByText("Quellrubrik leer")).toHaveCount(35) // total number of importable categories
+        await expect(page.getByText("Quellrubrik leer")).toHaveCount(36) // total number of importable categories
       })
     },
   )
@@ -117,7 +117,7 @@ test.describe("category import", () => {
           prefilledDocumentUnitWithTexts.documentNumber,
         )
 
-        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(29) // number of non-importable categories, if target category already filled
+        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(30) // number of non-importable categories, if target category already filled
       })
     },
   )
@@ -1104,6 +1104,42 @@ test.describe("category import", () => {
       await test.step("scroll to category", async () => {
         await expect(
           page.getByText("Gewerbebetrieb, Programmierer"),
+        ).toBeInViewport()
+      })
+    },
+  )
+
+  // Verknüpfung anhängiges Verfahren
+  test(
+    "import related pending proceeding (Verknüpfung anhängiges Verfahren)",
+    { tag: ["@RISDEV-8678"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(
+          page.getByLabel("Verknüpfung anhängiges Verfahren übernehmen"),
+        ).toBeVisible()
+        await page
+          .getByLabel("Verknüpfung anhängiges Verfahren übernehmen")
+          .click()
+
+        await expect(
+          page.getByText("BFH, 01.02.2022, IV R 99/99 | YYTestDoc0017"),
+        ).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByText("BFH, 01.02.2022, IV R 99/99 | YYTestDoc0017"),
         ).toBeInViewport()
       })
     },

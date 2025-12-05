@@ -41,6 +41,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ObjectValue;
 import de.bund.digitalservice.ris.caselaw.domain.OriginOfTranslation;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
@@ -164,6 +165,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       addAbuseFees(builder, contentRelatedIndexing);
       addCountriesOfOrigin(builder, contentRelatedIndexing);
       addIncomeTypes(builder, contentRelatedIndexing);
+      addRelatedPendingProceedings(builder, contentRelatedIndexing);
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -903,6 +905,11 @@ public class DecisionTransformer extends DocumentableTransformer {
       contentRelatedIndexingBuilder.incomeTypes(incomeTypes);
     }
 
+    if (decisionDTO.getRelatedPendingProceedings() != null) {
+      contentRelatedIndexingBuilder.relatedPendingProceedings(
+          getRelatedPendingProceedings(decisionDTO));
+    }
+
     return contentRelatedIndexingBuilder.build();
   }
 
@@ -1013,5 +1020,32 @@ public class DecisionTransformer extends DocumentableTransformer {
                   .build();
             })
         .toList();
+  }
+
+  static List<RelatedPendingProceeding> getRelatedPendingProceedings(DecisionDTO decisionDTO) {
+    if (decisionDTO.getRelatedPendingProceedings() == null) {
+      return List.of();
+    }
+
+    return decisionDTO.getRelatedPendingProceedings().stream()
+        .map(RelatedPendingProceedingTransformer::transformToDomain)
+        .toList();
+  }
+
+  static void addRelatedPendingProceedings(
+      DecisionDTO.DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing updatedDomainObject) {
+    if (updatedDomainObject.relatedPendingProceedings() != null) {
+      AtomicInteger i = new AtomicInteger(1);
+      builder.relatedPendingProceedings(
+          updatedDomainObject.relatedPendingProceedings().stream()
+              .map(RelatedPendingProceedingTransformer::transformToDTO)
+              .filter(Objects::nonNull)
+              .map(
+                  relatedPendingProceedingDTO -> {
+                    relatedPendingProceedingDTO.setRank(i.getAndIncrement());
+                    return relatedPendingProceedingDTO;
+                  })
+              .toList());
+    }
   }
 }

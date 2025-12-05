@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -15,7 +16,10 @@ import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.LdmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.LoggingKeys;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
@@ -87,6 +91,7 @@ public class PortalPublicationService {
       var result = publishToBucket(documentationUnit);
       uploadChangelogWithdrawOnFailure(documentationUnit, result);
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, user);
+      updateResolutionNoteOfRelatedPendingProceedings(documentationUnit, user);
     } catch (Exception exception) {
       historyLogService.saveHistoryLog(
           documentationUnitId,
@@ -114,6 +119,7 @@ public class PortalPublicationService {
         documentationUnitRepository.findByDocumentNumber(documentNumber);
     var publicationResult = publishToBucket(documentationUnit);
     updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, null);
+    updateResolutionNoteOfRelatedPendingProceedings(documentationUnit, null);
     return publicationResult;
   }
 
@@ -345,6 +351,77 @@ public class PortalPublicationService {
     }
 
     addHistoryLog(documentationUnit, newStatus, user);
+  }
+
+  private void updateResolutionNoteOfRelatedPendingProceedings(
+      DocumentationUnit documentationUnit, User user) {
+    if (documentationUnit.contentRelatedIndexing() == null) {
+      return;
+    }
+
+    if (documentationUnit.contentRelatedIndexing().relatedPendingProceedings() == null) {
+      return;
+    }
+
+    var pendingProceedings = documentationUnit.contentRelatedIndexing().relatedPendingProceedings();
+
+    for (RelatedPendingProceeding relatedPendingProceeding : pendingProceedings) {
+      try {
+        var docUnit =
+            documentationUnitRepository.findByDocumentNumber(
+                relatedPendingProceeding.getDocumentNumber());
+
+        if (docUnit instanceof PendingProceeding pendingProceeding) {
+          updateResolutionNoteOfPendingProceeding(documentationUnit, pendingProceeding, user);
+        }
+      } catch (DocumentationUnitNotExistsException e) {
+        log.info(
+            "Could not find (and resolve) pending proceeding {}",
+            relatedPendingProceeding.getDocumentNumber());
+      }
+    }
+  }
+
+  private void updateResolutionNoteOfPendingProceeding(
+      DocumentationUnit documentationUnit, PendingProceeding pendingProceeding, User user) {
+    if (pendingProceeding.coreData() != null && pendingProceeding.coreData().isResolved()) {
+      log.info(
+          "Do not mark pending proceeding {} as resolved. It already is resolved. A Documentation unit ({}) was published that contained it as a related pending proceeding",
+          pendingProceeding.documentNumber(),
+          pendingProceeding.documentNumber());
+      return;
+    }
+
+    if (pendingProceeding.shortTexts() != null
+        && pendingProceeding.shortTexts().resolutionNote() != null) {
+      log.info(
+          "Do not mark pending proceeding {} as resolved. It already has a resolution note. A Documentation unit ({}) was published that contained it as a related pending proceeding",
+          pendingProceeding.documentNumber(),
+          pendingProceeding.documentNumber());
+      return;
+    }
+
+    documentationUnitRepository.save(
+        pendingProceeding.toBuilder()
+            .coreData(
+                Optional.ofNullable(pendingProceeding.coreData())
+                    .orElse(CoreData.builder().build())
+                    .toBuilder()
+                    .isResolved(true)
+                    .build())
+            .shortTexts(
+                Optional.ofNullable(pendingProceeding.shortTexts())
+                    .orElse(PendingProceedingShortTexts.builder().build())
+                    .toBuilder()
+                    .resolutionNote("Erledigt durch " + documentationUnit.documentNumber())
+                    .build())
+            .build(),
+        user);
+
+    log.info(
+        "Mark pending proceeding {} as resolved. A Documentation unit ({}) was published that contained it as a related pending proceeding",
+        pendingProceeding.documentNumber(),
+        pendingProceeding.documentNumber());
   }
 
   private void addHistoryLog(
