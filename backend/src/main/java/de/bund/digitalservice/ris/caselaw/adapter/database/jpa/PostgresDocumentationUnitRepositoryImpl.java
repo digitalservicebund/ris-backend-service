@@ -965,6 +965,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     LocalDate decisionDate = relatedDocumentationUnit.getDecisionDate();
     String fileNumber = relatedDocumentationUnit.getFileNumber();
     DocumentType documentType = relatedDocumentationUnit.getDocumentType();
+    String documentNumber = relatedDocumentationUnit.getDocumentNumber();
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
@@ -1022,6 +1023,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     Predicate documentationOfficeIdPredicate =
         criteriaBuilder.equal(
             root.get("documentationOffice").get("id"), documentationOfficeDTO.getId());
+
+    // 8. Filter by document number
+    if (documentNumber != null) {
+      conditions =
+          criteriaBuilder.and(
+              conditions, criteriaBuilder.equal(root.get("documentNumber"), documentNumber));
+    }
 
     Predicate publicationStatusPredicate =
         criteriaBuilder.or(
