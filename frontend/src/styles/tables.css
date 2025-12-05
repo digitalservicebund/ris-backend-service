@@ -33,6 +33,21 @@ div.tiptap:has(.ProseMirror-widget.invisible) td.invisible-table-cell {
       }
     }
 
+    /* Ensure pasted tables maintain border structure */
+    td[style*="border"],
+    th[style*="border"] {
+      /* Ensure all border sides are preserved during copy-paste */
+      border-style: solid;
+      border-width: 0;
+    }
+
+    /* Default border for table cells when no explicit style is present */
+    td:not(.invisible-table-cell):not([style*="border: none"]):not([style*="border:none"]),
+    th:not(.invisible-table-cell):not([style*="border: none"]):not([style*="border:none"]) {
+      /* Only apply if the cell is part of a table with borders */
+      border: inherit;
+    }
+
     .selectedCell:after {
       background: Highlight;
       content: "";

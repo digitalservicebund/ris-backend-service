@@ -214,10 +214,27 @@ export function createCellCommands() {
 export function hasAllBorders(style: string): boolean {
   const s = style.replaceAll(/\s+/g, "")
 
-  return (
+  // Check for explicit border-side declarations
+  const hasExplicitBorders =
     s.includes("border-top:") &&
     s.includes("border-right:") &&
     s.includes("border-bottom:") &&
     s.includes("border-left:")
-  )
+
+  // Check for shorthand border declaration that applies to all sides
+  const hasShorthandBorder = style.split(";").some((declaration) => {
+    const trimmed = declaration.trim()
+    // Check if it's a shorthand border property (not border-specific like border-top)
+    if (!trimmed.startsWith("border:")) return false
+
+    // Extract the value part after "border:"
+    const value = trimmed.substring(7).trim() // Remove "border:" prefix
+
+    // Check if it contains a border style keyword
+    return /\b(solid|dashed|dotted|double|groove|ridge|inset|outset)\b/i.test(
+      value,
+    )
+  })
+
+  return hasExplicitBorders || hasShorthandBorder
 }
