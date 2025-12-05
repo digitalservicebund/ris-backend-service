@@ -948,13 +948,17 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       RelatedDocumentationUnit relatedDocumentationUnit,
       DocumentationOffice documentationOffice,
       String documentNumberToExclude,
+      boolean onlyPendingProceedings,
       Pageable pageable) {
 
     // CriteriaBuilder and CriteriaQuery setup
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
     CriteriaQuery<DocumentationUnitDTO> criteriaQuery =
         criteriaBuilder.createQuery(DocumentationUnitDTO.class);
-    Root<DocumentationUnitDTO> root = criteriaQuery.from(DocumentationUnitDTO.class);
+    Root<? extends DocumentationUnitDTO> root =
+        onlyPendingProceedings
+            ? criteriaQuery.from(PendingProceedingDTO.class)
+            : criteriaQuery.from(DocumentationUnitDTO.class);
 
     // Conditions setup
     Predicate conditions = criteriaBuilder.conjunction(); // Start with an empty conjunction (AND)
@@ -1039,12 +1043,18 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                 root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.PUBLISHING));
 
     Predicate externalHandoverPendingPredicate =
-        criteriaBuilder.and(
-            criteriaBuilder.equal(
-                root.get(STATUS).get(PUBLICATION_STATUS),
-                PublicationStatus.EXTERNAL_HANDOVER_PENDING),
-            criteriaBuilder.equal(
-                root.get("creatingDocumentationOffice").get("id"), documentationOfficeDTO.getId()));
+        // PendingProceedings don't have a `creatingDocumentationOffice` so this predicate does not
+        // work when filtering
+        // for PendingProceedings.
+        onlyPendingProceedings
+            ? criteriaBuilder.disjunction()
+            : criteriaBuilder.and(
+                criteriaBuilder.equal(
+                    root.get(STATUS).get(PUBLICATION_STATUS),
+                    PublicationStatus.EXTERNAL_HANDOVER_PENDING),
+                criteriaBuilder.equal(
+                    root.get("creatingDocumentationOffice").get("id"),
+                    documentationOfficeDTO.getId()));
 
     Predicate finalPredicate =
         criteriaBuilder.or(
