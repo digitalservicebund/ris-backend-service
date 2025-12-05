@@ -15,6 +15,7 @@ public class LanguageCodeTransformer {
         .id(languageCodeDTO.getId())
         .label(languageCodeDTO.getValue())
         .isoCode(languageCodeDTO.getIsoCode())
+        .isoCode3Letters(languageCodeDTO.getIsoCode3Letters())
         .build();
   }
 
@@ -26,6 +27,7 @@ public class LanguageCodeTransformer {
         .id(languageCode.id())
         .value(languageCode.label())
         .isoCode(languageCode.isoCode())
+        .isoCode3Letters(languageCode.isoCode3Letters())
         .build();
   }
 }
