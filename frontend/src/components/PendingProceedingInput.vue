@@ -45,10 +45,9 @@ async function search() {
   })
 
   if (
-    pendingProceedingRef.court != lastSearchInput.value.court ||
-    pendingProceedingRef.decisionDate != lastSearchInput.value.decisionDate ||
-    pendingProceedingRef.fileNumber != lastSearchInput.value.fileNumber ||
-    pendingProceedingRef.documentType != lastSearchInput.value.documentType
+    pendingProceedingRef.documentNumber !=
+      lastSearchInput.value.documentNumber ||
+    pendingProceedingRef.fileNumber != lastSearchInput.value.fileNumber
   ) {
     pageNumber.value = 0
   }
@@ -69,6 +68,7 @@ async function search() {
       ...(documentNumberToExclude != undefined
         ? { documentNumber: documentNumberToExclude.toString() }
         : {}),
+      ...{ onlyPendingProceedings: "true" },
     },
   )
   if (response.data) {
@@ -165,7 +165,7 @@ onMounted(() => {
         <div class="flex gap-16">
           <Button
             v-if="!pendingProceeding.isReadOnly"
-            aria-label="Nach angängigem Verfahren suchen"
+            aria-label="Nach anhängigen Verfahren suchen"
             label="Suchen"
             size="small"
             @click="search"
