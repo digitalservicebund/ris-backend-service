@@ -19,7 +19,6 @@ body {
   --shadow-hover: inset 0 0 0 4px rgba(0, 75, 118, 1);
 }
 
-
 @layer base {
   ul,
   ol {
