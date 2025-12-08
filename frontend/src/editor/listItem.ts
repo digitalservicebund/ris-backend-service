@@ -1,5 +1,4 @@
 import { ListItem } from "@tiptap/extension-list-item"
-import "../styles/lists.css"
 
 export const CustomListItem = ListItem.extend({
   addAttributes() {
