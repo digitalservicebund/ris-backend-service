@@ -90,6 +90,11 @@ class PortalPublicationServiceTest {
           .shortTexts(
               PendingProceedingShortTexts.builder().resolutionNote("Resolution note").build())
           .build();
+  private static PendingProceeding resolvedRelatedPendingProceeding =
+      PendingProceeding.builder()
+          .documentNumber("Test document number 5")
+          .coreData(CoreData.builder().isResolved(true).build())
+          .build();
 
   @BeforeAll
   static void setUpBeforeClass() {
@@ -135,6 +140,9 @@ class PortalPublicationServiceTest {
                             RelatedPendingProceeding.builder()
                                 .documentNumber(
                                     relatedPendingProceedingWithResolutionNote.documentNumber())
+                                .build(),
+                            RelatedPendingProceeding.builder()
+                                .documentNumber(resolvedRelatedPendingProceeding.documentNumber())
                                 .build()))
                     .build())
             .build();
@@ -520,6 +528,9 @@ class PortalPublicationServiceTest {
         when(documentationUnitRepository.findByDocumentNumber(
                 relatedPendingProceedingWithResolutionNote.documentNumber()))
             .thenReturn(relatedPendingProceedingWithResolutionNote);
+        when(documentationUnitRepository.findByDocumentNumber(
+                resolvedRelatedPendingProceeding.documentNumber()))
+            .thenReturn(resolvedRelatedPendingProceeding);
 
         subject.publishDocumentationUnitWithChangelog(documentationUnitId, user);
 
@@ -543,6 +554,14 @@ class PortalPublicationServiceTest {
                         documentationUnit
                             .documentNumber()
                             .equals(relatedPendingProceedingWithResolutionNote.documentNumber())),
+                any());
+        verify(documentationUnitRepository, times(0))
+            .save(
+                argThat(
+                    documentationUnit ->
+                        documentationUnit
+                            .documentNumber()
+                            .equals(resolvedRelatedPendingProceeding.documentNumber())),
                 any());
       }
     }
