@@ -183,7 +183,7 @@ describe("preview content related indexing", () => {
     expect(await screen.findByText("E-VSF")).toBeInTheDocument()
     expect(await screen.findByText("Definition")).toBeInTheDocument()
     expect(await screen.findByText("Gegenstandswert")).toBeInTheDocument()
-    expect(await screen.findByText("Missbrauchsgebühr")).toBeInTheDocument()
+    expect(await screen.findByText("Missbrauchsgebühren")).toBeInTheDocument()
   })
 
   test("renders multiple keywords and nothing else", async () => {
@@ -223,7 +223,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
   })
 
   test("renders multiple norms and single norms and nothing else", async () => {
@@ -279,7 +279,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
   })
 
   test("renders multiple active citations and nothing else", async () => {
@@ -347,7 +347,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
   })
 
   test("renders multiple fields of law and nothing else", async () => {
@@ -437,7 +437,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
   })
 
   test("renders multiple job profiles and nothing else", async () => {
@@ -477,7 +477,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
   })
 
   test("renders multiple collective agreements and nothing else", async () => {
@@ -539,7 +539,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
   })
 
   test("renders legislative mandate and nothing else", async () => {
@@ -578,7 +578,7 @@ describe("preview content related indexing", () => {
     ).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
   })
 
   test("renders dismissal inputs and nothing else", async () => {
@@ -614,7 +614,7 @@ describe("preview content related indexing", () => {
     ).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
   })
 
   test("renders foreign language versions and nothing else", async () => {
@@ -676,7 +676,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
   })
 
   test("renders origin of translation and nothing else", async () => {
@@ -739,7 +739,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
   })
 
   test("renders no legislative mandate when it is false", async () => {
@@ -786,7 +786,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
   })
 
   test("renders definitions and nothing else", async () => {
@@ -834,7 +834,7 @@ describe("preview content related indexing", () => {
     )
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
   })
 
   test("renders 'Gegenstandswert' and nothing else", async () => {
@@ -882,10 +882,10 @@ describe("preview content related indexing", () => {
     expect(container).toHaveTextContent(
       "Gegenstandswert1.000 Euro (EUR), Verfassungsbeschwerde",
     )
-    expect(screen.queryByText("Missbrauchsgebühr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
   })
 
-  test("renders 'Missbrauchsgebühr' and nothing else", async () => {
+  test("renders 'Missbrauchsgebühren' and nothing else", async () => {
     const { container } = renderComponent({
       keywords: [],
       norms: [],
@@ -929,7 +929,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
     expect(container).toHaveTextContent(
-      "Missbrauchsgebühr1.000 Euro (EUR), Bevollmächtigter",
+      "Missbrauchsgebühren1.000 Euro (EUR), Bevollmächtigter",
     )
   })
 
@@ -1048,7 +1048,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittel")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
   })
 
   test("renders nothing when elements are undefined", async () => {
@@ -1089,6 +1089,6 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittel")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
   })
 })

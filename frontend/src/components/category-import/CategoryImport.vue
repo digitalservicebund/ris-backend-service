@@ -248,6 +248,8 @@ const handleImport = async (key: keyof typeof allLabels) => {
     case "originOfTranslations":
     case "objectValues":
     case "abuseFees":
+    case "countriesOfOrigin":
+    case "incomeTypes":
       importContextRelatedIndexing(key)
       break
     case "tenor":

@@ -9,8 +9,9 @@ import lombok.Builder;
  * DE: Inhaltliche Erschließung
  *
  * @param evsf Elektronische Vorschriftensammlung Bundesfinanzverwaltung
- * @param appealAdmission Rechtsmittelzulassung
- * @param appeal Rechtsmittel
+ * @param appealAdmission DE: Rechtsmittelzulassung
+ * @param appeal DE: Rechtsmittel
+ * @param countriesOfOrigin DE: Herkunftsland
  */
 @Builder(toBuilder = true)
 public record ContentRelatedIndexing(
@@ -27,7 +28,9 @@ public record ContentRelatedIndexing(
     List<OriginOfTranslation> originOfTranslations,
     List<ObjectValue> objectValues,
     List<AbuseFee> abuseFees,
+    List<IncomeType> incomeTypes,
     boolean hasLegislativeMandate,
     String evsf,
     AppealAdmission appealAdmission,
-    Appeal appeal) {}
+    Appeal appeal,
+    List<CountryOfOrigin> countriesOfOrigin) {}

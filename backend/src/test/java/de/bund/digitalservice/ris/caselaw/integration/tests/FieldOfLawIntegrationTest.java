@@ -227,7 +227,7 @@ class FieldOfLawIntegrationTest extends BaseIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=FL-01")
+            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=FL-01&sz=200&pg=0")
             .exchange()
             .expectStatus()
             .isOk()
