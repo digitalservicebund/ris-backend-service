@@ -1,11 +1,14 @@
 <script lang="ts" setup>
 import { computed } from "vue"
+import AbuseFees from "./AbuseFees.vue"
 import Appeal from "@/components/Appeal.vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import CollectiveAgreements from "@/components/CollectiveAgreements.vue"
+import CountriesOfOrigin from "@/components/CountriesOfOrigin.vue"
 import DefinitionList from "@/components/DefinitionList.vue"
 import DismissalInputs from "@/components/DismissalInputs.vue"
 import ForeignLanguageVersions from "@/components/ForeignLanguageVersions.vue"
+import IncomeTypes from "@/components/IncomeTypes.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
 import NonApplicationNorms from "@/components/NonApplicationNorms.vue"
@@ -64,6 +67,12 @@ const hasOriginOfTranslations = computed(() => {
     : false
 })
 
+const hasCountriesOfOrigin = computed(() => {
+  return contentRelatedIndexing.value.countriesOfOrigin
+    ? contentRelatedIndexing.value.countriesOfOrigin?.length > 0
+    : false
+})
+
 const hasAppeal = computed(() => {
   return (
     contentRelatedIndexing.value.appeal?.appellants?.length ||
@@ -83,6 +92,18 @@ const hasAppeal = computed(() => {
 const hasObjectValues = computed(() => {
   return contentRelatedIndexing.value.objectValues?.length
     ? contentRelatedIndexing.value.objectValues?.length > 0
+    : false
+})
+
+const hasIncomeTypes = computed(() => {
+  return contentRelatedIndexing.value.incomeTypes
+    ? contentRelatedIndexing.value.incomeTypes?.length > 0
+    : false
+})
+
+const hasAbuseFees = computed(() => {
+  return contentRelatedIndexing.value.abuseFees?.length
+    ? contentRelatedIndexing.value.abuseFees?.length > 0
     : false
 })
 
@@ -124,6 +145,10 @@ const shouldDisplayEvsf = computed(() => isFinanceCourt.value || evsf.value)
 
 const shouldDisplayAppeal = computed(
   () => isFinanceCourt.value || hasAppeal.value,
+)
+
+const shouldDisplayIncomeType = computed(
+  () => isFinanceCourt.value || hasIncomeTypes.value,
 )
 
 const shouldDisplayNonApplicationNorms = computed(
@@ -201,6 +226,27 @@ const shouldDisplayNonApplicationNorms = computed(
         :should-show-button="!hasObjectValues"
       >
         <ObjectValues :label="contentRelatedIndexingLabels.objectValues" />
+      </CategoryWrapper>
+      <CategoryWrapper
+        label="Missbrauchsgebühren"
+        :should-show-button="!hasAbuseFees"
+      >
+        <AbuseFees :label="contentRelatedIndexingLabels.abuseFees" />
+      </CategoryWrapper>
+      <CategoryWrapper
+        :label="contentRelatedIndexingLabels.countriesOfOrigin"
+        :should-show-button="!hasCountriesOfOrigin"
+      >
+        <CountriesOfOrigin
+          :label="contentRelatedIndexingLabels.countriesOfOrigin"
+        />
+      </CategoryWrapper>
+      <CategoryWrapper
+        v-if="shouldDisplayIncomeType"
+        :label="contentRelatedIndexingLabels.incomeTypes"
+        :should-show-button="!hasIncomeTypes"
+      >
+        <IncomeTypes :label="contentRelatedIndexingLabels.incomeTypes" />
       </CategoryWrapper>
       <CategoryWrapper
         v-if="shouldDisplayNonApplicationNorms"

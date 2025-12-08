@@ -9,10 +9,9 @@ defineProps<{
 
 <template>
   <div class="flex w-full justify-between">
-    <div class="flex flex-row items-center" data-testId="object-value-summary">
+    <div class="flex flex-row items-center">
       <Payment class="mr-8" />
       {{ data.renderSummary }}
     </div>
   </div>
 </template>
-ic:round-payments

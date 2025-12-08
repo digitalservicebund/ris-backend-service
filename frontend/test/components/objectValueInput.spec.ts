@@ -45,11 +45,9 @@ describe("ObjectValueInput", () => {
   it("renders currency combobox and chips inputs", () => {
     renderComponent()
 
-    expect(screen.getByTestId("object-value-amount")).toBeInTheDocument()
-    expect(screen.getByTestId("object-value-currency")).toBeInTheDocument()
-    expect(
-      screen.getByTestId("object-value-proceeding-type"),
-    ).toBeInTheDocument()
+    expect(screen.getByText("Betrag *")).toBeInTheDocument()
+    expect(screen.getByText("Währung *")).toBeInTheDocument()
+    expect(screen.getByText("Verfahren")).toBeInTheDocument()
   })
 
   it("disables 'Übernehmen' button with empty input", async () => {

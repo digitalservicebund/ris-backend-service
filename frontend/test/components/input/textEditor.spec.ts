@@ -22,6 +22,7 @@ describe("text editor", async () => {
     editable?: boolean
     value?: string
     fieldSize?: TextAreaInputAttributes["fieldSize"]
+    hideTextCheck?: boolean
   }) => {
     userEvent.setup()
     const router = createRouter({
@@ -45,6 +46,7 @@ describe("text editor", async () => {
         ariaLabel: options?.ariaLabel,
         editable: options?.editable,
         fieldSize: options?.fieldSize,
+        hideTextCheck: options?.hideTextCheck,
       },
       global: { plugins: [router, createTestingPinia()] },
     })
@@ -249,6 +251,25 @@ describe("text editor", async () => {
     expect(screen.getByLabelText("Rahmen rechts")).toBeInTheDocument()
     expect(screen.getByLabelText("Rahmen oben")).toBeInTheDocument()
     expect(screen.getByLabelText("Rahmen unten")).toBeInTheDocument()
+  })
+
+  it("hides Rechtschreibprüfung when it should be hidden", async () => {
+    await renderComponent({
+      value: "Test Value",
+      ariaLabel: "Gründe",
+      editable: true,
+      hideTextCheck: true,
+    })
+
+    const editorField = screen.getByTestId("Gründe")
+
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+    }
+
+    expect(
+      screen.queryByLabelText("Rechtschreibprüfung"),
+    ).not.toBeInTheDocument()
   })
 
   it.each([

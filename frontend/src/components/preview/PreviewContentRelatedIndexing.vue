@@ -2,6 +2,7 @@
 import { computed } from "vue"
 import BorderNumberLinkView from "@/components/BorderNumberLinkView.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
+import IncomeTypeSummaryBasic from "@/components/IncomeTypeSummaryBasic.vue"
 import OriginOfTranslationSummaryPreview from "@/components/OriginOfTranslationSummaryPreview.vue"
 import FieldOfLawNodeView from "@/components/preview/FieldOfLawNodeView.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
@@ -110,6 +111,13 @@ const hasObjectValues = computed(() => {
   )
 })
 
+const hasAbuseFees = computed(() => {
+  return (
+    props.contentRelatedIndexing.abuseFees &&
+    props.contentRelatedIndexing.abuseFees.length > 0
+  )
+})
+
 const hasAppeal = computed(() => {
   return (
     props.contentRelatedIndexing.appeal?.appellants?.length ||
@@ -123,6 +131,20 @@ const hasAppeal = computed(() => {
     props.contentRelatedIndexing.appeal?.nzbPlaintiffStatuses?.length ||
     props.contentRelatedIndexing.appeal?.appealWithdrawal ||
     props.contentRelatedIndexing.appeal?.pkhPlaintiff
+  )
+})
+
+const hasCountriesOfOrigin = computed(() => {
+  return (
+    props.contentRelatedIndexing.countriesOfOrigin &&
+    props.contentRelatedIndexing.countriesOfOrigin.length > 0
+  )
+})
+
+const hasIncomeTypes = computed(() => {
+  return (
+    props.contentRelatedIndexing.incomeTypes &&
+    props.contentRelatedIndexing.incomeTypes?.length > 0
   )
 })
 </script>
@@ -464,13 +486,49 @@ const hasAppeal = computed(() => {
     </div>
     <PreviewRow v-if="hasObjectValues">
       <PreviewCategory>Gegenstandswert</PreviewCategory>
-      <PreviewContent data-testid="Gegenstandswert">
+      <PreviewContent>
         <div
           v-for="objectValue in props.contentRelatedIndexing.objectValues"
           :key="objectValue.id"
         >
           {{ objectValue.renderSummary }}
         </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasAbuseFees">
+      <PreviewCategory>Missbrauchsgebühren</PreviewCategory>
+      <PreviewContent>
+        <div
+          v-for="abuseFee in props.contentRelatedIndexing.abuseFees"
+          :key="abuseFee.id"
+        >
+          {{ abuseFee.renderSummary }}
+        </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasCountriesOfOrigin">
+      <PreviewCategory>Herkunftsland</PreviewCategory>
+      <PreviewContent>
+        <div
+          v-for="countryOfOrigin in props.contentRelatedIndexing
+            .countriesOfOrigin"
+          :key="countryOfOrigin.id"
+        >
+          {{ countryOfOrigin.renderSummary }}
+        </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasIncomeTypes">
+      <PreviewCategory>{{
+        contentRelatedIndexingLabels.incomeTypes
+      }}</PreviewCategory>
+      <PreviewContent data-testid="Einkunftsart">
+        <span
+          v-for="incomeType in props.contentRelatedIndexing.incomeTypes"
+          :key="incomeType.id"
+        >
+          <IncomeTypeSummaryBasic :data="incomeType" />
+        </span>
       </PreviewContent>
     </PreviewRow>
   </FlexContainer>

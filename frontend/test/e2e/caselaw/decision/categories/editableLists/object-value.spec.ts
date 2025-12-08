@@ -33,15 +33,9 @@ test.describe(
         exact: true,
       })
 
-      const amountInput = otherCategoriesContainer.getByTestId(
-        "object-value-amount-input",
-      )
-      const currencyInput = otherCategoriesContainer.getByTestId(
-        "object-value-currency-input",
-      )
-      const proceedingInput = otherCategoriesContainer.getByTestId(
-        "object-value-proceeding-type-input",
-      )
+      const amountInput = otherCategoriesContainer.getByLabel("Betrag")
+      const currencyInput = otherCategoriesContainer.getByLabel("Währung")
+      const proceedingInput = otherCategoriesContainer.getByLabel("Verfahren")
 
       const acceptButton = otherCategoriesContainer.getByLabel(
         "Gegenstandswert speichern",
