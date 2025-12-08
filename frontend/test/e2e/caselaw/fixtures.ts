@@ -608,6 +608,11 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     )
     const country = await fieldsOfLawResponse.json()
 
+    const normAbbreviationResponse = await request.get(
+      `api/v1/caselaw/normabbreviation/search?q=BGB&sz=30&pg=0`,
+    )
+    const normAbbreviation = await normAbbreviationResponse.json()
+
     const updateResponse = await request.put(
       `/api/v1/caselaw/documentunits/${prefilledDocumentUnitWithLongTexts.uuid}`,
       {
@@ -754,6 +759,12 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                 newEntry: true,
                 terminology: "Programmierer",
                 typeOfIncome: TypeOfIncome.GEWERBEBETRIEB,
+              },
+            ],
+            nonApplicationNorms: [
+              {
+                normAbbreviation: normAbbreviation?.[0],
+                singleNorms: [{ singleNorm: "§ 1" }],
               },
             ],
           },

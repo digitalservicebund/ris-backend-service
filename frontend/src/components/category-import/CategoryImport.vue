@@ -222,8 +222,10 @@ const handleImport = async (key: keyof typeof allLabels) => {
       importFieldsOfLaw()
       break
     case "norms":
-    case "nonApplicationNorms":
       importNorms()
+      break
+    case "nonApplicationNorms":
+      importNonApplicationNorms()
       break
     case "activeCitations":
       importActiveCitations()
@@ -391,10 +393,25 @@ function importFieldsOfLaw() {
 }
 
 function importNorms() {
-  const source = sourceDocumentUnit.value?.contentRelatedIndexing.norms
+  importNormReferences(
+    sourceDocumentUnit.value?.contentRelatedIndexing.norms,
+    targetDocumentUnit.value!.contentRelatedIndexing.norms,
+  )
+}
+
+function importNonApplicationNorms() {
+  importNormReferences(
+    sourceDocumentUnit.value?.contentRelatedIndexing.nonApplicationNorms,
+    targetDocumentUnit.value!.contentRelatedIndexing.nonApplicationNorms,
+  )
+}
+
+function importNormReferences(
+  source: NormReference[] | undefined,
+  targetNorms: NormReference[] | undefined,
+) {
   if (!source) return
 
-  const targetNorms = targetDocumentUnit.value!.contentRelatedIndexing.norms
   if (targetNorms) {
     source.forEach((importableNorm) => {
       // first check for abbreviation, then for raw value
