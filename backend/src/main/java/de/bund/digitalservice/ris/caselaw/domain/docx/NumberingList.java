@@ -169,7 +169,20 @@ public class NumberingList implements DocumentationUnitDocx {
     if (listNumberFormat == DocumentationUnitNumberingListNumberFormat.BULLET) {
       return String.format("<ul style=\"%s\">", listStyle);
     } else {
-      return String.format("<ol style=\"%s\">", listStyle);
+      String startAttr = "";
+      try {
+        String startVal = numberingListEntryIndex.startVal();
+        if (startVal != null) {
+          int startInt = Integer.parseInt(startVal);
+          if (startInt > 1) {
+            startAttr = String.format(" start=\"%d\"", startInt);
+          }
+        }
+      } catch (NumberFormatException ex) {
+        LOGGER.debug(
+            "Invalid start value for numbering list: {}", numberingListEntryIndex.startVal());
+      }
+      return String.format("<ol style=\"%s\"%s>", listStyle, startAttr);
     }
   }
 
