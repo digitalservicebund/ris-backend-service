@@ -339,6 +339,15 @@
                             <ris:missbrauchsgebuehrAdressat domainTerm="Adressat">Beschwerdeführer / Antragsteller</ris:missbrauchsgebuehrAdressat>
                         </ris:missbrauchsgebuehr>
                     </ris:missbrauchsgebuehren>
+                    <ris:einkunftsarten domainTerm="Einkunftsarten">
+                        <ris:einkunftsart domainTerm="Einkunftsart">
+                            <ris:artDerEinkunft domainTerm="Einkunftsart">EStG</ris:artDerEinkunft>
+                            <ris:begrifflichkeit domainTerm="Begrifflichkeit">terminology test</ris:begrifflichkeit>
+                        </ris:einkunftsart>
+                        <ris:einkunftsart domainTerm="Einkunftsart">
+                            <ris:artDerEinkunft domainTerm="Einkunftsart">GewStG</ris:artDerEinkunft>
+                        </ris:einkunftsart>
+                    </ris:einkunftsarten>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>

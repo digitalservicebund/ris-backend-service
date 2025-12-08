@@ -25,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.D
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Definitionen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentRef;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Eingangsarten;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Einkunftsarten;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Evsf;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FehlerhafteGerichte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FremdsprachigeFassungen;
@@ -49,6 +50,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Correction;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
+import de.bund.digitalservice.ris.caselaw.domain.IncomeType;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
 import java.util.ArrayList;
@@ -182,6 +184,12 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.abuseFees())) {
         var missbrauchsgebuehren = buildMissbrauchsgebuehren(contentRelatedIndexing);
         builder.missbrauchsgebuehren(missbrauchsgebuehren);
+      }
+
+      // Einkunftsarten
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.incomeTypes())) {
+        var einkunftsarten = buildEinkunftsarten(contentRelatedIndexing);
+        builder.einkunftsarten(einkunftsarten);
       }
     }
 
@@ -684,6 +692,32 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
             .toList();
 
     return Missbrauchsgebuehren.builder().missbrauchsgebuehren(missbrauchsgebuehren).build();
+  }
+
+  private Einkunftsarten buildEinkunftsarten(ContentRelatedIndexing contentRelatedIndexing) {
+
+    var einkunftsarten =
+        contentRelatedIndexing.incomeTypes().stream()
+            .map(DecisionFullLdmlTransformer::buildEinkunftsart)
+            .toList();
+
+    return Einkunftsarten.builder().values(einkunftsarten).build();
+  }
+
+  private static Einkunftsarten.Einkunftsart buildEinkunftsart(IncomeType incomeType) {
+    var builder =
+        Einkunftsarten.Einkunftsart.builder()
+            .artDerEinkunft(
+                Einkunftsarten.ArtDerEinkunft.builder()
+                    .value(incomeType.typeOfIncome().humanReadable)
+                    .build());
+
+    if (incomeType.terminology() != null) {
+      builder.begrifflichkeit(
+          Einkunftsarten.Begrifflichkeit.builder().value(incomeType.terminology()).build());
+    }
+
+    return builder.build();
   }
 
   private AktenzeichenListe buildAbweichendeAktenzeichen(
