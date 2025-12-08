@@ -32,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.F
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gegenstandswerte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gesetzgebungsauftrag;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.HerkunftDerUebersetzungen;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Herkunftslaender;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Kuendigungsarten;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Kuendigungsgruende;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Missbrauchsgebuehren;
@@ -52,6 +53,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Correction;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.IncomeType;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
+import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -184,6 +186,11 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.abuseFees())) {
         var missbrauchsgebuehren = buildMissbrauchsgebuehren(contentRelatedIndexing);
         builder.missbrauchsgebuehren(missbrauchsgebuehren);
+      }
+
+      // Herkunftsland
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.countriesOfOrigin())) {
+        builder.herkunftslaender(buildHerkunftslaender(contentRelatedIndexing));
       }
 
       // Einkunftsarten
@@ -371,6 +378,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                         Sachgebiete.Sachgebiet.builder()
                             .value(sachgebiet.text())
                             .notation(sachgebiet.notation())
+                            .sachgebietId(sachgebiet.identifier())
                             .build())
                 .toList())
         .build();
@@ -692,6 +700,44 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
             .toList();
 
     return Missbrauchsgebuehren.builder().missbrauchsgebuehren(missbrauchsgebuehren).build();
+  }
+
+  private Herkunftslaender buildHerkunftslaender(ContentRelatedIndexing contentRelatedIndexing) {
+    return Herkunftslaender.builder()
+        .herkunftslaender(
+            contentRelatedIndexing.countriesOfOrigin().stream()
+                .map(
+                    countryOfOrigin -> {
+                      var builder = Herkunftslaender.Herkunftsland.builder();
+
+                      if (!StringUtils.isNullOrBlank(countryOfOrigin.legacyValue())) {
+                        builder.herkunftslandAltwert(
+                            Herkunftslaender.HerkunftslandAltwert.builder()
+                                .value(countryOfOrigin.legacyValue())
+                                .build());
+                      }
+
+                      if (countryOfOrigin.country() != null) {
+                        builder.landbezeichnung(
+                            Herkunftslaender.Landbezeichnung.builder()
+                                .value(countryOfOrigin.country().text())
+                                .notation(countryOfOrigin.country().notation())
+                                .sachgebietId(countryOfOrigin.country().identifier())
+                                .build());
+                      }
+                      if (countryOfOrigin.fieldOfLaw() != null) {
+                        builder.herkunftslandRechtlicherRahmen(
+                            Herkunftslaender.HerkunftslandRechtlicherRahmen.builder()
+                                .value(countryOfOrigin.fieldOfLaw().text())
+                                .notation(countryOfOrigin.fieldOfLaw().notation())
+                                .sachgebietId(countryOfOrigin.fieldOfLaw().identifier())
+                                .build());
+                      }
+
+                      return builder.build();
+                    })
+                .toList())
+        .build();
   }
 
   private Einkunftsarten buildEinkunftsarten(ContentRelatedIndexing contentRelatedIndexing) {
