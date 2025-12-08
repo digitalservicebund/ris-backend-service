@@ -4,6 +4,8 @@ import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   fillNormInputs,
   navigateToCategories,
+  navigateToHandover,
+  navigateToPreview,
   save,
   selectCourt,
 } from "~/e2e/caselaw/utils/e2e-utils"
@@ -28,7 +30,7 @@ test.describe(
         ).toBeVisible()
       })
 
-      await test.step("Nichtanwendungsgesetz hinzufügen, ändern und löschen", async () => {
+      await test.step("hinzufügen, ändern und löschen", async () => {
         await page
           .getByRole("button", { name: "Nichtanwendungsgesetz" })
           .click()
@@ -84,6 +86,30 @@ test.describe(
         // the default list entry is not shown on delete item
         await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
         await container.getByLabel("Weitere Angabe").isVisible()
+      })
+
+      await test.step("Einträge werden bei Gerichtswechel weiterhin angezeigt", async () => {
+        await selectCourt(page, "BGH")
+        await expect(
+          page.getByText("PBefGZustV HE, § 12, 12.12.2022"),
+        ).toBeVisible()
+      })
+
+      await test.step("Einträge werden in der Vorschau angezeigt", async () => {
+        await navigateToPreview(page, prefilledDocumentUnit.documentNumber)
+        await expect(
+          page.getByText("PBefGZustV HE - § 12, 12.12.2022"),
+        ).toBeVisible()
+      })
+
+      await test.step("Warnung auf der jDV Übergabe Seite wird angezeigt", async () => {
+        await navigateToHandover(page, prefilledDocumentUnit.documentNumber)
+        await expect(
+          page.getByText(
+            "Folgende Rubriken sind befüllt und können nicht an die jDV exportiert werden",
+          ),
+        ).toBeVisible()
+        await expect(page.getByText("Nichtanwendungsgesetz")).toBeVisible()
       })
     })
   },
