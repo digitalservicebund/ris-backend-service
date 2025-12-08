@@ -22,6 +22,7 @@ import {
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import NormReference from "@/domain/normReference"
 import ParticipatingJudge from "@/domain/participatingJudge"
+import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
 import Reference from "@/domain/reference"
 import SingleNorm from "@/domain/singleNorm"
 import documentUnitService from "@/services/documentUnitService"
@@ -226,6 +227,9 @@ const handleImport = async (key: keyof typeof allLabels) => {
       break
     case "activeCitations":
       importActiveCitations()
+      break
+    case "relatedPendingProceedings":
+      importRelatedPendingProceedings()
       break
     case "decisionNames":
       importDecisionNames()
@@ -465,6 +469,27 @@ function importActiveCitations() {
     ...targetActiveCitations,
     ...uniqueImportableFieldsOfLaw,
   ] as ActiveCitation[]
+}
+
+function importRelatedPendingProceedings() {
+  const source =
+    sourceDocumentUnit.value?.contentRelatedIndexing.relatedPendingProceedings
+  if (!source) return
+
+  const targetPendingProceedings =
+    targetDocumentUnit.value!.contentRelatedIndexing
+      .relatedPendingProceedings ?? []
+
+  const uniqueImportable = source.map((pendingProceeding) => ({
+    ...pendingProceeding,
+    uuid: crypto.randomUUID(),
+    newEntry: true,
+  }))
+
+  targetDocumentUnit.value!.contentRelatedIndexing.relatedPendingProceedings = [
+    ...targetPendingProceedings,
+    ...uniqueImportable,
+  ] as RelatedPendingProceeding[]
 }
 
 function importParticipatingJudges() {
