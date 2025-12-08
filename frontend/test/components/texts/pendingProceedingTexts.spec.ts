@@ -79,7 +79,7 @@ describe("Pending proceeding texts", () => {
     ).toBeVisible()
     expect(
       screen.getByRole("button", {
-        name: pendingProceedingLabels.legalIssue,
+        name: pendingProceedingLabels.legalIssue + " *",
       }),
     ).toBeVisible()
 
@@ -110,7 +110,7 @@ describe("Pending proceeding texts", () => {
     ).toBeVisible()
 
     expect(
-      screen.getByText(pendingProceedingLabels.legalIssue, {
+      screen.getByText(pendingProceedingLabels.legalIssue + " *", {
         exact: true,
       }),
     ).toBeVisible()
