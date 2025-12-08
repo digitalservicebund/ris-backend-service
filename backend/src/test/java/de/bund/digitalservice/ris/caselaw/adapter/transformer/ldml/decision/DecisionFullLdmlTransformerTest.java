@@ -1029,6 +1029,7 @@ class DecisionFullLdmlTransformerTest {
                         FieldOfLaw.builder()
                             .text("fieldOfLaw test")
                             .notation(Notation.NEW.toString())
+                            .identifier("AR-01-01-01")
                             .build()))
                 .norms(
                     List.of(
@@ -1210,12 +1211,14 @@ class DecisionFullLdmlTransformerTest {
                             .id(UUID.fromString("5b202af2-6f77-47e0-8a9b-64e652845240"))
                             .country(
                                 FieldOfLaw.builder()
-                                    .notation("RE-07-DEU")
+                                    .notation(Notation.NEW.toString())
+                                    .identifier("RE-07-DEU")
                                     .text("Deutschland")
                                     .build())
                             .fieldOfLaw(
                                 FieldOfLaw.builder()
-                                    .notation("AR-01-01-01")
+                                    .notation(Notation.NEW.toString())
+                                    .identifier("AR-01-01-01")
                                     .text("Verschulden bei Vertragsschluss (culpa in contrahendo)")
                                     .build())
                             .build()))

@@ -140,7 +140,7 @@
                         <ris:abweichendeDokumentnummer domainTerm="Abweichende Dokumentnummer">Abweichende Dokumentnummer</ris:abweichendeDokumentnummer>
                     </ris:abweichendeDokumentnummern>
                     <ris:sachgebiete domainTerm="Sachgebiete">
-                        <ris:sachgebiet domainTerm="Sachgebiet" notation="neu">Sachgebiet</ris:sachgebiet>
+                        <ris:sachgebiet domainTerm="Sachgebiet" notation="neu" sachgebiet-id="AR-01-01-01">Sachgebiet</ris:sachgebiet>
                     </ris:sachgebiete>
                 </ris:meta>
             </akn:proprietary>

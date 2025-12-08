@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.Notation;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
 import de.bund.digitalservice.ris.caselaw.domain.AbuseFee;
@@ -299,7 +300,12 @@ class DecisionReducedLdmlTransformerTest {
                                 .build()))
                     .keywords(List.of("keyword test"))
                     .fieldsOfLaw(
-                        List.of(FieldOfLaw.builder().identifier("fieldOfLaw test").build()))
+                        List.of(
+                            FieldOfLaw.builder()
+                                .identifier("AR-01-01-01")
+                                .notation(Notation.NEW.toString())
+                                .text("Verschulden bei Vertragsschluss (culpa in contrahendo)")
+                                .build()))
                     .norms(
                         List.of(
                             NormReference.builder()

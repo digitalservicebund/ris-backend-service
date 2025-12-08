@@ -370,6 +370,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                         Sachgebiete.Sachgebiet.builder()
                             .value(sachgebiet.text())
                             .notation(sachgebiet.notation())
+                            .sachgebietId(sachgebiet.identifier())
                             .build())
                 .toList())
         .build();
@@ -713,6 +714,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                             Herkunftslaender.Landbezeichnung.builder()
                                 .value(countryOfOrigin.country().text())
                                 .notation(countryOfOrigin.country().notation())
+                                .sachgebietId(countryOfOrigin.country().identifier())
                                 .build());
                       }
                       if (countryOfOrigin.fieldOfLaw() != null) {
@@ -720,6 +722,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                             Herkunftslaender.HerkunftslandRechtlicherRahmen.builder()
                                 .value(countryOfOrigin.fieldOfLaw().text())
                                 .notation(countryOfOrigin.fieldOfLaw().notation())
+                                .sachgebietId(countryOfOrigin.fieldOfLaw().identifier())
                                 .build());
                       }
 
