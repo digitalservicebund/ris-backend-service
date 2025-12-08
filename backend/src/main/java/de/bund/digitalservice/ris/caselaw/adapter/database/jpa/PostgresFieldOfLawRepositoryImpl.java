@@ -135,7 +135,9 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Override
   @Transactional
   public List<FieldOfLaw> findByIdentifier(String searchStr, Pageable pageable) {
-    return repository.findAllByIdentifierStartsWithIgnoreCaseOrderByIdentifier(searchStr).stream()
+    return repository
+        .findAllByIdentifierStartsWithIgnoreCaseOrderByIdentifier(searchStr, pageable)
+        .stream()
         .map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren)
         .toList();
   }

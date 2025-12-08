@@ -13,7 +13,7 @@ import { Text } from "@tiptap/extension-text"
 import { TextAlign } from "@tiptap/extension-text-align"
 import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
-import { BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3"
+import { AnyExtension, BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3"
 import { computed, onMounted, ref, watch } from "vue"
 import TextEditorFooter from "@/components/input/TextEditorFooter.vue"
 import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
@@ -56,6 +56,7 @@ interface Props {
   plainBorderNumbers?: boolean
   fieldSize?: TextAreaInputAttributes["fieldSize"]
   category?: string
+  hideTextCheck?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -63,6 +64,7 @@ const props = withDefaults(defineProps<Props>(), {
   editable: false,
   preview: false,
   plainBorderNumbers: false,
+  hideTextCheck: false,
   ariaLabel: "Editor Feld",
   fieldSize: "medium",
   category: "",
@@ -80,6 +82,60 @@ const editorElement = ref<HTMLElement>()
 const hasFocus = ref(false)
 const isHovered = ref(false)
 
+const extensions: AnyExtension[] = [
+  Document,
+  CustomParagraph,
+  Text,
+  BorderNumber,
+  BorderNumberNumber,
+  BorderNumberContent,
+  BorderNumberLink,
+  Bold,
+  Color,
+  EventHandler,
+  FontSize,
+  Italic,
+  CustomListItem,
+  CustomBulletList,
+  CustomOrderedList,
+  Underline,
+  Strike,
+  CustomSubscript,
+  CustomSuperscript,
+  CustomTable,
+  CustomTableCell,
+  CustomTableHeader,
+  TableRow,
+  TextStyle,
+  HardBreak,
+  InvisibleCharacters,
+  TextAlign.configure({
+    types: ["paragraph", "span"],
+    alignments: props.editable
+      ? ["left", "right", "center"]
+      : ["left", "right", "center", "justify"],
+  }),
+  CustomImage.configure({
+    allowBase64: true,
+    inline: true,
+    HTMLAttributes: {
+      class: "inline align-baseline",
+    },
+  }),
+  History.configure({
+    depth: 100,
+  }),
+  Blockquote,
+  Indent.configure({
+    names: ["listItem", "paragraph"],
+  }),
+  IgnoreOnceMark,
+  TextCheckMark,
+  TextCheckExtension.configure({
+    service: textCheckService,
+  }),
+]
+
 const editor: Editor = new Editor({
   editorProps: {
     attributes: {
@@ -90,59 +146,7 @@ const editor: Editor = new Editor({
     },
   },
   content: props.value,
-  extensions: [
-    Document,
-    CustomParagraph,
-    Text,
-    BorderNumber,
-    BorderNumberNumber,
-    BorderNumberContent,
-    BorderNumberLink,
-    Bold,
-    Color,
-    EventHandler,
-    FontSize,
-    Italic,
-    CustomListItem,
-    CustomBulletList,
-    CustomOrderedList,
-    Underline,
-    Strike,
-    CustomSubscript,
-    CustomSuperscript,
-    CustomTable,
-    CustomTableCell,
-    CustomTableHeader,
-    TableRow,
-    TextStyle,
-    HardBreak,
-    InvisibleCharacters,
-    TextAlign.configure({
-      types: ["paragraph", "span"],
-      alignments: props.editable
-        ? ["left", "right", "center"]
-        : ["left", "right", "center", "justify"],
-    }),
-    CustomImage.configure({
-      allowBase64: true,
-      inline: true,
-      HTMLAttributes: {
-        class: "inline align-baseline",
-      },
-    }),
-    History.configure({
-      depth: 100,
-    }),
-    Blockquote,
-    Indent.configure({
-      names: ["listItem", "paragraph"],
-    }),
-    IgnoreOnceMark,
-    TextCheckMark,
-    TextCheckExtension.configure({
-      service: textCheckService,
-    }),
-  ],
+  extensions,
   onUpdate: () => {
     emit("updateValue", editor.getHTML())
   },
@@ -339,6 +343,7 @@ defineExpose({ jumpToMatch })
       :container-width="containerWidth"
       :editor="editor"
       :editor-expanded="editorExpanded"
+      :hide-text-check="hideTextCheck"
       @no-cell-selected="
         (noCellSelected) => (showNoCellSelectedWarning = noCellSelected)
       "

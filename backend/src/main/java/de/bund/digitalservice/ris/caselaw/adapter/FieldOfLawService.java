@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -26,11 +25,12 @@ public class FieldOfLawService {
     this.repository = repository;
   }
 
-  public List<FieldOfLaw> getFieldsOfLawByIdentifierSearch(Optional<String> optionalSearchStr) {
+  public List<FieldOfLaw> getFieldsOfLawByIdentifierSearch(
+      Optional<String> optionalSearchStr, Pageable pageable) {
     if (optionalSearchStr.isEmpty() || optionalSearchStr.get().isBlank()) {
-      return repository.findAllByOrderByIdentifierAsc(PageRequest.of(0, 30)).stream().toList();
+      return repository.findAllByOrderByIdentifierAsc(pageable).stream().toList();
     }
-    return repository.findByIdentifier(optionalSearchStr.get().trim(), PageRequest.of(0, 30));
+    return repository.findByIdentifier(optionalSearchStr.get().trim(), pageable);
   }
 
   public Slice<FieldOfLaw> getFieldsOfLawBySearchQuery(

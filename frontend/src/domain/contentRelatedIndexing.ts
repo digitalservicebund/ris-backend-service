@@ -1,10 +1,13 @@
+import AbuseFee from "@/domain/abuseFee"
 import ActiveCitation from "@/domain/activeCitation"
 import { Appeal } from "@/domain/appeal"
 import { AppealAdmission } from "@/domain/appealAdmission"
 import { CollectiveAgreement } from "@/domain/collectiveAgreement"
+import CountryOfOrigin from "@/domain/countryOfOrigin"
 import Definition from "@/domain/definition"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
+import IncomeType from "@/domain/incomeType"
 import NormReference from "@/domain/normReference"
 import ObjectValue from "@/domain/objectValue"
 import OriginOfTranslation from "@/domain/originOfTranslation"
@@ -26,4 +29,7 @@ export type ContentRelatedIndexing = {
   appealAdmission?: AppealAdmission
   appeal?: Appeal
   objectValues?: ObjectValue[]
+  abuseFees?: AbuseFee[]
+  countriesOfOrigin?: CountryOfOrigin[]
+  incomeTypes?: IncomeType[]
 }

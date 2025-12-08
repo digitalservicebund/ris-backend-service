@@ -145,6 +145,7 @@ sonar {
             "sonar.coverage.exclusions",
             "**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/*Exception.java"
         )
+        property("sonar.cpd.exclusions", "**/AbuseFeeDTO.java") // Exclude duplication warning caused by ObjectValueDTO
         property("sonar.sources", "src/main/java")
     }
 }
@@ -204,9 +205,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.112")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.115")
     // for local development:
-//     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.110.jar"))
+//     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.115.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.20.1")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.20.1")

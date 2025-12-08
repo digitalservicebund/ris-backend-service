@@ -215,7 +215,7 @@ class FieldOfLawServiceTest {
   void testGetFieldsOfLawByIdentifierSearch_withoutQuery_shouldFindAllByOrderByIdentifierAsc() {
     when(repository.findAllByOrderByIdentifierAsc(any())).thenReturn(Page.empty());
 
-    var list = service.getFieldsOfLawByIdentifierSearch(Optional.empty());
+    var list = service.getFieldsOfLawByIdentifierSearch(Optional.empty(), PageRequest.ofSize(200));
     assertThat(list).isEmpty();
 
     verify(repository).findAllByOrderByIdentifierAsc(any());
@@ -226,7 +226,9 @@ class FieldOfLawServiceTest {
     String searchString = "foo";
     when(repository.findByIdentifier(eq(searchString), any())).thenReturn(List.of());
 
-    var list = service.getFieldsOfLawByIdentifierSearch(Optional.of(searchString));
+    var list =
+        service.getFieldsOfLawByIdentifierSearch(
+            Optional.of(searchString), PageRequest.ofSize(200));
     assertThat(list).isEmpty();
 
     verify(repository).findByIdentifier(eq(searchString), any());
