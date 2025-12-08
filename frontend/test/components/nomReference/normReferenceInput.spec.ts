@@ -48,6 +48,7 @@ function renderComponent(options?: { modelValue?: NormReference }) {
                   court: {
                     label: "VerfG",
                     type: "VerfG",
+                    jurisdictionType: "Verfassungsgerichtsbarkeit",
                   },
                 },
               }),
