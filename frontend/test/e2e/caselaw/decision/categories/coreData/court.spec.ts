@@ -15,11 +15,7 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.getByLabel("Gericht", { exact: true }).fill("BGH")
-    await expect(page.getByTestId("combobox-spinner")).toBeHidden()
-    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("BGH")
-    await expect(page.getByText("BGH")).toBeVisible()
-    await page.getByText("BGH").click()
+    await fillCombobox(page, "Gericht", "BGH")
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("BGH")
 
     await save(page)
@@ -373,13 +369,7 @@ test.describe("court", () => {
   )
 
   async function selectCourt(page: Page, courtName: string) {
-    await page.getByLabel("Gericht", { exact: true }).fill(courtName)
-    await expect(page.getByTestId("combobox-spinner")).toBeHidden()
-    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
-      courtName,
-    )
-    await expect(page.getByText(courtName, { exact: true })).toBeVisible()
-    await page.getByText(courtName, { exact: true }).click()
+    await fillCombobox(page, "Gericht", courtName)
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
       courtName,
     )
