@@ -8,7 +8,6 @@ import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import YearInput from "@/components/input/YearInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
-import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import LegalForce from "@/domain/legalForce"
 import SingleNorm, { SingleNormValidationInfo } from "@/domain/singleNorm"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -103,11 +102,11 @@ const legalForceRegion = computed({
   },
 })
 
-const isCourtWithLegalForce = computed(() => {
-  return constitutionalCourtTypes.items.includes(
-    store.documentUnit?.coreData.court?.type ?? "",
-  )
-})
+const isCourtWithLegalForce = computed(
+  () =>
+    store.documentUnit?.coreData.court?.jurisdictionType ===
+    "Verfassungsgerichtsbarkeit",
+)
 
 /**
  * Validates a given single norm against with a given norm abbreviation against a validation endpoint.
