@@ -202,7 +202,7 @@
                         <ris:abweichenderEcli domainTerm="Abweichender ECLI">deviating ecli test</ris:abweichenderEcli>
                     </ris:abweichendeEclis>
                     <ris:sachgebiete domainTerm="Sachgebiete">
-                        <ris:sachgebiet domainTerm="Sachgebiet" notation="neu">fieldOfLaw test</ris:sachgebiet>
+                        <ris:sachgebiet domainTerm="Sachgebiet" notation="neu" sachgebiet-id="AR-01-01-01">fieldOfLaw test</ris:sachgebiet>
                     </ris:sachgebiete>
                     <ris:rechtskraft domainTerm="Rechtskraft">Ja</ris:rechtskraft>
                     <ris:vorgaenge domainTerm="Vorgänge">
@@ -339,6 +339,19 @@
                             <ris:missbrauchsgebuehrAdressat domainTerm="Adressat">Beschwerdeführer / Antragsteller</ris:missbrauchsgebuehrAdressat>
                         </ris:missbrauchsgebuehr>
                     </ris:missbrauchsgebuehren>
+                   <ris:herkunftslaender domainTerm="Herkunftsländer">
+                        <ris:herkunftsland domainTerm="Herkunftsland">
+                            <ris:herkunftslandAltwert domainTerm="Altwert">legacy value</ris:herkunftslandAltwert>
+                        </ris:herkunftsland>
+                        <ris:herkunftsland domainTerm="Herkunftsland">
+                             <ris:herkunftslandLandbezeichnung domainTerm="Landbezeichnung"
+                                                               notation="neu"
+                                                               sachgebiet-id="RE-07-DEU">Deutschland</ris:herkunftslandLandbezeichnung>
+                             <ris:herkunftslandRechtlicherRahmen domainTerm="Rechtlicher Rahmen"
+                                                                 notation="neu"
+                                                                 sachgebiet-id="AR-01-01-01">Verschulden bei Vertragsschluss (culpa in contrahendo)</ris:herkunftslandRechtlicherRahmen>
+                      </ris:herkunftsland>
+                   </ris:herkunftslaender>
                 </ris:meta>
             </akn:proprietary>
         </akn:meta>

@@ -292,6 +292,7 @@ class PendingProceedingFullLdmlTransformerTest {
                         FieldOfLaw.builder()
                             .text("Sachgebiet")
                             .notation(Notation.NEW.toString())
+                            .identifier("AR-01-01-01")
                             .build()))
                 .norms(
                     List.of(

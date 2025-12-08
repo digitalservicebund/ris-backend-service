@@ -75,6 +75,7 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
                               Sachgebiete.Sachgebiet.builder()
                                   .value(sachgebiet.text())
                                   .notation(sachgebiet.notation())
+                                  .sachgebietId(sachgebiet.identifier())
                                   .build())
                       .toList())
               .build();

@@ -33,6 +33,9 @@ public class Sachgebiete {
     @XmlAttribute(name = "notation")
     private String notation;
 
+    @XmlAttribute(name = "sachgebiet-id")
+    private String sachgebietId;
+
     @XmlValue private String value;
   }
 }
