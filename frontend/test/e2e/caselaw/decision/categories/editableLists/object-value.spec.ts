@@ -35,7 +35,9 @@ test.describe(
 
       const amountInput = otherCategoriesContainer.getByLabel("Betrag")
       const currencyInput = otherCategoriesContainer.getByLabel("Währung")
-      const proceedingInput = otherCategoriesContainer.getByLabel("Verfahren")
+      const proceedingInput = otherCategoriesContainer.getByLabel("Verfahren", {
+        exact: true,
+      })
 
       const acceptButton = otherCategoriesContainer.getByLabel(
         "Gegenstandswert speichern",
