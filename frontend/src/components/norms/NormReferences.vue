@@ -16,7 +16,7 @@ defineProps<{
 const norms = defineModel<NormReference[]>()
 
 watch(norms, () => {
-  norms.value.forEach((norm) =>
+  norms.value?.forEach((norm) =>
     removeDuplicateSingleNorms(norm as unknown as NormReference),
   )
 })

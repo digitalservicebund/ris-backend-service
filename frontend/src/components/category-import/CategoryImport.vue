@@ -222,6 +222,7 @@ const handleImport = async (key: keyof typeof allLabels) => {
       importFieldsOfLaw()
       break
     case "norms":
+    case "nonApplicationNorms":
       importNorms()
       break
     case "activeCitations":
