@@ -17,7 +17,6 @@ import NormReference from "@/domain/normReference"
 import ObjectValue from "@/domain/objectValue"
 import OriginOfTranslation from "@/domain/originOfTranslation"
 import ParticipatingJudge from "@/domain/participatingJudge"
-import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
 import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
 import PreviousDecision from "@/domain/previousDecision"
 import ProcessStep from "@/domain/processStep"
@@ -92,7 +91,6 @@ export const contentRelatedIndexingLabels: {
   abuseFees: "Missbrauchsgebühren",
   countriesOfOrigin: "Herkunftsland",
   incomeTypes: "Einkunftsart",
-  relatedPendingProceedings: "Verknüpfung anhängiges Verfahren",
 }
 export const allLabels = {
   caselawReferences: "Rechtsprechungsfundstellen",
@@ -265,12 +263,6 @@ export class Decision {
         data.contentRelatedIndexing.countriesOfOrigin.map(
           (value) => new CountryOfOrigin({ ...value }),
         )
-
-    if (data.contentRelatedIndexing?.relatedPendingProceedings)
-      data.contentRelatedIndexing.relatedPendingProceedings =
-          data.contentRelatedIndexing.relatedPendingProceedings.map(
-              (value) => new RelatedPendingProceeding({ ...value }),
-          )
 
     Object.assign(this, data)
   }

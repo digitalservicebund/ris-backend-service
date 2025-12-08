@@ -147,13 +147,6 @@ const hasIncomeTypes = computed(() => {
     props.contentRelatedIndexing.incomeTypes?.length > 0
   )
 })
-
-const hasRelatedPendingProceedings = computed(() => {
-  return (
-    props.contentRelatedIndexing.relatedPendingProceedings &&
-    props.contentRelatedIndexing.relatedPendingProceedings?.length > 0
-  )
-})
 </script>
 
 <template>
@@ -536,20 +529,6 @@ const hasRelatedPendingProceedings = computed(() => {
         >
           <IncomeTypeSummaryBasic :data="incomeType" />
         </span>
-      </PreviewContent>
-    </PreviewRow>
-    <PreviewRow v-if="hasRelatedPendingProceedings">
-      <PreviewCategory>{{
-        contentRelatedIndexingLabels.relatedPendingProceedings
-      }}</PreviewCategory>
-      <PreviewContent>
-        <div
-          v-for="relatedPendingProceeding in props.contentRelatedIndexing
-            .relatedPendingProceedings"
-          :key="relatedPendingProceeding.id"
-        >
-          {{ relatedPendingProceeding.renderSummary }}
-        </div>
       </PreviewContent>
     </PreviewRow>
   </FlexContainer>

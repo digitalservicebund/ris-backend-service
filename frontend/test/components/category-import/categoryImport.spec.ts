@@ -19,7 +19,6 @@ import { Kind } from "@/domain/documentationUnitKind"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import NormReference from "@/domain/normReference"
 import PendingProceeding from "@/domain/pendingProceeding"
-import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
 import { PublicationState } from "@/domain/publicationStatus"
 import documentUnitService from "@/services/documentUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -401,63 +400,6 @@ describe("CategoryImport", () => {
     ).toEqual("Unrichtigkeiten")
     expect(
       (store.documentUnit as Decision).longTexts.corrections?.[0].newEntry,
-    ).toBe(true)
-  })
-
-  it("should import related pending proceedings (Verknüpfung anhängiges Verfahren)", async () => {
-    const target = new Decision("uuid", {
-      documentNumber: "XXRE123456789",
-      kind: Kind.DECISION,
-    })
-    const source = new Decision("456", {
-      kind: Kind.DECISION,
-      documentNumber: "TARGET3456789",
-      contentRelatedIndexing: {
-        relatedPendingProceedings: [
-          {
-            documentNumber: "YYTestDoc0017",
-            court: {
-              type: "BGH",
-              label: "BGH",
-            },
-            decisionDate: "2022-02-01",
-            fileNumber: "IV R 99/99",
-          } as RelatedPendingProceeding,
-        ],
-      },
-    })
-    vi.spyOn(documentUnitService, "getByDocumentNumber").mockResolvedValueOnce({
-      status: 200,
-      data: source,
-    })
-    const store = mockSessionStore(target)
-
-    const { user } = renderComponent()
-
-    await user.type(
-      screen.getByLabelText("Dokumentnummer Eingabefeld"),
-      "TARGET3456789",
-    )
-
-    await fireEvent.click(
-      screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
-    )
-
-    await fireEvent.click(
-      screen.getByLabelText("Verknüpfung anhängiges Verfahren übernehmen"),
-    )
-
-    expect(
-      (store.documentUnit as Decision).contentRelatedIndexing
-        .relatedPendingProceedings,
-    ).toHaveLength(1)
-    expect(
-      (store.documentUnit as Decision).contentRelatedIndexing
-        ?.relatedPendingProceedings?.[0].documentNumber,
-    ).toEqual("YYTestDoc0017")
-    expect(
-      (store.documentUnit as Decision).contentRelatedIndexing
-        ?.relatedPendingProceedings?.[0].newEntry,
     ).toBe(true)
   })
 

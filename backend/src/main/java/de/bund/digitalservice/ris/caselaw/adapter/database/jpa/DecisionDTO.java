@@ -165,13 +165,6 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   private List<PendingDecisionDTO> pendingDecisions = new ArrayList<>();
 
-  /** Verknüpfte anhängige Verfahren */
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-  @JoinColumn(name = "documentation_unit_id", nullable = false)
-  @Builder.Default
-  @OrderBy("rank")
-  private List<RelatedPendingProceedingDTO> relatedPendingProceedings = new ArrayList<>();
-
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default

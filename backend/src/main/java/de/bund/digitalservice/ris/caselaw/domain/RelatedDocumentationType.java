@@ -5,8 +5,7 @@ public enum RelatedDocumentationType {
   PASSIVE_CITATION(Values.PASSIVE_CITATION, "Passivzitierung"),
   ENSUING_DECISION(Values.ENSUING_DECISION, "nachgehende Entscheidung"),
   PENDING_DECISION(Values.PENDING_DECISION, "anhängige Entscheidung"),
-  PREVIOUS_DECISION(Values.PREVIOUS_DECISION, "vorgehende Entscheidung"),
-  PENDING_PROCEEDING(Values.PENDING_PROCEEDING, "anhängiges Verfahren");
+  PREVIOUS_DECISION(Values.PREVIOUS_DECISION, "vorgehende Entscheidung");
 
   private final String databaseValue;
   private final String name;
@@ -35,7 +34,6 @@ public enum RelatedDocumentationType {
     public static final String ENSUING_DECISION = "ensuing_decision";
     public static final String PENDING_DECISION = "pending_decision";
     public static final String PREVIOUS_DECISION = "previous_decision";
-    public static final String PENDING_PROCEEDING = "pending_proceeding";
 
     private Values() {}
   }

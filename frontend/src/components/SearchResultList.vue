@@ -81,9 +81,6 @@ export type SearchResults<Type extends RelatedDocumentation> = {
             <DecisionSummary
               :display-mode="displayMode"
               :document-number="searchResult.decision.documentNumber"
-              :is-pending-proceeding="
-                searchResult.decision.documentType?.jurisShortcut == 'Anh'
-              "
               :status="searchResult.decision.status"
               :summary="searchResult.decision.renderSummary"
             ></DecisionSummary>

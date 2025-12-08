@@ -33,5 +33,4 @@ public record ContentRelatedIndexing(
     String evsf,
     AppealAdmission appealAdmission,
     Appeal appeal,
-    List<CountryOfOrigin> countriesOfOrigin,
-    List<RelatedPendingProceeding> relatedPendingProceedings) {}
+    List<CountryOfOrigin> countriesOfOrigin) {}

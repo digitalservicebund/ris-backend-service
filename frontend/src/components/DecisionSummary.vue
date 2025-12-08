@@ -15,7 +15,6 @@ interface Props {
   displayMode?: DisplayMode
   icon?: Component
   linkClickable?: boolean
-  isPendingProceeding?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -60,9 +59,7 @@ const divider = computed(() => (props.documentNumber ? ` | ` : undefined))
             tabindex="-1"
             target="_blank"
             :to="{
-              name: isPendingProceeding
-                ? 'caselaw-pending-proceeding-documentNumber-preview'
-                : 'caselaw-documentUnit-documentNumber-preview',
+              name: 'caselaw-documentUnit-documentNumber-preview',
               params: { documentNumber: documentNumber },
             }"
           >

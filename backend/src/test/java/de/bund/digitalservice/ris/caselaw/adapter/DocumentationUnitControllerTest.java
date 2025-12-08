@@ -743,7 +743,7 @@ class DocumentationUnitControllerTest {
     PageRequest pageRequest = PageRequest.of(0, 10);
 
     when(service.searchLinkableDocumentationUnits(
-            linkedDocumentationUnit, docOffice, Optional.of("KORE0000000000"), false, pageRequest))
+            linkedDocumentationUnit, docOffice, Optional.of("KORE0000000000"), pageRequest))
         .thenReturn(new PageImpl<>(List.of(), pageRequest, 0));
 
     risWebClient
@@ -759,7 +759,7 @@ class DocumentationUnitControllerTest {
 
     verify(service)
         .searchLinkableDocumentationUnits(
-            linkedDocumentationUnit, docOffice, Optional.of("KORE0000000000"), false, pageRequest);
+            linkedDocumentationUnit, docOffice, Optional.of("KORE0000000000"), pageRequest);
   }
 
   @Test

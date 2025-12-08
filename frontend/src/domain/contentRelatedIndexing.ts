@@ -11,7 +11,6 @@ import IncomeType from "@/domain/incomeType"
 import NormReference from "@/domain/normReference"
 import ObjectValue from "@/domain/objectValue"
 import OriginOfTranslation from "@/domain/originOfTranslation"
-import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
 
 export type ContentRelatedIndexing = {
   collectiveAgreements?: CollectiveAgreement[]
@@ -33,5 +32,4 @@ export type ContentRelatedIndexing = {
   abuseFees?: AbuseFee[]
   countriesOfOrigin?: CountryOfOrigin[]
   incomeTypes?: IncomeType[]
-  relatedPendingProceedings?: RelatedPendingProceeding[]
 }

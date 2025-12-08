@@ -18,4 +18,3 @@ export type DocumentationUnitSearchParameter =
   | "processStep"
   | "assignedToMe"
   | "unassigned"
-  | "onlyPendingProceedings"

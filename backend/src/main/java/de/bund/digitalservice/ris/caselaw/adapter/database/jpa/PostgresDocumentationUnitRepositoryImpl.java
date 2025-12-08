@@ -948,17 +948,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       RelatedDocumentationUnit relatedDocumentationUnit,
       DocumentationOffice documentationOffice,
       String documentNumberToExclude,
-      boolean onlyPendingProceedings,
       Pageable pageable) {
 
     // CriteriaBuilder and CriteriaQuery setup
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
     CriteriaQuery<DocumentationUnitDTO> criteriaQuery =
         criteriaBuilder.createQuery(DocumentationUnitDTO.class);
-    Root<? extends DocumentationUnitDTO> root =
-        onlyPendingProceedings
-            ? criteriaQuery.from(PendingProceedingDTO.class)
-            : criteriaQuery.from(DocumentationUnitDTO.class);
+    Root<DocumentationUnitDTO> root = criteriaQuery.from(DocumentationUnitDTO.class);
 
     // Conditions setup
     Predicate conditions = criteriaBuilder.conjunction(); // Start with an empty conjunction (AND)
@@ -969,7 +965,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     LocalDate decisionDate = relatedDocumentationUnit.getDecisionDate();
     String fileNumber = relatedDocumentationUnit.getFileNumber();
     DocumentType documentType = relatedDocumentationUnit.getDocumentType();
-    String documentNumber = relatedDocumentationUnit.getDocumentNumber();
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
@@ -1028,16 +1023,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         criteriaBuilder.equal(
             root.get("documentationOffice").get("id"), documentationOfficeDTO.getId());
 
-    // 8. Filter by document number
-    if (documentNumber != null) {
-      conditions =
-          criteriaBuilder.and(
-              conditions,
-              criteriaBuilder.like(
-                  criteriaBuilder.upper(root.get("documentNumber")),
-                  "%" + documentNumber.trim().toUpperCase() + "%"));
-    }
-
     Predicate publicationStatusPredicate =
         criteriaBuilder.or(
             criteriaBuilder.equal(
@@ -1046,18 +1031,12 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                 root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.PUBLISHING));
 
     Predicate externalHandoverPendingPredicate =
-        // PendingProceedings don't have a `creatingDocumentationOffice` so this predicate does not
-        // work when filtering
-        // for PendingProceedings.
-        onlyPendingProceedings
-            ? criteriaBuilder.disjunction()
-            : criteriaBuilder.and(
-                criteriaBuilder.equal(
-                    root.get(STATUS).get(PUBLICATION_STATUS),
-                    PublicationStatus.EXTERNAL_HANDOVER_PENDING),
-                criteriaBuilder.equal(
-                    root.get("creatingDocumentationOffice").get("id"),
-                    documentationOfficeDTO.getId()));
+        criteriaBuilder.and(
+            criteriaBuilder.equal(
+                root.get(STATUS).get(PUBLICATION_STATUS),
+                PublicationStatus.EXTERNAL_HANDOVER_PENDING),
+            criteriaBuilder.equal(
+                root.get("creatingDocumentationOffice").get("id"), documentationOfficeDTO.getId()));
 
     Predicate finalPredicate =
         criteriaBuilder.or(

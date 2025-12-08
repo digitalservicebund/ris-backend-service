@@ -488,7 +488,6 @@ public class DocumentationUnitController {
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
       @RequestParam(value = "documentNumber") Optional<String> documentNumberToExclude,
-      @RequestParam(value = "onlyPendingProceedings") Optional<Boolean> onlyPendingProceedings,
       @RequestBody RelatedDocumentationUnit relatedDocumentationUnit,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
@@ -497,7 +496,6 @@ public class DocumentationUnitController {
         relatedDocumentationUnit,
         documentationOffice,
         documentNumberToExclude,
-        onlyPendingProceedings.orElse(false),
         PageRequest.of(page, size));
   }
 

@@ -12,7 +12,6 @@ function renderComponent(options?: {
   documentNumber?: string
   displayMode?: DisplayMode
   linkClickable?: boolean
-  isPendingProceeding?: boolean
 }) {
   const router = createRouter({
     history: createWebHistory(),
@@ -26,7 +25,6 @@ function renderComponent(options?: {
       documentNumber: options?.documentNumber ?? undefined,
       displayMode: options?.displayMode ?? undefined,
       linkClickable: options?.linkClickable ?? true,
-      isPendingProceeding: options?.isPendingProceeding ?? true,
     },
     global: {
       plugins: [[createTestingPinia()], [router]],
@@ -73,29 +71,5 @@ describe("Decision summary", () => {
 
     expect(screen.queryByRole("link")).not.toBeInTheDocument()
     expect(screen.queryByRole("button")).not.toBeInTheDocument()
-  })
-
-  it("docnumber links to decision preview", async () => {
-    renderComponent({
-      documentNumber: "12345678",
-      isPendingProceeding: false,
-    })
-
-    expect(screen.getByRole("link")).toHaveAttribute(
-      "href",
-      expect.stringMatching(/documentUnit\/12345678\/preview/),
-    )
-  })
-
-  it("docnumber links to pending proceeding preview", async () => {
-    renderComponent({
-      documentNumber: "12345678",
-      isPendingProceeding: true,
-    })
-
-    expect(screen.getByRole("link")).toHaveAttribute(
-      "href",
-      expect.stringMatching(/pendingProceeding\/12345678\/preview/),
-    )
   })
 })

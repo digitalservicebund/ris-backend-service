@@ -843,7 +843,6 @@ public class DocumentationUnitService {
       RelatedDocumentationUnit relatedDocumentationUnit,
       DocumentationOffice documentationOffice,
       Optional<String> documentNumberToExclude,
-      boolean onlyPendingProceedings,
       Pageable pageable) {
 
     if (relatedDocumentationUnit.getFileNumber() != null) {
@@ -854,7 +853,6 @@ public class DocumentationUnitService {
         relatedDocumentationUnit,
         documentationOffice,
         documentNumberToExclude.orElse(null),
-        onlyPendingProceedings,
         pageable);
   }
 

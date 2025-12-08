@@ -729,7 +729,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                     RelatedDocumentationUnit.builder().fileNumber("AB 34/1").build(),
                     docOffice,
                     Optional.empty(),
-                    false,
                     Pageable.ofSize(1))
                 .iterator()
                 .next()
