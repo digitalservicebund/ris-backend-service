@@ -21,9 +21,22 @@ test.describe(
   () => {
     test("Verknüpfung anhängiges Verfahren", async ({
       page,
-      prefilledPendingProceeding,
+      pendingProceeding,
       prefilledDocumentUnit,
     }) => {
+      await navigateToCategories(page, pendingProceeding.documentNumber, {
+        type: "pending-proceeding",
+      })
+      const coreData = page.getByLabel("Formaldaten")
+      await coreData
+        .getByRole("textbox", { name: "Gericht", exact: true })
+        .fill("AG Aachen")
+      await page.getByText("AG Aachen").click()
+      await coreData
+        .getByRole("textbox", { name: "Entscheidungsdatum" })
+        .fill("31.12.2019")
+      await save(page)
+
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
       const otherCategoriesContainer = page.getByLabel("Weitere Rubriken")
@@ -64,30 +77,26 @@ test.describe(
       })
 
       await test.step("Nach Aktenzeichen suchen ergibt einen Treffer", async () => {
-        await fileNumberInput.fill(
-          prefilledPendingProceeding.coreData.fileNumbers![0],
-        )
+        await fileNumberInput.fill(pendingProceeding.coreData.fileNumbers![0])
         await page.keyboard.press("Enter")
         await searchButton.click()
         await expect(page.getByText("1 Ergebnis gefunden")).toBeVisible()
         await expect(
           otherCategoriesContainer.getByText(
-            `AG Aachen, 31.12.2019, ${prefilledPendingProceeding.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, Unveröffentlicht | ${prefilledPendingProceeding.documentNumber}`,
+            `AG Aachen, 31.12.2019, ${pendingProceeding.coreData.fileNumbers?.[0]}, Anhängiges Verfahren, Unveröffentlicht | ${pendingProceeding.documentNumber}`,
           ),
         ).toBeVisible()
         await fileNumberInput.clear()
       })
 
       await test.step("Nach Dokumentnummer suchen und Treffer übernehmen", async () => {
-        await documentNumberInput.fill(
-          prefilledPendingProceeding.documentNumber,
-        )
+        await documentNumberInput.fill(pendingProceeding.documentNumber)
         await page.keyboard.press("Enter")
         await searchButton.click()
         await expect(page.getByText("1 Ergebnis gefunden")).toBeVisible()
         await expect(
           otherCategoriesContainer.getByText(
-            `AG Aachen, 31.12.2019, ${prefilledPendingProceeding.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, Unveröffentlicht | ${prefilledPendingProceeding.documentNumber}`,
+            `AG Aachen, 31.12.2019, ${pendingProceeding.coreData.fileNumbers?.[0]}, Anhängiges Verfahren, Unveröffentlicht | ${pendingProceeding.documentNumber}`,
           ),
         ).toBeVisible()
         await otherCategoriesContainer.getByLabel("Treffer übernehmen").click()
@@ -97,7 +106,7 @@ test.describe(
       await test.step("Zusammenfassung wird angezeigt", async () => {
         await expect(
           otherCategoriesContainer.getByText(
-            `AG Aachen, 31.12.2019, ${prefilledPendingProceeding.coreData.fileNumbers?.[0]}, Anerkenntnisurteil | ${prefilledPendingProceeding.documentNumber}`,
+            `AG Aachen, 31.12.2019, ${pendingProceeding.coreData.fileNumbers?.[0]}, Anhängiges Verfahren | ${pendingProceeding.documentNumber}`,
           ),
         ).toBeVisible()
       })
@@ -109,7 +118,7 @@ test.describe(
         ).toBeVisible()
         await expect(
           page.getByText(
-            `AG Aachen, 31.12.2019, ${prefilledPendingProceeding.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
+            `AG Aachen, 31.12.2019, ${pendingProceeding.coreData.fileNumbers?.[0]}, Anhängiges Verfahren`,
           ),
         ).toBeVisible()
       })
@@ -143,7 +152,42 @@ test.describe(
         ).toBeVisible()
         await expect(
           page.getByText(
-            `AG Aachen, 31.12.2019, ${prefilledPendingProceeding.coreData.fileNumbers?.[0]}, Anerkenntnisurteil | ${prefilledPendingProceeding.documentNumber}`,
+            `${pendingProceeding.coreData.fileNumbers?.[0]}, Anhängiges Verfahren | ${pendingProceeding.documentNumber}`,
+          ),
+        ).toBeVisible()
+      })
+
+      await test.step("Das verknüpfte anhängige Verfahren ist noch nicht erledigt", async () => {
+        await navigateToPreview(page, pendingProceeding.documentNumber, {
+          type: "pending-proceeding",
+        })
+        await expect(
+          page.getByText("Erledigung", { exact: true }),
+        ).toBeVisible()
+        await expect(page.getByText("Nein")).toBeVisible()
+        await expect(page.getByText("Erledigungsvermerk")).toBeHidden()
+      })
+
+      await test.step("Veröffentliche die Entscheidung", async () => {
+        await navigateToPublication(page, prefilledDocumentUnit.documentNumber)
+        const publishButton = page.getByRole("button", {
+          name: "Veröffentlichen",
+        })
+        await publishButton.click()
+      })
+
+      await test.step("Das verknüpfte anhängige Verfahren wurde auf erledigt gesetzt", async () => {
+        await navigateToPreview(page, pendingProceeding.documentNumber, {
+          type: "pending-proceeding",
+        })
+        await expect(
+          page.getByText("Erledigung", { exact: true }),
+        ).toBeVisible()
+        await expect(page.getByText("Ja")).toBeVisible()
+        await expect(page.getByText("Erledigungsvermerk")).toBeVisible()
+        await expect(
+          page.getByText(
+            "Erledigt durch " + prefilledDocumentUnit.documentNumber,
           ),
         ).toBeVisible()
       })

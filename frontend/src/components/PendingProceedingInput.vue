@@ -45,9 +45,9 @@ async function search() {
   })
 
   if (
-    pendingProceedingRef.documentNumber !=
+    pendingProceedingRef.documentNumber !==
       lastSearchInput.value.documentNumber ||
-    pendingProceedingRef.fileNumber != lastSearchInput.value.fileNumber
+    pendingProceedingRef.fileNumber !== lastSearchInput.value.fileNumber
   ) {
     pageNumber.value = 0
   }

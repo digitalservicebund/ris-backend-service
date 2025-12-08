@@ -385,19 +385,27 @@ public class PortalPublicationService {
   private void updateResolutionNoteOfPendingProceeding(
       DocumentationUnit documentationUnit, PendingProceeding pendingProceeding, User user) {
     if (pendingProceeding.coreData() != null && pendingProceeding.coreData().isResolved()) {
-      log.info(
-          "Do not mark pending proceeding {} as resolved. It already is resolved. A Documentation unit ({}) was published that contained it as a related pending proceeding",
-          pendingProceeding.documentNumber(),
-          documentationUnit.documentNumber());
+      log.atInfo()
+          .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentationUnit.documentNumber())
+          .addKeyValue("id", documentationUnit.uuid())
+          .setMessage(
+              String.format(
+                  "Do not mark pending proceeding %s as resolved. It already is resolved. A Documentation unit (%s) was published that contained it as a related pending proceeding",
+                  pendingProceeding.documentNumber(), documentationUnit.documentNumber()))
+          .log();
       return;
     }
 
     if (pendingProceeding.shortTexts() != null
         && pendingProceeding.shortTexts().resolutionNote() != null) {
-      log.info(
-          "Do not mark pending proceeding {} as resolved. It already has a resolution note. A Documentation unit ({}) was published that contained it as a related pending proceeding",
-          pendingProceeding.documentNumber(),
-          documentationUnit.documentNumber());
+      log.atInfo()
+          .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentationUnit.documentNumber())
+          .addKeyValue("id", documentationUnit.uuid())
+          .setMessage(
+              String.format(
+                  "Do not mark pending proceeding %s as resolved. It already has a resolution note. A Documentation unit (%s) was published that contained it as a related pending proceeding",
+                  pendingProceeding.documentNumber(), documentationUnit.documentNumber()))
+          .log();
       return;
     }
 
@@ -418,10 +426,14 @@ public class PortalPublicationService {
             .build(),
         user);
 
-    log.info(
-        "Mark pending proceeding {} as resolved. A Documentation unit ({}) was published that contained it as a related pending proceeding",
-        pendingProceeding.documentNumber(),
-        documentationUnit.documentNumber());
+    log.atInfo()
+        .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentationUnit.documentNumber())
+        .addKeyValue("id", documentationUnit.uuid())
+        .setMessage(
+            String.format(
+                "Mark pending proceeding %s as resolved. A Documentation unit (%s) was published that contained it as a related pending proceeding",
+                pendingProceeding.documentNumber(), documentationUnit.documentNumber()))
+        .log();
   }
 
   private void addHistoryLog(

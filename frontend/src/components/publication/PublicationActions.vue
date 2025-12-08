@@ -92,8 +92,8 @@ const lastPublishedAt = computed(() => {
 
 const hasRelatedPendingProceeding = computed(() => {
   return (
-    decision.value.contentRelatedIndexing.relatedPendingProceedings &&
-    decision.value.contentRelatedIndexing.relatedPendingProceedings?.length > 0
+    decision.value.contentRelatedIndexing?.relatedPendingProceedings &&
+    decision.value.contentRelatedIndexing?.relatedPendingProceedings?.length > 0
   )
 })
 </script>
@@ -108,13 +108,13 @@ const hasRelatedPendingProceeding = computed(() => {
       />
       <div v-if="hasRelatedPendingProceeding">
         Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft
-      </div>
-      <div
-        v-for="(pendingProceeding, id) in decision.contentRelatedIndexing
-          .relatedPendingProceedings"
-        :key="id"
-      >
-        <PendingProceedingSummary :data="pendingProceeding" />
+        <div
+          v-for="(pendingProceeding, id) in decision.contentRelatedIndexing
+            .relatedPendingProceedings"
+          :key="id"
+        >
+          <PendingProceedingSummary :data="pendingProceeding" />
+        </div>
       </div>
       <div
         v-if="
