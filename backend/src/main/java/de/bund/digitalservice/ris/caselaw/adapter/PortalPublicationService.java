@@ -388,7 +388,7 @@ public class PortalPublicationService {
       log.info(
           "Do not mark pending proceeding {} as resolved. It already is resolved. A Documentation unit ({}) was published that contained it as a related pending proceeding",
           pendingProceeding.documentNumber(),
-          pendingProceeding.documentNumber());
+          documentationUnit.documentNumber());
       return;
     }
 
@@ -397,7 +397,7 @@ public class PortalPublicationService {
       log.info(
           "Do not mark pending proceeding {} as resolved. It already has a resolution note. A Documentation unit ({}) was published that contained it as a related pending proceeding",
           pendingProceeding.documentNumber(),
-          pendingProceeding.documentNumber());
+          documentationUnit.documentNumber());
       return;
     }
 
@@ -421,7 +421,7 @@ public class PortalPublicationService {
     log.info(
         "Mark pending proceeding {} as resolved. A Documentation unit ({}) was published that contained it as a related pending proceeding",
         pendingProceeding.documentNumber(),
-        pendingProceeding.documentNumber());
+        documentationUnit.documentNumber());
   }
 
   private void addHistoryLog(
