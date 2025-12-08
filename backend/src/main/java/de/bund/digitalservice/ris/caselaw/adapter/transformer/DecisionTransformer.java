@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.NormReferenceType;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbstractNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbuseFeeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CountryOfOriginDto;
@@ -18,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.IncomeTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NonApplicationNormDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ObjectValueDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationDTO;
@@ -668,8 +671,11 @@ public class DecisionTransformer extends DocumentableTransformer {
     }
 
     builder.nonApplicationNorms(
-        NormReferenceTransformer.transformNonApplicationToDTO(
-            contentRelatedIndexing.nonApplicationNorms()));
+        (List<NonApplicationNormDTO>)
+            (List<? extends AbstractNormReferenceDTO>)
+                NormReferenceTransformer.transformToDTO(
+                    contentRelatedIndexing.nonApplicationNorms(),
+                    NormReferenceType.NON_APPLICATION_NORM));
   }
 
   public static Decision transformToDomain(DecisionDTO decisionDTO) {

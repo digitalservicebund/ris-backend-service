@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.NormReferenceType;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbstractNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NonApplicationNormDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
@@ -120,27 +121,18 @@ public class NormReferenceTransformer {
         .build();
   }
 
-  public static List<NormReferenceDTO> transformToDTO(List<NormReference> normReferences) {
-    return (List<NormReferenceDTO>)
-        (List<? extends AbstractNormReferenceDTO>)
-            transformListToDTO(normReferences, NormReferenceDTO.builder());
-  }
-
-  public static List<NonApplicationNormDTO> transformNonApplicationToDTO(
-      List<NormReference> normReferences) {
-    return (List<NonApplicationNormDTO>)
-        (List<? extends AbstractNormReferenceDTO>)
-            transformListToDTO(normReferences, NonApplicationNormDTO.builder());
-  }
-
-  private static List<AbstractNormReferenceDTO> transformListToDTO(
-      List<NormReference> normReferences,
-      AbstractNormReferenceDTO.AbstractNormReferenceDTOBuilder<?, ?> builder) {
+  public static List<AbstractNormReferenceDTO> transformToDTO(
+      List<NormReference> normReferences, String type) {
     AtomicInteger i = new AtomicInteger(1);
     List<AbstractNormReferenceDTO> flattenNormReferenceDTOs = new ArrayList<>();
     normReferences.forEach(
         norm -> {
-          List<AbstractNormReferenceDTO> normReferenceDTOs = transformAbstractToDTO(norm, builder);
+          List<AbstractNormReferenceDTO> normReferenceDTOs =
+              transformAbstractToDTO(
+                  norm,
+                  NormReferenceType.NORM.equals(type)
+                      ? NormReferenceDTO.builder()
+                      : NonApplicationNormDTO.builder());
           normReferenceDTOs.forEach(
               normReferenceDTO -> normReferenceDTO.setRank(i.getAndIncrement()));
           flattenNormReferenceDTOs.addAll(normReferenceDTOs);
