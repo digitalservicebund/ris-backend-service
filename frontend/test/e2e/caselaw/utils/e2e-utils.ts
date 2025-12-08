@@ -1208,3 +1208,18 @@ export async function selectUser(
   await expect(firstItem).toContainText(expectedUser)
   await firstItem.click()
 }
+
+export async function selectCourt(page: Page, courtName: string) {
+  await page.getByLabel("Gericht", { exact: true }).fill(courtName)
+  await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+  await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+    courtName,
+  )
+  await expect(page.getByText(courtName, { exact: true })).toBeVisible()
+  await page.getByText(courtName, { exact: true }).click()
+  await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+    courtName,
+  )
+
+  await save(page)
+}

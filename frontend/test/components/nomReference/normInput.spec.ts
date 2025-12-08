@@ -6,7 +6,7 @@ import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import InputText from "primevue/inputtext"
 import { beforeEach, vi } from "vitest"
-import NormReferenceInput from "@/components/norms/NormReferenceInput.vue"
+import NormInput from "@/components/norms/NormInput.vue"
 import { Decision } from "@/domain/decision"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
@@ -57,7 +57,7 @@ function renderComponent(options?: { modelValue?: NormReference }) {
       ],
     ],
   }
-  const utils = render(NormReferenceInput, { props })
+  const utils = render(NormInput, { props })
   return { user, props, ...utils }
 }
 
