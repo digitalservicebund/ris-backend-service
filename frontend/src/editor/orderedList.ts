@@ -32,14 +32,16 @@ export const CustomOrderedList = OrderedList.extend({
   addAttributes() {
     return {
       ...this.parent?.(),
-      type: {
-        default: "1",
-        parseHTML: (element) => element.getAttribute("type"),
+      listStyleType: {
+        default: "decimal",
+        parseHTML: (element) => {
+          const style = element.getAttribute("style") || ""
+          const match = style.match(/list-style-type:\s*([^;]+)/)
+          return match ? match[1].trim() : "decimal"
+        },
         renderHTML: (attributes) => {
-          const type = attributes.type || "1"
-          const listStyleType = TYPE_TO_STYLE[type] || "decimal"
+          const listStyleType = attributes.listStyleType || "decimal"
           return {
-            type: type,
             style: `list-style-type: ${listStyleType};`,
           }
         },
@@ -56,30 +58,34 @@ export const CustomOrderedList = OrderedList.extend({
           if (typeof styleOrAttributes === "string") {
             const mappedType = LIST_STYLES[styleOrAttributes]
             if (mappedType) {
-              attributes = { type: mappedType }
+              const listStyleType = TYPE_TO_STYLE[mappedType] || "decimal"
+              attributes = { listStyleType }
             }
           } else if (typeof styleOrAttributes === "object") {
             attributes = styleOrAttributes
           } else if (!styleOrAttributes) {
-            attributes = { type: "1" }
+            attributes = { listStyleType: "decimal" }
           }
 
           const { $from } = state.selection
           let currentListNode = null
-          let currentListType = null
+          let currentListStyleType = null
           let currentListPos = null
 
           for (let depth = $from.depth; depth > 0; depth--) {
             const node = $from.node(depth)
             if (node.type.name === this.name) {
               currentListNode = node
-              currentListType = node.attrs.type
+              currentListStyleType = node.attrs.listStyleType
               currentListPos = $from.before(depth)
               break
             }
           }
 
-          if (currentListNode && currentListType === attributes.type) {
+          if (
+            currentListNode &&
+            currentListStyleType === attributes.listStyleType
+          ) {
             return commands.toggleList(
               this.name,
               this.options.itemTypeName,
@@ -89,7 +95,7 @@ export const CustomOrderedList = OrderedList.extend({
 
           if (
             currentListNode &&
-            currentListType !== attributes.type &&
+            currentListStyleType !== attributes.listStyleType &&
             currentListPos !== null
           ) {
             tr.setNodeMarkup(currentListPos, undefined, {
