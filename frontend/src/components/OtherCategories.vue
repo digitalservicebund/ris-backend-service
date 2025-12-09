@@ -15,7 +15,6 @@ import ObjectValues from "@/components/ObjectValues.vue"
 import OriginOfTranslations from "@/components/OriginOfTranslations.vue"
 import PendingProceedings from "@/components/PendingProceedings.vue"
 import TextInputCategory from "@/components/texts/TextInputCategory.vue"
-import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import laborCourtTypes from "@/data/laborCourtTypes.json"
 import { contentRelatedIndexingLabels } from "@/domain/decision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -112,13 +111,11 @@ const hasRelatedPendingProceedings = computed(() => {
     : false
 })
 
-const shouldDisplayLegislativeMandateCategory = computed(() => {
-  return (
-    constitutionalCourtTypes.items.includes(
-      store.documentUnit?.coreData.court?.type ?? "",
-    ) || hasLegislativeMandate.value
-  )
-})
+const isConstitutionalCourt = computed(
+  () =>
+    store.documentUnit?.coreData.court?.jurisdictionType ===
+    "Verfassungsgerichtsbarkeit",
+)
 
 const isLaborCourt = computed(() =>
   laborCourtTypes.items.includes(
@@ -149,6 +146,14 @@ const shouldDisplayAppeal = computed(
 const shouldDisplayIncomeType = computed(
   () => isFinanceCourt.value || hasIncomeTypes.value,
 )
+
+const shouldDisplayAbuseFees = computed(
+  () => isConstitutionalCourt.value || hasAbuseFees.value,
+)
+
+const shouldDisplayLegislativeMandateCategory = computed(() => {
+  return isConstitutionalCourt.value || hasLegislativeMandate.value
+})
 </script>
 
 <template>
@@ -223,6 +228,7 @@ const shouldDisplayIncomeType = computed(
         <ObjectValues :label="contentRelatedIndexingLabels.objectValues" />
       </CategoryWrapper>
       <CategoryWrapper
+        v-if="shouldDisplayAbuseFees"
         label="Missbrauchsgebühren"
         :should-show-button="!hasAbuseFees"
       >

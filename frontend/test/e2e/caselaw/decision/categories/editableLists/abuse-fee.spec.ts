@@ -23,6 +23,18 @@ test.describe(
     test("Missbrauchsgebühren", async ({ page, prefilledDocumentUnit }) => {
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
+      await test.step("wird nur bei Verfassungsgerichtsbarkeit angezeigt", async () => {
+        await expect(
+          page.getByRole("button", { name: "Missbrauchsgebühren" }),
+        ).toBeHidden()
+
+        await fillCombobox(page, "Gericht", "BVerfG")
+
+        await expect(
+          page.getByRole("button", { name: "Missbrauchsgebühren" }),
+        ).toBeVisible()
+      })
+
       const otherCategoriesContainer = page.getByLabel("Weitere Rubriken")
       const abuseFeeButton = otherCategoriesContainer.getByRole("button", {
         name: "Missbrauchsgebühren",
@@ -86,6 +98,16 @@ test.describe(
       })
 
       await test.step("Zusammenfassung wird angezeigt", async () => {
+        await expect(
+          otherCategoriesContainer.getByText(
+            "10.000 Euro (EUR), Bevollmächtigter",
+          ),
+        ).toBeVisible()
+      })
+
+      await test.step("Existierende Daten werden auch bei anderer Gerichtsbarkeit angezeigt", async () => {
+        await fillCombobox(page, "Gericht", "BGH")
+
         await expect(
           otherCategoriesContainer.getByText(
             "10.000 Euro (EUR), Bevollmächtigter",

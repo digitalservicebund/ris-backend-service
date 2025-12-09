@@ -1,6 +1,7 @@
-import { expect, Page } from "@playwright/test"
+import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
+  fillCombobox,
   navigateToCategories,
   navigateToHandover,
   navigateToPreview,
@@ -21,7 +22,7 @@ test.describe(
           page.getByRole("button", { name: "Einkunftsart" }),
         ).toBeHidden()
 
-        await selectCourt(page, "BFH")
+        await fillCombobox(page, "Gericht", "BFH")
         await expect(
           page.getByRole("button", { name: "Einkunftsart" }),
         ).toBeVisible()
@@ -79,7 +80,7 @@ test.describe(
       })
 
       await test.step("Einträge werden bei Gerichtswechel weiterhin angezeigt", async () => {
-        await selectCourt(page, "BGH")
+        await fillCombobox(page, "Gericht", "BGH")
         await expect(
           page.getByText("Land- und Forstwirtschaft, Förster"),
         ).toBeVisible()
@@ -104,20 +105,5 @@ test.describe(
         await expect(page.getByText("Einkunftsart")).toBeVisible()
       })
     })
-
-    async function selectCourt(page: Page, courtName: string) {
-      await page.getByLabel("Gericht", { exact: true }).fill(courtName)
-      await expect(page.getByTestId("combobox-spinner")).toBeHidden()
-      await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
-        courtName,
-      )
-      await expect(page.getByText(courtName, { exact: true })).toBeVisible()
-      await page.getByText(courtName, { exact: true }).click()
-      await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
-        courtName,
-      )
-
-      await save(page)
-    }
   },
 )
