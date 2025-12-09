@@ -93,7 +93,7 @@ watch(
         editable
         field-size="small"
         :label="pendingProceedingLabels.legalIssue + ' *'"
-        :should-show-button="!pendingProceeding?.shortTexts.legalIssue?.length"
+        :should-show-button="false"
       />
       <div class="flex flex-row gap-24">
         <InputField

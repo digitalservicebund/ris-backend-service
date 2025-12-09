@@ -190,6 +190,58 @@ test.describe(
     )
 
     test(
+      "Plausibilitätsprüfung Anhängiges Verfahren",
+      {
+        tag: ["@RISDEV-9248"],
+      },
+      async ({ pageWithBfhUser, pendingProceedings }) => {
+        const { createdPendingProceedings } = pendingProceedings
+        const pendingProceeding = createdPendingProceedings[0]
+
+        await navigateToPublication(
+          pageWithBfhUser,
+          pendingProceeding.documentNumber,
+          {
+            type: "pending-proceeding",
+          },
+        )
+
+        await test.step("Plausibilitätsprüfung ist erfolgreich, wenn alle Pflichtfelder befüllt sind", async () => {
+          await expect(
+            pageWithBfhUser.getByText(
+              "Alle Pflichtfelder sind korrekt ausgefüllt",
+            ),
+          ).toBeVisible()
+
+          await expect(
+            pageWithBfhUser.getByRole("button", { name: "Veröffentlichen" }),
+          ).toBeEnabled()
+        })
+
+        await test.step("Plausibilitätsprüfung schlägt fehl, wenn ein Pflichtfeld nicht befüllt ist", async () => {
+          const pendingProceedingWithoutJudgmentBody =
+            createdPendingProceedings[1]
+          await navigateToPublication(
+            pageWithBfhUser,
+            pendingProceedingWithoutJudgmentBody.documentNumber,
+            {
+              type: "pending-proceeding",
+            },
+          )
+          await expect(
+            pageWithBfhUser.getByText(
+              "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt",
+            ),
+          ).toBeVisible()
+          await expect(pageWithBfhUser.getByText("LDML-Vorschau")).toBeHidden()
+          await expect(
+            pageWithBfhUser.getByRole("button", { name: "Veröffentlichen" }),
+          ).toBeDisabled()
+        })
+      },
+    )
+
+    test(
       "LDML Vorschau Anhängiges Verfahren",
       {
         tag: ["@RISDEV-7896", "@RISDEV-8843"],
@@ -220,29 +272,6 @@ test.describe(
           await expect(
             pageWithBfhUser.getByText("<akn:akomaNtoso"),
           ).toBeHidden()
-        })
-
-        await test.step("Fehler beim Laden der LDML Vorschau wenn kein valides LDML erzeugt werden kann", async () => {
-          const pendingProceedingWithoutJudgmentBody =
-            createdPendingProceedings[1]
-          await navigateToPublication(
-            pageWithBfhUser,
-            pendingProceedingWithoutJudgmentBody.documentNumber,
-            {
-              type: "pending-proceeding",
-            },
-          )
-          await expect(
-            pageWithBfhUser.getByText("Fehler beim Laden der LDML-Vorschau"),
-          ).toBeVisible()
-          await expect(
-            pageWithBfhUser.getByText(
-              "Die LDML-Vorschau konnte nicht geladen werden: Missing judgment body.",
-            ),
-          ).toBeVisible()
-          await expect(
-            pageWithBfhUser.getByRole("button", { name: "Veröffentlichen" }),
-          ).toBeDisabled()
         })
       },
     )
