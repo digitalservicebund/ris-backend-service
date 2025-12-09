@@ -92,7 +92,7 @@ watch(
         :data-testid="pendingProceedingLabels.legalIssue"
         editable
         field-size="small"
-        :label="pendingProceedingLabels.legalIssue"
+        :label="pendingProceedingLabels.legalIssue + ' *'"
         :should-show-button="!pendingProceeding?.shortTexts.legalIssue?.length"
       />
       <div class="flex flex-row gap-24">
@@ -140,6 +140,7 @@ watch(
           !pendingProceeding?.shortTexts.resolutionNote?.length
         "
       />
+      <span>* Pflichtfelder zur Veröffentlichung</span>
     </div>
   </div>
 </template>
