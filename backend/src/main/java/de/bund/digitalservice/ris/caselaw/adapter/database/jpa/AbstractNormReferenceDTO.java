@@ -22,7 +22,10 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-/** An interface representing a norm reference, linked to a documentation unit. */
+/**
+ * An abstract class representing a reference to a norm, which can be of type "NormReference" (Norm)
+ * or "NonApplicationNorm" (Nichtanwendungsgesetz).
+ */
 @Getter
 @Setter
 @NoArgsConstructor

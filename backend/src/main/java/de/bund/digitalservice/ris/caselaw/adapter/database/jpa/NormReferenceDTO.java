@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-/** An interface representing a norm reference, linked to a documentation unit. */
+/** A DTO representing a norm (Normen) */
 @NoArgsConstructor
 @SuperBuilder
 @Getter

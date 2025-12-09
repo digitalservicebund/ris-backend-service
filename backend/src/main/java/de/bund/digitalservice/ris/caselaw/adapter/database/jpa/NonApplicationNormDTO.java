@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-/** An interface representing a non-application norm (Nichtanwendungsgesetz) */
+/** A DTO representing a non-application norm (Nichtanwendungsgesetz) */
 @NoArgsConstructor
 @SuperBuilder
 @Getter
