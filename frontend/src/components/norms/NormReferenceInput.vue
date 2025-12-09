@@ -17,6 +17,7 @@ const props = defineProps<{
   modelValue?: NormReference
   modelValueList?: NormReference[]
 }>()
+
 const emit = defineEmits<{
   "update:modelValue": [value: NormReference]
   addEntry: [void]
@@ -24,6 +25,11 @@ const emit = defineEmits<{
   removeEntry: [void]
 }>()
 
+interface SingleNormInputRef {
+  validateNorm: () => Promise<void>
+}
+
+const singleNormRef = ref<SingleNormInputRef[] | null>(null)
 const validationStore =
   useValidationStore<
     [
@@ -83,6 +89,11 @@ const normAbbreviation = computed({
  * sa new emtpy entry is added to the list
  */
 async function addNormReference() {
+  if (singleNormRef.value) {
+    await Promise.all(
+      singleNormRef.value.map((instance) => instance.validateNorm()),
+    )
+  }
   if (
     !validationStore.getByField("singleNorm") &&
     !validationStore.getByField("dateOfVersion") &&
@@ -214,6 +225,7 @@ watch(
       <SingleNormInput
         v-for="(_, index) in singleNorms"
         :key="index"
+        ref="singleNormRef"
         v-model="singleNorms[index] as SingleNorm"
         aria-label="Einzelnorm"
         :index="index"
