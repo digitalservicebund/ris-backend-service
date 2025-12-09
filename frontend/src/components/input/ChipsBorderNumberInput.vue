@@ -31,7 +31,7 @@ const isDuplicate = (value: number, values: number[] = []) => {
   return values.filter((v) => v === value).length > 1
 }
 const isCharacter = (value: string) => {
-  return !/^\d+$/.test(value.trim())
+  return !/^[1-9]\d*$/.test(value.trim())
 }
 
 const chips = computed<string[]>({
