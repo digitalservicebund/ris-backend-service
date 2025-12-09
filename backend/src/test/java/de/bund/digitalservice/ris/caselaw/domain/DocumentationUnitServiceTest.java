@@ -7,6 +7,7 @@ import static org.hibernate.validator.internal.util.Contracts.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
@@ -997,6 +998,7 @@ class DocumentationUnitServiceTest {
             any(RelatedDocumentationUnit.class),
             any(DocumentationOffice.class),
             any(String.class),
+            anyBoolean(),
             any(Pageable.class)))
         .thenReturn(new PageImpl<>(List.of(relatedDocumentationUnit)));
 
@@ -1005,6 +1007,7 @@ class DocumentationUnitServiceTest {
         relatedDocumentationUnit,
         documentationOffice,
         Optional.of(documentNumberToExclude),
+        false,
         pageRequest);
 
     // Capture the relatedDocumentationUnit argument
@@ -1013,6 +1016,7 @@ class DocumentationUnitServiceTest {
             relatedDocumentationUnitCaptor.capture(),
             any(DocumentationOffice.class),
             any(String.class),
+            anyBoolean(),
             any(Pageable.class));
 
     RelatedDocumentationUnit capturedRelatedDocumentationUnit =

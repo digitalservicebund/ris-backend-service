@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Classification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Keyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.AnhaengigesVerfahren;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.DokumentarischeKurztexte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Entscheidungsnamen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.ImplicitReference;
@@ -52,6 +53,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Correction;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.IncomeType;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
@@ -104,7 +106,10 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
   @Nonnull
   protected List<ImplicitReference> buildImplicitReferences(Decision decision) {
     return Stream.concat(
-            super.buildImplicitReferences(decision).stream(), buildFundstellen(decision).stream())
+            Stream.concat(
+                super.buildImplicitReferences(decision).stream(),
+                buildFundstellen(decision).stream()),
+            buildAnhaengigeVerfahren(decision).stream())
         .toList();
   }
 
@@ -943,5 +948,33 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                     })
                 .toList())
         .build();
+  }
+
+  @Nonnull
+  private List<ImplicitReference> buildAnhaengigeVerfahren(Decision documentationUnit) {
+    List<ImplicitReference> anhaengigeVerfahren = new ArrayList<>();
+    if (documentationUnit.contentRelatedIndexing() == null) {
+      return anhaengigeVerfahren;
+    }
+
+    var relatedPendingProceedings =
+        documentationUnit.contentRelatedIndexing().relatedPendingProceedings();
+    if (relatedPendingProceedings == null) {
+      return anhaengigeVerfahren;
+    }
+
+    for (RelatedPendingProceeding relatedPendingProceeding : relatedPendingProceedings) {
+      if (relatedPendingProceeding == null) continue;
+
+      var builder = AnhaengigesVerfahren.builder();
+      buildCaselawReference(relatedPendingProceeding, builder);
+      anhaengigeVerfahren.add(
+          ImplicitReference.builder()
+              .domainTerm("Anhängiges Verfahren")
+              .anhaengigesVerfahren(builder.build())
+              .build());
+    }
+
+    return anhaengigeVerfahren;
   }
 }

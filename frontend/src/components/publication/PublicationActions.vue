@@ -3,6 +3,7 @@ import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import { computed, Ref, ref } from "vue"
 import InfoModal from "@/components/InfoModal.vue"
+import PendingProceedingSummary from "@/components/PendingProceedingSummary.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import PortalPublicationStatusBadge from "@/components/publication/PortalPublicationStatusBadge.vue"
 import UatTestPortalInfo from "@/components/publication/UatTestPortalInfo.vue"
@@ -88,6 +89,13 @@ const lastPublishedAt = computed(() => {
   }
   return "-"
 })
+
+const hasRelatedPendingProceeding = computed(() => {
+  return (
+    decision.value.contentRelatedIndexing?.relatedPendingProceedings &&
+    decision.value.contentRelatedIndexing?.relatedPendingProceedings?.length > 0
+  )
+})
 </script>
 
 <template>
@@ -98,6 +106,16 @@ const lastPublishedAt = computed(() => {
       <PortalPublicationStatusBadge
         :status="decision.portalPublicationStatus"
       />
+      <div v-if="hasRelatedPendingProceeding">
+        Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft
+        <div
+          v-for="(pendingProceeding, id) in decision.contentRelatedIndexing
+            .relatedPendingProceedings"
+          :key="id"
+        >
+          <PendingProceedingSummary :data="pendingProceeding" />
+        </div>
+      </div>
       <div
         v-if="
           decision.portalPublicationStatus ===

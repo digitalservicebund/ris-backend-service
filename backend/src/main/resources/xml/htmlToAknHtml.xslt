@@ -357,6 +357,7 @@
     |ris:einkunftsarten|ris:einkunftsart|ris:einkunftsartTyp|ris:einkunftsartBegrifflichkeit
     |ris:berichtigungen|ris:berichtigung|ris:berichtigungArtDerEintragung|ris:berichtigungArtDerAenderung|ris:berichtigungDatumDerAenderung|ris:berichtigungRandnummern|ris:berichtigungInhaltDerAenderung|ris:berichtigungRandnummer
     |ris:herkunftslaender|ris:herkunftsland|ris:herkunftslandAltwert|ris:herkunftslandLandbezeichnung|ris:herkunftslandRechtlicherRahmen
+    |ris:anhaengigesVerfahren
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@akn:refersTo|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
     |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId|@akn:eId|@type|@by|@domainTerm|@notation|@ris:domainTerm|@art|@sachgebiet-id">
 

@@ -1,7 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
-import { vi } from "vitest"
+import { expect, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import OtherCategories from "@/components/OtherCategories.vue"
 import AbuseFee, { Addressee } from "@/domain/abuseFee"
@@ -15,6 +15,7 @@ import ObjectValue, { ProceedingType } from "@/domain/objectValue"
 import OriginOfTranslation, {
   TranslationType,
 } from "@/domain/originOfTranslation"
+import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import routes from "~/test-helper/routes"
 
@@ -668,6 +669,66 @@ describe("other categories", () => {
       expect(await screen.findByText("Missbrauchsgebühren")).toBeVisible()
       expect(
         await screen.findByText("500 Euro (EUR), Bevollmächtigter"),
+      ).toBeVisible()
+    })
+  })
+
+  describe("related pending proceedings (Verknüpfung anhängiges Verfahren)", () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: routes,
+    })
+
+    it("should display 'Verknüpfung anhängiges Verfahren' button when no data", async () => {
+      // Arrange
+      mockSessionStore({
+        abuseFees: [],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(
+        screen.getByRole("button", {
+          name: "Verknüpfung anhängiges Verfahren",
+        }),
+      ).toBeInTheDocument()
+    })
+
+    it("should display 'Verknüpfung anhängiges Verfahren'", async () => {
+      // Arrange
+      mockSessionStore({
+        relatedPendingProceedings: [
+          new RelatedPendingProceeding({
+            documentNumber: "YYTestDoc0017",
+            court: {
+              type: "BGH",
+              label: "BGH",
+            },
+            decisionDate: "2022-02-01",
+            fileNumber: "IV R 99/99",
+          }),
+        ],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(
+        await screen.findByText("Verknüpfung anhängiges Verfahren"),
+      ).toBeVisible()
+      expect(
+        screen.getByText(/bgh, 01\.02\.2022, iv r 99\/99 \|/i),
       ).toBeVisible()
     })
   })

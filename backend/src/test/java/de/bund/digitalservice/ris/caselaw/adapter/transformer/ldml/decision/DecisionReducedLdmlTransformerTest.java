@@ -38,6 +38,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ProceedingType;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
@@ -490,6 +491,23 @@ class DecisionReducedLdmlTransformerTest {
                                         .text(
                                             "Verschulden bei Vertragsschluss (culpa in contrahendo)")
                                         .build())
+                                .build()))
+                    .relatedPendingProceedings(
+                        List.of(
+                            RelatedPendingProceeding.builder()
+                                .uuid(UUID.fromString("b7f4d567-1ee4-4e72-b6d4-a1e56c77815a"))
+                                .court(
+                                    Court.builder()
+                                        .type("AG")
+                                        .location("Aachen")
+                                        .jurisdictionType("Ordentliche Gerichtsbarkeit")
+                                        .label("AG Aachen")
+                                        .build())
+                                .decisionDate(LocalDate.of(2022, 1, 23))
+                                .documentNumber("XXRE011158825")
+                                .documentType(
+                                    DocumentType.builder().label("Anhängiges Verfahren").build())
+                                .fileNumber("VIa ZR 339/22")
                                 .build()))
                     .incomeTypes(
                         List.of(
