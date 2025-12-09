@@ -2,12 +2,14 @@ import { createTestingPinia } from "@pinia/testing"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { setActivePinia } from "pinia"
+import { createRouter, createWebHistory } from "vue-router"
 import PublicationActions from "@/components/publication/PublicationActions.vue"
 import { Decision } from "@/domain/decision"
 import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
 import { ServiceResponse } from "@/services/httpClient"
 import publishDocumentationUnitService from "@/services/publishDocumentationUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import routes from "~/test-helper/routes"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
 const publishMock = vi.spyOn(publishDocumentationUnitService, "publishDocument")
@@ -23,6 +25,47 @@ describe("PublicationActions", () => {
   })
   afterEach(() => {
     vi.clearAllMocks()
+  })
+  it("should list related pending proceedings", async () => {
+    mockDocUnitStore(PortalPublicationStatus.UNPUBLISHED, {
+      contentRelatedIndexing: {
+        relatedPendingProceedings: [
+          {
+            documentNumber: "YYTestDoc0017",
+            court: {
+              type: "BGH",
+              label: "BGH",
+            },
+            decisionDate: "2022-02-01",
+            fileNumber: "IV R 99/99",
+          },
+        ],
+      },
+    })
+    await renderComponent({ isPublishable: true, publicationWarnings: [] })
+    expect(
+      screen.getByText(
+        "Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft",
+      ),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(/bgh, 01\.02\.2022, iv r 99\/99 \|/i),
+    ).toBeInTheDocument()
+    expect(screen.getByText("YYTestDoc0017")).toBeInTheDocument()
+  })
+
+  it("should not list related pending proceedings", async () => {
+    mockDocUnitStore(PortalPublicationStatus.UNPUBLISHED, {
+      contentRelatedIndexing: {
+        relatedPendingProceedings: [],
+      },
+    })
+    await renderComponent({ isPublishable: true, publicationWarnings: [] })
+    expect(
+      screen.queryByText(
+        "Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft",
+      ),
+    ).not.toBeInTheDocument()
   })
 
   describe("Status: Unpublished", () => {
@@ -648,7 +691,16 @@ async function renderComponent(props: {
   isPublishable: boolean
   publicationWarnings: string[]
 }) {
-  return render(PublicationActions, { props })
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: routes,
+  })
+  return render(PublicationActions, {
+    props,
+    global: {
+      plugins: [router],
+    },
+  })
 }
 
 function mockDocUnitStore(

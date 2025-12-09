@@ -132,8 +132,6 @@ E2E_BASE_URL='<ENV_URL>' npm run <your_test>
 
 ### Style (linting & formatting)
 
-Check our [Frontend Styleguide](FRONTEND_STYLEGUIDE.md) document.
-
 Linting is done via [ESLint](https://eslint.org/docs/user-guide/getting-started); consistent formatting for a variety of
 source code files is being enforced using [Prettier](https://prettier.io/docs/en/index.html). ESLint and Prettier work
 in conjunction.

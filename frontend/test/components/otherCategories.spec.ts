@@ -15,6 +15,7 @@ import ObjectValue, { ProceedingType } from "@/domain/objectValue"
 import OriginOfTranslation, {
   TranslationType,
 } from "@/domain/originOfTranslation"
+import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import routes from "~/test-helper/routes"
 
@@ -661,6 +662,66 @@ describe("other categories", () => {
       expect(await screen.findByText("Missbrauchsgebühren")).toBeVisible()
       expect(
         await screen.findByText("500 Euro (EUR), Bevollmächtigter"),
+      ).toBeVisible()
+    })
+  })
+
+  describe("related pending proceedings (Verknüpfung anhängiges Verfahren)", () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: routes,
+    })
+
+    it("should display 'Verknüpfung anhängiges Verfahren' button when no data", async () => {
+      // Arrange
+      mockSessionStore({
+        relatedPendingProceedings: [],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(
+        screen.getByRole("button", {
+          name: "Verknüpfung anhängiges Verfahren",
+        }),
+      ).toBeInTheDocument()
+    })
+
+    it("should display 'Verknüpfung anhängiges Verfahren'", async () => {
+      // Arrange
+      mockSessionStore({
+        relatedPendingProceedings: [
+          new RelatedPendingProceeding({
+            documentNumber: "YYTestDoc0017",
+            court: {
+              type: "BGH",
+              label: "BGH",
+            },
+            decisionDate: "2022-02-01",
+            fileNumber: "IV R 99/99",
+          }),
+        ],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(
+        await screen.findByText("Verknüpfung anhängiges Verfahren"),
+      ).toBeVisible()
+      expect(
+        screen.getByText(/bgh, 01\.02\.2022, iv r 99\/99 \|/i),
       ).toBeVisible()
     })
   })
