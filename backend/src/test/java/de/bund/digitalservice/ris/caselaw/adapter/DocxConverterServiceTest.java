@@ -662,6 +662,44 @@ class DocxConverterServiceTest {
     }
 
     @Test
+    void testGetHtml_customStartValue() {
+      numberFormat = DocumentationUnitNumberingListNumberFormat.DECIMAL;
+      lvlText = "%1.";
+      startVal = "5";
+      entries.add(
+          (NumberingListEntry) generateNumberingListEntry("Five", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry) generateNumberingListEntry("Six", createNumberingListEntryIndex()));
+
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocumentationUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
+
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
+
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+
+        String expected =
+            "<ol style=\"list-style-type:decimal;\" start=\"5\">"
+                + "<li><p>Five</p></li>"
+                + "<li><p>Six</p></li>"
+                + "</ol>";
+
+        assertEquals(expected, docx2Html.html());
+      }
+    }
+
+    @Test
     void testGetHtml_withThreeLvlOfNumberingListEntriesBullet() {
       entries.add(
           (NumberingListEntry)
