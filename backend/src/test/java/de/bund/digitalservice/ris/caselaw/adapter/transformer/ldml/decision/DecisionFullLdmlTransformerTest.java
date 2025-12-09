@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Definition;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
+import de.bund.digitalservice.ris.caselaw.domain.IncomeType;
 import de.bund.digitalservice.ris.caselaw.domain.LanguageCode;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
@@ -46,6 +47,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Source;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.TranslationType;
+import de.bund.digitalservice.ris.caselaw.domain.TypeOfIncome;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealStatus;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealWithdrawal;
@@ -1240,6 +1242,13 @@ class DecisionFullLdmlTransformerTest {
                                 DocumentType.builder().label("Anhängiges Verfahren").build())
                             .fileNumber("VIa ZR 339/22")
                             .build()))
+                .incomeTypes(
+                    List.of(
+                        IncomeType.builder()
+                            .typeOfIncome(TypeOfIncome.ESTG)
+                            .terminology("terminology test")
+                            .build(),
+                        IncomeType.builder().typeOfIncome(TypeOfIncome.GEWSTG).build()))
                 .build())
         .previousDecisions(List.of(previousDecision1, previousDecision2))
         .ensuingDecisions(List.of(ensuingDecision1, ensuingDecision2))

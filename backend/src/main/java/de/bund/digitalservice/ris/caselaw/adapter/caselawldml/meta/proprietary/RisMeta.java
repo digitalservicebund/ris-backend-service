@@ -123,4 +123,7 @@ public class RisMeta {
 
   @XmlElement(name = "herkunftslaender", namespace = CaseLawLdml.RIS_NS)
   private Herkunftslaender herkunftslaender;
+
+  @XmlElement(name = "einkunftsarten", namespace = CaseLawLdml.RIS_NS)
+  private Einkunftsarten einkunftsarten;
 }

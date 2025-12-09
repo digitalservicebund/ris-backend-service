@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.D
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Definitionen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DocumentRef;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Eingangsarten;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Einkunftsarten;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Evsf;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FehlerhafteGerichte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FremdsprachigeFassungen;
@@ -51,6 +52,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Correction;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
+import de.bund.digitalservice.ris.caselaw.domain.IncomeType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
@@ -194,6 +196,12 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       // Herkunftsland
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.countriesOfOrigin())) {
         builder.herkunftslaender(buildHerkunftslaender(contentRelatedIndexing));
+      }
+
+      // Einkunftsarten
+      if (!CollectionUtils.isEmpty(contentRelatedIndexing.incomeTypes())) {
+        var einkunftsarten = buildEinkunftsarten(contentRelatedIndexing);
+        builder.einkunftsarten(einkunftsarten);
       }
     }
 
@@ -735,6 +743,34 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                     })
                 .toList())
         .build();
+  }
+
+  private Einkunftsarten buildEinkunftsarten(ContentRelatedIndexing contentRelatedIndexing) {
+
+    var einkunftsarten =
+        contentRelatedIndexing.incomeTypes().stream()
+            .map(DecisionFullLdmlTransformer::buildEinkunftsart)
+            .toList();
+
+    return Einkunftsarten.builder().values(einkunftsarten).build();
+  }
+
+  private static Einkunftsarten.Einkunftsart buildEinkunftsart(IncomeType incomeType) {
+    var builder =
+        Einkunftsarten.Einkunftsart.builder()
+            .einkunftsartTyp(
+                Einkunftsarten.EinkunftsartTyp.builder()
+                    .value(incomeType.typeOfIncome().humanReadable)
+                    .build());
+
+    if (incomeType.terminology() != null) {
+      builder.einkunftsartBegrifflichkeit(
+          Einkunftsarten.EinkunftsartBegrifflichkeit.builder()
+              .value(incomeType.terminology())
+              .build());
+    }
+
+    return builder.build();
   }
 
   private AktenzeichenListe buildAbweichendeAktenzeichen(
