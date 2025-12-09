@@ -36,7 +36,7 @@ export const CustomOrderedList = OrderedList.extend({
         default: "decimal",
         parseHTML: (element) => {
           const style = element.getAttribute("style") || ""
-          const match = style.match(/list-style-type:\s*([^;]+)/)
+          const match = /list-style-type:\s*([^;]+)/.exec(style)
           return match ? match[1].trim() : "decimal"
         },
         renderHTML: (attributes) => {
