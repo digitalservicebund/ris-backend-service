@@ -518,6 +518,16 @@ describe("HandoverDocumentationUnitView:", () => {
                 fileNumber: "IV R 99/99",
               }),
             ],
+            nonApplicationNorms: [
+              new NormReference({
+                normAbbreviation: { abbreviation: "ABC" },
+                singleNorms: [
+                  new SingleNorm({
+                    singleNorm: "§ 1",
+                  }),
+                ],
+              }),
+            ],
           },
           longTexts: { decisionReasons: "decisionReasons" },
           managementData: {
@@ -547,6 +557,7 @@ describe("HandoverDocumentationUnitView:", () => {
       expect(
         screen.getByText("Verknüpfung anhängiges Verfahren"),
       ).toBeInTheDocument()
+      expect(screen.getByText("Nichtanwendungsgesetz")).toBeInTheDocument()
       const handoverButton = screen.getByRole("button", {
         name: "Dokumentationseinheit an jDV übergeben",
       })
