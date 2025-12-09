@@ -174,6 +174,9 @@ test.describe(
           name: "Veröffentlichen",
         })
         await publishButton.click()
+        await expect(
+          page.getByTestId("portal-publication-status-badge"),
+        ).toHaveText("Veröffentlicht")
       })
 
       await test.step("Das verknüpfte anhängige Verfahren wurde auf erledigt gesetzt", async () => {
