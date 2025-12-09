@@ -995,10 +995,12 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     for (NormReference nonApplicationNorm : nonApplicationNorms) {
       if (nonApplicationNorm == null) continue;
 
+      var norm = buildNorm(nonApplicationNorm).domainTerm("Nichtanwendungsgesetz").build();
+
       nichtanwendungsgesetze.add(
           ImplicitReference.builder()
               .domainTerm("Nichtanwendungsgesetz")
-              .nichtanwendungsgesetz(buildNorm(nonApplicationNorm))
+              .nichtanwendungsgesetz(norm)
               .build());
     }
 

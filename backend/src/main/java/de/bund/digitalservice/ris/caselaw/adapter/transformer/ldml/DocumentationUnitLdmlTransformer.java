@@ -401,7 +401,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
       for (NormReference normRef : norms) {
         if (normRef == null) continue;
 
-        Norm norm = buildNorm(normRef);
+        Norm norm = buildNorm(normRef).build();
 
         normen.add(ImplicitReference.builder().domainTerm("Norm").norm(norm).build());
       }
@@ -456,7 +456,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     return gerichtBuilder.build();
   }
 
-  default Norm buildNorm(NormReference normRef) {
+  default Norm.NormBuilder buildNorm(NormReference normRef) {
     Norm.NormBuilder normBuilder = Norm.builder();
     String abbr = null;
     if (normRef.normAbbreviation() != null
@@ -485,7 +485,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     if (!einzelNormen.isEmpty()) {
       normBuilder.einzelnormen(einzelNormen);
     }
-    return normBuilder.build();
+    return normBuilder;
   }
 
   default Norm.Einzelnorm buildEinzelnorm(SingleNorm singleNorm) {

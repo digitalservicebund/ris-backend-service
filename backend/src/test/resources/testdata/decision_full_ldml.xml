@@ -145,7 +145,7 @@
                        </ris:anhaengigesVerfahren>
                     </akn:implicitReference>
                     <akn:implicitReference ris:domainTerm="Nichtanwendungsgesetz">
-                       <ris:nichtanwendungsgesetz domainTerm="Norm">
+                       <ris:nichtanwendungsgesetz domainTerm="Nichtanwendungsgesetz">
                           <ris:abkuerzung domainTerm="Abkürzung">SeefBgV</ris:abkuerzung>
                           <ris:einzelnorm domainTerm="Einzelnorm">
                              <ris:bezeichnung domainTerm="Bezeichnung">§ 30</ris:bezeichnung>
