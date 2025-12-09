@@ -126,4 +126,7 @@ public class RisMeta {
 
   @XmlElement(name = "einkunftsarten", namespace = CaseLawLdml.RIS_NS)
   private Einkunftsarten einkunftsarten;
+
+  @XmlElement(name = "nichtanwendungsgesetze", namespace = CaseLawLdml.RIS_NS)
+  private Nichtanwendungsgesetze nichtanwendungsgesetze;
 }

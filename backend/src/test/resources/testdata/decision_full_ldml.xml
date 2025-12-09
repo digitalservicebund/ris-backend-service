@@ -144,6 +144,16 @@
                           </ris:gericht>
                        </ris:anhaengigesVerfahren>
                     </akn:implicitReference>
+                    <akn:implicitReference ris:domainTerm="Nichtanwendungsgesetz">
+                       <ris:nichtanwendungsgesetz domainTerm="Norm">
+                          <ris:abkuerzung domainTerm="Abkürzung">SeefBgV</ris:abkuerzung>
+                          <ris:einzelnorm domainTerm="Einzelnorm">
+                             <ris:bezeichnung domainTerm="Bezeichnung">§ 30</ris:bezeichnung>
+                             <ris:datum domainTerm="Fassungsdatum">2021-02-05</ris:datum>
+                             <ris:jahr domainTerm="Jahr">2020</ris:jahr>
+                          </ris:einzelnorm>
+                       </ris:nichtanwendungsgesetz>
+                   </akn:implicitReference>
                 </akn:otherReferences>
                 <akn:otherAnalysis source="#ris">
                     <ris:dokumentarischeKurztexte domainTerm="Dokumentarische Kurztexte">

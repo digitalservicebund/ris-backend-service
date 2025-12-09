@@ -35,4 +35,7 @@ public class ImplicitReference {
 
   @XmlElement(name = "fundstelleLiteraturUnselbststaendig", namespace = CaseLawLdml.RIS_NS)
   private Fundstelle fundstelleLiteraturUnselbststaendig;
+
+  @XmlElement(name = "nichtanwendungsgesetz", namespace = CaseLawLdml.RIS_NS)
+  private Norm nichtanwendungsgesetz;
 }
