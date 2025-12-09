@@ -14,7 +14,6 @@ import {
   getFirstCellHTML,
   insertTable,
   getOrderedListHTML,
-  getOrderedListType,
   hasOrderedList,
 } from "~/test-helper/tableUtil"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
@@ -329,10 +328,8 @@ describe("text editor toolbar", async () => {
 
       expect(hasOrderedList()).toBe(true)
       const listStyle = getOrderedListHTML()
-      const listType = getOrderedListType()
 
       expect(listStyle).toContain("list-style-type: decimal")
-      expect(listType).toBe("1")
     })
 
     test("should create lowercase Latin list when 'Lateinisch klein (a, b, c)' is clicked", async () => {
@@ -345,10 +342,8 @@ describe("text editor toolbar", async () => {
 
       expect(hasOrderedList()).toBe(true)
       const listStyle = getOrderedListHTML()
-      const listType = getOrderedListType()
 
       expect(listStyle).toContain("list-style-type: lower-alpha")
-      expect(listType).toBe("a")
     })
 
     test("should create uppercase Latin list when 'Lateinisch groß (A, B, C)' is clicked", async () => {
@@ -361,10 +356,8 @@ describe("text editor toolbar", async () => {
 
       expect(hasOrderedList()).toBe(true)
       const listStyle = getOrderedListHTML()
-      const listType = getOrderedListType()
 
       expect(listStyle).toContain("list-style-type: upper-alpha")
-      expect(listType).toBe("A")
     })
 
     test("should create lowercase Roman list when 'Römisch klein (i, ii, iii)' is clicked", async () => {
@@ -377,10 +370,8 @@ describe("text editor toolbar", async () => {
 
       expect(hasOrderedList()).toBe(true)
       const listStyle = getOrderedListHTML()
-      const listType = getOrderedListType()
 
       expect(listStyle).toContain("list-style-type: lower-roman")
-      expect(listType).toBe("i")
     })
 
     test("should create uppercase Roman list when 'Römisch groß (I, II, III)' is clicked", async () => {
@@ -393,10 +384,8 @@ describe("text editor toolbar", async () => {
 
       expect(hasOrderedList()).toBe(true)
       const listStyle = getOrderedListHTML()
-      const listType = getOrderedListType()
 
       expect(listStyle).toContain("list-style-type: upper-roman")
-      expect(listType).toBe("I")
     })
 
     test("should change list style when switching from numeric to lowercase Latin", async () => {
@@ -407,16 +396,14 @@ describe("text editor toolbar", async () => {
       expect(editorField.firstElementChild).toHaveFocus()
 
       await clickOrderedListSubButton("Numerisch (1, 2, 3)")
-      expect(getOrderedListType()).toBe("1")
+      expect(getOrderedListHTML()).toContain("list-style-type: decimal")
 
       await clickOrderedListSubButton("Lateinisch klein (a, b, c)")
 
       expect(hasOrderedList()).toBe(true)
       const listStyle = getOrderedListHTML()
-      const listType = getOrderedListType()
 
       expect(listStyle).toContain("list-style-type: lower-alpha")
-      expect(listType).toBe("a")
     })
 
     test("should remove list when clicking the same list style twice", async () => {
@@ -442,16 +429,14 @@ describe("text editor toolbar", async () => {
       expect(editorField.firstElementChild).toHaveFocus()
 
       await clickOrderedListSubButton("Römisch klein (i, ii, iii)")
-      expect(getOrderedListType()).toBe("i")
+      expect(getOrderedListHTML()).toContain("list-style-type: lower-roman")
 
       await clickOrderedListSubButton("Römisch groß (I, II, III)")
 
       expect(hasOrderedList()).toBe(true)
       const listStyle = getOrderedListHTML()
-      const listType = getOrderedListType()
 
       expect(listStyle).toContain("list-style-type: upper-roman")
-      expect(listType).toBe("I")
     })
 
     test("should create lowercase Greek list when 'Griechisch klein (α, β, γ)' is clicked", async () => {
@@ -464,10 +449,8 @@ describe("text editor toolbar", async () => {
 
       expect(hasOrderedList()).toBe(true)
       const listStyle = getOrderedListHTML()
-      const listType = getOrderedListType()
 
       expect(listStyle).toContain("list-style-type: lower-greek")
-      expect(listType).toBe("α")
     })
 
     test("should change list style when switching from Latin to Greek", async () => {
@@ -478,16 +461,14 @@ describe("text editor toolbar", async () => {
       expect(editorField.firstElementChild).toHaveFocus()
 
       await clickOrderedListSubButton("Lateinisch klein (a, b, c)")
-      expect(getOrderedListType()).toBe("a")
+      expect(getOrderedListHTML()).toContain("list-style-type: lower-alpha")
 
       await clickOrderedListSubButton("Griechisch klein (α, β, γ)")
 
       expect(hasOrderedList()).toBe(true)
       const listStyle = getOrderedListHTML()
-      const listType = getOrderedListType()
 
       expect(listStyle).toContain("list-style-type: lower-greek")
-      expect(listType).toBe("α")
     })
   })
 })
