@@ -161,7 +161,8 @@ const pendingDuplicates = ref(
 )
 
 // Labels of non-empty fields that won't be exported to the jDV
-const fieldsWithoutJdvExport = computed<string[]>(() => {
+// prettier-ignore
+const fieldsWithoutJdvExport = computed<string[]>(() => { // NOSONAR typescript:S3776
   const fieldLabels: string[] = []
   if (decision.value?.contentRelatedIndexing?.evsf)
     fieldLabels.push(contentRelatedIndexingLabels.evsf)

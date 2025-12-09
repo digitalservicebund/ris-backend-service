@@ -806,6 +806,7 @@ public class DecisionTransformer extends DocumentableTransformer {
     return coreDataBuilder.build();
   }
 
+  @SuppressWarnings("java:S3776")
   private static ContentRelatedIndexing buildContentRelatedIndexing(DecisionDTO decisionDTO) {
     ContentRelatedIndexing.ContentRelatedIndexingBuilder contentRelatedIndexingBuilder =
         DocumentableTransformer.buildContentRelatedIndexing(decisionDTO).toBuilder();
