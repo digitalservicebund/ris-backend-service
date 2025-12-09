@@ -32,6 +32,7 @@ const validationStore = useValidationStore<(typeof SingleNorm.fields)[number]>()
 const legalForceValidationStore =
   useValidationStore<(typeof LegalForce.fields)[number]>()
 const singleNormInput = ref<InstanceType<typeof InputText> | null>(null)
+const isNormValidating = ref(false)
 
 const singleNorm = computed({
   get: () => {
@@ -113,30 +114,45 @@ const isCourtWithLegalForce = computed(
  * The validation endpint either responds with "Ok" oder "Validation error". In the latter case a validation error is emitted to the parent.
  */
 async function validateNorm() {
+  if (isNormValidating.value) {
+    return
+  }
+
+  isNormValidating.value = true
   validationStore.reset()
   emit("update:validationError", undefined, "singleNorm")
-
-  if (singleNorm.value?.singleNorm) {
-    const singleNormValidationInfo: SingleNormValidationInfo = {
-      singleNorm: singleNorm.value?.singleNorm,
-      normAbbreviation: props.normAbbreviation,
-    }
-    const response = await documentUnitService.validateSingleNorm(
-      singleNormValidationInfo,
-    )
-
-    if (response.data !== "Ok") {
-      validationStore.add("Inhalt nicht valide", "singleNorm")
-
-      emit(
-        "update:validationError",
-        {
-          message: "Inhalt nicht valide",
-          instance: "singleNorm",
-        },
-        "singleNorm",
+  try {
+    if (singleNorm.value?.singleNorm) {
+      const singleNormValidationInfo: SingleNormValidationInfo = {
+        singleNorm: singleNorm.value?.singleNorm,
+        normAbbreviation: props.normAbbreviation,
+      }
+      const response = await documentUnitService.validateSingleNorm(
+        singleNormValidationInfo,
       )
+
+      if (response.data !== "Ok") {
+        validationStore.add("Inhalt nicht valide", "singleNorm")
+
+        emit(
+          "update:validationError",
+          {
+            message: "Inhalt nicht valide",
+            instance: "singleNorm",
+          },
+          "singleNorm",
+        )
+      }
     }
+  } catch (error) {
+    console.log(
+      "Error validating norm: " +
+        singleNorm.value?.singleNorm +
+        " with error: " +
+        error,
+    )
+  } finally {
+    isNormValidating.value = false
   }
 }
 /**
@@ -198,6 +214,8 @@ onMounted(async () => {
   )
   inputElement?.focus() // This works without TypeScript errors
 })
+
+defineExpose({ validateNorm })
 </script>
 
 <template>
