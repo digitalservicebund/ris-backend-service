@@ -24,19 +24,30 @@ const emit = defineEmits<{
 const localChips = computed(() => props.modelValue ?? [])
 const { documentUnit } = storeToRefs(useDocumentUnitStore())
 
-function isValidBorderNumber(value: number) {
+const isValidBorderNumber = (value: number) => {
   return validateBorderNumber(value)
 }
-function isDuplicate(value: number, values: number[] = []) {
+const isDuplicate = (value: number, values: number[] = []) => {
   return values.filter((v) => v === value).length > 1
+}
+const isCharacter = (value: string) => {
+  return !/^\d+$/.test(value.trim())
 }
 
 const chips = computed<string[]>({
-  get: () => {
-    return localChips.value.map((value) => value.toString())
-  },
+  get: () => localChips.value.map((value) => value.toString()),
 
   set: (newValues: string[]) => {
+    const containsCharacters = newValues.some(isCharacter)
+
+    if (containsCharacters) {
+      newValues = newValues.filter((value) => !isCharacter(value))
+      emit(
+        "update:modelValue",
+        newValues.map((value) => Number.parseInt(value)),
+      )
+      return
+    }
     const numberValues = newValues.map((value) => Number.parseInt(value))
 
     const isValid = newValues.every((value) =>

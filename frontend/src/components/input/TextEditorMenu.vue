@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { commands, selectActiveState } from "@guardian/prosemirror-invisibles"
 import { Editor } from "@tiptap/vue-3"
-import { computed, ref } from "vue"
+import { computed, ref, markRaw, h } from "vue"
 import { useRoute } from "vue-router"
 import TextEditorButton, {
   EditorButton,
@@ -51,6 +51,7 @@ interface Props {
   buttonsDisabled: boolean
   editor: Editor
   containerWidth?: number
+  hideTextCheck?: boolean
 }
 
 const props = defineProps<Props>()
@@ -88,6 +89,30 @@ const validateCellSelection = (callback: () => unknown) => {
 
   emit("noCellSelected", false)
   return callback()
+}
+
+const createTextIcon = (text: string) => {
+  return markRaw({
+    render: () =>
+      h(
+        "span",
+        {
+          style: {
+            fontFamily: "var(--font-sans)",
+            fontSize: "14pt",
+            display: "flex",
+            fontWeight: "bold",
+            alignItems: "center",
+            justifyContent: "center",
+            lineHeight: "1",
+            width: "24px",
+            height: "24px",
+          },
+          class: "text-blue-900",
+        },
+        text,
+      ),
+  })
 }
 
 const buttons = computed(() => {
@@ -198,13 +223,57 @@ const buttons = computed(() => {
       callback: () => props.editor.chain().focus().setTextAlign("right").run(),
     },
     {
-      type: "orderedList",
+      type: "menu",
       icon: IconOrderedList,
       ariaLabel: "Nummerierte Liste",
-      shortcut: "Strg + ⇧ + 7",
-      group: "indent",
+      group: "orderedListGroup",
       isCollapsable: false,
-      callback: () => props.editor.chain().focus().toggleOrderedList().run(),
+      childButtons: [
+        {
+          type: "numericList",
+          icon: "1.",
+          ariaLabel: "Numerisch (1, 2, 3)",
+          style: "numeric",
+        },
+        {
+          type: "lowercaseAlphabeticalList",
+          icon: "a.",
+          ariaLabel: "Lateinisch klein (a, b, c)",
+          style: "smallLatin",
+        },
+        {
+          type: "uppercaseAlphabeticalList",
+          icon: "A.",
+          ariaLabel: "Lateinisch groß (A, B, C)",
+          style: "capitalLatin",
+        },
+        {
+          type: "lowercaseRomanList",
+          icon: "i.",
+          ariaLabel: "Römisch klein (i, ii, iii)",
+          style: "smallRoman",
+        },
+        {
+          type: "uppercaseRomanList",
+          icon: "I.",
+          ariaLabel: "Römisch groß (I, II, III)",
+          style: "capitalRoman",
+        },
+        {
+          type: "lowercaseGreekList",
+          icon: "ε.",
+          ariaLabel: "Griechisch klein (α, β, γ)",
+          style: "smallGreek",
+        },
+      ].map(({ type, icon, ariaLabel, style }) => ({
+        type,
+        icon: createTextIcon(icon),
+        ariaLabel,
+        group: "orderedListGroup",
+        isCollapsable: false,
+        callback: () =>
+          props.editor.chain().focus().toggleOrderedList(style).run(),
+      })),
     },
     {
       type: "bulletList",
@@ -459,16 +528,18 @@ const buttons = computed(() => {
     })
   }
 
-  buttons.push({
-    type: "textCheck",
-    icon: IconSpellCheck,
-    ariaLabel: "Rechtschreibprüfung",
-    group: "textCheck",
-    isCollapsable: false,
-    callback: async () => {
-      props.editor.chain().focus().textCheck().run()
-    },
-  })
+  if (!props.hideTextCheck) {
+    buttons.push({
+      type: "textCheck",
+      icon: IconSpellCheck,
+      ariaLabel: "Rechtschreibprüfung",
+      group: "textCheck",
+      isCollapsable: false,
+      callback: async () => {
+        props.editor.chain().focus().textCheck().run()
+      },
+    })
+  }
 
   return buttons
 })
@@ -580,7 +651,7 @@ const ariaLabel = props.ariaLabel ? props.ariaLabel : null
   <div
     ref="menuBar"
     :aria-label="ariaLabel + ' Button Leiste'"
-    class="flex flex-row flex-wrap justify-between ps-8 pe-8 pt-8 pb-4"
+    class="flex flex-row flex-wrap justify-between gap-2 ps-8 pe-8 pt-8 pb-4"
     :tabindex="
       menuBar?.matches(':focus-within') || props.buttonsDisabled ? -1 : 0
     "
@@ -588,7 +659,7 @@ const ariaLabel = props.ariaLabel ? props.ariaLabel : null
     @keydown.left.stop.prevent="focusPreviousButton"
     @keydown.right.stop.prevent="focusNextButton"
   >
-    <div class="flex flex-row">
+    <div class="flex min-w-0 flex-1 flex-row flex-wrap gap-1">
       <TextEditorButton
         v-for="(button, index) in collapsedButtons"
         :key="index"
@@ -599,7 +670,7 @@ const ariaLabel = props.ariaLabel ? props.ariaLabel : null
         @toggle="handleButtonClick"
       />
     </div>
-    <div class="flex flex-row">
+    <div class="flex flex-shrink-0 flex-row gap-1">
       <TextEditorButton
         v-for="(button, index) in fixButtons"
         :key="index"

@@ -96,7 +96,7 @@ test.describe("category import", () => {
       await test.step("disable import for empty source categories", async () => {
         await navigateToCategoryImport(page, documentNumber)
         await searchForDocumentUnitToImport(page, documentNumber)
-        await expect(page.getByText("Quellrubrik leer")).toHaveCount(30) // total number of importable categories
+        await expect(page.getByText("Quellrubrik leer")).toHaveCount(37) // total number of importable categories
       })
     },
   )
@@ -117,7 +117,7 @@ test.describe("category import", () => {
           prefilledDocumentUnitWithTexts.documentNumber,
         )
 
-        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(24) // number of non-importable categories, if target category already filled
+        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(31) // number of non-importable categories, if target category already filled
       })
     },
   )
@@ -945,7 +945,7 @@ test.describe("category import", () => {
     },
   )
 
-  // Rechtsmittel
+  // Tarifvertrag
   test(
     "import collective agreement",
     {
@@ -977,6 +977,200 @@ test.describe("category import", () => {
         await expect(
           page.getByRole("heading", { name: "Tarifvertrag" }),
         ).toBeInViewport()
+      })
+    },
+  )
+
+  // Gegenstandswert
+  test(
+    "import objectValues (Gegenstandswert)",
+    { tag: ["@RISDEV-8810"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(
+          page.getByLabel("Gegenstandswert übernehmen"),
+        ).toBeVisible()
+        await page.getByLabel("Gegenstandswert übernehmen").click()
+
+        await expect(
+          page.getByText("123 Dollar (USD), Verfassungsbeschwerde"),
+        ).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByText("123 Dollar (USD), Verfassungsbeschwerde"),
+        ).toBeInViewport()
+      })
+    },
+  )
+
+  // Missbrauchsgebühren
+  test(
+    "import abuseFees (Missbrauchsgebühren)",
+    { tag: ["@RISDEV-9959"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(
+          page.getByLabel("Missbrauchsgebühren übernehmen"),
+        ).toBeVisible()
+        await page.getByLabel("Missbrauchsgebühren übernehmen").click()
+
+        await expect(
+          page.getByText("223 Dollar (USD), Bevollmächtigter"),
+        ).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByText("223 Dollar (USD), Bevollmächtigter"),
+        ).toBeInViewport()
+      })
+    },
+  )
+
+  // Herkunftsland
+  test(
+    "import country of origin (Herkunftsland)",
+    { tag: ["@RISDEV-9884"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(page.getByLabel("Herkunftsland übernehmen")).toBeVisible()
+        await page.getByLabel("Herkunftsland übernehmen").click()
+
+        await expect(page.getByText("RE-07-DEU Deutschland")).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(page.getByText("RE-07-DEU Deutschland")).toBeInViewport()
+      })
+    },
+  )
+
+  // Einkunftsart
+  test(
+    "import income types (Einkunftsart)",
+    { tag: ["@RISDEV-8712"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(page.getByLabel("Einkunftsart übernehmen")).toBeVisible()
+        await page.getByLabel("Einkunftsart übernehmen").click()
+
+        await expect(
+          page.getByText("Gewerbebetrieb, Programmierer"),
+        ).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByText("Gewerbebetrieb, Programmierer"),
+        ).toBeInViewport()
+      })
+    },
+  )
+
+  // Verknüpfung anhängiges Verfahren
+  test(
+    "import related pending proceeding (Verknüpfung anhängiges Verfahren)",
+    { tag: ["@RISDEV-8678"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(
+          page.getByLabel("Verknüpfung anhängiges Verfahren übernehmen"),
+        ).toBeVisible()
+        await page
+          .getByLabel("Verknüpfung anhängiges Verfahren übernehmen")
+          .click()
+
+        await expect(
+          page.getByText("BFH, 01.02.2022, IV R 99/99 | YYTestDoc0017"),
+        ).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByText("BFH, 01.02.2022, IV R 99/99 | YYTestDoc0017"),
+        ).toBeInViewport()
+      })
+    },
+  )
+
+  // Nichtanwendungsgesetz
+  test(
+    "import non-application norms (Nichtanwendungsgesetz)",
+    { tag: ["@RISDEV-9960"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(
+          page.getByLabel("Nichtanwendungsgesetz übernehmen"),
+        ).toBeVisible()
+        await page.getByLabel("Nichtanwendungsgesetz übernehmen").click()
+
+        await expect(page.getByText("BGB, § 1")).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(page.getByText("BGB, § 1")).toBeInViewport()
       })
     },
   )
@@ -1405,6 +1599,38 @@ test.describe("category import", () => {
       await test.step("scroll to category", async () => {
         await expect(
           page.getByLabel("Langtexte").getByText("Gliederung", { exact: true }),
+        ).toBeInViewport()
+      })
+    },
+  )
+
+  // Berichtigung
+  test(
+    "import correction",
+    { tag: ["@RISDEV-8622"] },
+    async ({ page, documentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, documentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(page.getByLabel("Berichtigung übernehmen")).toBeVisible()
+        await page.getByLabel("Berichtigung übernehmen").click()
+
+        await expect(page.getByText("Hauffen -> Haufen")).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page
+            .getByLabel("Langtexte")
+            .getByText("Berichtigung", { exact: true }),
         ).toBeInViewport()
       })
     },

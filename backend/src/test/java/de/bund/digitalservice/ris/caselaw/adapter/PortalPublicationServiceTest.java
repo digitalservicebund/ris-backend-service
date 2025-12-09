@@ -1,15 +1,18 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.assertArg;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
+import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
@@ -39,6 +43,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -77,6 +82,20 @@ class PortalPublicationServiceTest {
 
   private PortalPublicationService subject;
 
+  private static PendingProceeding relatedPendingProceeding =
+      PendingProceeding.builder().documentNumber("Test document number 3").build();
+  private static PendingProceeding relatedPendingProceedingWithResolutionNote =
+      PendingProceeding.builder()
+          .documentNumber("Test document number 4")
+          .shortTexts(
+              PendingProceedingShortTexts.builder().resolutionNote("Resolution note").build())
+          .build();
+  private static PendingProceeding resolvedRelatedPendingProceeding =
+      PendingProceeding.builder()
+          .documentNumber("Test document number 5")
+          .coreData(CoreData.builder().isResolved(true).build())
+          .build();
+
   @BeforeAll
   static void setUpBeforeClass() {
     PreviousDecision related1 =
@@ -111,6 +130,21 @@ class PortalPublicationServiceTest {
             .longTexts(LongTexts.builder().caseFacts("<p>Example content 1</p>").build())
             .shortTexts(ShortTexts.builder().build())
             .previousDecisions(List.of(related1, related2))
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .relatedPendingProceedings(
+                        List.of(
+                            RelatedPendingProceeding.builder()
+                                .documentNumber(relatedPendingProceeding.documentNumber())
+                                .build(),
+                            RelatedPendingProceeding.builder()
+                                .documentNumber(
+                                    relatedPendingProceedingWithResolutionNote.documentNumber())
+                                .build(),
+                            RelatedPendingProceeding.builder()
+                                .documentNumber(resolvedRelatedPendingProceeding.documentNumber())
+                                .build()))
+                    .build())
             .build();
 
     testLdml =
@@ -477,6 +511,59 @@ class PortalPublicationServiceTest {
                 () -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, user))
             .withMessageContaining("Could not save LDML to bucket");
       }
+
+      @Test
+      void
+          publishDocumentationUnitWithChangeLog_withRelatedPendingProceedings_shouldResolveUnresolvedPendingProceedings()
+              throws DocumentationUnitNotExistsException {
+        UUID documentationUnitId = UUID.randomUUID();
+        User user = mock(User.class);
+        when(documentationUnitRepository.findByUuid(documentationUnitId))
+            .thenReturn(testDocumentUnit);
+        when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
+        when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
+        when(documentationUnitRepository.findByDocumentNumber(
+                relatedPendingProceeding.documentNumber()))
+            .thenReturn(relatedPendingProceeding);
+        when(documentationUnitRepository.findByDocumentNumber(
+                relatedPendingProceedingWithResolutionNote.documentNumber()))
+            .thenReturn(relatedPendingProceedingWithResolutionNote);
+        when(documentationUnitRepository.findByDocumentNumber(
+                resolvedRelatedPendingProceeding.documentNumber()))
+            .thenReturn(resolvedRelatedPendingProceeding);
+
+        subject.publishDocumentationUnitWithChangelog(documentationUnitId, user);
+
+        verify(documentationUnitRepository, times(1))
+            .save(
+                assertArg(
+                    documentationUnit -> {
+                      assertThat(documentationUnit.documentNumber())
+                          .isEqualTo(relatedPendingProceeding.documentNumber());
+                      assertThat(documentationUnit).isInstanceOf(PendingProceeding.class);
+                      assertThat(documentationUnit.coreData().isResolved()).isTrue();
+                      assertThat(
+                              ((PendingProceeding) documentationUnit).shortTexts().resolutionNote())
+                          .isEqualTo("Erledigt durch TEST123456789");
+                    }),
+                any());
+        verify(documentationUnitRepository, times(0))
+            .save(
+                argThat(
+                    documentationUnit ->
+                        documentationUnit
+                            .documentNumber()
+                            .equals(relatedPendingProceedingWithResolutionNote.documentNumber())),
+                any());
+        verify(documentationUnitRepository, times(0))
+            .save(
+                argThat(
+                    documentationUnit ->
+                        documentationUnit
+                            .documentNumber()
+                            .equals(resolvedRelatedPendingProceeding.documentNumber())),
+                any());
+      }
     }
 
     @Nested
@@ -494,6 +581,25 @@ class PortalPublicationServiceTest {
         verify(documentationUnitRepository)
             .updatePortalPublicationStatus(
                 testDocumentUnit.uuid(), PortalPublicationStatus.WITHDRAWN);
+        verify(documentationUnitRepository, never())
+            .savePublicationDateTime(testDocumentUnit.uuid());
+      }
+
+      @Test
+      void withdraw_withNonExistingDocUnit_shouldDeleteFromBucket()
+          throws DocumentationUnitNotExistsException {
+        when(documentationUnitRepository.findByDocumentNumber(testDocumentUnit.documentNumber()))
+            .thenThrow(DocumentationUnitNotExistsException.class);
+        when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+            .thenReturn(List.of(withPrefix(testDocumentNumber)));
+
+        var result = subject.withdrawDocumentationUnit(testDocumentNumber);
+
+        assertThat(result.changedPaths()).isEmpty();
+        assertThat(result.deletedPaths()).containsExactly(withPrefix(testDocumentNumber));
+
+        verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
+        verify(documentationUnitRepository, never()).updatePortalPublicationStatus(any(), any());
         verify(documentationUnitRepository, never())
             .savePublicationDateTime(testDocumentUnit.uuid());
       }

@@ -57,8 +57,8 @@ test.describe(
       page,
       prefilledDocumentUnit,
     }) => {
-      const orderedList = `<ol class="list-decimal"><li><p>This is an ordered list</p></li><li><p>Second ordered list item</p></li></ol>`
-      const orderedListXMLPreview = `<ol class="list-decimal">`
+      const orderedList = `<ol style="list-style-type: decimal;"><li><p>This is an ordered list</p></li><li><p>Second ordered list item</p></li></ol>`
+      const orderedListXMLPreview = `<ol style="list-style-type: decimal;">`
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
@@ -69,6 +69,7 @@ test.describe(
       await page
         .locator(`[aria-label='Nummerierte Liste']:not([disabled])`)
         .click()
+      await page.getByLabel("Numerisch (1, 2, 3)").click()
       await page.keyboard.press("Enter")
       await page.keyboard.type("Second ordered list item")
 
@@ -95,7 +96,7 @@ test.describe(
       prefilledDocumentUnit,
     }) => {
       const bulletList = `<ul class="list-disc"><li><p>This is a list</p></li></ul>`
-      const orderedList = `<ol class="list-decimal"><li><p>This is a list</p></li></ol>`
+      const orderedList = `<ol style="list-style-type: decimal;"><li><p>This is a list</p></li></ol>`
       const noList = `<p>This is a list</p>`
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
@@ -112,7 +113,6 @@ test.describe(
       await page
         .locator(`[aria-label='Aufzählungsliste']:not([disabled])`)
         .click()
-
       let inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
       expect(inputFieldInnerHTML).toContain(bulletList)
@@ -120,6 +120,7 @@ test.describe(
       await page
         .locator(`[aria-label='Nummerierte Liste']:not([disabled])`)
         .click()
+      await page.getByLabel("Numerisch (1, 2, 3)").click()
       inputFieldInnerHTML = await inputField.innerHTML()
       expect(inputFieldInnerHTML).toContain(orderedList)
 
@@ -135,7 +136,7 @@ test.describe(
       prefilledDocumentUnit,
     }) => {
       const bulletList = `<ul class="list-disc"><li><p>This is a list</p></li></ul>`
-      const orderedList = `<ol class="list-decimal"><li><p>This is a list</p></li></ol>`
+      const orderedList = `<ol style="list-style-type: decimal;"><li><p>This is a list</p></li></ol>`
       const noList = `<p>This is a list</p>`
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)

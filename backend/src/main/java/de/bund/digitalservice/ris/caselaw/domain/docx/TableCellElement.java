@@ -13,6 +13,7 @@ public class TableCellElement extends BlockElement implements DocumentationUnitD
     this.usedStyles = usedStyles;
     addStyle("min-width", "5px");
     addStyle("padding", "5px");
+    addStyle("display", "table-cell");
   }
 
   public void setColumnSpan(Integer columnSpan) {

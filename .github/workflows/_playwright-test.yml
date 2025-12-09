@@ -31,7 +31,7 @@ jobs:
     name: ${{ inputs.project }} (${{ inputs.shard_index }}, ${{ inputs.shard_total }})
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
@@ -48,7 +48,7 @@ jobs:
       - name: Install node modules
         if: steps.cache-node.outputs.cache-hit != 'true'
         run: |
-          npm ci
+          npm ci --ignore-scripts
         working-directory: ./frontend
       - name: Get Playwright version
         working-directory: ./frontend

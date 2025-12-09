@@ -2,6 +2,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewLongTexts from "@/components/preview/PreviewLongTexts.vue"
+import Correction from "@/domain/correction"
 import { LongTexts } from "@/domain/decision"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
@@ -38,6 +39,15 @@ describe("preview long texts", () => {
       ],
       otherLongText: "other long text",
       outline: "outline",
+      corrections: [
+        new Correction({
+          type: "Schreibfehlerberichtigung",
+          date: "2023-12-24",
+          description: "Hauffen -> Haufen",
+          borderNumbers: [1, 3],
+          content: "Ersetzen von Hauffen durch Haufen",
+        }),
+      ],
     })
 
     expect(await screen.findByText("Tenor")).toBeInTheDocument()
@@ -48,6 +58,7 @@ describe("preview long texts", () => {
     expect(await screen.findByText("Mitwirkende Richter")).toBeInTheDocument()
     expect(await screen.findByText("Sonstiger Langtext")).toBeInTheDocument()
     expect(await screen.findByText("Gliederung")).toBeInTheDocument()
+    expect(await screen.findByText("Berichtigung")).toBeInTheDocument()
   })
 
   it.each([
@@ -62,6 +73,7 @@ describe("preview long texts", () => {
         "Mitwirkende Richter",
         "Sonstiger Langtext",
         "Gliederung",
+        "Berichtigung",
       ],
     ],
     [
@@ -75,6 +87,7 @@ describe("preview long texts", () => {
         "Mitwirkende Richter",
         "Sonstiger Langtext",
         "Gliederung",
+        "Berichtigung",
       ],
     ],
     [
@@ -88,6 +101,7 @@ describe("preview long texts", () => {
         "Mitwirkende Richter",
         "Sonstiger Langtext",
         "Gliederung",
+        "Berichtigung",
       ],
     ],
     [
@@ -101,6 +115,7 @@ describe("preview long texts", () => {
         "Mitwirkende Richter",
         "Sonstiger Langtext",
         "Gliederung",
+        "Berichtigung",
       ],
     ],
     [
@@ -114,6 +129,7 @@ describe("preview long texts", () => {
         "Abweichende Meinung",
         "Mitwirkende Richter",
         "Gliederung",
+        "Berichtigung",
       ],
     ],
     [
@@ -127,6 +143,7 @@ describe("preview long texts", () => {
         "Abweichende Meinung",
         "Mitwirkende Richter",
         "Sonstiger Langtext",
+        "Berichtigung",
       ],
     ],
     [
@@ -140,6 +157,7 @@ describe("preview long texts", () => {
         "Mitwirkende Richter",
         "Sonstiger Langtext",
         "Gliederung",
+        "Berichtigung",
       ],
     ],
     [
@@ -160,6 +178,7 @@ describe("preview long texts", () => {
         "Abweichende Meinung",
         "Sonstiger Langtext",
         "Gliederung",
+        "Berichtigung",
       ],
     ],
   ])(

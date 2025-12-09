@@ -8,13 +8,18 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.LdmlTransformationResult;
+import de.bund.digitalservice.ris.caselaw.domain.LoggingKeys;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
@@ -83,14 +88,10 @@ public class PortalPublicationService {
     try {
       DocumentationUnit documentationUnit =
           documentationUnitRepository.findByUuid(documentationUnitId);
-      log.atInfo()
-          .setMessage("Publishing doc unit...")
-          .addKeyValue("documentNumber", documentationUnit.documentNumber())
-          .addKeyValue("id", documentationUnitId)
-          .log();
       var result = publishToBucket(documentationUnit);
       uploadChangelogWithdrawOnFailure(documentationUnit, result);
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, user);
+      updateResolutionNoteOfRelatedPendingProceedings(documentationUnit, user);
     } catch (Exception exception) {
       historyLogService.saveHistoryLog(
           documentationUnitId,
@@ -118,6 +119,7 @@ public class PortalPublicationService {
         documentationUnitRepository.findByDocumentNumber(documentNumber);
     var publicationResult = publishToBucket(documentationUnit);
     updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, null);
+    updateResolutionNoteOfRelatedPendingProceedings(documentationUnit, null);
     return publicationResult;
   }
 
@@ -129,10 +131,18 @@ public class PortalPublicationService {
    */
   public PortalPublicationResult withdrawDocumentationUnit(String documentNumber)
       throws DocumentationUnitNotExistsException {
-    DocumentationUnit documentationUnit =
-        documentationUnitRepository.findByDocumentNumber(documentNumber);
     var result = withdraw(documentNumber);
-    updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.WITHDRAWN, null);
+    try {
+      DocumentationUnit documentationUnit =
+          documentationUnitRepository.findByDocumentNumber(documentNumber);
+      updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.WITHDRAWN, null);
+    } catch (DocumentationUnitNotExistsException e) {
+      log.atInfo()
+          .setMessage(
+              "Withdrawn documentation unit cannot be found in database. Likely, it was deleted by the migration or manually in the database. Portal publication status update skipped.")
+          .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentNumber)
+          .log();
+    }
     return result;
   }
 
@@ -140,6 +150,12 @@ public class PortalPublicationService {
     try {
       var deletableFiles = portalBucket.getAllFilenamesByPath(documentNumber + "/");
       deletableFiles.forEach(portalBucket::delete);
+
+      log.atInfo()
+          .setMessage("Documentation unit withdrawn from portal bucket.")
+          .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentNumber)
+          .log();
+
       return new PortalPublicationResult(List.of(), deletableFiles);
     } catch (BucketException e) {
       throw new PublishException("Could not delete LDML from bucket.", e);
@@ -164,11 +180,6 @@ public class PortalPublicationService {
       var result = withdraw(documentationUnit.documentNumber());
       uploadDeletionChangelog(result.deletedPaths());
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.WITHDRAWN, user);
-      log.atInfo()
-          .setMessage("Documentation unit withdrawn from portal.")
-          .addKeyValue("documentNumber", documentationUnit.documentNumber())
-          .addKeyValue("id", documentationUnitId)
-          .log();
     } catch (Exception e) {
       historyLogService.saveHistoryLog(
           documentationUnitId,
@@ -249,8 +260,15 @@ public class PortalPublicationService {
       throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);
     }
 
-    return saveToBucket(
-        ldml.getUniqueId() + "/", ldml.getFileName(), fileContent.get(), attachments);
+    var result =
+        saveToBucket(ldml.getUniqueId() + "/", ldml.getFileName(), fileContent.get(), attachments);
+
+    log.atInfo()
+        .setMessage("Doc unit published to portal bucket.")
+        .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentationUnit.documentNumber())
+        .log();
+
+    return result;
   }
 
   private PortalPublicationResult saveToBucket(
@@ -333,6 +351,89 @@ public class PortalPublicationService {
     }
 
     addHistoryLog(documentationUnit, newStatus, user);
+  }
+
+  private void updateResolutionNoteOfRelatedPendingProceedings(
+      DocumentationUnit documentationUnit, User user) {
+    if (documentationUnit.contentRelatedIndexing() == null) {
+      return;
+    }
+
+    if (documentationUnit.contentRelatedIndexing().relatedPendingProceedings() == null) {
+      return;
+    }
+
+    var pendingProceedings = documentationUnit.contentRelatedIndexing().relatedPendingProceedings();
+
+    for (RelatedPendingProceeding relatedPendingProceeding : pendingProceedings) {
+      try {
+        var docUnit =
+            documentationUnitRepository.findByDocumentNumber(
+                relatedPendingProceeding.getDocumentNumber());
+
+        if (docUnit instanceof PendingProceeding pendingProceeding) {
+          updateResolutionNoteOfPendingProceeding(documentationUnit, pendingProceeding, user);
+        }
+      } catch (DocumentationUnitNotExistsException e) {
+        log.info(
+            "Could not find (and resolve) pending proceeding {}",
+            relatedPendingProceeding.getDocumentNumber());
+      }
+    }
+  }
+
+  private void updateResolutionNoteOfPendingProceeding(
+      DocumentationUnit documentationUnit, PendingProceeding pendingProceeding, User user) {
+    if (pendingProceeding.coreData() != null && pendingProceeding.coreData().isResolved()) {
+      log.atInfo()
+          .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentationUnit.documentNumber())
+          .addKeyValue("id", documentationUnit.uuid())
+          .setMessage(
+              String.format(
+                  "Do not mark pending proceeding %s as resolved. It already is resolved. A Documentation unit (%s) was published that contained it as a related pending proceeding",
+                  pendingProceeding.documentNumber(), documentationUnit.documentNumber()))
+          .log();
+      return;
+    }
+
+    if (pendingProceeding.shortTexts() != null
+        && pendingProceeding.shortTexts().resolutionNote() != null) {
+      log.atInfo()
+          .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentationUnit.documentNumber())
+          .addKeyValue("id", documentationUnit.uuid())
+          .setMessage(
+              String.format(
+                  "Do not mark pending proceeding %s as resolved. It already has a resolution note. A Documentation unit (%s) was published that contained it as a related pending proceeding",
+                  pendingProceeding.documentNumber(), documentationUnit.documentNumber()))
+          .log();
+      return;
+    }
+
+    documentationUnitRepository.save(
+        pendingProceeding.toBuilder()
+            .coreData(
+                Optional.ofNullable(pendingProceeding.coreData())
+                    .orElse(CoreData.builder().build())
+                    .toBuilder()
+                    .isResolved(true)
+                    .build())
+            .shortTexts(
+                Optional.ofNullable(pendingProceeding.shortTexts())
+                    .orElse(PendingProceedingShortTexts.builder().build())
+                    .toBuilder()
+                    .resolutionNote("Erledigt durch " + documentationUnit.documentNumber())
+                    .build())
+            .build(),
+        user);
+
+    log.atInfo()
+        .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentationUnit.documentNumber())
+        .addKeyValue("id", documentationUnit.uuid())
+        .setMessage(
+            String.format(
+                "Mark pending proceeding %s as resolved. A Documentation unit (%s) was published that contained it as a related pending proceeding",
+                pendingProceeding.documentNumber(), documentationUnit.documentNumber()))
+        .log();
   }
 
   private void addHistoryLog(

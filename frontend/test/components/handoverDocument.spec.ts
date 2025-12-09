@@ -7,9 +7,11 @@ import { Decision } from "@/domain/decision"
 import { Env } from "@/domain/env"
 import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
+import IncomeType from "@/domain/incomeType"
 import LegalForce from "@/domain/legalForce"
 import { DuplicateRelationStatus } from "@/domain/managementData"
 import NormReference from "@/domain/normReference"
+import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
 import SingleNorm from "@/domain/singleNorm"
 import featureToggleService from "@/services/featureToggleService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
@@ -487,6 +489,7 @@ describe("HandoverDocumentationUnitView:", () => {
               location: "location",
               label: "label",
             },
+            courtBranchLocation: { value: "Augsburg", id: "1" },
             decisionDate: "2022-02-01",
             legalEffect: "legalEffect",
             documentType: {
@@ -503,6 +506,28 @@ describe("HandoverDocumentationUnitView:", () => {
             appeal: {
               appellants: [{ id: "1", value: "Kläger" }],
             },
+            incomeTypes: [new IncomeType()],
+            relatedPendingProceedings: [
+              new RelatedPendingProceeding({
+                documentNumber: "YYTestDoc0017",
+                court: {
+                  type: "BGH",
+                  label: "BGH",
+                },
+                decisionDate: "2022-02-01",
+                fileNumber: "IV R 99/99",
+              }),
+            ],
+            nonApplicationNorms: [
+              new NormReference({
+                normAbbreviation: { abbreviation: "ABC" },
+                singleNorms: [
+                  new SingleNorm({
+                    singleNorm: "§ 1",
+                  }),
+                ],
+              }),
+            ],
           },
           longTexts: { decisionReasons: "decisionReasons" },
           managementData: {
@@ -527,6 +552,12 @@ describe("HandoverDocumentationUnitView:", () => {
       ).toBeInTheDocument()
       expect(screen.getByText("Rechtsmittelzulassung")).toBeInTheDocument()
       expect(screen.getByText("Rechtsmittel")).toBeInTheDocument()
+      expect(screen.getByText("Einkunftsart")).toBeInTheDocument()
+      expect(screen.getByText("Sitz der Außenstelle")).toBeInTheDocument()
+      expect(
+        screen.getByText("Verknüpfung anhängiges Verfahren"),
+      ).toBeInTheDocument()
+      expect(screen.getByText("Nichtanwendungsgesetz")).toBeInTheDocument()
       const handoverButton = screen.getByRole("button", {
         name: "Dokumentationseinheit an jDV übergeben",
       })

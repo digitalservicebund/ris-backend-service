@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.NormReferenceType;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbstractNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
@@ -19,7 +21,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
-import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
@@ -156,19 +157,6 @@ public class DocumentableTransformer {
     return result;
   }
 
-  /**
-   * Adds norm references to the documentation unit builder based on the provided content-related
-   * indexing information. Each {@link SingleNorm} are grouped in a list of single norms, according
-   * to the associated norm abbreviation and packed into a {@link NormReference}. When converting
-   * into a DTO object, each single norm in the normReference is converted into its own {@link
-   * NormReferenceDTO}. In order for JPA to be able to correctly link the legal force of each
-   * NormReferenceDTO, it must be explicitly set again. (Because legal force is the owning side of
-   * the one to one connection, it is not implicitly linked by jpa, when a norm with legal force is
-   * saved.)
-   *
-   * @param builder The builder for constructing the documentation unit DTO.
-   * @param contentRelatedIndexing The content-related indexing information containing the norms.
-   */
   static void addNormReferences(
       DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder,
       ContentRelatedIndexing contentRelatedIndexing) {
@@ -176,26 +164,11 @@ public class DocumentableTransformer {
       return;
     }
 
-    AtomicInteger i = new AtomicInteger(1);
-    List<NormReferenceDTO> flattenNormReferenceDTOs = new ArrayList<>();
-    contentRelatedIndexing
-        .norms()
-        .forEach(
-            norm -> {
-              List<NormReferenceDTO> normReferenceDTOs =
-                  NormReferenceTransformer.transformToDTO(norm);
-              normReferenceDTOs.forEach(
-                  normReferenceDTO -> normReferenceDTO.setRank(i.getAndIncrement()));
-              flattenNormReferenceDTOs.addAll(normReferenceDTOs);
-            });
-
-    flattenNormReferenceDTOs.forEach(
-        normReferenceDTO -> {
-          if (normReferenceDTO.getLegalForce() != null)
-            normReferenceDTO.getLegalForce().setNormReference(normReferenceDTO);
-        });
-
-    builder.normReferences(flattenNormReferenceDTOs);
+    builder.normReferences(
+        (List<NormReferenceDTO>)
+            (List<? extends AbstractNormReferenceDTO>)
+                NormReferenceTransformer.transformToDTO(
+                    contentRelatedIndexing.norms(), NormReferenceType.NORM));
   }
 
   static void addPreviousDecisions(
@@ -280,7 +253,7 @@ public class DocumentableTransformer {
     builder.deviatingDates(deviatingDateDTOs);
   }
 
-  static void addDeviationCourts(
+  static void addDeviatingCourts(
       DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder, CoreData coreData) {
     if (coreData.deviatingCourts() == null) {
       return;
@@ -298,6 +271,16 @@ public class DocumentableTransformer {
     }
 
     builder.deviatingCourts(deviatingCourtDTOs);
+  }
+
+  static void addCourtBranchLocation(
+      DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder, CoreData coreData) {
+    if (coreData.courtBranchLocation() == null) {
+      builder.courtBranchLocation(null);
+    } else {
+      builder.courtBranchLocation(
+          CourtBranchLocationTransformer.transformToDTO(coreData.courtBranchLocation()));
+    }
   }
 
   static void addFileNumbers(
@@ -327,6 +310,9 @@ public class DocumentableTransformer {
     CoreDataBuilder coreDataBuilder =
         CoreData.builder()
             .court(CourtTransformer.transformToDomain(documentationUnitDTO.getCourt()))
+            .courtBranchLocation(
+                CourtBranchLocationTransformer.transformToDomain(
+                    documentationUnitDTO.getCourtBranchLocation()))
             .documentationOffice(
                 DocumentationOfficeTransformer.transformToDomain(
                     documentationUnitDTO.getDocumentationOffice()))
@@ -361,7 +347,8 @@ public class DocumentableTransformer {
     }
 
     if (decisionDTO.getNormReferences() != null) {
-      List<NormReference> norms = addNormReferencesToDomain(decisionDTO);
+      List<NormReference> norms =
+          NormReferenceTransformer.transformToDomain(decisionDTO.getNormReferences());
       contentRelatedIndexingBuilder.norms(norms);
     }
 
@@ -378,80 +365,6 @@ public class DocumentableTransformer {
     }
 
     return contentRelatedIndexingBuilder.build();
-  }
-
-  /**
-   * Adds norm references to the domain object based on the provided documentation unit DTO. A list
-   * of NormReferenceDTOs with the same normAbbreviation are grouped into one NormReference, with a
-   * list of {@link SingleNorm}.
-   *
-   * @param decisionDTO The documentation unit DTO containing norm references to be added.
-   * @return A list of NormReference objects representing the added norm references.
-   */
-  static List<NormReference> addNormReferencesToDomain(DocumentationUnitDTO decisionDTO) {
-    List<NormReference> normReferences = new ArrayList<>();
-
-    decisionDTO
-        .getNormReferences()
-        .forEach(
-            normReferenceDTO -> {
-              NormReference normReference =
-                  NormReferenceTransformer.transformToDomain(normReferenceDTO);
-
-              if (normReferenceDTO.getNormAbbreviation() != null) {
-                NormReference existingReference =
-                    normReferences.stream()
-                        .filter(
-                            existingNormReference ->
-                                existingNormReference.normAbbreviation() != null
-                                    && existingNormReference
-                                        .normAbbreviation()
-                                        .id()
-                                        .equals(normReferenceDTO.getNormAbbreviation().getId()))
-                        .findFirst()
-                        .orElse(null);
-
-                if (existingReference != null) {
-                  existingReference
-                      .singleNorms()
-                      .add(SingleNormTransformer.transformToDomain(normReferenceDTO));
-                } else {
-                  normReferences.add(normReference);
-                }
-
-              } else if (normReferenceDTO.getNormAbbreviationRawValue() != null) {
-                NormReference existingReference =
-                    normReferences.stream()
-                        .filter(
-                            existingNormReference ->
-                                existingNormReference.normAbbreviationRawValue() != null
-                                    && existingNormReference
-                                        .normAbbreviationRawValue()
-                                        .equals(normReferenceDTO.getNormAbbreviationRawValue()))
-                        .findFirst()
-                        .orElse(null);
-
-                if (existingReference != null) {
-                  existingReference
-                      .singleNorms()
-                      .add(SingleNormTransformer.transformToDomain(normReferenceDTO));
-                } else {
-                  normReferences.add(normReference);
-                }
-              }
-            });
-
-    // Handle cases where both abbreviation and raw value are null
-    normReferences.addAll(
-        decisionDTO.getNormReferences().stream()
-            .filter(
-                normReferenceDTO ->
-                    normReferenceDTO.getNormAbbreviation() == null
-                        && normReferenceDTO.getNormAbbreviationRawValue() == null)
-            .map(NormReferenceTransformer::transformToDomain)
-            .toList());
-
-    return normReferences;
   }
 
   static Status getStatus(DocumentationUnitDTO decisionDTO) {

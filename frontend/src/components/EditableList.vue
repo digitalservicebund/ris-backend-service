@@ -10,13 +10,14 @@ import IconEdit from "~icons/ic/outline-edit"
 import IconAdd from "~icons/material-symbols/add"
 
 interface Props {
-  editComponent: Component
+  editComponent?: Component
   summaryComponent?: Component
   modelValue?: T[]
   createEntry: () => T
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  editComponent: undefined,
   summaryComponent: DefaultSummary,
   modelValue: () => [],
 })
@@ -190,6 +191,7 @@ defineExpose({
         <Tooltip text="Eintrag bearbeiten">
           <Button
             id="editable-list-select-button"
+            aria-label="Eintrag bearbeiten"
             :data-testid="`list-entry-${index}`"
             size="small"
             text
@@ -219,17 +221,29 @@ defineExpose({
         class="sr-only absolute h-0 w-0 overflow-hidden"
         tabindex="-1"
       />
-      <component
-        :is="editComponent"
+
+      <slot
         v-if="isEditEntry(entry)"
-        v-model="mergedValues[index]"
         class="py-24"
-        :class="{ 'pt-0': index == 0 }"
         :model-value-list="modelValueList"
+        name="edit"
+        :value="mergedValues[index]"
         @add-entry="updateModel"
         @cancel-edit="cancelEdit"
         @remove-entry="removeEntry(entry as T)"
-      />
+        @update:value="(a: T) => (mergedValues[index] = a)"
+      >
+        <component
+          :is="editComponent"
+          v-if="editComponent"
+          v-model="mergedValues[index]"
+          :class="{ 'pt-0': index == 0 }"
+          :model-value-list="modelValueList"
+          @add-entry="updateModel"
+          @cancel-edit="cancelEdit"
+          @remove-entry="removeEntry(entry as T)"
+        />
+      </slot>
     </div>
 
     <Button

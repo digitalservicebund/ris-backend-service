@@ -124,7 +124,7 @@ test.describe(
         await urlsInput.locator("input").fill("www.link-to-translation.fr")
         await page.keyboard.press("Enter")
 
-        await fillSelect(page, "Übersetzungsart", "Amtlich")
+        await fillSelect(page, "Übersetzungsart", "amtlich")
       })
 
       await test.step("Ohne 'Originalsprache *' kann nicht übernommen werden", async () => {
@@ -147,7 +147,7 @@ test.describe(
       await test.step("Zusammenfassung wird angezeigt", async () => {
         await expect(
           otherCategoriesContainer.getByText(
-            "Französisch, Maxi Muster: 1, www.link-to-translation.fr (Amtlich)",
+            "Französisch, Maxi Muster: 1, www.link-to-translation.fr (amtlich)",
           ),
         ).toBeVisible()
       })
@@ -157,7 +157,7 @@ test.describe(
         await expect(page.getByText("Herkunft der Übersetzung")).toBeVisible()
         await expect(
           page.getByText(
-            "Französisch, Maxi Muster: 1, www.link-to-translation.fr (Amtlich)",
+            "Französisch, Maxi Muster: 1, www.link-to-translation.fr (amtlich)",
           ),
         ).toBeVisible()
       })

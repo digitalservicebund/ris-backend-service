@@ -1,1 +1,3 @@
-
+// CVE-2025-66021: There is no fix (last release 2024). We are not affected by the XSS vulnerability,
+// because our HtmlPolicyBuilder does not allow noscript tags. We only use it for the JurisXmlExporterResponseProcessor.
+CVE-2025-66021
