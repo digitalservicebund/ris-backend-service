@@ -6,6 +6,7 @@ import CodeSnippet from "@/components/CodeSnippet.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import { LdmlPreview } from "@/components/input/types"
+import PendingProceedingPlausibilityCheck from "@/components/publication/PendingProceedingPlausibilityCheck.vue"
 import PublicationActions from "@/components/publication/PublicationActions.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
@@ -14,11 +15,15 @@ import PendingProceeding from "@/domain/pendingProceeding"
 import publishDocumentationUnitService from "@/services/publishDocumentationUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
+const hasPlausibilityCheckPassed = ref(false)
 const isPortalPublicationEnabled = useFeatureToggle("neuris.portal-publication")
 const textCheckAllToggle = useFeatureToggle("neuris.text-check-publication")
 
 const isPublishable = computed(
-  () => !!preview.value?.success && isPortalPublicationEnabled.value,
+  () =>
+    hasPlausibilityCheckPassed.value &&
+    !!preview.value?.success &&
+    isPortalPublicationEnabled.value,
 )
 
 const store = useDocumentUnitStore()
@@ -29,6 +34,8 @@ const { documentUnit: pendingProceeding } = storeToRefs(store) as {
 const preview = ref<LdmlPreview>()
 const previewError = ref()
 const fetchPreview = async () => {
+  if (!hasPlausibilityCheckPassed.value) return
+
   const previewResponse = await publishDocumentationUnitService.getPreview(
     pendingProceeding.value!.uuid,
   )
@@ -50,6 +57,11 @@ onBeforeMount(async () => {
   <div class="flex w-full flex-1 grow flex-col gap-32 p-24">
     <div class="flex w-full flex-col gap-24 bg-white p-24">
       <TitleElement>Prüfen</TitleElement>
+      <PendingProceedingPlausibilityCheck
+        @plausibility-check-updated="
+          (hasPassed) => (hasPlausibilityCheckPassed = hasPassed)
+        "
+      />
       <HandoverTextCheckView
         v-if="textCheckAllToggle"
         :document-id="pendingProceeding!.uuid"
