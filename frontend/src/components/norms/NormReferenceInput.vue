@@ -93,7 +93,6 @@ async function addNormReference() {
     await Promise.all(
       singleNormRef.value.map((instance) => instance.validateNorm()),
     )
-    console.log("All norms validated.")
   }
   if (
     !validationStore.getByField("singleNorm") &&

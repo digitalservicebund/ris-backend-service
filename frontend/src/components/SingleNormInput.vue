@@ -144,13 +144,6 @@ async function validateNorm() {
         )
       }
     }
-  } catch (error) {
-    console.log(
-      "Error validating norm: " +
-        singleNorm.value?.singleNorm +
-        " with error: " +
-        error,
-    )
   } finally {
     isNormValidating.value = false
   }
