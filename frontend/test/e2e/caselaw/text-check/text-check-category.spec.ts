@@ -323,7 +323,7 @@ test.describe("check text category", () => {
         },
         {
           name: "legalIssue",
-          germanWord: pendingProceedingLabels.legalIssue,
+          germanWord: pendingProceedingLabels.legalIssue + " *",
         },
       ]
 
