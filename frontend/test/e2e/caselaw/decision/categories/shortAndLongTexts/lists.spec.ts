@@ -58,7 +58,7 @@ test.describe(
       prefilledDocumentUnit,
     }) => {
       const orderedList = `<ol style="list-style-type: decimal;"><li><p>This is an ordered list</p></li><li><p>Second ordered list item</p></li></ol>`
-      const orderedListXMLPreview = `<ol class="list-decimal">`
+      const orderedListXMLPreview = `<ol style="list-style-type: decimal;">`
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
