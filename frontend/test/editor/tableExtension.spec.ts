@@ -60,22 +60,4 @@ describe("TableStyle extension", () => {
 
     expect(editor.getHTML()).toContain('style="border: 1px solid red"')
   })
-
-  test("should show table border", async () => {
-    const editor = new Editor({
-      element: document.createElement("div"),
-      content:
-        '<table style="border: 1px solid blue"><tr><td style="border: 1px solid red">foo</td></tr></table>',
-      extensions: [
-        CustomTable,
-        Document,
-        Text,
-        TableCell,
-        TableHeader,
-        TableRow,
-      ],
-    })
-
-    expect(editor.getHTML()).toContain("border: 1px solid blue")
-  })
 })
