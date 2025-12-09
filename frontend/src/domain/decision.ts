@@ -93,6 +93,7 @@ export const contentRelatedIndexingLabels: {
   countriesOfOrigin: "Herkunftsland",
   incomeTypes: "Einkunftsart",
   relatedPendingProceedings: "Verknüpfung anhängiges Verfahren",
+  nonApplicationNorms: "Nichtanwendungsgesetz",
 }
 export const allLabels = {
   caselawReferences: "Rechtsprechungsfundstellen",
@@ -206,6 +207,20 @@ export class Decision {
                   legalForce: norm.legalForce
                     ? new LegalForce({ ...norm.legalForce })
                     : undefined,
+                }),
+            ),
+          }),
+      )
+
+    if (data.contentRelatedIndexing?.nonApplicationNorms)
+      data.contentRelatedIndexing.nonApplicationNorms = data.contentRelatedIndexing.nonApplicationNorms.map(
+        (norm) =>
+          new NormReference({
+            ...norm,
+            singleNorms: norm.singleNorms?.map(
+              (norm) =>
+                new SingleNorm({
+                  ...norm,
                 }),
             ),
           }),

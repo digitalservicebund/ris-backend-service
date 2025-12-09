@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.NormReferenceType;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbstractNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbuseFeeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CountryOfOriginDto;
@@ -18,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.IncomeTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NonApplicationNormDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ObjectValueDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationDTO;
@@ -166,6 +169,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       addCountriesOfOrigin(builder, contentRelatedIndexing);
       addIncomeTypes(builder, contentRelatedIndexing);
       addRelatedPendingProceedings(builder, contentRelatedIndexing);
+      addNonApplicationNorms(builder, contentRelatedIndexing);
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -662,6 +666,20 @@ public class DecisionTransformer extends DocumentableTransformer {
     builder.incomeTypes(incomeTypeDTOS);
   }
 
+  private static void addNonApplicationNorms(
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.nonApplicationNorms() == null) {
+      return;
+    }
+
+    builder.nonApplicationNorms(
+        (List<NonApplicationNormDTO>)
+            (List<? extends AbstractNormReferenceDTO>)
+                NormReferenceTransformer.transformToDTO(
+                    contentRelatedIndexing.nonApplicationNorms(),
+                    NormReferenceType.NON_APPLICATION_NORM));
+  }
+
   public static Decision transformToDomain(DecisionDTO decisionDTO) {
     return transformToDomain(decisionDTO, null);
   }
@@ -788,6 +806,7 @@ public class DecisionTransformer extends DocumentableTransformer {
     return coreDataBuilder.build();
   }
 
+  @SuppressWarnings("java:S3776")
   private static ContentRelatedIndexing buildContentRelatedIndexing(DecisionDTO decisionDTO) {
     ContentRelatedIndexing.ContentRelatedIndexingBuilder contentRelatedIndexingBuilder =
         DocumentableTransformer.buildContentRelatedIndexing(decisionDTO).toBuilder();
@@ -908,6 +927,11 @@ public class DecisionTransformer extends DocumentableTransformer {
     if (decisionDTO.getRelatedPendingProceedings() != null) {
       contentRelatedIndexingBuilder.relatedPendingProceedings(
           getRelatedPendingProceedings(decisionDTO));
+    }
+
+    if (decisionDTO.getNonApplicationNorms() != null) {
+      contentRelatedIndexingBuilder.nonApplicationNorms(
+          NormReferenceTransformer.transformToDomain(decisionDTO.getNonApplicationNorms()));
     }
 
     return contentRelatedIndexingBuilder.build();

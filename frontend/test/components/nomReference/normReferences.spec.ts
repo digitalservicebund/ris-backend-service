@@ -7,7 +7,7 @@ import { setupServer } from "msw/node"
 import InputText from "primevue/inputtext"
 import { describe } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
-import NormReferences from "@/components/NormReferences.vue"
+import Norms from "@/components/norms/Norms.vue"
 import { Decision } from "@/domain/decision"
 import LegalForce from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
@@ -34,7 +34,7 @@ function renderComponent(normReferences?: NormReference[]) {
   })
   return {
     user,
-    ...render(NormReferences, {
+    ...render(Norms, {
       global: {
         plugins: [
           [

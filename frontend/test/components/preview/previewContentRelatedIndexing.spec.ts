@@ -174,6 +174,16 @@ describe("preview content related indexing", () => {
           fileNumber: "AV R 77/77",
         }),
       ],
+      nonApplicationNorms: [
+        new NormReference({
+          normAbbreviation: { abbreviation: "ABC" },
+          singleNorms: [
+            new SingleNorm({
+              singleNorm: "§ 1",
+            }),
+          ],
+        }),
+      ],
     })
 
     expect(await screen.findByText("Schlagwörter")).toBeInTheDocument()
@@ -199,6 +209,7 @@ describe("preview content related indexing", () => {
     expect(
       await screen.findByText("Verknüpfung anhängiges Verfahren"),
     ).toBeInTheDocument()
+    expect(await screen.findByText("Nichtanwendungsgesetz")).toBeInTheDocument()
   })
 
   test("renders multiple keywords and nothing else", async () => {
@@ -218,6 +229,7 @@ describe("preview content related indexing", () => {
       objectValues: [],
       abuseFees: [],
       relatedPendingProceedings: [],
+      nonApplicationNorms: [],
     })
 
     expect(await screen.findByText("Schlagwörter")).toBeInTheDocument()
@@ -243,6 +255,7 @@ describe("preview content related indexing", () => {
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
   test("renders multiple norms and single norms and nothing else", async () => {
@@ -277,6 +290,7 @@ describe("preview content related indexing", () => {
       objectValues: [],
       abuseFees: [],
       relatedPendingProceedings: [],
+      nonApplicationNorms: [],
     })
 
     expect(await screen.findByText("Normen")).toBeInTheDocument()
@@ -303,6 +317,7 @@ describe("preview content related indexing", () => {
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
   test("renders multiple active citations and nothing else", async () => {
@@ -346,6 +361,7 @@ describe("preview content related indexing", () => {
       objectValues: [],
       abuseFees: [],
       relatedPendingProceedings: [],
+      nonApplicationNorms: [],
     })
 
     expect(await screen.findByText("Aktivzitierung")).toBeInTheDocument()
@@ -375,6 +391,7 @@ describe("preview content related indexing", () => {
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
   test("renders multiple fields of law and nothing else", async () => {
@@ -437,6 +454,7 @@ describe("preview content related indexing", () => {
       objectValues: [],
       abuseFees: [],
       relatedPendingProceedings: [],
+      nonApplicationNorms: [],
     })
 
     expect(await screen.findByText("Sachgebiete")).toBeInTheDocument()
@@ -469,6 +487,7 @@ describe("preview content related indexing", () => {
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
   test("renders multiple job profiles and nothing else", async () => {
@@ -488,6 +507,7 @@ describe("preview content related indexing", () => {
       objectValues: [],
       abuseFees: [],
       relatedPendingProceedings: [],
+      nonApplicationNorms: [],
     })
 
     expect(await screen.findByText("Berufsbild")).toBeInTheDocument()
@@ -513,6 +533,7 @@ describe("preview content related indexing", () => {
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
   test("renders multiple collective agreements and nothing else", async () => {
@@ -548,6 +569,7 @@ describe("preview content related indexing", () => {
       objectValues: [],
       abuseFees: [],
       relatedPendingProceedings: [],
+      nonApplicationNorms: [],
     })
 
     expect(await screen.findByText("Tarifvertrag")).toBeInTheDocument()
@@ -579,6 +601,7 @@ describe("preview content related indexing", () => {
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
   test("renders legislative mandate and nothing else", async () => {
@@ -598,6 +621,7 @@ describe("preview content related indexing", () => {
       objectValues: [],
       abuseFees: [],
       relatedPendingProceedings: [],
+      nonApplicationNorms: [],
     })
 
     expect(await screen.findByText("Gesetzgebungsauftrag")).toBeInTheDocument()
@@ -622,6 +646,7 @@ describe("preview content related indexing", () => {
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
   test("renders dismissal inputs and nothing else", async () => {
@@ -641,6 +666,7 @@ describe("preview content related indexing", () => {
       objectValues: [],
       abuseFees: [],
       relatedPendingProceedings: [],
+      nonApplicationNorms: [],
     })
 
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
@@ -662,6 +688,7 @@ describe("preview content related indexing", () => {
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
   test("renders foreign language versions and nothing else", async () => {
@@ -694,6 +721,7 @@ describe("preview content related indexing", () => {
       objectValues: [],
       abuseFees: [],
       relatedPendingProceedings: [],
+      nonApplicationNorms: [],
     })
 
     expect(screen.getByText("Fremdsprachige Fassung")).toBeInTheDocument()
@@ -728,6 +756,7 @@ describe("preview content related indexing", () => {
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
   test("renders origin of translation and nothing else", async () => {
@@ -770,6 +799,7 @@ describe("preview content related indexing", () => {
       objectValues: [],
       abuseFees: [],
       relatedPendingProceedings: [],
+      nonApplicationNorms: [],
     })
 
     expect(screen.getByText("Herkunft der Übersetzung")).toBeInTheDocument()
@@ -795,6 +825,7 @@ describe("preview content related indexing", () => {
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
   test("renders no legislative mandate when it is false", async () => {
@@ -823,6 +854,7 @@ describe("preview content related indexing", () => {
       objectValues: [],
       abuseFees: [],
       relatedPendingProceedings: [],
+      nonApplicationNorms: [],
     })
 
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
@@ -846,6 +878,7 @@ describe("preview content related indexing", () => {
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
   test("renders definitions and nothing else", async () => {
@@ -874,6 +907,7 @@ describe("preview content related indexing", () => {
       objectValues: [],
       abuseFees: [],
       relatedPendingProceedings: [],
+      nonApplicationNorms: [],
     })
 
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
@@ -898,6 +932,7 @@ describe("preview content related indexing", () => {
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
   test("renders 'Gegenstandswert' and nothing else", async () => {
@@ -926,6 +961,7 @@ describe("preview content related indexing", () => {
       ],
       abuseFees: [],
       relatedPendingProceedings: [],
+      nonApplicationNorms: [],
     })
 
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
@@ -950,6 +986,7 @@ describe("preview content related indexing", () => {
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
   test("renders 'Missbrauchsgebühren' and nothing else", async () => {
@@ -977,6 +1014,7 @@ describe("preview content related indexing", () => {
           addressee: Addressee.BEVOLLMAECHTIGTER,
         }),
       ],
+      nonApplicationNorms: [],
     })
 
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
@@ -1001,6 +1039,7 @@ describe("preview content related indexing", () => {
     expect(container).toHaveTextContent(
       "Missbrauchsgebühren1.000 Euro (EUR), Bevollmächtigter",
     )
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
   test("renders 'Verknüpfung anhängiges Verfahren' and nothing else", async () => {
@@ -1029,6 +1068,7 @@ describe("preview content related indexing", () => {
           fileNumber: "AV R 77/77",
         }),
       ],
+      nonApplicationNorms: [],
     })
 
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
@@ -1052,6 +1092,59 @@ describe("preview content related indexing", () => {
       screen.getByText("Verknüpfung anhängiges Verfahren"),
     ).toBeInTheDocument()
     expect(container).toHaveTextContent(/bfh, 05\.05\.2025, av r 77\/77/i)
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
+  })
+
+  test("renders 'Nichtanwendungsgesetz' and nothing else", async () => {
+    const { container } = renderComponent({
+      keywords: [],
+      norms: [],
+      activeCitations: [],
+      fieldsOfLaw: [],
+      jobProfiles: [],
+      dismissalGrounds: [],
+      dismissalTypes: [],
+      collectiveAgreements: [],
+      hasLegislativeMandate: false,
+      originOfTranslations: [],
+      definitions: [],
+      objectValues: [],
+      abuseFees: [],
+      relatedPendingProceedings: [],
+      nonApplicationNorms: [
+        new NormReference({
+          normAbbreviation: { abbreviation: "ABC" },
+          singleNorms: [
+            new SingleNorm({
+              singleNorm: "§ 1",
+            }),
+          ],
+        }),
+      ],
+    })
+
+    expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
+    expect(screen.queryByText("Normen")).not.toBeInTheDocument()
+    expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
+    expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Herkunft der Übersetzung"),
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText("Definition")).not.toBeInTheDocument()
+    expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
+    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Verknüpfung anhängiges Verfahren"),
+    ).not.toBeInTheDocument()
+    expect(screen.getByText("Nichtanwendungsgesetz")).toBeInTheDocument()
+    expect(container).toHaveTextContent("NichtanwendungsgesetzABC - § 1")
   })
 
   describe("renders appeal admission", () => {
@@ -1151,6 +1244,7 @@ describe("preview content related indexing", () => {
       objectValues: [],
       abuseFees: [],
       relatedPendingProceedings: [],
+      nonApplicationNorms: [],
     })
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
@@ -1174,6 +1268,8 @@ describe("preview content related indexing", () => {
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
+
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
   test("renders nothing when elements are undefined", async () => {
@@ -1195,6 +1291,8 @@ describe("preview content related indexing", () => {
       appeal: undefined,
       objectValues: undefined,
       abuseFees: undefined,
+      relatedPendingProceedings: undefined,
+      nonApplicationNorms: undefined,
     })
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
@@ -1218,5 +1316,6 @@ describe("preview content related indexing", () => {
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
+    expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 })

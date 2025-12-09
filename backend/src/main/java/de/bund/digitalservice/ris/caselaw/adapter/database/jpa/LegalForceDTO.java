@@ -34,5 +34,5 @@ public class LegalForceDTO {
 
   @OneToOne()
   @JoinColumn(name = "norm_reference_id", referencedColumnName = "id")
-  private NormReferenceDTO normReference;
+  private AbstractNormReferenceDTO normReference;
 }

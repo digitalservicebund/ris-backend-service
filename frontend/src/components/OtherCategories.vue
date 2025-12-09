@@ -11,6 +11,7 @@ import ForeignLanguageVersions from "@/components/ForeignLanguageVersions.vue"
 import IncomeTypes from "@/components/IncomeTypes.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
+import NonApplicationNorms from "@/components/norms/NonApplicationNorms.vue"
 import ObjectValues from "@/components/ObjectValues.vue"
 import OriginOfTranslations from "@/components/OriginOfTranslations.vue"
 import PendingProceedings from "@/components/PendingProceedings.vue"
@@ -111,6 +112,12 @@ const hasRelatedPendingProceedings = computed(() => {
     : false
 })
 
+const hasNonApplicationNorms = computed(() => {
+  return contentRelatedIndexing.value.nonApplicationNorms?.length
+    ? contentRelatedIndexing.value.nonApplicationNorms?.length > 0
+    : false
+})
+
 const isConstitutionalCourt = computed(
   () =>
     store.documentUnit?.coreData.court?.jurisdictionType ===
@@ -154,6 +161,10 @@ const shouldDisplayAbuseFees = computed(
 const shouldDisplayLegislativeMandateCategory = computed(() => {
   return isConstitutionalCourt.value || hasLegislativeMandate.value
 })
+
+const shouldDisplayNonApplicationNorms = computed(
+  () => isFinanceCourt.value || hasNonApplicationNorms.value,
+)
 </script>
 
 <template>
@@ -256,6 +267,13 @@ const shouldDisplayLegislativeMandateCategory = computed(() => {
         <PendingProceedings
           :label="contentRelatedIndexingLabels.relatedPendingProceedings"
         />
+      </CategoryWrapper>
+      <CategoryWrapper
+        v-if="shouldDisplayNonApplicationNorms"
+        :label="contentRelatedIndexingLabels.nonApplicationNorms"
+        :should-show-button="!hasNonApplicationNorms"
+      >
+        <NonApplicationNorms />
       </CategoryWrapper>
     </div>
   </div>

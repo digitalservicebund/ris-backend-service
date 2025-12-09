@@ -7,10 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-/** A DTO representing a norm (Normen) */
+/** A DTO representing a non-application norm (Nichtanwendungsgesetz) */
 @NoArgsConstructor
 @SuperBuilder
 @Getter
 @Entity
-@DiscriminatorValue(NormReferenceType.NORM)
-public class NormReferenceDTO extends AbstractNormReferenceDTO {}
+@DiscriminatorValue(NormReferenceType.NON_APPLICATION_NORM)
+public class NonApplicationNormDTO extends AbstractNormReferenceDTO {}

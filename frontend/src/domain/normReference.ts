@@ -6,8 +6,6 @@ export default class NormReference implements EditableListItem {
   public normAbbreviation?: NormAbbreviation
   public singleNorms?: SingleNorm[]
   public normAbbreviationRawValue?: string
-  public hasForeignSource: boolean = false
-  // public uuid?: string
 
   static readonly requiredFields = ["normAbbreviation"] as const
   static readonly fields = [
@@ -92,9 +90,7 @@ export default class NormReference implements EditableListItem {
     } else return false
   }
 
-  private fieldIsEmpty(
-    value: NormReference[(typeof NormReference.fields)[number]],
-  ) {
+  fieldIsEmpty(value: NormReference[(typeof NormReference.fields)[number]]) {
     return value === undefined || !value || Object.keys(value).length === 0
   }
 }

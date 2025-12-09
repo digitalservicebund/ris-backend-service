@@ -126,7 +126,8 @@ insert into
     date_of_relevance,
     documentation_unit_id,
     norm_abbreviation_id,
-    rank
+    rank,
+                                        dtype
   )
 values
   (
@@ -137,7 +138,8 @@ values
     '2011',
     '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
     '33333333-2222-3333-4444-555555555555',
-    1
+    1,
+    'NORM'
   ),
   (
     'f0232240-7416-11ee-b962-0242ac120002',
@@ -147,7 +149,8 @@ values
     '2011',
     'f13e7fe2-78a5-11ee-b962-0242ac120002',
     '33333333-2222-3333-4444-555555555555',
-    1
+    1,
+    'NORM'
   );
 
 INSERT INTO

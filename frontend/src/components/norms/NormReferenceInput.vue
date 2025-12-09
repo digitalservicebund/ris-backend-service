@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
 import { computed, ref, watch } from "vue"
-import { ValidationError } from "./input/types"
+import { ValidationError } from "../input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import SingleNormInput from "@/components/SingleNormInput.vue"
@@ -93,14 +93,14 @@ async function addNormReference() {
       ...norm.value,
       singleNorms: singleNorms.value
         .map((singleNorm) =>
-          !singleNorm.isEmpty
-            ? new SingleNorm({
+          singleNorm.isEmpty
+            ? null
+            : new SingleNorm({
                 ...singleNorm,
                 legalForce: singleNorm.legalForce
                   ? new LegalForce({ ...singleNorm.legalForce })
                   : undefined,
-              })
-            : null,
+              }),
         )
         .filter((norm) => norm !== null) as SingleNorm[],
     })

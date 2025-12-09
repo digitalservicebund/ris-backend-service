@@ -96,7 +96,7 @@ test.describe("category import", () => {
       await test.step("disable import for empty source categories", async () => {
         await navigateToCategoryImport(page, documentNumber)
         await searchForDocumentUnitToImport(page, documentNumber)
-        await expect(page.getByText("Quellrubrik leer")).toHaveCount(36) // total number of importable categories
+        await expect(page.getByText("Quellrubrik leer")).toHaveCount(37) // total number of importable categories
       })
     },
   )
@@ -117,7 +117,7 @@ test.describe("category import", () => {
           prefilledDocumentUnitWithTexts.documentNumber,
         )
 
-        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(30) // number of non-importable categories, if target category already filled
+        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(31) // number of non-importable categories, if target category already filled
       })
     },
   )
@@ -945,7 +945,7 @@ test.describe("category import", () => {
     },
   )
 
-  // Rechtsmittel
+  // Tarifvertrag
   test(
     "import collective agreement",
     {
@@ -1141,6 +1141,36 @@ test.describe("category import", () => {
         await expect(
           page.getByText("BFH, 01.02.2022, IV R 99/99 | YYTestDoc0017"),
         ).toBeInViewport()
+      })
+    },
+  )
+
+  // Nichtanwendungsgesetz
+  test(
+    "import non-application norms (Nichtanwendungsgesetz)",
+    { tag: ["@RISDEV-9960"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(
+          page.getByLabel("Nichtanwendungsgesetz übernehmen"),
+        ).toBeVisible()
+        await page.getByLabel("Nichtanwendungsgesetz übernehmen").click()
+
+        await expect(page.getByText("BGB, § 1")).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(page.getByText("BGB, § 1")).toBeInViewport()
       })
     },
   )

@@ -6,7 +6,7 @@ import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import InputText from "primevue/inputtext"
 import { beforeEach, vi } from "vitest"
-import NormReferenceInput from "@/components/NormReferenceInput.vue"
+import NormReferenceInput from "@/components/norms/NormReferenceInput.vue"
 import { Decision } from "@/domain/decision"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
@@ -407,7 +407,6 @@ describe("NormReferenceEntry", () => {
           },
           singleNorms: [],
           normAbbreviationRawValue: undefined,
-          hasForeignSource: false,
         },
       ],
     ])
@@ -576,7 +575,6 @@ describe("NormReferenceEntry", () => {
               },
             ],
             normAbbreviationRawValue: undefined,
-            hasForeignSource: false,
           },
         ],
       ])
@@ -623,7 +621,6 @@ describe("NormReferenceEntry", () => {
               },
             ],
             normAbbreviationRawValue: undefined,
-            hasForeignSource: false,
           },
         ],
       ])

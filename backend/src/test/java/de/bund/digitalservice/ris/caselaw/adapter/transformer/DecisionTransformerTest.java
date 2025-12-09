@@ -2823,6 +2823,7 @@ class DecisionTransformerTest {
                 .countriesOfOrigin(Collections.emptyList())
                 .incomeTypes(Collections.emptyList())
                 .relatedPendingProceedings(Collections.emptyList())
+                .nonApplicationNorms(Collections.emptyList())
                 .build())
         .caselawReferences(Collections.emptyList())
         .literatureReferences(Collections.emptyList())
