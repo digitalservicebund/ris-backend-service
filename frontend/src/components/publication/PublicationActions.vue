@@ -107,7 +107,7 @@ const hasRelatedPendingProceeding = computed(() => {
         :status="decision.portalPublicationStatus"
       />
       <div v-if="hasRelatedPendingProceeding">
-        Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft
+        Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft:
         <div
           v-for="(pendingProceeding, id) in decision.contentRelatedIndexing
             .relatedPendingProceedings"

@@ -147,7 +147,7 @@ test.describe(
         await navigateToPublication(page, prefilledDocumentUnit.documentNumber)
         await expect(
           page.getByText(
-            "Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft",
+            "Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft:",
           ),
         ).toBeVisible()
         await expect(
