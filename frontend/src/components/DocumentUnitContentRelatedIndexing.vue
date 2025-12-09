@@ -7,7 +7,7 @@ import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import FieldsOfLaw from "@/components/field-of-law/FieldsOfLaw.vue"
 import KeyWords from "@/components/KeyWords.vue"
-import NormReferences from "@/components/norms/NormReferences.vue"
+import Norms from "@/components/norms/Norms.vue"
 import OtherCategories from "@/components/OtherCategories.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { DocumentationUnit } from "@/domain/documentationUnit"
@@ -52,7 +52,7 @@ const shouldDisplayAppealAdmission = computed(
       <KeyWords data-testid="keywords" @reset="slotProps.reset" />
     </CategoryWrapper>
     <FieldsOfLaw data-testid="fieldsOfLaw" />
-    <NormReferences data-testid="norms" />
+    <Norms data-testid="norms" />
     <ActiveCitations
       v-if="isDecision(documentUnit)"
       data-testid="activeCitations"

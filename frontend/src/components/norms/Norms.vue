@@ -1,6 +1,7 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
-import NormsList from "@/components/norms/NormsList.vue"
+import NormReferences from "@/components/norms/NormReferences.vue"
 import { contentRelatedIndexingLabels } from "@/domain/decision"
 import NormReference from "@/domain/normReference"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -9,12 +10,11 @@ const store = useDocumentUnitStore()
 </script>
 
 <template>
-  <NormsList
-    :id="DocumentUnitCategoriesEnum.NON_APPLICATION_NORMS"
+  <NormReferences
+    :id="DocumentUnitCategoriesEnum.NORMS"
     v-model="
-      store.documentUnit!.contentRelatedIndexing
-        .nonApplicationNorms as NormReference[]
+      store.documentUnit!.contentRelatedIndexing.norms as NormReference[]
     "
-    :label="contentRelatedIndexingLabels.nonApplicationNorms"
+    :label="contentRelatedIndexingLabels.norms"
   />
 </template>
