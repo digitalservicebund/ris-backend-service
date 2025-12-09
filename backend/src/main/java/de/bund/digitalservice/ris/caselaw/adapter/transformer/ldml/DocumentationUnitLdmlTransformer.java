@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.DocType;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.EmbeddedStructure;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.ShortTitle;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.CaselawReference;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Fundstelle;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.ImplicitReference;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Norm;
@@ -411,8 +412,8 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
   @SuppressWarnings("java:S1854")
   default void buildCaselawReference(
       RelatedDocumentationUnit relatedDocUnit,
-      Rechtszug.CaselawReference.CaselawReferenceBuilder<
-              ?, ? extends Rechtszug.CaselawReference.CaselawReferenceBuilder<?, ?>>
+      CaselawReference.CaselawReferenceBuilder<
+              ?, ? extends CaselawReference.CaselawReferenceBuilder<?, ?>>
           builder) {
     if (relatedDocUnit.getDocumentType() != null
         && isNotBlank(relatedDocUnit.getDocumentType().label())) {

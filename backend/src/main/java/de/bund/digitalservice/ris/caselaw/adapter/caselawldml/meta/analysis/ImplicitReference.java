@@ -24,6 +24,9 @@ public class ImplicitReference {
   @XmlElement(name = "nachgehend", namespace = CaseLawLdml.RIS_NS)
   private Rechtszug.Nachgehend nachgehend;
 
+  @XmlElement(name = "anhaengigesVerfahren", namespace = CaseLawLdml.RIS_NS)
+  private AnhaengigesVerfahren anhaengigesVerfahren;
+
   @XmlElement(name = "norm", namespace = CaseLawLdml.RIS_NS)
   private Norm norm;
 
