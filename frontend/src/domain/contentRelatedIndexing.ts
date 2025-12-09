@@ -34,4 +34,5 @@ export type ContentRelatedIndexing = {
   countriesOfOrigin?: CountryOfOrigin[]
   incomeTypes?: IncomeType[]
   relatedPendingProceedings?: RelatedPendingProceeding[]
+  nonApplicationNorms?: NormReference[]
 }

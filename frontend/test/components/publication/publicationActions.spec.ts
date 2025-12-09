@@ -45,7 +45,7 @@ describe("PublicationActions", () => {
     await renderComponent({ isPublishable: true, publicationWarnings: [] })
     expect(
       screen.getByText(
-        "Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft",
+        "Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft:",
       ),
     ).toBeInTheDocument()
     expect(
@@ -63,7 +63,7 @@ describe("PublicationActions", () => {
     await renderComponent({ isPublishable: true, publicationWarnings: [] })
     expect(
       screen.queryByText(
-        "Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft",
+        "Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft:",
       ),
     ).not.toBeInTheDocument()
   })

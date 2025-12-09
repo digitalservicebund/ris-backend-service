@@ -21,6 +21,7 @@ import NormReference from "@/domain/normReference"
 import PendingProceeding from "@/domain/pendingProceeding"
 import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
 import { PublicationState } from "@/domain/publicationStatus"
+import SingleNorm from "@/domain/singleNorm"
 import documentUnitService from "@/services/documentUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import routes from "~/test-helper/routes"
@@ -459,6 +460,127 @@ describe("CategoryImport", () => {
       (store.documentUnit as Decision).contentRelatedIndexing
         ?.relatedPendingProceedings?.[0].newEntry,
     ).toBe(true)
+  })
+
+  it("should import non-application norms (Nichtanwendungsgesetz)", async () => {
+    const target = new Decision("uuid", {
+      documentNumber: "XXRE123456789",
+      kind: Kind.DECISION,
+      contentRelatedIndexing: {
+        nonApplicationNorms: [],
+      },
+    })
+    const source = new Decision("456", {
+      kind: Kind.DECISION,
+      documentNumber: "TARGET3456789",
+      contentRelatedIndexing: {
+        nonApplicationNorms: [
+          new NormReference({
+            normAbbreviation: { abbreviation: "ABC" },
+            singleNorms: [
+              new SingleNorm({
+                singleNorm: "§ 1",
+              }),
+              new SingleNorm({
+                singleNorm: "§ 2",
+              }),
+            ],
+          }),
+        ],
+      },
+    })
+    vi.spyOn(documentUnitService, "getByDocumentNumber").mockResolvedValueOnce({
+      status: 200,
+      data: source,
+    })
+    const store = mockSessionStore(target)
+
+    const { user } = renderComponent()
+
+    await user.type(
+      screen.getByLabelText("Dokumentnummer Eingabefeld"),
+      "TARGET3456789",
+    )
+
+    await fireEvent.click(
+      screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
+    )
+
+    await fireEvent.click(
+      screen.getByLabelText("Nichtanwendungsgesetz übernehmen"),
+    )
+
+    expect(
+      (store.documentUnit as Decision).contentRelatedIndexing
+        .nonApplicationNorms,
+    ).toHaveLength(1)
+    expect(
+      (store.documentUnit as Decision).contentRelatedIndexing
+        ?.nonApplicationNorms?.[0].normAbbreviation?.abbreviation,
+    ).toEqual("ABC")
+    expect(
+      (store.documentUnit as Decision).contentRelatedIndexing
+        ?.nonApplicationNorms?.[0].singleNorms?.[0].singleNorm,
+    ).toEqual("§ 1")
+  })
+
+  it("should import norms (Normen)", async () => {
+    const target = new Decision("uuid", {
+      documentNumber: "XXRE123456789",
+      kind: Kind.DECISION,
+      contentRelatedIndexing: {
+        norms: [],
+      },
+    })
+    const source = new Decision("456", {
+      kind: Kind.DECISION,
+      documentNumber: "TARGET3456789",
+      contentRelatedIndexing: {
+        norms: [
+          new NormReference({
+            normAbbreviation: { abbreviation: "ABC" },
+            singleNorms: [
+              new SingleNorm({
+                singleNorm: "§ 1",
+              }),
+              new SingleNorm({
+                singleNorm: "§ 2",
+              }),
+            ],
+          }),
+        ],
+      },
+    })
+    vi.spyOn(documentUnitService, "getByDocumentNumber").mockResolvedValueOnce({
+      status: 200,
+      data: source,
+    })
+    const store = mockSessionStore(target)
+
+    const { user } = renderComponent()
+
+    await user.type(
+      screen.getByLabelText("Dokumentnummer Eingabefeld"),
+      "TARGET3456789",
+    )
+
+    await fireEvent.click(
+      screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
+    )
+
+    await fireEvent.click(screen.getByLabelText("Normen übernehmen"))
+
+    expect(
+      (store.documentUnit as Decision).contentRelatedIndexing.norms,
+    ).toHaveLength(1)
+    expect(
+      (store.documentUnit as Decision).contentRelatedIndexing?.norms?.[0]
+        .normAbbreviation?.abbreviation,
+    ).toEqual("ABC")
+    expect(
+      (store.documentUnit as Decision).contentRelatedIndexing?.norms?.[0]
+        .singleNorms?.[0].singleNorm,
+    ).toEqual("§ 1")
   })
 
   it("displays core data when document unit found", async () => {

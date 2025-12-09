@@ -6,12 +6,15 @@ import { flushPromises } from "@vue/test-utils"
 import { beforeAll, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
+import { clickOrderedListSubButton } from "~/test-helper/listUtil"
 import { mockDocumentForProsemirror } from "~/test-helper/prosemirror-document-mock"
 import {
   clickTableBorderSubButton,
   clickTableCellAlignmentSubButton,
   getFirstCellHTML,
   insertTable,
+  getOrderedListHTML,
+  hasOrderedList,
 } from "~/test-helper/tableUtil"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 import routes from "~pages"
@@ -311,6 +314,161 @@ describe("text editor toolbar", async () => {
       const cellStyle = getFirstCellHTML()
 
       expect(cellStyle).toContain(`vertical-align: bottom`)
+    })
+  })
+
+  describe("ordered list commands", () => {
+    test("should create numeric list when 'Numerisch (1, 2, 3)' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await clickOrderedListSubButton("Numerisch (1, 2, 3)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: decimal")
+    })
+
+    test("should create lowercase Latin list when 'Lateinisch klein (a, b, c)' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await clickOrderedListSubButton("Lateinisch klein (a, b, c)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: lower-alpha")
+    })
+
+    test("should create uppercase Latin list when 'Lateinisch groß (A, B, C)' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await clickOrderedListSubButton("Lateinisch groß (A, B, C)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: upper-alpha")
+    })
+
+    test("should create lowercase Roman list when 'Römisch klein (i, ii, iii)' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await clickOrderedListSubButton("Römisch klein (i, ii, iii)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: lower-roman")
+    })
+
+    test("should create uppercase Roman list when 'Römisch groß (I, II, III)' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await clickOrderedListSubButton("Römisch groß (I, II, III)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: upper-roman")
+    })
+
+    test("should change list style when switching from numeric to lowercase Latin", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+
+      await clickOrderedListSubButton("Numerisch (1, 2, 3)")
+      expect(getOrderedListHTML()).toContain("list-style-type: decimal")
+
+      await clickOrderedListSubButton("Lateinisch klein (a, b, c)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: lower-alpha")
+    })
+
+    test("should remove list when clicking the same list style twice", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+
+      await clickOrderedListSubButton("Numerisch (1, 2, 3)")
+      expect(hasOrderedList()).toBe(true)
+
+      await clickOrderedListSubButton("Numerisch (1, 2, 3)")
+
+      expect(hasOrderedList()).toBe(false)
+    })
+
+    test("should change list style when switching between different Roman numerals", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+
+      await clickOrderedListSubButton("Römisch klein (i, ii, iii)")
+      expect(getOrderedListHTML()).toContain("list-style-type: lower-roman")
+
+      await clickOrderedListSubButton("Römisch groß (I, II, III)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: upper-roman")
+    })
+
+    test("should create lowercase Greek list when 'Griechisch klein (α, β, γ)' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await clickOrderedListSubButton("Griechisch klein (α, β, γ)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: lower-greek")
+    })
+
+    test("should change list style when switching from Latin to Greek", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+
+      await clickOrderedListSubButton("Lateinisch klein (a, b, c)")
+      expect(getOrderedListHTML()).toContain("list-style-type: lower-alpha")
+
+      await clickOrderedListSubButton("Griechisch klein (α, β, γ)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: lower-greek")
     })
   })
 })

@@ -37,3 +37,16 @@ export const getFirstCellHTML = () => {
 
   return firstCell.getAttribute("style") || ""
 }
+
+export const getOrderedListHTML = () => {
+  const editorContent = screen.getByTestId("Gründe")
+  const orderedList = editorContent.querySelector("ol")
+  if (!orderedList) throw new Error("No ordered list found in the document.")
+
+  return orderedList.getAttribute("style") || ""
+}
+
+export const hasOrderedList = () => {
+  const editorContent = screen.getByTestId("Gründe")
+  return !!editorContent.querySelector("ol")
+}

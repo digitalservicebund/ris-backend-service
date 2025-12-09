@@ -154,6 +154,13 @@ const hasRelatedPendingProceedings = computed(() => {
     props.contentRelatedIndexing.relatedPendingProceedings?.length > 0
   )
 })
+
+const hasNonApplicationNorms = computed(() => {
+  return (
+    props.contentRelatedIndexing.nonApplicationNorms &&
+    props.contentRelatedIndexing.nonApplicationNorms?.length > 0
+  )
+})
 </script>
 
 <template>
@@ -549,6 +556,32 @@ const hasRelatedPendingProceedings = computed(() => {
           :key="relatedPendingProceeding.id"
         >
           {{ relatedPendingProceeding.renderSummary }}
+        </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasNonApplicationNorms">
+      <PreviewCategory>Nichtanwendungsgesetz</PreviewCategory>
+      <PreviewContent>
+        <div
+          v-for="norm in props.contentRelatedIndexing.nonApplicationNorms"
+          :key="norm.id"
+        >
+          <div v-if="norm.singleNorms && norm.singleNorms.length > 0">
+            <div v-for="(singleNorm, i) in norm.singleNorms" :key="i">
+              {{ norm.renderSummary }}
+              {{
+                singleNorm.renderSummary.length > 0
+                  ? " - " + singleNorm.renderSummary
+                  : ""
+              }}
+              {{
+                singleNorm.legalForce ? " | " + singleNorm.renderLegalForce : ""
+              }}
+            </div>
+          </div>
+          <div v-else>
+            {{ norm.renderSummary }}
+          </div>
         </div>
       </PreviewContent>
     </PreviewRow>
