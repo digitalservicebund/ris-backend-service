@@ -57,7 +57,7 @@ test.describe(
       page,
       prefilledDocumentUnit,
     }) => {
-      const orderedList = `<ol type="1" style="list-style-type: decimal;"><li><p>This is an ordered list</p></li><li><p>Second ordered list item</p></li></ol>`
+      const orderedList = `<ol style="list-style-type: decimal;"><li><p>This is an ordered list</p></li><li><p>Second ordered list item</p></li></ol>`
       const orderedListXMLPreview = `<ol class="list-decimal">`
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
@@ -96,7 +96,7 @@ test.describe(
       prefilledDocumentUnit,
     }) => {
       const bulletList = `<ul class="list-disc"><li><p>This is a list</p></li></ul>`
-      const orderedList = `<ol type="1" style="list-style-type: decimal;"><li><p>This is a list</p></li></ol>`
+      const orderedList = `<ol style="list-style-type: decimal;"><li><p>This is a list</p></li></ol>`
       const noList = `<p>This is a list</p>`
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
@@ -136,7 +136,7 @@ test.describe(
       prefilledDocumentUnit,
     }) => {
       const bulletList = `<ul class="list-disc"><li><p>This is a list</p></li></ul>`
-      const orderedList = `<ol type="1" style="list-style-type: decimal;"><li><p>This is a list</p></li></ol>`
+      const orderedList = `<ol style="list-style-type: decimal;"><li><p>This is a list</p></li></ol>`
       const noList = `<p>This is a list</p>`
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
