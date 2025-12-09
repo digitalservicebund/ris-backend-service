@@ -185,7 +185,7 @@ describe("Core Data", () => {
   })
 
   test("renders jurisdiction type", async () => {
-    const coreData = {
+    const coreData: CoreData = {
       court: {
         label: "BGH",
         jurisdictionType: "Ordentliche Gerichtsbarkeit",

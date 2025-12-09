@@ -1,11 +1,11 @@
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
+  fillCombobox,
   navigateToCategories,
   navigateToHandover,
   navigateToPreview,
   save,
-  selectCourt,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe(
@@ -22,7 +22,7 @@ test.describe(
           page.getByRole("button", { name: "Einkunftsart" }),
         ).toBeHidden()
 
-        await selectCourt(page, "BFH")
+        await fillCombobox(page, "Gericht", "BFH")
         await expect(
           page.getByRole("button", { name: "Einkunftsart" }),
         ).toBeVisible()
@@ -80,7 +80,7 @@ test.describe(
       })
 
       await test.step("Einträge werden bei Gerichtswechel weiterhin angezeigt", async () => {
-        await selectCourt(page, "BGH")
+        await fillCombobox(page, "Gericht", "BGH")
         await expect(
           page.getByText("Land- und Forstwirtschaft, Förster"),
         ).toBeVisible()

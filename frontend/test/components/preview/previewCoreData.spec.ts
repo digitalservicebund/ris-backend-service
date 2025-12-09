@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewCoreData from "@/components/preview/PreviewCoreData.vue"
 import { CoreData } from "@/domain/coreData"
+import { JurisdictionType } from "@/domain/court"
 import { Kind } from "@/domain/documentationUnitKind"
 import { SourceValue } from "@/domain/source"
 
@@ -622,7 +623,7 @@ describe("preview core data", () => {
     ],
     [
       "Gerichtsbarkeit",
-      { court: { label: "foo", jurisdictionType: "foo" } },
+      { court: { label: "foo", jurisdictionType: "foo" as JurisdictionType } },
       [
         "Fehlerhaftes Gericht",
         "Aktenzeichen",
