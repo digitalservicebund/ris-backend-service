@@ -24,7 +24,6 @@ class CustomTableView extends TableView {
 
   update(node: Node) {
     super.update(node)
-    this.applyAttributes()
     return true
   }
 }
