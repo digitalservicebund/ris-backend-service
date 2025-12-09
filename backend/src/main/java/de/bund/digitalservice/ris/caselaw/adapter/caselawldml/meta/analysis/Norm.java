@@ -16,7 +16,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Norm {
   @XmlAttribute(name = "domainTerm")
-  private static final String DOMAIN_TERM = "Norm";
+  @Builder.Default
+  private String domainTerm = "Norm";
 
   @XmlElement(name = "abkuerzung", namespace = CaseLawLdml.RIS_NS)
   private Abkuerzung abkuerzung;

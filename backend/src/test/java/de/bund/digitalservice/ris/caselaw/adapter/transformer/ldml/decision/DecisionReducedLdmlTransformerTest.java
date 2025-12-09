@@ -516,6 +516,19 @@ class DecisionReducedLdmlTransformerTest {
                                 .terminology("terminology test")
                                 .build(),
                             IncomeType.builder().typeOfIncome(TypeOfIncome.GEWSTG).build()))
+                    .nonApplicationNorms(
+                        List.of(
+                            NormReference.builder()
+                                .singleNorms(
+                                    List.of(
+                                        SingleNorm.builder()
+                                            .singleNorm("§ 30")
+                                            .dateOfRelevance("2020")
+                                            .dateOfVersion(LocalDate.of(2021, 2, 5))
+                                            .build()))
+                                .normAbbreviation(
+                                    NormAbbreviation.builder().abbreviation("SeefBgV").build())
+                                .build()))
                     .build())
             .previousDecisions(List.of(previousDecision1, previousDecision2))
             .ensuingDecisions(List.of(ensuingDecision1, ensuingDecision2))

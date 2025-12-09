@@ -53,6 +53,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Correction;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.IncomeType;
+import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
@@ -107,9 +108,11 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
   protected List<ImplicitReference> buildImplicitReferences(Decision decision) {
     return Stream.concat(
             Stream.concat(
-                super.buildImplicitReferences(decision).stream(),
-                buildFundstellen(decision).stream()),
-            buildAnhaengigeVerfahren(decision).stream())
+                Stream.concat(
+                    super.buildImplicitReferences(decision).stream(),
+                    buildFundstellen(decision).stream()),
+                buildAnhaengigeVerfahren(decision).stream()),
+            buildNichtanwendungsgesetze(decision).stream())
         .toList();
   }
 
@@ -976,5 +979,31 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     }
 
     return anhaengigeVerfahren;
+  }
+
+  private List<ImplicitReference> buildNichtanwendungsgesetze(Decision documentationUnit) {
+    List<ImplicitReference> nichtanwendungsgesetze = new ArrayList<>();
+    if (documentationUnit.contentRelatedIndexing() == null) {
+      return nichtanwendungsgesetze;
+    }
+
+    var nonApplicationNorms = documentationUnit.contentRelatedIndexing().nonApplicationNorms();
+    if (nonApplicationNorms == null) {
+      return nichtanwendungsgesetze;
+    }
+
+    for (NormReference nonApplicationNorm : nonApplicationNorms) {
+      if (nonApplicationNorm == null) continue;
+
+      var norm = buildNorm(nonApplicationNorm).domainTerm("Nichtanwendungsgesetz").build();
+
+      nichtanwendungsgesetze.add(
+          ImplicitReference.builder()
+              .domainTerm("Nichtanwendungsgesetz")
+              .nichtanwendungsgesetz(norm)
+              .build());
+    }
+
+    return nichtanwendungsgesetze;
   }
 }
