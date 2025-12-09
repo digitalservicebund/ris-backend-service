@@ -70,16 +70,11 @@ describe("Pending proceeding texts", () => {
     expect(screen.getByText("Kurztexte")).toBeVisible()
   })
 
-  test("renders all text categories as buttons", async () => {
+  test("renders all non-required text categories as buttons", async () => {
     await renderComponent()
     expect(
       screen.getByRole("button", {
         name: pendingProceedingLabels.headline,
-      }),
-    ).toBeVisible()
-    expect(
-      screen.getByRole("button", {
-        name: pendingProceedingLabels.legalIssue + " *",
       }),
     ).toBeVisible()
 
@@ -87,6 +82,14 @@ describe("Pending proceeding texts", () => {
       screen.getByRole("button", {
         name: pendingProceedingLabels.resolutionNote,
       }),
+    ).toBeVisible()
+  })
+
+  test("renders required text category directly", async () => {
+    await renderComponent()
+
+    expect(
+      screen.getByTestId(pendingProceedingLabels.legalIssue + " *"),
     ).toBeVisible()
   })
 
