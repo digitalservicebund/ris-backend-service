@@ -147,6 +147,20 @@ const hasIncomeTypes = computed(() => {
     props.contentRelatedIndexing.incomeTypes?.length > 0
   )
 })
+
+const hasRelatedPendingProceedings = computed(() => {
+  return (
+    props.contentRelatedIndexing.relatedPendingProceedings &&
+    props.contentRelatedIndexing.relatedPendingProceedings?.length > 0
+  )
+})
+
+const hasNonApplicationNorms = computed(() => {
+  return (
+    props.contentRelatedIndexing.nonApplicationNorms &&
+    props.contentRelatedIndexing.nonApplicationNorms?.length > 0
+  )
+})
 </script>
 
 <template>
@@ -529,6 +543,46 @@ const hasIncomeTypes = computed(() => {
         >
           <IncomeTypeSummaryBasic :data="incomeType" />
         </span>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasRelatedPendingProceedings">
+      <PreviewCategory>{{
+        contentRelatedIndexingLabels.relatedPendingProceedings
+      }}</PreviewCategory>
+      <PreviewContent>
+        <div
+          v-for="relatedPendingProceeding in props.contentRelatedIndexing
+            .relatedPendingProceedings"
+          :key="relatedPendingProceeding.id"
+        >
+          {{ relatedPendingProceeding.renderSummary }}
+        </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasNonApplicationNorms">
+      <PreviewCategory>Nichtanwendungsgesetz</PreviewCategory>
+      <PreviewContent>
+        <div
+          v-for="norm in props.contentRelatedIndexing.nonApplicationNorms"
+          :key="norm.id"
+        >
+          <div v-if="norm.singleNorms && norm.singleNorms.length > 0">
+            <div v-for="(singleNorm, i) in norm.singleNorms" :key="i">
+              {{ norm.renderSummary }}
+              {{
+                singleNorm.renderSummary.length > 0
+                  ? " - " + singleNorm.renderSummary
+                  : ""
+              }}
+              {{
+                singleNorm.legalForce ? " | " + singleNorm.renderLegalForce : ""
+              }}
+            </div>
+          </div>
+          <div v-else>
+            {{ norm.renderSummary }}
+          </div>
+        </div>
       </PreviewContent>
     </PreviewRow>
   </FlexContainer>

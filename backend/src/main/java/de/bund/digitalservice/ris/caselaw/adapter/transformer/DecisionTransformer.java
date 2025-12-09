@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.NormReferenceType;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbstractNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbuseFeeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CountryOfOriginDto;
@@ -18,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.IncomeTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NonApplicationNormDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ObjectValueDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationDTO;
@@ -41,6 +44,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ObjectValue;
 import de.bund.digitalservice.ris.caselaw.domain.OriginOfTranslation;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
@@ -164,6 +168,8 @@ public class DecisionTransformer extends DocumentableTransformer {
       addAbuseFees(builder, contentRelatedIndexing);
       addCountriesOfOrigin(builder, contentRelatedIndexing);
       addIncomeTypes(builder, contentRelatedIndexing);
+      addRelatedPendingProceedings(builder, contentRelatedIndexing);
+      addNonApplicationNorms(builder, contentRelatedIndexing);
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -660,6 +666,20 @@ public class DecisionTransformer extends DocumentableTransformer {
     builder.incomeTypes(incomeTypeDTOS);
   }
 
+  private static void addNonApplicationNorms(
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.nonApplicationNorms() == null) {
+      return;
+    }
+
+    builder.nonApplicationNorms(
+        (List<NonApplicationNormDTO>)
+            (List<? extends AbstractNormReferenceDTO>)
+                NormReferenceTransformer.transformToDTO(
+                    contentRelatedIndexing.nonApplicationNorms(),
+                    NormReferenceType.NON_APPLICATION_NORM));
+  }
+
   public static Decision transformToDomain(DecisionDTO decisionDTO) {
     return transformToDomain(decisionDTO, null);
   }
@@ -786,6 +806,7 @@ public class DecisionTransformer extends DocumentableTransformer {
     return coreDataBuilder.build();
   }
 
+  @SuppressWarnings("java:S3776")
   private static ContentRelatedIndexing buildContentRelatedIndexing(DecisionDTO decisionDTO) {
     ContentRelatedIndexing.ContentRelatedIndexingBuilder contentRelatedIndexingBuilder =
         DocumentableTransformer.buildContentRelatedIndexing(decisionDTO).toBuilder();
@@ -903,6 +924,16 @@ public class DecisionTransformer extends DocumentableTransformer {
       contentRelatedIndexingBuilder.incomeTypes(incomeTypes);
     }
 
+    if (decisionDTO.getRelatedPendingProceedings() != null) {
+      contentRelatedIndexingBuilder.relatedPendingProceedings(
+          getRelatedPendingProceedings(decisionDTO));
+    }
+
+    if (decisionDTO.getNonApplicationNorms() != null) {
+      contentRelatedIndexingBuilder.nonApplicationNorms(
+          NormReferenceTransformer.transformToDomain(decisionDTO.getNonApplicationNorms()));
+    }
+
     return contentRelatedIndexingBuilder.build();
   }
 
@@ -1013,5 +1044,32 @@ public class DecisionTransformer extends DocumentableTransformer {
                   .build();
             })
         .toList();
+  }
+
+  static List<RelatedPendingProceeding> getRelatedPendingProceedings(DecisionDTO decisionDTO) {
+    if (decisionDTO.getRelatedPendingProceedings() == null) {
+      return List.of();
+    }
+
+    return decisionDTO.getRelatedPendingProceedings().stream()
+        .map(RelatedPendingProceedingTransformer::transformToDomain)
+        .toList();
+  }
+
+  static void addRelatedPendingProceedings(
+      DecisionDTO.DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing updatedDomainObject) {
+    if (updatedDomainObject.relatedPendingProceedings() != null) {
+      AtomicInteger i = new AtomicInteger(1);
+      builder.relatedPendingProceedings(
+          updatedDomainObject.relatedPendingProceedings().stream()
+              .map(RelatedPendingProceedingTransformer::transformToDTO)
+              .filter(Objects::nonNull)
+              .map(
+                  relatedPendingProceedingDTO -> {
+                    relatedPendingProceedingDTO.setRank(i.getAndIncrement());
+                    return relatedPendingProceedingDTO;
+                  })
+              .toList());
+    }
   }
 }

@@ -1541,6 +1541,34 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             du6.getDocumentNumber());
   }
 
+  @Test
+  void testSearchLinkableDocumentationUnits_shouldOnlyFindPendingProceedings() {
+    createDocumentationUnit(
+        LocalDate.parse("2023-02-02"), List.of("AkteZ"), "DS", PublicationStatus.PUBLISHED, null);
+    EntityBuilderTestUtil.createAndSavePendingProceeding(
+        repository,
+        PendingProceedingDTO.builder()
+            .documentNumber("DOCNUMBER_002")
+            .documentationOffice(documentationOffice));
+
+    RisBodySpec<SliceTestImpl<RelatedDocumentationUnit>> risBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .put()
+            .uri(
+                "/api/v1/caselaw/documentunits/search-linkable-documentation-units?pg=0&sz=30&onlyPendingProceedings=true")
+            .bodyValue(RelatedDocumentationUnit.builder().build())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<>() {});
+    List<RelatedDocumentationUnit> content = risBody.returnResult().getResponseBody().getContent();
+    assertThat(content).hasSize(1);
+    assertThat(content)
+        .extracting(RelatedDocumentationUnit::getDocumentNumber)
+        .containsExactlyInAnyOrder("DOCNUMBER_002");
+  }
+
   private DocumentationUnitDTO createDocumentationUnit(
       LocalDate decisionDate,
       List<String> fileNumbers,

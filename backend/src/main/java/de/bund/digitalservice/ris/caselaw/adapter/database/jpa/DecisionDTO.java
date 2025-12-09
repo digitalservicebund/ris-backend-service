@@ -165,6 +165,13 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   private List<PendingDecisionDTO> pendingDecisions = new ArrayList<>();
 
+  /** Verknüpfte anhängige Verfahren */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @Builder.Default
+  @OrderBy("rank")
+  private List<RelatedPendingProceedingDTO> relatedPendingProceedings = new ArrayList<>();
+
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
@@ -312,6 +319,13 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   @Builder.Default
   private List<IncomeTypeDTO> incomeTypes = new ArrayList<>();
+
+  /** Nichtanwendungsgesetz */
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @Builder.Default
+  @OrderBy("rank")
+  private List<NonApplicationNormDTO> nonApplicationNorms = new ArrayList<>();
 
   @Override
   @SuppressWarnings("java:S2097") // Class type check is not recognized by Sonar

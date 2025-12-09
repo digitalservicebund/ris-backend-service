@@ -1,13 +1,13 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
-import { vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import OtherCategories from "@/components/OtherCategories.vue"
 import AbuseFee, { Addressee } from "@/domain/abuseFee"
 import { AppealWithdrawal } from "@/domain/appeal"
 import { CollectiveAgreement } from "@/domain/collectiveAgreement"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
+import { Court, JurisdictionType } from "@/domain/court"
 import { Decision } from "@/domain/decision"
 import Definition from "@/domain/definition"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
@@ -15,28 +15,10 @@ import ObjectValue, { ProceedingType } from "@/domain/objectValue"
 import OriginOfTranslation, {
   TranslationType,
 } from "@/domain/originOfTranslation"
+import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import routes from "~/test-helper/routes"
 
-function mockSessionStore(
-  contentRelatedIndexing: ContentRelatedIndexing,
-  courtType: string = "",
-  jurisdictionType: string = "",
-) {
-  const mockedSessionStore = useDocumentUnitStore()
-  mockedSessionStore.documentUnit = new Decision("q834", {
-    contentRelatedIndexing: contentRelatedIndexing,
-    coreData: {
-      court: {
-        label: courtType,
-        type: courtType,
-        jurisdictionType,
-      },
-    },
-  })
-
-  return mockedSessionStore
-}
 describe("other categories", () => {
   beforeEach(() => {
     vi.resetModules()
@@ -46,7 +28,7 @@ describe("other categories", () => {
   describe("LegislativeMandate", () => {
     test("should not display legislative mandate when it is false and courtType is non-constitutional", async () => {
       // Arrange
-      mockSessionStore({ hasLegislativeMandate: false }, "BAG")
+      mockSessionStore({ hasLegislativeMandate: false }, BAG)
 
       // Act
       render(OtherCategories)
@@ -61,7 +43,7 @@ describe("other categories", () => {
 
     test("should display legislative mandate button when it is false and courtType is constitutional", async () => {
       // Arrange
-      mockSessionStore({ hasLegislativeMandate: false }, "BVerfG")
+      mockSessionStore({ hasLegislativeMandate: false }, BVerfG)
 
       // Act
       render(OtherCategories)
@@ -76,7 +58,7 @@ describe("other categories", () => {
 
     test("should display checked legislative mandate when it is true and has constitutional courtType", async () => {
       // Arrange
-      mockSessionStore({ hasLegislativeMandate: true }, "BVerfG")
+      mockSessionStore({ hasLegislativeMandate: true }, BVerfG)
 
       // Act
       render(OtherCategories)
@@ -91,7 +73,7 @@ describe("other categories", () => {
 
     test("should display checked legislative mandate when it is true and has non-constitutional courtType", async () => {
       // Arrange
-      mockSessionStore({ hasLegislativeMandate: true }, "BAG")
+      mockSessionStore({ hasLegislativeMandate: true }, BAG)
 
       // Act
       render(OtherCategories)
@@ -108,7 +90,7 @@ describe("other categories", () => {
   describe("Dismissal Inputs", () => {
     test("should not display dismissal inputs/button when inputs are empty and courtType is non-labor", async () => {
       // Arrange
-      mockSessionStore({ dismissalGrounds: [], dismissalTypes: [] }, "BGH")
+      mockSessionStore({ dismissalGrounds: [], dismissalTypes: [] }, BGH)
 
       // Act
       render(OtherCategories)
@@ -121,7 +103,7 @@ describe("other categories", () => {
 
     test("should display dismissal button when inputs are empty and courtType is labor", async () => {
       // Arrange
-      mockSessionStore({ dismissalGrounds: [], dismissalTypes: [] }, "BAG")
+      mockSessionStore({ dismissalGrounds: [], dismissalTypes: [] }, BAG)
 
       // Act
       render(OtherCategories)
@@ -136,7 +118,7 @@ describe("other categories", () => {
       // Arrange
       mockSessionStore(
         { dismissalGrounds: ["ground"], dismissalTypes: [] },
-        "BGH",
+        BGH,
       )
 
       // Act
@@ -150,10 +132,7 @@ describe("other categories", () => {
 
     test("should display dismissal inputs when ground is non-empty and courtType is non-labor", async () => {
       // Arrange
-      mockSessionStore(
-        { dismissalGrounds: [], dismissalTypes: ["type"] },
-        "BGH",
-      )
+      mockSessionStore({ dismissalGrounds: [], dismissalTypes: ["type"] }, BGH)
 
       // Act
       render(OtherCategories)
@@ -171,7 +150,7 @@ describe("other categories", () => {
           dismissalGrounds: ["ground"],
           dismissalTypes: ["type"],
         },
-        "BAG",
+        BAG,
       )
 
       // Act
@@ -192,7 +171,7 @@ describe("other categories", () => {
 
     test("should not display collective agreements button when it is empty and not a labor court", async () => {
       // Arrange
-      mockSessionStore({ collectiveAgreements: [] }, "BVerfG")
+      mockSessionStore({ collectiveAgreements: [] }, BVerfG)
 
       // Act
       render(OtherCategories)
@@ -208,7 +187,7 @@ describe("other categories", () => {
 
     test("should display collective agreements button when it is empty and labor court", async () => {
       // Arrange
-      mockSessionStore({ collectiveAgreements: [] }, "LArbG")
+      mockSessionStore({ collectiveAgreements: [] }, LArbG)
 
       // Act
       render(OtherCategories)
@@ -230,7 +209,7 @@ describe("other categories", () => {
             new CollectiveAgreement({ name: "Stehende Bühnen", norm: "§ 23" }),
           ],
         },
-        "BVerfG",
+        BVerfG,
       )
 
       // Act
@@ -252,7 +231,7 @@ describe("other categories", () => {
   describe("E-VSF", () => {
     test("should not display evsf button when it is empty and not a financial court", async () => {
       // Arrange
-      mockSessionStore({ evsf: undefined }, "BVerfG")
+      mockSessionStore({ evsf: undefined }, BVerfG)
 
       // Act
       render(OtherCategories)
@@ -268,7 +247,7 @@ describe("other categories", () => {
 
     test("should display E-VSF button when it is empty and financial court", async () => {
       // Arrange
-      mockSessionStore({ evsf: undefined }, "BFH", "Finanzgerichtsbarkeit")
+      mockSessionStore({ evsf: undefined }, BFH)
 
       // Act
       render(OtherCategories)
@@ -282,7 +261,7 @@ describe("other categories", () => {
 
     test("should display E-VSF when it is not empty without financial court", async () => {
       // Arrange
-      mockSessionStore({ evsf: "X 00 00-0-0" }, "BVerfG")
+      mockSessionStore({ evsf: "X 00 00-0-0" }, BVerfG)
 
       // Act
       render(OtherCategories)
@@ -300,7 +279,7 @@ describe("other categories", () => {
   describe("Definition", () => {
     test("should display button without existing definitions", async () => {
       // Arrange
-      mockSessionStore({ definitions: [] }, "BGH")
+      mockSessionStore({ definitions: [] }, BGH)
 
       // Act
       render(OtherCategories)
@@ -315,7 +294,7 @@ describe("other categories", () => {
       // Arrange
       mockSessionStore(
         { definitions: [new Definition({ definedTerm: "abc" })] },
-        "BGH",
+        BGH,
       )
 
       // Act
@@ -486,7 +465,7 @@ describe("other categories", () => {
   describe("Appeal", () => {
     test("should not display appeal button when it is empty and not a financial court", async () => {
       // Arrange
-      mockSessionStore({ appeal: undefined }, "BVerfG")
+      mockSessionStore({ appeal: undefined }, BVerfG)
 
       // Act
       render(OtherCategories)
@@ -500,7 +479,7 @@ describe("other categories", () => {
 
     test("should display appeal button when it is undefined and financial court", async () => {
       // Arrange
-      mockSessionStore({ appeal: undefined }, "BFH", "Finanzgerichtsbarkeit")
+      mockSessionStore({ appeal: undefined }, BFH)
 
       // Act
       render(OtherCategories)
@@ -516,7 +495,7 @@ describe("other categories", () => {
       // Arrange
       mockSessionStore(
         { appeal: { appealWithdrawal: AppealWithdrawal.JA } },
-        "BVerfG",
+        BVerfG,
       )
 
       // Act
@@ -622,11 +601,9 @@ describe("other categories", () => {
       routes: routes,
     })
 
-    it("should display 'Missbrauchsgebühren' button when no data", async () => {
+    it("should display 'Missbrauchsgebühren' button when no data and VerfG", async () => {
       // Arrange
-      mockSessionStore({
-        abuseFees: [],
-      })
+      mockSessionStore({ abuseFees: [] }, BVerfG)
 
       // Act
       render(OtherCategories, {
@@ -641,7 +618,24 @@ describe("other categories", () => {
       ).toBeInTheDocument()
     })
 
-    it("should display 'Missbrauchsgebühren'", async () => {
+    it("should not display 'Missbrauchsgebühren' button when no data and not VerfG", async () => {
+      // Arrange
+      mockSessionStore({ abuseFees: [] }, BAG)
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(
+        screen.queryByRole("button", { name: "Missbrauchsgebühren" }),
+      ).not.toBeInTheDocument()
+    })
+
+    it("should display 'Missbrauchsgebühren' with data for any court", async () => {
       // Arrange
       mockSessionStore({
         abuseFees: [
@@ -671,4 +665,108 @@ describe("other categories", () => {
       ).toBeVisible()
     })
   })
+
+  describe("related pending proceedings (Verknüpfung anhängiges Verfahren)", () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: routes,
+    })
+
+    it("should display 'Verknüpfung anhängiges Verfahren' button when no data", async () => {
+      // Arrange
+      mockSessionStore({
+        relatedPendingProceedings: [],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(
+        screen.getByRole("button", {
+          name: "Verknüpfung anhängiges Verfahren",
+        }),
+      ).toBeInTheDocument()
+    })
+
+    it("should display 'Verknüpfung anhängiges Verfahren'", async () => {
+      // Arrange
+      mockSessionStore({
+        relatedPendingProceedings: [
+          new RelatedPendingProceeding({
+            documentNumber: "YYTestDoc0017",
+            court: {
+              type: "BGH",
+              label: "BGH",
+            },
+            decisionDate: "2022-02-01",
+            fileNumber: "IV R 99/99",
+          }),
+        ],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(
+        await screen.findByText("Verknüpfung anhängiges Verfahren"),
+      ).toBeVisible()
+      expect(
+        screen.getByText(/bgh, 01\.02\.2022, iv r 99\/99 \|/i),
+      ).toBeVisible()
+    })
+  })
 })
+
+function mockSessionStore(
+  contentRelatedIndexing: ContentRelatedIndexing,
+  court: Court = testCourt,
+) {
+  const mockedSessionStore = useDocumentUnitStore()
+  mockedSessionStore.documentUnit = new Decision("q834", {
+    contentRelatedIndexing: contentRelatedIndexing,
+    coreData: { court },
+  })
+
+  return mockedSessionStore
+}
+
+const testCourt: Court = {
+  label: "label",
+  type: "courtType",
+  jurisdictionType: "jurisdictionType" as JurisdictionType,
+}
+const BVerfG: Court = {
+  label: "BVerfG",
+  type: "BVerfG",
+  jurisdictionType: "Verfassungsgerichtsbarkeit",
+}
+const BAG: Court = {
+  label: "BAG",
+  type: "BAG",
+  jurisdictionType: "Arbeitsgerichtsbarkeit",
+}
+const LArbG: Court = {
+  label: "LArbG Hamburg",
+  type: "LArbG",
+  jurisdictionType: "Arbeitsgerichtsbarkeit",
+}
+const BGH: Court = {
+  label: "BGH",
+  type: "BGH",
+  jurisdictionType: "Ordentliche Gerichtsbarkeit",
+}
+const BFH: Court = {
+  label: "BFH",
+  type: "BFH",
+  jurisdictionType: "Finanzgerichtsbarkeit",
+}

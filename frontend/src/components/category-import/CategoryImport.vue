@@ -22,6 +22,7 @@ import {
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import NormReference from "@/domain/normReference"
 import ParticipatingJudge from "@/domain/participatingJudge"
+import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
 import Reference from "@/domain/reference"
 import SingleNorm from "@/domain/singleNorm"
 import documentUnitService from "@/services/documentUnitService"
@@ -224,8 +225,14 @@ const handleImport = async (key: keyof typeof allLabels) => {
     case "norms":
       importNorms()
       break
+    case "nonApplicationNorms":
+      importNonApplicationNorms()
+      break
     case "activeCitations":
       importActiveCitations()
+      break
+    case "relatedPendingProceedings":
+      importRelatedPendingProceedings()
       break
     case "decisionNames":
       importDecisionNames()
@@ -390,10 +397,25 @@ function importFieldsOfLaw() {
 }
 
 function importNorms() {
-  const source = sourceDocumentUnit.value?.contentRelatedIndexing.norms
+  importNormReferences(
+    sourceDocumentUnit.value?.contentRelatedIndexing.norms,
+    targetDocumentUnit.value!.contentRelatedIndexing.norms,
+  )
+}
+
+function importNonApplicationNorms() {
+  importNormReferences(
+    sourceDocumentUnit.value?.contentRelatedIndexing.nonApplicationNorms,
+    targetDocumentUnit.value!.contentRelatedIndexing.nonApplicationNorms,
+  )
+}
+
+function importNormReferences(
+  source: NormReference[] | undefined,
+  targetNorms: NormReference[] | undefined,
+) {
   if (!source) return
 
-  const targetNorms = targetDocumentUnit.value!.contentRelatedIndexing.norms
   if (targetNorms) {
     source.forEach((importableNorm) => {
       // first check for abbreviation, then for raw value
@@ -465,6 +487,27 @@ function importActiveCitations() {
     ...targetActiveCitations,
     ...uniqueImportableFieldsOfLaw,
   ] as ActiveCitation[]
+}
+
+function importRelatedPendingProceedings() {
+  const source =
+    sourceDocumentUnit.value?.contentRelatedIndexing.relatedPendingProceedings
+  if (!source) return
+
+  const targetPendingProceedings =
+    targetDocumentUnit.value!.contentRelatedIndexing
+      .relatedPendingProceedings ?? []
+
+  const uniqueImportable = source.map((pendingProceeding) => ({
+    ...pendingProceeding,
+    uuid: crypto.randomUUID(),
+    newEntry: true,
+  }))
+
+  targetDocumentUnit.value!.contentRelatedIndexing.relatedPendingProceedings = [
+    ...targetPendingProceedings,
+    ...uniqueImportable,
+  ] as RelatedPendingProceeding[]
 }
 
 function importParticipatingJudges() {

@@ -11,10 +11,11 @@ import ForeignLanguageVersions from "@/components/ForeignLanguageVersions.vue"
 import IncomeTypes from "@/components/IncomeTypes.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
+import NonApplicationNorms from "@/components/norms/NonApplicationNorms.vue"
 import ObjectValues from "@/components/ObjectValues.vue"
 import OriginOfTranslations from "@/components/OriginOfTranslations.vue"
+import PendingProceedings from "@/components/PendingProceedings.vue"
 import TextInputCategory from "@/components/texts/TextInputCategory.vue"
-import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import laborCourtTypes from "@/data/laborCourtTypes.json"
 import { contentRelatedIndexingLabels } from "@/domain/decision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -105,13 +106,23 @@ const hasAbuseFees = computed(() => {
     : false
 })
 
-const shouldDisplayLegislativeMandateCategory = computed(() => {
-  return (
-    constitutionalCourtTypes.items.includes(
-      store.documentUnit?.coreData.court?.type ?? "",
-    ) || hasLegislativeMandate.value
-  )
+const hasRelatedPendingProceedings = computed(() => {
+  return contentRelatedIndexing.value.relatedPendingProceedings?.length
+    ? contentRelatedIndexing.value.relatedPendingProceedings?.length > 0
+    : false
 })
+
+const hasNonApplicationNorms = computed(() => {
+  return contentRelatedIndexing.value.nonApplicationNorms?.length
+    ? contentRelatedIndexing.value.nonApplicationNorms?.length > 0
+    : false
+})
+
+const isConstitutionalCourt = computed(
+  () =>
+    store.documentUnit?.coreData.court?.jurisdictionType ===
+    "Verfassungsgerichtsbarkeit",
+)
 
 const isLaborCourt = computed(() =>
   laborCourtTypes.items.includes(
@@ -141,6 +152,18 @@ const shouldDisplayAppeal = computed(
 
 const shouldDisplayIncomeType = computed(
   () => isFinanceCourt.value || hasIncomeTypes.value,
+)
+
+const shouldDisplayAbuseFees = computed(
+  () => isConstitutionalCourt.value || hasAbuseFees.value,
+)
+
+const shouldDisplayLegislativeMandateCategory = computed(() => {
+  return isConstitutionalCourt.value || hasLegislativeMandate.value
+})
+
+const shouldDisplayNonApplicationNorms = computed(
+  () => isFinanceCourt.value || hasNonApplicationNorms.value,
 )
 </script>
 
@@ -216,6 +239,7 @@ const shouldDisplayIncomeType = computed(
         <ObjectValues :label="contentRelatedIndexingLabels.objectValues" />
       </CategoryWrapper>
       <CategoryWrapper
+        v-if="shouldDisplayAbuseFees"
         label="Missbrauchsgebühren"
         :should-show-button="!hasAbuseFees"
       >
@@ -235,6 +259,21 @@ const shouldDisplayIncomeType = computed(
         :should-show-button="!hasIncomeTypes"
       >
         <IncomeTypes :label="contentRelatedIndexingLabels.incomeTypes" />
+      </CategoryWrapper>
+      <CategoryWrapper
+        :label="contentRelatedIndexingLabels.relatedPendingProceedings"
+        :should-show-button="!hasRelatedPendingProceedings"
+      >
+        <PendingProceedings
+          :label="contentRelatedIndexingLabels.relatedPendingProceedings"
+        />
+      </CategoryWrapper>
+      <CategoryWrapper
+        v-if="shouldDisplayNonApplicationNorms"
+        :label="contentRelatedIndexingLabels.nonApplicationNorms"
+        :should-show-button="!hasNonApplicationNorms"
+      >
+        <NonApplicationNorms />
       </CategoryWrapper>
     </div>
   </div>

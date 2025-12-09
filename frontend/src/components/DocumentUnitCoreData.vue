@@ -693,6 +693,6 @@ onBeforeUnmount(() => {
       </InputField>
     </div>
 
-    <div class="mt-4">* Pflichtfelder zur Übergabe</div>
+    <div class="mt-4">* Pflichtfelder zur Veröffentlichung</div>
   </div>
 </template>

@@ -29,8 +29,10 @@ public record ContentRelatedIndexing(
     List<ObjectValue> objectValues,
     List<AbuseFee> abuseFees,
     List<IncomeType> incomeTypes,
+    List<NormReference> nonApplicationNorms,
     boolean hasLegislativeMandate,
     String evsf,
     AppealAdmission appealAdmission,
     Appeal appeal,
-    List<CountryOfOrigin> countriesOfOrigin) {}
+    List<CountryOfOrigin> countriesOfOrigin,
+    List<RelatedPendingProceeding> relatedPendingProceedings) {}

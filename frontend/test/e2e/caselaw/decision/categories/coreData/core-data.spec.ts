@@ -1,7 +1,11 @@
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
-import { navigateToCategories, save } from "~/e2e/caselaw/utils/e2e-utils"
+import {
+  fillCombobox,
+  navigateToCategories,
+  save,
+} from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("core data", () => {
   test("core data change", async ({ page, documentNumber }) => {
@@ -599,13 +603,7 @@ test.describe("core data", () => {
       })
 
       await test.step("Celex Nummer ist bearbeitbar", async () => {
-        const court = page.getByLabel("Gericht", { exact: true })
-        await expect(court).toHaveValue("")
-        await court.fill("EuGH")
-        await expect(page.getByTestId("combobox-spinner")).toBeHidden()
-        await expect(court).toHaveValue("EuGH")
-        await page.getByText("EuGH", { exact: true }).click()
-        await expect(court).toHaveValue("EuGH")
+        await fillCombobox(page, "Gericht", "EuGH")
         const celexNumber = page.getByLabel("Celex-Nummer", { exact: true })
         await expect(celexNumber).toBeEditable()
       })
@@ -693,13 +691,7 @@ test.describe("core data", () => {
       })
 
       await test.step("set court to EuGH", async () => {
-        const court = page.getByLabel("Gericht", { exact: true })
-        await expect(court).toHaveValue("")
-        await court.fill("EuGH")
-        await expect(page.getByTestId("combobox-spinner")).toBeHidden()
-        await expect(court).toHaveValue("EuGH")
-        await page.getByText("EuGH", { exact: true }).click()
-        await expect(court).toHaveValue("EuGH")
+        await fillCombobox(page, "Gericht", "EuGH")
       })
 
       await test.step("check celex number is editable", async () => {
@@ -711,12 +703,7 @@ test.describe("core data", () => {
       })
 
       await test.step("set court to BGH", async () => {
-        const court = page.getByLabel("Gericht", { exact: true })
-        await court.fill("BGH")
-        await expect(page.getByTestId("combobox-spinner")).toBeHidden()
-        await expect(court).toHaveValue("BGH")
-        await page.getByText("BGH", { exact: true }).click()
-        await expect(court).toHaveValue("BGH")
+        await fillCombobox(page, "Gericht", "BGH")
       })
 
       await test.step("check celex number is not editable", async () => {
