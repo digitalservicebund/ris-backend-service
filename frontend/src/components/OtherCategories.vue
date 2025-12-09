@@ -14,6 +14,7 @@ import LegislativeMandate from "@/components/LegislativeMandate.vue"
 import NonApplicationNormReferences from "@/components/norms/NonApplicationNormReferences.vue"
 import ObjectValues from "@/components/ObjectValues.vue"
 import OriginOfTranslations from "@/components/OriginOfTranslations.vue"
+import PendingProceedings from "@/components/PendingProceedings.vue"
 import TextInputCategory from "@/components/texts/TextInputCategory.vue"
 import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import laborCourtTypes from "@/data/laborCourtTypes.json"
@@ -103,6 +104,12 @@ const hasIncomeTypes = computed(() => {
 const hasAbuseFees = computed(() => {
   return contentRelatedIndexing.value.abuseFees?.length
     ? contentRelatedIndexing.value.abuseFees?.length > 0
+    : false
+})
+
+const hasRelatedPendingProceedings = computed(() => {
+  return contentRelatedIndexing.value.relatedPendingProceedings?.length
+    ? contentRelatedIndexing.value.relatedPendingProceedings?.length > 0
     : false
 })
 
@@ -246,6 +253,14 @@ const shouldDisplayNonApplicationNorms = computed(
         :should-show-button="!hasIncomeTypes"
       >
         <IncomeTypes :label="contentRelatedIndexingLabels.incomeTypes" />
+      </CategoryWrapper>
+      <CategoryWrapper
+        :label="contentRelatedIndexingLabels.relatedPendingProceedings"
+        :should-show-button="!hasRelatedPendingProceedings"
+      >
+        <PendingProceedings
+          :label="contentRelatedIndexingLabels.relatedPendingProceedings"
+        />
       </CategoryWrapper>
       <CategoryWrapper
         v-if="shouldDisplayNonApplicationNorms"

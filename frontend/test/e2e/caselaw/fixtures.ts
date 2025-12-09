@@ -598,6 +598,9 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
     const court = await courtResponse.json()
 
+    const courtBFHResponse = await request.get(`api/v1/caselaw/courts?q=BFH`)
+    const courtBFH = await courtBFHResponse.json()
+
     const documentTypeResponse = await request.get(
       `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
     )
@@ -759,6 +762,16 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                 newEntry: true,
                 terminology: "Programmierer",
                 typeOfIncome: TypeOfIncome.GEWERBEBETRIEB,
+              },
+            ],
+            relatedPendingProceedings: [
+              {
+                id: "aa9add9a-8655-4dbe-a187-1e3b4c2b15ad",
+                newEntry: true,
+                documentNumber: "YYTestDoc0017",
+                court: courtBFH?.[0],
+                decisionDate: "2022-02-01",
+                fileNumber: "IV R 99/99",
               },
             ],
             nonApplicationNorms: [

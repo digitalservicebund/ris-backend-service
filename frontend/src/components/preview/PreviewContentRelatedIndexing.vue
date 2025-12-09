@@ -148,6 +148,13 @@ const hasIncomeTypes = computed(() => {
   )
 })
 
+const hasRelatedPendingProceedings = computed(() => {
+  return (
+    props.contentRelatedIndexing.relatedPendingProceedings &&
+    props.contentRelatedIndexing.relatedPendingProceedings?.length > 0
+  )
+})
+
 const hasNonApplicationNorms = computed(() => {
   return (
     props.contentRelatedIndexing.nonApplicationNorms &&
@@ -536,6 +543,20 @@ const hasNonApplicationNorms = computed(() => {
         >
           <IncomeTypeSummaryBasic :data="incomeType" />
         </span>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasRelatedPendingProceedings">
+      <PreviewCategory>{{
+        contentRelatedIndexingLabels.relatedPendingProceedings
+      }}</PreviewCategory>
+      <PreviewContent>
+        <div
+          v-for="relatedPendingProceeding in props.contentRelatedIndexing
+            .relatedPendingProceedings"
+          :key="relatedPendingProceeding.id"
+        >
+          {{ relatedPendingProceeding.renderSummary }}
+        </div>
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="hasNonApplicationNorms">
