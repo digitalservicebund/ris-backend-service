@@ -354,11 +354,11 @@
                    </ris:herkunftslaender>
                     <ris:einkunftsarten domainTerm="Einkunftsarten">
                         <ris:einkunftsart domainTerm="Einkunftsart">
-                            <ris:artDerEinkunft domainTerm="Einkunftsart">EStG</ris:artDerEinkunft>
-                            <ris:begrifflichkeit domainTerm="Begrifflichkeit">terminology test</ris:begrifflichkeit>
+                            <ris:einkunftsartTyp domainTerm="Einkunftsart">EStG</ris:einkunftsartTyp>
+                            <ris:einkunftsartBegrifflichkeit domainTerm="Begrifflichkeit">terminology test</ris:einkunftsartBegrifflichkeit>
                         </ris:einkunftsart>
                         <ris:einkunftsart domainTerm="Einkunftsart">
-                            <ris:artDerEinkunft domainTerm="Einkunftsart">GewStG</ris:artDerEinkunft>
+                            <ris:einkunftsartTyp domainTerm="Einkunftsart">GewStG</ris:einkunftsartTyp>
                         </ris:einkunftsart>
                     </ris:einkunftsarten>
                 </ris:meta>

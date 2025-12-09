@@ -354,7 +354,7 @@
     |ris:nzbBeklagter|ris:zuruecknahmeDerRevision|ris:pkhAntragKlaeger|ris:sitzDerAussenstelle
     |ris:gegenstandswerte|ris:gegenstandswert|ris:gegenstandswertBetrag|ris:gegenstandswertWaehrung|ris:gegenstandswertVerfahren
     |ris:missbrauchsgebuehren|ris:missbrauchsgebuehr|ris:missbrauchsgebuehrBetrag|ris:missbrauchsgebuehrWaehrung|ris:missbrauchsgebuehrAdressat
-    |ris:einkunftsarten|ris:einkunftsart|ris:artDerEinkunft|ris:begrifflichkeit
+    |ris:einkunftsarten|ris:einkunftsart|ris:einkunftsartTyp|ris:einkunftsartBegrifflichkeit
     |ris:berichtigungen|ris:berichtigung|ris:berichtigungArtDerEintragung|ris:berichtigungArtDerAenderung|ris:berichtigungDatumDerAenderung|ris:berichtigungRandnummern|ris:berichtigungInhaltDerAenderung|ris:berichtigungRandnummer
     |ris:herkunftslaender|ris:herkunftsland|ris:herkunftslandAltwert|ris:herkunftslandLandbezeichnung|ris:herkunftslandRechtlicherRahmen
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@akn:refersTo|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan

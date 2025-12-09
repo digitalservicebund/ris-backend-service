@@ -29,18 +29,18 @@ public class Einkunftsarten {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Einkunftsart";
 
-    @XmlElement(name = "artDerEinkunft", namespace = CaseLawLdml.RIS_NS)
-    private ArtDerEinkunft artDerEinkunft;
+    @XmlElement(name = "einkunftsartTyp", namespace = CaseLawLdml.RIS_NS)
+    private EinkunftsartTyp einkunftsartTyp;
 
-    @XmlElement(name = "begrifflichkeit", namespace = CaseLawLdml.RIS_NS)
-    private Begrifflichkeit begrifflichkeit;
+    @XmlElement(name = "einkunftsartBegrifflichkeit", namespace = CaseLawLdml.RIS_NS)
+    private EinkunftsartBegrifflichkeit einkunftsartBegrifflichkeit;
   }
 
   @NoArgsConstructor
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class ArtDerEinkunft {
+  public static class EinkunftsartTyp {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Einkunftsart";
 
@@ -51,7 +51,7 @@ public class Einkunftsarten {
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class Begrifflichkeit {
+  public static class EinkunftsartBegrifflichkeit {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Begrifflichkeit";
 

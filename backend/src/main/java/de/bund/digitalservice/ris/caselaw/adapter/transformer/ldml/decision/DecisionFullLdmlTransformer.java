@@ -753,14 +753,16 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
   private static Einkunftsarten.Einkunftsart buildEinkunftsart(IncomeType incomeType) {
     var builder =
         Einkunftsarten.Einkunftsart.builder()
-            .artDerEinkunft(
-                Einkunftsarten.ArtDerEinkunft.builder()
+            .einkunftsartTyp(
+                Einkunftsarten.EinkunftsartTyp.builder()
                     .value(incomeType.typeOfIncome().humanReadable)
                     .build());
 
     if (incomeType.terminology() != null) {
-      builder.begrifflichkeit(
-          Einkunftsarten.Begrifflichkeit.builder().value(incomeType.terminology()).build());
+      builder.einkunftsartBegrifflichkeit(
+          Einkunftsarten.EinkunftsartBegrifflichkeit.builder()
+              .value(incomeType.terminology())
+              .build());
     }
 
     return builder.build();
