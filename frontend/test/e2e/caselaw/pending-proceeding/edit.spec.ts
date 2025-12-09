@@ -108,7 +108,6 @@ test.describe("edit pending proceeding", () => {
 
       // Rechtsfrage
       await test.step("user can edit legal issue", async () => {
-        await page.getByLabel("Rechtsfrage").click()
         const headline = page.locator("#legalIssue")
         await headline.click()
         await page.keyboard.type(`Unveröffentlichtes anhängiges Verfahren`)
