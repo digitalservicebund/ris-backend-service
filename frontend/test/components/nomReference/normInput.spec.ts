@@ -406,7 +406,6 @@ describe("NormReferenceEntry", () => {
           },
           singleNorms: [],
           normAbbreviationRawValue: undefined,
-          hasForeignSource: false,
         },
       ],
     ])
@@ -575,7 +574,6 @@ describe("NormReferenceEntry", () => {
               },
             ],
             normAbbreviationRawValue: undefined,
-            hasForeignSource: false,
           },
         ],
       ])
@@ -622,7 +620,6 @@ describe("NormReferenceEntry", () => {
               },
             ],
             normAbbreviationRawValue: undefined,
-            hasForeignSource: false,
           },
         ],
       ])
