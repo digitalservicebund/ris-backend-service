@@ -6,13 +6,13 @@ import { flushPromises } from "@vue/test-utils"
 import { beforeAll, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
+import { clickOrderedListSubButton } from "~/test-helper/listUtils"
 import { mockDocumentForProsemirror } from "~/test-helper/prosemirror-document-mock"
 import {
   clickTableBorderSubButton,
   clickTableCellAlignmentSubButton,
   getFirstCellHTML,
   insertTable,
-  clickOrderedListSubButton,
   getOrderedListHTML,
   getOrderedListType,
   hasOrderedList,
