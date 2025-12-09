@@ -151,7 +151,7 @@ test(
     const orderedListItemText = "This is an ordered list"
     const orderedListSecondItemText = "Second ordered list item"
     const bulletList = `<ul style="list-style-type:disc;" class="list-disc"><li><p>This is a bullet list</p></li><li><p>Second bullet list item</p></li></ul>`
-    const orderedList = `ol style="list-style-type:decimal;" class="list-decimal"><li><p>This is an ordered list</p></li><li><p>Second ordered list item</p></li></ol>`
+    const orderedList = `<ol style="list-style-type: decimal;"><li><p>This is an ordered list</p></li><li><p>Second ordered list item</p></li></ol>`
 
     await test.step("upload test file", async () => {
       await uploadTestfile(page, "some-lists.docx")

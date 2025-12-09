@@ -46,14 +46,6 @@ export const getOrderedListHTML = () => {
   return orderedList.getAttribute("style") || ""
 }
 
-export const getOrderedListType = () => {
-  const editorContent = screen.getByTestId("Gründe")
-  const orderedList = editorContent.querySelector("ol")
-  if (!orderedList) throw new Error("No ordered list found in the document.")
-
-  return orderedList.getAttribute("type") || ""
-}
-
 export const hasOrderedList = () => {
   const editorContent = screen.getByTestId("Gründe")
   return !!editorContent.querySelector("ol")
