@@ -23,7 +23,7 @@ const firstParagraph = "First paragraph"
 const secondParagraph = "Second paragraph"
 const thirdParagraph = "Third paragraph"
 const firstParagraphHtml =
-  '<span style="color: rgb(0, 0, 0)">First <strong>paragraph</strong></span>'
+  '<span style="color: rgb(0, 0, 0);">First <strong>paragraph</strong></span>'
 
 test.describe(
   "Remove border numbers (Randnummern)",
