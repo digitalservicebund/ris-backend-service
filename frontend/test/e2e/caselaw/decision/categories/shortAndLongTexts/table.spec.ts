@@ -68,7 +68,7 @@ test.describe(
         await expect(cell).toBeAttached()
         await expect(cell).toHaveAttribute("colspan", "1")
         await expect(cell).toHaveAttribute("rowspan", "1")
-        await expect(cell).toHaveStyle("")
+        await expect(cell).toHaveAttribute("style", "")
 
         expect(inputFieldInnerHTML).toContain(tableOpeningHTML)
         expect(inputFieldInnerHTML).toContain(tableExpectedParagraphText)
