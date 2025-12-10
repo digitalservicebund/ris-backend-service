@@ -77,8 +77,8 @@ test.describe(
       documentNumber,
     }) => {
       const noIndentation = `<p>Abschnitt mit Einzug</p>`
-      const singleIndentation = `<p style="margin-left: 40px!important;">Abschnitt mit Einzug</p>`
-      const tripleIndentation = `<p style="margin-left: 120px!important;">Abschnitt mit Einzug</p>`
+      const singleIndentation = `<p style="margin-left: 40px !important;">Abschnitt mit Einzug</p>`
+      const tripleIndentation = `<p style="margin-left: 120px !important;">Abschnitt mit Einzug</p>`
 
       await navigateToCategories(page, documentNumber)
 
