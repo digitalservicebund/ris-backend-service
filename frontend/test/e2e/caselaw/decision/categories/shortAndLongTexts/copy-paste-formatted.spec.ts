@@ -26,9 +26,9 @@ test("copy-paste text with different styles and alignments from side panel", asy
   const rightAlignText = "I am right aligned"
   const centerAlignText = "I am centered"
   const justifyAlignText = "I am justify aligned"
-  const leftAlignTextWithStyle = `<span style="color: rgb(0, 0, 0)">${leftAlignText}</span>`
-  const rightAlignTextWithStyle = `<p style="text-align: right"><span style="color: rgb(0, 0, 0)">${rightAlignText}</span></p>`
-  const centerAlignTextWithStyle = `<p style="text-align: center">${centerAlignText}</p>`
+  const leftAlignTextWithStyle = `<span style="color: rgb(0, 0, 0);">${leftAlignText}</span>`
+  const rightAlignTextWithStyle = `<p style="text-align: right;"><span style="color: rgb(0, 0, 0);">${rightAlignText}</span></p>`
+  const centerAlignTextWithStyle = `<p style="text-align: center;">${centerAlignText}</p>`
   const justifyAlignTextWithoutStyle = `<p>${justifyAlignText}</p>`
 
   await test.step("upload document", async () => {
@@ -87,11 +87,11 @@ test(
     const tripleIndentationText = "Abschnitt mit Einzug 3"
     const noIndentation = /<p[^>]*>Abschnitt mit Einzug 0<\/p>/
     const singleIndentation =
-      /<p\s+style="[^"]*margin-left:\s*40px!important[^"]*"\s*>Abschnitt mit Einzug 1<\/p>/
+      /<p\s+style="[^"]*margin-left:\s*40px !important[^"]*"\s*>Abschnitt mit Einzug 1<\/p>/
     const doubleIndentation =
-      /<p\s+style="[^"]*margin-left:\s*80px!important[^"]*"\s*>Abschnitt mit Einzug 2<\/p>/
+      /<p\s+style="[^"]*margin-left:\s*80px !important[^"]*"\s*>Abschnitt mit Einzug 2<\/p>/
     const tripleIndentation =
-      /<p\s+style="[^"]*margin-left:\s*120px!important[^"]*"\s*>Abschnitt mit Einzug 3<\/p>/
+      /<p\s+style="[^"]*margin-left:\s*120px !important[^"]*"\s*>Abschnitt mit Einzug 3<\/p>/
 
     await test.step("upload document", async () => {
       await uploadTestfile(page, "some-indentations.docx")
@@ -150,7 +150,7 @@ test(
     const bulletListSecondItemText = "Second bullet list item"
     const orderedListItemText = "This is an ordered list"
     const orderedListSecondItemText = "Second ordered list item"
-    const bulletList = `<ul style="list-style-type:disc;" class="list-disc"><li><p>This is a bullet list</p></li><li><p>Second bullet list item</p></li></ul>`
+    const bulletList = `<ul class="list-disc" style="list-style-type: disc;"><li><p>This is a bullet list</p></li><li><p>Second bullet list item</p></li></ul>`
     const orderedList = `<ol style="list-style-type: decimal;"><li><p>This is an ordered list</p></li><li><p>Second ordered list item</p></li></ol>`
 
     await test.step("upload test file", async () => {
