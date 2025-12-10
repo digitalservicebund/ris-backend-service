@@ -120,7 +120,6 @@ describe("Collective Agreement Input", () => {
   })
 
   it("should disable 'Übernehmen' button with invalid norm input", async () => {
-    // Arrange + Act
     const { user } = renderComponent({
       modelValue: {
         id: "73b51cc0-c779-4c31-954a-0cc74943d6d4",
@@ -150,7 +149,6 @@ describe("Collective Agreement Input", () => {
   })
 
   it("should enable 'Übernehmen' button with complete and valid input", async () => {
-    // Arrange + Act
     renderComponent({
       modelValue: {
         id: "73b51cc0-c779-4c31-954a-0cc74943d6d4",
