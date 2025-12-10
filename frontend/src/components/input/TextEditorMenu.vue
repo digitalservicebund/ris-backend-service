@@ -367,7 +367,7 @@ const buttons = computed(() => {
       type: "menu",
       icon: IconBorderTop,
       ariaLabel: "Tabellenrahmen",
-      group: "Tabellenrahmen",
+      group: "Tabelle",
       isCollapsable: false,
       childButtons: [
         {
@@ -456,7 +456,7 @@ const buttons = computed(() => {
       type: "menu",
       icon: IconVerticalAlignTop,
       ariaLabel: "Vertikale Ausrichtung in Tabellen",
-      group: "Zellenausrichtung",
+      group: "Tabelle",
       isCollapsable: false,
       childButtons: [
         {
