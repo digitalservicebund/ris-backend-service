@@ -77,7 +77,7 @@
     "tippy.js": "^6.3.7",
     "vue": "^3.5.25",
     "vue-router": "4.6.3",
-    "vue-tsc": "3.1.5"
+    "vue-tsc": "3.1.6"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",
