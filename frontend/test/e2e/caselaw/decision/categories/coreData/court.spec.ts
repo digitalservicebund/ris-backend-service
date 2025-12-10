@@ -255,15 +255,19 @@ test.describe("court", () => {
     async ({ page, documentNumber }) => {
       await navigateToCategories(page, documentNumber)
 
+      await test.step("is disabled for court without branch location options", async () => {
+        await selectCourt(page, "BGH")
+        await page
+          .getByLabel("Fehlerhaftes Gericht anzeigen", { exact: true })
+          .click()
+        await expect(page.getByLabel("Sitz der Außenstelle")).toBeDisabled()
+      })
+
       await test.step("select court with branch location options", async () => {
         await selectCourt(page, "ArbG Bremen-Bremerhaven")
       })
 
       await test.step("pick branch location from dropdown", async () => {
-        await page
-          .getByLabel("Fehlerhaftes Gericht anzeigen", { exact: true })
-          .click()
-
         await page.getByLabel("Sitz der Außenstelle").click()
 
         await expect(page.getByText("Kammern Bremen")).toBeVisible()

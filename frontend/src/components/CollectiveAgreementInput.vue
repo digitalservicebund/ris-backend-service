@@ -7,6 +7,7 @@ import CollectiveAgreementNormInput from "@/components/CollectiveAgreementNormIn
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import { ValidationError } from "@/components/input/types"
+import { useValidationStore } from "@/composables/useValidationStore"
 import { CollectiveAgreement } from "@/domain/collectiveAgreement"
 import ComboboxItemService from "@/services/comboboxItemService"
 
@@ -17,11 +18,13 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "update:modelValue": [value: CollectiveAgreement]
-  "update:validationError": [value: ValidationError]
   addEntry: [void]
   cancelEdit: [void]
   removeEntry: [value?: boolean]
 }>()
+
+type CollectiveAgreementField = (typeof CollectiveAgreement.fields)[number]
+const validationStore = useValidationStore<CollectiveAgreementField>()
 
 const lastSavedModelValue = ref(
   new CollectiveAgreement({ ...props.modelValue }),
@@ -33,6 +36,14 @@ const collectiveAgreement = ref(
 async function addCollectiveAgreement() {
   emit("update:modelValue", collectiveAgreement.value as CollectiveAgreement)
   emit("addEntry")
+}
+
+const updateValidationStore = (error?: ValidationError) => {
+  if (!error) {
+    validationStore.reset()
+    return
+  }
+  validationStore.add(error.message, error.instance as CollectiveAgreementField)
 }
 
 watch(
@@ -77,6 +88,7 @@ onMounted(() => {
           id="collectiveAgreementDateInput"
           v-slot="slotProps"
           label="Datum"
+          @update:validation-error="updateValidationStore"
         >
           <CollectiveAgreementDateInput
             id="collectiveAgreementDateInputText"
@@ -92,6 +104,7 @@ onMounted(() => {
           id="collectiveAgreementNormInput"
           v-slot="slotProps"
           label="Tarifnorm"
+          @update:validation-error="updateValidationStore"
         >
           <CollectiveAgreementNormInput
             id="collectiveAgreementNormInputText"
@@ -124,7 +137,9 @@ onMounted(() => {
         <div class="flex gap-16">
           <Button
             aria-label="Tarifvertrag speichern"
-            :disabled="collectiveAgreement.isEmpty"
+            :disabled="
+              !validationStore.isValid() || collectiveAgreement.isEmpty
+            "
             label="Übernehmen"
             severity="secondary"
             size="small"

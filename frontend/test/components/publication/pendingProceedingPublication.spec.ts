@@ -4,7 +4,9 @@ import { setActivePinia } from "pinia"
 import { createRouter, createWebHistory } from "vue-router"
 import PendingProceedingPublication from "@/components/publication/PendingProceedingPublication.vue"
 import { CoreData } from "@/domain/coreData"
-import PendingProceeding from "@/domain/pendingProceeding"
+import PendingProceeding, {
+  PendingProceedingShortTexts,
+} from "@/domain/pendingProceeding"
 import publishDocumentationUnitService from "@/services/publishDocumentationUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
@@ -12,7 +14,7 @@ import routes from "~pages"
 
 const previewMock = vi.spyOn(publishDocumentationUnitService, "getPreview")
 
-describe("PendingProceedingPlausibilityCheck", () => {
+describe("PendingProceedingPublication", () => {
   beforeEach(() => {
     setActivePinia(createTestingPinia())
     useFeatureToggleServiceMock()
@@ -28,14 +30,42 @@ describe("PendingProceedingPlausibilityCheck", () => {
     vi.resetAllMocks()
   })
 
-  it("should render all child components when plausibility check is true", async () => {
-    await renderComponent({ hasPlausibilityCheckPassed: true })
+  describe("plausibility check", () => {
+    it("should render all child components when plausibility check is true", async () => {
+      await renderComponent({ hasPlausibilityCheckPassed: true })
 
-    expect(await screen.findByText("LDML Vorschau")).toBeInTheDocument()
+      expect(await screen.findByText("LDML Vorschau")).toBeInTheDocument()
 
-    expect(
-      screen.getByRole("button", { name: "Veröffentlichen" }),
-    ).toBeEnabled()
+      expect(
+        screen.getByRole("button", { name: "Veröffentlichen" }),
+      ).toBeEnabled()
+    })
+
+    it("should not show LDML preview if plausibility check fails", async () => {
+      await renderComponent({ hasPlausibilityCheckPassed: false })
+
+      expect(
+        screen.getByText(
+          "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:",
+        ),
+      ).toBeInTheDocument()
+
+      expect(screen.queryByText("LDML Vorschau")).not.toBeInTheDocument()
+    })
+
+    it("should not allow publishing if plausibility check fails", async () => {
+      await renderComponent({ hasPlausibilityCheckPassed: false })
+
+      expect(
+        screen.getByText(
+          "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:",
+        ),
+      ).toBeInTheDocument()
+
+      expect(
+        screen.getByRole("button", { name: "Veröffentlichen" }),
+      ).toBeDisabled()
+    })
   })
 
   describe("ldml preview", () => {
@@ -90,16 +120,16 @@ async function renderComponent({
   hasPlausibilityCheckPassed: boolean
 }) {
   let coreData: CoreData = {}
+  let shortTexts: PendingProceedingShortTexts = {}
   if (hasPlausibilityCheckPassed) {
     coreData = {
       fileNumbers: ["IZ 1234"],
       court: { label: "BGH" },
       decisionDate: "2024-01-01",
-      documentType: { label: "Urteil", jurisShortcut: "U" },
-      legalEffect: "unbestimmt",
     }
+    shortTexts = { legalIssue: "legalIssue" }
   }
-  const store = mockDocUnitStore({ coreData })
+  const store = mockDocUnitStore({ coreData, shortTexts })
 
   const router = createRouter({
     history: createWebHistory(),
@@ -120,10 +150,17 @@ async function renderComponent({
   }
 }
 
-function mockDocUnitStore({ coreData }: { coreData?: CoreData }) {
+function mockDocUnitStore({
+  coreData,
+  shortTexts,
+}: {
+  coreData?: CoreData
+  shortTexts?: PendingProceedingShortTexts
+}) {
   const mockedSessionStore = useDocumentUnitStore()
   mockedSessionStore.documentUnit = new PendingProceeding("q834", {
     coreData,
+    shortTexts,
   })
 
   return mockedSessionStore

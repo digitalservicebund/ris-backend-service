@@ -21,6 +21,8 @@ export class CollectiveAgreement implements EditableListItem {
     }
   }
 
+  static readonly fields = ["name", "date", "norm", "industry"] as const
+
   get renderSummary(): string {
     return (
       [this.name, this.date, this.norm].filter(Boolean).join(`, `) +

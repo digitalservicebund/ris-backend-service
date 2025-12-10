@@ -5,7 +5,7 @@ import PreviousDecision from "./previousDecision"
 import Reference from "./reference"
 import ActiveCitation from "@/domain/activeCitation"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
-import { CoreData } from "@/domain/coreData"
+import { CoreData, coreDataLabels } from "@/domain/coreData"
 import { Kind } from "@/domain/documentationUnitKind"
 import LegalForce from "@/domain/legalForce"
 import { ManagementData } from "@/domain/managementData"
@@ -23,6 +23,10 @@ export const pendingProceedingLabels = {
   isResolved: "Erledigt",
   resolutionNote: "Erledigungsvermerk",
   resolutionDate: "Erledigungsmitteilung",
+  previousDecisions: "Vorgehende Entscheidungen",
+  court: coreDataLabels.court,
+  decisionDate: "Mitteilungsdatum",
+  fileNumbers: coreDataLabels.fileNumbers,
 }
 
 export type PendingProceedingShortTexts = {
@@ -58,13 +62,6 @@ export default class PendingProceeding {
   public processSteps?: DocumentationUnitProcessStep[]
 
   public isEditable?: boolean
-
-  static readonly requiredFields = [
-    "fileNumbers",
-    "court",
-    "decisionDate",
-    "documentType",
-  ] as const
 
   constructor(uuid: string, data: Partial<PendingProceeding> = {}) {
     this.uuid = String(uuid)
@@ -143,24 +140,8 @@ export default class PendingProceeding {
         ? dayjs(this.coreData.decisionDate).format("DD.MM.YYYY")
         : null,
       this.coreData.fileNumbers ? this.coreData.fileNumbers[0] : null,
-      this.coreData.documentType?.label,
     ]
       .filter(Boolean)
       .join(", ")
-  }
-
-  public isEmpty(
-    value: CoreData[(typeof PendingProceeding.requiredFields)[number]],
-  ) {
-    if (value === undefined || !value) {
-      return true
-    }
-    if (value instanceof Array && value.length === 0) {
-      return true
-    }
-    if (typeof value === "object" && "location" in value && "type" in value) {
-      return value.location === "" && value.type === ""
-    }
-    return false
   }
 }

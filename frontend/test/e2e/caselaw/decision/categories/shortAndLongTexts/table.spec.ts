@@ -58,6 +58,7 @@ test.describe(
         await page.keyboard.press("ArrowDown")
         await menu.getByLabel("Tabelle", { exact: true }).click()
         await menu.getByLabel("Zeile löschen").click()
+        await page.keyboard.press("ArrowUp")
         await menu.getByLabel("Tabelle", { exact: true }).click()
         await menu.getByLabel("Zeile löschen").click()
         await menu.getByLabel("Nicht-druckbare Zeichen").click()

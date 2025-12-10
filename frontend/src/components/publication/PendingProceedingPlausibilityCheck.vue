@@ -4,12 +4,9 @@ import Button from "primevue/button"
 import { computed, Ref, watch } from "vue"
 import { RouterLink, useRouter } from "vue-router"
 import { useScroll } from "@/composables/useScroll"
-import { coreDataLabels } from "@/domain/coreData"
-import {
-  contentRelatedIndexingLabels,
-  Decision,
-  longTextLabels,
-} from "@/domain/decision"
+import PendingProceeding, {
+  pendingProceedingLabels,
+} from "@/domain/pendingProceeding"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconCheck from "~icons/ic/baseline-check"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
@@ -22,12 +19,12 @@ const emits =
     ) => void
   >()
 const store = useDocumentUnitStore()
-const { documentUnit: decision } = storeToRefs(store) as {
-  documentUnit: Ref<Decision>
+const { documentUnit: pendingProceeding } = storeToRefs(store) as {
+  documentUnit: Ref<PendingProceeding>
 }
 
 const categoriesRoute = {
-  name: "caselaw-documentUnit-documentNumber-categories",
+  name: "caselaw-pending-proceeding-documentNumber-categories",
 }
 
 type CategoryWithMissingData = {
@@ -39,53 +36,14 @@ type CategoryWithMissingData = {
 const categoriesWithMissingData = computed<CategoryWithMissingData[]>(() => {
   const categories: CategoryWithMissingData[] = []
 
-  if (decision.value?.previousDecisions) {
-    const count = decision.value.previousDecisions.filter(
+  if (pendingProceeding.value?.previousDecisions) {
+    const count = pendingProceeding.value.previousDecisions.filter(
       (docUnit) => docUnit.hasMissingRequiredFields,
     ).length
     if (count > 0) {
       categories.push({
         field: "previousDecisions",
-        label: "Vorgehende Entscheidungen",
-        entriesWithMissingDataCount: count,
-      })
-    }
-  }
-
-  if (decision.value?.ensuingDecisions) {
-    const count = decision.value.ensuingDecisions.filter(
-      (docUnit) => docUnit.hasMissingRequiredFields,
-    ).length
-    if (count > 0) {
-      categories.push({
-        field: "ensuingDecisions",
-        label: "Nachgehende Entscheidungen",
-        entriesWithMissingDataCount: count,
-      })
-    }
-  }
-
-  if (decision.value?.contentRelatedIndexing?.activeCitations) {
-    const count = decision.value.contentRelatedIndexing.activeCitations.filter(
-      (citations) => citations.hasMissingRequiredFields,
-    ).length
-    if (count > 0) {
-      categories.push({
-        field: "activeCitations",
-        label: contentRelatedIndexingLabels.activeCitations,
-        entriesWithMissingDataCount: count,
-      })
-    }
-  }
-
-  if (decision.value?.contentRelatedIndexing?.norms) {
-    const count = decision.value.contentRelatedIndexing.norms.filter(
-      (citations) => citations.hasMissingFieldsInLegalForce,
-    ).length
-    if (count > 0) {
-      categories.push({
-        field: "norms",
-        label: contentRelatedIndexingLabels.norms,
+        label: pendingProceedingLabels.previousDecisions,
         entriesWithMissingDataCount: count,
       })
     }
@@ -94,29 +52,33 @@ const categoriesWithMissingData = computed<CategoryWithMissingData[]>(() => {
   return categories
 })
 
-const missingCoreDataFields = computed(() =>
-  decision.value.missingRequiredFields.map((field) => ({
-    field,
-    label: coreDataLabels[field],
-  })),
-)
+type MissingRequiredField = { field: string; label: string }
+const missingRequiredFields = computed<MissingRequiredField[]>(() => {
+  const missingFields = []
 
-const isCaseFactsInvalid = computed<boolean>(
-  () =>
-    !!decision.value?.longTexts.reasons &&
-    !!decision.value?.longTexts.caseFacts,
-)
-const isDecisionReasonsInvalid = computed<boolean>(
-  () =>
-    !!decision.value?.longTexts.reasons &&
-    !!decision.value?.longTexts.decisionReasons,
-)
+  const requiredCoreFields = ["court", "decisionDate", "fileNumbers"] as const
+  for (const field of requiredCoreFields) {
+    const value = pendingProceeding.value.coreData?.[field]
+    if (!value || (Array.isArray(value) && value.length === 0)) {
+      const label = pendingProceedingLabels[field]
+      missingFields.push({ field, label })
+    }
+  }
+
+  if (!pendingProceeding.value.shortTexts.legalIssue) {
+    missingFields.push({
+      field: "legalIssue",
+      label: pendingProceedingLabels.legalIssue,
+    })
+  }
+
+  return missingFields
+})
+
 const hasPlausibilityCheckPassed = computed<boolean>(
   () =>
-    missingCoreDataFields.value.length === 0 &&
-    categoriesWithMissingData.value.length === 0 &&
-    !isCaseFactsInvalid.value &&
-    !isDecisionReasonsInvalid.value,
+    missingRequiredFields.value.length === 0 &&
+    categoriesWithMissingData.value.length === 0,
 )
 watch(
   hasPlausibilityCheckPassed,
@@ -142,12 +104,12 @@ async function scrollToCategory(key: string) {
     </div>
 
     <div v-else class="ris-body1-regular flex flex-col gap-16">
-      <div v-if="missingCoreDataFields.length" class="flex flex-row gap-8">
+      <div v-if="missingRequiredFields.length" class="flex flex-row gap-8">
         <IconErrorOutline class="text-red-800" />
         <div class="flex flex-col">
           <p>Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:</p>
           <ul class="list-disc">
-            <li v-for="{ field, label } in missingCoreDataFields" :key="field">
+            <li v-for="{ field, label } in missingRequiredFields" :key="field">
               <Button
                 class="h-auto border-none p-0!"
                 text
@@ -196,26 +158,6 @@ async function scrollToCategory(key: string) {
             </div>
           </dl>
         </div>
-      </div>
-
-      <div v-if="isCaseFactsInvalid" class="flex flex-row gap-8">
-        <IconErrorOutline class="text-red-800" />
-        <p>
-          Die Rubriken "{{ longTextLabels.reasons }}" und "{{
-            longTextLabels.caseFacts
-          }}" sind befüllt.<br />
-          Es darf nur eine der beiden Rubriken befüllt sein.
-        </p>
-      </div>
-
-      <div v-if="isDecisionReasonsInvalid" class="flex flex-row gap-8">
-        <IconErrorOutline class="text-red-800" />
-        <p>
-          Die Rubriken "{{ longTextLabels.reasons }}" und "{{
-            longTextLabels.decisionReasons
-          }}" sind befüllt.<br />
-          Es darf nur eine der beiden Rubriken befüllt sein.
-        </p>
       </div>
 
       <Button

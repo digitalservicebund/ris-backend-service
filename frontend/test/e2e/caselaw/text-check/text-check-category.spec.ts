@@ -323,13 +323,13 @@ test.describe("check text category", () => {
         },
         {
           name: "legalIssue",
-          germanWord: pendingProceedingLabels.legalIssue,
+          germanWord: pendingProceedingLabels.legalIssue + " *",
         },
       ]
 
       allowedTextCheckCategories.forEach(({ name, germanWord }) => {
         test(
-          `${name}: clicking on text check button, save document and returns matches`,
+          `${name}: fill text, save document and return matches`,
           {
             tag: ["@RISDEV-10128"],
           },

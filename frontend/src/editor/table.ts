@@ -1,6 +1,27 @@
-import { Table } from "@tiptap/extension-table"
+import { Table, TableView } from "@tiptap/extension-table"
 import "../styles/tables.css"
+import { Node } from "prosemirror-model"
 import { hasAllBorders } from "./tableUtil"
+
+/**
+ * Notwendig, weil das resizable: true die styles (border) der Tabelle entfernt.
+ */
+class CustomTableView extends TableView {
+  constructor(node: Node, cellMinWidth: number) {
+    super(node, cellMinWidth)
+    this.applyAttributes()
+  }
+
+  applyAttributes() {
+    Object.entries(this.node.attrs).forEach(([key, value]) => {
+      if (value == null) {
+        this.table.removeAttribute(key)
+      } else {
+        this.table.setAttribute(key, String(value))
+      }
+    })
+  }
+}
 
 /**
  * Erweitert die Tiptap Table Extension, um die Logik für die 'invisible-table-cell'-Klasse
@@ -46,6 +67,7 @@ export const CustomTable = Table.extend({
   addOptions() {
     return {
       ...this.parent?.(),
+      View: CustomTableView,
       resizable: true,
       allowTableNodeSelection: true,
     }

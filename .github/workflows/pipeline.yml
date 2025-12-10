@@ -425,13 +425,14 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d
       - name: Deploy new images
-        uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
+        uses: digitalservicebund/argocd-deploy@faa88406a1d6afa918aad127b19735c6e54d7fb1 # v1.0.0
         with:
           environment: staging
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
           deploying_repo: ris-backend-service,ris-backend-service/frontend
           infra_repo: neuris-infra
-          deploy_key: ${{ secrets.DEPLOY_KEY }}
+          github_app_private_key: ${{ secrets.GITOPS_NEURIS_APP_PRIVATE_KEY }}
+          github_app_id: ${{ secrets.GITOPS_NEURIS_APP_ID }}
           app: ris-staging
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
@@ -524,51 +525,15 @@ jobs:
           name: html-test-report
           path: ./frontend/playwright-report
 
-  check-latest-deploy-tag:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs:
-      - e2e-tests
-    runs-on: ubuntu-latest
-    outputs:
-      should_deploy: ${{ steps.compare-tags.outputs.should_deploy }}
-    environment: production
-    steps:
-      - name: Checkout infra repository
-        uses: actions/checkout@v6
-        with:
-          repository: digitalservicebund/neuris-infra
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
-          path: infra
-      - name: Checkout main repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          path: main
-      - name: compare image tags
-        id: compare-tags
-        run: |
-          set -x
-          CURRENT_TAG=${{ env.CONTAINER_IMAGE_VERSION }}
-          DEPLOYED_TAG=$(yq '.images[0] | .newTag' infra/manifests/overlays/production/kustomization.yaml)
-          cd main
-          if git merge-base --is-ancestor $CURRENT_TAG $DEPLOYED_TAG; then
-            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
-          fi
-
   deploy-production:
     runs-on: ubuntu-latest
-    if: |
-      github.ref == 'refs/heads/main' &&
-      needs.check-latest-deploy-tag.outputs.should_deploy == 'true'
+    if: github.ref == 'refs/heads/main'
     concurrency: deploy-production
     environment: production
     needs:
       - push-frontend-image-to-registry
       - push-backend-image-to-registry
       - e2e-tests
-      - check-latest-deploy-tag
       - backend-checks
       - frontend-checks
     permissions:
@@ -576,13 +541,14 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d
       - name: Deploy new images
-        uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
+        uses: digitalservicebund/argocd-deploy@faa88406a1d6afa918aad127b19735c6e54d7fb1 # v1.0.0
         with:
           environment: production
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
           deploying_repo: ris-backend-service,ris-backend-service/frontend
           infra_repo: neuris-infra
-          deploy_key: ${{ secrets.DEPLOY_KEY }}
+          github_app_private_key: ${{ secrets.GITOPS_NEURIS_APP_PRIVATE_KEY }}
+          github_app_id: ${{ secrets.GITOPS_NEURIS_APP_ID }}
           app: ris-production
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
@@ -618,13 +584,14 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d
       - name: Deploy new images
-        uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
+        uses: digitalservicebund/argocd-deploy@faa88406a1d6afa918aad127b19735c6e54d7fb1 # v1.0.0
         with:
           environment: uat
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
           deploying_repo: ris-backend-service,ris-backend-service/frontend
           infra_repo: neuris-infra
-          deploy_key: ${{ secrets.DEPLOY_KEY }}
+          github_app_private_key: ${{ secrets.GITOPS_NEURIS_APP_PRIVATE_KEY }}
+          github_app_id: ${{ secrets.GITOPS_NEURIS_APP_ID }}
           app: ris-uat
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
