@@ -526,51 +526,15 @@ jobs:
           name: html-test-report
           path: ./frontend/playwright-report
 
-  check-latest-deploy-tag:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs:
-      - e2e-tests
-    runs-on: ubuntu-latest
-    outputs:
-      should_deploy: ${{ steps.compare-tags.outputs.should_deploy }}
-    environment: production
-    steps:
-      - name: Checkout infra repository
-        uses: actions/checkout@v6
-        with:
-          repository: digitalservicebund/neuris-infra
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
-          path: infra
-      - name: Checkout main repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          path: main
-      - name: compare image tags
-        id: compare-tags
-        run: |
-          set -x
-          CURRENT_TAG=${{ env.CONTAINER_IMAGE_VERSION }}
-          DEPLOYED_TAG=$(yq '.images[0] | .newTag' infra/manifests/overlays/production/kustomization.yaml)
-          cd main
-          if git merge-base --is-ancestor $CURRENT_TAG $DEPLOYED_TAG; then
-            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
-          fi
-
   deploy-production:
     runs-on: ubuntu-latest
-    if: |
-      github.ref == 'refs/heads/main' &&
-      needs.check-latest-deploy-tag.outputs.should_deploy == 'true'
+    if: github.ref == 'refs/heads/main'
     concurrency: deploy-production
     environment: production
     needs:
       - push-frontend-image-to-registry
       - push-backend-image-to-registry
       - e2e-tests
-      - check-latest-deploy-tag
       - backend-checks
       - frontend-checks
     permissions:
