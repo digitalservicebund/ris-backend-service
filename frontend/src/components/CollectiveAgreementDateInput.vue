@@ -1,5 +1,8 @@
 <script lang="ts" setup>
+import dayjs from "dayjs"
+import customParseFormat from "dayjs/plugin/customParseFormat"
 import InputText from "primevue/inputtext"
+import { computed, nextTick } from "vue"
 import { ValidationError } from "@/components/input/types"
 
 const emit = defineEmits<{
@@ -8,18 +11,36 @@ const emit = defineEmits<{
 
 const model = defineModel<string>()
 
-const DATE_PATTERN = /^((([0-2][1-9]|3[0-1])\.)?(0[1-9]|1[0-2])\.)?\d{4}$/
+const isValidDate = computed(() => {
+  return dayjs(model.value, ["YYYY", "MM.YYYY", "DD.MM.YYYY"], true).isValid()
+})
+const isInPast = computed(() => {
+  return dayjs(model.value, ["YYYY", "MM.YYYY", "DD.MM.YYYY"], true).isBefore(
+    dayjs(),
+  )
+})
+
+dayjs.extend(customParseFormat)
 
 async function validate() {
-  if (model.value && !model.value.match(DATE_PATTERN)) {
+  await nextTick()
+
+  if (model.value && !isValidDate.value) {
     emit("update:validationError", {
       message:
         "Datum entspricht nicht dem erlaubten Muster (TT.MM.JJJJ, MM.JJJJ oder JJJJ)",
       instance: "date",
     })
-  } else {
-    emit("update:validationError")
+    return
   }
+  if (model.value && !isInPast.value) {
+    emit("update:validationError", {
+      message: "Das Datum darf nicht in der Zukunft liegen",
+      instance: "date",
+    })
+    return
+  }
+  emit("update:validationError")
 }
 </script>
 

@@ -213,7 +213,7 @@ describe("Collective Agreement Input", () => {
     expect(emitted("removeEntry")).toBeTruthy()
   })
 
-  it("should validate date", async () => {
+  it("should validate date format", async () => {
     const { user } = renderComponent({
       modelValue: {} as CollectiveAgreement,
     })
@@ -241,6 +241,39 @@ describe("Collective Agreement Input", () => {
 
     expect(dateInput).toHaveValue("12.2001")
   })
+
+  const testCases = [
+    { invalidDate: "9999", validDate: "2001" },
+    { invalidDate: "12.9999", validDate: "12.2001" },
+    { invalidDate: "31.12.9999", validDate: "31.12.2001" },
+  ]
+  it.each(testCases)(
+    "should validate date is not in future",
+    async ({ invalidDate, validDate }) => {
+      const { user } = renderComponent({
+        modelValue: {} as CollectiveAgreement,
+      })
+
+      const dateInput = screen.getByRole("textbox", { name: "Datum" })
+
+      await user.type(dateInput, invalidDate)
+      await user.tab()
+
+      expect(
+        screen.getByText("Das Datum darf nicht in der Zukunft liegen"),
+      ).toBeVisible()
+
+      await user.clear(dateInput)
+      await user.type(dateInput, validDate)
+      await user.tab()
+
+      expect(
+        screen.queryByText("Das Datum darf nicht in der Zukunft liegen"),
+      ).not.toBeInTheDocument()
+
+      expect(dateInput).toHaveValue(validDate)
+    },
+  )
 
   it("should validate norm", async () => {
     const { user } = renderComponent({
