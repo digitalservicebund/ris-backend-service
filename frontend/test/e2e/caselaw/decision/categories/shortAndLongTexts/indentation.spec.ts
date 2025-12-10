@@ -22,9 +22,9 @@ test.describe(
       prefilledDocumentUnit,
     }) => {
       const noIndentation = `<p>Abschnitt mit Einzug 0</p>`
-      const singleIndentation = `<p style="margin-left: 40px!important;">Abschnitt mit Einzug 1</p>`
-      const doubleIndentation = `<p style="margin-left: 80px!important;">Abschnitt mit Einzug 2</p>`
-      const tripleIndentation = `<p style="margin-left: 120px!important;">Abschnitt mit Einzug 3</p>`
+      const singleIndentation = `<p style="margin-left: 40px !important;">Abschnitt mit Einzug 1</p>`
+      const doubleIndentation = `<p style="margin-left: 80px !important;">Abschnitt mit Einzug 2</p>`
+      const tripleIndentation = `<p style="margin-left: 120px !important;">Abschnitt mit Einzug 3</p>`
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
