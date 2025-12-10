@@ -40,7 +40,7 @@ describe("TableStyle extension", () => {
       ],
     })
 
-    expect(editor.getHTML()).toContain('style="border: 1px solid red;"')
+    expect(editor.getHTML()).toContain('style="border: 1px solid red"')
   })
 
   test("should not transform inline styling for td tag", async () => {
@@ -58,7 +58,7 @@ describe("TableStyle extension", () => {
       ],
     })
 
-    expect(editor.getHTML()).toContain('style="border: 1px solid red;"')
+    expect(editor.getHTML()).toContain('style="border: 1px solid red"')
   })
 
   test("should show table border", async () => {
