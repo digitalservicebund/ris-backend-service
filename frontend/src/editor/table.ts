@@ -21,11 +21,6 @@ class CustomTableView extends TableView {
       }
     })
   }
-
-  update(node: Node) {
-    super.update(node)
-    return true
-  }
 }
 
 /**
