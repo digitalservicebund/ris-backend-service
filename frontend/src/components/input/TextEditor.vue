@@ -43,7 +43,6 @@ import { CustomTableCell } from "@/editor/tableCell"
 import { CustomTableHeader } from "@/editor/tableHeader"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
-import { TrailingNode } from "@/editor/trailingNode"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { Match } from "@/types/textCheck"
 import IconInfoOutline from "~icons/mdi/information-outline"
@@ -135,7 +134,6 @@ const extensions: AnyExtension[] = [
   TextCheckExtension.configure({
     service: textCheckService,
   }),
-  TrailingNode,
 ]
 
 const editor: Editor = new Editor({
