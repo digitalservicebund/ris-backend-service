@@ -24,9 +24,9 @@ test.describe(
     }) => {
       const tableHTML =
         '<table style="min-width: 25px;"><colgroup><col style="min-width: 25px;"></colgroup>' +
-        '<tbody><tr><th class="invisible-table-cell" colspan="1" rowspan="1" style="">' +
+        '<tbody><tr><th class="invisible-table-cell" style="" colspan="1" rowspan="1">' +
         "<p>some text so the table is exportable</p></th></tr></tbody></table>"
-      const tableXMLPreview = `<table class="invisible-table-cell" style="min-width: 25px;">`
+      const tableXMLPreview = `<table class="invisible-table-cell" style="min-width: 25px">`
       const inputField = page.getByTestId("Gründe")
       const menu = page.getByLabel("Gründe Button Leiste")
 
