@@ -81,8 +81,74 @@ describe("Collective Agreement Input", () => {
     ).toBeDisabled()
   })
 
-  it("should enable 'Übernehmen' button with complete input", async () => {
+  it("should disable 'Übernehmen' button with invalid date input", async () => {
     // Arrange + Act
+    const { user } = renderComponent({
+      modelValue: {
+        id: "73b51cc0-c779-4c31-954a-0cc74943d6d4",
+        name: "Stehende Bühnen",
+      } as CollectiveAgreement,
+    })
+    const dateInput = screen.getByRole("textbox", { name: "Datum" })
+
+    await user.type(dateInput, "test")
+    await user.tab()
+
+    expect(
+      screen.getByText(
+        "Datum entspricht nicht dem erlaubten Muster (TT.MM.JJJJ, MM.JJJJ oder JJJJ)",
+      ),
+    ).toBeVisible()
+
+    expect(
+      screen.getByRole("button", { name: "Tarifvertrag speichern" }),
+    ).toBeDisabled()
+
+    await user.clear(dateInput)
+    await user.type(dateInput, "2025")
+    await user.tab()
+
+    expect(
+      screen.queryByText(
+        "Datum entspricht nicht dem erlaubten Muster (TT.MM.JJJJ, MM.JJJJ oder JJJJ)",
+      ),
+    ).not.toBeInTheDocument()
+
+    expect(
+      screen.getByRole("button", { name: "Tarifvertrag speichern" }),
+    ).toBeEnabled()
+  })
+
+  it("should disable 'Übernehmen' button with invalid norm input", async () => {
+    const { user } = renderComponent({
+      modelValue: {
+        id: "73b51cc0-c779-4c31-954a-0cc74943d6d4",
+        name: "Stehende Bühnen",
+      } as CollectiveAgreement,
+    })
+    const normInput = screen.getByRole("textbox", { name: "Tarifnorm" })
+
+    await user.type(normInput, "invalid single norm")
+    await user.tab()
+
+    expect(screen.getByText("Inhalt nicht valide")).toBeVisible()
+
+    expect(
+      screen.getByRole("button", { name: "Tarifvertrag speichern" }),
+    ).toBeDisabled()
+
+    await user.clear(normInput)
+    await user.type(normInput, "§ 1")
+    await user.tab()
+
+    expect(screen.queryByText("Inhalt nicht valide")).not.toBeInTheDocument()
+
+    expect(
+      screen.getByRole("button", { name: "Tarifvertrag speichern" }),
+    ).toBeEnabled()
+  })
+
+  it("should enable 'Übernehmen' button with complete and valid input", async () => {
     renderComponent({
       modelValue: {
         id: "73b51cc0-c779-4c31-954a-0cc74943d6d4",
