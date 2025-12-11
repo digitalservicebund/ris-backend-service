@@ -14,13 +14,13 @@ plugins {
     id("org.springframework.boot") version "3.5.8"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "8.1.0"
-    id("org.sonarqube") version "7.1.0.6387"
+    id("org.sonarqube") version "7.2.0.6526"
     id("com.github.jk1.dependency-license-report") version "3.0.1"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.1.0"
-    id("org.flywaydb.flyway") version "11.18.0"
+    id("org.flywaydb.flyway") version "11.19.0"
     id("io.sentry.jvm.gradle") version "5.12.2"
 }
 
@@ -169,7 +169,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.33.1")
+    implementation("com.google.protobuf:protobuf-java:4.33.2")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.6.0")
@@ -181,11 +181,11 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.39.5"))
+    implementation(platform("software.amazon.awssdk:bom:2.40.3"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
-    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.7")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.8")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
@@ -222,11 +222,11 @@ dependencies {
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
     implementation("io.getunleash:unleash-client-java:11.1.1")
-    implementation("org.apache.commons:commons-text:1.14.0")
+    implementation("org.apache.commons:commons-text:1.15.0")
     implementation("org.jsoup:jsoup:1.21.2")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:7.2.0")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.2.0")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:7.2.1")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.2.1")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.4")
