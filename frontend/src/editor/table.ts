@@ -1,4 +1,4 @@
-import { Table, TableOptions, TableView } from "@tiptap/extension-table"
+import { Table, TableView } from "@tiptap/extension-table"
 import "../styles/tables.css"
 import { Node } from "prosemirror-model"
 import { hasAllBorders } from "./tableUtil"
@@ -66,7 +66,7 @@ export const CustomTable = Table.extend({
 
   addOptions() {
     return {
-      ...(this.parent?.() as TableOptions),
+      ...this.parent?.(),
       View: CustomTableView,
       resizable: true,
       allowTableNodeSelection: true,
