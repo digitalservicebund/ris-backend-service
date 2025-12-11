@@ -366,7 +366,7 @@ defineExpose({ jumpToMatch })
     <div>
       <BubbleMenu
         v-if="editor"
-        class="bubble-menu"
+        class="bubble-menu z-9999"
         :editor="editor"
         :options="{ placement: 'bottom-start' }"
         :should-show="shouldShowBubbleMenu"
