@@ -144,9 +144,9 @@ async function scrollToCategory(key: string) {
     <div v-else class="ris-body1-regular flex flex-col gap-16">
       <div v-if="missingCoreDataFields.length" class="flex flex-row gap-8">
         <IconErrorOutline class="text-red-800" />
-        <div class="flex flex-col gap-8">
+        <div class="flex flex-col">
           <p>Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:</p>
-          <ul class="ml-32 list-disc">
+          <ul class="list-disc">
             <li v-for="{ field, label } in missingCoreDataFields" :key="field">
               <Button
                 class="h-auto border-none p-0!"
