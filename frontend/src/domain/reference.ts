@@ -5,6 +5,7 @@ import LegalPeriodical from "@/domain/legalPeriodical"
 
 export default class Reference implements EditableListItem {
   id?: string
+  localId: string // FE only
   citation?: string
   referenceSupplement?: string
   footnote?: string
@@ -51,7 +52,7 @@ export default class Reference implements EditableListItem {
         ...data.documentationUnit,
       })
     }
-    this.id ??= crypto.randomUUID()
+    this.localId = data.localId ?? crypto.randomUUID()
   }
 
   /**
@@ -106,7 +107,7 @@ export default class Reference implements EditableListItem {
   }
 
   equals(entry: Reference): boolean {
-    return this.id === entry.id
+    return this.localId === entry.localId
   }
 
   get isEmpty(): boolean {

@@ -18,7 +18,8 @@ export const TranslationTypeLabels: Record<TranslationType, string> = {
 }
 
 export default class OriginOfTranslation implements EditableListItem {
-  public id?: string
+  public id?: string // BE only
+  public localId: string // FE only
   public newEntry?: boolean
   public languageCode?: LanguageCode
   public translationType?: TranslationType
@@ -28,13 +29,7 @@ export default class OriginOfTranslation implements EditableListItem {
 
   constructor(data: Partial<OriginOfTranslation> = {}) {
     Object.assign(this, data)
-
-    if (this.id == undefined) {
-      this.id = crypto.randomUUID()
-      this.newEntry = true
-    } else if (data.newEntry == undefined) {
-      this.newEntry = false
-    }
+    this.localId = data.localId ?? crypto.randomUUID()
   }
 
   get isEmpty(): boolean {
@@ -42,6 +37,6 @@ export default class OriginOfTranslation implements EditableListItem {
   }
 
   equals(entry: OriginOfTranslation): boolean {
-    return this.id === entry.id
+    return this.localId === entry.localId
   }
 }

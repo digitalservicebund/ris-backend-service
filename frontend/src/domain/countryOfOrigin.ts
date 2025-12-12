@@ -2,7 +2,8 @@ import EditableListItem from "./editableListItem"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 
 export default class CountryOfOrigin implements EditableListItem {
-  public id?: string
+  public id?: string // BE only
+  public localId: string // FE only
   public newEntry?: boolean
   public legacyValue?: string
   public country?: FieldOfLaw
@@ -10,13 +11,7 @@ export default class CountryOfOrigin implements EditableListItem {
 
   constructor(data: Partial<CountryOfOrigin> = {}) {
     Object.assign(this, data)
-
-    if (this.id == undefined) {
-      this.id = crypto.randomUUID()
-      this.newEntry = true
-    } else if (data.newEntry == undefined) {
-      this.newEntry = false
-    }
+    this.localId = data.localId ?? crypto.randomUUID()
   }
 
   get isEmpty(): boolean {
@@ -24,7 +19,7 @@ export default class CountryOfOrigin implements EditableListItem {
   }
 
   equals(entry: CountryOfOrigin): boolean {
-    return this.id === entry.id
+    return this.localId === entry.localId
   }
 
   get renderSummary(): string {

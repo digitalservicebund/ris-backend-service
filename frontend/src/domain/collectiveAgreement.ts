@@ -2,23 +2,16 @@ import { CollectiveAgreementIndustry } from "@/domain/collectiveAgreementIndustr
 import EditableListItem from "@/domain/editableListItem"
 
 export class CollectiveAgreement implements EditableListItem {
-  id?: string
-  name?: string
-  date?: string
-  norm?: string
-  industry?: CollectiveAgreementIndustry
-
-  public newEntry?: boolean
+  public id?: string // BE only
+  public localId: string // FE only
+  public name?: string
+  public date?: string
+  public norm?: string
+  public industry?: CollectiveAgreementIndustry
 
   constructor(data: Partial<CollectiveAgreement> = {}) {
     Object.assign(this, data)
-
-    if (this.id == undefined) {
-      this.id = crypto.randomUUID()
-      this.newEntry = true
-    } else if (data.newEntry == undefined) {
-      this.newEntry = false
-    }
+    this.localId = data.localId ?? crypto.randomUUID()
   }
 
   static readonly fields = ["name", "date", "norm", "industry"] as const
@@ -35,6 +28,6 @@ export class CollectiveAgreement implements EditableListItem {
   }
 
   equals(entry: CollectiveAgreement): boolean {
-    return this.id === entry.id
+    return this.localId === entry.localId
   }
 }

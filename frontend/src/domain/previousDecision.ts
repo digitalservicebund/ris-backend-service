@@ -22,16 +22,8 @@ export default class PreviousDecision
   ] as const
 
   constructor(data: Partial<PreviousDecision> = {}) {
-    super()
+    super(data)
     Object.assign(this, data)
-    if (this.uuid == undefined) {
-      this.uuid = crypto.randomUUID()
-      this.newEntry = true
-    }
-  }
-
-  get id() {
-    return this.uuid
   }
 
   get renderSummary(): string {
@@ -83,7 +75,7 @@ export default class PreviousDecision
   }
 
   equals(entry: PreviousDecision): boolean {
-    return this.id === entry.id
+    return this.localId === entry.localId
   }
 
   get showSummaryOnEdit(): boolean {

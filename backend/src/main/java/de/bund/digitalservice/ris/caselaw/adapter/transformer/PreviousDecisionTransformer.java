@@ -24,7 +24,7 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
     }
 
     return PreviousDecisionDTO.builder()
-        .id(previousDecision.isNewEntry() ? null : previousDecision.getUuid())
+        .id(previousDecision.getUuid())
         .court(getCourtFromDomain(previousDecision.getCourt()))
         .date(previousDecision.getDecisionDate())
         .documentNumber(previousDecision.getDocumentNumber())

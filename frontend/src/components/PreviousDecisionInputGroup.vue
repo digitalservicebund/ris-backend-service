@@ -10,7 +10,6 @@ import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import NestedComponent from "@/components/NestedComponents.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
-import { useIsSaved } from "@/composables/useIsSaved"
 import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
 import PreviousDecision from "@/domain/previousDecision"
@@ -30,7 +29,6 @@ const emit = defineEmits<{
   removeEntry: [value: PreviousDecision]
 }>()
 const { scrollIntoViewportById } = useScroll()
-const { isSaved } = useIsSaved(props.modelValue, props.modelValueList)
 const lastSearchInput = ref(new PreviousDecision())
 const lastSavedModelValue = ref(new PreviousDecision({ ...props.modelValue }))
 const previousDecision = ref(new PreviousDecision({ ...props.modelValue }))
@@ -159,7 +157,7 @@ watch(
 
 onMounted(async () => {
   // don't validate on initial empty entries
-  if (isSaved.value) {
+  if (props.modelValue?.uuid) {
     await validateRequiredInput()
   }
   previousDecision.value = new PreviousDecision({ ...props.modelValue })

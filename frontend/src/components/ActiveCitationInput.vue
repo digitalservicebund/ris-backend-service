@@ -8,7 +8,6 @@ import ComboboxInput from "@/components/ComboboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
-import { useIsSaved } from "@/composables/useIsSaved"
 import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ActiveCitation from "@/domain/activeCitation"
@@ -30,7 +29,6 @@ const emit = defineEmits<{
 }>()
 
 const { scrollIntoViewportById } = useScroll()
-const { isSaved } = useIsSaved(props.modelValue, props.modelValueList)
 const lastSearchInput = ref(new ActiveCitation())
 const lastSavedModelValue = ref(new ActiveCitation({ ...props.modelValue }))
 const activeCitation = ref(new ActiveCitation({ ...props.modelValue }))
@@ -193,7 +191,7 @@ watch(
 
 onMounted(() => {
   // we don't want to validate on initial empty entries
-  if (isSaved.value) {
+  if (props.modelValue?.uuid) {
     validateRequiredInput()
   }
   activeCitation.value = new ActiveCitation({ ...props.modelValue })

@@ -1,7 +1,8 @@
 import EditableListItem from "./editableListItem"
 
 export default class ParticipatingJudge implements EditableListItem {
-  public id?: string
+  public id?: string // BE only
+  public localId: string // FE only
   public newEntry?: boolean
   public name?: string
   public referencedOpinions?: string
@@ -12,13 +13,7 @@ export default class ParticipatingJudge implements EditableListItem {
 
   constructor(data: Partial<ParticipatingJudge> = {}) {
     Object.assign(this, data)
-
-    if (this.id == undefined) {
-      this.id = crypto.randomUUID()
-      this.newEntry = true
-    } else if (data.newEntry == undefined) {
-      this.newEntry = false
-    }
+    this.localId = data.localId ?? crypto.randomUUID()
   }
 
   get renderSummary(): string {
@@ -45,7 +40,7 @@ export default class ParticipatingJudge implements EditableListItem {
   }
 
   equals(entry: ParticipatingJudge): boolean {
-    return this.id === entry.id
+    return this.localId === entry.localId
   }
 
   get nameIsSet(): boolean {

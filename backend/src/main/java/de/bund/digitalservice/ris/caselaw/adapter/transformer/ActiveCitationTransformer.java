@@ -41,7 +41,7 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
 
     ActiveCitationDTOBuilder<?, ?> activeCitationDTOBuilder =
         ActiveCitationDTO.builder()
-            .id(activeCitation.isNewEntry() ? null : activeCitation.getUuid())
+            .id(activeCitation.getUuid())
             .court(getCourtFromDomain(activeCitation.getCourt()))
             .date(activeCitation.getDecisionDate())
             .documentNumber(activeCitation.getDocumentNumber())

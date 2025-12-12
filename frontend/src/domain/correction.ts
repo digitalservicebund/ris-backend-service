@@ -11,7 +11,8 @@ export const CORRECTION_TYPES = [
 export type CorrectionType = (typeof CORRECTION_TYPES)[number]
 
 export default class Correction implements EditableListItem {
-  public id?: string
+  public id?: string // BE only
+  public localId: string // FE only
   public newEntry?: boolean
   public type?: CorrectionType
   public description?: string
@@ -29,15 +30,8 @@ export default class Correction implements EditableListItem {
 
   constructor(data: Partial<Correction> = {}) {
     Object.assign(this, data)
-
-    if (this.id == undefined) {
-      this.id = crypto.randomUUID()
-      this.newEntry = true
-    } else if (data.newEntry == undefined) {
-      this.newEntry = false
-    }
+    this.localId = data.localId ?? crypto.randomUUID()
   }
-
   get hasMissingRequiredFields(): boolean {
     return this.missingRequiredFields.length > 0
   }
@@ -55,7 +49,7 @@ export default class Correction implements EditableListItem {
   }
 
   equals(entry: EditableListItem): boolean {
-    return entry.id === this.id
+    return entry.localId === this.localId
   }
 
   fieldIsEmpty(value: Correction[(typeof Correction.fields)[number]]) {

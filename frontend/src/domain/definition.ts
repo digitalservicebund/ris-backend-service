@@ -1,7 +1,8 @@
 import EditableListItem from "./editableListItem"
 
 export default class Definition implements EditableListItem {
-  public id?: string
+  public id?: string // BE only
+  public localId: string // FE only
   public newEntry?: boolean
   public definedTerm?: string
   public definingBorderNumber?: number
@@ -12,13 +13,7 @@ export default class Definition implements EditableListItem {
 
   constructor(data: Partial<Definition> = {}) {
     Object.assign(this, data)
-
-    if (this.id == undefined) {
-      this.id = crypto.randomUUID()
-      this.newEntry = true
-    } else if (data.newEntry == undefined) {
-      this.newEntry = false
-    }
+    this.localId = data.localId ?? crypto.randomUUID()
   }
 
   get hasMissingRequiredFields(): boolean {
@@ -36,7 +31,7 @@ export default class Definition implements EditableListItem {
   }
 
   equals(entry: Definition): boolean {
-    return this.id === entry.id
+    return this.localId === entry.localId
   }
 
   private fieldIsEmpty(
