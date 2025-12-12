@@ -510,7 +510,9 @@ const hasNonApplicationNorms = computed(() => {
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="hasAbuseFees">
-      <PreviewCategory>Missbrauchsgebühren</PreviewCategory>
+      <PreviewCategory>{{
+        contentRelatedIndexingLabels.abuseFees
+      }}</PreviewCategory>
       <PreviewContent>
         <div
           v-for="abuseFee in props.contentRelatedIndexing.abuseFees"

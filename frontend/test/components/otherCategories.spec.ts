@@ -595,13 +595,13 @@ describe("other categories", () => {
     })
   })
 
-  describe("AbuseFees (Missbrauchsgebühren)", () => {
+  describe("AbuseFees (Gebühren)", () => {
     const router = createRouter({
       history: createWebHistory(),
       routes: routes,
     })
 
-    it("should display 'Missbrauchsgebühren' button when no data and VerfG", async () => {
+    it("should display 'Gebühren' button when no data and VerfG", async () => {
       // Arrange
       mockSessionStore({ abuseFees: [] }, BVerfG)
 
@@ -614,11 +614,11 @@ describe("other categories", () => {
 
       // Assert
       expect(
-        screen.getByRole("button", { name: "Missbrauchsgebühren" }),
+        screen.getByRole("button", { name: "Gebühren" }),
       ).toBeInTheDocument()
     })
 
-    it("should not display 'Missbrauchsgebühren' button when no data and not VerfG", async () => {
+    it("should not display 'Gebühren' button when no data and not VerfG", async () => {
       // Arrange
       mockSessionStore({ abuseFees: [] }, BAG)
 
@@ -631,11 +631,11 @@ describe("other categories", () => {
 
       // Assert
       expect(
-        screen.queryByRole("button", { name: "Missbrauchsgebühren" }),
+        screen.queryByRole("button", { name: "Gebühren" }),
       ).not.toBeInTheDocument()
     })
 
-    it("should display 'Missbrauchsgebühren' with data for any court", async () => {
+    it("should display 'Gebühren' with data for any court", async () => {
       // Arrange
       mockSessionStore({
         abuseFees: [
@@ -659,7 +659,7 @@ describe("other categories", () => {
       })
 
       // Assert
-      expect(await screen.findByText("Missbrauchsgebühren")).toBeVisible()
+      expect(await screen.findByText("Gebühren")).toBeVisible()
       expect(
         await screen.findByText("500 Euro (EUR), Bevollmächtigter"),
       ).toBeVisible()

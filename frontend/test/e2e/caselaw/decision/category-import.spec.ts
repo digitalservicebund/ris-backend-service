@@ -1015,9 +1015,9 @@ test.describe("category import", () => {
     },
   )
 
-  // Missbrauchsgebühren
+  // Gebühren
   test(
-    "import abuseFees (Missbrauchsgebühren)",
+    "import abuseFees (Gebühren)",
     { tag: ["@RISDEV-9959"] },
     async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
       await navigateToCategoryImport(page, linkedDocumentNumber)
@@ -1027,10 +1027,8 @@ test.describe("category import", () => {
           page,
           prefilledDocumentUnitWithTexts.documentNumber,
         )
-        await expect(
-          page.getByLabel("Missbrauchsgebühren übernehmen"),
-        ).toBeVisible()
-        await page.getByLabel("Missbrauchsgebühren übernehmen").click()
+        await expect(page.getByLabel("Gebühren übernehmen")).toBeVisible()
+        await page.getByLabel("Gebühren übernehmen").click()
 
         await expect(
           page.getByText("223 Dollar (USD), Bevollmächtigter"),
