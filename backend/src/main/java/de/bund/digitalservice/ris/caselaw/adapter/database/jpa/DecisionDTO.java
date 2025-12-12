@@ -32,9 +32,9 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.type.SqlTypes;
 
 @Getter
 @Setter
@@ -270,7 +270,7 @@ public class DecisionDTO extends DocumentationUnitDTO {
   /** Rechtsmittel zugelassen durch */
   @Column(name = "appeal_admitted_by")
   @Enumerated(EnumType.STRING)
-  @JdbcType(PostgreSQLEnumJdbcType.class)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   private AppealAdmitter appealAdmittedBy;
 
   /** Rechtsmittel */
