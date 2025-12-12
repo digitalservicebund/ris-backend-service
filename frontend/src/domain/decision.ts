@@ -89,7 +89,7 @@ export const contentRelatedIndexingLabels: {
   appealAdmission: "Rechtsmittelzulassung",
   appeal: "Rechtsmittel",
   objectValues: "Gegenstandswert",
-  abuseFees: "Missbrauchsgebühren",
+  abuseFees: "Gebühren",
   countriesOfOrigin: "Herkunftsland",
   incomeTypes: "Einkunftsart",
   relatedPendingProceedings: "Verknüpfung anhängiges Verfahren",

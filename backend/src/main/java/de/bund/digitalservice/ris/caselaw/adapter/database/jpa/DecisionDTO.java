@@ -299,7 +299,7 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   private List<CorrectionDTO> corrections = new ArrayList<>();
 
-  /** Missbrauchgebühr */
+  /** Gebühren */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "decision_id", nullable = false)
   @OrderBy("rank")

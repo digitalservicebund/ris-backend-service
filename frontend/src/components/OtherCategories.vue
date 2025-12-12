@@ -240,7 +240,7 @@ const shouldDisplayNonApplicationNorms = computed(
       </CategoryWrapper>
       <CategoryWrapper
         v-if="shouldDisplayAbuseFees"
-        label="Missbrauchsgebühren"
+        :label="contentRelatedIndexingLabels.abuseFees"
         :should-show-button="!hasAbuseFees"
       >
         <AbuseFees :label="contentRelatedIndexingLabels.abuseFees" />

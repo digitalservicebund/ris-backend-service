@@ -205,7 +205,7 @@ describe("preview content related indexing", () => {
     expect(await screen.findByText("E-VSF")).toBeInTheDocument()
     expect(await screen.findByText("Definition")).toBeInTheDocument()
     expect(await screen.findByText("Gegenstandswert")).toBeInTheDocument()
-    expect(await screen.findByText("Missbrauchsgebühren")).toBeInTheDocument()
+    expect(await screen.findByText("Gebühren")).toBeInTheDocument()
     expect(
       await screen.findByText("Verknüpfung anhängiges Verfahren"),
     ).toBeInTheDocument()
@@ -251,7 +251,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
@@ -313,7 +313,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
@@ -387,7 +387,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
@@ -483,7 +483,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
@@ -529,7 +529,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
@@ -597,7 +597,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
@@ -642,7 +642,7 @@ describe("preview content related indexing", () => {
     ).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
@@ -684,7 +684,7 @@ describe("preview content related indexing", () => {
     ).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
@@ -752,7 +752,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
@@ -821,7 +821,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
@@ -874,7 +874,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
@@ -928,7 +928,7 @@ describe("preview content related indexing", () => {
     )
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
@@ -982,14 +982,14 @@ describe("preview content related indexing", () => {
     expect(container).toHaveTextContent(
       "Gegenstandswert1.000 Euro (EUR), Verfassungsbeschwerde",
     )
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
     expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
 
-  test("renders 'Missbrauchsgebühren' and nothing else", async () => {
+  test("renders 'Gebühren' and nothing else", async () => {
     const { container } = renderComponent({
       keywords: [],
       norms: [],
@@ -1037,7 +1037,7 @@ describe("preview content related indexing", () => {
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
     expect(container).toHaveTextContent(
-      "Missbrauchsgebühren1.000 Euro (EUR), Bevollmächtigter",
+      "Gebühren1.000 Euro (EUR), Bevollmächtigter",
     )
     expect(screen.queryByText("Nichtanwendungsgesetz")).not.toBeInTheDocument()
   })
@@ -1087,7 +1087,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.getByText("Verknüpfung anhängiges Verfahren"),
     ).toBeInTheDocument()
@@ -1139,7 +1139,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
@@ -1264,7 +1264,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittel")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
@@ -1312,7 +1312,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Rechtsmittelzulassung")).not.toBeInTheDocument()
     expect(screen.queryByText("Rechtsmittel")).not.toBeInTheDocument()
     expect(screen.queryByText("Gegenstandswert")).not.toBeInTheDocument()
-    expect(screen.queryByText("Missbrauchsgebühren")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gebühren")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Verknüpfung anhängiges Verfahren"),
     ).not.toBeInTheDocument()
