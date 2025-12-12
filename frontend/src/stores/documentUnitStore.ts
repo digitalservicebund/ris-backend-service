@@ -6,7 +6,6 @@ import fields from "@/data/fieldNames.json"
 import { Decision } from "@/domain/decision"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import PendingProceeding from "@/domain/pendingProceeding"
-import PreviousDecision from "@/domain/previousDecision"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import errorMessages from "@/i18n/errors.json"
 import documentUnitService from "@/services/documentUnitService"
@@ -77,7 +76,6 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
                 documentUnit.value = getPatchApplyResult(
                     instantiateDocUnitClass(documentUnit.value as DocumentationUnit),
                     backendPatch.patch,
-                    documentUnit.value 
                 )
                 // We apply the local changes that were successfully saved in the backend on our docUnit backend representation
                 originalDocumentUnit.value = getPatchApplyResult(
@@ -164,51 +162,12 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
   function getPatchApplyResult(
     docUnit: DocumentationUnit,
     backendPatch: Operation[],
-    frontendSource?: DocumentationUnit, // optional, nur beim FE-Patch gesetzt
   ) {
     if (!documentUnit.value?.uuid) {
       throw new Error("Can't apply patch on an empty uuid")
     }
     jsonpatch.applyPatch(docUnit, backendPatch)
-    const newDocUnit = instantiateDocUnitClass(docUnit)
-
-    // Nur für FE-Patch LocalIds erhalten
-    if (frontendSource?.previousDecisions && newDocUnit.previousDecisions) {
-      newDocUnit.previousDecisions = preserveLocalIds(
-        frontendSource.previousDecisions, // alte FE-Liste
-        newDocUnit.previousDecisions.filter(Boolean), // neue Liste vom Backend
-        PreviousDecision,
-      )
-    }
-    return newDocUnit
-  }
-
-  function preserveLocalIds<T extends { uuid?: string; localId?: string }>(
-    oldList: T[],
-    backendList: T[],
-    ClassRef: new (data: Partial<T>) => T,
-  ): T[] {
-    const alreadySavedInFrontend = new Map(
-      oldList.filter((o) => o.uuid).map((o) => [o.uuid, o]),
-    )
-
-    return backendList.map((item, index) => {
-      const newObj = new ClassRef({ ...item })
-
-      // Fall 1: item hat UUID
-      if (item.uuid && alreadySavedInFrontend.has(item.uuid)) {
-        newObj.localId = alreadySavedInFrontend.get(item.uuid)!.localId
-        return newObj
-      }
-
-      // Fall 2: item hat keine uuid → neuer Eintrag
-      const old = oldList[index]
-      if (old && !old.uuid) {
-        newObj.localId = old.localId
-      }
-
-      return newObj
-    })
+    return instantiateDocUnitClass(docUnit)
   }
 
   return {
