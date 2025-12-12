@@ -407,15 +407,15 @@ test.describe("Literature references", () => {
       await test.step("Change existing reference", async () => {
         await fillInput(page, "Zitatstelle *", `2021, 99${suffix}`)
         await fillInput(page, "Autor Literaturfundstelle", "Kirk, James T.")
-        await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ebs")
-        await page.getByText("Ebs", { exact: true }).click()
+        await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
+        await page.getByText("Ean", { exact: true }).click()
         await expect(
           page.getByLabel("Dokumenttyp Literaturfundstelle", { exact: true }),
-        ).toHaveValue("Entscheidungsbesprechung")
+        ).toHaveValue("Anmerkung")
         await page.getByLabel("Fundstelle vermerken", { exact: true }).click()
 
         await expect(
-          page.getByText(`MMG 2021, 99${suffix}, Kirk, James T. (Ebs)`, {
+          page.getByText(`MMG 2021, 99${suffix}, Kirk, James T. (Ean)`, {
             exact: true,
           }),
         ).toBeVisible()
@@ -434,7 +434,7 @@ test.describe("Literature references", () => {
           prefilledDocumentUnit.documentNumber || "",
         )
         await expect(
-          previewTab.getByText(`MMG 2021, 99${suffix}, Kirk, James T. (Ebs)`, {
+          previewTab.getByText(`MMG 2021, 99${suffix}, Kirk, James T. (Ean)`, {
             exact: true,
           }),
         ).toBeVisible()
