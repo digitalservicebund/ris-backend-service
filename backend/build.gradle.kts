@@ -181,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.40.3"))
+    implementation(platform("software.amazon.awssdk:bom:2.40.4"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -205,9 +205,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.116")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.118")
     // for local development:
-//     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.116.jar"))
+//     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.118.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.20.1")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.20.1")
@@ -216,8 +216,8 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.16.0")
-    implementation("io.micrometer:micrometer-core:1.16.0")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.16.1")
+    implementation("io.micrometer:micrometer-core:1.16.1")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
@@ -231,10 +231,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.4")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.18.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.19.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.18.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.19.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -258,7 +258,7 @@ dependencies {
 
 buildscript {
     dependencies {
-        classpath("org.flywaydb:flyway-database-postgresql:11.18.0")
+        classpath("org.flywaydb:flyway-database-postgresql:11.19.0")
     }
 }
 
