@@ -165,6 +165,7 @@ dependencies {
         exclude(group = "net.minidev", module = "json-smart")
     }
     implementation("org.springframework.security:spring-security-oauth2-resource-server:7.0.0")
+    implementation("org.springframework.boot:spring-boot-starter-flyway")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:5.0.0")
 
