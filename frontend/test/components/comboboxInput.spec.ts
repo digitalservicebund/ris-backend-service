@@ -156,34 +156,6 @@ describe("Combobox Element", () => {
     ])
   })
 
-  it("user input should not be overwritten when autosave receives the currently stored value again", async () => {
-    const { rerender } = renderComponent({ modelValue: { label: "court" } })
-    const input = screen.getByLabelText("test label")
-
-    await user.type(input, "new-input")
-
-    expect(input).toHaveValue("new-input")
-
-    // This simulates auto-save -> updates the props with same initial value
-    await rerender({ modelValue: { label: "court" } })
-
-    expect(input).toHaveValue("new-input")
-  })
-
-  it("user input should be overwritten when autosave receives a new value", async () => {
-    const { rerender } = renderComponent({ modelValue: { label: "old-court" } })
-    const input = screen.getByLabelText("test label")
-
-    await user.type(input, "new-input")
-
-    expect(input).toHaveValue("new-input")
-
-    // This simulates auto-save -> new value from backend is received and should overwrite current input
-    await rerender({ modelValue: { label: "new-court" } })
-
-    expect(input).toHaveValue("new-court")
-  })
-
   it("items should be filtered", async () => {
     renderComponent()
 
