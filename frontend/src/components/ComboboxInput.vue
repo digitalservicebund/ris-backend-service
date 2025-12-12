@@ -103,6 +103,7 @@ const setChosenItem = (item: ComboboxItem) => {
     inputText.value = ""
   } else {
     filter.value = item.label
+    inputText.value = item.label
   }
   candidateForSelection.value = undefined
 }
