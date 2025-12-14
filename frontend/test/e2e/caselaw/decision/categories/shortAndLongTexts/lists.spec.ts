@@ -385,10 +385,16 @@ test.describe("Nested lists", () => {
 
     // check first list iteration
     const outerList = inputField.locator("ol").first()
-    await expect(outerList).toHaveStyle("list-style-type: lower-greek;")
+    await expect(outerList).toHaveAttribute(
+      "style",
+      "list-style-type: lower-greek;",
+    )
 
     const nestedList = inputField.locator("ol ol").first()
-    await expect(nestedList).toHaveStyle("list-style-type: decimal;")
+    await expect(nestedList).toHaveAttribute(
+      "style",
+      "list-style-type: decimal;",
+    )
 
     await expect(inputField.getByText("Ordered list item one")).toBeVisible()
     await expect(inputField.getByText("Sub list item one")).toBeVisible()
@@ -405,12 +411,14 @@ test.describe("Nested lists", () => {
 
     // check second list iteration
     const nestedListAfterChange = inputField.locator("ol ol").first()
-    await expect(nestedListAfterChange).toHaveStyle(
+    await expect(nestedListAfterChange).toHaveAttribute(
+      "style",
       "list-style-type: lower-roman;",
     )
 
     const outerListAfterChange = inputField.locator("ol").first()
-    await expect(outerListAfterChange).toHaveStyle(
+    await expect(outerListAfterChange).toHaveAttribute(
+      "style",
       "list-style-type: lower-greek;",
     )
 
