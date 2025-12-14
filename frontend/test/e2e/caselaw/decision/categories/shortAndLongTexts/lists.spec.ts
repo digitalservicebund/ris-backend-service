@@ -422,8 +422,6 @@ test.describe("Nested lists", () => {
       "list-style-type: lower-greek;",
     )
 
-    await save(page)
-
     // just checking on validity of XML through button being visible
     // this is to recognize that juris XML convertion did not break
     // due to the conversion being sensitive to custom attributes
