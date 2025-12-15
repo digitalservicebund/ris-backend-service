@@ -35,8 +35,4 @@ export default class OriginOfTranslation implements EditableListItem {
   get isEmpty(): boolean {
     return !this["languageCode"]
   }
-
-  equals(entry: OriginOfTranslation): boolean {
-    return this.localId === entry.localId
-  }
 }

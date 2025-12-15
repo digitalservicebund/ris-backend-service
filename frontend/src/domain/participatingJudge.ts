@@ -39,10 +39,6 @@ export default class ParticipatingJudge implements EditableListItem {
     )
   }
 
-  equals(entry: ParticipatingJudge): boolean {
-    return this.localId === entry.localId
-  }
-
   get nameIsSet(): boolean {
     return !!this.name
   }

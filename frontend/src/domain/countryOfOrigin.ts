@@ -18,10 +18,6 @@ export default class CountryOfOrigin implements EditableListItem {
     return !this.legacyValue && !this.country
   }
 
-  equals(entry: CountryOfOrigin): boolean {
-    return this.localId === entry.localId
-  }
-
   get renderSummary(): string {
     let summary = ""
 

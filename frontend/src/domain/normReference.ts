@@ -29,20 +29,6 @@ export default class NormReference implements EditableListItem {
     return !this.normAbbreviation && !!this.normAbbreviationRawValue
   }
 
-  equals(entry: NormReference): boolean {
-    if (entry.isEmpty) return true
-    let isEquals = false
-    if (this.normAbbreviation) {
-      isEquals = entry.normAbbreviation
-        ? this.normAbbreviation?.abbreviation ==
-          entry.normAbbreviation.abbreviation
-        : false
-    } else if (this.normAbbreviationRawValue) {
-      isEquals = this.normAbbreviationRawValue == entry.normAbbreviationRawValue
-    }
-    return isEquals
-  }
-
   get renderSummary(): string {
     let result: string[]
     if (this.normAbbreviation?.abbreviation) {

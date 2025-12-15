@@ -73,11 +73,6 @@ export default class PreviousDecision
     })
     return isEmpty
   }
-
-  equals(entry: PreviousDecision): boolean {
-    return this.localId === entry.localId
-  }
-
   get showSummaryOnEdit(): boolean {
     return true
   }

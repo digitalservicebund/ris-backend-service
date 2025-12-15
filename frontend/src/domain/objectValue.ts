@@ -69,10 +69,6 @@ export default class ObjectValue implements EditableListItem {
     return ObjectValue.fields.every((field) => this.fieldIsEmpty(this[field]))
   }
 
-  equals(entry: ObjectValue): boolean {
-    return this.id === entry.id
-  }
-
   private fieldIsEmpty(
     value: ObjectValue[(typeof ObjectValue.fields)[number]],
   ): boolean {

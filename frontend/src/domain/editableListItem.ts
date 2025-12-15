@@ -4,6 +4,4 @@ export default interface EditableListItem {
   renderSummary?: string
   hasMissingRequiredFields?: boolean
   missingRequiredFields?: string[]
-
-  equals(entry: EditableListItem): boolean
 }

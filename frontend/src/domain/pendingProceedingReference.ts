@@ -27,10 +27,6 @@ export default class RelatedPendingProceeding
     )
   }
 
-  equals(entry: RelatedPendingProceeding): boolean {
-    return this.localId === entry.localId
-  }
-
   private fieldIsEmpty(
     value: RelatedPendingProceeding[(typeof RelatedPendingProceeding.fields)[number]],
   ): boolean {

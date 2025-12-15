@@ -48,10 +48,6 @@ export default class Correction implements EditableListItem {
     return Correction.fields.every((field) => this.fieldIsEmpty(this[field]))
   }
 
-  equals(entry: EditableListItem): boolean {
-    return entry.localId === this.localId
-  }
-
   fieldIsEmpty(value: Correction[(typeof Correction.fields)[number]]) {
     return value === undefined || !value || Object.keys(value).length === 0
   }

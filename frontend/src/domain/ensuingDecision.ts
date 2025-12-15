@@ -27,10 +27,6 @@ export default class EnsuingDecision
     Object.assign(this, data)
   }
 
-  equals(entry: EnsuingDecision): boolean {
-    return this.localId === entry.localId
-  }
-
   get renderSummary(): string {
     return [
       ...(this.pending === true ? ["anhängig"] : ["nachgehend"]),

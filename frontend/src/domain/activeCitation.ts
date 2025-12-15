@@ -61,10 +61,6 @@ export default class ActiveCitation
     return false
   }
 
-  equals(entry: ActiveCitation): boolean {
-    return this.localId === entry.localId
-  }
-
   get citationTypeIsSet(): boolean {
     return !!this.citationType?.uuid
   }

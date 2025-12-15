@@ -19,10 +19,6 @@ export default class IncomeType implements EditableListItem {
     return IncomeType.fields.every((field) => this.fieldIsEmpty(this[field]))
   }
 
-  equals(entry: IncomeType): boolean {
-    return this.localId === entry.localId
-  }
-
   private fieldIsEmpty(
     value: IncomeType[(typeof IncomeType.fields)[number]],
   ): boolean {

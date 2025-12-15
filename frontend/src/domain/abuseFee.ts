@@ -51,10 +51,6 @@ export default class AbuseFee implements EditableListItem {
     return AbuseFee.fields.every((field) => this.fieldIsEmpty(this[field]))
   }
 
-  equals(entry: AbuseFee): boolean {
-    return this.localId === entry.localId
-  }
-
   private fieldIsEmpty(
     value: AbuseFee[(typeof AbuseFee.fields)[number]],
   ): boolean {

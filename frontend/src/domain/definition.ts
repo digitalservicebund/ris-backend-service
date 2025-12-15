@@ -30,10 +30,6 @@ export default class Definition implements EditableListItem {
     return Definition.fields.every((field) => this.fieldIsEmpty(this[field]))
   }
 
-  equals(entry: Definition): boolean {
-    return this.localId === entry.localId
-  }
-
   private fieldIsEmpty(
     value: Definition[(typeof Definition.fields)[number]],
   ): boolean {

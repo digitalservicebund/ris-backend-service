@@ -106,10 +106,6 @@ export default class Reference implements EditableListItem {
     )
   }
 
-  equals(entry: Reference): boolean {
-    return this.localId === entry.localId
-  }
-
   get isEmpty(): boolean {
     let isEmpty = true
 

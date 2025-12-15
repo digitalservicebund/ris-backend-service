@@ -26,8 +26,4 @@ export class CollectiveAgreement implements EditableListItem {
   get isEmpty(): boolean {
     return this.name == null || this.name.length === 0
   }
-
-  equals(entry: CollectiveAgreement): boolean {
-    return this.localId === entry.localId
-  }
 }

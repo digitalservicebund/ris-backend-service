@@ -25,10 +25,6 @@ export default class ForeignLanguageVersion implements EditableListItem {
     )
   }
 
-  equals(entry: ForeignLanguageVersion): boolean {
-    return this.localId === entry.localId
-  }
-
   private fieldIsEmpty(
     value: ForeignLanguageVersion[(typeof ForeignLanguageVersion.fields)[number]],
   ): boolean {
