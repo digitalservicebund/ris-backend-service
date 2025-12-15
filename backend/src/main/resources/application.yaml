@@ -16,7 +16,10 @@ management:
       show-details: always
       group:
         readiness:
-          include: readinessState,db # TODO: (Malte Laukötter, 2025-12-15) readd redis
+          include: readinessState,redis,db
+      # Since the update to Spring Boot 4 the group membership validation thinks that redis is not available. This is
+      # wrong. Redis is still correctly included in the readiness check.
+      validate-group-membership: false
   endpoints:
     web:
       exposure:
