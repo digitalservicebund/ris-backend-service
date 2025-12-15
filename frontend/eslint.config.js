@@ -158,6 +158,7 @@ export default defineConfig(
 
   {
     files: ["test/**/*.ts"],
+    ignores: ["test/{e2e,a11y}/**"],
     ...jestDomPlugin.configs["flat/recommended"],
   },
 
