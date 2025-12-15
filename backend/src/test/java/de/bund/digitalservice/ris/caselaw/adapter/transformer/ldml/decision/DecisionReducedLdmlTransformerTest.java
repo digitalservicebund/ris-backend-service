@@ -657,7 +657,7 @@ class DecisionReducedLdmlTransformerTest {
             "'ensuingDecisions' (Nachgehende Entscheidungen)",
             """
                 <akn:implicitReference ris:domainTerm="Rechtszug">
-                    <ris:nachgehend domainTerm="Nachgehende Entscheidung" art="anhängig">
+                    <ris:nachgehend art="anhängig" domainTerm="Nachgehende Entscheidung">
                         <ris:nachgehendDokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:nachgehendDokumentTyp>
                         <ris:nachgehendDatum domainTerm="Entscheidungsdatum">2022-10-01</ris:nachgehendDatum>
                         <ris:nachgehendDokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 1</ris:nachgehendDokumentNummer>
@@ -668,7 +668,7 @@ class DecisionReducedLdmlTransformerTest {
                     </ris:nachgehend>
                 </akn:implicitReference>
                 <akn:implicitReference ris:domainTerm="Rechtszug">
-                    <ris:nachgehend domainTerm="Nachgehende Entscheidung" art="anhängig">
+                    <ris:nachgehend art="anhängig" domainTerm="Nachgehende Entscheidung">
                         <ris:nachgehendDokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:nachgehendDokumentTyp>
                         <ris:nachgehendDatum domainTerm="Entscheidungsdatum">2022-10-01</ris:nachgehendDatum>
                         <ris:nachgehendDokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 2</ris:nachgehendDokumentNummer>
