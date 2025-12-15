@@ -1,4 +1,3 @@
-/* eslint-disable jest-dom/prefer-to-have-style */
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
