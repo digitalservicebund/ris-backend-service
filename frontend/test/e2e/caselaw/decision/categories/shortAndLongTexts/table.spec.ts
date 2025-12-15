@@ -22,11 +22,12 @@ test.describe(
       page,
       prefilledDocumentUnit,
     }) => {
-      const tableHTML =
-        '<table style="min-width: 25px;"><colgroup><col style="min-width: 25px;"></colgroup>' +
-        '<tbody><tr><th class="invisible-table-cell" style="" colspan="1" rowspan="1">' +
-        "<p>some text so the table is exportable</p></th></tr></tbody></table>"
-      const tableXMLPreview = `<table class="invisible-table-cell" style="min-width: 25px">`
+      const tableOpeningHTML =
+        '<table style="min-width: 25px;"><colgroup><col style="min-width: 25px;"></colgroup>'
+      const tableExpectedParagraphText =
+        "<p>some text so the table is exportable</p>"
+      const tableClosingHTML = "</tbody></table>"
+      const tableXMLPreview = `<table class="invisible-table-cell" style="min-width: 25px;">`
       const inputField = page.getByTestId("Gründe")
       const menu = page.getByLabel("Gründe Button Leiste")
 
@@ -63,7 +64,16 @@ test.describe(
         await menu.getByLabel("Zeile löschen").click()
         await menu.getByLabel("Nicht-druckbare Zeichen").click()
         const inputFieldInnerHTML = await inputField.innerHTML()
-        expect(inputFieldInnerHTML).toContain(tableHTML)
+
+        const cell = page.locator("th.invisible-table-cell")
+        await expect(cell).toBeAttached()
+        await expect(cell).toHaveAttribute("colspan", "1")
+        await expect(cell).toHaveAttribute("rowspan", "1")
+        await expect(cell).toHaveAttribute("style")
+
+        expect(inputFieldInnerHTML).toContain(tableOpeningHTML)
+        expect(inputFieldInnerHTML).toContain(tableExpectedParagraphText)
+        expect(inputFieldInnerHTML).toContain(tableClosingHTML)
       })
 
       await save(page)
