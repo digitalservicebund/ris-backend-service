@@ -15,6 +15,7 @@ import PopupModal from "@/components/PopupModal.vue"
 import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
+import { useIsSaved } from "@/composables/useIsSaved"
 import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { DocumentationUnit } from "@/domain/documentationUnit"
@@ -41,8 +42,7 @@ const emit = defineEmits<{
 }>()
 
 const { scrollIntoViewportById, openSidePanelAndScrollToSection } = useScroll()
-
-const isSaved = computed(() => props.modelValue?.id)
+const { isSaved } = useIsSaved(props.modelValue, props.modelValueList)
 
 const store = useEditionStore()
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
