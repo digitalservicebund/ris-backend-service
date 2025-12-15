@@ -191,10 +191,8 @@ test.describe(
 
       // verify list structure
       const orderedList = inputField.locator("ol").first()
-      await expect(orderedList).toHaveAttribute(
-        "style",
-        "list-style-type: decimal;",
-      )
+
+      await expect(orderedList).toHaveStyle("list-style-type: decimal;")
 
       const listItems = inputField.locator("ol > li")
       await expect(listItems).toHaveCount(2)
@@ -241,10 +239,8 @@ test.describe(
 
       // verify list structure
       const orderedList = inputField.locator("ol").first()
-      await expect(orderedList).toHaveAttribute(
-        "style",
-        "list-style-type: lower-roman;",
-      )
+
+      await expect(orderedList).toHaveStyle("list-style-type: lower-roman;")
 
       const listItems = inputField.locator("ol > li")
       await expect(listItems).toHaveCount(2)
@@ -291,10 +287,8 @@ test.describe(
 
       // verify list structure
       const orderedList = inputField.locator("ol").first()
-      await expect(orderedList).toHaveAttribute(
-        "style",
-        "list-style-type: upper-roman;",
-      )
+
+      await expect(orderedList).toHaveStyle("list-style-type: upper-roman;")
 
       const listItems = inputField.locator("ol > li")
       await expect(listItems).toHaveCount(2)
@@ -341,10 +335,8 @@ test.describe(
 
       // verify list structure
       const orderedList = inputField.locator("ol").first()
-      await expect(orderedList).toHaveAttribute(
-        "style",
-        "list-style-type: lower-alpha;",
-      )
+
+      await expect(orderedList).toHaveStyle("list-style-type: lower-alpha;")
 
       const listItems = inputField.locator("ol > li")
       await expect(listItems).toHaveCount(2)
@@ -391,10 +383,8 @@ test.describe(
 
       // verify list structure
       const orderedList = inputField.locator("ol").first()
-      await expect(orderedList).toHaveAttribute(
-        "style",
-        "list-style-type: upper-alpha;",
-      )
+
+      await expect(orderedList).toHaveStyle("list-style-type: upper-alpha;")
 
       const listItems = inputField.locator("ol > li")
       await expect(listItems).toHaveCount(2)
@@ -450,16 +440,12 @@ test.describe("Nested lists", () => {
 
     // check first list iteration
     const outerList = inputField.locator("ol").first()
-    await expect(outerList).toHaveAttribute(
-      "style",
-      "list-style-type: lower-greek;",
-    )
+
+    await expect(outerList).toHaveStyle("list-style-type: lower-greek;")
 
     const nestedList = inputField.locator("ol ol").first()
-    await expect(nestedList).toHaveAttribute(
-      "style",
-      "list-style-type: decimal;",
-    )
+
+    await expect(nestedList).toHaveStyle("list-style-type: decimal;")
 
     await expect(inputField.getByText("Ordered list item one")).toBeVisible()
     await expect(inputField.getByText("Sub list item one")).toBeVisible()
@@ -476,14 +462,14 @@ test.describe("Nested lists", () => {
 
     // check second list iteration
     const nestedListAfterChange = inputField.locator("ol ol").first()
-    await expect(nestedListAfterChange).toHaveAttribute(
-      "style",
+
+    await expect(nestedListAfterChange).toHaveStyle(
       "list-style-type: lower-roman;",
     )
 
     const outerListAfterChange = inputField.locator("ol").first()
-    await expect(outerListAfterChange).toHaveAttribute(
-      "style",
+
+    await expect(outerListAfterChange).toHaveStyle(
       "list-style-type: lower-greek;",
     )
 
