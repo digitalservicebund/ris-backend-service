@@ -30,13 +30,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.E
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Evsf;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FehlerhafteGerichte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FremdsprachigeFassungen;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gebuehren;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gegenstandswerte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gesetzgebungsauftrag;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.HerkunftDerUebersetzungen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Herkunftslaender;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Kuendigungsarten;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Kuendigungsgruende;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Missbrauchsgebuehren;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Notiz;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Quellen;
@@ -190,10 +190,10 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         builder.gegenstandswerte(gegenstandswerte);
       }
 
-      // Missbrauchsgebühren
+      // Gebühren
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.abuseFees())) {
-        var missbrauchsgebuehren = buildMissbrauchsgebuehren(contentRelatedIndexing);
-        builder.missbrauchsgebuehren(missbrauchsgebuehren);
+        var gebuehren = buildGebuehren(contentRelatedIndexing);
+        builder.gebuehren(gebuehren);
       }
 
       // Herkunftsland
@@ -684,30 +684,29 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     return Gegenstandswerte.builder().gegenstandswerte(gegenstandswerte).build();
   }
 
-  private Missbrauchsgebuehren buildMissbrauchsgebuehren(
-      ContentRelatedIndexing contentRelatedIndexing) {
+  private Gebuehren buildGebuehren(ContentRelatedIndexing contentRelatedIndexing) {
 
-    var missbrauchsgebuehren =
+    var gebuehren =
         contentRelatedIndexing.abuseFees().stream()
             .map(
                 abuseFee ->
-                    Missbrauchsgebuehren.Missbrauchsgebuehr.builder()
-                        .missbrauchsgebuehrBetrag(
-                            Missbrauchsgebuehren.MissbrauchsgebuehrBetrag.builder()
+                    Gebuehren.Gebuehr.builder()
+                        .gebuehrBetrag(
+                            Gebuehren.GebuehrBetrag.builder()
                                 .value(String.valueOf(abuseFee.amount()))
                                 .build())
-                        .missbrauchsgebuehrWaehrung(
-                            Missbrauchsgebuehren.MissbrauchsgebuehrWaehrung.builder()
+                        .gebuehrWaehrung(
+                            Gebuehren.GebuehrWaehrung.builder()
                                 .value(abuseFee.currencyCode().isoCode())
                                 .build())
-                        .missbrauchsgebuehrAdressat(
-                            Missbrauchsgebuehren.MissbrauchsgebuehrAdressat.builder()
+                        .gebuehrAdressat(
+                            Gebuehren.GebuehrAdressat.builder()
                                 .value(abuseFee.addressee().toString())
                                 .build())
                         .build())
             .toList();
 
-    return Missbrauchsgebuehren.builder().missbrauchsgebuehren(missbrauchsgebuehren).build();
+    return Gebuehren.builder().gebuehren(gebuehren).build();
   }
 
   private Herkunftslaender buildHerkunftslaender(ContentRelatedIndexing contentRelatedIndexing) {

@@ -355,13 +355,13 @@
                            </ris:berichtigungInhaltDerAenderung>
                        </ris:berichtigung>
                    </ris:berichtigungen>
-                    <ris:missbrauchsgebuehren domainTerm="Missbrauchsgebühren">
-                        <ris:missbrauchsgebuehr domainTerm="Missbrauchsgebühr">
-                            <ris:missbrauchsgebuehrBetrag domainTerm="Betrag">1234</ris:missbrauchsgebuehrBetrag>
-                            <ris:missbrauchsgebuehrWaehrung domainTerm="Währung">USD</ris:missbrauchsgebuehrWaehrung>
-                            <ris:missbrauchsgebuehrAdressat domainTerm="Adressat">Beschwerdeführer / Antragsteller</ris:missbrauchsgebuehrAdressat>
-                        </ris:missbrauchsgebuehr>
-                    </ris:missbrauchsgebuehren>
+                    <ris:gebuehren domainTerm="Gebühren">
+                        <ris:gebuehr domainTerm="Gebühr">
+                            <ris:gebuehrBetrag domainTerm="Betrag">1234</ris:gebuehrBetrag>
+                            <ris:gebuehrWaehrung domainTerm="Währung">USD</ris:gebuehrWaehrung>
+                            <ris:gebuehrAdressat domainTerm="Adressat">Beschwerdeführer / Antragsteller</ris:gebuehrAdressat>
+                        </ris:gebuehr>
+                    </ris:gebuehren>
                    <ris:herkunftslaender domainTerm="Herkunftsländer">
                         <ris:herkunftsland domainTerm="Herkunftsland">
                             <ris:herkunftslandAltwert domainTerm="Altwert">legacy value</ris:herkunftslandAltwert>

@@ -118,8 +118,8 @@ public class RisMeta {
   @XmlElement(name = "berichtigungen", namespace = CaseLawLdml.RIS_NS)
   private Berichtigungen berichtigungen;
 
-  @XmlElement(name = "missbrauchsgebuehren", namespace = CaseLawLdml.RIS_NS)
-  private Missbrauchsgebuehren missbrauchsgebuehren;
+  @XmlElement(name = "gebuehren", namespace = CaseLawLdml.RIS_NS)
+  private Gebuehren gebuehren;
 
   @XmlElement(name = "herkunftslaender", namespace = CaseLawLdml.RIS_NS)
   private Herkunftslaender herkunftslaender;
