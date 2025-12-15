@@ -85,7 +85,7 @@ test.describe(
         })
 
         const headNoteEditor = page.getByTestId("Orientierungssatz")
-        const headNoteEditorTextArea = headNoteEditor.locator("div")
+        const headNoteEditorTextArea = headNoteEditor.locator(".tiptap")
 
         await test.step("add jDV globally ignored word in headnote (Orientierungssatz)", async () => {
           await headNoteEditorTextArea.fill("")

@@ -115,6 +115,7 @@ test.describe(
         await test.step("ignoring a word marks match with blue in all categories", async () => {
           const textCheckTag = page
             .getByTestId("Gründe")
+            .locator(".tiptap")
             .getByText(wordWithTypo)
 
           await textCheckTag.click()
@@ -140,6 +141,7 @@ test.describe(
         await test.step("removing a word marks match with red in all categories", async () => {
           const textCheckTag = page
             .getByTestId("Gründe")
+            .locator(".tiptap")
             .getByText(wordWithTypo)
 
           await textCheckTag.click()
