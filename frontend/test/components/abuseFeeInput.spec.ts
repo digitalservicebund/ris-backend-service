@@ -59,7 +59,7 @@ describe("AbuseFeeInput", () => {
     // Assert
     expect(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühren speichern",
+        name: "Gebühren speichern",
       }),
     ).toBeDisabled()
   })
@@ -80,7 +80,7 @@ describe("AbuseFeeInput", () => {
     expect(currency).toHaveValue("")
     expect(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühren speichern",
+        name: "Gebühren speichern",
       }),
     ).toBeDisabled()
   })
@@ -127,7 +127,7 @@ describe("AbuseFeeInput", () => {
     expect(currency).toHaveValue("Euro (EUR)")
     expect(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühren speichern",
+        name: "Gebühren speichern",
       }),
     ).toBeEnabled()
   })
@@ -148,7 +148,7 @@ describe("AbuseFeeInput", () => {
     // Act
     await user.click(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühren speichern",
+        name: "Gebühren speichern",
       }),
     )
 
@@ -172,7 +172,7 @@ describe("AbuseFeeInput", () => {
     // Act
     await user.click(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühren speichern",
+        name: "Gebühren speichern",
       }),
     )
 
