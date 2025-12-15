@@ -25,19 +25,19 @@ public class Rechtszug {
     private static final String DOMAIN_TERM = "Vorgehende Entscheidung";
 
     @XmlElement(name = "vorgehendDokumentTyp", namespace = CaseLawLdml.RIS_NS)
-    private DokumentTyp dokumentTyp;
+    private DokumentTyp vorgehendDokumentTyp;
 
     @XmlElement(name = "vorgehendDatum", namespace = CaseLawLdml.RIS_NS)
-    private Rechtszug.Datum datum;
+    private Rechtszug.Datum vorgehendDatum;
 
     @XmlElement(name = "vorgehendDokumentNummer", namespace = CaseLawLdml.RIS_NS)
-    private Rechtszug.DokumentNummer dokumentNummer;
+    private Rechtszug.DokumentNummer vorgehendDokumentNummer;
 
     @XmlElement(name = "vorgehendAktenzeichen", namespace = CaseLawLdml.RIS_NS)
-    private AktenzeichenListe.Aktenzeichen aktenzeichen;
+    private AktenzeichenListe.Aktenzeichen vorgehendAktenzeichen;
 
     @XmlElement(name = "vorgehendGericht", namespace = CaseLawLdml.RIS_NS)
-    private Gericht gericht;
+    private Gericht vorgehendGericht;
   }
 
   @NoArgsConstructor
@@ -52,19 +52,19 @@ public class Rechtszug {
     private ArtDerNachgehendenEntscheidung art;
 
     @XmlElement(name = "nachgehendDokumentTyp", namespace = CaseLawLdml.RIS_NS)
-    private DokumentTyp dokumentTyp;
+    private DokumentTyp nachgehendDokumentTyp;
 
     @XmlElement(name = "nachgehendDatum", namespace = CaseLawLdml.RIS_NS)
-    private Rechtszug.Datum datum;
+    private Rechtszug.Datum nachgehendDatum;
 
     @XmlElement(name = "nachgehendDokumentNummer", namespace = CaseLawLdml.RIS_NS)
-    private Rechtszug.DokumentNummer dokumentNummer;
+    private Rechtszug.DokumentNummer nachgehendDokumentNummer;
 
     @XmlElement(name = "nachgehendAktenzeichen", namespace = CaseLawLdml.RIS_NS)
-    private AktenzeichenListe.Aktenzeichen aktenzeichen;
+    private AktenzeichenListe.Aktenzeichen nachgehendAktenzeichen;
 
     @XmlElement(name = "nachgehendGericht", namespace = CaseLawLdml.RIS_NS)
-    private Gericht gericht;
+    private Gericht nachgehendGericht;
 
     @XmlElement(name = "nachgehendVermerk", namespace = CaseLawLdml.RIS_NS)
     private Vermerk vermerk;

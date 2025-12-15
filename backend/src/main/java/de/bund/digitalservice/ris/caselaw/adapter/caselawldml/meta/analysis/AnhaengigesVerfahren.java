@@ -18,17 +18,17 @@ public class AnhaengigesVerfahren extends CaselawReference {
   private static final String DOMAIN_TERM = "Anhängiges Verfahren";
 
   @XmlElement(name = "anhaengigesVerfahrenDokumentTyp", namespace = CaseLawLdml.RIS_NS)
-  private DokumentTyp dokumentTyp;
+  private DokumentTyp anhDokumentTyp;
 
   @XmlElement(name = "anhaengigesVerfahrenDatum", namespace = CaseLawLdml.RIS_NS)
-  private Rechtszug.Datum datum;
+  private Rechtszug.Datum anhDatum;
 
   @XmlElement(name = "anhaengigesVerfahrenDokumentNummer", namespace = CaseLawLdml.RIS_NS)
-  private Rechtszug.DokumentNummer dokumentNummer;
+  private Rechtszug.DokumentNummer anhDokumentNummer;
 
   @XmlElement(name = "anhaengigesVerfahrenAktenzeichen", namespace = CaseLawLdml.RIS_NS)
-  private AktenzeichenListe.Aktenzeichen aktenzeichen;
+  private AktenzeichenListe.Aktenzeichen anhAktenzeichen;
 
   @XmlElement(name = "anhaengigesVerfahrenGericht", namespace = CaseLawLdml.RIS_NS)
-  private Gericht gericht;
+  private Gericht anhGericht;
 }
