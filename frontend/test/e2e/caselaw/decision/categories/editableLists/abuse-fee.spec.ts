@@ -79,6 +79,15 @@ test.describe(
         await expect(acceptButton).toBeDisabled()
       })
 
+      await test.step("'Betrag' kann nicht mehr als 9 Stellen haben", async () => {
+        const input = page.getByLabel("Betrag", { exact: true })
+        await input.fill("1000000000")
+        await page.keyboard.press("Enter")
+        await expect(
+          page.getByTestId("abuseFeeAmount-validationError"),
+        ).toHaveText("Max. 9 Zeichen")
+      })
+
       await test.step("'Betrag *' und 'Währung *' ausfüllen", async () => {
         const input = page.getByLabel("Betrag", { exact: true })
         await input.fill("10000")
