@@ -1,6 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DokumentTyp;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gericht;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlEnum;
@@ -20,6 +23,21 @@ public class Rechtszug {
   public static class Vorgehend extends CaselawReference {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Vorgehende Entscheidung";
+
+    @XmlElement(name = "vorgehendDokumentTyp", namespace = CaseLawLdml.RIS_NS)
+    private DokumentTyp dokumentTyp;
+
+    @XmlElement(name = "vorgehendDatum", namespace = CaseLawLdml.RIS_NS)
+    private Rechtszug.Datum datum;
+
+    @XmlElement(name = "vorgehendDokumentNummer", namespace = CaseLawLdml.RIS_NS)
+    private Rechtszug.DokumentNummer dokumentNummer;
+
+    @XmlElement(name = "vorgehendAktenzeichen", namespace = CaseLawLdml.RIS_NS)
+    private AktenzeichenListe.Aktenzeichen aktenzeichen;
+
+    @XmlElement(name = "vorgehendGericht", namespace = CaseLawLdml.RIS_NS)
+    private Gericht gericht;
   }
 
   @NoArgsConstructor
@@ -30,11 +48,26 @@ public class Rechtszug {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Nachgehende Entscheidung";
 
-    @XmlElement(name = "vermerk", namespace = CaseLawLdml.RIS_NS)
-    private Vermerk vermerk;
-
     @XmlAttribute(name = "art")
     private ArtDerNachgehendenEntscheidung art;
+
+    @XmlElement(name = "nachgehendDokumentTyp", namespace = CaseLawLdml.RIS_NS)
+    private DokumentTyp dokumentTyp;
+
+    @XmlElement(name = "nachgehendDatum", namespace = CaseLawLdml.RIS_NS)
+    private Rechtszug.Datum datum;
+
+    @XmlElement(name = "nachgehendDokumentNummer", namespace = CaseLawLdml.RIS_NS)
+    private Rechtszug.DokumentNummer dokumentNummer;
+
+    @XmlElement(name = "nachgehendAktenzeichen", namespace = CaseLawLdml.RIS_NS)
+    private AktenzeichenListe.Aktenzeichen aktenzeichen;
+
+    @XmlElement(name = "nachgehendGericht", namespace = CaseLawLdml.RIS_NS)
+    private Gericht gericht;
+
+    @XmlElement(name = "nachgehendVermerk", namespace = CaseLawLdml.RIS_NS)
+    private Vermerk vermerk;
   }
 
   @NoArgsConstructor

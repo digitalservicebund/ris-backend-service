@@ -332,7 +332,7 @@
     |akn:analysis|akn:otherAnalysis|akn:implicitReference|akn:ref
     |akn:FRBRWork|akn:FRBRExpression|akn:FRBRManifestation|akn:p
     |akn:FRBRthis|akn:FRBRuri|akn:FRBRalias|akn:FRBRdate|akn:FRBRauthor|akn:FRBRcountry|akn:FRBRlanguage|akn:documentRef
-    |ris:meta|ris:fileNumber|ris:dokumentTyp|ris:courtType|ris:gericht|ris:typ|ris:ort|ris:gerichtsbarkeit
+    |ris:meta|ris:dokumentTyp|ris:gericht|ris:gerichtTyp|ris:gerichtOrt|ris:gerichtsbarkeit
     |ris:fehlerhafteGerichte|ris:fehlerhaftesGericht|ris:regionen|ris:region|ris:dokumentationsstelle
     |ris:aktenzeichenListe|ris:aktenzeichen|ris:abweichendeDaten|ris:abweichendesDatum|ris:datenDerMuendlichenVerhandlung|ris:datumDerMuendlichenVerhandlung
     |ris:abweichendeDokumentnummern|ris:abweichendeDokumentnummer|ris:abweichendeEclis|ris:abweichenderEcli
@@ -340,14 +340,17 @@
     |ris:dokumentarischeKurztexte|ris:orientierungssatz|ris:sonstigerOrientierungssatz|ris:entscheidungsnamen|ris:entscheidungsname|ris:titelzeile
     |ris:eingangsarten|ris:eingangsart|ris:definitionen|ris:definition|ris:definierterBegriff|ris:definierendeRandnummer
     |ris:fremdsprachigeFassungen|ris:fremdsprachigeFassung|ris:evsf|ris:rechtsmittelzulassung|ris:rechtsmittelZugelassen|ris:rechtsmittelZugelassenDurch
-    |ris:documentNumber|ris:vorgehend|ris:nachgehend|ris:datum|ris:dokumentNummer|akn:otherReferences|ris:vermerk
-    |ris:norm|ris:abkuerzung|ris:einzelnorm|ris:bezeichnung|ris:gesetzeskraft|ris:geltungsbereich|ris:jahr|ris:titel
-    |ris:fundstelle|ris:zitatstelle|ris:zitatstelle|ris:titel|ris:untertitel|ris:periodikum|ris:fundstelleLiteraturSelbststaendig|ris:fundstelleLiteraturUnselbststaendig
-    |ris:decisionNames|ris:decisionName|ris:herkunftDerUebersetzungen|ris:herkunftDerUebersetzung|ris:uebersetzerinnen|ris:uebersetzerin
-    |ris:interneVerlinkungen|ris:interneVerlinkung|ris:externeVerlinkungen|ris:externeVerlinkung|ris:art
+    |ris:vorgehend|ris:vorgehendDokumentTyp|ris:vorgehendDatum|ris:vorgehendDokumentNummer|ris:vorgehendAktenzeichen|ris:vorgehendGericht
+    |ris:nachgehend|ris:nachgehendDokumentTyp|ris:nachgehendDatum|ris:nachgehendDokumentNummer|ris:nachgehendAktenzeichen|ris:nachgehendGericht|ris:nachgehendVermerk
+    |ris:datum|ris:dokumentNummer|akn:otherReferences
+    |ris:norm|ris:normAbkuerzung|ris:einzelnorm|ris:einzelnormDatum|ris:einzelnormBezeichnung|ris:einzelnormGesetzeskraft|ris:gesetzeskraftTyp|ris:gesetzeskraftGeltungsbereich
+    |ris:einzelnormJahr|ris:normTitel|ris:datum
+    |ris:fundstelle|ris:zitatstelle|ris:periodikumUntertitel|ris:periodikum|ris:periodikumTitel|ris:periodikumAbkuerzung|ris:periodikumTyp|ris:fundstelleLiteraturUnselbststaendig
+    |ris:decisionNames|ris:decisionName|ris:herkunftDerUebersetzungen|ris:herkunftDerUebersetzung|ris:herkunftDerUebersetzungUebersetzerinnen|ris:uebersetzerin
+    |ris:herkunftDerUebersetzungInterneVerlinkungen|ris:interneVerlinkung|ris:herkunftDerUebersetzungExterneVerlinkungen|ris:herkunftDerUebersetzungExterneVerlinkung|ris:herkunftDerUebersetzungTyp
     |ris:tarifvertraege|ris:tarifvertrag|ris:tarifvertragName|ris:tarifvertragDatum|ris:tarifvertragTarifnorm|ris:tarifvertragBranche|ris:notiz
     |ris:berufsbilder|ris:berufsbild|ris:gesetzgebungsauftrag|ris:kuendigungsarten|ris:kuendigungsart|ris:kuendigungsgruende|ris:kuendigungsgrund|ris:quellen|ris:quelle
-    |ris:streitjahre|ris:streitjahr
+    |ris:streitjahre|ris:streitjahr|ris:nichtanwendungsgesetzAbkuerzung
     |ris:rechtsmittel|ris:rechtsmittelfuehrerListe|ris:rechtsmittelfuehrer|ris:revisionKlaegerListe|ris:revisionKlaeger
     |ris:revisionBeklagterListe|ris:revisionBeklagter|ris:anschlussRevisionKlaegerListe|ris:anschlussRevisionKlaeger
     |ris:anschlussRevisionBeklagterListe|ris:anschlussRevisionBeklagter|ris:nzbKlaegerListe|ris:nzbKlaeger|ris:nzbBeklagterListe
@@ -357,7 +360,7 @@
     |ris:einkunftsarten|ris:einkunftsart|ris:einkunftsartTyp|ris:einkunftsartBegrifflichkeit
     |ris:berichtigungen|ris:berichtigung|ris:berichtigungArtDerEintragung|ris:berichtigungArtDerAenderung|ris:berichtigungDatumDerAenderung|ris:berichtigungRandnummern|ris:berichtigungInhaltDerAenderung|ris:berichtigungRandnummer
     |ris:herkunftslaender|ris:herkunftsland|ris:herkunftslandAltwert|ris:herkunftslandLandbezeichnung|ris:herkunftslandRechtlicherRahmen
-    |ris:anhaengigesVerfahren
+    |ris:anhaengigesVerfahren|ris:anhaengigesVerfahrenDokumentTyp|ris:anhaengigesVerfahrenDatum|ris:anhaengigesVerfahrenDokumentNummer|ris:anhaengigesVerfahrenAktenzeichen|ris:anhaengigesVerfahrenGericht
     |ris:nichtanwendungsgesetz
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@akn:refersTo|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
     |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId|@akn:eId|@type|@by|@domainTerm|@notation|@ris:domainTerm|@art|@sachgebiet-id">

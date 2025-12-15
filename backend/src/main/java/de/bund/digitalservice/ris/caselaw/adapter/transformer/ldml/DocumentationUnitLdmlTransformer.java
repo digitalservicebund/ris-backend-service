@@ -471,7 +471,8 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
 
     if (normRef.normAbbreviation() != null
         && isNotBlank(normRef.normAbbreviation().officialLongTitle())) {
-      normBuilder.titel(normRef.normAbbreviation().officialLongTitle());
+      normBuilder.titel(
+          Norm.Titel.builder().value(normRef.normAbbreviation().officialLongTitle()).build());
     }
 
     List<Norm.Einzelnorm> einzelNormen = new ArrayList<>();
@@ -500,9 +501,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
       if (singleNorm.legalForce().type() != null
           && isNotBlank(singleNorm.legalForce().type().label())) {
         gkBuilder.typ(
-            Norm.TypDerGesetzeskraft.builder()
-                .value(singleNorm.legalForce().type().label())
-                .build());
+            Norm.GesetzeskraftTyp.builder().value(singleNorm.legalForce().type().label()).build());
       }
       if (singleNorm.legalForce().region() != null
           && isNotBlank(singleNorm.legalForce().region().longText())) {

@@ -512,7 +512,7 @@ class DecisionFullLdmlTransformerTest {
       String expectedRisMeta =
           """
           <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
-             <ris:typ domainTerm="Gerichtstyp">BGH</ris:typ>
+             <ris:gerichtTyp domainTerm="Gerichtstyp">BGH</ris:gerichtTyp>
              <ris:gerichtsbarkeit domainTerm="Gerichtsbarkeit">Ordentliche Gerichtsbarkeit</ris:gerichtsbarkeit>
          </ris:gericht>
          """;
@@ -559,7 +559,7 @@ class DecisionFullLdmlTransformerTest {
       String expectedRisMeta =
           """
           <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
-             <ris:typ domainTerm="Gerichtstyp">Tribunal Economico-Administrativo Regional Katalonien</ris:typ>
+             <ris:gerichtTyp domainTerm="Gerichtstyp">Tribunal Economico-Administrativo Regional Katalonien</ris:gerichtTyp>
          </ris:gericht>
          """;
       Decision decision =
@@ -605,8 +605,8 @@ class DecisionFullLdmlTransformerTest {
       String expectedRisMeta =
           """
           <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
-             <ris:typ domainTerm="Gerichtstyp">AG</ris:typ>
-             <ris:ort domainTerm="Gerichtsort">Aachen</ris:ort>
+             <ris:gerichtTyp domainTerm="Gerichtstyp">AG</ris:gerichtTyp>
+             <ris:gerichtOrt domainTerm="Gerichtsort">Aachen</ris:gerichtOrt>
              <ris:gerichtsbarkeit domainTerm="Gerichtsbarkeit">Ordentliche Gerichtsbarkeit</ris:gerichtsbarkeit>
          </ris:gericht>
          """;
@@ -1260,7 +1260,10 @@ class DecisionFullLdmlTransformerTest {
                                         .dateOfVersion(LocalDate.of(2021, 2, 5))
                                         .build()))
                             .normAbbreviation(
-                                NormAbbreviation.builder().abbreviation("SeefBgV").build())
+                                NormAbbreviation.builder()
+                                    .abbreviation("SeefBgV")
+                                    .officialLongTitle("OfficialLongTitle")
+                                    .build())
                             .build()))
                 .build())
         .previousDecisions(List.of(previousDecision1, previousDecision2))

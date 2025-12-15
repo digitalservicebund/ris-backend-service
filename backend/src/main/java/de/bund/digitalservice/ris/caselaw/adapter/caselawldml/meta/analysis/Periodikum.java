@@ -18,23 +18,23 @@ public class Periodikum {
   @XmlAttribute(name = "domainTerm")
   private static final String DOMAIN_TERM = "Periodikum";
 
-  @XmlElement(name = "abkuerzung", namespace = CaseLawLdml.RIS_NS)
+  @XmlElement(name = "periodikumAbkuerzung", namespace = CaseLawLdml.RIS_NS)
   private Abkuerzung abkuerzung;
 
-  @XmlElement(name = "typ", namespace = CaseLawLdml.RIS_NS)
+  @XmlElement(name = "periodikumTyp", namespace = CaseLawLdml.RIS_NS)
   private Typ typ;
 
-  @XmlElement(name = "titel", namespace = CaseLawLdml.RIS_NS)
+  @XmlElement(name = "periodikumTitel", namespace = CaseLawLdml.RIS_NS)
   private Titel titel;
 
-  @XmlElement(name = "untertitel", namespace = CaseLawLdml.RIS_NS)
+  @XmlElement(name = "periodikumUntertitel", namespace = CaseLawLdml.RIS_NS)
   private Untertitel untertitel;
 
   @NoArgsConstructor
   @AllArgsConstructor
   @Getter
   @Builder
-  @XmlType(name = "AbkuerzungPeriodikum") // Avoid conflict with inner classes with same name
+  @XmlType(name = "PeriodikumAbkuerzung") // Avoid conflict with inner classes with same name
   public static class Abkuerzung {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Abkürzung";

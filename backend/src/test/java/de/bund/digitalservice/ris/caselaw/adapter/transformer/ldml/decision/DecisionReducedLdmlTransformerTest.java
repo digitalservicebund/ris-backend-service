@@ -565,8 +565,8 @@ class DecisionReducedLdmlTransformerTest {
             "'court' (Gericht)",
             """
                 <ris:gericht domainTerm="Gericht"akn:refersTo="#gericht">
-                  <ris:typ domainTerm="Gerichtstyp">courtType</ris:typ>
-                  <ris:ort domainTerm="Gerichtsort">courtLocation</ris:ort>
+                  <ris:gerichtTyp domainTerm="Gerichtstyp">courtType</ris:gerichtTyp>
+                  <ris:gerichtOrt domainTerm="Gerichtsort">courtLocation</ris:gerichtOrt>
                   <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBodytest</ris:spruchkoerper>
                 </ris:gericht>
                """),
@@ -610,16 +610,16 @@ class DecisionReducedLdmlTransformerTest {
             """
                <akn:implicitReference ris:domainTerm="Norm">
                   <ris:norm domainTerm="Norm">
-                     <ris:abkuerzung domainTerm="Abkürzung">normReference test</ris:abkuerzung>
+                     <ris:normAbkuerzung domainTerm="Abkürzung">normReference test</ris:normAbkuerzung>
                      <ris:einzelnorm domainTerm="Einzelnorm">
-                        <ris:bezeichnung domainTerm="Bezeichnung">singleNorm test</ris:bezeichnung>
-                        <ris:datum domainTerm="Fassungsdatum">2021-02-05</ris:datum>
-                        <ris:jahr domainTerm="Jahr">2020</ris:jahr>
+                        <ris:einzelnormBezeichnung domainTerm="Bezeichnung">singleNorm test</ris:einzelnormBezeichnung>
+                        <ris:einzelnormDatum domainTerm="Fassungsdatum">2021-02-05</ris:einzelnormDatum>
+                        <ris:einzelnormJahr domainTerm="Jahr">2020</ris:einzelnormJahr>
                      </ris:einzelnorm>
                      <ris:einzelnorm domainTerm="Einzelnorm">
-                        <ris:bezeichnung domainTerm="Bezeichnung">singleNorm 2 test</ris:bezeichnung>
-                        <ris:datum domainTerm="Fassungsdatum">2022-03-06</ris:datum>
-                        <ris:jahr domainTerm="Jahr">2022</ris:jahr>
+                        <ris:einzelnormBezeichnung domainTerm="Bezeichnung">singleNorm 2 test</ris:einzelnormBezeichnung>
+                        <ris:einzelnormDatum domainTerm="Fassungsdatum">2022-03-06</ris:einzelnormDatum>
+                        <ris:einzelnormJahr domainTerm="Jahr">2022</ris:einzelnormJahr>
                      </ris:einzelnorm>
                   </ris:norm>
                """),
@@ -629,26 +629,26 @@ class DecisionReducedLdmlTransformerTest {
             """
                  <akn:implicitReference ris:domainTerm="Rechtszug">
                      <ris:vorgehend domainTerm="Vorgehende Entscheidung">
-                         <ris:dokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:dokumentTyp>
-                         <ris:datum domainTerm="Entscheidungsdatum">2020-01-01</ris:datum>
-                         <ris:dokumentNummer domainTerm="Dokumentnummer">previous decision document number 1</ris:dokumentNummer>
-                         <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
-                         <ris:gericht domainTerm="Gericht">
-                             <ris:typ domainTerm="Gerichtstyp">previous decision court type</ris:typ>
-                             <ris:ort domainTerm="Gerichtsort">previous decision court location</ris:ort>
-                         </ris:gericht>
+                         <ris:vorgehendDokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:vorgehendDokumentTyp>
+                         <ris:vorgehendDatum domainTerm="Entscheidungsdatum">2020-01-01</ris:vorgehendDatum>
+                         <ris:vorgehendDokumentNummer domainTerm="Dokumentnummer">previous decision document number 1</ris:vorgehendDokumentNummer>
+                         <ris:vorgehendAktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:vorgehendAktenzeichen>
+                         <ris:vorgehendGericht domainTerm="Gericht">
+                             <ris:gerichtTyp domainTerm="Gerichtstyp">previous decision court type</ris:gerichtTyp>
+                             <ris:gerichtOrt domainTerm="Gerichtsort">previous decision court location</ris:gerichtOrt>
+                         </ris:vorgehendGericht>
                      </ris:vorgehend>
                  </akn:implicitReference>
                  <akn:implicitReference ris:domainTerm="Rechtszug">
                      <ris:vorgehend domainTerm="Vorgehende Entscheidung">
-                         <ris:dokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:dokumentTyp>
-                         <ris:datum domainTerm="Entscheidungsdatum">2020-01-01</ris:datum>
-                         <ris:dokumentNummer domainTerm="Dokumentnummer">previous decision document number 2</ris:dokumentNummer>
-                         <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
-                         <ris:gericht domainTerm="Gericht">
-                             <ris:typ domainTerm="Gerichtstyp">previous decision court type</ris:typ>
-                             <ris:ort domainTerm="Gerichtsort">previous decision court location</ris:ort>
-                         </ris:gericht>
+                         <ris:vorgehendDokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:vorgehendDokumentTyp>
+                         <ris:vorgehendDatum domainTerm="Entscheidungsdatum">2020-01-01</ris:vorgehendDatum>
+                         <ris:vorgehendDokumentNummer domainTerm="Dokumentnummer">previous decision document number 2</ris:vorgehendDokumentNummer>
+                         <ris:vorgehendAktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:vorgehendAktenzeichen>
+                         <ris:vorgehendGericht domainTerm="Gericht">
+                             <ris:gerichtTyp domainTerm="Gerichtstyp">previous decision court type</ris:gerichtTyp>
+                             <ris:gerichtOrt domainTerm="Gerichtsort">previous decision court location</ris:gerichtOrt>
+                         </ris:vorgehendGericht>
                      </ris:vorgehend>
                  </akn:implicitReference>
                  """),
@@ -658,25 +658,25 @@ class DecisionReducedLdmlTransformerTest {
             """
                 <akn:implicitReference ris:domainTerm="Rechtszug">
                     <ris:nachgehend domainTerm="Nachgehende Entscheidung" art="anhängig">
-                        <ris:dokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:dokumentTyp>
-                        <ris:datum domainTerm="Entscheidungsdatum">2022-10-01</ris:datum>
-                        <ris:dokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 1</ris:dokumentNummer>
-                        <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
-                        <ris:gericht domainTerm="Gericht">
-                            <ris:typ domainTerm="Gerichtstyp">ensuing decision court type</ris:typ>
-                        </ris:gericht>
+                        <ris:nachgehendDokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:nachgehendDokumentTyp>
+                        <ris:nachgehendDatum domainTerm="Entscheidungsdatum">2022-10-01</ris:nachgehendDatum>
+                        <ris:nachgehendDokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 1</ris:nachgehendDokumentNummer>
+                        <ris:nachgehendAktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:nachgehendAktenzeichen>
+                        <ris:nachgehendGericht domainTerm="Gericht">
+                            <ris:gerichtTyp domainTerm="Gerichtstyp">ensuing decision court type</ris:gerichtTyp>
+                        </ris:nachgehendGericht>
                     </ris:nachgehend>
                 </akn:implicitReference>
                 <akn:implicitReference ris:domainTerm="Rechtszug">
                     <ris:nachgehend domainTerm="Nachgehende Entscheidung" art="anhängig">
-                        <ris:dokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:dokumentTyp>
-                        <ris:datum domainTerm="Entscheidungsdatum">2022-10-01</ris:datum>
-                        <ris:dokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 2</ris:dokumentNummer>
-                        <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
-                        <ris:gericht domainTerm="Gericht">
-                            <ris:typ domainTerm="Gerichtstyp">ensuing decision court type</ris:typ>
-                        </ris:gericht>
-                        <ris:vermerk domainTerm="Vermerk">ensuing decision note</ris:vermerk>
+                        <ris:nachgehendDokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:nachgehendDokumentTyp>
+                        <ris:nachgehendDatum domainTerm="Entscheidungsdatum">2022-10-01</ris:nachgehendDatum>
+                        <ris:nachgehendDokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 2</ris:nachgehendDokumentNummer>
+                        <ris:nachgehendAktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:nachgehendAktenzeichen>
+                        <ris:nachgehendGericht domainTerm="Gericht">
+                            <ris:gerichtTyp domainTerm="Gerichtstyp">ensuing decision court type</ris:gerichtTyp>
+                        </ris:nachgehendGericht>
+                        <ris:nachgehendVermerk domainTerm="Vermerk">ensuing decision note</ris:nachgehendVermerk>
                     </ris:nachgehend>
                 </akn:implicitReference>
                 """),
