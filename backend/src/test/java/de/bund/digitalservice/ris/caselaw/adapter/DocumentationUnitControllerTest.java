@@ -14,7 +14,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
@@ -143,7 +142,6 @@ class DocumentationUnitControllerTest {
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private final User user = buildDSuser();
-  private final ObjectMapper mapper = new ObjectMapper();
 
   @BeforeEach
   void setup() throws DocumentationUnitNotExistsException {

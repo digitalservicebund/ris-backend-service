@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverters;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -21,10 +21,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
   }
 
   @Override
-  public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-    converters.add(byteArrayHttpMessageConverter());
-    converters.add(stringHttpMessageConverter());
-    converters.add(new JacksonJsonHttpMessageConverter(jsonMapper));
+  public void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
+    builder
+        .addCustomConverter(byteArrayHttpMessageConverter())
+        .addCustomConverter(stringHttpMessageConverter())
+        .addCustomConverter(new JacksonJsonHttpMessageConverter(jsonMapper));
   }
 
   private StringHttpMessageConverter stringHttpMessageConverter() {

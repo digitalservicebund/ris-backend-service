@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.gravity9.jsonpatch.JsonPatch;
 import de.bund.digitalservice.ris.caselaw.adapter.JurisXmlExporterWrapper;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 @Configuration
 public class ConverterConfig {
@@ -59,7 +61,13 @@ public class ConverterConfig {
   @Bean
   @Primary
   public JsonMapper jsonMapper() {
-    return JsonMapper.builder().build();
+    var legacyObjectMapper = legacyObjectMapper();
+
+    var module = new SimpleModule();
+    module.addDeserializer(JsonPatch.class, new JsonPatchDeserializer(legacyObjectMapper));
+    module.addSerializer(JsonPatch.class, new JsonPatchSerializer(legacyObjectMapper));
+
+    return JsonMapper.builder().addModule(module).build();
   }
 
   @Bean
@@ -67,8 +75,10 @@ public class ConverterConfig {
     return new JurisXmlExporterWrapper(jsonMapper(), transformerFactory());
   }
 
+  /** Jackson 2 object mapper to support dependencies that still depend on it. */
   @Bean
   @Primary
+  @Deprecated(since = "2025-12-16")
   public ObjectMapper legacyObjectMapper() {
     var objectMapper = new ObjectMapper();
     objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
