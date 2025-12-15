@@ -169,7 +169,6 @@ test.describe(
       page,
       prefilledDocumentUnit,
     }) => {
-      const orderedList = `<ol style="list-style-type: decimal;"><li><p>This is an ordered list</p></li><li><p>Second ordered list item</p></li></ol>`
       const orderedListXMLPreview = `<ol style="list-style-type: decimal;">`
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
@@ -190,8 +189,22 @@ test.describe(
         .locator(`[aria-label='Nicht-druckbare Zeichen']:not([disabled])`)
         .click()
 
-      const inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML).toContain(orderedList)
+      // verify list structure
+      const orderedList = inputField.locator("ol").first()
+      await expect(orderedList).toHaveAttribute(
+        "style",
+        "list-style-type: decimal;",
+      )
+
+      const listItems = inputField.locator("ol > li")
+      await expect(listItems).toHaveCount(2)
+
+      await expect(
+        inputField.getByText("This is an ordered list"),
+      ).toBeVisible()
+      await expect(
+        inputField.getByText("Second ordered list item"),
+      ).toBeVisible()
 
       await save(page)
 
@@ -206,7 +219,6 @@ test.describe(
       page,
       prefilledDocumentUnit,
     }) => {
-      const orderedList = `<ol style="list-style-type: lower-roman;"><li><p>This is an ordered list</p></li><li><p>Second ordered list item</p></li></ol>`
       const orderedListXMLPreview = `<ol style="list-style-type: lower-roman;">`
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
@@ -227,8 +239,22 @@ test.describe(
         .locator(`[aria-label='Nicht-druckbare Zeichen']:not([disabled])`)
         .click()
 
-      const inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML).toContain(orderedList)
+      // verify list structure
+      const orderedList = inputField.locator("ol").first()
+      await expect(orderedList).toHaveAttribute(
+        "style",
+        "list-style-type: lower-roman;",
+      )
+
+      const listItems = inputField.locator("ol > li")
+      await expect(listItems).toHaveCount(2)
+
+      await expect(
+        inputField.getByText("This is an ordered list"),
+      ).toBeVisible()
+      await expect(
+        inputField.getByText("Second ordered list item"),
+      ).toBeVisible()
 
       await save(page)
 
@@ -243,7 +269,6 @@ test.describe(
       page,
       prefilledDocumentUnit,
     }) => {
-      const orderedList = `<ol style="list-style-type: upper-roman;"><li><p>This is an ordered list</p></li><li><p>Second ordered list item</p></li></ol>`
       const orderedListXMLPreview = `<ol style="list-style-type: upper-roman;">`
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
@@ -264,8 +289,22 @@ test.describe(
         .locator(`[aria-label='Nicht-druckbare Zeichen']:not([disabled])`)
         .click()
 
-      const inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML).toContain(orderedList)
+      // verify list structure
+      const orderedList = inputField.locator("ol").first()
+      await expect(orderedList).toHaveAttribute(
+        "style",
+        "list-style-type: upper-roman;",
+      )
+
+      const listItems = inputField.locator("ol > li")
+      await expect(listItems).toHaveCount(2)
+
+      await expect(
+        inputField.getByText("This is an ordered list"),
+      ).toBeVisible()
+      await expect(
+        inputField.getByText("Second ordered list item"),
+      ).toBeVisible()
 
       await save(page)
 
@@ -280,7 +319,6 @@ test.describe(
       page,
       prefilledDocumentUnit,
     }) => {
-      const orderedList = `<ol style="list-style-type: lower-alpha;"><li><p>This is an ordered list</p></li><li><p>Second ordered list item</p></li></ol>`
       const orderedListXMLPreview = `<ol style="list-style-type: lower-alpha;">`
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
@@ -301,8 +339,22 @@ test.describe(
         .locator(`[aria-label='Nicht-druckbare Zeichen']:not([disabled])`)
         .click()
 
-      const inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML).toContain(orderedList)
+      // verify list structure
+      const orderedList = inputField.locator("ol").first()
+      await expect(orderedList).toHaveAttribute(
+        "style",
+        "list-style-type: lower-alpha;",
+      )
+
+      const listItems = inputField.locator("ol > li")
+      await expect(listItems).toHaveCount(2)
+
+      await expect(
+        inputField.getByText("This is an ordered list"),
+      ).toBeVisible()
+      await expect(
+        inputField.getByText("Second ordered list item"),
+      ).toBeVisible()
 
       await save(page)
 
@@ -317,7 +369,6 @@ test.describe(
       page,
       prefilledDocumentUnit,
     }) => {
-      const orderedList = `<ol style="list-style-type: upper-alpha;"><li><p>This is an ordered list</p></li><li><p>Second ordered list item</p></li></ol>`
       const orderedListXMLPreview = `<ol style="list-style-type: upper-alpha;">`
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
@@ -338,8 +389,22 @@ test.describe(
         .locator(`[aria-label='Nicht-druckbare Zeichen']:not([disabled])`)
         .click()
 
-      const inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML).toContain(orderedList)
+      // verify list structure
+      const orderedList = inputField.locator("ol").first()
+      await expect(orderedList).toHaveAttribute(
+        "style",
+        "list-style-type: upper-alpha;",
+      )
+
+      const listItems = inputField.locator("ol > li")
+      await expect(listItems).toHaveCount(2)
+
+      await expect(
+        inputField.getByText("This is an ordered list"),
+      ).toBeVisible()
+      await expect(
+        inputField.getByText("Second ordered list item"),
+      ).toBeVisible()
 
       await save(page)
 
