@@ -958,7 +958,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     Root<? extends DocumentationUnitDTO> root =
         onlyPendingProceedings
             ? criteriaQuery.from(PendingProceedingDTO.class)
-            : criteriaQuery.from(DocumentationUnitDTO.class);
+            : criteriaQuery.from(DecisionDTO.class);
 
     // Conditions setup
     Predicate conditions = criteriaBuilder.conjunction(); // Start with an empty conjunction (AND)
