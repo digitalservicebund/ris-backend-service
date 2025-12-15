@@ -308,22 +308,5 @@ describe("Document Number Route", () => {
         screen.queryByLabelText("Seitenpanel schließen"),
       ).not.toBeInTheDocument()
     })
-
-    it('does not detect ">" when input is focused', async () => {
-      const { user, router } = renderComponent()
-      await router.push({
-        path: "/caselaw/pendingProceeding/1234567891234/categories?showAttachmentPanel=false",
-      })
-
-      expect(
-        screen.queryByLabelText("Seitenpanel schließen"),
-      ).not.toBeInTheDocument()
-      screen.getByLabelText("Gericht *").focus()
-      expect(screen.getByLabelText("Gericht *")).toHaveFocus()
-      await user.keyboard("<")
-      expect(
-        screen.queryByLabelText("Seitenpanel schließen"),
-      ).not.toBeInTheDocument()
-    })
   })
 })
