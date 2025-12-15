@@ -233,6 +233,7 @@ describe("Legal periodical edition evaluation", () => {
       references: [
         {
           id: "id",
+          localId: "id0",
           citation: "123",
           referenceSupplement: "supplement",
           legalPeriodicalRawValue: "BDZ",
@@ -254,7 +255,7 @@ describe("Legal periodical edition evaluation", () => {
     await screen.findByText("DOC123")
     expect(screen.getByText(/file123,/)).toBeVisible()
     expect(screen.getByText("Unveröffentlicht")).toBeVisible()
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-id0"))
     return user
   }
 
@@ -264,6 +265,7 @@ describe("Legal periodical edition evaluation", () => {
       references: [
         {
           id: sameId,
+          localId: "id0",
           citation: "3",
           referenceSupplement: "3",
           legalPeriodical: {
@@ -292,7 +294,7 @@ describe("Legal periodical edition evaluation", () => {
     await screen.findByText("KORE700")
     expect(screen.getByText(/externalFile123,/)).toBeVisible()
     expect(screen.getByText("Fremdanlage")).toBeVisible()
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-id0"))
     return user
   }
 })

@@ -145,8 +145,16 @@ describe("DefinitionList", () => {
 
   test("Existing data can be edited", async () => {
     renderComponent([
-      new Definition({ definedTerm: "abc", definingBorderNumber: 2 }),
-      new Definition({ definedTerm: "def", definingBorderNumber: 3 }),
+      new Definition({
+        localId: "0",
+        definedTerm: "abc",
+        definingBorderNumber: 2,
+      }),
+      new Definition({
+        localId: "1",
+        definedTerm: "def",
+        definingBorderNumber: 3,
+      }),
     ])
 
     expect(screen.getAllByLabelText("Listen Eintrag")[0]).toHaveTextContent(

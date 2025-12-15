@@ -55,6 +55,7 @@ function renderComponent(
 
 function generateRelatedPendingProceeding(options?: {
   uuid?: string
+  localId?: string
   documentNumber?: string
   court?: Court
   decisionDate?: string
@@ -62,6 +63,7 @@ function generateRelatedPendingProceeding(options?: {
 }) {
   return new RelatedPendingProceeding({
     uuid: options?.uuid ?? crypto.randomUUID(),
+    localId: options?.localId ?? "0",
     documentNumber: options?.documentNumber ?? undefined,
     court: options?.court ?? {
       type: "type1",
@@ -70,7 +72,6 @@ function generateRelatedPendingProceeding(options?: {
     },
     decisionDate: options?.decisionDate ?? "2022-02-01",
     fileNumber: options?.fileNumber ?? "test fileNumber",
-    newEntry: false,
   })
 }
 
@@ -189,8 +190,8 @@ describe("Verknüpfung anhängiges Verfahren", () => {
 
   it("correctly deletes related pending proceeding", async () => {
     const { user } = renderComponent([
-      generateRelatedPendingProceeding(),
-      generateRelatedPendingProceeding(),
+      generateRelatedPendingProceeding({ localId: "0" }),
+      generateRelatedPendingProceeding({ localId: "1" }),
     ])
     const relatedPendingProceedings = screen.getAllByLabelText("Listen Eintrag")
     expect(relatedPendingProceedings.length).toBe(2)

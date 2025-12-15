@@ -78,6 +78,7 @@ function renderComponent(ensuingDecisions?: EnsuingDecision[]) {
 
 function generateEnsuingDecision(options?: {
   uuid?: string
+  localId?: string
   documentNumber?: string
   court?: Court
   decisionDate?: string
@@ -87,7 +88,8 @@ function generateEnsuingDecision(options?: {
   note?: string
 }) {
   const ensuingDecision = new EnsuingDecision({
-    uuid: options?.uuid ?? crypto.randomUUID(),
+    uuid: options?.uuid,
+    localId: options?.localId ?? "test0",
     documentNumber: options?.documentNumber ?? undefined,
     court: options?.court ?? {
       type: "type1",
@@ -228,7 +230,7 @@ describe("EnsuingDecisions", () => {
       screen.queryByLabelText("Nachgehende Entscheidung speichern"),
     ).not.toBeInTheDocument()
 
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-test0"))
 
     expect(
       screen.getByLabelText("Nachgehende Entscheidung speichern"),
@@ -238,7 +240,7 @@ describe("EnsuingDecisions", () => {
   it("correctly toggles value of date known checkbox", async () => {
     const { user } = renderComponent([generateEnsuingDecision()])
 
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-test0"))
 
     const checkbox = await screen.findByLabelText("Anhängige Entscheidung")
 
@@ -253,7 +255,7 @@ describe("EnsuingDecisions", () => {
 
     expect(screen.queryByText(/AG Test/)).not.toBeInTheDocument()
 
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-test0"))
 
     await user.type(
       await screen.findByLabelText("Gericht Nachgehende Entscheidung"),
@@ -272,7 +274,7 @@ describe("EnsuingDecisions", () => {
     const { user } = renderComponent([generateEnsuingDecision()])
 
     expect(screen.queryByText(/new fileNumber/)).not.toBeInTheDocument()
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-test0"))
 
     const fileNumberInput = await screen.findByLabelText(
       "Aktenzeichen Nachgehende Entscheidung",
@@ -290,7 +292,7 @@ describe("EnsuingDecisions", () => {
     const { user } = renderComponent([generateEnsuingDecision()])
 
     expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-test0"))
 
     const fileNumberInput = await screen.findByLabelText(
       "Entscheidungsdatum Nachgehende Entscheidung",
@@ -306,13 +308,17 @@ describe("EnsuingDecisions", () => {
 
   it("correctly deletes ensuing decision", async () => {
     const { user } = renderComponent([
-      generateEnsuingDecision(),
-      generateEnsuingDecision(),
+      generateEnsuingDecision({
+        localId: "test0",
+      }),
+      generateEnsuingDecision({
+        localId: "test1",
+      }),
     ])
     const ensuingDecisions = screen.getAllByLabelText("Listen Eintrag")
     expect(ensuingDecisions.length).toBe(2)
 
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-test0"))
     await user.click(screen.getByLabelText("Eintrag löschen"))
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
@@ -323,7 +329,7 @@ describe("EnsuingDecisions", () => {
         documentNumber: "ABC",
       }),
     ])
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-test0"))
 
     expect(screen.getByLabelText("Anhängige Entscheidung")).toBeDisabled()
     expect(screen.getByLabelText("Vermerk")).toBeInTheDocument()
@@ -384,9 +390,12 @@ describe("EnsuingDecisions", () => {
   })
 
   it("displays error in list and edit component when fields missing", async () => {
-    const ensuingDecisions: EnsuingDecision[] = [generateEnsuingDecision()]
+    // errors only displayed, when entry was already saved to backend
+    const ensuingDecisions: EnsuingDecision[] = [
+      generateEnsuingDecision({ uuid: "id-from-backend" }),
+    ]
     const { user } = renderComponent(ensuingDecisions)
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-test0"))
 
     const fileInput = await screen.findByLabelText(
       "Aktenzeichen Nachgehende Entscheidung",
@@ -396,7 +405,7 @@ describe("EnsuingDecisions", () => {
       screen.getByLabelText("Nachgehende Entscheidung speichern"),
     )
     expect(screen.getByText(/Fehlende Daten/)).toBeInTheDocument()
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-test0"))
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })
 

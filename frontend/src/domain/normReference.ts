@@ -3,6 +3,7 @@ import { NormAbbreviation } from "./normAbbreviation"
 import SingleNorm from "./singleNorm"
 
 export default class NormReference implements EditableListItem {
+  public localId: string
   public normAbbreviation?: NormAbbreviation
   public singleNorms?: SingleNorm[]
   public normAbbreviationRawValue?: string
@@ -15,6 +16,7 @@ export default class NormReference implements EditableListItem {
 
   constructor(data: Partial<NormReference> = {}) {
     Object.assign(this, data)
+    this.localId = data.localId ?? crypto.randomUUID()
   }
 
   get id() {

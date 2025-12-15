@@ -13,8 +13,8 @@ import DummyListItem from "@/kitchensink/domain/dummyListItem"
 import routes from "~/test-helper/routes"
 
 const listWithEntries = ref<DummyListItem[]>([
-  new DummyListItem({ text: "foo", uuid: "123" }),
-  new DummyListItem({ text: "bar", uuid: "124" }),
+  new DummyListItem({ text: "foo", localId: "123" }),
+  new DummyListItem({ text: "bar", localId: "124" }),
 ])
 
 function summerizer(dataEntry: EditableListItem) {
@@ -116,7 +116,7 @@ describe("EditableList", () => {
   it("shows edit component when list item is clicked", async () => {
     const { user } = await renderComponent()
 
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-123"))
 
     expect(screen.getByLabelText("Editier Input")).toHaveValue("foo")
     expect(screen.getByLabelText("Listeneintrag speichern")).toBeVisible()
@@ -126,7 +126,7 @@ describe("EditableList", () => {
 
   it("delete button emits modelValue without the deleted entry", async () => {
     const { user, emitted } = await renderComponent()
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-123"))
     await user.click(screen.getByLabelText("Eintrag löschen"))
 
     expect(listWithEntries.value.length).toEqual(2)
@@ -135,8 +135,8 @@ describe("EditableList", () => {
       [
         [
           {
+            localId: "124",
             text: "bar",
-            uuid: "124",
           },
         ],
       ],
@@ -164,7 +164,7 @@ describe("EditableList", () => {
   it("updates the model value entry on editing it", async () => {
     const { emitted, user } = await renderComponent()
 
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-123"))
     await user.type(screen.getByLabelText("Editier Input"), "1")
     await user.click(screen.getByLabelText("Listeneintrag speichern"))
 
@@ -172,12 +172,12 @@ describe("EditableList", () => {
       [
         [
           {
+            localId: "123",
             text: "foo1",
-            uuid: "123",
           },
           {
+            localId: "124",
             text: "bar",
-            uuid: "124",
           },
         ],
       ],
@@ -187,7 +187,7 @@ describe("EditableList", () => {
   it("closes the editing component if user clicks cancel button, changes not saved", async () => {
     const { user } = await renderComponent()
 
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-123"))
 
     expect(screen.getByLabelText("Editier Input")).toBeVisible()
     await user.type(screen.getByLabelText("Editier Input"), "1")
@@ -203,7 +203,7 @@ describe("EditableList", () => {
     await user.click(screen.getByLabelText("Weitere Angabe"))
 
     //no inputs made, click in other entry
-    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByTestId("list-entry-123"))
 
     expect(screen.getAllByLabelText("Listen Eintrag").length).toEqual(2)
   })
@@ -212,7 +212,7 @@ describe("EditableList", () => {
     it("scrolls editable list back into view after cancel", async () => {
       // Arrange
       const { user } = await renderComponent()
-      const item = screen.getByTestId("list-entry-0")
+      const item = screen.getByTestId("list-entry-123")
       await user.click(item)
       const scrollIntoViewMock = vi.fn()
       window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
@@ -227,7 +227,7 @@ describe("EditableList", () => {
     it("scrolls editable list back into view after 'übernehmen''", async () => {
       // Arrange
       const { user } = await renderComponent()
-      const item = screen.getByTestId("list-entry-0")
+      const item = screen.getByTestId("list-entry-123")
       await user.click(item)
       expect(screen.getByLabelText("Editier Input")).toBeVisible()
       await user.type(screen.getByLabelText("Editier Input"), "1")
@@ -245,7 +245,7 @@ describe("EditableList", () => {
     it("scrolls editable list back into view if an item has been deleted", async () => {
       // Arrange
       const { user } = await renderComponent()
-      const item = screen.getByTestId("list-entry-0")
+      const item = screen.getByTestId("list-entry-123")
       await user.click(item)
       const scrollIntoViewMock = vi.fn()
       window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
@@ -273,7 +273,7 @@ describe("EditableList", () => {
     it("shows edit component when list item is clicked", async () => {
       const { user } = await renderComponent({ editComponentAsSlot: true })
 
-      await user.click(screen.getByTestId("list-entry-0"))
+      await user.click(screen.getByTestId("list-entry-123"))
 
       expect(screen.getByLabelText("Editier Input")).toHaveValue("foo")
       expect(screen.getByLabelText("Listeneintrag speichern")).toBeVisible()
@@ -285,7 +285,7 @@ describe("EditableList", () => {
       const { user, emitted } = await renderComponent({
         editComponentAsSlot: true,
       })
-      await user.click(screen.getByTestId("list-entry-0"))
+      await user.click(screen.getByTestId("list-entry-123"))
       await user.click(screen.getByLabelText("Eintrag löschen"))
 
       expect(listWithEntries.value.length).toEqual(2)
@@ -294,8 +294,8 @@ describe("EditableList", () => {
         [
           [
             {
+              localId: "124",
               text: "bar",
-              uuid: "124",
             },
           ],
         ],
@@ -325,7 +325,7 @@ describe("EditableList", () => {
         editComponentAsSlot: true,
       })
 
-      await user.click(screen.getByTestId("list-entry-0"))
+      await user.click(screen.getByTestId("list-entry-123"))
       await user.type(screen.getByLabelText("Editier Input"), "1")
       await user.click(screen.getByLabelText("Listeneintrag speichern"))
 
@@ -333,13 +333,10 @@ describe("EditableList", () => {
         [
           [
             {
+              localId: "123",
               text: "foo1",
-              uuid: "123",
             },
-            {
-              text: "bar",
-              uuid: "124",
-            },
+            { localId: "124", text: "bar" },
           ],
         ],
       ])
@@ -348,7 +345,7 @@ describe("EditableList", () => {
     it("closes the editing component if user clicks cancel button, changes not saved", async () => {
       const { user } = await renderComponent({ editComponentAsSlot: true })
 
-      await user.click(screen.getByTestId("list-entry-0"))
+      await user.click(screen.getByTestId("list-entry-123"))
 
       expect(screen.getByLabelText("Editier Input")).toBeVisible()
       await user.type(screen.getByLabelText("Editier Input"), "1")
@@ -364,7 +361,7 @@ describe("EditableList", () => {
       await user.click(screen.getByLabelText("Weitere Angabe"))
 
       //no inputs made, click in other entry
-      await user.click(screen.getByTestId("list-entry-0"))
+      await user.click(screen.getByTestId("list-entry-123"))
 
       expect(screen.getAllByLabelText("Listen Eintrag").length).toEqual(2)
     })

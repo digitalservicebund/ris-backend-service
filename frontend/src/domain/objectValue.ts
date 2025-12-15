@@ -28,7 +28,7 @@ export const ProceedingTypeLabels: Record<ProceedingType, string> = {
 }
 
 export default class ObjectValue implements EditableListItem {
-  public backendId?: string
+  public id?: string
   public localId: string
   public newEntry?: boolean
   public amount?: number
@@ -39,15 +39,9 @@ export default class ObjectValue implements EditableListItem {
 
   static readonly fields = ["amount", "currencyCode", "proceedingType"] as const
 
-  constructor(data: Partial<ObjectValue> & { id?: string } = {}) {
+  constructor(data: Partial<ObjectValue> = {}) {
     Object.assign(this, data)
-
     this.localId = data.localId ?? crypto.randomUUID()
-    this.backendId = data.id
-  }
-
-  get id() {
-    return this.localId
   }
 
   get renderSummary(): string {
