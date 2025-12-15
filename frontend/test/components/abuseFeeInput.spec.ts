@@ -100,7 +100,7 @@ describe("AbuseFeeInput", () => {
     // Assert
     expect(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühren speichern",
+        name: "Gebühren speichern",
       }),
     ).toBeDisabled()
     expect(screen.getByText("Max. 9 Zeichen")).toBeInTheDocument()
