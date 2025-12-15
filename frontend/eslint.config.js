@@ -157,11 +157,7 @@ export default defineConfig(
   },
 
   {
-    files: [
-      "test/components/**/*.ts",
-      "test/domain/**/*.ts",
-      "test/services/**/*.ts",
-    ],
+    files: ["test/**/*.ts"],
     ...jestDomPlugin.configs["flat/recommended"],
   },
 
