@@ -17,6 +17,7 @@ import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
 
@@ -67,7 +68,10 @@ public class ConverterConfig {
     module.addDeserializer(JsonPatch.class, new JsonPatchDeserializer(legacyObjectMapper));
     module.addSerializer(JsonPatch.class, new JsonPatchSerializer(legacyObjectMapper));
 
-    return JsonMapper.builder().addModule(module).build();
+    return JsonMapper.builder()
+        .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+        .addModule(module)
+        .build();
   }
 
   @Bean
