@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.XmlValue;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +18,7 @@ public class Periodikum {
   private static final String DOMAIN_TERM = "Periodikum";
 
   @XmlElement(name = "periodikumAbkuerzung", namespace = CaseLawLdml.RIS_NS)
-  private Abkuerzung abkuerzung;
+  private PeriodikumAbkuerzung periodikumAbkuerzung;
 
   @XmlElement(name = "periodikumTyp", namespace = CaseLawLdml.RIS_NS)
   private Typ typ;
@@ -34,8 +33,7 @@ public class Periodikum {
   @AllArgsConstructor
   @Getter
   @Builder
-  @XmlType(name = "PeriodikumAbkuerzung") // Avoid conflict with inner classes with same name
-  public static class Abkuerzung {
+  public static class PeriodikumAbkuerzung {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Abkürzung";
 

@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.XmlValue;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -27,7 +26,7 @@ public class Norm {
   private List<Einzelnorm> einzelnormen;
 
   @XmlElement(name = "normTitel", namespace = CaseLawLdml.RIS_NS)
-  private Titel titel;
+  private NormTitel normTitel;
 
   @NoArgsConstructor
   @AllArgsConstructor
@@ -135,8 +134,7 @@ public class Norm {
   @AllArgsConstructor
   @Getter
   @Builder
-  @XmlType(name = "NormTitel") // Avoid conflict with inner classes with same name
-  public static class Titel {
+  public static class NormTitel {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Amtliche Langüberschrift";
 

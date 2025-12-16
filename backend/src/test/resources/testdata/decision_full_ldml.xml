@@ -64,9 +64,9 @@
                     </akn:implicitReference>
                     <akn:implicitReference ris:domainTerm="Rechtszug">
                         <ris:vorgehend domainTerm="Vorgehende Entscheidung">
-                            <ris:vorgehendDokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:vorgehendDokumentTyp>
+                            <ris:vorgehendDokumenttyp domainTerm="Dokumenttyp">previous decision document type</ris:vorgehendDokumenttyp>
                             <ris:vorgehendDatum domainTerm="Entscheidungsdatum">2020-01-01</ris:vorgehendDatum>
-                            <ris:vorgehendDokumentNummer domainTerm="Dokumentnummer">previous decision document number 1</ris:vorgehendDokumentNummer>
+                            <ris:vorgehendDokumentnummer domainTerm="Dokumentnummer">previous decision document number 1</ris:vorgehendDokumentnummer>
                             <ris:vorgehendAktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:vorgehendAktenzeichen>
                             <ris:vorgehendGericht domainTerm="Gericht">
                                 <ris:gerichtTyp domainTerm="Gerichtstyp">previous decision court type</ris:gerichtTyp>
@@ -77,9 +77,9 @@
                     </akn:implicitReference>
                     <akn:implicitReference ris:domainTerm="Rechtszug">
                         <ris:vorgehend domainTerm="Vorgehende Entscheidung">
-                            <ris:vorgehendDokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:vorgehendDokumentTyp>
+                            <ris:vorgehendDokumenttyp domainTerm="Dokumenttyp">previous decision document type</ris:vorgehendDokumenttyp>
                             <ris:vorgehendDatum domainTerm="Entscheidungsdatum">2020-01-01</ris:vorgehendDatum>
-                            <ris:vorgehendDokumentNummer domainTerm="Dokumentnummer">previous decision document number 2</ris:vorgehendDokumentNummer>
+                            <ris:vorgehendDokumentnummer domainTerm="Dokumentnummer">previous decision document number 2</ris:vorgehendDokumentnummer>
                             <ris:vorgehendAktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:vorgehendAktenzeichen>
                             <ris:vorgehendGericht domainTerm="Gericht">
                                 <ris:gerichtTyp domainTerm="Gerichtstyp">previous decision court type</ris:gerichtTyp>
@@ -90,9 +90,9 @@
                     </akn:implicitReference>
                     <akn:implicitReference ris:domainTerm="Rechtszug">
                         <ris:nachgehend art="nachgehend" domainTerm="Nachgehende Entscheidung">
-                            <ris:nachgehendDokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:nachgehendDokumentTyp>
+                            <ris:nachgehendDokumenttyp domainTerm="Dokumenttyp">ensuing decision document type</ris:nachgehendDokumenttyp>
                             <ris:nachgehendDatum domainTerm="Entscheidungsdatum">2022-10-01</ris:nachgehendDatum>
-                            <ris:nachgehendDokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 1</ris:nachgehendDokumentNummer>
+                            <ris:nachgehendDokumentnummer domainTerm="Dokumentnummer">ensuing decision document number 1</ris:nachgehendDokumentnummer>
                             <ris:nachgehendAktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:nachgehendAktenzeichen>
                             <ris:nachgehendGericht domainTerm="Gericht">
                                 <ris:gerichtTyp domainTerm="Gerichtstyp">ensuing decision court type</ris:gerichtTyp>
@@ -101,9 +101,9 @@
                     </akn:implicitReference>
                     <akn:implicitReference ris:domainTerm="Rechtszug">
                         <ris:nachgehend art="anhängig" domainTerm="Nachgehende Entscheidung">
-                            <ris:nachgehendDokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:nachgehendDokumentTyp>
+                            <ris:nachgehendDokumenttyp domainTerm="Dokumenttyp">ensuing decision document type</ris:nachgehendDokumenttyp>
                             <ris:nachgehendDatum domainTerm="Entscheidungsdatum">2022-10-01</ris:nachgehendDatum>
-                            <ris:nachgehendDokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 2</ris:nachgehendDokumentNummer>
+                            <ris:nachgehendDokumentnummer domainTerm="Dokumentnummer">ensuing decision document number 2</ris:nachgehendDokumentnummer>
                             <ris:nachgehendAktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:nachgehendAktenzeichen>
                             <ris:nachgehendGericht domainTerm="Gericht">
                                 <ris:gerichtTyp domainTerm="Gerichtstyp">ensuing decision court type</ris:gerichtTyp>
@@ -133,9 +133,9 @@
                     </akn:implicitReference>
                     <akn:implicitReference ris:domainTerm="Anhängiges Verfahren">
                         <ris:anhaengigesVerfahren domainTerm="Anhängiges Verfahren">
-                            <ris:anhaengigesVerfahrenDokumentTyp domainTerm="Dokumenttyp">Anhängiges Verfahren</ris:anhaengigesVerfahrenDokumentTyp>
+                            <ris:anhaengigesVerfahrenDokumenttyp domainTerm="Dokumenttyp">Anhängiges Verfahren</ris:anhaengigesVerfahrenDokumenttyp>
                             <ris:anhaengigesVerfahrenDatum domainTerm="Entscheidungsdatum">2022-01-23</ris:anhaengigesVerfahrenDatum>
-                            <ris:anhaengigesVerfahrenDokumentNummer domainTerm="Dokumentnummer">XXRE011158825</ris:anhaengigesVerfahrenDokumentNummer>
+                            <ris:anhaengigesVerfahrenDokumentnummer domainTerm="Dokumentnummer">XXRE011158825</ris:anhaengigesVerfahrenDokumentnummer>
                             <ris:anhaengigesVerfahrenAktenzeichen domainTerm="Aktenzeichen">VIa ZR 339/22</ris:anhaengigesVerfahrenAktenzeichen>
                             <ris:anhaengigesVerfahrenGericht domainTerm="Gericht">
                                 <ris:gerichtTyp domainTerm="Gerichtstyp">AG</ris:gerichtTyp>
@@ -190,7 +190,7 @@
             </akn:references>
             <akn:proprietary source="#ris">
                 <ris:meta>
-                    <ris:dokumentTyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">documentType test</ris:dokumentTyp>
+                    <ris:dokumenttyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">documentType test</ris:dokumenttyp>
                     <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
                         <ris:gerichtTyp domainTerm="Gerichtstyp">courtType</ris:gerichtTyp>
                         <ris:gerichtOrt domainTerm="Gerichtsort">courtLocation</ris:gerichtOrt>

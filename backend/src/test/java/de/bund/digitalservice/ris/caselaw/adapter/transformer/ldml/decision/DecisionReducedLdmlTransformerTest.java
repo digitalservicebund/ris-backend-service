@@ -578,7 +578,7 @@ class DecisionReducedLdmlTransformerTest {
         Arguments.of(
             "'documentType' (Dokumenttyp)",
             """
-                <ris:dokumentTyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">documentType test</ris:dokumentTyp>
+                <ris:dokumenttyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">documentType test</ris:dokumenttyp>
                """),
         Arguments.of(
             "'ecli'",
@@ -629,9 +629,9 @@ class DecisionReducedLdmlTransformerTest {
             """
                  <akn:implicitReference ris:domainTerm="Rechtszug">
                      <ris:vorgehend domainTerm="Vorgehende Entscheidung">
-                         <ris:vorgehendDokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:vorgehendDokumentTyp>
+                         <ris:vorgehendDokumenttyp domainTerm="Dokumenttyp">previous decision document type</ris:vorgehendDokumenttyp>
                          <ris:vorgehendDatum domainTerm="Entscheidungsdatum">2020-01-01</ris:vorgehendDatum>
-                         <ris:vorgehendDokumentNummer domainTerm="Dokumentnummer">previous decision document number 1</ris:vorgehendDokumentNummer>
+                         <ris:vorgehendDokumentnummer domainTerm="Dokumentnummer">previous decision document number 1</ris:vorgehendDokumentnummer>
                          <ris:vorgehendAktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:vorgehendAktenzeichen>
                          <ris:vorgehendGericht domainTerm="Gericht">
                              <ris:gerichtTyp domainTerm="Gerichtstyp">previous decision court type</ris:gerichtTyp>
@@ -641,9 +641,9 @@ class DecisionReducedLdmlTransformerTest {
                  </akn:implicitReference>
                  <akn:implicitReference ris:domainTerm="Rechtszug">
                      <ris:vorgehend domainTerm="Vorgehende Entscheidung">
-                         <ris:vorgehendDokumentTyp domainTerm="Dokumenttyp">previous decision document type</ris:vorgehendDokumentTyp>
+                         <ris:vorgehendDokumenttyp domainTerm="Dokumenttyp">previous decision document type</ris:vorgehendDokumenttyp>
                          <ris:vorgehendDatum domainTerm="Entscheidungsdatum">2020-01-01</ris:vorgehendDatum>
-                         <ris:vorgehendDokumentNummer domainTerm="Dokumentnummer">previous decision document number 2</ris:vorgehendDokumentNummer>
+                         <ris:vorgehendDokumentnummer domainTerm="Dokumentnummer">previous decision document number 2</ris:vorgehendDokumentnummer>
                          <ris:vorgehendAktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:vorgehendAktenzeichen>
                          <ris:vorgehendGericht domainTerm="Gericht">
                              <ris:gerichtTyp domainTerm="Gerichtstyp">previous decision court type</ris:gerichtTyp>
@@ -658,9 +658,9 @@ class DecisionReducedLdmlTransformerTest {
             """
                 <akn:implicitReference ris:domainTerm="Rechtszug">
                     <ris:nachgehend art="anhängig" domainTerm="Nachgehende Entscheidung">
-                        <ris:nachgehendDokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:nachgehendDokumentTyp>
+                        <ris:nachgehendDokumenttyp domainTerm="Dokumenttyp">ensuing decision document type</ris:nachgehendDokumenttyp>
                         <ris:nachgehendDatum domainTerm="Entscheidungsdatum">2022-10-01</ris:nachgehendDatum>
-                        <ris:nachgehendDokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 1</ris:nachgehendDokumentNummer>
+                        <ris:nachgehendDokumentnummer domainTerm="Dokumentnummer">ensuing decision document number 1</ris:nachgehendDokumentnummer>
                         <ris:nachgehendAktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:nachgehendAktenzeichen>
                         <ris:nachgehendGericht domainTerm="Gericht">
                             <ris:gerichtTyp domainTerm="Gerichtstyp">ensuing decision court type</ris:gerichtTyp>
@@ -669,9 +669,9 @@ class DecisionReducedLdmlTransformerTest {
                 </akn:implicitReference>
                 <akn:implicitReference ris:domainTerm="Rechtszug">
                     <ris:nachgehend art="anhängig" domainTerm="Nachgehende Entscheidung">
-                        <ris:nachgehendDokumentTyp domainTerm="Dokumenttyp">ensuing decision document type</ris:nachgehendDokumentTyp>
+                        <ris:nachgehendDokumenttyp domainTerm="Dokumenttyp">ensuing decision document type</ris:nachgehendDokumenttyp>
                         <ris:nachgehendDatum domainTerm="Entscheidungsdatum">2022-10-01</ris:nachgehendDatum>
-                        <ris:nachgehendDokumentNummer domainTerm="Dokumentnummer">ensuing decision document number 2</ris:nachgehendDokumentNummer>
+                        <ris:nachgehendDokumentnummer domainTerm="Dokumentnummer">ensuing decision document number 2</ris:nachgehendDokumentnummer>
                         <ris:nachgehendAktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:nachgehendAktenzeichen>
                         <ris:nachgehendGericht domainTerm="Gericht">
                             <ris:gerichtTyp domainTerm="Gerichtstyp">ensuing decision court type</ris:gerichtTyp>

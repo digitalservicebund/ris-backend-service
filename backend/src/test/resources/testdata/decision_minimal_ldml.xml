@@ -38,7 +38,7 @@
             </akn:references>
             <akn:proprietary source="#ris">
                 <ris:meta>
-                    <ris:dokumentTyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">testDocumentTypeAbbreviation</ris:dokumentTyp>
+                    <ris:dokumenttyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">testDocumentTypeAbbreviation</ris:dokumenttyp>
                     <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
                         <ris:gerichtTyp domainTerm="Gerichtstyp">Tribunal Administratif</ris:gerichtTyp>
                         <ris:gerichtOrt domainTerm="Gerichtsort">Nantes</ris:gerichtOrt>

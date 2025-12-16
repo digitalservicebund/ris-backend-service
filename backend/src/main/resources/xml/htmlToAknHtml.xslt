@@ -332,7 +332,7 @@
     |akn:analysis|akn:otherAnalysis|akn:implicitReference|akn:ref
     |akn:FRBRWork|akn:FRBRExpression|akn:FRBRManifestation|akn:p
     |akn:FRBRthis|akn:FRBRuri|akn:FRBRalias|akn:FRBRdate|akn:FRBRauthor|akn:FRBRcountry|akn:FRBRlanguage|akn:documentRef
-    |ris:meta|ris:dokumentTyp|ris:gericht|ris:gerichtTyp|ris:gerichtOrt|ris:gerichtsbarkeit
+    |ris:meta|ris:dokumenttyp|ris:gericht|ris:gerichtTyp|ris:gerichtOrt|ris:gerichtsbarkeit
     |ris:fehlerhafteGerichte|ris:fehlerhaftesGericht|ris:regionen|ris:region|ris:dokumentationsstelle
     |ris:aktenzeichenListe|ris:aktenzeichen|ris:abweichendeDaten|ris:abweichendesDatum|ris:datenDerMuendlichenVerhandlung|ris:datumDerMuendlichenVerhandlung
     |ris:abweichendeDokumentnummern|ris:abweichendeDokumentnummer|ris:abweichendeEclis|ris:abweichenderEcli
@@ -340,9 +340,9 @@
     |ris:dokumentarischeKurztexte|ris:orientierungssatz|ris:sonstigerOrientierungssatz|ris:entscheidungsnamen|ris:entscheidungsname|ris:titelzeile
     |ris:eingangsarten|ris:eingangsart|ris:definitionen|ris:definition|ris:definierterBegriff|ris:definierendeRandnummer
     |ris:fremdsprachigeFassungen|ris:fremdsprachigeFassung|ris:evsf|ris:rechtsmittelzulassung|ris:rechtsmittelZugelassen|ris:rechtsmittelZugelassenDurch
-    |ris:vorgehend|ris:vorgehendDokumentTyp|ris:vorgehendDatum|ris:vorgehendDokumentNummer|ris:vorgehendAktenzeichen|ris:vorgehendGericht
-    |ris:nachgehend|ris:nachgehendDokumentTyp|ris:nachgehendDatum|ris:nachgehendDokumentNummer|ris:nachgehendAktenzeichen|ris:nachgehendGericht|ris:nachgehendVermerk
-    |ris:datum|ris:dokumentNummer|akn:otherReferences
+    |ris:vorgehend|ris:vorgehendDokumenttyp|ris:vorgehendDatum|ris:vorgehendDokumentnummer|ris:vorgehendAktenzeichen|ris:vorgehendGericht
+    |ris:nachgehend|ris:nachgehendDokumenttyp|ris:nachgehendDatum|ris:nachgehendDokumentnummer|ris:nachgehendAktenzeichen|ris:nachgehendGericht|ris:nachgehendVermerk
+    |ris:datum|ris:dokumentnummer|akn:otherReferences
     |ris:norm|ris:normAbkuerzung|ris:einzelnorm|ris:einzelnormDatum|ris:einzelnormBezeichnung|ris:einzelnormGesetzeskraft|ris:gesetzeskraftTyp|ris:gesetzeskraftGeltungsbereich
     |ris:einzelnormJahr|ris:normTitel|ris:datum
     |ris:fundstelle|ris:zitatstelle|ris:periodikumUntertitel|ris:periodikum|ris:periodikumTitel|ris:periodikumAbkuerzung|ris:periodikumTyp|ris:fundstelleLiteraturUnselbststaendig
@@ -360,7 +360,7 @@
     |ris:einkunftsarten|ris:einkunftsart|ris:einkunftsartTyp|ris:einkunftsartBegrifflichkeit
     |ris:berichtigungen|ris:berichtigung|ris:berichtigungArtDerEintragung|ris:berichtigungArtDerAenderung|ris:berichtigungDatumDerAenderung|ris:berichtigungRandnummern|ris:berichtigungInhaltDerAenderung|ris:berichtigungRandnummer
     |ris:herkunftslaender|ris:herkunftsland|ris:herkunftslandAltwert|ris:herkunftslandLandbezeichnung|ris:herkunftslandRechtlicherRahmen
-    |ris:anhaengigesVerfahren|ris:anhaengigesVerfahrenDokumentTyp|ris:anhaengigesVerfahrenDatum|ris:anhaengigesVerfahrenDokumentNummer|ris:anhaengigesVerfahrenAktenzeichen|ris:anhaengigesVerfahrenGericht
+    |ris:anhaengigesVerfahren|ris:anhaengigesVerfahrenDokumenttyp|ris:anhaengigesVerfahrenDatum|ris:anhaengigesVerfahrenDokumentnummer|ris:anhaengigesVerfahrenAktenzeichen|ris:anhaengigesVerfahrenGericht
     |ris:nichtanwendungsgesetz
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@akn:refersTo|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
     |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId|@akn:eId|@type|@by|@domainTerm|@notation|@ris:domainTerm|@art|@sachgebiet-id">

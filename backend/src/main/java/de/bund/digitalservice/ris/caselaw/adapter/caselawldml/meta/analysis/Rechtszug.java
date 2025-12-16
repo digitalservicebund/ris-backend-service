@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DokumentTyp;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumenttyp;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gericht;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -21,15 +21,15 @@ public class Rechtszug {
   @NoArgsConstructor
   @Getter
   @SuperBuilder
-  @XmlType(propOrder = {"dokumentTyp", "datum", "dokumentNummer", "aktenzeichen", "gericht"})
+  @XmlType(propOrder = {"dokumenttyp", "datum", "dokumentnummer", "aktenzeichen", "gericht"})
   public static class Vorgehend extends CaselawReference {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Vorgehende Entscheidung";
 
     @Override
-    @XmlElement(name = "vorgehendDokumentTyp", namespace = CaseLawLdml.RIS_NS)
-    public DokumentTyp getDokumentTyp() {
-      return super.getDokumentTyp();
+    @XmlElement(name = "vorgehendDokumenttyp", namespace = CaseLawLdml.RIS_NS)
+    public Dokumenttyp getDokumenttyp() {
+      return super.getDokumenttyp();
     }
 
     @Override
@@ -39,9 +39,9 @@ public class Rechtszug {
     }
 
     @Override
-    @XmlElement(name = "vorgehendDokumentNummer", namespace = CaseLawLdml.RIS_NS)
-    public Rechtszug.DokumentNummer getDokumentNummer() {
-      return super.getDokumentNummer();
+    @XmlElement(name = "vorgehendDokumentnummer", namespace = CaseLawLdml.RIS_NS)
+    public Dokumentnummer getDokumentnummer() {
+      return super.getDokumentnummer();
     }
 
     @Override
@@ -64,9 +64,9 @@ public class Rechtszug {
   @XmlType(
       propOrder = {
         "art",
-        "dokumentTyp",
+        "dokumenttyp",
         "datum",
-        "dokumentNummer",
+        "dokumentnummer",
         "aktenzeichen",
         "gericht",
         "vermerk"
@@ -79,9 +79,9 @@ public class Rechtszug {
     private ArtDerNachgehendenEntscheidung art;
 
     @Override
-    @XmlElement(name = "nachgehendDokumentTyp", namespace = CaseLawLdml.RIS_NS)
-    public DokumentTyp getDokumentTyp() {
-      return super.getDokumentTyp();
+    @XmlElement(name = "nachgehendDokumenttyp", namespace = CaseLawLdml.RIS_NS)
+    public Dokumenttyp getDokumenttyp() {
+      return super.getDokumenttyp();
     }
 
     @Override
@@ -91,9 +91,9 @@ public class Rechtszug {
     }
 
     @Override
-    @XmlElement(name = "nachgehendDokumentNummer", namespace = CaseLawLdml.RIS_NS)
-    public Rechtszug.DokumentNummer getDokumentNummer() {
-      return super.getDokumentNummer();
+    @XmlElement(name = "nachgehendDokumentnummer", namespace = CaseLawLdml.RIS_NS)
+    public Dokumentnummer getDokumentnummer() {
+      return super.getDokumentnummer();
     }
 
     @Override
@@ -127,7 +127,7 @@ public class Rechtszug {
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class DokumentNummer {
+  public static class Dokumentnummer {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Dokumentnummer";
 

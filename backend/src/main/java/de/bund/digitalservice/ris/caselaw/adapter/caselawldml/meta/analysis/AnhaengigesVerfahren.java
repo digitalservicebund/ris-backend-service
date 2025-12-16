@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DokumentTyp;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumenttyp;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gericht;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -14,15 +14,15 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @Getter
 @SuperBuilder
-@XmlType(propOrder = {"dokumentTyp", "datum", "dokumentNummer", "aktenzeichen", "gericht"})
+@XmlType(propOrder = {"dokumenttyp", "datum", "dokumentnummer", "aktenzeichen", "gericht"})
 public class AnhaengigesVerfahren extends CaselawReference {
   @XmlAttribute(name = "domainTerm")
   private static final String DOMAIN_TERM = "Anhängiges Verfahren";
 
   @Override
-  @XmlElement(name = "anhaengigesVerfahrenDokumentTyp", namespace = CaseLawLdml.RIS_NS)
-  public DokumentTyp getDokumentTyp() {
-    return super.getDokumentTyp();
+  @XmlElement(name = "anhaengigesVerfahrenDokumenttyp", namespace = CaseLawLdml.RIS_NS)
+  public Dokumenttyp getDokumenttyp() {
+    return super.getDokumenttyp();
   }
 
   @Override
@@ -32,9 +32,9 @@ public class AnhaengigesVerfahren extends CaselawReference {
   }
 
   @Override
-  @XmlElement(name = "anhaengigesVerfahrenDokumentNummer", namespace = CaseLawLdml.RIS_NS)
-  public Rechtszug.DokumentNummer getDokumentNummer() {
-    return super.getDokumentNummer();
+  @XmlElement(name = "anhaengigesVerfahrenDokumentnummer", namespace = CaseLawLdml.RIS_NS)
+  public Rechtszug.Dokumentnummer getDokumentnummer() {
+    return super.getDokumentnummer();
   }
 
   @Override
