@@ -17,12 +17,6 @@ updates:
         patterns:
           - "@tiptap/*"
     ignore:
-      # 1.53.0 breaks border-number, border-number-link and text-check e2e in chrome
-      - dependency-name: "playwright"
-        versions: [">1.52"]
-      # 1.53.0 breaks border-number, border-number-link and text-check e2e in chrome
-      - dependency-name: "@playwright/test"
-        versions: [ ">1.52" ]
       # later versions have a bug that reports false positives
       - dependency-name: "eslint-plugin-testing-library"
         versions: [ ">7.6.3" ]

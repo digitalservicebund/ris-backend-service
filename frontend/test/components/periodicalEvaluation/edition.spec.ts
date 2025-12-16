@@ -20,9 +20,16 @@ const legalPeriodical: LegalPeriodical = {
   citationStyle: "2024, Heft 1",
 }
 
+const legalPeriodical2: LegalPeriodical = {
+  uuid: crypto.randomUUID(),
+  abbreviation: "JBL",
+  title: "Juristische Blätter",
+  citationStyle: "2024, Heft 1",
+}
+
 const server = setupServer(
   http.get("/api/v1/caselaw/legalperiodicals", () => {
-    return HttpResponse.json([legalPeriodical])
+    return HttpResponse.json([legalPeriodical, legalPeriodical2])
   }),
 )
 
@@ -53,7 +60,7 @@ async function renderComponent() {
                 editionStore: {
                   edition: new LegalPeriodicalEdition({
                     id: editionUUid,
-                    legalPeriodical: legalPeriodical,
+                    legalPeriodical: legalPeriodical2,
                     name: "name",
                     prefix: "präfix",
                     suffix: "suffix",

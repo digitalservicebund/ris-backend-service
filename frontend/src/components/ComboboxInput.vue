@@ -103,6 +103,7 @@ const setChosenItem = (item: ComboboxItem) => {
     inputText.value = ""
   } else {
     filter.value = item.label
+    inputText.value = item.label
   }
   candidateForSelection.value = undefined
 }
@@ -240,8 +241,10 @@ const closeDropdownAndRevertToLastSavedValue = () => {
 }
 
 watch(
-  props,
-  () => {
+  () => props.modelValue,
+  (newValue, oldValue) => {
+    // On autosave, the props get updated. We only need to update the input if the value has actually changed. Otherwise, this would overwrite user input when autosave happens.
+    if (newValue?.label === oldValue?.label) return
     inputText.value = props.modelValue?.label
   },
   { immediate: true },

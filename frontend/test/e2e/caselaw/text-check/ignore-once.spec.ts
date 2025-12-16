@@ -90,10 +90,10 @@ test.describe(
         }
 
         const headNoteEditor = page.getByTestId("Orientierungssatz")
-        const headNoteEditorTextArea = headNoteEditor.locator("div")
+        const headNoteEditorTextArea = headNoteEditor.locator(".tiptap")
 
         const guidingPrinciple = page.getByTestId("Leitsatz")
-        const guidingPrincipleTextArea = guidingPrinciple.locator("div")
+        const guidingPrincipleTextArea = guidingPrinciple.locator(".tiptap")
         const textWithErrors = {
           text: "Das ist ein felher. Das ist ein zweiter felher.",
           incorrectWords: ["felher"],

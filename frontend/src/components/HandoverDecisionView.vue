@@ -396,11 +396,11 @@ const isPublishable = computed<boolean>(
 
             <div class="ris-body1-regular flex flex-col">
               <div v-if="fieldsMissing" class="flex flex-col gap-24">
-                <div>
+                <div class="flex flex-col gap-8">
                   <p>
                     Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:
                   </p>
-                  <ul class="list-disc">
+                  <ul class="ml-32 list-disc">
                     <li v-for="field in missingCoreDataFields" :key="field">
                       {{ field }}
                     </li>
@@ -527,7 +527,7 @@ const isPublishable = computed<boolean>(
           <RouterLink class="inline-block" :to="categoriesRoute">
             <Button
               aria-label="Rubriken bearbeiten"
-              class="w-fit"
+              class="mt-16 w-fit"
               label="Rubriken bearbeiten"
               severity="secondary"
               size="small"

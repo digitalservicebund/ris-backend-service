@@ -72,6 +72,7 @@ describe("PendingProceedingPlausibilityCheck", () => {
       expect(screen.getByText("Gericht")).toBeVisible()
       expect(screen.queryByText("Aktenzeichen")).not.toBeInTheDocument()
       expect(screen.queryByText("Mitteilungsdatum")).not.toBeInTheDocument()
+      expect(screen.queryByText("Rechtsfrage")).not.toBeInTheDocument()
       expect(
         screen.getByRole("button", { name: "Rubriken bearbeiten" }),
       ).toBeVisible()
@@ -97,6 +98,7 @@ describe("PendingProceedingPlausibilityCheck", () => {
       expect(screen.queryByText("Gericht")).not.toBeInTheDocument()
       expect(screen.queryByText("Aktenzeichen")).not.toBeInTheDocument()
       expect(screen.queryByText("Mitteilungsdatum")).not.toBeInTheDocument()
+      expect(screen.queryByText("Rechtsfrage")).not.toBeInTheDocument()
       expect(
         screen.queryByRole("button", { name: "Rubriken bearbeiten" }),
       ).not.toBeInTheDocument()
@@ -143,6 +145,7 @@ describe("PendingProceedingPlausibilityCheck", () => {
       expect(screen.queryByText("Gericht")).not.toBeInTheDocument()
       expect(screen.queryByText("Aktenzeichen")).not.toBeInTheDocument()
       expect(screen.queryByText("Mitteilungsdatum")).not.toBeInTheDocument()
+      expect(screen.queryByText("Rechtsfrage")).not.toBeInTheDocument()
       expect(
         screen.queryByRole("button", { name: "Rubriken bearbeiten" }),
       ).not.toBeInTheDocument()

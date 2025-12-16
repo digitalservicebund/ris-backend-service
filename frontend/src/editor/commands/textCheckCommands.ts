@@ -95,11 +95,10 @@ class NeurisTextCheckService implements TextCheckService {
         this.category,
         languageToolCheckResponse.data!.matches,
       )
-      editor.commands.setContent(
-        languageToolCheckResponse.data!.htmlText,
-        true,
-        { preserveWhitespace: "full" },
-      )
+      editor.commands.setContent(languageToolCheckResponse.data!.htmlText, {
+        emitUpdate: true,
+        parseOptions: { preserveWhitespace: "full" },
+      })
     } else if (languageToolCheckResponse.error) {
       this.responseError.value = languageToolCheckResponse.error
     }
