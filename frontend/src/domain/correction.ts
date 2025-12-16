@@ -13,7 +13,6 @@ export type CorrectionType = (typeof CORRECTION_TYPES)[number]
 export default class Correction implements EditableListItem {
   public id?: string // BE only
   public localId: string // FE only
-  public newEntry?: boolean
   public type?: CorrectionType
   public description?: string
   public date?: string

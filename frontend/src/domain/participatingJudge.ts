@@ -3,7 +3,6 @@ import EditableListItem from "./editableListItem"
 export default class ParticipatingJudge implements EditableListItem {
   public id?: string // BE only
   public localId: string // FE only
-  public newEntry?: boolean
   public name?: string
   public referencedOpinions?: string
 

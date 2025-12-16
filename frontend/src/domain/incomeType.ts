@@ -4,7 +4,6 @@ import { DropdownItem } from "@/components/input/types"
 export default class IncomeType implements EditableListItem {
   public id?: string // BE only
   public localId: string // FE only
-  public newEntry?: boolean
   public typeOfIncome?: TypeOfIncome
   public terminology?: string
 

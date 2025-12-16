@@ -4,7 +4,6 @@ import { FieldOfLaw } from "@/domain/fieldOfLaw"
 export default class CountryOfOrigin implements EditableListItem {
   public id?: string // BE only
   public localId: string // FE only
-  public newEntry?: boolean
   public legacyValue?: string
   public country?: FieldOfLaw
   public fieldOfLaw?: FieldOfLaw

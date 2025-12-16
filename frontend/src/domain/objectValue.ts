@@ -30,7 +30,6 @@ export const ProceedingTypeLabels: Record<ProceedingType, string> = {
 export default class ObjectValue implements EditableListItem {
   public id?: string
   public localId: string
-  public newEntry?: boolean
   public amount?: number
   public currencyCode?: CurrencyCode
   public proceedingType?: ProceedingType

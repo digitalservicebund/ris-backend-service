@@ -20,7 +20,6 @@ export const TranslationTypeLabels: Record<TranslationType, string> = {
 export default class OriginOfTranslation implements EditableListItem {
   public id?: string // BE only
   public localId: string // FE only
-  public newEntry?: boolean
   public languageCode?: LanguageCode
   public translationType?: TranslationType
   public translators?: string[]

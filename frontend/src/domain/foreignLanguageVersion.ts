@@ -8,7 +8,6 @@ export type LanguageCode = {
 export default class ForeignLanguageVersion implements EditableListItem {
   public id?: string // BE only
   public localId: string // FE only
-  public newEntry?: boolean
   public languageCode?: LanguageCode
   public link?: string
 

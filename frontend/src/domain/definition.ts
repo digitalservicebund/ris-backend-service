@@ -3,7 +3,6 @@ import EditableListItem from "./editableListItem"
 export default class Definition implements EditableListItem {
   public id?: string // BE only
   public localId: string // FE only
-  public newEntry?: boolean
   public definedTerm?: string
   public definingBorderNumber?: number
 
