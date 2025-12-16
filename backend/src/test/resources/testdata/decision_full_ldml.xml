@@ -114,7 +114,7 @@
                     <akn:implicitReference ris:domainTerm="Fundstelle">
                        <ris:fundstelle domainTerm="Fundstelle">
                           <ris:periodikum domainTerm="Periodikum">
-                             <ris:periodikumAbkuerzung domainTerm="Abkürzung">LegalPeriodical abbreviation</ris:periodikumAbkuerzung>
+                             <ris:abkuerzung domainTerm="Abkürzung">LegalPeriodical abbreviation</ris:abkuerzung>
                              <ris:periodikumTyp domainTerm="Art der Fundstelle">amtlich</ris:periodikumTyp>
                              <ris:titel domainTerm="Titel">LegalPeriodical Title</ris:titel>
                              <ris:untertitel domainTerm="Untertitel">LegalPeriodical Subtitle</ris:untertitel>
@@ -125,7 +125,7 @@
                     <akn:implicitReference ris:domainTerm="Fundstelle">
                        <ris:fundstelleLiteraturUnselbststaendig domainTerm="Fundstelle unselbstständige Literatur">
                           <ris:periodikum domainTerm="Periodikum">
-                             <ris:periodikumAbkuerzung domainTerm="Abkürzung">LegalPeriodical RawValue</ris:periodikumAbkuerzung>
+                             <ris:abkuerzung domainTerm="Abkürzung">LegalPeriodical RawValue</ris:abkuerzung>
                              <ris:periodikumTyp domainTerm="Art der Fundstelle">nicht-amtlich</ris:periodikumTyp>
                           </ris:periodikum>
                           <ris:zitatstelle domainTerm="Zitatstelle">citation</ris:zitatstelle>
@@ -146,7 +146,7 @@
                     </akn:implicitReference>
                     <akn:implicitReference ris:domainTerm="Nichtanwendungsgesetz">
                        <ris:nichtanwendungsgesetz domainTerm="Nichtanwendungsgesetz">
-                          <ris:normAbkuerzung domainTerm="Abkürzung">SeefBgV</ris:normAbkuerzung>
+                          <ris:abkuerzung domainTerm="Abkürzung">SeefBgV</ris:abkuerzung>
                           <ris:einzelnorm domainTerm="Einzelnorm">
                              <ris:bezeichnung domainTerm="Bezeichnung">§ 30</ris:bezeichnung>
                              <ris:fassungsdatum domainTerm="Fassungsdatum">2021-02-05</ris:fassungsdatum>
