@@ -835,8 +835,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           contentRelatedIndexing: {
             countriesOfOrigin: [
               {
-                id: "b86036b8-8ceb-4655-8392-bb6252b13994",
-                newEntry: true,
                 legacyValue: "legacy value",
               },
             ],
