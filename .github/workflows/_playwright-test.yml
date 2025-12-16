@@ -99,7 +99,7 @@ jobs:
           npx playwright test --project ${{ inputs.project }} --repeat-each ${{ inputs.runs}} $reporter_config $workers_config --retries=3 --max-failures=5 --shard=${{ inputs.shard_index }}/${{ inputs.shard_total }}
         working-directory: ./frontend
       - name: Upload screenshots and traces of failed tests
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: ${{ failure() }}
         with:
           name: failed-${{ inputs.project }}-tests
@@ -133,14 +133,14 @@ jobs:
           done
         working-directory: ./frontend
       - name: Upload json reports
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: ${{ always() }}
         with:
           name: test-results-${{ inputs.project }}-${{ inputs.shard_index }}
           path: ./frontend/test-results.json
           retention-days: 1
       - name: Upload test result blobs reports
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
           name: test-results-blob-${{ inputs.project }}-${{ inputs.shard_index }}

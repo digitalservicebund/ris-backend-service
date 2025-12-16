@@ -45,7 +45,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew build --profile -x integrationTest -x test
       - name: Upload build performance report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: performance-report
           path: backend/build/reports/profile/profile*.html
@@ -108,7 +108,7 @@ jobs:
           fi
       # Todo: Remove this step
       - name: Upload Trivy scan results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: "trivy-results-backend.sarif"
           path: "trivy-results.sarif"
@@ -130,7 +130,7 @@ jobs:
           format: "cosign-vuln"
           output: "vuln-backend.json"
       - name: Upload cosign vulnerability scan record
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: "vuln-backend.json"
           path: "vuln-backend.json"
@@ -173,7 +173,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew checkLicense
       - name: Upload licence report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: licence-reports-backend
           retention-days: 3
@@ -203,7 +203,7 @@ jobs:
         run: npm run audit:licences
         working-directory: ./frontend
       - name: Upload licence report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: licence-reports-frontend
           retention-days: 3
@@ -291,7 +291,7 @@ jobs:
           format: "cosign-vuln"
           output: "vuln-frontend.json"
       - name: Upload cosign vulnerability scan record
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: "vuln-frontend.json"
           path: "vuln-frontend.json"
@@ -521,7 +521,7 @@ jobs:
         run: npx playwright merge-reports --reporter html ./all-blob-reports
         working-directory: ./frontend
       - name: Upload html report to artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: html-test-report
           path: ./frontend/playwright-report
@@ -663,7 +663,7 @@ jobs:
           flags: --debug
           version: 0.9.0
       - name: Upload mermaid ER-diagram
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: erdiagram
           retention-days: 3
@@ -687,7 +687,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew javadoc
       - name: Upload documentation
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: backend-code-documentation
           retention-days: 3
