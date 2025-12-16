@@ -27,7 +27,7 @@ public class AbuseFeeTransformer {
     }
 
     return AbuseFeeDTO.builder()
-        .id(abuseFee.newEntry() ? null : abuseFee.id())
+        .id(abuseFee.id())
         .amount(abuseFee.amount())
         .currencyCode(CurrencyCodeTransformer.transformToDTO(abuseFee.currencyCode()))
         .addressee(abuseFee.addressee())

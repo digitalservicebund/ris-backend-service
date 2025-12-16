@@ -27,7 +27,7 @@ public class ObjectValueTransformer {
     }
 
     return ObjectValueDTO.builder()
-        .id(objectValue.newEntry() ? null : objectValue.id())
+        .id(objectValue.id())
         .amount(objectValue.amount())
         .currencyCode(CurrencyCodeTransformer.transformToDTO(objectValue.currencyCode()))
         .proceedingType(objectValue.proceedingType())
