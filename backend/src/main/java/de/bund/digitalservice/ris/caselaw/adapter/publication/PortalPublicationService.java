@@ -1,6 +1,8 @@
-package de.bund.digitalservice.ris.caselaw.adapter;
+package de.bund.digitalservice.ris.caselaw.adapter.publication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.bund.digitalservice.ris.caselaw.adapter.S3Bucket;
+import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
@@ -8,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
