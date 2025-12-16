@@ -5,6 +5,7 @@ import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { setActivePinia } from "pinia"
 import { beforeEach } from "vitest"
+import { nextTick } from "vue"
 import ObjectValueInput from "@/components/ObjectValueInput.vue"
 import ObjectValue, { CurrencyCode } from "@/domain/objectValue"
 
@@ -81,6 +82,27 @@ describe("ObjectValueInput", () => {
         name: "Gegenstandswert speichern",
       }),
     ).toBeDisabled()
+  })
+
+  it("disables 'Übernehmen' button and displays validation error with invalid input", async () => {
+    // Arrange + Act
+    renderComponent({
+      modelValue: {
+        id: "id",
+        amount: 10000000000,
+      } as ObjectValue,
+    })
+
+    // validation happens in onMounted so we need to wait for next tick
+    await nextTick()
+
+    // Assert
+    expect(
+      screen.getByRole("button", {
+        name: "Gegenstandswert speichern",
+      }),
+    ).toBeDisabled()
+    expect(screen.getByText("Max. 9 Zeichen")).toBeInTheDocument()
   })
 
   it("enables 'Übernehmen' button with complete input", async () => {

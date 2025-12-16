@@ -27,8 +27,10 @@ const validationStore = useValidationStore<ObjectValueField>()
 
 const lastSavedModelValue = ref(new ObjectValue({ ...props.modelValue }))
 const objectValue = ref(new ObjectValue({ ...props.modelValue }))
-const isSixDigitNumber = computed(() => {
-  return objectValue.value.amount != null && objectValue.value.amount <= 999999
+const isNineDigitNumber = computed(() => {
+  return (
+    objectValue.value.amount != null && objectValue.value.amount <= 999999999
+  )
 })
 async function addObjectValue() {
   validate()
@@ -42,10 +44,10 @@ function validate() {
   } else {
     if (null == objectValue.value.amount) {
       validationStore.add("Pflichtfeld nicht befüllt", "amount")
-    } else if (isSixDigitNumber.value) {
+    } else if (isNineDigitNumber.value) {
       validationStore.remove("amount")
     } else {
-      validationStore.add("Max. 6 Zeichen", "amount")
+      validationStore.add("Max. 9 Zeichen", "amount")
     }
     if (objectValue.value.currencyCode) {
       validationStore.remove("currencyCode")
