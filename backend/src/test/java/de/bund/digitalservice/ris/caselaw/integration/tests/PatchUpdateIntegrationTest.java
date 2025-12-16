@@ -5045,7 +5045,6 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           "path": "/previousDecisions/0",
           "value": {
             "uuid": null,
-            "newEntry": false,
             "documentNumber": "%s",
             "status": {
               "publicationStatus": "UNPUBLISHED",
