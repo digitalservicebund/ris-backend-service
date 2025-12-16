@@ -64,7 +64,7 @@ function generateNormReference(options?: {
   singleNorms?: SingleNorm[]
 }) {
   return new NormReference({
-    localId: options?.localId ?? "test0",
+    localId: options?.localId ?? "0",
     normAbbreviation: options?.normAbbreviation ?? {
       id: crypto.randomUUID.toString(),
       abbreviation: "ABC",
@@ -127,7 +127,7 @@ describe("Norm references", () => {
         singleNorms: [new SingleNorm({ singleNorm: "§ 123" })],
       }),
     ])
-    await user.click(screen.getByTestId("list-entry-test0"))
+    await user.click(screen.getByTestId("list-entry-0"))
 
     expect(screen.getByLabelText("RIS-Abkürzung")).toBeInTheDocument()
     expect(screen.getByLabelText("Einzelnorm der Norm")).toBeInTheDocument()

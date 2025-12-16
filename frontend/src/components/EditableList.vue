@@ -27,7 +27,9 @@ const emit = defineEmits<{
 }>()
 
 const editEntry = ref<T | undefined>() as Ref<T | undefined>
-const modelValueList = ref<T[]>([...props.modelValue]) as Ref<T[]>
+const modelValueList = ref<T[]>(
+  (props.modelValue ?? []).map(withLocalId),
+) as Ref<T[]>
 const localNewEntry = ref<T | undefined>() as Ref<T | undefined>
 const editableListContainer = ref(null)
 const focusAnchors = ref<Map<string, HTMLElement>>(new Map())
@@ -42,6 +44,18 @@ const mergedValues = computed(() => {
     ? [...modelValueList.value, localNewEntry.value]
     : [...modelValueList.value]
 })
+
+function withLocalId(item: T): T {
+  if (item.localId) return item
+
+  // we need to preserve the original prototype here → getters & methods stay intact
+  const clone = Object.create(Object.getPrototypeOf(item))
+  Object.assign(clone, item, {
+    localId: crypto.randomUUID(),
+  })
+
+  return clone
+}
 
 function setEditEntry(entry?: T) {
   editEntry.value = entry
@@ -99,10 +113,14 @@ async function toggleNewEntry(shouldDisplay: boolean) {
  */
 watch(
   () => props.modelValue,
-  (newValue) => {
-    modelValueList.value = [...newValue].map((item) =>
-      editEntry.value?.localId === item.localId ? editEntry.value : item,
-    )
+  (newValue = []) => {
+    modelValueList.value = newValue.map((item) => {
+      const normalized = withLocalId(item)
+
+      return editEntry.value?.localId === normalized.localId
+        ? editEntry.value
+        : normalized
+    })
   },
   { immediate: true, deep: true },
 )
@@ -136,7 +154,7 @@ defineExpose({
     data-testid="editable-list-container"
   >
     <div
-      v-for="entry in mergedValues"
+      v-for="(entry, index) in mergedValues"
       :key="entry.localId"
       aria-label="Listen Eintrag"
     >
@@ -156,7 +174,7 @@ defineExpose({
           <Button
             id="editable-list-select-button"
             aria-label="Eintrag bearbeiten"
-            :data-testid="`list-entry-${entry.localId}`"
+            :data-testid="`list-entry-${index}`"
             size="small"
             text
             @click="

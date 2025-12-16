@@ -55,9 +55,11 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
         }
 
         // Create JSON Patch
-        const frontendPatch = jsonpatch.compare(
+        const frontendPatch = sanitizePatch(
+          jsonpatch.compare(
             originalDocumentUnit.value,
             documentUnit.value,
+          ),
         )
 
         const response = await documentUnitService.update(documentUnit.value.uuid, {
@@ -157,6 +159,10 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     } else {
       throw Error("Unsupported doc type: " + docUnit)
     }
+  }
+
+  function sanitizePatch(operations: Operation[]): Operation[] {
+    return operations.filter((op) => !op.path.split("/").includes("localId"))
   }
 
   function getPatchApplyResult(
