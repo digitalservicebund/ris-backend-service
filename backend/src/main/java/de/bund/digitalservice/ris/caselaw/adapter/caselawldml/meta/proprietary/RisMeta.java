@@ -28,8 +28,8 @@ public class RisMeta {
   @XmlElement(name = "ensuingDecision", namespace = CaseLawLdml.RIS_NS)
   private List<RelatedDecision> ensuingDecision;
 
-  @XmlElement(name = "dokumentTyp", namespace = CaseLawLdml.RIS_NS)
-  private DokumentTyp dokumentTyp;
+  @XmlElement(name = "dokumenttyp", namespace = CaseLawLdml.RIS_NS)
+  private Dokumenttyp dokumenttyp;
 
   @XmlElement(name = "gericht", namespace = CaseLawLdml.RIS_NS)
   private Gericht gericht;

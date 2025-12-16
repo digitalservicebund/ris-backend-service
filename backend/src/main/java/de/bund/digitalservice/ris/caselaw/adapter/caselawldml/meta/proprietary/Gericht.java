@@ -20,10 +20,10 @@ public class Gericht {
   @XmlAttribute(namespace = CaseLawLdml.AKN_NS, name = "refersTo")
   private String refersTo;
 
-  @XmlElement(name = "typ", namespace = CaseLawLdml.RIS_NS)
+  @XmlElement(name = "gerichtTyp", namespace = CaseLawLdml.RIS_NS)
   private GerichtTyp typ;
 
-  @XmlElement(name = "ort", namespace = CaseLawLdml.RIS_NS)
+  @XmlElement(name = "gerichtOrt", namespace = CaseLawLdml.RIS_NS)
   private GerichtOrt ort;
 
   @XmlElement(name = "gerichtsbarkeit", namespace = CaseLawLdml.RIS_NS)

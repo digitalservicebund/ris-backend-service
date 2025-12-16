@@ -29,7 +29,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identificatio
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrLanguage;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.Identification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DokumentTyp;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumenttyp;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gericht;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.references.References;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -356,7 +356,8 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     }
 
     if (isNotBlank(abbreviation)) {
-      builder.abkuerzung(Periodikum.Abkuerzung.builder().value(abbreviation).build());
+      builder.periodikumAbkuerzung(
+          Periodikum.PeriodikumAbkuerzung.builder().value(abbreviation).build());
     }
     if (isNotBlank(title)) {
       builder.titel(Periodikum.Titel.builder().value(title).build());
@@ -417,8 +418,8 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
           builder) {
     if (relatedDocUnit.getDocumentType() != null
         && isNotBlank(relatedDocUnit.getDocumentType().label())) {
-      builder.dokumentTyp(
-          DokumentTyp.builder().eId(null).value(relatedDocUnit.getDocumentType().label()).build());
+      builder.dokumenttyp(
+          Dokumenttyp.builder().eId(null).value(relatedDocUnit.getDocumentType().label()).build());
     }
     if (relatedDocUnit.getDecisionDate() != null) {
       builder.datum(
@@ -427,8 +428,8 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
               .build());
     }
     if (isNotBlank(relatedDocUnit.getDocumentNumber())) {
-      builder.dokumentNummer(
-          Rechtszug.DokumentNummer.builder().value(relatedDocUnit.getDocumentNumber()).build());
+      builder.dokumentnummer(
+          Rechtszug.Dokumentnummer.builder().value(relatedDocUnit.getDocumentNumber()).build());
     }
     if (isNotBlank(relatedDocUnit.getFileNumber())) {
       builder.aktenzeichen(
@@ -471,7 +472,8 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
 
     if (normRef.normAbbreviation() != null
         && isNotBlank(normRef.normAbbreviation().officialLongTitle())) {
-      normBuilder.titel(normRef.normAbbreviation().officialLongTitle());
+      normBuilder.normTitel(
+          Norm.NormTitel.builder().value(normRef.normAbbreviation().officialLongTitle()).build());
     }
 
     List<Norm.Einzelnorm> einzelNormen = new ArrayList<>();
@@ -500,9 +502,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
       if (singleNorm.legalForce().type() != null
           && isNotBlank(singleNorm.legalForce().type().label())) {
         gkBuilder.typ(
-            Norm.TypDerGesetzeskraft.builder()
-                .value(singleNorm.legalForce().type().label())
-                .build());
+            Norm.GesetzeskraftTyp.builder().value(singleNorm.legalForce().type().label()).build());
       }
       if (singleNorm.legalForce().region() != null
           && isNotBlank(singleNorm.legalForce().region().longText())) {

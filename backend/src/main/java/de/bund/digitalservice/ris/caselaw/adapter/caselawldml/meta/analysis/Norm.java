@@ -19,14 +19,14 @@ public class Norm {
   @Builder.Default
   private String domainTerm = "Norm";
 
-  @XmlElement(name = "abkuerzung", namespace = CaseLawLdml.RIS_NS)
+  @XmlElement(name = "normAbkuerzung", namespace = CaseLawLdml.RIS_NS)
   private Abkuerzung abkuerzung;
 
   @XmlElement(name = "einzelnorm", namespace = CaseLawLdml.RIS_NS)
   private List<Einzelnorm> einzelnormen;
 
-  @XmlElement(name = "titel", namespace = CaseLawLdml.RIS_NS)
-  private String titel;
+  @XmlElement(name = "normTitel", namespace = CaseLawLdml.RIS_NS)
+  private NormTitel normTitel;
 
   @NoArgsConstructor
   @AllArgsConstructor
@@ -47,16 +47,16 @@ public class Norm {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Einzelnorm";
 
-    @XmlElement(name = "bezeichnung", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "einzelnormBezeichnung", namespace = CaseLawLdml.RIS_NS)
     private Bezeichnung bezeichnung;
 
-    @XmlElement(name = "gesetzeskraft", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "einzelnormGesetzeskraft", namespace = CaseLawLdml.RIS_NS)
     private Gesetzeskraft gesetzeskraft;
 
-    @XmlElement(name = "datum", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "einzelnormDatum", namespace = CaseLawLdml.RIS_NS)
     private Fassungsdatum datum;
 
-    @XmlElement(name = "jahr", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "einzelnormJahr", namespace = CaseLawLdml.RIS_NS)
     private Jahr jahr;
   }
 
@@ -79,10 +79,10 @@ public class Norm {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Gesetzeskraft";
 
-    @XmlElement(name = "typ", namespace = CaseLawLdml.RIS_NS)
-    private TypDerGesetzeskraft typ;
+    @XmlElement(name = "gesetzeskraftTyp", namespace = CaseLawLdml.RIS_NS)
+    private GesetzeskraftTyp typ;
 
-    @XmlElement(name = "geltungsbereich", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "gesetzeskraftGeltungsbereich", namespace = CaseLawLdml.RIS_NS)
     private Geltungsbereich geltungsbereich;
   }
 
@@ -90,7 +90,7 @@ public class Norm {
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class TypDerGesetzeskraft {
+  public static class GesetzeskraftTyp {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Typ der Gesetzeskraft";
 
@@ -126,6 +126,17 @@ public class Norm {
   public static class Jahr {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Jahr";
+
+    @XmlValue private String value;
+  }
+
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Getter
+  @Builder
+  public static class NormTitel {
+    @XmlAttribute(name = "domainTerm")
+    private static final String DOMAIN_TERM = "Amtliche Langüberschrift";
 
     @XmlValue private String value;
   }

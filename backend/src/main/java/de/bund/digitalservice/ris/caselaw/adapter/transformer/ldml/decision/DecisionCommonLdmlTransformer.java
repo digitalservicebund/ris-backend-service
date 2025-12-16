@@ -21,8 +21,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Othe
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.OtherReferences;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Rechtszug;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.DokumentTyp;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumentationsstelle;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumenttyp;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gericht;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Regionen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
@@ -193,7 +193,7 @@ public abstract class DecisionCommonLdmlTransformer
     var coreData = decision.coreData();
     if (coreData != null) {
       // Dokumenttyp
-      builder.dokumentTyp(DokumentTyp.builder().value(coreData.documentType().label()).build());
+      builder.dokumenttyp(Dokumenttyp.builder().value(coreData.documentType().label()).build());
 
       // Gericht
       Court court = coreData.court();
