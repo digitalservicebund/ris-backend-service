@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
+import { useToast } from "primevue/usetoast"
 import { computed, Ref, ref } from "vue"
 import InfoModal from "@/components/InfoModal.vue"
 import PendingProceedingSummary from "@/components/PendingProceedingSummary.vue"
@@ -36,6 +37,8 @@ const linkToPortal = computed(
 
 const docUnitPublicationError = ref<ResponseError | null>(null)
 
+const toastService = useToast()
+
 const showPublicationWarningModal = ref(false)
 const warningModalText = computed(
   () =>
@@ -52,11 +55,13 @@ const checkWarningsAndPublishDocUnit = async () => {
 
 const isPublishing = ref(false)
 const isPublished = ref(false)
+const hasRelatedPendingProceedingsError = ref(false)
 const publishDocUnit = async () => {
   showPublicationWarningModal.value = false
   docUnitPublicationError.value = null
+  hasRelatedPendingProceedingsError.value = false
   isPublishing.value = true
-  const { error } = await publishDocumentationUnitService.publishDocument(
+  const { data, error } = await publishDocumentationUnitService.publishDocument(
     store.documentUnit!.uuid!,
   )
   docUnitPublicationError.value = error ?? null
@@ -64,11 +69,22 @@ const publishDocUnit = async () => {
   isPublishing.value = false
   isPublished.value = error == null
   isWithdrawn.value = false
+
+  if (data?.relatedPendingProceedingsPublicationResult === "SUCCESS")
+    toastService.add({
+      severity: "success",
+      life: 5_000,
+      summary:
+        "Die zugehörigen anhängigen Verfahren wurden als erledigt veröffentlicht.",
+    })
+  if (data?.relatedPendingProceedingsPublicationResult === "ERROR")
+    hasRelatedPendingProceedingsError.value = true
 }
 
 const isWithdrawing = ref(false)
 const isWithdrawn = ref(false)
 const withdrawDocUnit = async () => {
+  hasRelatedPendingProceedingsError.value = false
   docUnitPublicationError.value = null
   isWithdrawing.value = true
   const { error } = await publishDocumentationUnitService.withdrawDocument(
@@ -170,6 +186,12 @@ const hasRelatedPendingProceeding = computed(() => {
       aria-label="Fehler bei der Veröffentlichung/Zurückziehung"
       :description="docUnitPublicationError.description"
       :title="docUnitPublicationError.title"
+    />
+    <InfoModal
+      v-if="hasRelatedPendingProceedingsError"
+      aria-label="Fehler beim Veröffentlichen zugehöriger anhängiger Verfahren"
+      description="Die zugehörigen anhängigen Verfahren konnten nicht vollständig als erledigt veröffentlicht werden. Bitte stellen Sie sicher, dass die anhängigen Verfahren bereits im Portal veröffentlicht sind und alle Pflichtfelder befüllt haben."
+      title="Zugehörige anhängige Verfahren nicht veröffentlicht"
     />
     <InfoModal
       v-if="!isPortalPublicationEnabled"

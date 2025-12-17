@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.ManualPortalPublicationResult;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment2Html;
@@ -626,12 +627,12 @@ public class DocumentationUnitController {
    */
   @PutMapping(value = "/{uuid}/publish")
   @PreAuthorize("@userHasWriteAccess.apply(#uuid)")
-  public ResponseEntity<Void> publishDocumentationUnit(
+  public ResponseEntity<ManualPortalPublicationResult> publishDocumentationUnit(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
     User user = userService.getUser(oidcUser);
     try {
-      portalPublicationService.publishDocumentationUnitWithChangelog(uuid, user);
-      return ResponseEntity.ok().build();
+      var result = portalPublicationService.publishDocumentationUnitWithChangelog(uuid, user);
+      return ResponseEntity.ok(result);
     } catch (DocumentationUnitNotExistsException e) {
       log.atError()
           .setMessage("Could not find documentation unit to publish to portal")

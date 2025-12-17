@@ -76,7 +76,10 @@ describe("DecisionPlausibilityCheck", () => {
     vi.spyOn(
       publishDocumentationUnitService,
       "publishDocument",
-    ).mockResolvedValue({ status: 200, data: undefined })
+    ).mockResolvedValue({
+      status: 200,
+      data: { relatedPendingProceedingsPublicationResult: "NO_ACTION" },
+    })
   })
   afterEach(() => {
     vi.clearAllMocks()
@@ -176,7 +179,10 @@ describe("DecisionPlausibilityCheck", () => {
     vi.spyOn(
       publishDocumentationUnitService,
       "publishDocument",
-    ).mockResolvedValue({ status: 200, data: undefined })
+    ).mockResolvedValue({
+      status: 200,
+      data: { relatedPendingProceedingsPublicationResult: "NO_ACTION" },
+    })
     vi.spyOn(borderNumberService, "validateBorderNumberLinks").mockReturnValue({
       isValid: false,
       invalidCategories: [],

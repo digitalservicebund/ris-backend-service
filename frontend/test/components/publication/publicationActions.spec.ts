@@ -7,7 +7,9 @@ import PublicationActions from "@/components/publication/PublicationActions.vue"
 import { Decision } from "@/domain/decision"
 import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
 import { ServiceResponse } from "@/services/httpClient"
-import publishDocumentationUnitService from "@/services/publishDocumentationUnitService"
+import publishDocumentationUnitService, {
+  PublicationResult,
+} from "@/services/publishDocumentationUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import routes from "~/test-helper/routes"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
@@ -191,7 +193,7 @@ describe("PublicationActions", () => {
       mockDocUnitStore(PortalPublicationStatus.PUBLISHED)
       publishMock.mockResolvedValue({
         status: 200,
-        data: undefined,
+        data: { relatedPendingProceedingsPublicationResult: "NO_ACTION" },
       })
       await renderComponent({ isPublishable: true, publicationWarnings: [] })
 
@@ -262,7 +264,10 @@ describe("PublicationActions", () => {
         vi.spyOn(
           publishDocumentationUnitService,
           "publishDocument",
-        ).mockResolvedValue({ status: 200, data: undefined })
+        ).mockResolvedValue({
+          status: 200,
+          data: { relatedPendingProceedingsPublicationResult: "NO_ACTION" },
+        })
 
         await fireEvent.click(
           screen.getByRole("button", { name: "Veröffentlichen" }),
@@ -283,7 +288,10 @@ describe("PublicationActions", () => {
             status: 500,
             error: { title: "Error-Titel", description: "Error-Beschreibung" },
           })
-          .mockResolvedValueOnce({ status: 200, data: undefined })
+          .mockResolvedValueOnce({
+            status: 200,
+            data: { relatedPendingProceedingsPublicationResult: "NO_ACTION" },
+          })
 
         // This one fails and shows error
         await fireEvent.click(
@@ -337,7 +345,7 @@ describe("PublicationActions", () => {
         await renderComponent({ isPublishable: true, publicationWarnings: [] })
 
         const { promise: publishPromise, resolve: resolvePublish } =
-          Promise.withResolvers<ServiceResponse<void>>()
+          Promise.withResolvers<ServiceResponse<PublicationResult>>()
         vi.spyOn(
           publishDocumentationUnitService,
           "publishDocument",
@@ -355,7 +363,10 @@ describe("PublicationActions", () => {
         ).toBeDisabled()
 
         // This simulates the server response
-        resolvePublish({ status: 200, data: undefined })
+        resolvePublish({
+          status: 200,
+          data: { relatedPendingProceedingsPublicationResult: "NO_ACTION" },
+        })
         await flushPromises()
 
         expect(
@@ -374,7 +385,10 @@ describe("PublicationActions", () => {
       vi.spyOn(
         publishDocumentationUnitService,
         "publishDocument",
-      ).mockResolvedValue({ status: 200, data: undefined })
+      ).mockResolvedValue({
+        status: 200,
+        data: { relatedPendingProceedingsPublicationResult: "NO_ACTION" },
+      })
 
       store.documentUnit = new Decision("q834", {
         portalPublicationStatus: PortalPublicationStatus.PUBLISHED,
@@ -392,7 +406,10 @@ describe("PublicationActions", () => {
       await renderComponent({ isPublishable: true, publicationWarnings: [] })
       const publishSpy = vi
         .spyOn(publishDocumentationUnitService, "publishDocument")
-        .mockResolvedValue({ status: 200, data: undefined })
+        .mockResolvedValue({
+          status: 200,
+          data: { relatedPendingProceedingsPublicationResult: "NO_ACTION" },
+        })
 
       await fireEvent.click(
         screen.getByRole("button", { name: "Veröffentlichen" }),
