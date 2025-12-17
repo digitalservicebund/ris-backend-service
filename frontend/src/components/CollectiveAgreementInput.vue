@@ -38,12 +38,20 @@ async function addCollectiveAgreement() {
   emit("addEntry")
 }
 
-const updateValidationStore = (error?: ValidationError) => {
-  if (!error) {
-    validationStore.reset()
-    return
+const updateDateValidationStore = (error?: ValidationError) => {
+  if (error) {
+    validationStore.add(error.message, "date")
+  } else {
+    validationStore.remove("date")
   }
-  validationStore.add(error.message, error.instance as CollectiveAgreementField)
+}
+
+const updateNormValidationStore = (error?: ValidationError) => {
+  if (error) {
+    validationStore.add(error.message, "norm")
+  } else {
+    validationStore.remove("norm")
+  }
 }
 
 watch(
@@ -88,7 +96,7 @@ onMounted(() => {
           id="collectiveAgreementDateInput"
           v-slot="slotProps"
           label="Datum"
-          @update:validation-error="updateValidationStore"
+          @update:validation-error="updateDateValidationStore"
         >
           <CollectiveAgreementDateInput
             id="collectiveAgreementDateInputText"
@@ -104,7 +112,7 @@ onMounted(() => {
           id="collectiveAgreementNormInput"
           v-slot="slotProps"
           label="Tarifnorm"
-          @update:validation-error="updateValidationStore"
+          @update:validation-error="updateNormValidationStore"
         >
           <CollectiveAgreementNormInput
             id="collectiveAgreementNormInputText"

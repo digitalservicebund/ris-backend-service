@@ -44,7 +44,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew build --profile -x integrationTest -x test
       - name: Upload build performance report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: performance-report
           path: backend/build/reports/profile/profile*.html
@@ -107,7 +107,7 @@ jobs:
           fi
       # Todo: Remove this step
       - name: Upload Trivy scan results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: "trivy-results-backend.sarif"
           path: "trivy-results.sarif"
@@ -129,7 +129,7 @@ jobs:
           format: "cosign-vuln"
           output: "vuln-backend.json"
       - name: Upload cosign vulnerability scan record
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: "vuln-backend.json"
           path: "vuln-backend.json"
@@ -138,7 +138,7 @@ jobs:
         run: |
           mkdir /tmp/images
           docker save -o /tmp/images/backend-image.tar ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: /tmp/images
           key: docker-images-cache-${{ env.RUN_ID }}
@@ -172,7 +172,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew checkLicense
       - name: Upload licence report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: licence-reports-backend
           retention-days: 3
@@ -202,7 +202,7 @@ jobs:
         run: npm run audit:licences
         working-directory: ./frontend
       - name: Upload licence report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: licence-reports-frontend
           retention-days: 3
@@ -290,7 +290,7 @@ jobs:
           format: "cosign-vuln"
           output: "vuln-frontend.json"
       - name: Upload cosign vulnerability scan record
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: "vuln-frontend.json"
           path: "vuln-frontend.json"
@@ -299,7 +299,7 @@ jobs:
         run: |
           mkdir /tmp/images
           docker save -o /tmp/images/frontend-image.tar ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: /tmp/images
           key: docker-frontend-images-cache-${{ env.RUN_ID }}
@@ -328,7 +328,7 @@ jobs:
     outputs:
       version: ${{ steps.set-version.outputs.version }}
     steps:
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: /tmp/images
           key: docker-images-cache-${{ env.RUN_ID }}
@@ -349,7 +349,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@29bcfa8619aeb12eaac78d31157172c86183b05c
+        uses: sigstore/cosign-installer@b9a9af4616125e37640447359ca8bd199a502d8d
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - id: set-version
@@ -376,7 +376,7 @@ jobs:
     outputs:
       version: ${{ steps.set-version.outputs.version }}
     steps:
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: /tmp/images
           key: docker-frontend-images-cache-${{ env.RUN_ID }}
@@ -397,7 +397,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@29bcfa8619aeb12eaac78d31157172c86183b05c
+        uses: sigstore/cosign-installer@b9a9af4616125e37640447359ca8bd199a502d8d
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - id: set-version
@@ -425,7 +425,7 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d
       - name: Deploy new images
-        uses: digitalservicebund/argocd-deploy@faa88406a1d6afa918aad127b19735c6e54d7fb1 # v1.0.0
+        uses: digitalservicebund/argocd-deploy@4e758f584953506c571951ffcba33d6a6246e856 # v1.0.0
         with:
           environment: staging
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
@@ -489,7 +489,7 @@ jobs:
           cache: npm
           cache-dependency-path: ./frontend/package-lock.json
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: node-modules-cache
         with:
           path: |
@@ -501,7 +501,7 @@ jobs:
           npm ci --ignore-scripts
         working-directory: ./frontend
       - name: Download blob reports from artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           path: ./frontend/all-blob-reports
           pattern: test-results-blob-*
@@ -520,7 +520,7 @@ jobs:
         run: npx playwright merge-reports --reporter html ./all-blob-reports
         working-directory: ./frontend
       - name: Upload html report to artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: html-test-report
           path: ./frontend/playwright-report
@@ -541,7 +541,7 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d
       - name: Deploy new images
-        uses: digitalservicebund/argocd-deploy@faa88406a1d6afa918aad127b19735c6e54d7fb1 # v1.0.0
+        uses: digitalservicebund/argocd-deploy@4e758f584953506c571951ffcba33d6a6246e856 # v1.0.0
         with:
           environment: production
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
@@ -584,7 +584,7 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d
       - name: Deploy new images
-        uses: digitalservicebund/argocd-deploy@faa88406a1d6afa918aad127b19735c6e54d7fb1 # v1.0.0
+        uses: digitalservicebund/argocd-deploy@4e758f584953506c571951ffcba33d6a6246e856 # v1.0.0
         with:
           environment: uat
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
@@ -662,7 +662,7 @@ jobs:
           flags: --debug
           version: 0.9.0
       - name: Upload mermaid ER-diagram
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: erdiagram
           retention-days: 3
@@ -686,7 +686,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew javadoc
       - name: Upload documentation
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: backend-code-documentation
           retention-days: 3
@@ -745,7 +745,7 @@ jobs:
       #     destinationDir: entity-relationship-diagrams/ris-backend-service
       # Licence reports
       - name: Licence reports - Download
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           pattern: licence-reports-*
           path: tmp/licence-reports/
@@ -762,7 +762,7 @@ jobs:
           destinationDir: licence-reports/backend/ris-backend-service
       # Performance report
       - name: Performance reports - Download
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: performance-report
           path: tmp/performance-reports/
@@ -774,7 +774,7 @@ jobs:
           destinationDir: performance-reports/ris-backend-service
       # Backend code documentation
       - name: Backend Code Documentation - Download
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: backend-code-documentation
           path: tmp/backend-code-documentation/
@@ -786,7 +786,7 @@ jobs:
           reportIsDirectory: true
       # e2e test report
       - name: E2E test reports - Download
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: html-test-report
           path: tmp/html-test-report/
