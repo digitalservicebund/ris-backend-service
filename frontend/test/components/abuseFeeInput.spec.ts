@@ -5,6 +5,7 @@ import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { setActivePinia } from "pinia"
 import { beforeEach } from "vitest"
+import { nextTick } from "vue"
 import AbuseFeeInput from "@/components/AbuseFeeInput.vue"
 import AbuseFee from "@/domain/abuseFee"
 import { CurrencyCode } from "@/domain/objectValue"
@@ -58,7 +59,7 @@ describe("AbuseFeeInput", () => {
     // Assert
     expect(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühren speichern",
+        name: "Gebühren speichern",
       }),
     ).toBeDisabled()
   })
@@ -79,9 +80,30 @@ describe("AbuseFeeInput", () => {
     expect(currency).toHaveValue("")
     expect(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühren speichern",
+        name: "Gebühren speichern",
       }),
     ).toBeDisabled()
+  })
+
+  it("disables 'Übernehmen' button and displays validation error with invalid input", async () => {
+    // Arrange + Act
+    renderComponent({
+      modelValue: {
+        id: "id",
+        amount: 10000000000,
+      } as AbuseFee,
+    })
+
+    // validation happens in onMounted so we need to wait for next tick
+    await nextTick()
+
+    // Assert
+    expect(
+      screen.getByRole("button", {
+        name: "Gebühren speichern",
+      }),
+    ).toBeDisabled()
+    expect(screen.getByText("Max. 9 Zeichen")).toBeInTheDocument()
   })
 
   it("enables 'Übernehmen' button with complete input", async () => {
@@ -105,7 +127,7 @@ describe("AbuseFeeInput", () => {
     expect(currency).toHaveValue("Euro (EUR)")
     expect(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühren speichern",
+        name: "Gebühren speichern",
       }),
     ).toBeEnabled()
   })
@@ -126,7 +148,7 @@ describe("AbuseFeeInput", () => {
     // Act
     await user.click(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühren speichern",
+        name: "Gebühren speichern",
       }),
     )
 
@@ -150,7 +172,7 @@ describe("AbuseFeeInput", () => {
     // Act
     await user.click(
       screen.getByRole("button", {
-        name: "Missbrauchsgebühren speichern",
+        name: "Gebühren speichern",
       }),
     )
 

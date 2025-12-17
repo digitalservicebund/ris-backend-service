@@ -85,7 +85,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
             + coreData.fileNumbers().getFirst()
             + "</p>";
     String title =
-        ObjectUtils.defaultIfNull(
+        ObjectUtils.getIfNull(
             nullSafeGet(pendingProceeding.shortTexts(), PendingProceedingShortTexts::headline),
             fallbackTitle);
 

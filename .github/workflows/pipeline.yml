@@ -33,7 +33,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@4e7e684fbb6e33f88ecb2cf1e6b3797739cf499b
+        uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -45,7 +45,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew build --profile -x integrationTest -x test
       - name: Upload build performance report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: performance-report
           path: backend/build/reports/profile/profile*.html
@@ -108,7 +108,7 @@ jobs:
           fi
       # Todo: Remove this step
       - name: Upload Trivy scan results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: "trivy-results-backend.sarif"
           path: "trivy-results.sarif"
@@ -130,7 +130,7 @@ jobs:
           format: "cosign-vuln"
           output: "vuln-backend.json"
       - name: Upload cosign vulnerability scan record
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: "vuln-backend.json"
           path: "vuln-backend.json"
@@ -139,7 +139,7 @@ jobs:
         run: |
           mkdir /tmp/images
           docker save -o /tmp/images/backend-image.tar ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: /tmp/images
           key: docker-images-cache-${{ env.RUN_ID }}
@@ -161,7 +161,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Set up JDK
-        uses: actions/setup-java@4e7e684fbb6e33f88ecb2cf1e6b3797739cf499b
+        uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -173,7 +173,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew checkLicense
       - name: Upload licence report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: licence-reports-backend
           retention-days: 3
@@ -203,7 +203,7 @@ jobs:
         run: npm run audit:licences
         working-directory: ./frontend
       - name: Upload licence report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: licence-reports-frontend
           retention-days: 3
@@ -291,7 +291,7 @@ jobs:
           format: "cosign-vuln"
           output: "vuln-frontend.json"
       - name: Upload cosign vulnerability scan record
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: "vuln-frontend.json"
           path: "vuln-frontend.json"
@@ -300,7 +300,7 @@ jobs:
         run: |
           mkdir /tmp/images
           docker save -o /tmp/images/frontend-image.tar ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: /tmp/images
           key: docker-frontend-images-cache-${{ env.RUN_ID }}
@@ -329,7 +329,7 @@ jobs:
     outputs:
       version: ${{ steps.set-version.outputs.version }}
     steps:
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: /tmp/images
           key: docker-images-cache-${{ env.RUN_ID }}
@@ -350,7 +350,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@29bcfa8619aeb12eaac78d31157172c86183b05c
+        uses: sigstore/cosign-installer@b9a9af4616125e37640447359ca8bd199a502d8d
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - id: set-version
@@ -377,7 +377,7 @@ jobs:
     outputs:
       version: ${{ steps.set-version.outputs.version }}
     steps:
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: /tmp/images
           key: docker-frontend-images-cache-${{ env.RUN_ID }}
@@ -398,7 +398,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@29bcfa8619aeb12eaac78d31157172c86183b05c
+        uses: sigstore/cosign-installer@b9a9af4616125e37640447359ca8bd199a502d8d
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - id: set-version
@@ -426,13 +426,14 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d
       - name: Deploy new images
-        uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
+        uses: digitalservicebund/argocd-deploy@4e758f584953506c571951ffcba33d6a6246e856 # v1.0.0
         with:
           environment: staging
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
           deploying_repo: ris-backend-service,ris-backend-service/frontend
           infra_repo: neuris-infra
-          deploy_key: ${{ secrets.DEPLOY_KEY }}
+          github_app_private_key: ${{ secrets.GITOPS_NEURIS_APP_PRIVATE_KEY }}
+          github_app_id: ${{ secrets.GITOPS_NEURIS_APP_ID }}
           app: ris-staging
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
@@ -489,7 +490,7 @@ jobs:
           cache: npm
           cache-dependency-path: ./frontend/package-lock.json
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: node-modules-cache
         with:
           path: |
@@ -501,7 +502,7 @@ jobs:
           npm ci --ignore-scripts
         working-directory: ./frontend
       - name: Download blob reports from artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           path: ./frontend/all-blob-reports
           pattern: test-results-blob-*
@@ -520,56 +521,20 @@ jobs:
         run: npx playwright merge-reports --reporter html ./all-blob-reports
         working-directory: ./frontend
       - name: Upload html report to artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: html-test-report
           path: ./frontend/playwright-report
 
-  check-latest-deploy-tag:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs:
-      - e2e-tests
-    runs-on: ubuntu-latest
-    outputs:
-      should_deploy: ${{ steps.compare-tags.outputs.should_deploy }}
-    environment: production
-    steps:
-      - name: Checkout infra repository
-        uses: actions/checkout@v6
-        with:
-          repository: digitalservicebund/neuris-infra
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
-          path: infra
-      - name: Checkout main repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          path: main
-      - name: compare image tags
-        id: compare-tags
-        run: |
-          set -x
-          CURRENT_TAG=${{ env.CONTAINER_IMAGE_VERSION }}
-          DEPLOYED_TAG=$(yq '.images[0] | .newTag' infra/manifests/overlays/production/kustomization.yaml)
-          cd main
-          if git merge-base --is-ancestor $CURRENT_TAG $DEPLOYED_TAG; then
-            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
-          fi
-
   deploy-production:
     runs-on: ubuntu-latest
-    if: |
-      github.ref == 'refs/heads/main' &&
-      needs.check-latest-deploy-tag.outputs.should_deploy == 'true'
+    if: github.ref == 'refs/heads/main'
     concurrency: deploy-production
     environment: production
     needs:
       - push-frontend-image-to-registry
       - push-backend-image-to-registry
       - e2e-tests
-      - check-latest-deploy-tag
       - backend-checks
       - frontend-checks
     permissions:
@@ -577,13 +542,14 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d
       - name: Deploy new images
-        uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
+        uses: digitalservicebund/argocd-deploy@4e758f584953506c571951ffcba33d6a6246e856 # v1.0.0
         with:
           environment: production
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
           deploying_repo: ris-backend-service,ris-backend-service/frontend
           infra_repo: neuris-infra
-          deploy_key: ${{ secrets.DEPLOY_KEY }}
+          github_app_private_key: ${{ secrets.GITOPS_NEURIS_APP_PRIVATE_KEY }}
+          github_app_id: ${{ secrets.GITOPS_NEURIS_APP_ID }}
           app: ris-production
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
@@ -619,13 +585,14 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d
       - name: Deploy new images
-        uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
+        uses: digitalservicebund/argocd-deploy@4e758f584953506c571951ffcba33d6a6246e856 # v1.0.0
         with:
           environment: uat
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
           deploying_repo: ris-backend-service,ris-backend-service/frontend
           infra_repo: neuris-infra
-          deploy_key: ${{ secrets.DEPLOY_KEY }}
+          github_app_private_key: ${{ secrets.GITOPS_NEURIS_APP_PRIVATE_KEY }}
+          github_app_id: ${{ secrets.GITOPS_NEURIS_APP_ID }}
           app: ris-uat
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
@@ -671,7 +638,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@4e7e684fbb6e33f88ecb2cf1e6b3797739cf499b
+        uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -696,7 +663,7 @@ jobs:
           flags: --debug
           version: 0.9.0
       - name: Upload mermaid ER-diagram
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: erdiagram
           retention-days: 3
@@ -708,7 +675,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Set up JDK
-        uses: actions/setup-java@4e7e684fbb6e33f88ecb2cf1e6b3797739cf499b
+        uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -720,7 +687,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew javadoc
       - name: Upload documentation
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: backend-code-documentation
           retention-days: 3
@@ -779,7 +746,7 @@ jobs:
       #     destinationDir: entity-relationship-diagrams/ris-backend-service
       # Licence reports
       - name: Licence reports - Download
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           pattern: licence-reports-*
           path: tmp/licence-reports/
@@ -796,7 +763,7 @@ jobs:
           destinationDir: licence-reports/backend/ris-backend-service
       # Performance report
       - name: Performance reports - Download
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: performance-report
           path: tmp/performance-reports/
@@ -808,7 +775,7 @@ jobs:
           destinationDir: performance-reports/ris-backend-service
       # Backend code documentation
       - name: Backend Code Documentation - Download
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: backend-code-documentation
           path: tmp/backend-code-documentation/
@@ -820,7 +787,7 @@ jobs:
           reportIsDirectory: true
       # e2e test report
       - name: E2E test reports - Download
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: html-test-report
           path: tmp/html-test-report/

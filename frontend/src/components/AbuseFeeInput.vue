@@ -27,8 +27,8 @@ const validationStore = useValidationStore<AbuseFeeField>()
 
 const lastSavedModelValue = ref(new AbuseFee({ ...props.modelValue }))
 const abuseFee = ref(new AbuseFee({ ...props.modelValue }))
-const isSixDigitNumber = computed(() => {
-  return abuseFee.value.amount != null && abuseFee.value.amount <= 999999
+const isNineDigitNumber = computed(() => {
+  return abuseFee.value.amount != null && abuseFee.value.amount <= 999999999
 })
 async function addAbuseFee() {
   validate()
@@ -42,10 +42,10 @@ function validate() {
   } else {
     if (null == abuseFee.value.amount) {
       validationStore.add("Pflichtfeld nicht befüllt", "amount")
-    } else if (isSixDigitNumber.value) {
+    } else if (isNineDigitNumber.value) {
       validationStore.remove("amount")
     } else {
-      validationStore.add("Max. 6 Zeichen", "amount")
+      validationStore.add("Max. 9 Zeichen", "amount")
     }
     if (abuseFee.value.currencyCode) {
       validationStore.remove("currencyCode")
@@ -132,7 +132,7 @@ onMounted(() => {
       <div>
         <div class="flex gap-16">
           <Button
-            aria-label="Missbrauchsgebühren speichern"
+            aria-label="Gebühren speichern"
             :disabled="!validationStore.isValid() || abuseFee.isEmpty"
             label="Übernehmen"
             severity="secondary"
