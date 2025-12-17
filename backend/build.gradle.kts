@@ -231,6 +231,18 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.4")
 
+    // CVE-2025-8916
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.79")
+
+    // CVE-2025-51775
+    implementation("org.bitbucket.b_c:jose4j:0.9.4")
+
+    // CVE-2025-48924
+    implementation("org.apache.commons:commons-lang3:3.18.0")
+
+    // CVE-2025-67735
+    implementation("io.netty:netty-codec-http:4.1.129.Final")
+
     val flywayCore = "org.flywaydb:flyway-core:11.19.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
