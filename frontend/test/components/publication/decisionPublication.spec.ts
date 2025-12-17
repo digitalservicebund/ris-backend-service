@@ -26,6 +26,10 @@ vi.mock("@/composables/useScroll", () => ({
   }),
 }))
 
+vi.mock("primevue/usetoast", () => ({
+  useToast: () => ({ add: vi.fn() }),
+}))
+
 describe("DecisionPlausibilityCheck", () => {
   beforeEach(() => {
     setActivePinia(createTestingPinia())
