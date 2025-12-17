@@ -7,7 +7,7 @@ import {
   save,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
-test.describe("Editor table tests", () => {
+test.describe("Editor: table tests", () => {
   test.describe(
     "Create table",
     {
@@ -118,7 +118,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Alle Rahmen", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border", "1px solid rgb(0, 0, 0)")
         })
 
@@ -127,7 +129,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Kein Rahmen", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border", "1px dashed rgb(68, 102, 255)")
         })
       })
@@ -147,7 +151,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Rahmen links", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border-left", "1px solid rgb(0, 0, 0)")
         })
 
@@ -156,7 +162,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Kein Rahmen", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border", "1px dashed rgb(68, 102, 255)")
         })
       })
@@ -176,7 +184,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Rahmen rechts", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border-right", "1px solid rgb(0, 0, 0)")
         })
 
@@ -185,7 +195,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Kein Rahmen", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border", "1px dashed rgb(68, 102, 255)")
         })
       })
@@ -205,7 +217,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Rahmen oben", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border-top", "1px solid rgb(0, 0, 0)")
         })
 
@@ -214,7 +228,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Kein Rahmen", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border", "1px dashed rgb(68, 102, 255)")
         })
       })
@@ -234,7 +250,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Rahmen unten", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border-bottom", "1px solid rgb(0, 0, 0)")
         })
 
@@ -243,7 +261,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Kein Rahmen", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border", "1px dashed rgb(68, 102, 255)")
         })
       })
@@ -264,7 +284,9 @@ test.describe("Editor table tests", () => {
         await menu.getByLabel("Oben ausrichten", { exact: true }).click()
 
         await expect(
-          page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+          page
+            .getByTestId("Gründe")
+            .getByRole("columnheader", { name: /r1c1/ }),
         ).toHaveCSS("vertical-align", "top")
       })
 
@@ -284,7 +306,9 @@ test.describe("Editor table tests", () => {
         await menu.getByLabel("Mittig ausrichten", { exact: true }).click()
 
         await expect(
-          page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+          page
+            .getByTestId("Gründe")
+            .getByRole("columnheader", { name: /r1c1/ }),
         ).toHaveCSS("vertical-align", "middle")
       })
 
@@ -304,7 +328,9 @@ test.describe("Editor table tests", () => {
         await menu.getByLabel("Unten ausrichten", { exact: true }).click()
 
         await expect(
-          page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+          page
+            .getByTestId("Gründe")
+            .getByRole("columnheader", { name: /r1c1/ }),
         ).toHaveCSS("vertical-align", "bottom")
       })
     },
@@ -337,7 +363,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Alle Rahmen", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border", "1px solid rgb(0, 0, 0)")
           await expect(
             page.getByTestId("Gründe").getByRole("cell", { name: /r2c1/ }),
@@ -352,7 +380,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Kein Rahmen", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border", "1px dashed rgb(68, 102, 255)")
           await expect(
             page.getByTestId("Gründe").getByRole("cell", { name: /r2c1/ }),
@@ -379,7 +409,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Rahmen links", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border-left", "1px solid rgb(0, 0, 0)")
           await expect(
             page.getByTestId("Gründe").getByRole("cell", { name: /r2c1/ }),
@@ -394,7 +426,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Kein Rahmen", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border", "1px dashed rgb(68, 102, 255)")
           await expect(
             page.getByTestId("Gründe").getByRole("cell", { name: /r2c1/ }),
@@ -421,7 +455,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Rahmen rechts", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border-right", "1px solid rgb(0, 0, 0)")
           await expect(
             page.getByTestId("Gründe").getByRole("cell", { name: /r2c1/ }),
@@ -436,7 +472,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Kein Rahmen", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border", "1px dashed rgb(68, 102, 255)")
           await expect(
             page.getByTestId("Gründe").getByRole("cell", { name: /r2c1/ }),
@@ -463,7 +501,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Rahmen oben", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border-top", "1px solid rgb(0, 0, 0)")
           await expect(
             page.getByTestId("Gründe").getByRole("cell", { name: /r2c1/ }),
@@ -478,7 +518,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Kein Rahmen", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border", "1px dashed rgb(68, 102, 255)")
           await expect(
             page.getByTestId("Gründe").getByRole("cell", { name: /r2c1/ }),
@@ -505,7 +547,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Rahmen unten", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border-bottom", "1px solid rgb(0, 0, 0)")
           await expect(
             page.getByTestId("Gründe").getByRole("cell", { name: /r2c1/ }),
@@ -520,7 +564,9 @@ test.describe("Editor table tests", () => {
           await menu.getByLabel("Kein Rahmen", { exact: true }).click()
 
           await expect(
-            page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+            page
+              .getByTestId("Gründe")
+              .getByRole("columnheader", { name: /r1c1/ }),
           ).toHaveCSS("border", "1px dashed rgb(68, 102, 255)")
           await expect(
             page.getByTestId("Gründe").getByRole("cell", { name: /r2c1/ }),
@@ -548,7 +594,9 @@ test.describe("Editor table tests", () => {
         await menu.getByLabel("Oben ausrichten", { exact: true }).click()
 
         await expect(
-          page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+          page
+            .getByTestId("Gründe")
+            .getByRole("columnheader", { name: /r1c1/ }),
         ).toHaveCSS("vertical-align", "top")
         await expect(
           page.getByTestId("Gründe").getByRole("cell", { name: /r2c1/ }),
@@ -575,7 +623,9 @@ test.describe("Editor table tests", () => {
         await menu.getByLabel("Mittig ausrichten", { exact: true }).click()
 
         await expect(
-          page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+          page
+            .getByTestId("Gründe")
+            .getByRole("columnheader", { name: /r1c1/ }),
         ).toHaveCSS("vertical-align", "middle")
         await expect(
           page.getByTestId("Gründe").getByRole("cell", { name: /r2c1/ }),
@@ -602,7 +652,9 @@ test.describe("Editor table tests", () => {
         await menu.getByLabel("Unten ausrichten", { exact: true }).click()
 
         await expect(
-          page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }),
+          page
+            .getByTestId("Gründe")
+            .getByRole("columnheader", { name: /r1c1/ }),
         ).toHaveCSS("vertical-align", "bottom")
         await expect(
           page.getByTestId("Gründe").getByRole("cell", { name: /r2c1/ }),
@@ -714,35 +766,67 @@ const generateTableAndPutTextInEveryCell = async (page: Page) => {
   await menu.getByLabel("Tabelle einfügen").click()
 
   // first row
-  await page.keyboard.type("table cell r1c1")
-  await page.keyboard.press("ArrowRight")
-  await page.keyboard.type("table cell r1c2")
-  await page.keyboard.press("ArrowRight")
-  await page.keyboard.type("table cell r1c3")
+  await page
+    .getByTestId("Gründe")
+    .getByRole("columnheader")
+    .nth(0)
+    .fill("table cell r1c1")
+  await page
+    .getByTestId("Gründe")
+    .getByRole("columnheader")
+    .nth(1)
+    .fill("table cell r1c2")
+  await page
+    .getByTestId("Gründe")
+    .getByRole("columnheader")
+    .nth(2)
+    .fill("table cell r1c3")
 
   // second row
-  await page.keyboard.press("ArrowDown")
-  await page.keyboard.type("table cell r2c3")
-  await page.keyboard.press("Home")
-  await page.keyboard.press("ArrowLeft")
-  await page.keyboard.type("table cell r2c2")
-  await page.keyboard.press("Home")
-  await page.keyboard.press("ArrowLeft")
-  await page.keyboard.type("table cell r2c1")
+  await page
+    .getByTestId("Gründe")
+    .getByRole("cell")
+    .nth(0)
+    .fill("table cell r2c1")
+  await page
+    .getByTestId("Gründe")
+    .getByRole("cell")
+    .nth(1)
+    .fill("table cell r2c2")
+  await page
+    .getByTestId("Gründe")
+    .getByRole("cell")
+    .nth(2)
+    .fill("table cell r2c3")
 
   // third row
-  await page.keyboard.press("ArrowDown")
-  await page.keyboard.type("table cell r3c1")
-  await page.keyboard.press("ArrowRight")
-  await page.keyboard.type("table cell r3c2")
-  await page.keyboard.press("ArrowRight")
-  await page.keyboard.type("table cell r3c3")
+  await page
+    .getByTestId("Gründe")
+    .getByRole("cell")
+    .nth(3)
+    .fill("table cell r3c1")
+  await page
+    .getByTestId("Gründe")
+    .getByRole("cell")
+    .nth(4)
+    .fill("table cell r3c2")
+  await page
+    .getByTestId("Gründe")
+    .getByRole("cell")
+    .nth(5)
+    .fill("table cell r3c3")
 
   // goto first row and first cell
-  await page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }).click()
+  await page
+    .getByTestId("Gründe")
+    .getByRole("columnheader", { name: /r1c1/ })
+    .click()
 }
 const selectCellsInFirstColumn = async (page: Page) => {
-  await page.getByTestId("Gründe").getByRole("cell", { name: /r1c1/ }).click()
+  await page
+    .getByTestId("Gründe")
+    .getByRole("columnheader", { name: /r1c1/ })
+    .click()
   await page.keyboard.down("Shift")
   await page.getByTestId("Gründe").getByRole("cell", { name: /r2c1/ }).click()
   await page.getByTestId("Gründe").getByRole("cell", { name: /r3c1/ }).click()
