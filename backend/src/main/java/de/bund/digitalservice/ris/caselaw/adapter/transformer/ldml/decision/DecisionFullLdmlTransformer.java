@@ -503,8 +503,8 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                       var tarifvertragBuilder = Tarifvertraege.Tarifvertrag.builder();
 
                       if (collectiveAgreement.name() != null) {
-                        tarifvertragBuilder.name(
-                            Tarifvertraege.Tarifvertrag.TarifvertragName.builder()
+                        tarifvertragBuilder.bezeichnung(
+                            Tarifvertraege.Tarifvertrag.TarifvertragBezeichnung.builder()
                                 .value(collectiveAgreement.name())
                                 .build());
                       }
