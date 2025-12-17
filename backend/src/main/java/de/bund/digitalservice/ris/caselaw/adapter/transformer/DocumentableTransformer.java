@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
@@ -69,10 +70,15 @@ public class DocumentableTransformer {
                     referenceDTO -> {
                       referenceDTO.setDocumentationUnitRank(rank.incrementAndGet());
 
-                      var existingReference =
-                          currentDTO.getCaselawReferences().stream()
-                              .filter(existing -> referenceDTO.getId().equals(existing.getId()))
-                              .findFirst();
+                      Optional<CaselawReferenceDTO> existingReference = Optional.empty();
+
+                      UUID referenceId = referenceDTO.getId();
+                      if (referenceId != null) {
+                        existingReference =
+                            currentDTO.getCaselawReferences().stream()
+                                .filter(existing -> referenceId.equals(existing.getId()))
+                                .findFirst();
+                      }
                       existingReference.ifPresent(
                           caselawReferenceDTO -> {
                             referenceDTO.setEditionRank(caselawReferenceDTO.getEditionRank());
@@ -98,10 +104,15 @@ public class DocumentableTransformer {
                     referenceDTO -> {
                       referenceDTO.setDocumentationUnitRank(rank.incrementAndGet());
 
-                      var existingReference =
-                          currentDTO.getLiteratureReferences().stream()
-                              .filter(existing -> referenceDTO.getId().equals(existing.getId()))
-                              .findFirst();
+                      Optional<LiteratureReferenceDTO> existingReference = Optional.empty();
+
+                      UUID referenceId = referenceDTO.getId();
+                      if (referenceId != null) {
+                        existingReference =
+                            currentDTO.getLiteratureReferences().stream()
+                                .filter(existing -> referenceId.equals(existing.getId()))
+                                .findFirst();
+                      }
                       existingReference.ifPresent(
                           literatureReferenceDTO -> {
                             referenceDTO.setEditionRank(literatureReferenceDTO.getEditionRank());
