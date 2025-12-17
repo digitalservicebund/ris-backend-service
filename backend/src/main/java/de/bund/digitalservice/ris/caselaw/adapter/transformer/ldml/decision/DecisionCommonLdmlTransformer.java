@@ -89,7 +89,7 @@ public abstract class DecisionCommonLdmlTransformer
             + coreData.fileNumbers().getFirst()
             + "</p>";
     String title =
-        ObjectUtils.defaultIfNull(
+        ObjectUtils.getIfNull(
             nullSafeGet(decision.shortTexts(), ShortTexts::headline), fallbackTitle);
 
     validateNotNull(title, "Title missing");
