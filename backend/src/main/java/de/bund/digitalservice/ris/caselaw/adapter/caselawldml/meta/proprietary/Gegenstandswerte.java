@@ -30,14 +30,14 @@ public class Gegenstandswerte {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Gegenstandswert";
 
-    @XmlElement(name = "gegenstandswertBetrag", namespace = CaseLawLdml.RIS_NS)
-    private GegenstandswertBetrag gegenstandswertBetrag;
+    @XmlElement(name = "betrag", namespace = CaseLawLdml.RIS_NS)
+    private GegenstandswertBetrag betrag;
 
-    @XmlElement(name = "gegenstandswertWaehrung", namespace = CaseLawLdml.RIS_NS)
-    private GegenstandswertWaehrung gegenstandswertWaehrung;
+    @XmlElement(name = "waehrung", namespace = CaseLawLdml.RIS_NS)
+    private GegenstandswertWaehrung waehrung;
 
-    @XmlElement(name = "gegenstandswertVerfahren", namespace = CaseLawLdml.RIS_NS)
-    private GegenstandswertVerfahren gegenstandswertVerfahren;
+    @XmlElement(name = "verfahren", namespace = CaseLawLdml.RIS_NS)
+    private Verfahren verfahren;
   }
 
   @NoArgsConstructor
@@ -66,7 +66,7 @@ public class Gegenstandswerte {
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class GegenstandswertVerfahren {
+  public static class Verfahren {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Verfahren";
 

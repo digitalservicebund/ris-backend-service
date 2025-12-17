@@ -30,21 +30,21 @@ public class Herkunftslaender {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Herkunftsland";
 
-    @XmlElement(name = "herkunftslandAltwert", namespace = CaseLawLdml.RIS_NS)
-    private HerkunftslandAltwert herkunftslandAltwert;
+    @XmlElement(name = "altwert", namespace = CaseLawLdml.RIS_NS)
+    private Altwert altwert;
 
-    @XmlElement(name = "herkunftslandLandbezeichnung", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "landbezeichnung", namespace = CaseLawLdml.RIS_NS)
     private Landbezeichnung landbezeichnung;
 
-    @XmlElement(name = "herkunftslandRechtlicherRahmen", namespace = CaseLawLdml.RIS_NS)
-    private HerkunftslandRechtlicherRahmen herkunftslandRechtlicherRahmen;
+    @XmlElement(name = "rechtlicherRahmen", namespace = CaseLawLdml.RIS_NS)
+    private RechtlicherRahmen rechtlicherRahmen;
   }
 
   @NoArgsConstructor
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class HerkunftslandAltwert {
+  public static class Altwert {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Altwert";
 
@@ -72,7 +72,7 @@ public class Herkunftslaender {
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class HerkunftslandRechtlicherRahmen {
+  public static class RechtlicherRahmen {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Rechtlicher Rahmen";
 

@@ -30,13 +30,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.E
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Evsf;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FehlerhafteGerichte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.FremdsprachigeFassungen;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gebuehren;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gegenstandswerte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gesetzgebungsauftrag;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.HerkunftDerUebersetzungen;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Herkunftslaender;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Kuendigungsarten;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Kuendigungsgruende;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Missbrauchsgebuehren;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Notiz;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Quellen;
@@ -190,10 +190,10 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         builder.gegenstandswerte(gegenstandswerte);
       }
 
-      // Missbrauchsgebühren
+      // Gebühren
       if (!CollectionUtils.isEmpty(contentRelatedIndexing.abuseFees())) {
-        var missbrauchsgebuehren = buildMissbrauchsgebuehren(contentRelatedIndexing);
-        builder.missbrauchsgebuehren(missbrauchsgebuehren);
+        var gebuehren = buildGebuehren(contentRelatedIndexing);
+        builder.gebuehren(gebuehren);
       }
 
       // Herkunftsland
@@ -666,16 +666,16 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
             .map(
                 objectValue ->
                     Gegenstandswerte.Gegenstandswert.builder()
-                        .gegenstandswertBetrag(
+                        .betrag(
                             Gegenstandswerte.GegenstandswertBetrag.builder()
                                 .value(String.valueOf(objectValue.amount()))
                                 .build())
-                        .gegenstandswertWaehrung(
+                        .waehrung(
                             Gegenstandswerte.GegenstandswertWaehrung.builder()
                                 .value(objectValue.currencyCode().isoCode())
                                 .build())
-                        .gegenstandswertVerfahren(
-                            Gegenstandswerte.GegenstandswertVerfahren.builder()
+                        .verfahren(
+                            Gegenstandswerte.Verfahren.builder()
                                 .value(objectValue.proceedingType().toString())
                                 .build())
                         .build())
@@ -684,30 +684,29 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     return Gegenstandswerte.builder().gegenstandswerte(gegenstandswerte).build();
   }
 
-  private Missbrauchsgebuehren buildMissbrauchsgebuehren(
-      ContentRelatedIndexing contentRelatedIndexing) {
+  private Gebuehren buildGebuehren(ContentRelatedIndexing contentRelatedIndexing) {
 
-    var missbrauchsgebuehren =
+    var gebuehren =
         contentRelatedIndexing.abuseFees().stream()
             .map(
                 abuseFee ->
-                    Missbrauchsgebuehren.Missbrauchsgebuehr.builder()
-                        .missbrauchsgebuehrBetrag(
-                            Missbrauchsgebuehren.MissbrauchsgebuehrBetrag.builder()
+                    Gebuehren.Gebuehr.builder()
+                        .betrag(
+                            Gebuehren.Betrag.builder()
                                 .value(String.valueOf(abuseFee.amount()))
                                 .build())
-                        .missbrauchsgebuehrWaehrung(
-                            Missbrauchsgebuehren.MissbrauchsgebuehrWaehrung.builder()
+                        .waehrung(
+                            Gebuehren.Waehrung.builder()
                                 .value(abuseFee.currencyCode().isoCode())
                                 .build())
-                        .missbrauchsgebuehrAdressat(
-                            Missbrauchsgebuehren.MissbrauchsgebuehrAdressat.builder()
+                        .adressat(
+                            Gebuehren.Adressat.builder()
                                 .value(abuseFee.addressee().toString())
                                 .build())
                         .build())
             .toList();
 
-    return Missbrauchsgebuehren.builder().missbrauchsgebuehren(missbrauchsgebuehren).build();
+    return Gebuehren.builder().gebuehren(gebuehren).build();
   }
 
   private Herkunftslaender buildHerkunftslaender(ContentRelatedIndexing contentRelatedIndexing) {
@@ -719,8 +718,8 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                       var builder = Herkunftslaender.Herkunftsland.builder();
 
                       if (!StringUtils.isNullOrBlank(countryOfOrigin.legacyValue())) {
-                        builder.herkunftslandAltwert(
-                            Herkunftslaender.HerkunftslandAltwert.builder()
+                        builder.altwert(
+                            Herkunftslaender.Altwert.builder()
                                 .value(countryOfOrigin.legacyValue())
                                 .build());
                       }
@@ -734,8 +733,8 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                                 .build());
                       }
                       if (countryOfOrigin.fieldOfLaw() != null) {
-                        builder.herkunftslandRechtlicherRahmen(
-                            Herkunftslaender.HerkunftslandRechtlicherRahmen.builder()
+                        builder.rechtlicherRahmen(
+                            Herkunftslaender.RechtlicherRahmen.builder()
                                 .value(countryOfOrigin.fieldOfLaw().text())
                                 .notation(countryOfOrigin.fieldOfLaw().notation())
                                 .sachgebietId(countryOfOrigin.fieldOfLaw().identifier())
@@ -767,10 +766,8 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                     .build());
 
     if (incomeType.terminology() != null) {
-      builder.einkunftsartBegrifflichkeit(
-          Einkunftsarten.EinkunftsartBegrifflichkeit.builder()
-              .value(incomeType.terminology())
-              .build());
+      builder.begrifflichkeit(
+          Einkunftsarten.Begrifflichkeit.builder().value(incomeType.terminology()).build());
     }
 
     return builder.build();

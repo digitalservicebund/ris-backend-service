@@ -30,16 +30,16 @@ public class Tarifvertraege {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Tarifvertrag";
 
-    @XmlElement(name = "tarifvertragName", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "bezeichnung", namespace = CaseLawLdml.RIS_NS)
     private TarifvertragName name;
 
-    @XmlElement(name = "tarifvertragTarifnorm", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "tarifnorm", namespace = CaseLawLdml.RIS_NS)
     private Tarifnorm tarifnorm;
 
-    @XmlElement(name = "tarifvertragDatum", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "datum", namespace = CaseLawLdml.RIS_NS)
     private TarifvertragDatum datum;
 
-    @XmlElement(name = "tarifvertragBranche", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "branche", namespace = CaseLawLdml.RIS_NS)
     private TarifvertragBranche branche;
 
     @NoArgsConstructor

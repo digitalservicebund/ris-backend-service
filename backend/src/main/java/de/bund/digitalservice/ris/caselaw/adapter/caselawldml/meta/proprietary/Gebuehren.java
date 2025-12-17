@@ -14,37 +14,37 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Builder
-public class Missbrauchsgebuehren {
+public class Gebuehren {
   @XmlAttribute(name = "domainTerm")
-  private static final String DOMAIN_TERM = "Missbrauchsgebühren";
+  private static final String DOMAIN_TERM = "Gebühren";
 
   @SuppressWarnings("java:S1700")
-  @XmlElement(name = "missbrauchsgebuehr", namespace = CaseLawLdml.RIS_NS)
-  private List<Missbrauchsgebuehr> missbrauchsgebuehren;
+  @XmlElement(name = "gebuehr", namespace = CaseLawLdml.RIS_NS)
+  private List<Gebuehr> gebuehren;
 
   @NoArgsConstructor
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class Missbrauchsgebuehr {
+  public static class Gebuehr {
     @XmlAttribute(name = "domainTerm")
-    private static final String DOMAIN_TERM = "Missbrauchsgebühr";
+    private static final String DOMAIN_TERM = "Gebühr";
 
-    @XmlElement(name = "missbrauchsgebuehrBetrag", namespace = CaseLawLdml.RIS_NS)
-    private MissbrauchsgebuehrBetrag missbrauchsgebuehrBetrag;
+    @XmlElement(name = "betrag", namespace = CaseLawLdml.RIS_NS)
+    private Betrag betrag;
 
-    @XmlElement(name = "missbrauchsgebuehrWaehrung", namespace = CaseLawLdml.RIS_NS)
-    private MissbrauchsgebuehrWaehrung missbrauchsgebuehrWaehrung;
+    @XmlElement(name = "waehrung", namespace = CaseLawLdml.RIS_NS)
+    private Waehrung waehrung;
 
-    @XmlElement(name = "missbrauchsgebuehrAdressat", namespace = CaseLawLdml.RIS_NS)
-    private MissbrauchsgebuehrAdressat missbrauchsgebuehrAdressat;
+    @XmlElement(name = "adressat", namespace = CaseLawLdml.RIS_NS)
+    private Adressat adressat;
   }
 
   @NoArgsConstructor
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class MissbrauchsgebuehrBetrag {
+  public static class Betrag {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Betrag";
 
@@ -55,7 +55,7 @@ public class Missbrauchsgebuehren {
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class MissbrauchsgebuehrWaehrung {
+  public static class Waehrung {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Währung";
 
@@ -66,7 +66,7 @@ public class Missbrauchsgebuehren {
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class MissbrauchsgebuehrAdressat {
+  public static class Adressat {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Adressat";
 
