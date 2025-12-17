@@ -51,7 +51,7 @@ test.describe(
 
       await test.step("Eintrag mit nicht existierender Randnummer kann nicht hinzugefügt werden", async () => {
         await fillInput(page, "Definierter Begriff", "Sachgesamtheit")
-        await fillInput(page, "Definition des Begriffs", "1")
+        await fillInput(page, "Stelle im Text (Randnummer)", "1")
         await saveDefinitionButton.focus()
         await expect(page.getByText("Randnummer existiert nicht")).toBeVisible()
         await expect(saveDefinitionButton).toBeDisabled()
@@ -67,7 +67,7 @@ test.describe(
       })
 
       await test.step("Eintrag mit existierender Randnummer kann hinzugefügt werden", async () => {
-        await page.getByLabel("Definition des Begriffs").focus()
+        await page.getByLabel("Stelle im Text (Randnummer)").focus()
         await saveDefinitionButton.focus()
         await expect(page.getByText("Randnummer existiert nicht")).toBeHidden()
         await expect(saveDefinitionButton).toBeEnabled()
