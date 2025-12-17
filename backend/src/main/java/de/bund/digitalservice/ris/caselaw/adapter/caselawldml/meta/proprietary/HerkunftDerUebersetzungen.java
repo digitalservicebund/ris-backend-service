@@ -35,13 +35,13 @@ public class HerkunftDerUebersetzungen {
     @XmlElement(name = "FRBRlanguage", namespace = CaseLawLdml.AKN_NS)
     private FrbrLanguage frbrLanguage;
 
-    @XmlElement(name = "herkunftDerUebersetzungUebersetzerinnen", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "uebersetzerinnen", namespace = CaseLawLdml.RIS_NS)
     private Uebersetzerinnen uebersetzerinnen;
 
-    @XmlElement(name = "herkunftDerUebersetzungInterneVerlinkungen", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "interneVerlinkungen", namespace = CaseLawLdml.RIS_NS)
     private InterneVerlinkungen interneVerlinkungen;
 
-    @XmlElement(name = "herkunftDerUebersetzungExterneVerlinkungen", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "externeVerlinkungen", namespace = CaseLawLdml.RIS_NS)
     private ExterneVerlinkungen externeVerlinkungen;
 
     @XmlElement(name = "herkunftDerUebersetzungTyp", namespace = CaseLawLdml.RIS_NS)
@@ -100,7 +100,7 @@ public class HerkunftDerUebersetzungen {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Externe Verlinkungen";
 
-    @XmlElement(name = "herkunftDerUebersetzungExterneVerlinkung", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "externeVerlinkung", namespace = CaseLawLdml.RIS_NS)
     @SuppressWarnings("java:S1700")
     private List<ExterneVerlinkung> externeVerlinkungen;
   }

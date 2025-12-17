@@ -20,11 +20,11 @@ public class Gericht {
   @XmlAttribute(namespace = CaseLawLdml.AKN_NS, name = "refersTo")
   private String refersTo;
 
-  @XmlElement(name = "gerichtTyp", namespace = CaseLawLdml.RIS_NS)
-  private GerichtTyp typ;
+  @XmlElement(name = "gerichtstyp", namespace = CaseLawLdml.RIS_NS)
+  private Gerichtstyp gerichtstyp;
 
-  @XmlElement(name = "gerichtOrt", namespace = CaseLawLdml.RIS_NS)
-  private GerichtOrt ort;
+  @XmlElement(name = "gerichtsort", namespace = CaseLawLdml.RIS_NS)
+  private Gerichtsort gerichtsort;
 
   @XmlElement(name = "gerichtsbarkeit", namespace = CaseLawLdml.RIS_NS)
   private Gerichtsbarkeit gerichtsbarkeit;
@@ -39,7 +39,7 @@ public class Gericht {
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class GerichtTyp {
+  public static class Gerichtstyp {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Gerichtstyp";
 
@@ -50,7 +50,7 @@ public class Gericht {
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class GerichtOrt {
+  public static class Gerichtsort {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Gerichtsort";
 

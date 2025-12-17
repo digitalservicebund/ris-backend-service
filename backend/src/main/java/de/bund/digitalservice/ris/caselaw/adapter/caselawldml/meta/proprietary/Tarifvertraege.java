@@ -30,23 +30,23 @@ public class Tarifvertraege {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Tarifvertrag";
 
-    @XmlElement(name = "tarifvertragName", namespace = CaseLawLdml.RIS_NS)
-    private TarifvertragName name;
+    @XmlElement(name = "bezeichnung", namespace = CaseLawLdml.RIS_NS)
+    private TarifvertragBezeichnung bezeichnung;
 
-    @XmlElement(name = "tarifvertragTarifnorm", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "tarifnorm", namespace = CaseLawLdml.RIS_NS)
     private Tarifnorm tarifnorm;
 
-    @XmlElement(name = "tarifvertragDatum", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "datum", namespace = CaseLawLdml.RIS_NS)
     private TarifvertragDatum datum;
 
-    @XmlElement(name = "tarifvertragBranche", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "branche", namespace = CaseLawLdml.RIS_NS)
     private TarifvertragBranche branche;
 
     @NoArgsConstructor
     @AllArgsConstructor
     @Getter
     @Builder
-    public static class TarifvertragName {
+    public static class TarifvertragBezeichnung {
       @XmlAttribute(name = "domainTerm")
       private static final String DOMAIN_TERM = "Bezeichnung des Tarifvertrag";
 

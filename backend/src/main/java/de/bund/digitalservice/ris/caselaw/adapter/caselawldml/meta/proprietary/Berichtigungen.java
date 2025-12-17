@@ -33,19 +33,19 @@ public class Berichtigungen {
     @XmlAttribute(name = "domainTerm")
     private String domainTerm = "Berichtigung";
 
-    @XmlElement(name = "berichtigungArtDerEintragung", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "artDerEintragung", namespace = CaseLawLdml.RIS_NS)
     private ArtDerEintragung artDerEintragung;
 
-    @XmlElement(name = "berichtigungArtDerAenderung", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "artDerAenderung", namespace = CaseLawLdml.RIS_NS)
     private ArtDerAenderung artDerAenderung;
 
-    @XmlElement(name = "berichtigungDatumDerAenderung", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "datumDerAenderung", namespace = CaseLawLdml.RIS_NS)
     private DatumDerAenderung datumDerAenderung;
 
-    @XmlElement(name = "berichtigungRandnummern", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "randnummern", namespace = CaseLawLdml.RIS_NS)
     private Randnummern randnummern;
 
-    @XmlElement(name = "berichtigungInhaltDerAenderung", namespace = CaseLawLdml.RIS_NS)
+    @XmlElement(name = "inhaltDerAenderung", namespace = CaseLawLdml.RIS_NS)
     private InhaltDerAenderung inhaltDerAenderung;
 
     @NoArgsConstructor

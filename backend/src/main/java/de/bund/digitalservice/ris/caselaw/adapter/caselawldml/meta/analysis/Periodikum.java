@@ -17,16 +17,16 @@ public class Periodikum {
   @XmlAttribute(name = "domainTerm")
   private static final String DOMAIN_TERM = "Periodikum";
 
-  @XmlElement(name = "periodikumAbkuerzung", namespace = CaseLawLdml.RIS_NS)
-  private PeriodikumAbkuerzung periodikumAbkuerzung;
+  @XmlElement(name = "abkuerzung", namespace = CaseLawLdml.RIS_NS)
+  private PeriodikumAbkuerzung abkuerzung;
 
   @XmlElement(name = "periodikumTyp", namespace = CaseLawLdml.RIS_NS)
   private Typ typ;
 
-  @XmlElement(name = "periodikumTitel", namespace = CaseLawLdml.RIS_NS)
+  @XmlElement(name = "titel", namespace = CaseLawLdml.RIS_NS)
   private Titel titel;
 
-  @XmlElement(name = "periodikumUntertitel", namespace = CaseLawLdml.RIS_NS)
+  @XmlElement(name = "untertitel", namespace = CaseLawLdml.RIS_NS)
   private Untertitel untertitel;
 
   @NoArgsConstructor

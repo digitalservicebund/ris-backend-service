@@ -503,8 +503,8 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                       var tarifvertragBuilder = Tarifvertraege.Tarifvertrag.builder();
 
                       if (collectiveAgreement.name() != null) {
-                        tarifvertragBuilder.name(
-                            Tarifvertraege.Tarifvertrag.TarifvertragName.builder()
+                        tarifvertragBuilder.bezeichnung(
+                            Tarifvertraege.Tarifvertrag.TarifvertragBezeichnung.builder()
                                 .value(collectiveAgreement.name())
                                 .build());
                       }
@@ -666,16 +666,16 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
             .map(
                 objectValue ->
                     Gegenstandswerte.Gegenstandswert.builder()
-                        .gegenstandswertBetrag(
+                        .betrag(
                             Gegenstandswerte.GegenstandswertBetrag.builder()
                                 .value(String.valueOf(objectValue.amount()))
                                 .build())
-                        .gegenstandswertWaehrung(
+                        .waehrung(
                             Gegenstandswerte.GegenstandswertWaehrung.builder()
                                 .value(objectValue.currencyCode().isoCode())
                                 .build())
-                        .gegenstandswertVerfahren(
-                            Gegenstandswerte.GegenstandswertVerfahren.builder()
+                        .verfahren(
+                            Gegenstandswerte.Verfahren.builder()
                                 .value(objectValue.proceedingType().toString())
                                 .build())
                         .build())
@@ -691,16 +691,16 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
             .map(
                 abuseFee ->
                     Gebuehren.Gebuehr.builder()
-                        .gebuehrBetrag(
-                            Gebuehren.GebuehrBetrag.builder()
+                        .betrag(
+                            Gebuehren.Betrag.builder()
                                 .value(String.valueOf(abuseFee.amount()))
                                 .build())
-                        .gebuehrWaehrung(
-                            Gebuehren.GebuehrWaehrung.builder()
+                        .waehrung(
+                            Gebuehren.Waehrung.builder()
                                 .value(abuseFee.currencyCode().isoCode())
                                 .build())
-                        .gebuehrAdressat(
-                            Gebuehren.GebuehrAdressat.builder()
+                        .adressat(
+                            Gebuehren.Adressat.builder()
                                 .value(abuseFee.addressee().toString())
                                 .build())
                         .build())
@@ -718,8 +718,8 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                       var builder = Herkunftslaender.Herkunftsland.builder();
 
                       if (!StringUtils.isNullOrBlank(countryOfOrigin.legacyValue())) {
-                        builder.herkunftslandAltwert(
-                            Herkunftslaender.HerkunftslandAltwert.builder()
+                        builder.altwert(
+                            Herkunftslaender.Altwert.builder()
                                 .value(countryOfOrigin.legacyValue())
                                 .build());
                       }
@@ -733,8 +733,8 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                                 .build());
                       }
                       if (countryOfOrigin.fieldOfLaw() != null) {
-                        builder.herkunftslandRechtlicherRahmen(
-                            Herkunftslaender.HerkunftslandRechtlicherRahmen.builder()
+                        builder.rechtlicherRahmen(
+                            Herkunftslaender.RechtlicherRahmen.builder()
                                 .value(countryOfOrigin.fieldOfLaw().text())
                                 .notation(countryOfOrigin.fieldOfLaw().notation())
                                 .sachgebietId(countryOfOrigin.fieldOfLaw().identifier())
@@ -766,10 +766,8 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                     .build());
 
     if (incomeType.terminology() != null) {
-      builder.einkunftsartBegrifflichkeit(
-          Einkunftsarten.EinkunftsartBegrifflichkeit.builder()
-              .value(incomeType.terminology())
-              .build());
+      builder.begrifflichkeit(
+          Einkunftsarten.Begrifflichkeit.builder().value(incomeType.terminology()).build());
     }
 
     return builder.build();

@@ -30,21 +30,21 @@ public class Gebuehren {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Gebühr";
 
-    @XmlElement(name = "gebuehrBetrag", namespace = CaseLawLdml.RIS_NS)
-    private GebuehrBetrag gebuehrBetrag;
+    @XmlElement(name = "betrag", namespace = CaseLawLdml.RIS_NS)
+    private Betrag betrag;
 
-    @XmlElement(name = "gebuehrWaehrung", namespace = CaseLawLdml.RIS_NS)
-    private GebuehrWaehrung gebuehrWaehrung;
+    @XmlElement(name = "waehrung", namespace = CaseLawLdml.RIS_NS)
+    private Waehrung waehrung;
 
-    @XmlElement(name = "gebuehrAdressat", namespace = CaseLawLdml.RIS_NS)
-    private GebuehrAdressat gebuehrAdressat;
+    @XmlElement(name = "adressat", namespace = CaseLawLdml.RIS_NS)
+    private Adressat adressat;
   }
 
   @NoArgsConstructor
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class GebuehrBetrag {
+  public static class Betrag {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Betrag";
 
@@ -55,7 +55,7 @@ public class Gebuehren {
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class GebuehrWaehrung {
+  public static class Waehrung {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Währung";
 
@@ -66,7 +66,7 @@ public class Gebuehren {
   @AllArgsConstructor
   @Getter
   @Builder
-  public static class GebuehrAdressat {
+  public static class Adressat {
     @XmlAttribute(name = "domainTerm")
     private static final String DOMAIN_TERM = "Adressat";
 

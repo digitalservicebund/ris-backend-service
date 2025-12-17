@@ -512,7 +512,7 @@ class DecisionFullLdmlTransformerTest {
       String expectedRisMeta =
           """
           <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
-             <ris:gerichtTyp domainTerm="Gerichtstyp">BGH</ris:gerichtTyp>
+             <ris:gerichtstyp domainTerm="Gerichtstyp">BGH</ris:gerichtstyp>
              <ris:gerichtsbarkeit domainTerm="Gerichtsbarkeit">Ordentliche Gerichtsbarkeit</ris:gerichtsbarkeit>
          </ris:gericht>
          """;
@@ -559,7 +559,7 @@ class DecisionFullLdmlTransformerTest {
       String expectedRisMeta =
           """
           <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
-             <ris:gerichtTyp domainTerm="Gerichtstyp">Tribunal Economico-Administrativo Regional Katalonien</ris:gerichtTyp>
+             <ris:gerichtstyp domainTerm="Gerichtstyp">Tribunal Economico-Administrativo Regional Katalonien</ris:gerichtstyp>
          </ris:gericht>
          """;
       Decision decision =
@@ -605,8 +605,8 @@ class DecisionFullLdmlTransformerTest {
       String expectedRisMeta =
           """
           <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
-             <ris:gerichtTyp domainTerm="Gerichtstyp">AG</ris:gerichtTyp>
-             <ris:gerichtOrt domainTerm="Gerichtsort">Aachen</ris:gerichtOrt>
+             <ris:gerichtstyp domainTerm="Gerichtstyp">AG</ris:gerichtstyp>
+             <ris:gerichtsort domainTerm="Gerichtsort">Aachen</ris:gerichtsort>
              <ris:gerichtsbarkeit domainTerm="Gerichtsbarkeit">Ordentliche Gerichtsbarkeit</ris:gerichtsbarkeit>
          </ris:gericht>
          """;

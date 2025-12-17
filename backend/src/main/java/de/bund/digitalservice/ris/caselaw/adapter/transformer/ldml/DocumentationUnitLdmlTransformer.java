@@ -42,6 +42,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
@@ -356,8 +357,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     }
 
     if (isNotBlank(abbreviation)) {
-      builder.periodikumAbkuerzung(
-          Periodikum.PeriodikumAbkuerzung.builder().value(abbreviation).build());
+      builder.abkuerzung(Periodikum.PeriodikumAbkuerzung.builder().value(abbreviation).build());
     }
     if (isNotBlank(title)) {
       builder.titel(Periodikum.Titel.builder().value(title).build());
@@ -422,10 +422,13 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
           Dokumenttyp.builder().eId(null).value(relatedDocUnit.getDocumentType().label()).build());
     }
     if (relatedDocUnit.getDecisionDate() != null) {
-      builder.datum(
-          Rechtszug.Datum.builder()
-              .value(DateUtils.toDateString(relatedDocUnit.getDecisionDate()))
-              .build());
+      String date = DateUtils.toDateString(relatedDocUnit.getDecisionDate());
+
+      if (relatedDocUnit instanceof RelatedPendingProceeding) {
+        builder.mitteilungsdatum(Rechtszug.Mitteilungsdatum.builder().value(date).build());
+      } else {
+        builder.entscheidungsdatum(Rechtszug.Entscheidungsdatum.builder().value(date).build());
+      }
     }
     if (isNotBlank(relatedDocUnit.getDocumentNumber())) {
       builder.dokumentnummer(
@@ -445,10 +448,10 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
   default Gericht buildGericht(Court court) {
     Gericht.GerichtBuilder gerichtBuilder = Gericht.builder();
     if (isNotBlank(court.type())) {
-      gerichtBuilder.typ(Gericht.GerichtTyp.builder().value(court.type()).build());
+      gerichtBuilder.gerichtstyp(Gericht.Gerichtstyp.builder().value(court.type()).build());
     }
     if (isNotBlank(court.location())) {
-      gerichtBuilder.ort(Gericht.GerichtOrt.builder().value(court.location()).build());
+      gerichtBuilder.gerichtsort(Gericht.Gerichtsort.builder().value(court.location()).build());
     }
     if (isFullLDML() && isNotBlank(court.jurisdictionType())) {
       gerichtBuilder.gerichtsbarkeit(
