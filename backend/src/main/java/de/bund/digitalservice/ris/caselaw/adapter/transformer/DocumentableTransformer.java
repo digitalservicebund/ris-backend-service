@@ -32,6 +32,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -42,18 +43,16 @@ import lombok.extern.slf4j.Slf4j;
 public class DocumentableTransformer {
   DocumentableTransformer() {}
 
-  static boolean documentableContainsReferenceWithId(DocumentationUnit docUnit, UUID referenceID) {
-    boolean caselawReferencesContainId =
-        docUnit.caselawReferences() != null
-            && !docUnit.caselawReferences().isEmpty()
-            && referenceID.equals(docUnit.caselawReferences().getFirst().id());
+  static boolean documentableContainsReferenceWithId(DocumentationUnit docUnit, UUID referenceId) {
 
-    boolean literatureReferencesContainId =
-        docUnit.literatureReferences() != null
-            && !docUnit.literatureReferences().isEmpty()
-            && referenceID.equals(docUnit.literatureReferences().getFirst().id());
+    if (referenceId == null) {
+      return false;
+    }
 
-    return caselawReferencesContainId || literatureReferencesContainId;
+    return Stream.concat(
+            Optional.ofNullable(docUnit.caselawReferences()).orElse(List.of()).stream(),
+            Optional.ofNullable(docUnit.literatureReferences()).orElse(List.of()).stream())
+        .anyMatch(ref -> referenceId.equals(ref.id()));
   }
 
   static void addCaselawReferences(
