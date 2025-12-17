@@ -32,7 +32,7 @@ const modelValueList = ref<T[]>(
 ) as Ref<T[]>
 const localNewEntry = ref<T | undefined>() as Ref<T | undefined>
 const editableListContainer = ref(null)
-const focusAnchors = ref<Map<string, HTMLElement>>(new Map())
+const focusAnchors = ref<HTMLElement[]>([])
 const { scrollNearestRefIntoViewport } = useScroll()
 
 /**
@@ -91,10 +91,12 @@ async function handleAddFromSummary(newEntry: T) {
 
 async function resetFocus() {
   await nextTick()
-  if (!localNewEntry.value) return
-
-  const anchor = focusAnchors.value.get(localNewEntry.value.localId)
-  anchor?.focus()
+  const index = mergedValues.value.findIndex(
+    (item) => item.localId === localNewEntry.value?.localId,
+  )
+  if (index !== -1 && focusAnchors.value[index - 1]) {
+    focusAnchors.value[index - 1].focus()
+  }
 }
 
 async function toggleNewEntry(shouldDisplay: boolean) {
@@ -139,7 +141,7 @@ watch(
 )
 
 onBeforeUpdate(() => {
-  focusAnchors.value.clear()
+  focusAnchors.value = []
 })
 
 defineExpose({
@@ -199,8 +201,7 @@ defineExpose({
       <div
         :ref="
           (el) => {
-            if (el && entry.localId)
-              focusAnchors.set(entry.localId, el as HTMLElement)
+            if (el) focusAnchors[index] = el as HTMLElement
           }
         "
         class="sr-only absolute h-0 w-0 overflow-hidden"
