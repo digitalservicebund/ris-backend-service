@@ -955,7 +955,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
     CriteriaQuery<DocumentationUnitDTO> criteriaQuery =
         criteriaBuilder.createQuery(DocumentationUnitDTO.class);
-    Root<DocumentationUnitDTO> root = criteriaQuery.from(DocumentationUnitDTO.class);
+    Root<? extends DocumentationUnitDTO> root =
+        onlyPendingProceedings
+            ? criteriaQuery.from(PendingProceedingDTO.class)
+            : criteriaQuery.from(DocumentationUnitDTO.class);
 
     // Conditions setup
     Predicate conditions = criteriaBuilder.conjunction(); // Start with an empty conjunction (AND)
@@ -973,8 +976,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // 1. Filter by document number
     if (documentNumberToExclude != null) {
       Predicate documentNumberPredicate =
-          criteriaBuilder.notEqual(
-              root.get(DocumentationUnitDTO_.documentNumber), documentNumberToExclude);
+          criteriaBuilder.notEqual(root.get("documentNumber"), documentNumberToExclude);
       conditions = criteriaBuilder.and(conditions, documentNumberPredicate);
     }
 
@@ -982,7 +984,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     if (courtType != null) {
       Predicate courtTypePredicate =
           criteriaBuilder.like(
-              criteriaBuilder.upper(root.get(DocumentationUnitDTO_.court).get(CourtDTO_.type)),
+              criteriaBuilder.upper(root.get("court").get("type")),
               "%" + courtType.toUpperCase() + "%");
       conditions = criteriaBuilder.and(conditions, courtTypePredicate);
     }
@@ -991,26 +993,23 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     if (courtLocation != null) {
       Predicate courtLocationPredicate =
           criteriaBuilder.like(
-              criteriaBuilder.upper(root.get(DocumentationUnitDTO_.court).get(CourtDTO_.location)),
+              criteriaBuilder.upper(root.get("court").get("location")),
               "%" + courtLocation.toUpperCase() + "%");
       conditions = criteriaBuilder.and(conditions, courtLocationPredicate);
     }
 
     // 4. Filter by decision date
     if (decisionDate != null) {
-      Predicate decisionDatePredicate =
-          criteriaBuilder.equal(root.get(DocumentationUnitDTO_.date), decisionDate);
+      Predicate decisionDatePredicate = criteriaBuilder.equal(root.get("date"), decisionDate);
       conditions = criteriaBuilder.and(conditions, decisionDatePredicate);
     }
 
     // 5. Filter by file number
     if (fileNumber != null) {
-      Join<DocumentationUnitDTO, FileNumberDTO> fileNumberJoin =
-          root.join(DocumentationUnitDTO_.fileNumbers, JoinType.LEFT);
+      Join<DocumentationUnitDTO, String> fileNumberJoin = root.join("fileNumbers", JoinType.LEFT);
       Predicate fileNumberPredicate =
           criteriaBuilder.like(
-              criteriaBuilder.upper(fileNumberJoin.get(FileNumberDTO_.value)),
-              fileNumber.toUpperCase() + "%");
+              criteriaBuilder.upper(fileNumberJoin.get("value")), fileNumber.toUpperCase() + "%");
       conditions = criteriaBuilder.and(conditions, fileNumberPredicate);
     }
 
@@ -1018,54 +1017,47 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     if (documentType != null) {
       Predicate documentTypePredicate =
           criteriaBuilder.equal(
-              root.get(DocumentationUnitDTO_.documentType),
-              DocumentTypeTransformer.transformToDTO(documentType));
+              root.get("documentType"), DocumentTypeTransformer.transformToDTO(documentType));
       conditions = criteriaBuilder.and(conditions, documentTypePredicate);
     }
 
-    // 7. Filter by document number
+    // 7. Filter by publication status
+    final String PUBLICATION_STATUS = "publicationStatus";
+    final String STATUS = "status";
+    Predicate documentationOfficeIdPredicate =
+        criteriaBuilder.equal(
+            root.get("documentationOffice").get("id"), documentationOfficeDTO.getId());
+
+    // 8. Filter by document number
     if (documentNumber != null) {
       conditions =
           criteriaBuilder.and(
               conditions,
               criteriaBuilder.like(
-                  criteriaBuilder.upper(root.get(DocumentationUnitDTO_.documentNumber)),
+                  criteriaBuilder.upper(root.get("documentNumber")),
                   "%" + documentNumber.trim().toUpperCase() + "%"));
     }
-
-    // 8. Filter by onlyPendingProceedings
-    if (onlyPendingProceedings) {
-      conditions =
-          criteriaBuilder.and(
-              conditions, criteriaBuilder.equal(root.type(), PendingProceedingDTO.class));
-    }
-
-    // 9. Filter by publication status
-    Predicate documentationOfficeIdPredicate =
-        criteriaBuilder.equal(
-            root.get(DocumentationUnitDTO_.documentationOffice).get(DocumentationOfficeDTO_.id),
-            documentationOfficeDTO.getId());
 
     Predicate publicationStatusPredicate =
         criteriaBuilder.or(
             criteriaBuilder.equal(
-                root.get(DocumentationUnitDTO_.status).get(StatusDTO_.publicationStatus),
-                PublicationStatus.PUBLISHED),
+                root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.PUBLISHED),
             criteriaBuilder.equal(
-                root.get(DocumentationUnitDTO_.status).get(StatusDTO_.publicationStatus),
-                PublicationStatus.PUBLISHING));
+                root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.PUBLISHING));
 
     Predicate externalHandoverPendingPredicate =
-        criteriaBuilder.and(
-            criteriaBuilder.equal(
-                root.get(DocumentationUnitDTO_.status).get(StatusDTO_.publicationStatus),
-                PublicationStatus.EXTERNAL_HANDOVER_PENDING),
-            criteriaBuilder.equal(
-                criteriaBuilder
-                    .treat(root, DecisionDTO.class)
-                    .get(DecisionDTO_.creatingDocumentationOffice)
-                    .get(DocumentationOfficeDTO_.id),
-                documentationOfficeDTO.getId()));
+        // PendingProceedings don't have a `creatingDocumentationOffice` so this predicate does not
+        // work when filtering
+        // for PendingProceedings.
+        onlyPendingProceedings
+            ? criteriaBuilder.disjunction()
+            : criteriaBuilder.and(
+                criteriaBuilder.equal(
+                    root.get(STATUS).get(PUBLICATION_STATUS),
+                    PublicationStatus.EXTERNAL_HANDOVER_PENDING),
+                criteriaBuilder.equal(
+                    root.get("creatingDocumentationOffice").get("id"),
+                    documentationOfficeDTO.getId()));
 
     Predicate finalPredicate =
         criteriaBuilder.or(

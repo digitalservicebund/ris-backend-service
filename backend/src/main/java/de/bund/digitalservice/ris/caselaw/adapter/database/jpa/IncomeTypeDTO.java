@@ -17,8 +17,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 @Getter
 @Setter
@@ -38,7 +38,7 @@ public class IncomeTypeDTO {
 
   @Column(name = "type_of_income")
   @Enumerated(EnumType.STRING)
-  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+  @JdbcType(PostgreSQLEnumJdbcType.class)
   private TypeOfIncome typeOfIncome;
 
   @Column @NotNull private Long rank;

@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,10 +23,8 @@ public class LegalForceTypeController {
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<List<LegalForceType>> getLegalForceTypes(
+  public List<LegalForceType> getLegalForceTypes(
       @RequestParam(value = "q", required = false) String searchStr) {
-    return ResponseEntity.ok()
-        .cacheControl(CacheControlDefaults.staticValues())
-        .body(service.getLegalForceTypes(searchStr));
+    return service.getLegalForceTypes(searchStr);
   }
 }

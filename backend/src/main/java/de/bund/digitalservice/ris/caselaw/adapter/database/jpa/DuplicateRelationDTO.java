@@ -21,8 +21,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 @Getter
 @Setter
@@ -37,7 +37,7 @@ public class DuplicateRelationDTO {
 
   @Column(name = "status")
   @Enumerated(EnumType.STRING)
-  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+  @JdbcType(PostgreSQLEnumJdbcType.class)
   private DuplicateRelationStatus relationStatus;
 
   @ManyToOne(fetch = FetchType.LAZY)

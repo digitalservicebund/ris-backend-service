@@ -2,6 +2,9 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
@@ -17,8 +20,6 @@ import org.docx4j.org.apache.xalan.processor.TransformerFactoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
 
 @Tag("integration")
 class JurisXmlExporterWrapperIntegrationTest {
@@ -31,7 +32,9 @@ class JurisXmlExporterWrapperIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    objectMapper = JsonMapper.builder().build();
+    objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
   }
 
   @Test

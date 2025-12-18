@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.caselaw.webtestclient;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import java.net.URI;
 import java.util.Objects;
@@ -14,8 +16,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.util.UriComponentsBuilder;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
 
 public class RisRequestSpec {
   private final MockMvc mockMvc;
@@ -132,7 +132,7 @@ public class RisRequestSpec {
       try {
         String jsonString = objectMapper.writeValueAsString(bodySupplier.get());
         request.content(jsonString);
-      } catch (JacksonException e) {
+      } catch (JsonProcessingException e) {
         throw new RuntimeException(e);
       }
     } else if (json != null) {
