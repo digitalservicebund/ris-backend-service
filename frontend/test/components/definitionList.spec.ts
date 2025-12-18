@@ -51,7 +51,9 @@ describe("DefinitionList", () => {
       screen.getByRole("textbox", { name: /definierter begriff/i }),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole("spinbutton", { name: /definition des begriffs/i }),
+      screen.getByRole("spinbutton", {
+        name: /stelle im text \(randnummer\)/i,
+      }),
     ).toBeInTheDocument()
     expect(
       screen.getByRole("button", { name: /definition speichern/i }),
@@ -61,7 +63,9 @@ describe("DefinitionList", () => {
   test("Definierter Begriff is required", async () => {
     renderComponent()
     await userEvent.type(
-      screen.getByRole("spinbutton", { name: /definition des begriffs/i }),
+      screen.getByRole("spinbutton", {
+        name: /stelle im text \(randnummer\)/i,
+      }),
       "1",
     )
     await userEvent.click(
@@ -77,7 +81,9 @@ describe("DefinitionList", () => {
   test("Randnummer only allows number input", async () => {
     renderComponent()
     await userEvent.type(
-      screen.getByRole("spinbutton", { name: /definition des begriffs/i }),
+      screen.getByRole("spinbutton", {
+        name: /stelle im text \(randnummer\)/i,
+      }),
       "abc",
     )
     await userEvent.click(
@@ -85,14 +91,18 @@ describe("DefinitionList", () => {
     )
 
     expect(
-      screen.getByRole("spinbutton", { name: /definition des begriffs/i }),
+      screen.getByRole("spinbutton", {
+        name: /stelle im text \(randnummer\)/i,
+      }),
     ).toHaveValue("")
   })
 
   test("Only valid Randnummer is allowed", async () => {
     renderComponent()
     await userEvent.type(
-      screen.getByRole("spinbutton", { name: /definition des begriffs/i }),
+      screen.getByRole("spinbutton", {
+        name: /stelle im text \(randnummer\)/i,
+      }),
       "3",
     )
     await userEvent.click(
@@ -110,7 +120,9 @@ describe("DefinitionList", () => {
       "abc",
     )
     await userEvent.type(
-      screen.getByRole("spinbutton", { name: /definition des begriffs/i }),
+      screen.getByRole("spinbutton", {
+        name: /stelle im text \(randnummer\)/i,
+      }),
       "2",
     )
     await userEvent.click(
@@ -139,7 +151,9 @@ describe("DefinitionList", () => {
       screen.getByRole("textbox", { name: /definierter begriff/i }),
     ).toHaveValue("")
     expect(
-      screen.getByRole("spinbutton", { name: /definition des begriffs/i }),
+      screen.getByRole("spinbutton", {
+        name: /stelle im text \(randnummer\)/i,
+      }),
     ).toHaveValue("")
   })
 
@@ -168,7 +182,9 @@ describe("DefinitionList", () => {
     )
 
     await userEvent.dblClick(
-      screen.getByRole("spinbutton", { name: /definition des begriffs/i }),
+      screen.getByRole("spinbutton", {
+        name: /stelle im text \(randnummer\)/i,
+      }),
     )
     await userEvent.keyboard("1")
 
@@ -185,7 +201,9 @@ describe("DefinitionList", () => {
       screen.getByRole("textbox", { name: /definierter begriff/i }),
     ).toHaveValue("")
     expect(
-      screen.getByRole("spinbutton", { name: /definition des begriffs/i }),
+      screen.getByRole("spinbutton", {
+        name: /stelle im text \(randnummer\)/i,
+      }),
     ).toHaveValue("")
   })
 })

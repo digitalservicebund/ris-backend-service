@@ -105,13 +105,13 @@ onMounted(() => {
         id="definitionDefiningBorderNumberInput"
         v-slot="slotProps"
         data-testid="definition-defining-border-number"
-        label="Definition des Begriffs"
+        label="Stelle im Text (Randnummer)"
         :validation-error="validationStore.getByField('definingBorderNumber')"
       >
         <InputNumber
           id="definitionDefiningBorderNumberInputText"
           v-model="definition.definingBorderNumber"
-          aria-label="Definition des Begriffs"
+          aria-label="Stelle im Text (Randnummer)"
           class="w-full"
           data-testid="definition-defining-border-number-input"
           input-class="w-full"
