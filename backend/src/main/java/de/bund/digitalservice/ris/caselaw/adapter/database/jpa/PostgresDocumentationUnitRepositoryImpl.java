@@ -955,10 +955,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
     CriteriaQuery<DocumentationUnitDTO> criteriaQuery =
         criteriaBuilder.createQuery(DocumentationUnitDTO.class);
-    Root<? extends DocumentationUnitDTO> root =
-        onlyPendingProceedings
-            ? criteriaQuery.from(PendingProceedingDTO.class)
-            : criteriaQuery.from(DecisionDTO.class);
+    Root<DocumentationUnitDTO> root = criteriaQuery.from(DocumentationUnitDTO.class);
 
     // Conditions setup
     Predicate conditions = criteriaBuilder.conjunction(); // Start with an empty conjunction (AND)
@@ -1038,6 +1035,12 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                   "%" + documentNumber.trim().toUpperCase() + "%"));
     }
 
+    if (onlyPendingProceedings) {
+      conditions =
+          criteriaBuilder.and(
+              conditions, criteriaBuilder.equal(root.type(), PendingProceedingDTO.class));
+    }
+
     Predicate publicationStatusPredicate =
         criteriaBuilder.or(
             criteriaBuilder.equal(
@@ -1046,18 +1049,16 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                 root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.PUBLISHING));
 
     Predicate externalHandoverPendingPredicate =
-        // PendingProceedings don't have a `creatingDocumentationOffice` so this predicate does not
-        // work when filtering
-        // for PendingProceedings.
-        onlyPendingProceedings
-            ? criteriaBuilder.disjunction()
-            : criteriaBuilder.and(
-                criteriaBuilder.equal(
-                    root.get(STATUS).get(PUBLICATION_STATUS),
-                    PublicationStatus.EXTERNAL_HANDOVER_PENDING),
-                criteriaBuilder.equal(
-                    root.get("creatingDocumentationOffice").get("id"),
-                    documentationOfficeDTO.getId()));
+        criteriaBuilder.and(
+            criteriaBuilder.equal(
+                root.get(STATUS).get(PUBLICATION_STATUS),
+                PublicationStatus.EXTERNAL_HANDOVER_PENDING),
+            criteriaBuilder.equal(
+                criteriaBuilder
+                    .treat(root, DecisionDTO.class)
+                    .get("creatingDocumentationOffice")
+                    .get("id"),
+                documentationOfficeDTO.getId()));
 
     Predicate finalPredicate =
         criteriaBuilder.or(
