@@ -16,7 +16,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrElement;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrThis;
@@ -167,7 +166,7 @@ class PortalPublicationServiceTest {
   }
 
   @BeforeEach
-  void mockReset() throws JsonProcessingException {
+  void mockReset() {
     subject =
         new PortalPublicationService(
             documentationUnitRepository,
@@ -626,7 +625,7 @@ class PortalPublicationServiceTest {
     class WithdrawDocumentationUnitWithChangelog {
       @Test
       void withdrawWithChangelog_shouldDeleteFromBucketAndWriteDeletionChangelog()
-          throws DocumentationUnitNotExistsException, JsonProcessingException {
+          throws DocumentationUnitNotExistsException {
         Decision decision =
             Decision.builder()
                 .uuid(UUID.randomUUID())
@@ -739,7 +738,7 @@ class PortalPublicationServiceTest {
     @Nested
     class UploadChangelog {
       @Test
-      void uploadChangelog_shouldUpload() throws JsonProcessingException {
+      void uploadChangelog_shouldUpload() {
         var changelogContent =
             """
                 {"changed":["1/1.xml"],"deleted":[]}
@@ -764,7 +763,7 @@ class PortalPublicationServiceTest {
     @Nested
     class UploadDeletionChangelog {
       @Test
-      void uploadDeletionChangelog_shouldUpload() throws JsonProcessingException {
+      void uploadDeletionChangelog_shouldUpload() {
         var changelogContent =
             """
                 {"deleted":[123/123.xml]}
@@ -787,8 +786,7 @@ class PortalPublicationServiceTest {
       }
 
       @Test
-      void uploadFullReindexChangelog_withRegularChangelogsDisabled_shouldUpload()
-          throws JsonProcessingException {
+      void uploadFullReindexChangelog_withRegularChangelogsDisabled_shouldUpload() {
         var changelogContent =
             """
                 {"changeAll":true}
