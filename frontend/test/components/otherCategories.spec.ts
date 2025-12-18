@@ -169,25 +169,9 @@ describe("other categories", () => {
       routes: routes,
     })
 
-    test("should not display collective agreements button when it is empty and not a labor court", async () => {
+    test("should display collective agreements button when it is empty", async () => {
       // Arrange
-      mockSessionStore({ collectiveAgreements: [] }, BVerfG)
-
-      // Act
-      render(OtherCategories)
-
-      // Assert
-      expect(
-        screen.queryByRole("button", { name: "Tarifvertrag" }),
-      ).not.toBeInTheDocument()
-      expect(
-        screen.queryByRole("textbox", { name: "Tarifvertrag Input" }),
-      ).not.toBeInTheDocument()
-    })
-
-    test("should display collective agreements button when it is empty and labor court", async () => {
-      // Arrange
-      mockSessionStore({ collectiveAgreements: [] }, LArbG)
+      mockSessionStore({ collectiveAgreements: [] })
 
       // Act
       render(OtherCategories)
@@ -201,7 +185,7 @@ describe("other categories", () => {
       ).not.toBeInTheDocument()
     })
 
-    test("should display collective agreements when it is not empty without labor court", async () => {
+    test("should display collective agreements when it is not empty", async () => {
       // Arrange
       mockSessionStore(
         {
@@ -753,11 +737,6 @@ const BVerfG: Court = {
 const BAG: Court = {
   label: "BAG",
   type: "BAG",
-  jurisdictionType: "Arbeitsgerichtsbarkeit",
-}
-const LArbG: Court = {
-  label: "LArbG Hamburg",
-  type: "LArbG",
   jurisdictionType: "Arbeitsgerichtsbarkeit",
 }
 const BGH: Court = {
