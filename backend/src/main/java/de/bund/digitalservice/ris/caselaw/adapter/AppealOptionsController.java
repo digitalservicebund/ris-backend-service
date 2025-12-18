@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealStatus;
 import de.bund.digitalservice.ris.caselaw.domain.appeal.Appellant;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,8 +29,10 @@ public class AppealOptionsController {
    */
   @GetMapping("/appellants")
   @PreAuthorize("isAuthenticated()")
-  public List<Appellant> getAppellants() {
-    return appealOptionsService.getAppellantOptions();
+  public ResponseEntity<List<Appellant>> getAppellants() {
+    return ResponseEntity.ok()
+        .cacheControl(CacheControlDefaults.staticValues())
+        .body(appealOptionsService.getAppellantOptions());
   }
 
   /**
@@ -40,7 +43,9 @@ public class AppealOptionsController {
    */
   @GetMapping("/statuses")
   @PreAuthorize("isAuthenticated()")
-  public List<AppealStatus> getStatuses() {
-    return appealOptionsService.getAppealStatusOptions();
+  public ResponseEntity<List<AppealStatus>> getStatuses() {
+    return ResponseEntity.ok()
+        .cacheControl(CacheControlDefaults.staticValues())
+        .body(appealOptionsService.getAppealStatusOptions());
   }
 }
