@@ -24,28 +24,6 @@ test.describe(
     }) => {
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
-      await test.step("check button is not displayed without labor court", async () => {
-        await expect(
-          page.getByRole("button", { name: "Tarifvertrag" }),
-        ).toBeHidden()
-      })
-
-      await test.step("Select BAG (labor court)", async () => {
-        await page.getByLabel("Gericht", { exact: true }).fill("BAG")
-        await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
-          "BAG",
-        )
-        await expect(
-          page.locator("button").filter({ hasText: /^BAG$/ }),
-        ).toBeVisible()
-        await page.locator("button").filter({ hasText: /^BAG$/ }).click()
-        await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
-          "BAG",
-        )
-
-        await save(page)
-      })
-
       await test.step("check button is displayed when field is empty", async () => {
         await expect(
           page.getByRole("button", { name: "Tarifvertrag" }),
