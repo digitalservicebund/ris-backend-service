@@ -22,8 +22,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Getter
 @Setter
@@ -43,7 +43,7 @@ public class OriginOfTranslationDTO {
 
   @Column(name = "translation_type")
   @Enumerated(EnumType.STRING)
-  @JdbcType(PostgreSQLEnumJdbcType.class)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   private TranslationType translationType;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

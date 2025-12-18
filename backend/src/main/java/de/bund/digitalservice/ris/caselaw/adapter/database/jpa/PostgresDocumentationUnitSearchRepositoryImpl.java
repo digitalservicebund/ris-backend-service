@@ -18,6 +18,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Nulls;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
@@ -35,7 +36,6 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.query.NullPrecedence;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.hibernate.query.criteria.JpaPredicate;
 import org.jetbrains.annotations.NotNull;
@@ -564,14 +564,12 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     if (parameters.scheduledOnly || parameters.handoverDate.isPresent()) {
       orderCriteria.add(
           cb.desc(root.get(DocumentationUnitDTO_.scheduledPublicationDateTime))
-              .nullPrecedence(NullPrecedence.LAST));
+              .nullPrecedence(Nulls.LAST));
       orderCriteria.add(
-          cb.desc(root.get(DocumentationUnitDTO_.lastHandoverDateTime))
-              .nullPrecedence(NullPrecedence.LAST));
+          cb.desc(root.get(DocumentationUnitDTO_.lastHandoverDateTime)).nullPrecedence(Nulls.LAST));
     }
 
-    orderCriteria.add(
-        cb.desc(root.get(DocumentationUnitDTO_.date)).nullPrecedence(NullPrecedence.LAST));
+    orderCriteria.add(cb.desc(root.get(DocumentationUnitDTO_.date)).nullPrecedence(Nulls.LAST));
     orderCriteria.add(cb.desc(root.get(DocumentationUnitDTO_.documentNumber)));
     return orderCriteria;
   }

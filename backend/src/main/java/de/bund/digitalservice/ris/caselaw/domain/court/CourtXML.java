@@ -2,8 +2,8 @@ package de.bund.digitalservice.ris.caselaw.domain.court;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.Data;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 @Data
 @JsonIgnoreProperties(value = {"synonym", "spruchkoerper"})

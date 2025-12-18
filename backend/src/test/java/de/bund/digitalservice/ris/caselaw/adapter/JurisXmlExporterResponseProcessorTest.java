@@ -57,11 +57,16 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @Import({JurisXmlExporterResponseProcessor.class, JurisMessageWrapperFactory.class})
 class JurisXmlExporterResponseProcessorTest {
   private static final String DOCUMENT_NUMBER = "KORE123456789";
