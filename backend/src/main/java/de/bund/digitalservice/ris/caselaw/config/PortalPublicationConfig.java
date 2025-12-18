@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.config;
 
-import de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.ReducedLdmlTransformer;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.springframework.context.annotation.Bean;

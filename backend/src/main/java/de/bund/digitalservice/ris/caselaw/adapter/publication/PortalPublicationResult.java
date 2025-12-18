@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter;
+package de.bund.digitalservice.ris.caselaw.adapter.publication;
 
 import java.util.List;
 

@@ -3,14 +3,16 @@ import { LdmlPreview } from "@/components/input/types"
 import errorMessages from "@/i18n/errors.json"
 
 interface PublishDocumentationUnitService {
-  publishDocument(documentUnitUuid: string): Promise<ServiceResponse<void>>
+  publishDocument(
+    documentUnitUuid: string,
+  ): Promise<ServiceResponse<PublicationResult>>
   withdrawDocument(documentUnitUuid: string): Promise<ServiceResponse<void>>
   getPreview(documentUnitUuid: string): Promise<ServiceResponse<LdmlPreview>>
 }
 
 const service: PublishDocumentationUnitService = {
   async publishDocument(documentUnitUuid: string) {
-    const response = await httpClient.put<string, void>(
+    const response = await httpClient.put<string, PublicationResult>(
       `caselaw/documentunits/${documentUnitUuid}/publish`,
     )
 
@@ -74,4 +76,7 @@ const service: PublishDocumentationUnitService = {
   },
 }
 
+export type PublicationResult = {
+  relatedPendingProceedingsPublicationResult: "SUCCESS" | "ERROR" | "NO_ACTION"
+}
 export default service

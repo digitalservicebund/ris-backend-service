@@ -165,3 +165,7 @@ function mockDocUnitStore({
 
   return mockedSessionStore
 }
+
+vi.mock("primevue/usetoast", () => ({
+  useToast: () => ({ add: vi.fn() }),
+}))

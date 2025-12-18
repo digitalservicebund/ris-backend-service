@@ -8,6 +8,9 @@ import static org.mockito.Mockito.when;
 
 import ch.qos.logback.classic.Level;
 import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalBucket;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalSanityCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import java.util.List;
 import java.util.Set;

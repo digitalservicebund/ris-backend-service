@@ -1,5 +1,7 @@
-package de.bund.digitalservice.ris.caselaw.adapter;
+package de.bund.digitalservice.ris.caselaw.adapter.publication;
 
+import de.bund.digitalservice.ris.caselaw.adapter.RiiService;
+import de.bund.digitalservice.ris.caselaw.adapter.S3Bucket;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;

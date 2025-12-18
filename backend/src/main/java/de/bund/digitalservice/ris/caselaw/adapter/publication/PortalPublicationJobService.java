@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter;
+package de.bund.digitalservice.ris.caselaw.adapter.publication;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
