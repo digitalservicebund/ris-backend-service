@@ -217,7 +217,7 @@ public class DocumentationUnitController {
 
     } catch (Exception e) {
       attachmentService.deleteByS3Path(attachmentPath, uuid, userService.getUser(oidcUser));
-      return ResponseEntity.unprocessableEntity().build();
+      return ResponseEntity.unprocessableContent().build();
     }
   }
 
@@ -362,7 +362,7 @@ public class DocumentationUnitController {
       @AuthenticationPrincipal OidcUser oidcUser) {
 
     if (!uuid.equals(decision.uuid())) {
-      return ResponseEntity.unprocessableEntity().body(Decision.builder().build());
+      return ResponseEntity.unprocessableContent().body(Decision.builder().build());
     }
     try {
       var du = service.updateDocumentationUnit(decision);
@@ -437,7 +437,7 @@ public class DocumentationUnitController {
               uuid, userService.getEmail(oidcUser), userService.getUser(oidcUser));
       if (handoverMail == null || !handoverMail.isSuccess()) {
         log.warn("Failed to send mail for documentation unit {}", uuid);
-        return ResponseEntity.unprocessableEntity().body(handoverMail);
+        return ResponseEntity.unprocessableContent().body(handoverMail);
       }
       service.saveSuccessfulHandover(uuid);
       return ResponseEntity.ok(handoverMail);
@@ -607,7 +607,7 @@ public class DocumentationUnitController {
               .success(false)
               .statusMessages(List.of(e.getMessage()))
               .build();
-      return ResponseEntity.unprocessableEntity().body(result);
+      return ResponseEntity.unprocessableContent().body(result);
     } catch (Exception e) {
       var result =
           LdmlTransformationResult.builder()

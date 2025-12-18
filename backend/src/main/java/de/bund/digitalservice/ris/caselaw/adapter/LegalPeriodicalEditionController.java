@@ -100,7 +100,7 @@ public class LegalPeriodicalEditionController {
     try {
       HandoverMail handoverMail = handoverService.handoverEditionAsMail(uuid, oidcUser.getEmail());
       if (!handoverMail.isSuccess()) {
-        return ResponseEntity.unprocessableEntity().body(handoverMail);
+        return ResponseEntity.unprocessableContent().body(handoverMail);
       }
       return ResponseEntity.ok(handoverMail);
     } catch (IOException e) {
