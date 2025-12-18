@@ -79,7 +79,11 @@ public class ConverterConfig {
     return new JurisXmlExporterWrapper(jsonMapper(), transformerFactory());
   }
 
-  /** Jackson 2 object mapper to support dependencies that still depend on it. */
+  /**
+   * Jackson 2 object mapper to support dependencies that still depend on it.
+   *
+   * @deprecated use {@link #jsonMapper()} instead
+   */
   @Bean
   @Primary
   @Deprecated(since = "2025-12-16")

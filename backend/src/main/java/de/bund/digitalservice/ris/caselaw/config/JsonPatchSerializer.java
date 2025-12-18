@@ -11,6 +11,8 @@ import tools.jackson.databind.ser.std.StdSerializer;
 /**
  * Custom JSON Serializer for {@link JsonPatch} as the library does not yet support Jackson 3. This
  * class will use Jackson 2 to serialize the JsonPatch.
+ *
+ * @deprecated will be removed once {@link JsonPatch} supports Jackson 3
  */
 @Deprecated(since = "2025-12-16")
 public class JsonPatchSerializer extends StdSerializer<JsonPatch> {
