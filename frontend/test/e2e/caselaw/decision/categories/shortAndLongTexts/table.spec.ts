@@ -725,6 +725,12 @@ test.describe("Editor: table tests", () => {
       tag: ["@RISDEV-6646"],
     },
     () => {
+      // eslint-disable-next-line playwright/no-skipped-test
+      test.skip(
+        ({ browserName }) => browserName !== "chromium",
+        "Skipping in engines other than chromium, reason playwright diriven for firefox and safari does not support copy paste type='text/html' from clipboard",
+      )
+
       test("Check style information on pasted table", async ({
         page,
         context,
