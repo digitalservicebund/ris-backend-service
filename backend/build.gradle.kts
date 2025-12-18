@@ -195,7 +195,7 @@ dependencies {
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.5")
     implementation("org.eclipse.angus:angus-mail:2.0.5")
-    implementation("com.icegreen:greenmail:2.1.7")
+    implementation("com.icegreen:greenmail:2.1.8")
 
     // package served by private repo, requires authentication:
     implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.46") {
@@ -210,10 +210,10 @@ dependencies {
     // for local development:
 //     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.118.jar"))
 
-    implementation("tools.jackson.core:jackson-core:3.0.2")
-    implementation("tools.jackson.core:jackson-databind:3.0.2")
+    implementation("tools.jackson.core:jackson-core:3.0.3")
+    implementation("tools.jackson.core:jackson-databind:3.0.3")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.20")
-    implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.0.2")
+    implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.0.3")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
@@ -234,16 +234,16 @@ dependencies {
     implementation("com.squareup.okio:okio-jvm:3.16.4")
 
     // CVE-2025-8916
-    implementation("org.bouncycastle:bcpkix-jdk18on:1.79")
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.83")
 
     // CVE-2025-51775
-    implementation("org.bitbucket.b_c:jose4j:0.9.4")
+    implementation("org.bitbucket.b_c:jose4j:0.9.6")
 
     // CVE-2025-48924
-    implementation("org.apache.commons:commons-lang3:3.18.0")
+    implementation("org.apache.commons:commons-lang3:3.20.0")
 
     // CVE-2025-67735
-    implementation("io.netty:netty-codec-http:4.1.129.Final")
+    implementation("io.netty:netty-codec-http:4.2.9.Final")
 
     val flywayCore = "org.flywaydb:flyway-core:11.19.0"
     implementation(flywayCore)
@@ -274,7 +274,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.1.11.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.2.0.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
