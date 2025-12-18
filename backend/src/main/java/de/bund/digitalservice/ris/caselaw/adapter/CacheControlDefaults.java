@@ -8,6 +8,6 @@ public final class CacheControlDefaults {
 
   /** These are typically used for static values (Wertetabellen) that rarely change like courts. */
   public static CacheControl staticValues() {
-    return CacheControl.maxAge(12, TimeUnit.HOURS).staleWhileRevalidate(7, TimeUnit.DAYS);
+    return CacheControl.maxAge(12, TimeUnit.HOURS).staleWhileRevalidate(1, TimeUnit.DAYS);
   }
 }
