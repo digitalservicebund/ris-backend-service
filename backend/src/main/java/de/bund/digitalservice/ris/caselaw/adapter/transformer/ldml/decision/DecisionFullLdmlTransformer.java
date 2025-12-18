@@ -403,10 +403,10 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
                                 Definitionen.Definition.DefinierterBegriff.builder()
                                     .value(definition.definedTerm())
                                     .build())
-                            .definierendeRandnummer(
+                            .stelleImText(
                                 definition.definingBorderNumber() == null
                                     ? null
-                                    : new Definitionen.Definition.DefinierendeRandnummer(
+                                    : new Definitionen.Definition.StelleImText(
                                         String.valueOf(definition.definingBorderNumber())))
                             .build())
                 .toList())

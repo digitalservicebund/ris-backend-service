@@ -35,7 +35,7 @@ public class Definitionen {
     private DefinierterBegriff definierterBegriff;
 
     @XmlElement(name = "ref", namespace = CaseLawLdml.AKN_NS)
-    private DefinierendeRandnummer definierendeRandnummer;
+    private StelleImText stelleImText;
 
     @NoArgsConstructor
     @AllArgsConstructor
@@ -49,9 +49,9 @@ public class Definitionen {
     }
 
     @NoArgsConstructor
-    public static class DefinierendeRandnummer extends RandnummerRef {
-      public DefinierendeRandnummer(String randnummer) {
-        super("Definierende Randnummer", randnummer);
+    public static class StelleImText extends RandnummerRef {
+      public StelleImText(String randnummer) {
+        super("Stelle im Text (Randnummer)", randnummer);
       }
     }
   }

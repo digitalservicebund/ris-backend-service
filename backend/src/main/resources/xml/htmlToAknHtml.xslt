@@ -338,7 +338,7 @@
     |ris:abweichendeDokumentnummern|ris:abweichendeDokumentnummer|ris:abweichendeEclis|ris:abweichenderEcli
     |ris:spruchkoerper|ris:sachgebiete|ris:sachgebiet|ris:rechtskraft|ris:vorgaenge|ris:vorgang
     |ris:dokumentarischeKurztexte|ris:orientierungssatz|ris:sonstigerOrientierungssatz|ris:entscheidungsnamen|ris:entscheidungsname|ris:titelzeile
-    |ris:eingangsarten|ris:eingangsart|ris:definitionen|ris:definition|ris:definierterBegriff|ris:definierendeRandnummer
+    |ris:eingangsarten|ris:eingangsart|ris:definitionen|ris:definition|ris:definierterBegriff|ris:stelleImText
     |ris:fremdsprachigeFassungen|ris:fremdsprachigeFassung|ris:evsf|ris:rechtsmittelzulassung|ris:rechtsmittelZugelassen|ris:rechtsmittelZugelassenDurch
     |ris:vorgehend|ris:entscheidungsdatum|ris:dokumentnummer
     |ris:nachgehend|ris:vermerk

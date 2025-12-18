@@ -240,7 +240,7 @@
                     <ris:definitionen ris:domainTerm="Definitionen">
                         <ris:definition ris:domainTerm="Definition">
                             <ris:definierterBegriff domainTerm="Definierter Begriff">indirekte Steuern</ris:definierterBegriff>
-                            <akn:ref ris:domainTerm="Definierende Randnummer" href="#randnummer-2">2</akn:ref>
+                            <akn:ref ris:domainTerm="Stelle im Text (Randnummer)" href="#randnummer-2">2</akn:ref>
                         </ris:definition>
                         <ris:definition ris:domainTerm="Definition">
                             <ris:definierterBegriff domainTerm="Definierter Begriff">Sachgesamtheit</ris:definierterBegriff>
