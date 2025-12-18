@@ -5,6 +5,7 @@ import {
   fillInput,
   fillNormInputs,
   navigateToCategoryImport,
+  navigateToReferences,
   save,
   searchForDocumentUnitToImport,
 } from "../utils/e2e-utils"
@@ -167,8 +168,9 @@ test.describe("category import", () => {
       })
 
       await test.step("add new reference to source document", async () => {
-        await page.goto(
-          `/caselaw/documentunit/${prefilledDocumentUnitWithReferences.documentNumber}/references`,
+        await navigateToReferences(
+          page,
+          prefilledDocumentUnitWithReferences.documentNumber ?? "",
         )
 
         await page

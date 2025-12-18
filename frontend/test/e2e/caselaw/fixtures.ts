@@ -386,7 +386,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           },
           caselawReferences: [
             {
-              id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -396,7 +395,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           ],
           literatureReferences: [
             {
-              id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical?.[0],
@@ -688,9 +686,14 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               admitted: true,
               by: AppealAdmitter.FG,
             },
-            // appellants: [
-            //   { id: "37213474-a727-4d85-8cc6-309d86944132", value: "Kläger" },
-            // ],
+            appeal: {
+              appellants: [
+                {
+                  id: "37213474-a727-4d85-8cc6-309d86944132",
+                  value: "Kläger",
+                },
+              ],
+            },
             collectiveAgreements: [
               {
                 name: "Stehende Bühnen",
