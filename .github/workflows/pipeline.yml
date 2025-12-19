@@ -350,7 +350,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@b9a9af4616125e37640447359ca8bd199a502d8d
+        uses: sigstore/cosign-installer@f14800521ef377428f8fdd1f9ccc6b2f900212ad
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - id: set-version
@@ -398,7 +398,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@b9a9af4616125e37640447359ca8bd199a502d8d
+        uses: sigstore/cosign-installer@f14800521ef377428f8fdd1f9ccc6b2f900212ad
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - id: set-version
