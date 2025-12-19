@@ -1,16 +1,3 @@
 neuris:
   loki:
     url: http://loki-dev.loki.svc.cluster.local:3100/loki/api/v1/push
-
-spring:
-  cloud:
-    kubernetes:
-      config:
-        fail-fast: true
-        sources:
-          - name: database-config
-          - name: ris-search-config
-      secrets:
-        enabled: true
-        fail-fast: true
-        paths: /etc/secrets
