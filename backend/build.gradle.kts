@@ -151,7 +151,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "2.0.2"
+    val testContainersVersion = "2.0.3"
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -164,7 +164,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:7.0.0")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:7.0.2")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
 
@@ -181,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.40.8"))
+    implementation(platform("software.amazon.awssdk:bom:2.40.9"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -194,7 +194,7 @@ dependencies {
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.5")
     implementation("org.eclipse.angus:angus-mail:2.0.5")
-    implementation("com.icegreen:greenmail:2.1.7")
+    implementation("com.icegreen:greenmail:2.1.8")
 
     // package served by private repo, requires authentication:
     implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.45") {
@@ -232,16 +232,16 @@ dependencies {
     implementation("com.squareup.okio:okio-jvm:3.16.4")
 
     // CVE-2025-8916
-    implementation("org.bouncycastle:bcpkix-jdk18on:1.79")
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.83")
 
     // CVE-2025-51775
-    implementation("org.bitbucket.b_c:jose4j:0.9.4")
+    implementation("org.bitbucket.b_c:jose4j:0.9.6")
 
     // CVE-2025-48924
-    implementation("org.apache.commons:commons-lang3:3.18.0")
+    implementation("org.apache.commons:commons-lang3:3.20.0")
 
     // CVE-2025-67735
-    implementation("io.netty:netty-codec-http:4.1.129.Final")
+    implementation("io.netty:netty-codec-http:4.2.9.Final")
 
     val flywayCore = "org.flywaydb:flyway-core:11.19.0"
     implementation(flywayCore)
@@ -255,7 +255,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.8.1")
-    testImplementation("org.springframework.security:spring-security-test:7.0.0")
+    testImplementation("org.springframework.security:spring-security-test:7.0.2")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter:$testContainersVersion")
