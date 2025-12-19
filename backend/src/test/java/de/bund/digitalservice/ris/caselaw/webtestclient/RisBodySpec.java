@@ -1,13 +1,13 @@
 package de.bund.digitalservice.ris.caselaw.webtestclient;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.integration.tests.RisEntityExchangeResult;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.test.web.servlet.ResultActions;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 public class RisBodySpec<T> {
