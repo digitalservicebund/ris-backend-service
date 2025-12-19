@@ -75,7 +75,7 @@ public class S3AttachmentService implements AttachmentService {
   public Attachment attachFileToDocumentationUnit(
       UUID documentationUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders, User user) {
     String fileName =
-        httpHeaders.containsKey("X-Filename")
+        httpHeaders.containsHeader("X-Filename")
             ? httpHeaders.getFirst("X-Filename")
             : "Kein Dateiname gefunden";
 

@@ -11,7 +11,7 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.5.8"
+    id("org.springframework.boot") version "4.0.0"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "8.1.0"
     id("org.sonarqube") version "7.2.1.6560"
@@ -153,7 +153,7 @@ sonar {
 dependencies {
     val testContainersVersion = "2.0.3"
 
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -161,12 +161,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-client") {
+    implementation("org.springframework.boot:spring-boot-starter-security-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
     implementation("org.springframework.security:spring-security-oauth2-resource-server:7.0.2")
+    implementation("org.springframework.boot:spring-boot-starter-flyway")
 
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:5.0.0")
 
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:4.33.2")
@@ -197,11 +198,11 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.8")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.45") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.46") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
-//     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.45.jar"))
+//     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.46.jar"))
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
@@ -209,10 +210,11 @@ dependencies {
     // for local development:
 //     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.118.jar"))
 
-    implementation("com.fasterxml.jackson.core:jackson-core:2.20.1")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.20.1")
+    implementation("tools.jackson.core:jackson-core:3.0.2")
+    implementation("tools.jackson.core:jackson-databind:3.0.2")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.20")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.20.1")
+    implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.0.2")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
@@ -251,6 +253,15 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
     }
+
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-redis-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-security-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-security-oauth2-client-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-flyway-test")
     testImplementation("org.mockito:mockito-junit-jupiter:5.21.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
@@ -263,7 +274,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.36.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.1.11.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

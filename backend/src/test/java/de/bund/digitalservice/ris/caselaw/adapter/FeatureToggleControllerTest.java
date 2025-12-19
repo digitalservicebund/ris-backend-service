@@ -1,16 +1,14 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
-import de.bund.digitalservice.ris.caselaw.domain.CourtService;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
-import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,57 +20,48 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = CourtController.class)
-@Import({SecurityConfig.class, TestConfig.class, DocumentNumberPatternConfig.class})
-class CourtControllerTest {
+@WebMvcTest(controllers = FeatureToggleController.class)
+@Import({SecurityConfig.class, TestConfig.class})
+class FeatureToggleControllerTest {
+
   @Autowired private RisWebTestClient risWebTestClient;
 
-  @MockitoBean private CourtService service;
+  @MockitoBean private FeatureToggleService service;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
 
   @Test
-  void testGetCourtsWithoutSize() {
-    when(service.getCourts(anyString(), anyInt())).thenReturn(new ArrayList<>());
+  void shouldReturnTrueForEnabledFlag() {
+    when(service.isEnabled("enabled_flag")).thenReturn(true);
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/courts")
+        .uri("/api/v1/feature-toggles/enabled_flag")
         .exchange()
         .expectStatus()
-        .isOk();
+        .isOk()
+        .expectBody(Boolean.class)
+        .consumeWith(result -> assertThat(result.getResponseBody()).isTrue());
 
-    verify(service, times(1)).getCourts(null, 200);
+    verify(service, times(1)).isEnabled("enabled_flag");
   }
 
   @Test
-  void testGetCourtsWithSize() {
-    when(service.getCourts(anyString(), anyInt())).thenReturn(new ArrayList<>());
+  void shouldReturnFalseForDisabledFlag() {
+    when(service.isEnabled("disabled_flag")).thenReturn(false);
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/courts?sz=100")
+        .uri("/api/v1/feature-toggles/disabled_flag")
+        .bodyValue(true)
         .exchange()
         .expectStatus()
-        .isOk();
+        .isOk()
+        .expectBody(Boolean.class)
+        .consumeWith(result -> assertThat(result.getResponseBody()).isFalse());
 
-    verify(service, times(1)).getCourts(null, 100);
-  }
-
-  @Test
-  void testGetCourtsWithQuery() {
-    when(service.getCourts(anyString(), anyInt())).thenReturn(new ArrayList<>());
-
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/courts?q=test")
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    verify(service, times(1)).getCourts("test", 200);
+    verify(service, times(1)).isEnabled("disabled_flag");
   }
 }
