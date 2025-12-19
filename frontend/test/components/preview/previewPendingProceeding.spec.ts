@@ -57,7 +57,7 @@ function renderComponent() {
                       },
                       previousProcedures: ["vorgang-0"],
                       legalEffect: "Ja",
-                      yearsOfDispute: ["2023"],
+                      yearsOfDispute: [2023],
                       sources: [{ value: SourceValue.Zeitschrift }],
                       isResolved: true,
                       resolutionDate: "2025-06-12",
