@@ -16,6 +16,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrElement;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrThis;
@@ -61,8 +63,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(SpringExtension.class)
 class PortalPublicationServiceTest {
@@ -166,7 +166,7 @@ class PortalPublicationServiceTest {
   }
 
   @BeforeEach
-  void mockReset() {
+  void mockReset() throws JsonProcessingException {
     subject =
         new PortalPublicationService(
             documentationUnitRepository,
@@ -439,7 +439,7 @@ class PortalPublicationServiceTest {
       @DisplayName("Should fail when changelog file cannot be created")
       void
           publishDocumentationUnitWithChangeLog_withChangelogFileCreationError_shouldThrowPublishException()
-              throws DocumentationUnitNotExistsException, JacksonException {
+              throws DocumentationUnitNotExistsException, JsonProcessingException {
         UUID documentationUnitId = UUID.randomUUID();
         User user = mock(User.class);
         when(documentationUnitRepository.findByUuid(documentationUnitId))
@@ -449,7 +449,7 @@ class PortalPublicationServiceTest {
         when(caseLawBucket.getAllFilenamesByPath(testDocumentUnit.documentNumber() + "/"))
             .thenReturn(new ArrayList<>(), List.of(withPrefix(testDocumentNumber)));
 
-        when(objectMapper.writeValueAsString(any())).thenThrow(JacksonException.class);
+        when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
 
         assertThatExceptionOfType(PublishException.class)
             .isThrownBy(
@@ -625,7 +625,7 @@ class PortalPublicationServiceTest {
     class WithdrawDocumentationUnitWithChangelog {
       @Test
       void withdrawWithChangelog_shouldDeleteFromBucketAndWriteDeletionChangelog()
-          throws DocumentationUnitNotExistsException {
+          throws DocumentationUnitNotExistsException, JsonProcessingException {
         Decision decision =
             Decision.builder()
                 .uuid(UUID.randomUUID())
@@ -688,8 +688,8 @@ class PortalPublicationServiceTest {
       }
 
       @Test
-      void withdrawWithChangelog_withJacksonException_shouldThrowChangelogException()
-          throws DocumentationUnitNotExistsException, JacksonException {
+      void withdrawWithChangelog_withJsonProcessingException_shouldThrowChangelogException()
+          throws DocumentationUnitNotExistsException, JsonProcessingException {
         UUID uuid = UUID.randomUUID();
         Decision decision =
             Decision.builder()
@@ -701,7 +701,7 @@ class PortalPublicationServiceTest {
         when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
             .thenReturn(List.of(withPrefix(testDocumentNumber)));
         User user = mock(User.class);
-        when(objectMapper.writeValueAsString(any())).thenThrow(JacksonException.class);
+        when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
 
         assertThatExceptionOfType(ChangelogException.class)
             .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
@@ -738,7 +738,7 @@ class PortalPublicationServiceTest {
     @Nested
     class UploadChangelog {
       @Test
-      void uploadChangelog_shouldUpload() {
+      void uploadChangelog_shouldUpload() throws JsonProcessingException {
         var changelogContent =
             """
                 {"changed":["1/1.xml"],"deleted":[]}
@@ -763,7 +763,7 @@ class PortalPublicationServiceTest {
     @Nested
     class UploadDeletionChangelog {
       @Test
-      void uploadDeletionChangelog_shouldUpload() {
+      void uploadDeletionChangelog_shouldUpload() throws JsonProcessingException {
         var changelogContent =
             """
                 {"deleted":[123/123.xml]}
@@ -786,7 +786,8 @@ class PortalPublicationServiceTest {
       }
 
       @Test
-      void uploadFullReindexChangelog_withRegularChangelogsDisabled_shouldUpload() {
+      void uploadFullReindexChangelog_withRegularChangelogsDisabled_shouldUpload()
+          throws JsonProcessingException {
         var changelogContent =
             """
                 {"changeAll":true}

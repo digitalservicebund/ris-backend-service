@@ -34,7 +34,7 @@ public class RisStatusAssertions {
 
   public RisResponseSpec isUnprocessableEntity() {
     try {
-      resultActions.andExpect(status().isUnprocessableContent());
+      resultActions.andExpect(status().isUnprocessableEntity());
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

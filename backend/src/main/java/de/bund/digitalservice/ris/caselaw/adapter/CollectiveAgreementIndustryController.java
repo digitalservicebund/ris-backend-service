@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreementIndustryServ
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,10 +29,8 @@ public class CollectiveAgreementIndustryController {
    */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<List<CollectiveAgreementIndustry>> getCollectiveAgreementIndustries(
+  public List<CollectiveAgreementIndustry> getCollectiveAgreementIndustries(
       @RequestParam(value = "q", required = false) String searchStr) {
-    return ResponseEntity.ok()
-        .cacheControl(CacheControlDefaults.staticValues())
-        .body(service.getCollectiveAgreementIndustries(searchStr));
+    return service.getCollectiveAgreementIndustries(searchStr);
   }
 }

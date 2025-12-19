@@ -1,0 +1,11 @@
+spring:
+  cloud:
+    kubernetes:
+      config:
+        enabled: true
+        fail-fast: true
+        name: database-config
+      secrets:
+        enabled: true
+        fail-fast: true
+        paths: /etc/secrets

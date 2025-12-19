@@ -1,31 +1,30 @@
 package de.bund.digitalservice.ris.caselaw.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverters;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
-  private final JsonMapper jsonMapper;
+  private final ObjectMapper objectMapper;
 
-  public WebMvcConfiguration(JsonMapper jsonMapper) {
-    this.jsonMapper = jsonMapper;
+  public WebMvcConfiguration(ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
   }
 
   @Override
-  public void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
-    builder
-        .addCustomConverter(byteArrayHttpMessageConverter())
-        .addCustomConverter(stringHttpMessageConverter())
-        .addCustomConverter(new JacksonJsonHttpMessageConverter(jsonMapper));
+  public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    converters.add(byteArrayHttpMessageConverter());
+    converters.add(stringHttpMessageConverter());
+    converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
   }
 
   private StringHttpMessageConverter stringHttpMessageConverter() {

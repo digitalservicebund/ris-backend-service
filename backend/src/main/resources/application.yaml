@@ -17,9 +17,6 @@ management:
       group:
         readiness:
           include: readinessState,redis,db
-      # Since the update to Spring Boot 4 the group membership validation thinks that redis is not available. This is
-      # wrong. Redis is still correctly included in the readiness check.
-      validate-group-membership: false
   endpoints:
     web:
       exposure:
@@ -62,11 +59,6 @@ logging:
 #    org.hibernate.type: TRACE
 #    org.hibernate.orm.jdbc.bind: trace
 spring:
-  cloud:
-    kubernetes:
-      config:
-        sources:
-          - name: database-config
   codec:
     max-in-memory-size: 100MB
   sql:
@@ -162,10 +154,3 @@ eurlex:
 
 bareid:
   instance: ${BAREID_INSTANCE}
-
----
-spring:
-  config:
-    import: "kubernetes:,configtree:/etc/secrets/*/"
-    activate:
-      on-cloud-platform: kubernetes

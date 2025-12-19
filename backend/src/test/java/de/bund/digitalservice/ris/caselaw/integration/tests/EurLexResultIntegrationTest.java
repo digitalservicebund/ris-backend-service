@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.PageTestImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseEurLexResultRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexResultRepository;
@@ -14,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-import tools.jackson.core.type.TypeReference;
 
 @Sql(
     scripts = {"classpath:eurlex_init.sql"},

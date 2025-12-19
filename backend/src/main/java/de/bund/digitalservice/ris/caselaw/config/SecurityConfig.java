@@ -5,7 +5,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -37,7 +36,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 public class SecurityConfig {
   @Bean
   @SuppressWarnings("java:S3330")
-  SecurityFilterChain web(HttpSecurity http) {
+  SecurityFilterChain web(HttpSecurity http) throws Exception {
     CookieCsrfTokenRepository tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
     XorCsrfTokenRequestAttributeHandler delegate = new XorCsrfTokenRequestAttributeHandler();
     // set the name of the attribute the CsrfToken will be populated on
@@ -102,7 +101,7 @@ public class SecurityConfig {
 
     @Override
     protected void doFilterInternal(
-        HttpServletRequest request, @NonNull HttpServletResponse response, FilterChain filterChain)
+        HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
       CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
       // Render the token value to a cookie by causing the deferred token to be loaded
