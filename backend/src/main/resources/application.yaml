@@ -62,6 +62,11 @@ logging:
 #    org.hibernate.type: TRACE
 #    org.hibernate.orm.jdbc.bind: trace
 spring:
+  cloud:
+    kubernetes:
+      config:
+        sources:
+          - name: database-config
   codec:
     max-in-memory-size: 100MB
   sql:
