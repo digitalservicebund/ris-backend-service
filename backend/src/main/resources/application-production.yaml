@@ -3,8 +3,6 @@ otc:
     bucket-name: neuris-document-storage-production
 
 spring:
-  config:
-    import: "kubernetes:,configtree:/etc/secrets/*/"
   data:
     redis:
       host: redis

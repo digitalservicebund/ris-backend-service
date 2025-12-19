@@ -7,8 +7,6 @@ error:
     active: true
 
 spring:
-  config:
-    import: "kubernetes:,configtree:/etc/secrets/*/"
   data:
     redis:
       host: redis

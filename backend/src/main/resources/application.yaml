@@ -162,3 +162,10 @@ eurlex:
 
 bareid:
   instance: ${BAREID_INSTANCE}
+
+---
+spring:
+  config:
+    import: "kubernetes:,configtree:/etc/secrets/*/"
+    activate:
+      on-cloud-platform: kubernetes
