@@ -1138,7 +1138,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           name: "2024, " + generateString(),
           references: [
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 12-22, Heft 1",
               referenceSupplement: "L",
@@ -1150,7 +1149,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
@@ -1162,7 +1160,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "literature",
               citation: "2024, 23-25, Heft 1",
               author: "Picard, Jean-Luc",
@@ -1175,7 +1172,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "literature",
               citation: "2024, 26, Heft 1",
               author: "Janeway, Kathryn",
@@ -1296,7 +1292,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           name: "2024, " + generateString(),
           references: [
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 12-22, Heft 1",
               referenceSupplement: "L",
@@ -1308,7 +1303,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
@@ -1320,7 +1314,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
@@ -1332,7 +1325,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
@@ -1344,7 +1336,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
