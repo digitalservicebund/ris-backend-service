@@ -22,6 +22,7 @@ import { DocumentationUnit } from "@/domain/documentationUnit"
 import { PublicationState } from "@/domain/publicationStatus"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
+import { Source } from "@/domain/source"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import FeatureToggleService from "@/services/featureToggleService"
@@ -221,23 +222,36 @@ async function addReference(decision: RelatedDocumentation) {
 async function addReferenceWithCreatedDocumentationUnit(
   docUnit: DocumentationUnit,
 ) {
-  if (!docUnit) return
-  await addReference(
-    new RelatedDocumentation({
+  const sources = docUnit.coreData?.sources as Source[] | undefined
+  const backendReference = sources?.[0]?.reference
+
+  if (!docUnit || !backendReference) {
+    console.error("Daten unvollständig", { docUnit, backendReference })
+    return
+  }
+  const newReference: Reference = new Reference({
+    ...backendReference,
+    citation: buildCitation() || backendReference.citation,
+    documentationUnit: new RelatedDocumentation({
       uuid: docUnit.uuid,
-      fileNumber: docUnit.coreData.fileNumbers
-        ? docUnit.coreData.fileNumbers[0]
-        : undefined,
+      fileNumber: docUnit.coreData.fileNumbers?.[0],
       decisionDate: docUnit.coreData.decisionDate,
       court: docUnit.coreData.court,
       documentType: docUnit.coreData.documentType,
       documentNumber: docUnit.documentNumber,
       status: docUnit.status,
-      createdByReference: reference.value.id,
+      createdByReference: backendReference.id,
       creatingDocOffice: docUnit.coreData.creatingDocOffice,
       documentationOffice: docUnit.coreData.documentationOffice,
     }),
-  )
+  })
+
+  validateRequiredInput(newReference)
+
+  if (validationStore.isValid()) {
+    emit("update:modelValue", newReference)
+    emit("addEntry")
+  }
 }
 
 /**
