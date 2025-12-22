@@ -97,7 +97,9 @@ test.describe(
 
       await test.step("Bei gelöschter Randnummer wird der Eintrag als fehlerhaft markiert", async () => {
         await navigateToCategories(page, documentNumber)
-        await page.getByTestId("Gründe").click()
+        const editor = page.getByTestId("Gründe")
+        await editor.click()
+        await editor.getByText("Text", { exact: true }).click()
         await page.keyboard.press(`ControlOrMeta+Alt+-`)
         await save(page)
         await expect(
