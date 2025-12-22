@@ -658,14 +658,18 @@ const isPublishable = computed<boolean>(
         </ul>
       </Message>
 
-      <InfoModal
+      <Message
         v-if="hasImages"
         aria-label="Übergabe an die jDV nicht möglich"
         class="mt-8"
-        description="Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV übergeben werden"
-        :status="InfoStatus.INFO"
-        title="Übergabe an die jDV nicht möglich"
-      />
+        severity="info"
+      >
+        <p class="ris-body1-bold">Übergabe an die jDV nicht möglich</p>
+        <p>
+          Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV
+          übergeben werden
+        </p>
+      </Message>
 
       <div>
         <Button

@@ -2,12 +2,12 @@
 import { UUID } from "crypto"
 import { useInterval } from "@vueuse/core"
 import Button from "primevue/button"
+import Message from "primevue/message"
 import { computed, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import PeriodicalEditionReferenceInput from "./PeriodicalEditionReferenceInput.vue"
 import PeriodicalEditionReferenceSummary from "./PeriodicalEditionReferenceSummary.vue"
 import EditableList from "@/components/EditableList.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import Reference from "@/domain/reference"
 import { ResponseError } from "@/services/httpClient"
@@ -80,10 +80,10 @@ watch(loadEditionIntervalCounter, async () => {
     <div class="flex w-full flex-col gap-24 bg-white p-24">
       <TitleElement data-testid="references-title">Fundstellen</TitleElement>
       <div v-if="responseError">
-        <InfoModal
-          :description="responseError.description"
-          :title="responseError.title"
-        />
+        <Message severity="error">
+          <p class="ris-body1-bold">{{ responseError.title }}</p>
+          <p>{{ responseError.description }}</p>
+        </Message>
       </div>
       <Button
         v-if="references.length > 3"

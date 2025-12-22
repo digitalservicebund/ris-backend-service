@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import Message from "primevue/message"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import { Preview } from "@/domain/eventRecord"
 import { ResponseError } from "@/services/httpClient"
 
@@ -33,12 +33,14 @@ defineProps<{
         :xml="item.xml!"
       />
     </ExpandableContent>
-    <InfoModal
+    <Message
       v-else-if="previewError"
       aria-label="Fehler beim Laden der Preview"
       class="mt-8"
-      :description="previewError.description"
-      :title="previewError.title"
-    />
+      severity="error"
+    >
+      <p class="ris-body1-bold">{{ previewError.title }}</p>
+      <p>{{ previewError.description }}</p>
+    </Message>
   </div>
 </template>
