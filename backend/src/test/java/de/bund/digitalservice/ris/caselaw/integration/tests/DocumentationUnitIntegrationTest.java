@@ -1793,7 +1793,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         DocumentationUnitCreationParameters.builder()
             .reference(
                 Reference.builder()
-                    .id(UUID.randomUUID())
                     .referenceType(ReferenceType.CASELAW)
                     .legalPeriodical(LegalPeriodicalTransformer.transformToDomain(legalPeriodical))
                     .legalPeriodicalRawValue(legalPeriodical.getAbbreviation())
@@ -1880,7 +1879,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             .documentationOffice(creatingDocumentationOffice)
             .reference(
                 Reference.builder()
-                    .id(UUID.randomUUID())
                     .referenceType(ReferenceType.CASELAW)
                     .legalPeriodical(LegalPeriodicalTransformer.transformToDomain(legalPeriodical))
                     .legalPeriodicalRawValue(legalPeriodical.getAbbreviation())
