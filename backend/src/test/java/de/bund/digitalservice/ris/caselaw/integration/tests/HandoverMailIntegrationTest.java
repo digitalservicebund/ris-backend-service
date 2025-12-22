@@ -228,7 +228,6 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
               .references(
                   List.of(
                       Reference.builder()
-                          .id(UUID.randomUUID())
                           .referenceType(ReferenceType.CASELAW)
                           .citation("citation")
                           .legalPeriodicalRawValue("ABC")
