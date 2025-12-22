@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import Button from "primevue/button"
+import Message from "primevue/message"
 import { onBeforeMount, ref } from "vue"
 import { useRouter } from "vue-router"
 import { getCategoryLabel } from "./categoryLabels"
-import InfoModal from "@/components/InfoModal.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import { Kind } from "@/domain/documentationUnitKind"
 // import router from "@/router"
@@ -85,10 +85,10 @@ onBeforeMount(async () => {
     <h2 class="ris-label1-bold mb-16">Rechtschreibprüfung</h2>
 
     <div v-if="responseError">
-      <InfoModal
-        :description="responseError.description"
-        :title="responseError.title"
-      />
+      <Message severity="error">
+        <p class="ris-body1-bold">{{ responseError.title }}</p>
+        <p>{{ responseError.description }}</p>
+      </Message>
     </div>
 
     <div v-else-if="loading" class="flex flex-col">

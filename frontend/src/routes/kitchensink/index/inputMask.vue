@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import InputMask from "primevue/inputmask"
+import Message from "primevue/message"
 import { reactive } from "vue"
-import { InfoStatus } from "@/components/enumInfoStatus"
-import InfoModal from "@/components/InfoModal.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
@@ -27,11 +26,14 @@ const validationStore = useValidationStore<["date", "dateInFuture"][number]>()
 
 <template>
   <KitchensinkPage name="Input Mask">
-    <InfoModal
-      description="In order to ensure a consistent layout for inputs, the actual input field must always be wrapped with an InputField containing the label and (if necessary) the error message."
-      :status="InfoStatus.INFO"
-      title="Code convention for usage of inputs"
-    />
+    <Message severity="info">
+      <p class="ris-body1-bold">Code convention for usage of inputs</p>
+      <p>
+        In order to ensure a consistent layout for inputs, the actual input
+        field must always be wrapped with an InputField containing the label and
+        (if necessary) the error message.
+      </p>
+    </Message>
 
     <KitchensinkStory name="Date, year, time">
       <InputField

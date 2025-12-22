@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
+import Message from "primevue/message"
 import { watch, ref, computed } from "vue"
 import PeriodicalEditionHandoverEventLog from "./PeriodicalEditionHandoverEventLog.vue"
 import PeriodicalEditionHandoverPreview from "./PeriodicalEditionHandoverPreview.vue"
-import { InfoStatus } from "@/components/enumInfoStatus"
-import InfoModal from "@/components/InfoModal.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import EventRecord, { HandoverMail, Preview } from "@/domain/eventRecord"
@@ -122,19 +121,24 @@ watch(
       />
 
       <!-- Handover -->
-      <InfoModal
+      <Message
         v-if="handoverError"
         aria-label="Fehler bei jDV Übergabe"
         class="mt-8"
-        v-bind="handoverError"
-      />
-      <InfoModal
+        severity="error"
+      >
+        <p class="ris-body1-bold">{{ handoverError.title }}</p>
+        <p>{{ handoverError.description }}</p>
+      </Message>
+      <Message
         v-else-if="handoverSucceedMessage"
         aria-label="Erfolg der jDV Übergabe"
         class="mt-8"
-        v-bind="handoverSucceedMessage"
-        :status="InfoStatus.SUCCEED"
-      />
+        severity="success"
+      >
+        <p class="ris-body1-bold">{{ handoverSucceedMessage.title }}</p>
+        <p>{{ handoverSucceedMessage.description }}</p>
+      </Message>
       <Button
         v-if="featureToggle"
         aria-label="Fundstellen der Ausgabe an jDV übergeben"

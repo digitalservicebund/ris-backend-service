@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
+import Message from "primevue/message"
 import { computed, onBeforeMount, Ref, ref } from "vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import HandoverDuplicateCheckView from "@/components/HandoverDuplicateCheckView.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import { LdmlPreview } from "@/components/input/types"
 import BorderNumberCheck from "@/components/publication/BorderNumberCheck.vue"
 import DecisionPlausibilityCheck from "@/components/publication/DecisionPlausibilityCheck.vue"
@@ -111,12 +111,14 @@ onBeforeMount(async () => {
       >
         <CodeSnippet title="" :xml="preview.ldml" />
       </ExpandableContent>
-      <InfoModal
+      <Message
         v-if="hasPlausibilityCheckPassed && previewError"
         aria-label="Fehler beim Laden der LDML-Vorschau"
-        :description="previewError.description"
-        :title="previewError.title"
-      />
+        severity="error"
+      >
+        <p class="ris-body1-bold">{{ previewError.title }}</p>
+        <p>{{ previewError.description }}</p>
+      </Message>
     </div>
     <div class="flex w-full flex-col gap-24 bg-white p-24">
       <TitleElement>Veröffentlichen und Zurückziehen</TitleElement>

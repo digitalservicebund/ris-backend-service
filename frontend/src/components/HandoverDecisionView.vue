@@ -1,13 +1,12 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
+import Message from "primevue/message"
 import { computed, onBeforeMount, Ref, ref } from "vue"
 import { RouterLink } from "vue-router"
 import ExpandableContent from "./ExpandableContent.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
-import { InfoStatus } from "@/components/enumInfoStatus"
 import HandoverDuplicateCheckView from "@/components/HandoverDuplicateCheckView.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import BorderNumberCheck from "@/components/publication/BorderNumberCheck.vue"
 import ScheduledPublishingDateTime from "@/components/ScheduledPublishingDateTime.vue"
@@ -34,6 +33,7 @@ import { DuplicateRelationStatus } from "@/domain/managementData"
 import PreviousDecision, {
   previousDecisionFieldLabels,
 } from "@/domain/previousDecision"
+import errorMessages from "@/i18n/errors.json"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -97,8 +97,18 @@ async function fetchPreview() {
   const previewResponse = await handoverDocumentationUnitService.getPreview(
     decision.value!.uuid,
   )
+
   if (previewResponse.error) {
     previewError.value = previewResponse.error
+  } else if (previewResponse.status >= 300 || !previewResponse.data?.success) {
+    previewError.value = {
+      title: errorMessages.DOCUMENT_UNIT_LOADING_XML_PREVIEW.title,
+      description:
+        previewResponse.data?.statusMessages &&
+        previewResponse.data.statusMessages.length > 0
+          ? previewResponse.data?.statusMessages
+          : errorMessages.DOCUMENT_UNIT_LOADING_XML_PREVIEW.description,
+    }
   } else if (previewResponse.data?.xml) {
     preview.value = previewResponse.data
   }
@@ -590,20 +600,35 @@ const isPublishable = computed<boolean>(
       >
         <CodeSnippet title="" :xml="preview.xml" />
       </ExpandableContent>
-      <InfoModal
+      <Message
         v-if="errorMessage"
         aria-label="Fehler bei jDV Übergabe"
         class="mt-8"
-        :description="errorMessage.description"
-        :title="errorMessage.title"
-      />
-      <InfoModal
+        severity="error"
+      >
+        <p class="ris-body1-bold">{{ errorMessage.title }}</p>
+        <ul
+          v-if="Array.isArray(errorMessage.description)"
+          class="m-0 list-disc ps-20"
+        >
+          <li
+            v-for="(description, index) in errorMessage.description"
+            :key="index"
+          >
+            {{ description }}
+          </li>
+        </ul>
+        <p v-else>{{ errorMessage.description }}</p>
+      </Message>
+      <Message
         v-else-if="succeedMessage"
         aria-label="Erfolg der jDV Übergabe"
         class="mt-8"
-        v-bind="succeedMessage"
-        :status="InfoStatus.SUCCEED"
-      />
+        severity="success"
+      >
+        <p class="ris-body1-bold">{{ succeedMessage.title }}</p>
+        <p>{{ succeedMessage.description }}</p>
+      </Message>
       <PopupModal
         v-if="showHandoverWarningModal"
         aria-label="Bestätigung für Übergabe bei Fehlern"
@@ -615,25 +640,36 @@ const isPublishable = computed<boolean>(
         @primary-action="confirmHandoverDialog"
       />
 
-      <InfoModal
-        v-if="env?.environment === 'uat'"
-        :description="[
-          'Dokumentationseinheiten werden in der jDV ohne Dokumentnummer erstellt',
-          'Diese sind auffindbar über Gericht=VGH Mannheim und Aktenzeichen und/oder Entscheidungsdatum der Entscheidung',
-          'Die Dokumentationseinheiten müssen manuell in der jDV gelöscht werden',
-        ]"
-        :status="InfoStatus.INFO"
-        title="UAT Testmodus für die Übergabe an die jDV"
-      />
+      <Message v-if="env?.environment === 'uat'" severity="info">
+        <p class="ris-body1-bold">UAT Testmodus für die Übergabe an die jDV</p>
+        <ul class="m-0 list-disc ps-20">
+          <li>
+            Dokumentationseinheiten werden in der jDV ohne Dokumentnummer
+            erstellt
+          </li>
+          <li>
+            Diese sind auffindbar über Gericht=VGH Mannheim und Aktenzeichen
+            und/oder Entscheidungsdatum der Entscheidung
+          </li>
+          <li>
+            Die Dokumentationseinheiten müssen manuell in der jDV gelöscht
+            werden
+          </li>
+        </ul>
+      </Message>
 
-      <InfoModal
+      <Message
         v-if="hasImages"
         aria-label="Übergabe an die jDV nicht möglich"
         class="mt-8"
-        description="Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV übergeben werden"
-        :status="InfoStatus.INFO"
-        title="Übergabe an die jDV nicht möglich"
-      />
+        severity="info"
+      >
+        <p class="ris-body1-bold">Übergabe an die jDV nicht möglich</p>
+        <p>
+          Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV
+          übergeben werden
+        </p>
+      </Message>
 
       <div>
         <Button

@@ -6,9 +6,9 @@ import dayjsUtc from "dayjs/plugin/utc"
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import InputMask from "primevue/inputmask"
+import Message from "primevue/message"
 import { computed, Ref, ref } from "vue"
 import { ValidationError } from "./input/types"
-import InfoModal from "@/components/InfoModal.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import { DocumentationUnit } from "@/domain/documentationUnit"
@@ -236,12 +236,14 @@ const dateValidationError = ref<ValidationError | undefined>()
         </div>
       </div>
     </div>
-    <InfoModal
+    <Message
       v-if="docUnitSaveError"
       aria-label="Fehler bei der Terminierung"
       class="mt-8"
-      :description="docUnitSaveError.description"
-      :title="docUnitSaveError.title"
-    />
+      severity="error"
+    >
+      <p class="ris-body1-bold">{{ docUnitSaveError.title }}</p>
+      <p>{{ docUnitSaveError.description }}</p>
+    </Message>
   </div>
 </template>

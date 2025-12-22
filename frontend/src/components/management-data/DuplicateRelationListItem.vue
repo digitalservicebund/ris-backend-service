@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia"
 import Checkbox from "primevue/checkbox"
+import Message from "primevue/message"
 import { computed, Ref, ref } from "vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
-import { InfoStatus } from "@/components/enumInfoStatus"
-import InfoModal from "@/components/InfoModal.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import { Decision } from "@/domain/decision"
 import {
@@ -120,12 +119,13 @@ const coreDataText = computed(() =>
       />
     </InputField>
 
-    <InfoModal
+    <Message
       v-if="hasSetStateError"
       data-testid="set-state-error"
-      description="Bitte laden Sie die Seite neu und versuchen Sie es erneut."
-      :status="InfoStatus.ERROR"
-      title="Warnungsstatus konnte nicht gesetzt werden."
-    />
+      severity="error"
+    >
+      <p class="ris-body1-bold">Warnungsstatus konnte nicht gesetzt werden.</p>
+      <p>Bitte laden Sie die Seite neu und versuchen Sie es erneut.</p>
+    </Message>
   </div>
 </template>

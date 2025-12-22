@@ -1,9 +1,8 @@
 <script setup lang="ts">
+import Message from "primevue/message"
 import { useToast } from "primevue/usetoast"
 import { ref } from "vue"
 import AssignProcedure from "@/components/AssignProcedure.vue"
-import { InfoStatus } from "@/components/enumInfoStatus"
-import InfoModal from "@/components/InfoModal.vue"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { Procedure } from "@/domain/procedure"
 import { PublicationState } from "@/domain/publicationStatus"
@@ -86,13 +85,17 @@ const areSelectedDocUnitsValid = () => {
 </script>
 
 <template>
-  <InfoModal
+  <Message
     v-if="hasBulkAssignError"
     class="mb-16"
     data-testid="bulk-assign-procedure-error"
-    description="Bitte laden Sie die Seite neu."
-    :status="InfoStatus.ERROR"
-    title="Die Dokumentationseinheit(en) konnten nicht zum Vorgang hinzugefügt werden."
-  />
+    severity="error"
+  >
+    <p class="ris-body1-bold">
+      Die Dokumentationseinheit(en) konnten nicht zum Vorgang hinzugefügt
+      werden.
+    </p>
+    <p>Bitte laden Sie die Seite neu.</p>
+  </Message>
   <AssignProcedure class="justify-end" @assign-procedure="assignProcedure" />
 </template>

@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import Button from "primevue/button"
+import Message from "primevue/message"
 import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import ResultList from "./shared/ResultList.vue"
 import SearchForm from "./shared/SearchForm.vue"
-import { InfoStatus } from "@/components/enumInfoStatus"
-import InfoModal from "@/components/InfoModal.vue"
 import { Page } from "@/components/Pagination.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { Query } from "@/composables/useQueryFromRoute"
@@ -210,14 +209,15 @@ async function createNewFromSearch() {
       @search="updateQuery"
     />
 
-    <InfoModal
+    <Message
       v-if="serviceError"
       class="my-16"
       data-testid="service-error"
-      :description="serviceError.description"
-      :status="InfoStatus.ERROR"
-      :title="serviceError.title"
-    />
+      severity="error"
+    >
+      <p class="ris-body1-bold">{{ serviceError.title }}</p>
+      <p>{{ serviceError.description }}</p>
+    </Message>
 
     <ResultList
       :kind="Kind.PENDING_PROCEEDING"

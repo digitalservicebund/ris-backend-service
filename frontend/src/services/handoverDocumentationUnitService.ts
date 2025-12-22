@@ -88,22 +88,9 @@ const service: HandoverDocumentationUnitService = {
   },
 
   async getPreview(documentUnitUuid: string) {
-    const response = await httpClient.get<HandoverMail>(
+    return await httpClient.get<HandoverMail>(
       `caselaw/documentunits/${documentUnitUuid}/preview-xml`,
     )
-
-    if (response.status >= 300 || !response.data?.success) {
-      response.error = {
-        title: errorMessages.DOCUMENT_UNIT_LOADING_XML_PREVIEW.title,
-        description:
-          response.data?.statusMessages &&
-          response.data.statusMessages.length > 0
-            ? response.data?.statusMessages
-            : errorMessages.DOCUMENT_UNIT_LOADING_XML_PREVIEW.description,
-      }
-    }
-
-    return response
   },
 }
 

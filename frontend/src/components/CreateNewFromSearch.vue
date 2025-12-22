@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
+import Message from "primevue/message"
 import { ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import DocumentationOfficeSelector from "@/components/DocumentationOfficeSelector.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentationUnit } from "@/domain/documentationUnit"
@@ -127,9 +127,9 @@ watch(
   </div>
 
   <div v-if="createNewFromSearchResponseError">
-    <InfoModal
-      :description="createNewFromSearchResponseError.description"
-      :title="createNewFromSearchResponseError.title"
-    />
+    <Message severity="error">
+      <p class="ris-body1-bold">{{ createNewFromSearchResponseError.title }}</p>
+      <p>{{ createNewFromSearchResponseError.description }}</p>
+    </Message>
   </div>
 </template>

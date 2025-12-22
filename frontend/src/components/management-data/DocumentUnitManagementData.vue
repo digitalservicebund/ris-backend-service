@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
+import Message from "primevue/message"
 import { useToast } from "primevue/usetoast"
 import { computed, onBeforeMount, Ref, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import DocumentationOfficeSelector from "@/components/DocumentationOfficeSelector.vue"
 import DocumentUnitDeleteButton from "@/components/DocumentUnitDeleteButton.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import DocumentUnitHistoryLog from "@/components/management-data/DocumentUnitHistoryLog.vue"
 import DuplicateRelationListItem from "@/components/management-data/DuplicateRelationListItem.vue"
 import ManagementDataMetadata from "@/components/management-data/ManagementDataMetadata.vue"
@@ -140,11 +140,10 @@ watch(
         </div>
       </dl>
       <div v-if="assignDocOfficeResponseError">
-        <InfoModal
-          data-testid="assignDocOfficeErrorModal"
-          :description="assignDocOfficeResponseError.description"
-          :title="assignDocOfficeResponseError.title"
-        />
+        <Message data-testid="assignDocOfficeErrorModal" severity="error">
+          <p class="ris-body1-bold">{{ assignDocOfficeResponseError.title }}</p>
+          <p>{{ assignDocOfficeResponseError.description }}</p>
+        </Message>
       </div>
       <dl v-if="!isPendingProceeding(documentUnit)">
         <div class="flex gap-24">
