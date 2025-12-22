@@ -196,23 +196,16 @@ function validateRequiredInput(referenceToValidate?: Reference): boolean {
 async function addReference(decision: RelatedDocumentation) {
   validationStore.reset()
 
-  const newReference: Reference = new Reference({
-    id: reference.value.id,
-    citation: isSaved.value ? reference.value.citation : buildCitation(),
-    referenceSupplement: reference.value.referenceSupplement,
-    author: reference.value.author,
-    documentType: reference.value.documentType,
-    referenceType: reference.value.referenceType,
-    footnote: reference.value.footnote,
-    legalPeriodical: reference.value.legalPeriodical,
-    legalPeriodicalRawValue: reference.value.legalPeriodicalRawValue,
-    documentationUnit: new RelatedDocumentation({ ...decision }),
-  })
+  reference.value.documentationUnit = new RelatedDocumentation({ ...decision })
 
-  validateRequiredInput(newReference)
+  if (!isSaved.value) {
+    reference.value.citation = buildCitation()
+  }
+
+  validateRequiredInput(reference.value)
 
   if (validationStore.isValid()) {
-    emit("update:modelValue", newReference)
+    emit("update:modelValue", reference.value)
     emit("addEntry")
   } else {
     await scrollIntoViewportById("periodical-references")
@@ -225,31 +218,28 @@ async function addReferenceWithCreatedDocumentationUnit(
   const sources = docUnit.coreData?.sources as Source[] | undefined
   const backendReference = sources?.[0]?.reference
 
-  if (!docUnit || !backendReference) {
-    console.error("Daten unvollständig", { docUnit, backendReference })
-    return
-  }
-  const newReference: Reference = new Reference({
-    ...backendReference,
-    citation: buildCitation() || backendReference.citation,
-    documentationUnit: new RelatedDocumentation({
-      uuid: docUnit.uuid,
-      fileNumber: docUnit.coreData.fileNumbers?.[0],
-      decisionDate: docUnit.coreData.decisionDate,
-      court: docUnit.coreData.court,
-      documentType: docUnit.coreData.documentType,
-      documentNumber: docUnit.documentNumber,
-      status: docUnit.status,
-      createdByReference: backendReference.id,
-      creatingDocOffice: docUnit.coreData.creatingDocOffice,
-      documentationOffice: docUnit.coreData.documentationOffice,
-    }),
+  if (!docUnit || !backendReference) return
+
+  Object.assign(reference.value, backendReference)
+
+  reference.value.citation = buildCitation() || backendReference.citation
+  reference.value.documentationUnit = new RelatedDocumentation({
+    uuid: docUnit.uuid,
+    fileNumber: docUnit.coreData.fileNumbers?.[0],
+    decisionDate: docUnit.coreData.decisionDate,
+    court: docUnit.coreData.court,
+    documentType: docUnit.coreData.documentType,
+    documentNumber: docUnit.documentNumber,
+    status: docUnit.status,
+    createdByReference: backendReference.id,
+    creatingDocOffice: docUnit.coreData.creatingDocOffice,
+    documentationOffice: docUnit.coreData.documentationOffice,
   })
 
-  validateRequiredInput(newReference)
+  validateRequiredInput(reference.value)
 
   if (validationStore.isValid()) {
-    emit("update:modelValue", newReference)
+    emit("update:modelValue", reference.value)
     emit("addEntry")
   }
 }
