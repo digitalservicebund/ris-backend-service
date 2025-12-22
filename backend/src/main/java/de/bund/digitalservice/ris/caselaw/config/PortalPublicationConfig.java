@@ -18,13 +18,13 @@ public class PortalPublicationConfig {
   }
 
   @Bean
-  @Profile({"staging", "local"})
+  @Profile({"staging", "local", "dev-env"})
   public PortalTransformer fullLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     return new FullLdmlTransformer(documentBuilderFactory);
   }
 
   @Bean
-  @Profile({"!staging & !production & !local"})
+  @Profile({"!staging & !production & !local & !dev-env"})
   public PortalTransformer defaultLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     return new ReducedLdmlTransformer(documentBuilderFactory);
   }

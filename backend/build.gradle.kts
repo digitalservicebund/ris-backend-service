@@ -109,8 +109,8 @@ spotless {
             "**/gradle.properties",
             "**/gradle-wrapper.properties",
             "**/jaxb.properties",
-            "**/sentry-debug-meta.properties"
-        )
+            "**/sentry-debug-meta.properties",
+            )
         // spotless:off
         prettier(
             mapOf(
@@ -145,7 +145,8 @@ sonar {
             "sonar.coverage.exclusions",
             "**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/*Exception.java"
         )
-        property("sonar.cpd.exclusions", "**/AbuseFeeDTO.java") // Exclude duplication warning caused by ObjectValueDTO
+        // ↓ Exclude duplication warning caused by LDML-Transformer, ObjectValueDTO.java, Rechtszug.java
+        property("sonar.cpd.exclusions", "**/DecisionCommonLdmlTransformer.java, **/PendingProceedingCommonLdmlTransformer.java, **/AbuseFeeDTO.java, **/AnhaengigesVerfahren.java, **/Rechtszug.java")
         property("sonar.sources", "src/main/java")
     }
 }
