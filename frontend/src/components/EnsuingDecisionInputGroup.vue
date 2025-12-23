@@ -196,7 +196,6 @@ onMounted(() => {
             id="court"
             v-model="ensuingDecision.court"
             aria-label="Gericht Nachgehende Entscheidung"
-            clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
             :read-only="ensuingDecision.hasForeignSource"

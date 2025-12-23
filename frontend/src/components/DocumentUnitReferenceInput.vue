@@ -103,7 +103,6 @@ watch(
         id="legalPeriodical"
         v-model="legalPeriodical"
         aria-label="Periodikum"
-        clear-on-choosing-item
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getLegalPeriodicals"
         @focus="validationStore.remove('legalPeriodical')"

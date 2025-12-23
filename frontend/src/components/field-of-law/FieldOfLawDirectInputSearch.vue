@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue"
+import { nextTick, ref } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -7,12 +7,19 @@ import ComboboxItemService from "@/services/comboboxItemService"
 const emit = defineEmits<{
   "add-to-list": [item: FieldOfLaw]
 }>()
-const fieldOfLawNode = ref()
-watch(fieldOfLawNode, () => {
+
+const value = ref<FieldOfLaw | undefined>(undefined)
+
+const handleUpdateModelValue = async (newValue: unknown | undefined) => {
   // Clearing the Dropdown can emit undefined, so we only add to list if the value is set.
-  if (fieldOfLawNode.value)
-    emit("add-to-list", fieldOfLawNode.value as FieldOfLaw)
-})
+  if (newValue != null) emit("add-to-list", newValue as FieldOfLaw)
+
+  // Clearing the dropdown again, we need to first set a value and then remove it a tick later so the
+  // reference is fully updated once so the component realises it needs to reset the input.
+  value.value = newValue as FieldOfLaw
+  await nextTick()
+  value.value = undefined
+}
 </script>
 
 <template>
@@ -20,11 +27,11 @@ watch(fieldOfLawNode, () => {
     <p class="ris-label2-regular pb-4">Direkteingabe Sachgebiet</p>
     <ComboboxInput
       id="directInputCombobox"
-      v-model="fieldOfLawNode"
       aria-label="Direkteingabe-Sachgebietssuche eingeben"
-      clear-on-choosing-item
       :item-service="ComboboxItemService.getFieldOfLawSearchByIdentifier"
+      :model-value="value"
       placeholder="Sachgebiet"
+      @update:model-value="handleUpdateModelValue"
     >
     </ComboboxInput>
   </div>

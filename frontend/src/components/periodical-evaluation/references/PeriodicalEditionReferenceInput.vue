@@ -563,7 +563,6 @@ onBeforeUnmount(() => {
                 id="courtInput"
                 v-model="relatedDocumentationUnit.court"
                 aria-label="Gericht"
-                clear-on-choosing-item
                 :has-error="slotProps.hasError"
                 :item-service="ComboboxItemService.getCourts"
                 @focus="validationStore.remove('court')"

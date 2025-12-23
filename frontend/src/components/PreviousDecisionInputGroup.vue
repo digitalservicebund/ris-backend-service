@@ -196,7 +196,6 @@ onMounted(async () => {
             id="court"
             v-model="previousDecision.court"
             aria-label="Gericht Vorgehende Entscheidung"
-            clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
             :read-only="previousDecision.hasForeignSource"

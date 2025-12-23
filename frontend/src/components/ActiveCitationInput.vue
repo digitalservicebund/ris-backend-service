@@ -212,7 +212,6 @@ onMounted(() => {
         id="activeCitationPredicate"
         v-model="activeCitationType"
         aria-label="Art der Zitierung"
-        clear-on-choosing-item
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getCitationTypes"
         @focus="validationStore.remove('citationType')"
@@ -230,7 +229,6 @@ onMounted(() => {
             id="activeCitationCourt"
             v-model="activeCitation.court"
             aria-label="Gericht Aktivzitierung"
-            clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
             :read-only="activeCitation.hasForeignSource"

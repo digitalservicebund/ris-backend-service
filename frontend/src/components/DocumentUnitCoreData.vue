@@ -241,7 +241,6 @@ onBeforeUnmount(() => {
           id="court"
           v-model="coreDataModel.court"
           aria-label="Gericht"
-          clear-on-choosing-item
           :has-error="slotProps.hasError"
           :item-service="ComboboxItemService.getCourts"
         ></ComboboxInput>

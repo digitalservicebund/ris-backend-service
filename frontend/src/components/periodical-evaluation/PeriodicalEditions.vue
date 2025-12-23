@@ -166,7 +166,6 @@ onMounted(async () => {
               v-model="legalPeriodical"
               aria-label="Periodikum"
               class="flex-shrink flex-grow-0 basis-1/2"
-              clear-on-choosing-item
               :has-error="false"
               :item-service="ComboboxItemService.getLegalPeriodicals"
               placeholder="Nach Periodikum suchen"

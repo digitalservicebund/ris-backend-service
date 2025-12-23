@@ -110,7 +110,6 @@ onBeforeMount(async () => {
           id="legalPeriodical"
           v-model="legalPeriodical"
           aria-label="Periodikum"
-          clear-on-choosing-item
           :has-error="slotProps.hasError"
           :item-service="ComboboxItemService.getLegalPeriodicals"
           :read-only="editionRef?.references?.length! > 0"
