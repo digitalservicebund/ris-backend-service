@@ -11,16 +11,16 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "4.0.0"
+    id("org.springframework.boot") version "4.0.1"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "8.1.0"
-    id("org.sonarqube") version "7.2.1.6560"
+    id("org.sonarqube") version "7.2.2.6593"
     id("com.github.jk1.dependency-license-report") version "3.0.1"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.1.0"
-    id("org.flywaydb.flyway") version "11.19.0"
+    id("org.flywaydb.flyway") version "11.19.1"
     id("io.sentry.jvm.gradle") version "5.12.2"
 }
 
@@ -181,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.40.9"))
+    implementation(platform("software.amazon.awssdk:bom:2.40.12"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -209,10 +209,10 @@ dependencies {
     // for local development:
 //     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.118.jar"))
 
-    implementation("tools.jackson.core:jackson-core:3.0.2")
-    implementation("tools.jackson.core:jackson-databind:3.0.2")
+    implementation("tools.jackson.core:jackson-core:3.0.3")
+    implementation("tools.jackson.core:jackson-databind:3.0.3")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.20")
-    implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.0.2")
+    implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.0.3")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
@@ -222,12 +222,12 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
-    implementation("io.getunleash:unleash-client-java:11.2.0")
+    implementation("io.getunleash:unleash-client-java:11.2.1")
     implementation("org.apache.commons:commons-text:1.15.0")
     implementation("org.jsoup:jsoup:1.21.2")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:7.2.2")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.2.2")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:7.4.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.4.0")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.4")
@@ -244,10 +244,10 @@ dependencies {
     // CVE-2025-67735
     implementation("io.netty:netty-codec-http:4.2.9.Final")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.19.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.19.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.19.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.19.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -273,14 +273,14 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.1.11.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.1.12.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
 buildscript {
     dependencies {
-        classpath("org.flywaydb:flyway-database-postgresql:11.19.0")
+        classpath("org.flywaydb:flyway-database-postgresql:11.19.1")
     }
 }
 
