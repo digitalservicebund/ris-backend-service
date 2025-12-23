@@ -69,7 +69,6 @@
     "axios": "^1.13.2",
     "dayjs": "^1.11.19",
     "fast-json-patch": "^3.1.1",
-    "immer": "^10.2.0",
     "maska": "^3.2.0",
     "pinia": "^3.0.4",
     "primevue": "^4.5.4",
