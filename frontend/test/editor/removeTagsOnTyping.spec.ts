@@ -284,7 +284,7 @@ describe("removeTagsOnTyping extension", () => {
     editor.destroy()
   })
 
-  it.skip("when the last character of word in text is deleted then validate mark removal", () => {
+  it("when the last character of word in text is deleted then validate mark removal", () => {
     const editor = new Editor({
       extensions: [
         Document,
@@ -378,6 +378,181 @@ describe("removeTagsOnTyping extension", () => {
         } else if (node.text === "secondwor") {
           expect(node.marks.length).toBe(0)
         } else if (node.text === "thirdword") {
+          expect(node.marks.length).toBe(1)
+        }
+      }
+    })
+
+    editor.destroy()
+  })
+
+  // This test deals with a case when a cursor is positioned just before the first character of a word that is marked as an error.
+  // When the user deletes a space before that word, the deletion should remove the mark from one or both words if this word is then merged
+  // with the previous word. Although, if this does not merge the words, the mark should be preserved, as tested in the next/other test.
+  it("handle space deletion when this merges two words", () => {
+    const editor = new Editor({
+      extensions: [
+        Document,
+        Paragraph,
+        Text,
+        TextCheckMark,
+        TextCheckExtension,
+      ],
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "firstword",
+              },
+              {
+                type: "text",
+                text: " ",
+              },
+              {
+                type: "text",
+                text: "secondword",
+              },
+            ],
+          },
+        ],
+      },
+    })
+
+    const textCheckMark = editor.schema.marks[TextCheckMark.name]
+    const fromFirst = 1
+    const toFirst = 10
+    const fromSecond = 11
+    const toSecond = 21
+
+    editor.commands.command(({ tr }) => {
+      tr.addMark(
+        fromFirst,
+        toFirst,
+        textCheckMark.create({ ...textCheckMarkAttrs, id: "1" }),
+      )
+      tr.addMark(
+        fromSecond,
+        toSecond,
+        textCheckMark.create({ ...textCheckMarkAttrs, id: "2" }),
+      )
+      return true
+    })
+
+    expect(editor.getText()).toBe("firstword secondword")
+
+    const paraBeforeDelete = editor.state.doc.firstChild
+    let markedWordsCount = 0
+    paraBeforeDelete?.forEach((node) => {
+      if (node.isText && node.marks.length > 0) {
+        markedWordsCount++
+      }
+    })
+    expect(markedWordsCount).toBe(2)
+
+    // Delete the space between the two words
+    // "secondword" starts at position 10, so delete from position 10 to 11
+    editor.commands.deleteRange({ from: 10, to: 11 })
+
+    expect(editor.getText()).toBe("firstwordsecondword")
+
+    // Verify the mark was removed from both words since they are now merged
+    const paragraphAfterDelete = editor.state.doc.firstChild
+    paragraphAfterDelete?.forEach((node) => {
+      if (node.isText) {
+        if (node.text === "firstwordsecondword") {
+          expect(node.marks.length).toBe(0)
+        }
+      }
+    })
+
+    editor.destroy()
+  })
+
+  // This test deals with a case when a cursor is positioned just before the first character of a word that is marked as an error.
+  // When the user deletes a space before that word, and the deletion does NOT merge the word with the previous word,
+  // the mark should stay.
+  it("handle space deletion when this does NOT merge two words", () => {
+    const editor = new Editor({
+      extensions: [
+        Document,
+        Paragraph,
+        Text,
+        TextCheckMark,
+        TextCheckExtension,
+      ],
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "firstword",
+              },
+              {
+                type: "text",
+                text: "  ",
+              },
+              {
+                type: "text",
+                text: "secondword",
+              },
+            ],
+          },
+        ],
+      },
+    })
+
+    const textCheckMark = editor.schema.marks[TextCheckMark.name]
+    const fromFirst = 1
+    const toFirst = 10
+    const fromSecond = 11
+    const toSecond = 21
+
+    editor.commands.command(({ tr }) => {
+      tr.addMark(
+        fromFirst,
+        toFirst,
+        textCheckMark.create({ ...textCheckMarkAttrs, id: "1" }),
+      )
+      tr.addMark(
+        fromSecond,
+        toSecond,
+        textCheckMark.create({ ...textCheckMarkAttrs, id: "2" }),
+      )
+      return true
+    })
+
+    expect(editor.getText()).toBe("firstword  secondword")
+
+    const paraBeforeDelete = editor.state.doc.firstChild
+    let markedWordsCount = 0
+    paraBeforeDelete?.forEach((node) => {
+      if (node.isText && node.marks.length > 0) {
+        markedWordsCount++
+      }
+    })
+    expect(markedWordsCount).toBe(2)
+
+    // Delete the space between the two words
+    // "secondword" starts at position 10, so delete from position 10 to 11
+    editor.commands.deleteRange({ from: 10, to: 11 })
+
+    expect(editor.getText()).toBe("firstword secondword")
+
+    // Verify the mark was removed from both words since they are now merged
+    const paragraphAfterDelete = editor.state.doc.firstChild
+    paragraphAfterDelete?.forEach((node) => {
+      if (node.isText) {
+        if (node.text === "firstword") {
+          expect(node.marks.length).toBe(1)
+        }
+        if (node.text === "secondword") {
           expect(node.marks.length).toBe(1)
         }
       }
