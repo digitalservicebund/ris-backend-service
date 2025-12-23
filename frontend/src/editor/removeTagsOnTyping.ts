@@ -214,32 +214,9 @@ function handleSpaceDeletion(
       : ""
 
   // If both sides have non-whitespace characters, words have been merged
-  if (
-    charBefore &&
-    !/\s/.test(charBefore) &&
-    charAfter &&
-    !/\s/.test(charAfter)
-  ) {
+  if (wordsMerged(charBefore, charAfter)) {
     // Find the full extent of both merged words
-    let wordStart = step.from
-    let wordEnd = step.from
-
-    const parentStart = $newPos.start()
-    const parentEnd = $newPos.end()
-
-    // Search backwards for word start
-    while (wordStart > parentStart) {
-      const char = newState.doc.textBetween(wordStart - 1, wordStart, " ")
-      if (/\s/.test(char)) break
-      wordStart--
-    }
-
-    // Search forwards for word end
-    while (wordEnd < parentEnd) {
-      const char = newState.doc.textBetween(wordEnd, wordEnd + 1, " ")
-      if (/\s/.test(char)) break
-      wordEnd++
-    }
+    const { wordStart, wordEnd } = calculateWordLimits(step, newState, $newPos)
 
     // Remove marks from entire merged range
     let modified = false
@@ -268,6 +245,42 @@ function handleSpaceDeletion(
 
   // If there's still a space between words, do nothing
   return null
+}
+
+function wordsMerged(charBefore: string, charAfter: string): boolean {
+  return !!(
+    charBefore &&
+    !/\s/.test(charBefore) &&
+    charAfter &&
+    !/\s/.test(charAfter)
+  )
+}
+
+function calculateWordLimits(
+  step: ReplaceStep,
+  newState: EditorState,
+  $newPos: ResolvedPos,
+) {
+  let wordStart = step.from
+  let wordEnd = step.from
+
+  const parentStart = $newPos.start()
+  const parentEnd = $newPos.end()
+
+  // Search backwards for word start
+  while (wordStart > parentStart) {
+    const char = newState.doc.textBetween(wordStart - 1, wordStart, " ")
+    if (/\s/.test(char)) break
+    wordStart--
+  }
+
+  // Search forwards for word end
+  while (wordEnd < parentEnd) {
+    const char = newState.doc.textBetween(wordEnd, wordEnd + 1, " ")
+    if (/\s/.test(char)) break
+    wordEnd++
+  }
+  return { wordStart, wordEnd }
 }
 
 export { removeTagsOnTypingPlugin }
