@@ -133,17 +133,7 @@ const removeTagsOnTypingPlugin = new Plugin({
 
     // Bestimmung des betroffenen Textknoten, basierend auf der Art der Änderung (deletedSize vs. insertedSize) und der Cursorposition ($oldPos.textOffset)
     let affectedNode: Node | null = null
-
-    if (deletedSize > 0) {
-      // Bei Löschung: Das ist fast immer der Knoten VOR der Position
-      affectedNode = $oldPos.nodeBefore
-    } else if (insertedSize > 0) {
-      // Wenn Inhalt eingefügt wird (Tippen), bestimmen wir den betroffenen Textknoten (im oldState) wie folgt:
-      // 1. $oldPos.textOffset > 0: Wir sind IN einem Textknoten (normales Tippen). Der Textknoten VOR der Position ($oldPos.nodeBefore) ist der sicherste Träger der ursprünglichen Tags.
-      // 2. $oldPos.textOffset === 0: Wir sind ZWISCHEN zwei Knoten (z.B. nach einem Leerzeichen oder Inline-Element). ProseMirror versucht angrenzende (neue) Textknoten mit dem NACHFOLGENDEN Knoten ($oldPos.nodeAfter) denselben Markierungen automatisch zu verschmelzen oder ihn dort zu erzeugen, daher wird dieser geprüft.
-      affectedNode =
-        $oldPos.textOffset > 0 ? $oldPos.nodeBefore : $oldPos.nodeAfter
-    }
+    affectedNode = findAffectedNode(deletedSize, insertedSize, $oldPos)
 
     // Prüfung: Hat der betroffene Node überhaupt TextCheck-Tags?
     // Wir brechen ab, wenn der gefundene Knoten kein Textknoten ist oder keine Tags hat.
@@ -174,6 +164,7 @@ const removeTagsOnTypingPlugin = new Plugin({
     const newStateTransaction = newState.tr
 
     // Markierungen im NEUEN Zustand über den gemappten Bereich entfernen
+    // Remove markers in the NEW state across the mapped area
     if (newFrom >= 0 && newTo <= newState.doc.content.size && newFrom < newTo) {
       newState.doc.nodesBetween(newFrom, newTo, (node, pos) => {
         // Nur Textknoten mit tatsächlichem Inhalt verarbeiten
@@ -197,6 +188,26 @@ const removeTagsOnTypingPlugin = new Plugin({
     return modified ? newStateTransaction : null
   },
 })
+
+function findAffectedNode(
+  deletedSize: number,
+  insertedSize: number,
+  $oldPos: ResolvedPos,
+): Node | null {
+  let result: Node | null = null
+
+  if (deletedSize > 0) {
+    // Bei Löschung: Das ist fast immer der Knoten VOR der Position
+    result = $oldPos.nodeBefore
+  } else if (insertedSize > 0) {
+    // Wenn Inhalt eingefügt wird (Tippen), bestimmen wir den betroffenen Textknoten (im oldState) wie folgt:
+    // 1. $oldPos.textOffset > 0: Wir sind IN einem Textknoten (normales Tippen). Der Textknoten VOR der Position ($oldPos.nodeBefore) ist der sicherste Träger der ursprünglichen Tags.
+    // 2. $oldPos.textOffset === 0: Wir sind ZWISCHEN zwei Knoten (z.B. nach einem Leerzeichen oder Inline-Element). ProseMirror versucht angrenzende (neue) Textknoten mit dem NACHFOLGENDEN Knoten ($oldPos.nodeAfter) denselben Markierungen automatisch zu verschmelzen oder ihn dort zu erzeugen, daher wird dieser geprüft.
+    result = $oldPos.textOffset > 0 ? $oldPos.nodeBefore : $oldPos.nodeAfter
+  }
+
+  return result
+}
 
 function handleSpaceDeletion(
   newState: EditorState,
