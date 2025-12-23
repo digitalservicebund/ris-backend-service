@@ -195,16 +195,15 @@ function validateRequiredInput(referenceToValidate?: Reference): boolean {
 
 async function addReference(decision: RelatedDocumentation) {
   validationStore.reset()
-
-  reference.value.documentationUnit = new RelatedDocumentation({ ...decision })
-
-  if (!isSaved.value) {
-    reference.value.citation = buildCitation()
-  }
-
   validateRequiredInput(reference.value)
 
   if (validationStore.isValid()) {
+    reference.value.documentationUnit = new RelatedDocumentation({
+      ...decision,
+    })
+    if (!isSaved.value) {
+      reference.value.citation = buildCitation()
+    }
     emit("update:modelValue", reference.value)
     emit("addEntry")
   } else {
