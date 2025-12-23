@@ -197,16 +197,9 @@ describe("Legal periodical edition reference input", () => {
               value: SourceValue.Zeitschrift,
               reference: new Reference({
                 id: "123",
-                citation: "w",
-                referenceSupplement: "q",
-                legalPeriodical: {
-                  uuid: "42419106-57be-4df9-9883-2af6fa9b30d8",
-                  abbreviation: "A&G",
-                  title: "Arbeit & Gesundheit",
-                  subtitle: "Das Magazin für Sicherheitsbeauftragte",
-                  primaryReference: false,
-                  citationStyle: "2011, Nr 9/10, 9-10",
-                },
+                citation: "3",
+                referenceSupplement: "L",
+                legalPeriodical: { uuid: "123", title: "Test Zeitschrift" },
                 legalPeriodicalRawValue: "A&G",
                 referenceType: "caselaw",
                 primaryReference: false,
@@ -226,9 +219,9 @@ describe("Legal periodical edition reference input", () => {
           expect.objectContaining({
             id: "123",
             citation: "3",
-            referenceSupplement: "q",
+            referenceSupplement: "L",
             referenceType: "caselaw",
-            legalPeriodicalRawValue: "A&G",
+            legalPeriodical: { uuid: "123", title: "Test Zeitschrift" },
 
             documentationUnit: expect.objectContaining({
               uuid: "foo",
