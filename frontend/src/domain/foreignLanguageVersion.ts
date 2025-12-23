@@ -6,8 +6,8 @@ export type LanguageCode = {
 }
 
 export default class ForeignLanguageVersion implements EditableListItem {
-  public id?: string
-  public newEntry?: boolean
+  public id?: string // BE only
+  public localId: string // FE only
   public languageCode?: LanguageCode
   public link?: string
 
@@ -15,23 +15,13 @@ export default class ForeignLanguageVersion implements EditableListItem {
 
   constructor(data: Partial<ForeignLanguageVersion> = {}) {
     Object.assign(this, data)
-
-    if (this.id == undefined) {
-      this.id = crypto.randomUUID()
-      this.newEntry = true
-    } else if (data.newEntry == undefined) {
-      this.newEntry = false
-    }
+    this.localId = data.localId ?? crypto.randomUUID()
   }
 
   get isEmpty(): boolean {
     return ForeignLanguageVersion.fields.some((field) =>
       this.fieldIsEmpty(this[field]),
     )
-  }
-
-  equals(entry: ForeignLanguageVersion): boolean {
-    return this.id === entry.id
   }
 
   private fieldIsEmpty(

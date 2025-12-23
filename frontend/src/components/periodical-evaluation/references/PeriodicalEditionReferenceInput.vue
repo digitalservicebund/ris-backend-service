@@ -22,6 +22,7 @@ import { DocumentationUnit } from "@/domain/documentationUnit"
 import { PublicationState } from "@/domain/publicationStatus"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
+import { Source } from "@/domain/source"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import FeatureToggleService from "@/services/featureToggleService"
@@ -195,23 +196,16 @@ function validateRequiredInput(referenceToValidate?: Reference): boolean {
 async function addReference(decision: RelatedDocumentation) {
   validationStore.reset()
 
-  const newReference: Reference = new Reference({
-    id: reference.value.id,
-    citation: isSaved.value ? reference.value.citation : buildCitation(),
-    referenceSupplement: reference.value.referenceSupplement,
-    author: reference.value.author,
-    documentType: reference.value.documentType,
-    referenceType: reference.value.referenceType,
-    footnote: reference.value.footnote,
-    legalPeriodical: reference.value.legalPeriodical,
-    legalPeriodicalRawValue: reference.value.legalPeriodicalRawValue,
-    documentationUnit: new RelatedDocumentation({ ...decision }),
-  })
+  reference.value.documentationUnit = new RelatedDocumentation({ ...decision })
 
-  validateRequiredInput(newReference)
+  if (!isSaved.value) {
+    reference.value.citation = buildCitation()
+  }
+
+  validateRequiredInput(reference.value)
 
   if (validationStore.isValid()) {
-    emit("update:modelValue", newReference)
+    emit("update:modelValue", reference.value)
     emit("addEntry")
   } else {
     await scrollIntoViewportById("periodical-references")
@@ -221,23 +215,33 @@ async function addReference(decision: RelatedDocumentation) {
 async function addReferenceWithCreatedDocumentationUnit(
   docUnit: DocumentationUnit,
 ) {
-  if (!docUnit) return
-  await addReference(
-    new RelatedDocumentation({
-      uuid: docUnit.uuid,
-      fileNumber: docUnit.coreData.fileNumbers
-        ? docUnit.coreData.fileNumbers[0]
-        : undefined,
-      decisionDate: docUnit.coreData.decisionDate,
-      court: docUnit.coreData.court,
-      documentType: docUnit.coreData.documentType,
-      documentNumber: docUnit.documentNumber,
-      status: docUnit.status,
-      createdByReference: reference.value.id,
-      creatingDocOffice: docUnit.coreData.creatingDocOffice,
-      documentationOffice: docUnit.coreData.documentationOffice,
-    }),
-  )
+  const sources = docUnit.coreData?.sources as Source[] | undefined
+  const backendReference = sources?.[0]?.reference
+
+  if (!docUnit || !backendReference) return
+
+  Object.assign(reference.value, backendReference)
+
+  reference.value.citation = buildCitation() || backendReference.citation
+  reference.value.documentationUnit = new RelatedDocumentation({
+    uuid: docUnit.uuid,
+    fileNumber: docUnit.coreData.fileNumbers?.[0],
+    decisionDate: docUnit.coreData.decisionDate,
+    court: docUnit.coreData.court,
+    documentType: docUnit.coreData.documentType,
+    documentNumber: docUnit.documentNumber,
+    status: docUnit.status,
+    createdByReference: backendReference.id,
+    creatingDocOffice: docUnit.coreData.creatingDocOffice,
+    documentationOffice: docUnit.coreData.documentationOffice,
+  })
+
+  validateRequiredInput(reference.value)
+
+  if (validationStore.isValid()) {
+    emit("update:modelValue", reference.value)
+    emit("addEntry")
+  }
 }
 
 /**

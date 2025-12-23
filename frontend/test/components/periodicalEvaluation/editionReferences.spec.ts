@@ -233,6 +233,7 @@ describe("Legal periodical edition evaluation", () => {
       references: [
         {
           id: "id",
+          localId: "0",
           citation: "123",
           referenceSupplement: "supplement",
           legalPeriodicalRawValue: "BDZ",
@@ -264,6 +265,7 @@ describe("Legal periodical edition evaluation", () => {
       references: [
         {
           id: sameId,
+          localId: "id0",
           citation: "3",
           referenceSupplement: "3",
           legalPeriodical: {

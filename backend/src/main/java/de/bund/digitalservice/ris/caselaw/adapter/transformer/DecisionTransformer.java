@@ -351,7 +351,7 @@ public class DecisionTransformer extends DocumentableTransformer {
             .map(
                 def ->
                     DefinitionDTO.builder()
-                        .id(def.newEntry() ? null : def.id())
+                        .id(def.id())
                         .value(def.definedTerm())
                         .borderNumber(def.definingBorderNumber())
                         .rank(definitions.indexOf(def) + 1L)
@@ -659,7 +659,7 @@ public class DecisionTransformer extends DocumentableTransformer {
               .typeOfIncome(incomeType.typeOfIncome())
               .terminology(incomeType.terminology())
               .rank(i + 1L)
-              .id(incomeType.newEntry() ? null : incomeType.id())
+              .id(incomeType.id())
               .build());
     }
 

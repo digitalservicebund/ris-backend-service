@@ -13,8 +13,8 @@ export const AddresseeLabels: Record<Addressee, string> = {
 }
 
 export default class AbuseFee implements EditableListItem {
-  public id?: string
-  public newEntry?: boolean
+  public id?: string // BE only
+  public localId: string // FE only
   public amount?: number
   public currencyCode?: CurrencyCode
   public addressee?: Addressee
@@ -25,13 +25,7 @@ export default class AbuseFee implements EditableListItem {
 
   constructor(data: Partial<AbuseFee> = {}) {
     Object.assign(this, data)
-
-    if (this.id == undefined) {
-      this.id = crypto.randomUUID()
-      this.newEntry = true
-    } else if (data.newEntry == undefined) {
-      this.newEntry = false
-    }
+    this.localId = data.localId ?? crypto.randomUUID()
   }
 
   get renderSummary(): string {
@@ -55,10 +49,6 @@ export default class AbuseFee implements EditableListItem {
 
   get isEmpty(): boolean {
     return AbuseFee.fields.every((field) => this.fieldIsEmpty(this[field]))
-  }
-
-  equals(entry: AbuseFee): boolean {
-    return this.id === entry.id
   }
 
   private fieldIsEmpty(

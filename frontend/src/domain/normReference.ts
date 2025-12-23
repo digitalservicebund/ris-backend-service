@@ -3,6 +3,7 @@ import { NormAbbreviation } from "./normAbbreviation"
 import SingleNorm from "./singleNorm"
 
 export default class NormReference implements EditableListItem {
+  public localId: string
   public normAbbreviation?: NormAbbreviation
   public singleNorms?: SingleNorm[]
   public normAbbreviationRawValue?: string
@@ -15,6 +16,7 @@ export default class NormReference implements EditableListItem {
 
   constructor(data: Partial<NormReference> = {}) {
     Object.assign(this, data)
+    this.localId = data.localId ?? crypto.randomUUID()
   }
 
   get id() {
@@ -25,20 +27,6 @@ export default class NormReference implements EditableListItem {
 
   get hasAmbiguousNormReference(): boolean {
     return !this.normAbbreviation && !!this.normAbbreviationRawValue
-  }
-
-  equals(entry: NormReference): boolean {
-    if (entry.isEmpty) return true
-    let isEquals = false
-    if (this.normAbbreviation) {
-      isEquals = entry.normAbbreviation
-        ? this.normAbbreviation?.abbreviation ==
-          entry.normAbbreviation.abbreviation
-        : false
-    } else if (this.normAbbreviationRawValue) {
-      isEquals = this.normAbbreviationRawValue == entry.normAbbreviationRawValue
-    }
-    return isEquals
   }
 
   get renderSummary(): string {

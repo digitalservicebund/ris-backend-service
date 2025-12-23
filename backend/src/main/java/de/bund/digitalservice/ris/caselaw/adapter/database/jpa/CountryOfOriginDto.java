@@ -16,6 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 /** DE: Herkunftsland */
 @Getter
@@ -27,7 +28,11 @@ import lombok.Setter;
 @Table(schema = "incremental_migration", name = "country_of_origin")
 public class CountryOfOriginDto {
 
-  @Id @GeneratedValue private UUID id;
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  @Column(updatable = false, nullable = false)
+  private UUID id;
 
   @Column(name = "value")
   @Size(max = 255)

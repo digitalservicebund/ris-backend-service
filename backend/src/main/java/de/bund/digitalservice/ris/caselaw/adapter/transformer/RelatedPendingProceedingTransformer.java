@@ -24,7 +24,7 @@ public class RelatedPendingProceedingTransformer extends RelatedDocumentationUni
     }
 
     return RelatedPendingProceedingDTO.builder()
-        .id(relatedPendingProceeding.isNewEntry() ? null : relatedPendingProceeding.getUuid())
+        .id(relatedPendingProceeding.getUuid())
         .court(getCourtFromDomain(relatedPendingProceeding.getCourt()))
         .date(relatedPendingProceeding.getDecisionDate())
         .documentNumber(relatedPendingProceeding.getDocumentNumber())

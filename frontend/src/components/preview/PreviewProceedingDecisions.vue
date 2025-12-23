@@ -19,7 +19,7 @@ defineProps<{
       <PreviewContent>
         <div
           v-for="previousDecision in previousDecisions"
-          :key="previousDecision.id"
+          :key="previousDecision.uuid"
         >
           {{ previousDecision.renderSummary }}
         </div>
@@ -30,7 +30,7 @@ defineProps<{
       <PreviewContent>
         <div
           v-for="ensuingDecision in ensuingDecisions"
-          :key="ensuingDecision.id"
+          :key="ensuingDecision.uuid"
         >
           {{ ensuingDecision.renderSummary }}
         </div>

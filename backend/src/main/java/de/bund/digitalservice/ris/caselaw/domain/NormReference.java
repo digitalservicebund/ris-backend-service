@@ -6,7 +6,6 @@ import java.util.List;
 import lombok.Builder;
 
 @Builder(toBuilder = true)
-// to ignore the validationErrors that the frontend might be sending along
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record NormReference(
     NormAbbreviation normAbbreviation,

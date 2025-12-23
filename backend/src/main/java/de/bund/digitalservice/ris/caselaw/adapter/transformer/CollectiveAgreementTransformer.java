@@ -28,7 +28,7 @@ public class CollectiveAgreementTransformer {
 
     var builder =
         CollectiveAgreementDTO.builder()
-            .id(collectiveAgreement.newEntry() ? null : collectiveAgreement.id())
+            .id(collectiveAgreement.id())
             .name(collectiveAgreement.name())
             .norm(collectiveAgreement.norm())
             .date(collectiveAgreement.date());

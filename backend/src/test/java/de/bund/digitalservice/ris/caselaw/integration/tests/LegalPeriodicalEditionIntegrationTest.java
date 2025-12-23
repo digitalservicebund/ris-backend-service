@@ -178,84 +178,84 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
   void testGetEdition_withMixedReferencesAndLiteratureCitationsFromDocUnitAndEdition_shouldSucceed()
       throws DocumentationUnitNotExistsException {
 
-    UUID existingReferenceId = UUID.randomUUID();
-    UUID existingLiteratureCitationId = UUID.randomUUID();
-
     var docUnit =
         EntityBuilderTestUtil.createAndSaveDecision(
             documentationUnitRepository,
             documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()),
             "DOC_NUMBER");
 
-    documentationUnitRepository.save(
-        docUnit.toBuilder()
-            .literatureReferences(
-                List.of(
-                    LiteratureReferenceDTO.builder()
-                        .id(UUID.randomUUID())
-                        .documentationUnitRank(1)
-                        .citation("Literature Reference Citation from Docunit")
-                        .legalPeriodicalRawValue("A")
-                        .author("author 1")
-                        .documentType(
-                            DocumentTypeDTO.builder()
-                                .id(UUID.fromString("f718a7ee-f419-46cf-a96a-29227927850c"))
-                                .abbreviation("Ean")
-                                .build())
-                        .documentationUnit(
-                            DecisionDTO.builder()
-                                .id(docUnit.getId())
-                                .documentNumber("DOC_NUMBER")
-                                .build())
-                        .build(),
-                    LiteratureReferenceDTO.builder()
-                        .id(existingLiteratureCitationId)
-                        .documentationUnitRank(2)
-                        .citation("Original Literature Reference Citation from Docunit")
-                        .author("author 2")
-                        .documentType(
-                            DocumentTypeDTO.builder()
-                                .id(UUID.fromString("198b276e-8e6d-4df6-8692-44d74ed4fcba"))
-                                .abbreviation("Ebs")
-                                .build())
-                        .legalPeriodicalRawValue("B")
-                        .documentationUnit(
-                            DecisionDTO.builder()
-                                .id(docUnit.getId())
-                                .documentNumber("DOC_NUMBER")
-                                .build())
-                        .build()))
-            .caselawReferences(
-                List.of(
-                    CaselawReferenceDTO.builder()
-                        .id(UUID.randomUUID())
-                        .documentationUnitRank(1)
-                        .citation("Caselaw Reference Citation from Docunit")
-                        .legalPeriodicalRawValue("A")
-                        .type("amtlich")
-                        .documentationUnit(
-                            DecisionDTO.builder()
-                                .id(docUnit.getId())
-                                .documentNumber("DOC_NUMBER")
-                                .build())
-                        .build(),
-                    CaselawReferenceDTO.builder()
-                        .id(existingReferenceId)
-                        .citation("Original Caselaw Reference Citation from Docunit")
-                        .legalPeriodicalRawValue("B")
-                        .type("amtlich")
-                        .documentationUnitRank(2)
-                        .documentationUnit(
-                            DecisionDTO.builder()
-                                .id(docUnit.getId())
-                                .documentNumber("DOC_NUMBER")
-                                .build())
-                        .build()))
-            .build());
+    // 1. Speichern mit null-IDs, um generierte IDs zu erhalten
+    var savedDocUnitDto =
+        documentationUnitRepository.save(
+            docUnit.toBuilder()
+                .literatureReferences(
+                    List.of(
+                        LiteratureReferenceDTO.builder()
+                            .id(null) // Generierung triggern
+                            .documentationUnitRank(1)
+                            .citation("Literature Reference Citation from Docunit")
+                            .legalPeriodicalRawValue("A")
+                            .author("author 1")
+                            .documentType(
+                                DocumentTypeDTO.builder()
+                                    .id(UUID.fromString("f718a7ee-f419-46cf-a96a-29227927850c"))
+                                    .abbreviation("Ean")
+                                    .build())
+                            .documentationUnit(
+                                DecisionDTO.builder()
+                                    .id(docUnit.getId())
+                                    .documentNumber("DOC_NUMBER")
+                                    .build())
+                            .build(),
+                        LiteratureReferenceDTO.builder()
+                            .id(null) // Generierung triggern
+                            .documentationUnitRank(2)
+                            .citation("Original Literature Reference Citation from Docunit")
+                            .author("author 2")
+                            .documentType(
+                                DocumentTypeDTO.builder()
+                                    .id(UUID.fromString("198b276e-8e6d-4df6-8692-44d74ed4fcba"))
+                                    .abbreviation("Ebs")
+                                    .build())
+                            .legalPeriodicalRawValue("B")
+                            .documentationUnit(
+                                DecisionDTO.builder()
+                                    .id(docUnit.getId())
+                                    .documentNumber("DOC_NUMBER")
+                                    .build())
+                            .build()))
+                .caselawReferences(
+                    List.of(
+                        CaselawReferenceDTO.builder()
+                            .id(null) // Generierung triggern
+                            .documentationUnitRank(1)
+                            .citation("Caselaw Reference Citation from Docunit")
+                            .legalPeriodicalRawValue("A")
+                            .type("amtlich")
+                            .documentationUnit(
+                                DecisionDTO.builder()
+                                    .id(docUnit.getId())
+                                    .documentNumber("DOC_NUMBER")
+                                    .build())
+                            .build(),
+                        CaselawReferenceDTO.builder()
+                            .id(null) // Generierung triggern
+                            .citation("Original Caselaw Reference Citation from Docunit")
+                            .legalPeriodicalRawValue("B")
+                            .type("amtlich")
+                            .documentationUnitRank(2)
+                            .documentationUnit(
+                                DecisionDTO.builder()
+                                    .id(docUnit.getId())
+                                    .documentNumber("DOC_NUMBER")
+                                    .build())
+                            .build()))
+                .build());
 
-    UUID newReferenceId = UUID.randomUUID();
-    UUID newLiteratureReferenceId = UUID.randomUUID();
-    UUID editionId = UUID.randomUUID();
+    // 2. Extrahiere die generierten IDs für den Abgleich
+    // Wir nehmen den jeweils zweiten Eintrag (Index 1), da diese im Test "geupdated" werden
+    UUID existingLiteratureCitationId = savedDocUnitDto.getLiteratureReferences().get(1).getId();
+    UUID existingReferenceId = savedDocUnitDto.getCaselawReferences().get(1).getId();
 
     RelatedDocumentationUnit relatedDocUnit =
         RelatedDocumentationUnit.builder()
@@ -265,7 +265,7 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
     var edition =
         repository.save(
             LegalPeriodicalEdition.builder()
-                .id(editionId)
+                .id(UUID.randomUUID())
                 .legalPeriodical(legalPeriodical)
                 .name("2024 Sonderheft 1")
                 .prefix("2024,")
@@ -291,7 +291,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
-                            .id(newReferenceId)
                             .referenceType(ReferenceType.CASELAW)
                             .citation("New Caselaw Reference Citation from Edition")
                             .legalPeriodicalRawValue("D")
@@ -299,7 +298,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
-                            .id(newLiteratureReferenceId)
                             .referenceType(ReferenceType.LITERATURE)
                             .citation("New Literature Reference Citation from Edition")
                             .author("author 3")
@@ -354,7 +352,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
             reference -> {
               assertThat(reference.citation())
                   .isEqualTo("New Caselaw Reference Citation from Edition");
-              assertThat(reference.id()).isEqualTo(newReferenceId);
             });
 
     // then, literature references
@@ -372,7 +369,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
             reference -> {
               assertThat(reference.citation())
                   .isEqualTo("New Literature Reference Citation from Edition");
-              assertThat(reference.id()).isEqualTo(newLiteratureReferenceId);
             });
 
     // clean up
@@ -395,7 +391,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
             .literatureReferences(
                 List.of(
                     LiteratureReferenceDTO.builder()
-                        .id(UUID.randomUUID())
                         .documentationUnitRank(1)
                         .citation("Literature Reference from Docunit")
                         .legalPeriodicalRawValue("A")
@@ -414,7 +409,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
             .caselawReferences(
                 List.of(
                     CaselawReferenceDTO.builder()
-                        .id(UUID.randomUUID())
                         .documentationUnitRank(1)
                         .citation("Caselaw Reference from Docunit")
                         .legalPeriodicalRawValue("A")
@@ -427,10 +421,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                         .build()))
             .build());
 
-    UUID literatureCitationId = UUID.randomUUID();
-    UUID referenceId = UUID.randomUUID();
-    UUID editionId = UUID.randomUUID();
-
     RelatedDocumentationUnit relatedDocUnit =
         RelatedDocumentationUnit.builder()
             .uuid(docUnit.getId())
@@ -440,7 +430,7 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
     var edition =
         repository.save(
             LegalPeriodicalEdition.builder()
-                .id(editionId)
+                .id(UUID.randomUUID())
                 .legalPeriodical(legalPeriodical)
                 .name("2024 Sonderheft 1")
                 .prefix("2024,")
@@ -448,7 +438,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                 .references(
                     List.of(
                         Reference.builder()
-                            .id(referenceId)
                             .referenceType(ReferenceType.CASELAW)
                             .citation("Updated Caselaw Reference Citation from Edition")
                             .legalPeriodicalRawValue("B")
@@ -456,7 +445,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
-                            .id(literatureCitationId)
                             .referenceType(ReferenceType.LITERATURE)
                             .citation("Updated Literature Reference Citation from Edition")
                             .author("author 2")
@@ -466,7 +454,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
-                            .id(UUID.randomUUID())
                             .referenceType(ReferenceType.CASELAW)
                             .citation("New Caselaw Reference from Edition")
                             .legalPeriodicalRawValue("D")
@@ -474,7 +461,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
-                            .id(UUID.randomUUID())
                             .referenceType(ReferenceType.LITERATURE)
                             .citation("New Literature Reference from Edition")
                             .author("author 4")
@@ -485,11 +471,14 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                             .build()))
                 .build());
 
-    edition.references().remove(0); // delete Updated Caselaw Reference Citation from Edition
-    edition.references().remove(0); // delete Updated Literature Reference Citation from Edition
+    UUID referenceIdToDelete = edition.references().get(0).id();
+    UUID literatureIdToDelete = edition.references().get(1).id();
 
-    assertThat(referenceRepository.findById(referenceId)).isPresent();
-    assertThat(referenceRepository.findById(literatureCitationId)).isPresent();
+    edition.references().removeFirst(); // delete Updated Caselaw Reference Citation from Edition
+    edition.references().removeFirst(); // delete Updated Literature Reference Citation from Edition
+
+    assertThat(referenceRepository.findById(referenceIdToDelete)).isPresent();
+    assertThat(referenceRepository.findById(literatureIdToDelete)).isPresent();
 
     var editionResponse =
         risWebTestClient
@@ -534,8 +523,8 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                 assertThat(reference.citation())
                     .isEqualTo("New Literature Reference from Edition"));
 
-    assertThat(referenceRepository.findById(referenceId)).isEmpty();
-    assertThat(referenceRepository.findById(literatureCitationId)).isEmpty();
+    assertThat(referenceRepository.findById(referenceIdToDelete)).isEmpty();
+    assertThat(referenceRepository.findById(literatureIdToDelete)).isEmpty();
 
     // clean up
     repository.save(edition.toBuilder().references(List.of()).build());
@@ -545,8 +534,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
   void testGetEdition_withDocUnitCreatedByReference_shouldSucceed()
       throws DocumentationUnitNotExistsException {
 
-    var referenceId = UUID.randomUUID();
-
     var docUnit =
         EntityBuilderTestUtil.createAndSaveDecision(
             documentationUnitRepository,
@@ -555,7 +542,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
 
     var reference =
         CaselawReferenceDTO.builder()
-            .id(referenceId)
             .documentationUnitRank(1)
             .legalPeriodicalRawValue("ABC")
             .citation("ABC 2024, 3")
@@ -564,7 +550,7 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
             .build();
 
     // Reference needs to be saved manually as the source has no full cascading.
-    referenceRepository.save(reference);
+    var saveReference = referenceRepository.save(reference);
 
     // add status and source
     documentationUnitRepository.save(
@@ -591,7 +577,7 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                 .references(
                     List.of(
                         Reference.builder()
-                            .id(referenceId)
+                            .id(saveReference.getId())
                             .referenceType(ReferenceType.CASELAW)
                             .citation("ABC 2024, 3")
                             .legalPeriodicalRawValue("ABC")
@@ -600,7 +586,7 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                                 RelatedDocumentationUnit.builder()
                                     .uuid(docUnit.getId())
                                     .documentNumber("DOC_NUMBER")
-                                    .createdByReference(referenceId)
+                                    .createdByReference(saveReference.getId())
                                     .build())
                             .build()))
                 .build());
@@ -622,16 +608,17 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
     Assertions.assertEquals(1, firstEditionReferences.size());
     Assertions.assertEquals("ABC 2024, 3", firstEditionReferences.get(0).citation());
     Assertions.assertEquals(
-        referenceId, firstEditionReferences.get(0).documentationUnit().getCreatedByReference());
+        saveReference.getId(),
+        firstEditionReferences.get(0).documentationUnit().getCreatedByReference());
 
     assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").caselawReferences())
         .hasSize(1)
         .satisfies(
             list -> {
-              assertThat(list.get(0).id()).isEqualTo(referenceId);
+              assertThat(list.get(0).id()).isEqualTo(saveReference.getId());
               assertThat(list.get(0).citation()).isEqualTo("ABC 2024, 3");
               assertThat(list.get(0).documentationUnit().getCreatedByReference())
-                  .isEqualTo(referenceId);
+                  .isEqualTo(saveReference.getId());
             });
 
     // clean up
@@ -640,9 +627,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testDeleteReference_shouldCleanupDocUnitSource() throws DocumentationUnitNotExistsException {
-
-    var referenceId = UUID.randomUUID();
-
     // create skeleton doc unit to retrieve ID
     var docUnit =
         EntityBuilderTestUtil.createAndSaveDecision(
@@ -652,7 +636,6 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
 
     var reference =
         CaselawReferenceDTO.builder()
-            .id(referenceId)
             .documentationUnitRank(1)
             .legalPeriodicalRawValue("ABC")
             .citation("ABC 2024, 3")
@@ -661,7 +644,7 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
             .build();
 
     // Reference needs to be saved manually as the source has no full cascading.
-    referenceRepository.save(reference);
+    var savedReference = referenceRepository.save(reference);
 
     // add status and source
     FileNumberDTO fileNumber = EntityBuilderTestUtil.createTestFileNumberDTO();
@@ -691,7 +674,7 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                 .references(
                     List.of(
                         Reference.builder()
-                            .id(referenceId)
+                            .id(savedReference.getId())
                             .referenceType(ReferenceType.CASELAW)
                             .citation("ABC 2024, 3")
                             .legalPeriodicalRawValue("ABC")
@@ -700,7 +683,7 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                                 RelatedDocumentationUnit.builder()
                                     .uuid(docUnit.getId())
                                     .documentNumber("DOC_NUMBER")
-                                    .createdByReference(referenceId)
+                                    .createdByReference(savedReference.getId())
                                     .build())
                             .build()))
                 .build());

@@ -33,18 +33,7 @@ const references = computed({
 
 async function saveReferences(references: Reference[]) {
   store.edition!.references = references
-  const response = await store.saveEdition()
-  if (response.error) {
-    const message =
-      "Fehler beim Speichern der Fundstellen. Bitte laden Sie die Seite neu."
-    alert(message)
-    responseError.value = {
-      title: message,
-    }
-  } else
-    store.edition!.references = response.data.references?.map(
-      (decision) => new Reference({ ...decision }),
-    )
+  await store.saveEdition()
 }
 
 async function addNewEntry() {
@@ -85,15 +74,17 @@ watch(loadEditionIntervalCounter, async () => {
           :title="responseError.title"
         />
       </div>
-      <Button
-        v-if="references.length > 3"
-        aria-label="Weitere Angabe Top"
-        label="Weitere Angabe"
-        severity="secondary"
-        size="small"
-        @click="addNewEntry"
-        ><template #icon> <IconAdd /> </template
-      ></Button>
+      <div>
+        <Button
+          v-if="references.length > 3"
+          aria-label="Weitere Angabe Top"
+          label="Weitere Angabe"
+          severity="secondary"
+          size="small"
+          @click="addNewEntry"
+          ><template #icon> <IconAdd /> </template
+        ></Button>
+      </div>
       <div aria-label="Fundstellen">
         <EditableList
           ref="editableListRef"

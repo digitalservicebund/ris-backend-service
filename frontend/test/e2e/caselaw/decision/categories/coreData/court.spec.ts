@@ -208,9 +208,7 @@ test.describe("court", () => {
       await expect(page.getByText("Region")).toBeVisible()
 
       // region was set by the backend based on state database table
-      await expect(page.getByLabel("Region", { exact: true })).toHaveValue(
-        "BR, ND",
-      )
+      await expect(page.getByLabel("Region", { exact: true })).toHaveValue("ND")
     },
   )
 

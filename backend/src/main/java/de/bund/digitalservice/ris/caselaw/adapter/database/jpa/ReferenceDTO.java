@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -16,6 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.UuidGenerator;
 
 @Getter
 @Setter
@@ -27,7 +29,11 @@ import lombok.experimental.SuperBuilder;
 @Table(schema = "incremental_migration", name = "reference")
 public abstract class ReferenceDTO {
 
-  @Id private UUID id;
+  @Id
+  @GeneratedValue
+  @UuidGenerator
+  @Column(updatable = false, nullable = false)
+  private UUID id;
 
   @ManyToOne
   @NotNull

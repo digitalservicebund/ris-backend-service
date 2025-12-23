@@ -2,8 +2,8 @@ import EditableListItem from "./editableListItem"
 import { DropdownItem } from "@/components/input/types"
 
 export default class IncomeType implements EditableListItem {
-  public id?: string
-  public newEntry?: boolean
+  public id?: string // BE only
+  public localId: string // FE only
   public typeOfIncome?: TypeOfIncome
   public terminology?: string
 
@@ -11,21 +11,11 @@ export default class IncomeType implements EditableListItem {
 
   constructor(data: Partial<IncomeType> = {}) {
     Object.assign(this, data)
-
-    if (this.id == undefined) {
-      this.id = crypto.randomUUID()
-      this.newEntry = true
-    } else if (data.newEntry == undefined) {
-      this.newEntry = false
-    }
+    this.localId = data.localId ?? crypto.randomUUID()
   }
 
   get isEmpty(): boolean {
     return IncomeType.fields.every((field) => this.fieldIsEmpty(this[field]))
-  }
-
-  equals(entry: IncomeType): boolean {
-    return this.id === entry.id
   }
 
   private fieldIsEmpty(
