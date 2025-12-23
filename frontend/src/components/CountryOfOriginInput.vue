@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import { UseFetchReturn } from "@vueuse/core"
 import Button from "primevue/button"
 import { computed, onMounted, Ref, ref, shallowRef, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CountryOfOriginSummary from "@/components/CountryOfOriginSummary.vue"
 import InputField from "@/components/input/InputField.vue"
-import { ComboboxItem } from "@/components/input/types"
 import CountryOfOrigin from "@/domain/countryOfOrigin"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
-import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemServices, {
+  ComboboxItemService,
+} from "@/services/comboboxItemService"
 
 const props = defineProps<{
   modelValue?: CountryOfOrigin
@@ -50,55 +50,46 @@ onMounted(() => {
   })
 })
 
-const countryWithLabel = computed({
-  get: () =>
-    currentValue.value?.country
-      ? {
-          label: currentValue.value.country.identifier,
-          value: currentValue.value.country,
-        }
-      : undefined,
+const country = computed({
+  get: () => currentValue.value?.country,
   set: (newValue: FieldOfLaw) => {
     currentValue.value.country = newValue
     currentValue.value.legacyValue = undefined
   },
 })
 
-const fieldOfLawWithLabel = computed({
-  get: () =>
-    currentValue.value?.fieldOfLaw
-      ? {
-          label: currentValue.value.fieldOfLaw.identifier,
-          value: currentValue.value.fieldOfLaw,
-        }
-      : undefined,
+const fieldOfLaw = computed({
+  get: () => currentValue.value?.fieldOfLaw,
   set: (newValue: FieldOfLaw) => {
     currentValue.value.fieldOfLaw = newValue
   },
 })
 
-const fieldOfLawWithoutCountriesService = (
-  filter: Ref<string | undefined>,
-): UseFetchReturn<ComboboxItem[]> => {
-  const useFetchReturn =
-    ComboboxItemService.getFieldOfLawSearchByIdentifier(filter)
+const fieldOfLawWithoutCountriesService: ComboboxItemService<FieldOfLaw> = (
+  filter,
+) => {
+  const { format, useFetch: useFetchReturn } =
+    ComboboxItemServices.getFieldOfLawSearchByIdentifier(filter)
 
-  const data = shallowRef<ComboboxItem[] | null>(null)
+  const data = shallowRef<FieldOfLaw[] | null>(null)
 
   watch(
     useFetchReturn.data,
     () => {
       data.value =
         useFetchReturn.data.value?.filter(
-          (item) => !item.label.startsWith("RE-07-"),
+          (item) => !format(item).label.startsWith("RE-07-"),
         ) ?? null
     },
     { immediate: true },
   )
 
   return {
-    ...useFetchReturn,
-    data,
+    useFetch: {
+      ...useFetchReturn,
+      data,
+    },
+    format,
   }
 }
 </script>
@@ -117,7 +108,7 @@ const fieldOfLawWithoutCountriesService = (
         >
           <ComboboxInput
             id="countryOfOriginCountryInputText"
-            v-model="countryWithLabel"
+            v-model="country"
             aria-label="Landbezeichnung"
             class="w-full"
             :invalid="slotProps.hasError"
@@ -135,7 +126,7 @@ const fieldOfLawWithoutCountriesService = (
         >
           <ComboboxInput
             id="countryOfOriginFieldOfLawInputText"
-            v-model="fieldOfLawWithLabel"
+            v-model="fieldOfLaw"
             aria-label="Rechtlicher Rahmen"
             class="w-full"
             :invalid="slotProps.hasError"

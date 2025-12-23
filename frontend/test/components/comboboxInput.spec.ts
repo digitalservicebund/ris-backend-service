@@ -1,13 +1,13 @@
 import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
-import { UseFetchReturn } from "@vueuse/core"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
-import { Ref } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { ComboboxItem } from "@/components/input/types"
 import { Court } from "@/domain/court"
-import comboboxItemService from "@/services/comboboxItemService"
+import comboboxItemService, {
+  ComboboxItemService,
+} from "@/services/comboboxItemService"
 
 const items = [
   {
@@ -41,23 +41,23 @@ function renderComponent<T extends object>(
   options: {
     id?: string
     modelValue?: T
-    itemService?: (
-      filter: Ref<string | undefined>,
-    ) => UseFetchReturn<ComboboxItem<T>[]>
+    itemService?: ComboboxItemService<T>
     ariaLabel?: string
     manualEntry?: boolean
     noClear?: boolean
   } = {},
 ) {
   return {
-    ...render(ComboboxInput, {
+    ...render(ComboboxInput<T>, {
       props: {
         id: options.id ?? "combobox-test",
         modelValue: options.modelValue,
         ariaLabel: options.ariaLabel ?? "test label",
         manualEntry: options.manualEntry ?? false,
         noClear: options.noClear ?? false,
-        itemService: options.itemService ?? comboboxItemService.getCourts,
+        itemService:
+          options.itemService ??
+          (comboboxItemService.getCourts as unknown as ComboboxItemService<T>),
       },
     }),
   }

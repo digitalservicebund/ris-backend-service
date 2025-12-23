@@ -1,5 +1,4 @@
 <script setup lang="ts" generic="T extends object">
-import { UseFetchReturn } from "@vueuse/core"
 import AutoComplete, {
   AutoCompleteChangeEvent,
   AutoCompleteCompleteEvent,
@@ -8,15 +7,14 @@ import AutoComplete, {
 import ProgressSpinner from "primevue/progressspinner"
 import { computed, Ref, ref, watch } from "vue"
 import { ComboboxItem } from "@/components/input/types"
+import { ComboboxItemService } from "@/services/comboboxItemService"
 import IcOutlineClear from "~icons/ic/outline-clear?height=16"
 import IconChevron from "~icons/mdi/chevron-down"
 
 const props = withDefaults(
   defineProps<{
     id: string
-    itemService: (
-      filter: Ref<string | undefined>,
-    ) => UseFetchReturn<ComboboxItem<T>[]>
+    itemService: ComboboxItemService<T>
     modelValue: T | undefined
     ariaLabel: string
     placeholder?: string
@@ -71,19 +69,21 @@ const conditionalClasses = computed(() => ({
 }))
 
 const {
-  data: existingItems,
-  execute: fetchItems,
-  isFetching,
+  useFetch: { data: existingItems, execute: fetchItems, isFetching },
+  format,
 } = props.itemService(filter)
 
 const selectionItems = computed(() => {
-  const exactMatchFound = existingItems.value?.find(
+  const formatedExistingItems =
+    existingItems.value?.map((item) => format(item)) ?? []
+
+  const exactMatchFound = formatedExistingItems.find(
     (item) => item.label === filter.value?.trim(),
   )
 
   if (props.manualEntry && filter.value && !exactMatchFound) {
     return [
-      ...(existingItems.value ?? []),
+      ...formatedExistingItems,
       {
         label: `${filter.value} neu erstellen`,
         value: { label: filter.value! },
@@ -91,7 +91,7 @@ const selectionItems = computed(() => {
     ]
   }
 
-  return existingItems.value ?? []
+  return formatedExistingItems
 })
 
 const handleComplete = async (e: AutoCompleteCompleteEvent) => {
@@ -144,7 +144,7 @@ watch(
     force-selection
     :loading="isFetching"
     :model-value="internalValue"
-    option-label="label"
+    :option-label="(option) => format(option).label"
     :placeholder="props.placeholder"
     :show-clear="!props.noClear"
     :suggestions="selectionItems"
@@ -180,7 +180,7 @@ watch(
         class="flex min-h-48 flex-col justify-start gap-2 border-l-4 border-transparent px-12 py-10 data-[variant=active]:-ml-4 data-[variant=active]:border-blue-800 data-[variant=active]:bg-blue-200"
         :data-variant="
           slotProps.option.value &&
-          props.comparisonFunction?.(slotProps.option.value, internalValue)
+          props.comparisonFunction(slotProps.option.value, internalValue)
             ? 'active'
             : ''
         "

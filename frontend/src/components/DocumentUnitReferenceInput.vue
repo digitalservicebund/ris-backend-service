@@ -7,7 +7,7 @@ import InputField from "@/components/input/InputField.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import Reference from "@/domain/reference"
-import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemServices from "@/services/comboboxItemService"
 
 const props = defineProps<{
   modelValue?: Reference
@@ -27,14 +27,7 @@ const lastSavedModelValue = ref(new Reference({ ...props.modelValue }))
 const validationStore = useValidationStore<(typeof Reference.fields)[number]>()
 
 const legalPeriodical = computed({
-  get: () =>
-    reference?.value?.legalPeriodical?.abbreviation
-      ? {
-          label: reference.value.legalPeriodical.abbreviation,
-          value: reference.value.legalPeriodical,
-          additionalInformation: reference.value.legalPeriodical.subtitle,
-        }
-      : undefined,
+  get: () => reference?.value?.legalPeriodical,
   set: (newValue) => {
     const legalPeriodical = { ...newValue } as LegalPeriodical
     if (newValue) {
@@ -104,7 +97,7 @@ watch(
         v-model="legalPeriodical"
         aria-label="Periodikum"
         :has-error="slotProps.hasError"
-        :item-service="ComboboxItemService.getLegalPeriodicals"
+        :item-service="ComboboxItemServices.getLegalPeriodicals"
         @focus="validationStore.remove('legalPeriodical')"
       ></ComboboxInput>
     </InputField>
@@ -129,7 +122,7 @@ watch(
             />
           </InputField>
           <span v-if="legalPeriodical" class="ris-label3-regular pt-4"
-            >Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}</span
+            >Zitierbeispiel: {{ legalPeriodical.citationStyle }}</span
           >
         </div>
         <InputField

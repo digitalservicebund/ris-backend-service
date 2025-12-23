@@ -12,7 +12,7 @@ import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
-import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemServices from "@/services/comboboxItemService"
 import { ResponseError } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 import { useEditionStore } from "@/stores/editionStore"
@@ -28,17 +28,7 @@ const validationStore =
   useValidationStore<(typeof LegalPeriodicalEdition.fields)[number]>()
 
 const legalPeriodical = computed({
-  get: () =>
-    editionRef.value?.legalPeriodical
-      ? {
-          label:
-            editionRef.value?.legalPeriodical.abbreviation +
-            " | " +
-            editionRef.value?.legalPeriodical.title,
-          value: editionRef.value?.legalPeriodical,
-          additionalInformation: editionRef.value?.legalPeriodical.subtitle,
-        }
-      : undefined,
+  get: () => editionRef.value?.legalPeriodical,
   set: (newValue) => {
     if (editionRef.value) {
       editionRef.value.legalPeriodical = newValue
@@ -111,7 +101,7 @@ onBeforeMount(async () => {
           v-model="legalPeriodical"
           aria-label="Periodikum"
           :has-error="slotProps.hasError"
-          :item-service="ComboboxItemService.getLegalPeriodicals"
+          :item-service="ComboboxItemServices.getLegalPeriodicals"
           :read-only="editionRef?.references?.length! > 0"
         ></ComboboxInput>
       </InputField>

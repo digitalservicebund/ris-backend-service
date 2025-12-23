@@ -6,7 +6,6 @@ import DataTable from "primevue/datatable"
 import { useToast } from "primevue/usetoast"
 import { computed, onMounted, ref } from "vue"
 import DocumentationOfficeSelector from "@/components/DocumentationOfficeSelector.vue"
-import { ComboboxItem } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
 import EURLexResult, { EurlexParameters } from "@/domain/eurlex"
@@ -41,13 +40,9 @@ const entries = computed(() => {
 })
 
 onMounted(async () => {
-  const comboboxItems: ComboboxItem[] | null = (
-    await service.getDocumentationOffices(ref(undefined))
-  ).data.value
-
-  documentationOffices.value = comboboxItems?.map(
-    ({ value }) => value as DocumentationOffice,
-  )
+  documentationOffices.value =
+    (await service.getDocumentationOffices(ref(undefined))).useFetch.data
+      .value ?? undefined
 })
 
 function openPreview(entry: EURLexResult) {

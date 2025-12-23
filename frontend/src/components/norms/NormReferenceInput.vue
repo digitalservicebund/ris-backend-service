@@ -10,7 +10,7 @@ import LegalForce from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
-import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemServices from "@/services/comboboxItemService"
 import IconAdd from "~icons/ic/baseline-add"
 
 const props = defineProps<{
@@ -56,14 +56,7 @@ const hasMaxOneSingleNorm = computed(() => singleNorms.value.length <= 1)
  * against already existing norm abbreviations in the list.
  */
 const normAbbreviation = computed({
-  get: () =>
-    norm.value.normAbbreviation
-      ? {
-          label: norm.value.normAbbreviation.abbreviation,
-          value: norm.value.normAbbreviation,
-          additionalInformation: norm.value.normAbbreviation.officialLongTitle,
-        }
-      : undefined,
+  get: () => norm.value.normAbbreviation,
   set: (newValue) => {
     const newNormAbbreviation = { ...newValue } as NormAbbreviation
     if (newValue) {
@@ -217,7 +210,7 @@ watch(
         v-model="normAbbreviation"
         aria-label="RIS-Abkürzung"
         :has-error="slotProps.hasError"
-        :item-service="ComboboxItemService.getRisAbbreviations"
+        :item-service="ComboboxItemServices.getRisAbbreviations"
         no-clear
         placeholder="Abkürzung, Kurz-oder Langtitel oder Region eingeben..."
         @focus="validationStore.remove('normAbbreviation')"

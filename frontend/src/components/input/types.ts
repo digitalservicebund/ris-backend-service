@@ -1,5 +1,4 @@
-import { UseFetchReturn } from "@vueuse/core"
-import { Component, Ref } from "vue"
+import { Component } from "vue"
 import { LabelPosition } from "@/components/input/InputField.vue"
 import { CitationType } from "@/domain/citationType"
 import { Court } from "@/domain/court"
@@ -91,16 +90,6 @@ export interface NestedInputModelType {
   }
 }
 
-export interface NestedInputAttributes extends BaseInputAttributes {
-  fields: { parent: InputField; child: InputField }
-}
-
-export interface NestedInputField extends Omit<BaseInputField, "name"> {
-  name: `nestedInputOf${Capitalize<string>}And${Capitalize<string>}`
-  type: InputType.NESTED
-  inputAttributes: NestedInputAttributes
-}
-
 //DATE
 export interface DateAttributes extends BaseInputAttributes {
   isFutureDate?: boolean
@@ -147,28 +136,6 @@ export type ComboboxInputModelType =
   | LanguageCode
   | User
 
-export type ComboboxItem = {
-  label: string
-  value?: ComboboxInputModelType
-  labelCssClasses?: string
-  additionalInformation?: string
-  sideInformation?: string
-}
-
-export interface ComboboxAttributes extends BaseInputAttributes {
-  itemService: (
-    filter: Ref<string | undefined>,
-  ) => UseFetchReturn<ComboboxItem[]>
-  placeholder?: string
-  manualEntry?: boolean
-  noClear?: boolean
-}
-
-export interface ComboboxInputField extends BaseInputField {
-  type: InputType.COMBOBOX
-  inputAttributes: ComboboxAttributes
-}
-
 //CHECKBOX
 export type BooleanModelType = boolean
 
@@ -194,26 +161,6 @@ export interface TextAreaInputField extends BaseInputField {
   type: InputType.TEXTAREA
   inputAttributes: TextAreaInputAttributes
 }
-
-export type InputField =
-  | TextInputField
-  | DropdownInputField
-  | DateInputField
-  | CheckboxInputField
-  | ChipsInputField
-  | DateChipsInputField
-  | NestedInputField
-  | ComboboxInputField
-  | TextAreaInputField
-
-export type InputAttributes =
-  | TextInputAttributes
-  | DropdownAttributes
-  | ChipsInputAttributes
-  | NestedInputAttributes
-  | DateAttributes
-  | ComboboxAttributes
-  | TextAreaInputAttributes
 
 export type ModelType =
   | TextInputModelType
@@ -247,4 +194,11 @@ export type LdmlPreview = {
   ldml?: string
   success?: boolean
   statusMessages?: string[]
+}
+
+export type ComboboxItem<T> = {
+  label: string
+  value?: T
+  additionalInformation?: string
+  sideInformation?: string
 }

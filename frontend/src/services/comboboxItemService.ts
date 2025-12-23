@@ -1,8 +1,7 @@
 import { useFetch, UseFetchReturn } from "@vueuse/core"
 import { capitalize, computed, Ref } from "vue"
 import { API_PREFIX } from "./httpClient"
-import { ComboboxInputModelType, ComboboxItem } from "@/components/input/types"
-import { Page } from "@/components/Pagination.vue"
+import { ComboboxItem } from "@/components/input/types"
 import { CitationType } from "@/domain/citationType"
 import { CollectiveAgreementIndustry } from "@/domain/collectiveAgreementIndustry"
 import { Court } from "@/domain/court"
@@ -19,132 +18,130 @@ import { Procedure } from "@/domain/procedure"
 import { User } from "@/domain/user"
 import errorMessages from "@/i18n/errors.json"
 
-enum Endpoint {
-  documentTypes = "documenttypes",
-  courts = "courts",
-  citationTypes = "citationtypes",
-  fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
-  risAbbreviations = `normabbreviation/search`,
-  procedures = `procedure`,
-  legalForceRegions = `region/applicable`,
-  legalForceTypes = `legalforcetype`,
-  legalPeriodicals = `legalperiodicals`,
-  documentationOffices = `documentationoffices`,
-  languageCodes = `languagecodes`,
-  usersForDocOffice = "users",
-  collectiveAgreementIndustries = "collective-agreement-industries",
-  currencyCodes = `currencycodes`,
+type Endpoint<T> = {
+  path: string
+  format: (responseData: T) => ComboboxItem<T>
 }
 
-function formatDropdownItems(
-  responseData: ComboboxInputModelType[],
-  endpoint: Endpoint,
-): ComboboxItem[] {
-  switch (endpoint) {
-    case Endpoint.documentTypes: {
-      return (responseData as DocumentType[]).map((item) => ({
-        label: item.label,
-        value: item,
-        additionalInformation: item.jurisShortcut,
-      }))
-    }
-    case Endpoint.courts: {
-      return (responseData as Court[]).map((item) => ({
-        label: item.label,
-        value: item,
-        additionalInformation: item.revoked,
-      }))
-    }
-    case Endpoint.fieldOfLawSearchByIdentifier: {
-      return (responseData as FieldOfLaw[]).map((item) => ({
-        label: item.identifier,
-        value: item,
-        additionalInformation: item.text,
-      }))
-    }
-    case Endpoint.risAbbreviations: {
-      return (responseData as NormAbbreviation[]).map((item) => ({
-        label: item.abbreviation,
-        value: item,
-        additionalInformation: `${item.officialLongTitle ?? ""} ${item.officialLongTitle && item.documentNumber ? " | " : ""} ${item.documentNumber ?? ""}`,
-      }))
-    }
-    case Endpoint.citationTypes: {
-      return (responseData as CitationType[]).map((item) => ({
-        label: item.label,
-        value: item,
-      }))
-    }
-    case Endpoint.procedures: {
-      return (responseData as unknown as Page<Procedure>).content.map(
-        (item) => ({
-          label: item.label,
-          value: item,
-          additionalInformation: `${
-            item.documentationUnitCount ?? 0
-          } Dokumentationseinheiten`,
-        }),
-      )
-    }
-    case Endpoint.legalForceTypes: {
-      return (responseData as LegalForceType[]).map((item) => ({
-        label: capitalize(item.abbreviation),
-        value: item,
-      }))
-    }
-    case Endpoint.legalForceRegions: {
-      return (responseData as LegalForceRegion[]).map((item) => ({
-        label: item.longText,
-        value: item,
-      }))
-    }
-    case Endpoint.legalPeriodicals: {
-      return (responseData as LegalPeriodical[]).map((item) => ({
-        label: `${item.abbreviation} | ${item.title}`,
-        value: item,
-        additionalInformation: item.subtitle,
-        sideInformation: item.primaryReference ? "amtlich" : "nicht amtlich",
-      }))
-    }
-    case Endpoint.documentationOffices: {
-      return (responseData as DocumentationOffice[]).map((item) => ({
-        label: item.abbreviation,
-        value: item,
-      }))
-    }
-    case Endpoint.languageCodes: {
-      return (responseData as LanguageCode[]).map((item) => ({
-        label: item.label,
-        value: item,
-      }))
-    }
-    case Endpoint.usersForDocOffice: {
-      return (responseData as User[]).map((item) => ({
-        label: item.name ?? item.email,
-        value: item,
-      }))
-    }
-    case Endpoint.collectiveAgreementIndustries: {
-      return (responseData as CollectiveAgreementIndustry[]).map((item) => ({
-        label: item.label,
-        value: item,
-      }))
-    }
-    case Endpoint.currencyCodes: {
-      return (responseData as CurrencyCode[]).map((item) => ({
-        label: item.label,
-        value: item,
-      }))
-    }
-  }
+const endpoints = {
+  documentTypes: {
+    path: "documenttypes",
+    format: (item: DocumentType) => ({
+      label: item.label,
+      value: item,
+      additionalInformation: item.jurisShortcut,
+    }),
+  },
+  courts: {
+    path: "courts",
+    format: (item: Court) => ({
+      label: item.label,
+      value: item,
+      additionalInformation: item.revoked,
+    }),
+  },
+  citationTypes: {
+    path: "citationtypes",
+    format: (item: CitationType) => ({
+      label: item.label,
+      value: item,
+    }),
+  },
+  fieldOfLawSearchByIdentifier: {
+    path: "fieldsoflaw/search-by-identifier",
+    format: (item: FieldOfLaw) => ({
+      label: item.identifier,
+      value: item,
+      additionalInformation: item.text,
+    }),
+  },
+  risAbbreviations: {
+    path: "normabbreviation/search",
+    format: (item: NormAbbreviation) => ({
+      label: item.abbreviation,
+      value: item,
+      additionalInformation: `${item.officialLongTitle ?? ""} ${item.officialLongTitle && item.documentNumber ? " | " : ""} ${item.documentNumber ?? ""}`,
+    }),
+  },
+  procedures: {
+    path: "procedure",
+    format: (item: Procedure) => ({
+      label: item.label,
+      value: item,
+      additionalInformation: `${
+        item.documentationUnitCount ?? 0
+      } Dokumentationseinheiten`,
+    }),
+  },
+  legalForceRegions: {
+    path: "region/applicable",
+    format: (item: LegalForceRegion) => ({
+      label: item.longText,
+      value: item,
+    }),
+  },
+  legalForceTypes: {
+    path: "legalforcetype",
+    format: (item: LegalForceType) => ({
+      label: capitalize(item.abbreviation),
+      value: item,
+    }),
+  },
+  legalPeriodicals: {
+    path: "legalperiodicals",
+    format: (item: LegalPeriodical) => ({
+      label: `${item.abbreviation} | ${item.title}`,
+      value: item,
+      additionalInformation: item.subtitle,
+      sideInformation: item.primaryReference ? "amtlich" : "nicht amtlich",
+    }),
+  },
+  documentationOffices: {
+    path: "documentationoffices",
+    format: (item: DocumentationOffice) => ({
+      label: item.abbreviation,
+      value: item,
+    }),
+  },
+  languageCodes: {
+    path: "languagecodes",
+    format: (item: LanguageCode) => ({
+      label: item.label,
+      value: item,
+    }),
+  },
+  usersForDocOffice: {
+    path: "users",
+    format: (item: User) => ({
+      label: item.name ?? item.email,
+      value: item,
+    }),
+  },
+  collectiveAgreementIndustries: {
+    path: "collective-agreement-industries",
+    format: (item: CollectiveAgreementIndustry) => ({
+      label: item.label,
+      value: item,
+    }),
+  },
+  currencyCodes: {
+    path: "currencycodes",
+    format: (item: CurrencyCode) => ({
+      label: item.label,
+      value: item,
+    }),
+  },
+} satisfies {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: Endpoint<any>
 }
 
-function fetchFromEndpoint(
-  endpoint: Endpoint,
+function fetchFromEndpoint<T>(
+  endpoint: Endpoint<T>,
   filter: Ref<string | undefined>,
   size?: number,
   category?: DocumentTypeCategory,
-) {
+): UseFetchReturn<T[]> {
   const requestParams = computed<{
     q?: string
     sz?: string
@@ -156,12 +153,16 @@ function fetchFromEndpoint(
   }))
   const url = computed(() => {
     const queryParams = new URLSearchParams(requestParams.value).toString()
-    return `${API_PREFIX}caselaw/${endpoint}?${queryParams}`
+    return `${API_PREFIX}caselaw/${endpoint.path}?${queryParams}`
   })
 
-  return useFetch<ComboboxItem[]>(url, {
+  return useFetch<T[]>(url, {
     afterFetch: (ctx) => {
-      ctx.data = formatDropdownItems(ctx.data, endpoint)
+      // endpoints.procedures returns a paginated response we need to unpack
+      if ("content" in ctx.data) {
+        ctx.data = ctx.data.content
+      }
+
       return ctx
     },
     onFetchError: ({ response }) => ({
@@ -174,81 +175,59 @@ function fetchFromEndpoint(
   }).json()
 }
 
-type ComboboxItemService = {
-  // Generic signature for most methods (excluding 'documentTypes')
-  [key in Exclude<
-    keyof typeof Endpoint,
-    "documentTypes"
-  > as `get${Capitalize<key>}`]: (
-    filter: Ref<string | undefined>,
-  ) => UseFetchReturn<ComboboxItem[]>
-} & {
-  // --- Convenience methods for document types ---
-  getCaselawDocumentTypes: (
-    filter: Ref<string | undefined>,
-  ) => UseFetchReturn<ComboboxItem[]>
-  getCaselawAndPendingProceedingDocumentTypes: (
-    filter: Ref<string | undefined>,
-  ) => UseFetchReturn<ComboboxItem[]>
-  getDependentLiteratureDocumentTypes: (
-    filter: Ref<string | undefined>,
-  ) => UseFetchReturn<ComboboxItem[]>
-  getCountryFieldOfLawSearchByIdentifier: (
-    filter: Ref<string | undefined>,
-  ) => UseFetchReturn<ComboboxItem[]>
+function toComboboxItemService<T>(
+  endpoint: Endpoint<T>,
+  size?: number,
+  category?: DocumentTypeCategory,
+): ComboboxItemService<T> {
+  return (filter) => ({
+    format: endpoint.format,
+    useFetch: fetchFromEndpoint(endpoint, filter, size, category),
+  })
 }
 
-const service: ComboboxItemService = {
-  getCollectiveAgreementIndustries: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.collectiveAgreementIndustries, filter),
-  getCourts: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.courts, filter, 200),
-  getCaselawDocumentTypes: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.documentTypes, filter),
-  getCaselawAndPendingProceedingDocumentTypes: (
-    filter: Ref<string | undefined>,
-  ) =>
-    fetchFromEndpoint(
-      Endpoint.documentTypes,
-      filter,
-      undefined,
-      DocumentTypeCategory.CASELAW_PENDING_PROCEEDING,
-    ),
-  getDependentLiteratureDocumentTypes: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(
-      Endpoint.documentTypes,
-      filter,
-      undefined,
-      DocumentTypeCategory.DEPENDENT_LITERATURE,
-    ),
-  getFieldOfLawSearchByIdentifier: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter, 200),
+const services = {
+  getCollectiveAgreementIndustries: toComboboxItemService(
+    endpoints.collectiveAgreementIndustries,
+  ),
+  getCourts: toComboboxItemService(endpoints.courts, 200),
+  getCaselawDocumentTypes: toComboboxItemService(endpoints.documentTypes),
+  getCaselawAndPendingProceedingDocumentTypes: toComboboxItemService(
+    endpoints.documentTypes,
+    undefined,
+    DocumentTypeCategory.CASELAW_PENDING_PROCEEDING,
+  ),
+  getDependentLiteratureDocumentTypes: toComboboxItemService(
+    endpoints.documentTypes,
+    undefined,
+    DocumentTypeCategory.DEPENDENT_LITERATURE,
+  ),
+  getFieldOfLawSearchByIdentifier: toComboboxItemService(
+    endpoints.fieldOfLawSearchByIdentifier,
+    200,
+  ),
   getCountryFieldOfLawSearchByIdentifier: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(
-      Endpoint.fieldOfLawSearchByIdentifier,
-      computed(() => `RE-07-${filter.value?.replace("RE-07-", "") ?? ""}`),
+    toComboboxItemService(
+      endpoints.fieldOfLawSearchByIdentifier,
       1000,
-    ),
-  getRisAbbreviations: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.risAbbreviations, filter, 30),
-  getCitationTypes: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.citationTypes, filter),
-  getProcedures: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.procedures, filter, 10),
-  getLegalForceTypes: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.legalForceTypes, filter),
-  getLegalForceRegions: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.legalForceRegions, filter),
-  getLegalPeriodicals: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.legalPeriodicals, filter),
-  getDocumentationOffices: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.documentationOffices, filter),
-  getLanguageCodes: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.languageCodes, filter),
-  getUsersForDocOffice: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.usersForDocOffice, filter),
-  getCurrencyCodes: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.currencyCodes, filter),
+    )(computed(() => `RE-07-${filter.value?.replace("RE-07-", "") ?? ""}`)),
+  getRisAbbreviations: toComboboxItemService(endpoints.risAbbreviations, 30),
+  getCitationTypes: toComboboxItemService(endpoints.citationTypes),
+  getProcedures: toComboboxItemService(endpoints.procedures, 10),
+  getLegalForceTypes: toComboboxItemService(endpoints.legalForceTypes),
+  getLegalForceRegions: toComboboxItemService(endpoints.legalForceRegions),
+  getLegalPeriodicals: toComboboxItemService(endpoints.legalPeriodicals),
+  getDocumentationOffices: toComboboxItemService(
+    endpoints.documentationOffices,
+  ),
+  getLanguageCodes: toComboboxItemService(endpoints.languageCodes),
+  getUsersForDocOffice: toComboboxItemService(endpoints.usersForDocOffice),
+  getCurrencyCodes: toComboboxItemService(endpoints.currencyCodes),
 }
 
-export default service
+export type ComboboxItemService<T> = (filter: Ref<string | undefined>) => {
+  useFetch: UseFetchReturn<T[]>
+  format: (item: T) => ComboboxItem<T>
+}
+
+export default services

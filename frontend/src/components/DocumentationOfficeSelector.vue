@@ -1,16 +1,13 @@
 <script lang="ts" setup>
 import { computed, Ref, shallowRef, watchEffect } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import { ComboboxItem } from "@/components/input/types"
 import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
 import errorMessages from "@/i18n/errors.json"
-import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemServices, {
+  ComboboxItemService,
+} from "@/services/comboboxItemService"
 
-type DocumentationOfficeComboboxInputType = {
-  label: string
-  value: DocumentationOffice
-}
 const props = defineProps<{
   modelValue: DocumentationOffice | undefined
   excludeOfficeAbbreviations?: string[] | null
@@ -24,13 +21,7 @@ const emit = defineEmits<{
 }>()
 
 const modelValueAdapter = computed({
-  get: () =>
-    props.modelValue?.abbreviation
-      ? {
-          label: props.modelValue.abbreviation,
-          value: props.modelValue,
-        }
-      : undefined,
+  get: () => props.modelValue,
   set: (newValue: DocumentationOffice) => {
     if (newValue) {
       emit("update:modelValue", newValue)
@@ -49,9 +40,12 @@ const modelValueAdapter = computed({
  * based on the provided exclusion list. It uses `watchEffect` to ensure the returned
  * `data` property reactively updates if the fetched list or exclusion criteria change.
  */
-const getFilteredItems = (filter: Ref<string | undefined>) => {
-  const serviceCallResult = ComboboxItemService.getDocumentationOffices(filter)
-  const filteredData = shallowRef<ComboboxItem[] | null>(null)
+const getFilteredItems: ComboboxItemService<DocumentationOffice> = (
+  filter: Ref<string | undefined>,
+) => {
+  const { useFetch: serviceCallResult, format } =
+    ComboboxItemServices.getDocumentationOffices(filter)
+  const filteredData = shallowRef<DocumentationOffice[] | null>(null)
 
   watchEffect(() => {
     const allItems = serviceCallResult.data.value
@@ -63,7 +57,7 @@ const getFilteredItems = (filter: Ref<string | undefined>) => {
         const exclusionSet = new Set(props.excludeOfficeAbbreviations)
 
         filteredData.value = allItems.filter(
-          (item) => !exclusionSet.has(item.label),
+          (item) => !exclusionSet.has(item.abbreviation),
         )
       } else {
         filteredData.value = allItems
@@ -74,8 +68,11 @@ const getFilteredItems = (filter: Ref<string | undefined>) => {
   })
 
   return {
-    ...serviceCallResult,
-    data: filteredData,
+    useFetch: {
+      ...serviceCallResult,
+      data: filteredData,
+    },
+    format,
   }
 }
 </script>
@@ -91,11 +88,7 @@ const getFilteredItems = (filter: Ref<string | undefined>) => {
       :item-service="getFilteredItems"
       :model-value="modelValueAdapter"
       placeholder="Dokumentationsstelle auswählen"
-      @update:model-value="
-        modelValueAdapter = $event as
-          | DocumentationOfficeComboboxInputType
-          | undefined
-      "
+      @update:model-value="modelValueAdapter = $event"
     />
     <InputErrorMessages
       v-if="props.hasError"

@@ -19,7 +19,7 @@ import useQuery from "@/composables/useQueryFromRoute"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import errorMessages from "@/i18n/errors.json"
-import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemServices from "@/services/comboboxItemService"
 import { ResponseError } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 import { useEditionStore } from "@/stores/editionStore"
@@ -67,7 +67,7 @@ async function getEditions(legalPeriodicalId: string) {
 async function addEdition() {
   saveResponseError.value = undefined
   const edition = new LegalPeriodicalEdition({
-    legalPeriodical: { uuid: legalPeriodical?.value?.value.uuid },
+    legalPeriodical: { uuid: legalPeriodical?.value?.uuid },
   })
   const response = await LegalPeriodicalEditionService.save(edition)
 
@@ -87,13 +87,7 @@ async function addEdition() {
 }
 
 const legalPeriodical = computed({
-  get: () =>
-    selectedLegalPeriodical.value?.abbreviation
-      ? {
-          label: selectedLegalPeriodical.value.abbreviation,
-          value: selectedLegalPeriodical.value,
-        }
-      : undefined,
+  get: () => selectedLegalPeriodical.value,
   set: (newValue) => {
     const legalPeriodical = { ...newValue } as LegalPeriodical
     if (newValue) {
@@ -167,7 +161,7 @@ onMounted(async () => {
               aria-label="Periodikum"
               class="flex-shrink flex-grow-0 basis-1/2"
               :has-error="false"
-              :item-service="ComboboxItemService.getLegalPeriodicals"
+              :item-service="ComboboxItemServices.getLegalPeriodicals"
               placeholder="Nach Periodikum suchen"
             ></ComboboxInput>
           </InputField>
