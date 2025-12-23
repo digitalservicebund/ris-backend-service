@@ -79,14 +79,22 @@ const removeTagsOnTypingPlugin = new Plugin({
     ) {
       return null
     }
-    // Eine Transaktion ist die logische Einheit einer Zustandsänderung im ProseMirror-Editor von oldState zu newState.
+    // DE: Eine Transaktion ist die logische Einheit einer Zustandsänderung im ProseMirror-Editor von oldState zu newState.
     // Sie kann eine oder mehrere atomare Änderungen umfassen, die der Benutzer oder ein Befehl als einen einzigen Vorgang betrachtet.
     // Zum Beispiel: Text mit fetter Formatierung kopieren und einfügen.
+    // EN: A transaction is the logical unit of a state change in the ProseMirror editor from oldState to newState.
+    // It can encompass one or more atomic changes that the user or a command considers as a single operation.
+    // For example: copying and pasting text with bold formatting.
     const transaction = transactions[0]
-    // Ein Step ist die atomare Einheit einer Zustandsänderung. Er definiert die kleinstmögliche, unteilbare Änderung am Dokument.
+
+    // DE: Ein Step ist die atomare Einheit einer Zustandsänderung. Er definiert die kleinstmögliche, unteilbare Änderung am Dokument.
     // Für das Beispiel mit fetter Formatierung:
     // - Step 1 (ReplaceStep): Fügt den reinen Text ein.
     // - Step 2 (AddMarkStep): Fügt die fette Markierung (Bold Mark) über den eingefügten Text hinzu
+    // EN: A step is the atomic unit of a state change. It defines the smallest, indivisible change to the document.
+    // FFor the example with bold formatting:
+    // - Step 1 (ReplaceStep): Inserts the plain text.
+    // - Step 2 (AddMarkStep): Adds the bold mark over the inserted text.
     const step = transaction.steps[0] as ReplaceStep
 
     // Filterung von History (Undo/Redo)
@@ -100,8 +108,13 @@ const removeTagsOnTypingPlugin = new Plugin({
     const insertedSize = step.slice.size
 
     // Reines Löschen (z.B. Backspace): Hier wird Inhalt entfernt, und nichts wird eingefügt (slice ist leer): deletedSize > 0 & insertedSize = 0.
+    // Pure deletion (e.g., Backspace): Here, content is removed, and nothing is inserted (slice is empty): deletedSize > 0 & insertedSize = 0.
+
     // Reines Tippen (Einfügen): Hier wird ein Bereich der Länge Null (step.from = step.to) entfernt und Inhalt eingefügt: deletedSize = 0 & insertedSize > 0.
+    // Pure typing (insertion): Here, a zero-length range (step.from = step.to) is removed and content is inserted: deletedSize = 0 & insertedSize > 0.
+
     // Ersetzen (Selektion + Paste): Hier wird der markierte Bereich entfernt und der neue Inhalt eingefügt: deletedSize > 0 & insertedSize > 0
+    // Replace (selection + paste): Here, the selected area is removed and the new content is inserted: deletedSize > 0 & insertedSize > 0
 
     // Nur fortfahren, wenn tatsächlich Inhalt hinzugefügt oder gelöscht wurde
     if (deletedSize === 0 && insertedSize === 0) return null
@@ -124,7 +137,7 @@ const removeTagsOnTypingPlugin = new Plugin({
             ? newState.doc.textBetween(step.from, step.from + 1, " ")
             : ""
 
-        // If both sides have non-whitespace characters, words merged
+        // If both sides have non-whitespace characters, words have been merged
         if (
           charBefore &&
           !/\s/.test(charBefore) &&
