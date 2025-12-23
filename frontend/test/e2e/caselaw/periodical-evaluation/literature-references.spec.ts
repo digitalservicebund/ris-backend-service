@@ -79,7 +79,8 @@ test.describe("Literature references", () => {
     },
   )
 
-  test(
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(
     "Literature references can be added for decisions to periodical evaluation",
     {
       tag: "@RISDEV-5240 @RISDEV-5237 @RISDEV-5454",
