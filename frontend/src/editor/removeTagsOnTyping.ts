@@ -124,74 +124,7 @@ const removeTagsOnTypingPlugin = new Plugin({
       const deletedText = oldState.doc.textBetween(step.from, step.to, "")
 
       if (deletedText === " ") {
-        // Check if deletion resulted in word merging in the NEW state
-        const $newPos = newState.doc.resolve(step.from)
-
-        // Check characters before and after the deletion point in NEW state
-        const charBefore =
-          step.from > 0
-            ? newState.doc.textBetween(step.from - 1, step.from, " ")
-            : ""
-        const charAfter =
-          step.from < newState.doc.content.size
-            ? newState.doc.textBetween(step.from, step.from + 1, " ")
-            : ""
-
-        // If both sides have non-whitespace characters, words have been merged
-        if (
-          charBefore &&
-          !/\s/.test(charBefore) &&
-          charAfter &&
-          !/\s/.test(charAfter)
-        ) {
-          // Find the full extent of both merged words
-          let wordStart = step.from
-          let wordEnd = step.from
-
-          const parentStart = $newPos.start()
-          const parentEnd = $newPos.end()
-
-          // Search backwards for word start
-          while (wordStart > parentStart) {
-            const char = newState.doc.textBetween(wordStart - 1, wordStart, " ")
-            if (/\s/.test(char)) break
-            wordStart--
-          }
-
-          // Search forwards for word end
-          while (wordEnd < parentEnd) {
-            const char = newState.doc.textBetween(wordEnd, wordEnd + 1, " ")
-            if (/\s/.test(char)) break
-            wordEnd++
-          }
-
-          // Remove marks from entire merged range
-          let modified = false
-          const tr = newState.tr
-
-          if (wordStart < wordEnd) {
-            newState.doc.nodesBetween(wordStart, wordEnd, (node, pos) => {
-              if (node && node.isText && node.text && node.text.trim() !== "") {
-                tr.removeMark(
-                  pos,
-                  pos + node.nodeSize,
-                  newState.schema.marks[TextCheckTagName],
-                )
-                tr.removeMark(
-                  pos,
-                  pos + node.nodeSize,
-                  newState.schema.marks[IgnoreOnceTagName],
-                )
-                modified = true
-              }
-            })
-          }
-
-          return modified ? tr : null
-        }
-
-        // If there's still a space between words, do nothing
-        return null
+        return handleSpaceDeletion(newState, step)
       }
     }
 
@@ -264,5 +197,77 @@ const removeTagsOnTypingPlugin = new Plugin({
     return modified ? newStateTransaction : null
   },
 })
+
+function handleSpaceDeletion(
+  newState: EditorState,
+  step: ReplaceStep,
+): Transaction | null {
+  // Check if deletion resulted in word merging in the NEW state
+  const $newPos = newState.doc.resolve(step.from)
+
+  // Check characters before and after the deletion point in NEW state
+  const charBefore =
+    step.from > 0 ? newState.doc.textBetween(step.from - 1, step.from, " ") : ""
+  const charAfter =
+    step.from < newState.doc.content.size
+      ? newState.doc.textBetween(step.from, step.from + 1, " ")
+      : ""
+
+  // If both sides have non-whitespace characters, words have been merged
+  if (
+    charBefore &&
+    !/\s/.test(charBefore) &&
+    charAfter &&
+    !/\s/.test(charAfter)
+  ) {
+    // Find the full extent of both merged words
+    let wordStart = step.from
+    let wordEnd = step.from
+
+    const parentStart = $newPos.start()
+    const parentEnd = $newPos.end()
+
+    // Search backwards for word start
+    while (wordStart > parentStart) {
+      const char = newState.doc.textBetween(wordStart - 1, wordStart, " ")
+      if (/\s/.test(char)) break
+      wordStart--
+    }
+
+    // Search forwards for word end
+    while (wordEnd < parentEnd) {
+      const char = newState.doc.textBetween(wordEnd, wordEnd + 1, " ")
+      if (/\s/.test(char)) break
+      wordEnd++
+    }
+
+    // Remove marks from entire merged range
+    let modified = false
+    const tr = newState.tr
+
+    if (wordStart < wordEnd) {
+      newState.doc.nodesBetween(wordStart, wordEnd, (node, pos) => {
+        if (node && node.isText && node.text && node.text.trim() !== "") {
+          tr.removeMark(
+            pos,
+            pos + node.nodeSize,
+            newState.schema.marks[TextCheckTagName],
+          )
+          tr.removeMark(
+            pos,
+            pos + node.nodeSize,
+            newState.schema.marks[IgnoreOnceTagName],
+          )
+          modified = true
+        }
+      })
+    }
+
+    return modified ? tr : null
+  }
+
+  // If there's still a space between words, do nothing
+  return null
+}
 
 export { removeTagsOnTypingPlugin }
