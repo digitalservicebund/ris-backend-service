@@ -25,7 +25,7 @@ function hasTextCheckMark(node: Node, state: EditorState): boolean {
  * * @param $pos Die aufgelöste Position (ResolvedPos) im ALTEN Dokument.
  * @returns { start: number, end: number } Die absoluten Grenzen des betroffenen Textbereichs im alten Dokument.
  */
-function findAffectedRangeInOldDoc($pos: ResolvedPos): {
+function findWordBoundaries($pos: ResolvedPos): {
   start: number
   end: number
 } {
@@ -148,7 +148,7 @@ const removeTagsOnTypingPlugin = new Plugin({
     // Bestimmung des zu bereinigenden Bereichs im ALTEN Zustand (Wortgrenzen)
     // Wir können nicht einfach die Start- und Endposition des affectedNode (affectedNode.nodeSize) nehmen, weil die Tags über die Grenzen
     // des einzelnen Textknotens hinausreichen, der bei der Bearbeitung entsteht.
-    const { start: oldStart, end: oldEnd } = findAffectedRangeInOldDoc($oldPos)
+    const { start: oldStart, end: oldEnd } = findWordBoundaries($oldPos)
 
     // Mappe die Positionen auf den NEUEN Zustand
     // Verwendet das Mapping-System von ProseMirror, um die im alten Dokument gefundenen Wortgrenzen (oldStart, oldEnd) in die korrekten
@@ -227,14 +227,14 @@ function handleSpaceDeletion(
   // If both sides have non-whitespace characters, words have been merged
   if (wordsMerged(charBefore, charAfter)) {
     // Find the full extent of both merged words
-    const { wordStart, wordEnd } = calculateWordLimits(step, newState, $newPos)
+    const { start, end } = findWordBoundaries($newPos)
 
     // Remove marks from entire merged range
     let modified = false
     const tr = newState.tr
 
-    if (wordStart < wordEnd) {
-      newState.doc.nodesBetween(wordStart, wordEnd, (node, pos) => {
+    if (start < end) {
+      newState.doc.nodesBetween(start, end, (node, pos) => {
         if (node && node.isText && node.text && node.text.trim() !== "") {
           tr.removeMark(
             pos,
@@ -265,33 +265,6 @@ function wordsMerged(charBefore: string, charAfter: string): boolean {
     charAfter &&
     !/\s/.test(charAfter)
   )
-}
-
-function calculateWordLimits(
-  step: ReplaceStep,
-  newState: EditorState,
-  $newPos: ResolvedPos,
-) {
-  let wordStart = step.from
-  let wordEnd = step.from
-
-  const parentStart = $newPos.start()
-  const parentEnd = $newPos.end()
-
-  // Search backwards for word start
-  while (wordStart > parentStart) {
-    const char = newState.doc.textBetween(wordStart - 1, wordStart, " ")
-    if (/\s/.test(char)) break
-    wordStart--
-  }
-
-  // Search forwards for word end
-  while (wordEnd < parentEnd) {
-    const char = newState.doc.textBetween(wordEnd, wordEnd + 1, " ")
-    if (/\s/.test(char)) break
-    wordEnd++
-  }
-  return { wordStart, wordEnd }
 }
 
 export { removeTagsOnTypingPlugin }
