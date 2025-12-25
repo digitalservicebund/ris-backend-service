@@ -181,11 +181,11 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.40.12"))
+    implementation(platform("software.amazon.awssdk:bom:2.40.13"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
-    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.8")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.9")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
@@ -273,7 +273,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.1.12.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.2.0.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
