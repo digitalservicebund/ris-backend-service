@@ -8,6 +8,7 @@ import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 const radioValues = reactive({
   group: "1",
   disabled: "1",
+  sizes: "1",
 })
 </script>
 
@@ -64,7 +65,7 @@ const radioValues = reactive({
       >
         <RadioButton
           id="small"
-          v-model="radioValues.disabled"
+          v-model="radioValues.sizes"
           name="regular"
           size="small"
           value="small"
@@ -77,7 +78,7 @@ const radioValues = reactive({
       >
         <RadioButton
           id="large"
-          v-model="radioValues.disabled"
+          v-model="radioValues.sizes"
           name="large"
           value="large"
         />
