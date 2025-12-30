@@ -67,7 +67,7 @@ const values = reactive({
         <Checkbox v-model="values.size" :input-id="id" value="Small" />
       </InputField>
       <InputField
-        id="small"
+        id="large"
         v-slot="{ id }"
         label="Large"
         :label-position="LabelPosition.RIGHT"
