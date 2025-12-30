@@ -230,7 +230,7 @@ defineExpose({ validateNorm })
           binary
           data-testid="legal-force-checkbox"
           :input-id="id"
-          size="large"
+          size="small"
         />
       </InputField>
       <button
