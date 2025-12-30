@@ -42,16 +42,16 @@ const radioValues = reactive({
 
     <KitchensinkStory name="Disabled">
       <InputField
-        id="d1"
+        id="4"
         label="Disabled 1"
         :label-position="LabelPosition.RIGHT"
       >
         <RadioButton
-          id="r1"
+          id="4"
           v-model="radioValues.disabled"
           disabled
           name="regular"
-          value="r1"
+          value="4"
         />
       </InputField>
     </KitchensinkStory>
@@ -63,11 +63,11 @@ const radioValues = reactive({
         :label-position="LabelPosition.RIGHT"
       >
         <RadioButton
-          id="r1"
+          id="small"
           v-model="radioValues.disabled"
           name="regular"
           size="small"
-          value="r1"
+          value="small"
         />
       </InputField>
       <InputField
@@ -79,7 +79,7 @@ const radioValues = reactive({
           id="large"
           v-model="radioValues.disabled"
           name="large"
-          value="r1"
+          value="large"
         />
       </InputField>
     </KitchensinkStory>
