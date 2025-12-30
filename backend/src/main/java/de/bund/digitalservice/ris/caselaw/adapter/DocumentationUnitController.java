@@ -351,6 +351,7 @@ public class DocumentationUnitController {
     }
   }
 
+  @Deprecated(forRemoval = true)
   @PutMapping(
       value = "/{uuid}",
       consumes = MediaType.APPLICATION_JSON_VALUE,
