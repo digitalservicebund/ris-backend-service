@@ -391,13 +391,13 @@ onBeforeUnmount(() => {
             id="caselaw"
             class="flex items-center"
             label="Rechtsprechung"
-            label-class="ris-body1-regular"
             :label-position="LabelPosition.RIGHT"
           >
             <RadioButton
               v-model="reference.referenceType"
               aria-label="Rechtsprechung Fundstelle"
               name="referenceType"
+              size="small"
               value="caselaw"
               @click="validationStore.reset()"
             />
@@ -409,14 +409,13 @@ onBeforeUnmount(() => {
             id="literature"
             class="flex items-center"
             label="Literatur"
-            label-class="ris-body1-regular"
             :label-position="LabelPosition.RIGHT"
           >
             <RadioButton
               v-model="reference.referenceType"
               aria-label="Literatur Fundstelle"
               name="referenceType"
-              size="medium"
+              size="small"
               value="literature"
               @click="validationStore.reset()"
             />

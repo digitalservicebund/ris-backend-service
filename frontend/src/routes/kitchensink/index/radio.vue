@@ -55,5 +55,33 @@ const radioValues = reactive({
         />
       </InputField>
     </KitchensinkStory>
+
+    <KitchensinkStory name="Sizes">
+      <InputField
+        id="small"
+        label="Small"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <RadioButton
+          id="r1"
+          v-model="radioValues.disabled"
+          name="regular"
+          size="small"
+          value="r1"
+        />
+      </InputField>
+      <InputField
+        id="large"
+        label="Large"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <RadioButton
+          id="large"
+          v-model="radioValues.disabled"
+          name="large"
+          value="r1"
+        />
+      </InputField>
+    </KitchensinkStory>
   </KitchensinkPage>
 </template>
