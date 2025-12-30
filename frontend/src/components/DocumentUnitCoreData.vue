@@ -372,7 +372,7 @@ onBeforeUnmount(() => {
           binary
           data-testid="has-delivery-date"
           :input-id="id"
-          size="large"
+          size="small"
         />
       </InputField>
       <InputField
@@ -668,7 +668,7 @@ onBeforeUnmount(() => {
         binary
         data-testid="is-resolved"
         :input-id="id"
-        size="large"
+        size="small"
       />
     </InputField>
 
