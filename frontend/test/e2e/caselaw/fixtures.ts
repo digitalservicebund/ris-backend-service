@@ -142,82 +142,153 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     }
     const prefilledDocumentUnit = await response.json()
 
-    const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
-    const court = await courtResponse.json()
+    // const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
+    // const court = await courtResponse.json()
 
-    const normAbbreviationResponse = await request.get(
-      `api/v1/caselaw/normabbreviation/search?q=BGB&sz=30&pg=0`,
-    )
-    const normAbbreviation = await normAbbreviationResponse.json()
+    // const normAbbreviationResponse = await request.get(
+    //   `api/v1/caselaw/normabbreviation/search?q=BGB&sz=30&pg=0`,
+    // )
+    // const normAbbreviation = await normAbbreviationResponse.json()
 
-    const citationTypeResponse = await request.get(
-      `api/v1/caselaw/citationtypes?q=Abgrenzung`,
-    )
-    const citationType = await citationTypeResponse.json()
+    // const citationTypeResponse = await request.get(
+    //   `api/v1/caselaw/citationtypes?q=Abgrenzung`,
+    // )
+    // const citationType = await citationTypeResponse.json()
 
-    const fieldsOfLawResponse = await request.get(
-      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01&sz=200&pg=0`,
-    )
-    const fieldsOfLaw = await fieldsOfLawResponse.json()
-    const documentTypeResponse = await request.get(
-      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
-    )
-    const documentType = await documentTypeResponse.json()
+    // const fieldsOfLawResponse = await request.get(
+    //   `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01&sz=200&pg=0`,
+    // )
+    // const fieldsOfLaw = await fieldsOfLawResponse.json()
+    // const documentTypeResponse = await request.get(
+    //   `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
+    // )
+    // const documentType = await documentTypeResponse.json()
 
-    const updateResponse = await request.put(
+    const [courtRes, normRes, citationRes, fieldsRes, docTypeRes] =
+      await Promise.all([
+        request.get(`api/v1/caselaw/courts?q=AG+Aachen`),
+        request.get(`api/v1/caselaw/normabbreviation/search?q=BGB&sz=30&pg=0`),
+        request.get(`api/v1/caselaw/citationtypes?q=Abgrenzung`),
+        request.get(
+          `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01&sz=200&pg=0`,
+        ),
+        request.get(`api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`),
+      ])
+
+    const court = (await courtRes.json())?.[0]
+    const normAbbreviation = (await normRes.json())?.[0]
+    const citationType = (await citationRes.json())?.[0]
+    const fieldsOfLaw = (await fieldsRes.json())?.[0]
+    const documentType = (await docTypeRes.json())?.[0]
+
+    const targetState = mergeDeep(prefilledDocumentUnit, {
+      coreData: {
+        court: court,
+        documentType: documentType,
+        fileNumbers: [generateString()],
+        decisionDate: "2019-12-31",
+        appraisalBody: "1. Senat, 2. Kammer",
+        sources: [{ value: SourceValue.AngefordertesOriginal }],
+      },
+      contentRelatedIndexing: {
+        keywords: ["keyword"],
+        norms: [{ normAbbreviation }],
+        activeCitations: [
+          {
+            documentNumber: "YYTestDoc0013",
+            court: court,
+            documentType: documentType,
+            decisionDate: "2022-02-01",
+            fileNumber: "123",
+            citationType: citationType,
+          },
+        ],
+        fieldsOfLaw: [fieldsOfLaw],
+      },
+      shortTexts: {
+        headnote: "testHeadnote",
+        guidingPrinciple: "guidingPrinciple",
+        headline: "testHeadline",
+      },
+    })
+
+    const frontendPatch = jsonPatch.compare(prefilledDocumentUnit, targetState)
+
+    // const updateResponse = await request.put(
+    //   `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
+    //   {
+    //     data: {
+    //       ...prefilledDocumentUnit,
+    //       coreData: {
+    //         ...prefilledDocumentUnit.coreData,
+    //         court: court?.[0],
+    //         documentType: documentType?.[0],
+    //         fileNumbers: [generateString()],
+    //         decisionDate: "2019-12-31",
+    //         appraisalBody: "1. Senat, 2. Kammer",
+    //         sources: [
+    //           {
+    //             value: SourceValue.AngefordertesOriginal,
+    //           },
+    //         ],
+    //       },
+    //       contentRelatedIndexing: {
+    //         keywords: ["keyword"],
+    //         norms: [
+    //           {
+    //             normAbbreviation: normAbbreviation?.[0],
+    //           },
+    //         ],
+    //         activeCitations: [
+    //           {
+    //             documentNumber: "YYTestDoc0013",
+    //             court: court?.[0],
+    //             documentType: documentType?.[0],
+    //             decisionDate: "2022-02-01",
+    //             fileNumber: "123",
+    //             citationType: citationType?.[0],
+    //           },
+    //         ],
+    //         fieldsOfLaw: [fieldsOfLaw?.[0]],
+    //       },
+    //       shortTexts: {
+    //         headnote: "testHeadnote",
+    //         guidingPrinciple: "guidingPrinciple",
+    //         headline: "testHeadline",
+    //       },
+    //     },
+    //     headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    //   },
+    // )
+
+    // if (!updateResponse.ok()) {
+    //   throw new Error(
+    //     `Failed to update prefilledDocumentUnit: ${response.status()} ${response.statusText()}`,
+    //   )
+    // }
+
+    // await use(await updateResponse.json())
+
+    const patchResponse = await request.patch(
       `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
       {
-        data: {
-          ...prefilledDocumentUnit,
-          coreData: {
-            ...prefilledDocumentUnit.coreData,
-            court: court?.[0],
-            documentType: documentType?.[0],
-            fileNumbers: [generateString()],
-            decisionDate: "2019-12-31",
-            appraisalBody: "1. Senat, 2. Kammer",
-            sources: [
-              {
-                value: SourceValue.AngefordertesOriginal,
-              },
-            ],
-          },
-          contentRelatedIndexing: {
-            keywords: ["keyword"],
-            norms: [
-              {
-                normAbbreviation: normAbbreviation?.[0],
-              },
-            ],
-            activeCitations: [
-              {
-                documentNumber: "YYTestDoc0013",
-                court: court?.[0],
-                documentType: documentType?.[0],
-                decisionDate: "2022-02-01",
-                fileNumber: "123",
-                citationType: citationType?.[0],
-              },
-            ],
-            fieldsOfLaw: [fieldsOfLaw?.[0]],
-          },
-          shortTexts: {
-            headnote: "testHeadnote",
-            guidingPrinciple: "guidingPrinciple",
-            headline: "testHeadline",
-          },
-        },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+        data: {
+          documentationUnitVersion: prefilledDocumentUnit.version,
+          patch: frontendPatch,
+          errorPaths: [],
+        },
       },
     )
 
-    if (!updateResponse.ok()) {
+    if (!patchResponse.ok()) {
       throw new Error(
-        `Failed to update prefilledDocumentUnit: ${response.status()} ${response.statusText()}`,
+        `Failed to patch prefilledDocumentUnit: ${patchResponse.status()} ${patchResponse.statusText()}`,
       )
     }
 
-    await use(await updateResponse.json())
+    const updatedDocument = await patchResponse.json()
+    await use(updatedDocument)
 
     await deleteWithRetry(
       request,
