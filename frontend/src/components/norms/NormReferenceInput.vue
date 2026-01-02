@@ -49,6 +49,8 @@ const singleNorms = ref(
     : ([] as SingleNorm[]),
 )
 
+const hasMaxOneSingleNorm = computed(() => singleNorms.value.length <= 1)
+
 /**
  * Data restructuring from norm abbreviation props to combobox item. When item in combobox set, it is validated
  * against already existing norm abbreviations in the list.
@@ -263,7 +265,7 @@ watch(
           </div>
         </div>
         <Button
-          v-if="!lastSavedModelValue.isEmpty"
+          v-if="!lastSavedModelValue.isEmpty && hasMaxOneSingleNorm"
           aria-label="Eintrag löschen"
           label="Eintrag löschen"
           severity="danger"
