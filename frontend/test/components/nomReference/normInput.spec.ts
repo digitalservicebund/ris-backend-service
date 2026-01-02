@@ -43,9 +43,6 @@ function renderComponent(options?: { modelValue?: NormReference }) {
   const utils = render(NormReferenceInput, {
     props,
     global: {
-      directives: {
-        tooltip: {},
-      },
       plugins: [
         createTestingPinia({
           initialState: {

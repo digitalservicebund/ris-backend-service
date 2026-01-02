@@ -2,7 +2,6 @@ import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createHead } from "@unhead/vue/client"
-import Tooltip from "primevue/tooltip"
 import { createRouter, createWebHistory } from "vue-router"
 import { Decision } from "@/domain/decision"
 import categories from "@/routes/caselaw/documentUnit/[documentNumber]/categories.vue"
@@ -10,7 +9,6 @@ import DocumentNumber from "@/routes/caselaw/documentUnit/[documentNumber].vue"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 
 function renderComponent() {
   const user = userEvent.setup()
@@ -92,10 +90,6 @@ function renderComponent() {
         documentNumber: "1234567891234",
       },
       global: {
-        directives: {
-          "ctrl-enter": onSearchShortcutDirective,
-          tooltip: Tooltip,
-        },
         plugins: [
           head,
           router,

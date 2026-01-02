@@ -15,7 +15,6 @@ import { DocumentType } from "@/domain/documentType"
 
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
@@ -55,7 +54,6 @@ function renderComponent(activeCitations?: ActiveCitation[]) {
     user,
     ...render(ActiveCitations, {
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           [
             createTestingPinia({

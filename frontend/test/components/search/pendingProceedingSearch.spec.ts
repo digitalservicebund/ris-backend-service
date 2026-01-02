@@ -18,7 +18,6 @@ import errorMessages from "@/i18n/errors.json"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const addToastMock = vi.fn()
@@ -60,10 +59,6 @@ function renderComponent(
     user,
     ...render(PendingProceedingSearch, {
       global: {
-        directives: {
-          "ctrl-enter": onSearchShortcutDirective,
-          tooltip: {},
-        },
         plugins: [
           router,
           createTestingPinia({

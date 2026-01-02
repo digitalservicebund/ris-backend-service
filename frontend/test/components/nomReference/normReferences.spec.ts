@@ -36,9 +36,6 @@ function renderComponent(normReferences?: NormReference[]) {
     user,
     ...render(Norms, {
       global: {
-        directives: {
-          tooltip: {},
-        },
         plugins: [
           [
             createTestingPinia({
