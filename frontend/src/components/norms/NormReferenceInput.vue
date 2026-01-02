@@ -205,7 +205,7 @@ watch(
 </script>
 
 <template>
-  <div class="flex flex-col gap-24">
+  <div class="flex flex-col gap-16">
     <InputField
       id="norm-reference-abbreviation-field"
       v-slot="slotProps"
@@ -223,7 +223,10 @@ watch(
         @focus="validationStore.remove('normAbbreviation')"
       ></ComboboxInput>
     </InputField>
-    <div v-if="normAbbreviation || norm.normAbbreviationRawValue">
+    <div
+      v-if="normAbbreviation || norm.normAbbreviationRawValue"
+      class="flex flex-col gap-24"
+    >
       <SingleNormInput
         v-for="(_, index) in singleNorms"
         :key="index"

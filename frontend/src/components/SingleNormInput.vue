@@ -213,7 +213,7 @@ defineExpose({ validateNorm })
 </script>
 
 <template>
-  <div class="mb-24 flex flex-col gap-24 pb-24">
+  <div>
     <div
       v-if="isCourtWithLegalForce"
       class="flex flex-row justify-between gap-24"
