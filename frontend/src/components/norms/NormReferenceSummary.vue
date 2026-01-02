@@ -24,7 +24,7 @@ const emit = defineEmits<{
         v-if="data.singleNorms?.length === 1"
         class="flex flex-row items-center"
       >
-        <component :is="IconBook" class="mr-8" />
+        <component :is="IconBook" class="mr-8 ml-2" />
         <div class="ris-label1-regular mr-8">
           {{ data.renderSummary + ", " + data.singleNorms[0].renderSummary }}
         </div>
@@ -54,7 +54,7 @@ const emit = defineEmits<{
       </div>
       <div v-else class="flex w-full flex-col gap-24">
         <div class="flex min-h-40 flex-row items-center">
-          <component :is="IconBook" class="mr-8" />
+          <component :is="IconBook" class="mr-8 ml-2" />
           <div class="ris-label1-regular mr-8">
             {{ data.renderSummary }}
           </div>
@@ -71,10 +71,10 @@ const emit = defineEmits<{
           <div v-for="(singleNorm, index) in data.singleNorms" :key="index">
             <div
               v-if="!singleNorm.isEmpty"
-              class="flex flex-row items-center justify-between"
+              class="-mr-48 flex flex-row items-center justify-between pr-48 hover:bg-blue-200"
             >
               <div class="flex flex-row items-center">
-                <component :is="IconArrowRight" class="mr-8" />
+                <component :is="IconArrowRight" class="mr-8 ml-4" />
                 {{
                   data.renderSummary +
                   ", " +
