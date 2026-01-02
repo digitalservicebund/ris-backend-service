@@ -35,10 +35,18 @@ const server = setupServer(
 
 function renderComponent(options?: { modelValue?: NormReference }) {
   const user = userEvent.setup()
+
   const props = {
     modelValue: new NormReference({ ...options?.modelValue }),
-    plugins: [
-      [
+  }
+
+  const utils = render(NormReferenceInput, {
+    props,
+    global: {
+      directives: {
+        tooltip: {},
+      },
+      plugins: [
         createTestingPinia({
           initialState: {
             docunitStore: {
@@ -56,9 +64,9 @@ function renderComponent(options?: { modelValue?: NormReference }) {
           },
         }),
       ],
-    ],
-  }
-  const utils = render(NormReferenceInput, { props })
+    },
+  })
+
   return { user, props, ...utils }
 }
 
