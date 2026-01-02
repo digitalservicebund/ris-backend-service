@@ -47,7 +47,7 @@ const props = defineProps<{
         />
       </div>
       <div v-else class="flex flex-col gap-24">
-        <div class="flex flex-row items-center">
+        <div class="flex min-h-40 flex-row items-center">
           <component :is="IconBook" class="mr-8" />
           <div class="ris-label1-regular mr-8">
             {{ data.renderSummary }}
