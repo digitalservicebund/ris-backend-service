@@ -9,7 +9,6 @@ import { Decision } from "@/domain/decision"
 
 import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
 import documentUnitService from "@/services/documentUnitService"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 function renderComponent(
@@ -27,9 +26,6 @@ function renderComponent(
     ...render(PendingProceedings, {
       props: { label: "Verknüpfung anhängiges Verfahren" },
       global: {
-        directives: {
-          "ctrl-enter": onSearchShortcutDirective,
-        },
         plugins: [
           [
             createTestingPinia({

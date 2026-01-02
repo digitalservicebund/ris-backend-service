@@ -4,7 +4,6 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitCategories from "@/components/DocumentUnitCategories.vue"
 import { Decision } from "@/domain/decision"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
@@ -24,7 +23,6 @@ function renderComponent() {
         registerTextEditorRef: vi.fn(),
       },
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           createTestingPinia({
             initialState: {

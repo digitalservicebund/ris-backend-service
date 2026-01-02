@@ -6,8 +6,6 @@ import AppealAdmissionComponent from "@/components/AppealAdmission.vue"
 import { AppealAdmission } from "@/domain/appealAdmission"
 import { AppealAdmitter } from "@/domain/appealAdmitter"
 import { Decision } from "@/domain/decision"
-
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 function renderComponent(appealAdmission?: AppealAdmission) {
@@ -21,7 +19,6 @@ function renderComponent(appealAdmission?: AppealAdmission) {
     user,
     ...render(AppealAdmissionComponent, {
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           [
             createTestingPinia({

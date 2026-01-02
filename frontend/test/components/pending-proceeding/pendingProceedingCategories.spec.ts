@@ -4,7 +4,6 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import PendingProceedingCategories from "@/components/PendingProceedingCategories.vue"
 import PendingProceeding from "@/domain/pendingProceeding"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 function renderComponent() {
@@ -21,7 +20,6 @@ function renderComponent() {
         registerTextEditorRef: vi.fn(),
       },
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           createTestingPinia({
             initialState: {

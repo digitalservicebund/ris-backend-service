@@ -4,7 +4,6 @@ import { config } from "@vue/test-utils"
 import InputText from "primevue/inputtext"
 import { createRouter, createWebHistory } from "vue-router"
 import InboxSearch from "@/components/inbox/shared/InboxSearch.vue"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 function renderComponent() {
@@ -18,7 +17,6 @@ function renderComponent() {
     user,
     ...render(InboxSearch, {
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [router],
       },
     }),

@@ -1,7 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import Tooltip from "primevue/tooltip"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import { CoreData } from "@/domain/coreData"
@@ -76,7 +75,6 @@ function renderComponent(options?: {
     user,
     ...render(DocumentUnitInfoPanel, {
       global: {
-        directives: { tooltip: Tooltip },
         plugins: [
           router,
           createTestingPinia({

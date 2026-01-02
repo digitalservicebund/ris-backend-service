@@ -3,17 +3,12 @@ import { render, screen } from "@testing-library/vue"
 import { config } from "@vue/test-utils"
 import InputText from "primevue/inputtext"
 import EURLexSearchForm from "@/components/eurlex/EURLexSearchForm.vue"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 
 describe("eurlex search", () => {
   const user = userEvent.setup()
 
   function renderComponent() {
-    return render(EURLexSearchForm, {
-      global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
-      },
-    })
+    return render(EURLexSearchForm)
   }
 
   beforeEach(() => {

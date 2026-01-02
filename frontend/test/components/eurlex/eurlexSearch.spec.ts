@@ -4,7 +4,6 @@ import { config } from "@vue/test-utils"
 import InputText from "primevue/inputtext"
 import EURLexSearch from "@/components/eurlex/EURLexSearch.vue"
 import eurlexService from "@/services/eurlexService"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 
 describe("eurlex search", () => {
   const eurlexMock = vi.spyOn(eurlexService, "get")
@@ -17,7 +16,6 @@ describe("eurlex search", () => {
   function renderComponent() {
     return render(EURLexSearch, {
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
         stubs: {
           EURLexSearchForm: {
             template: `

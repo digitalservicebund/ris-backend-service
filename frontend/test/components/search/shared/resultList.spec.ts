@@ -149,9 +149,6 @@ function renderComponent(props?: {
         showPublicationDate: props?.showPublicationDate || false,
       },
       global: {
-        directives: {
-          tooltip: {},
-        },
         plugins: [[router, createTestingPinia()]],
       },
     }),

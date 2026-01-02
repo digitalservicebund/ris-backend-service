@@ -2,7 +2,6 @@
 import Button from "primevue/button"
 import type { Component, Ref } from "vue"
 import { ref, watch, computed, nextTick, onBeforeUpdate } from "vue"
-import Tooltip from "./Tooltip.vue"
 import DefaultSummary from "@/components/DefaultSummary.vue"
 import { useScroll } from "@/composables/useScroll"
 import ListItem from "@/domain/editableListItem" // NOSONAR: import is needed for extension
@@ -165,36 +164,39 @@ defineExpose({
         class="group flex gap-8 border-b-1 border-blue-300 py-16"
         :class="{ 'border-t-1': mergedValues.indexOf(entry) === 0 }"
       >
-        <component
-          :is="summaryComponent"
-          class="flex scroll-m-64"
-          :data="entry"
-          @add-new-entry="handleAddFromSummary"
-        />
+        <slot :entry="entry" name="summary">
+          <component
+            :is="summaryComponent"
+            class="flex scroll-m-64"
+            :data="entry"
+            @add-new-entry="handleAddFromSummary"
+          />
+        </slot>
 
-        <Tooltip text="Eintrag bearbeiten">
-          <Button
-            id="editable-list-select-button"
-            aria-label="Eintrag bearbeiten"
-            :data-testid="`list-entry-${index}`"
-            size="small"
-            text
-            @click="
-              () => {
-                toggleNewEntry(false)
-                setEditEntry(entry as T)
-              }
-            "
-            @keypress.enter="
-              () => {
-                toggleNewEntry(false)
-                setEditEntry(entry as T)
-              }
-            "
-          >
-            <template #icon> <IconEdit /> </template>
-          </Button>
-        </Tooltip>
+        <Button
+          id="editable-list-select-button"
+          v-tooltip.bottom="{
+            value: 'Eintrag bearbeiten',
+          }"
+          aria-label="Eintrag bearbeiten"
+          :data-testid="`list-entry-${index}`"
+          size="small"
+          text
+          @click="
+            () => {
+              toggleNewEntry(false)
+              setEditEntry(entry as T)
+            }
+          "
+          @keypress.enter="
+            () => {
+              toggleNewEntry(false)
+              setEditEntry(entry as T)
+            }
+          "
+        >
+          <template #icon> <IconEdit /> </template>
+        </Button>
       </div>
 
       <!-- hidden focus anchor -->
