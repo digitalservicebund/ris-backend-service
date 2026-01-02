@@ -307,8 +307,12 @@ defineExpose({ validateNorm })
           @update:validation-error="slotProps.updateValidationError"
         />
       </InputField>
+
       <Button
         v-if="!isCourtWithLegalForce"
+        v-tooltip.bottom="{
+          value: 'Einzelnorm entfernen',
+        }"
         aria-label="Einzelnorm löschen"
         class="self-end"
         text
