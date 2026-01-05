@@ -186,14 +186,21 @@ export const navigateToAttachments = async (
   page: Page,
   documentNumber: string,
   options?: {
+    navigationBy?: "click" | "url"
     skipAssert?: boolean
   },
 ) => {
   await test.step("Navigate to 'Dokumente'", async () => {
     const queryParams = getAllQueryParamsFromUrl(page)
-    await page.goto(
-      `/caselaw/documentunit/${documentNumber}/attachments${queryParams}`,
-    )
+
+    if (options?.navigationBy === "click") {
+      await page.getByRole("link", { name: "Dokumente" }).click()
+    } else {
+      await page.goto(
+        `/caselaw/documentunit/${documentNumber}/attachments${queryParams}`,
+      )
+    }
+
     if (options?.skipAssert) return
 
     await expect(page.getByTestId("document-unit-attachments")).toBeVisible({
@@ -207,12 +214,17 @@ export const navigateToManagementData = async (
   documentNumber: string,
   options?: {
     type?: "pending-proceeding" | "documentunit"
+    navigationBy?: "click" | "url"
   },
 ) => {
   await test.step("Navigate to 'Verwaltungsdaten'", async () => {
     const documentType = options?.type ?? "documentunit"
     const baseUrl = `/caselaw/${documentType}/${documentNumber}/managementdata`
-    await getRequest(baseUrl, page)
+    if (options?.navigationBy === "click") {
+      await page.getByRole("link", { name: "Verwaltungsdaten" }).click()
+    } else {
+      await getRequest(baseUrl, page)
+    }
     await expect(page.getByTestId("title").first()).toHaveText(
       "Verwaltungsdaten",
     )
