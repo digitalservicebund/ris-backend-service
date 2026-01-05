@@ -210,8 +210,9 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
       )
     }
 
-    const updatedDocument = await patchResponse.json()
-    await use(updatedDocument)
+    const patchResult = await patchResponse.json()
+    const updatedDoc = jsonPatch.applyPatch(prefilledDocumentUnit, patchResult)
+    await use(updatedDoc.newDocument)
 
     await deleteWithRetry(
       request,
@@ -344,24 +345,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
 
     const prefilledDocumentUnit = await response.json()
 
-    // const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
-    // const court = await courtResponse.json()
-
-    // const documentTypeResponse = await request.get(
-    //   `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
-    // )
-    // const documentType = await documentTypeResponse.json()
-
-    // const literatureDocumentTypeResponse = await request.get(
-    //   `api/v1/caselaw/documenttypes?q=Ean&category=DEPENDENT_LITERATURE`,
-    // )
-    // const literatureDocumentType = await literatureDocumentTypeResponse.json()
-
-    // const legalPeriodicalResponse = await request.get(
-    //   `api/v1/caselaw/legalperiodicals?q=MMG`,
-    // )
-    // const legalPeriodical = await legalPeriodicalResponse.json()
-
     const [courtRes, docTypeRes, litDocTypeRes, periodicalRes] =
       await Promise.all([
         request.get(`api/v1/caselaw/courts?q=AG+Aachen`),
@@ -430,8 +413,9 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
       )
     }
 
-    const updatedDoc = await patchResponse.json()
-    await use(updatedDoc)
+    const patchResult = await patchResponse.json()
+    const updatedDoc = jsonPatch.applyPatch(prefilledDocumentUnit, patchResult)
+    await use(updatedDoc.newDocument)
 
     await deleteWithRetry(
       request,
@@ -600,7 +584,9 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
       )
     }
 
-    await use(await patchResponse.json())
+    const patchResult = await patchResponse.json()
+    const updatedDoc = jsonPatch.applyPatch(prefilledDocumentUnit, patchResult)
+    await use(updatedDoc.newDocument)
 
     await deleteWithRetry(
       request,
@@ -768,8 +754,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
       },
     })
 
-    // await use(await updateResponse.json())
-
     const frontendPatch = jsonPatch.compare(
       prefilledDocumentUnitWithLongTexts,
       targetState,
@@ -793,8 +777,12 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
       )
     }
 
-    const updatedDoc = await patchResponse.json()
-    await use(updatedDoc)
+    const patchResult = await patchResponse.json()
+    const updatedDoc = jsonPatch.applyPatch(
+      prefilledDocumentUnitWithLongTexts,
+      patchResult,
+    )
+    await use(updatedDoc.newDocument)
 
     await deleteWithRetry(
       request,
