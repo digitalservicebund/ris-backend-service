@@ -13,7 +13,6 @@ import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
 import service from "@/services/legalPeriodicalEditionService"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import testRoutes from "~/test-helper/routes"
 
 const editionUUid = crypto.randomUUID()
@@ -57,7 +56,6 @@ async function renderComponent(options?: { references?: Reference[] }) {
     user,
     ...render(PeriodicalEditionReferences, {
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [router, pinia],
       },
     }),

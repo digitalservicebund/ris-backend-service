@@ -1,7 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { UseFetchReturn } from "@vueuse/core"
-import Tooltip from "primevue/tooltip"
 import { beforeEach } from "vitest"
 import { computed, nextTick, Ref, ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
@@ -138,7 +137,6 @@ function renderComponent(
         // Include any other props from the options object
       },
       global: {
-        directives: { tooltip: Tooltip },
         plugins: [router],
       },
     }),

@@ -14,7 +14,6 @@ import { DocumentType } from "@/domain/documentType"
 import PreviousDecision from "@/domain/previousDecision"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
@@ -46,7 +45,6 @@ function renderComponent(previousDecisions?: PreviousDecision[]) {
     user,
     ...render(PreviousDecisions, {
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
         stubs: {
           routerLink: {
             template: "<a><slot/></a>",
