@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@braintree/sanitize-url": "^7.1.1",
-    "@digitalservicebund/ris-ui": "^3.20.0",
+    "@digitalservicebund/ris-ui": "^3.21.0",
     "@guardian/prosemirror-invisibles": "^3.1.1",
     "@sentry/integrations": "^7.114.0",
     "@sentry/vue": "^10.32.1",
@@ -119,7 +119,7 @@
     "globals": "^16.5.0",
     "jsdom": "^26.1.0",
     "license-checker": "^25.0.1",
-    "msw": "^2.12.6",
+    "msw": "^2.12.7",
     "playwright": "^1.57.0",
     "postcss": "^8.5.6",
     "postcss-import": "^16.1.1",

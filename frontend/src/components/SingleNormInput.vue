@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import Checkbox from "primevue/checkbox"
 import InputText from "primevue/inputtext"
 import { computed, onMounted, ref } from "vue"
@@ -212,7 +213,7 @@ defineExpose({ validateNorm })
 </script>
 
 <template>
-  <div class="mb-24 flex flex-col gap-24 pb-24">
+  <div>
     <div
       v-if="isCourtWithLegalForce"
       class="flex flex-row justify-between gap-24"
@@ -230,7 +231,7 @@ defineExpose({ validateNorm })
           binary
           data-testid="legal-force-checkbox"
           :input-id="id"
-          size="large"
+          size="small"
         />
       </InputField>
       <button
@@ -306,15 +307,21 @@ defineExpose({ validateNorm })
           @update:validation-error="slotProps.updateValidationError"
         />
       </InputField>
-      <button
+
+      <Button
         v-if="!isCourtWithLegalForce"
+        v-tooltip.bottom="{
+          value: 'Einzelnorm entfernen',
+        }"
         aria-label="Einzelnorm löschen"
-        class="mt-[25px] h-[50px] text-blue-800 focus:shadow-[inset_0_0_0_0.25rem] focus:shadow-blue-800 focus:outline-none"
-        tabindex="0"
+        class="self-end"
+        text
         @click="removeSingleNormEntry"
       >
-        <IconClear />
-      </button>
+        <template #icon>
+          <IconClear class="order-last" />
+        </template>
+      </Button>
     </div>
     <div
       v-if="hasLegalForce && isCourtWithLegalForce"

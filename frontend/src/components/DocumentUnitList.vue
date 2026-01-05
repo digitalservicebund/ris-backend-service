@@ -293,6 +293,7 @@ function onDelete() {
           <div class="flex flex-row -space-x-2">
             <Tooltip text="Bearbeiten">
               <router-link
+                tabindex="-1"
                 target="_blank"
                 :to="
                   listEntry.documentType?.jurisShortcut === 'Anh'
@@ -325,6 +326,7 @@ function onDelete() {
 
             <Tooltip text="Vorschau">
               <router-link
+                tabindex="-1"
                 target="_blank"
                 :to="{
                   name:

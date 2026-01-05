@@ -4,7 +4,6 @@ import { beforeAll } from "vitest"
 import PendingProceedingPreview from "@/components/preview/PendingProceedingPreview.vue"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { SourceValue } from "@/domain/source"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
 beforeAll(() => {
@@ -18,7 +17,6 @@ function renderComponent() {
         documentNumber: "1234567891234",
       },
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           [
             createTestingPinia({

@@ -181,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.40.15"))
+    implementation(platform("software.amazon.awssdk:bom:2.40.16"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -226,8 +226,8 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.15.0")
     implementation("org.jsoup:jsoup:1.21.2")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:7.4.0")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.4.0")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:7.5.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.5.0")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.4")
