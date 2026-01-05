@@ -257,7 +257,7 @@ describe("EnsuingDecisions", () => {
       await screen.findByLabelText("Gericht Nachgehende Entscheidung"),
       "AG",
     )
-    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    const dropdownItems = screen.getAllByRole("option")
     expect(dropdownItems[0]).toHaveTextContent("AG Test")
     await user.click(dropdownItems[0])
     const button = screen.getByLabelText("Nachgehende Entscheidung speichern")

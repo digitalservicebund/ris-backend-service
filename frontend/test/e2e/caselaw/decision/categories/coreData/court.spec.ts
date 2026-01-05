@@ -95,43 +95,43 @@ test.describe("court", () => {
     // on start: closed dropdown, no input text
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("")
     await expect(page.getByText("AG Aachen")).toBeHidden()
-    await expect(page.getByLabel("dropdown-option")).toBeHidden()
+    await expect(page.getByRole("option")).toBeHidden()
 
     // open dropdown
     await page
       .locator("#coreData div")
-      .filter({ hasText: "Gericht * Fehlerhaftes" })
-      .getByLabel("Dropdown öffnen")
+      .filter({ hasText: "Gericht" })
+      .getByLabel("Vorschläge anzeigen")
       .click()
-    await expect(page.getByLabel("dropdown-option")).toHaveCount(200)
+    await expect(page.getByRole("option")).toHaveCount(200)
     await expect(page.getByText("AG Aachen")).toBeVisible()
     await expect(page.getByText("AG Aalen")).toBeVisible()
 
     // type search string: 3 results for "bayern"
     await page.getByLabel("Gericht", { exact: true }).fill("bayern")
-    await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+    await expect(page.getByRole("progressbar")).toBeHidden()
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
       "bayern",
     )
-    await expect(page.getByLabel("dropdown-option")).toHaveCount(3)
+    await expect(page.getByRole("option")).toHaveCount(3)
 
     // use the clear icon
-    await page.getByLabel("Auswahl zurücksetzen", { exact: true }).click()
+    await page.getByLabel("Entfernen", { exact: true }).click()
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("")
-    await expect(page.getByLabel("dropdown-option")).toHaveCount(200)
+    await expect(page.getByRole("option")).toHaveCount(200)
 
     // close dropdown
-    await page.getByLabel("Dropdown schließen").click()
+    await page.getByRole("heading", { name: "Formaldaten" }).click() // a click anywhere outside the dropdown
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("")
-    await expect(page.getByLabel("dropdown-option")).toBeHidden()
+    await expect(page.getByRole("option")).toBeHidden()
 
     // open dropdown again by focussing
     await page.getByLabel("Gericht", { exact: true }).focus()
-    await expect(page.getByLabel("dropdown-option")).toHaveCount(200)
+    await expect(page.getByRole("option")).toHaveCount(200)
 
     // close dropdown using the esc key, user input text gets removed and last saved value restored
     await page.keyboard.down("Escape")
-    await expect(page.getByLabel("dropdown-option")).toBeHidden()
+    await expect(page.getByRole("option")).toBeHidden()
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("")
   })
 
@@ -141,36 +141,34 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("")
-    await expect(page.getByLabel("dropdown-option")).toBeHidden()
+    const combobox = page.getByRole("combobox", {
+      name: "Gericht",
+      exact: true,
+    })
 
-    await page.getByLabel("Gericht", { exact: true }).fill("BVerfG")
-    await expect(page.getByTestId("combobox-spinner")).toBeHidden()
-    await page.getByText("BVerfG").click()
+    await expect(combobox).toHaveValue("")
+    await expect(page.getByRole("option")).toBeHidden()
 
-    await expect(page.getByLabel("dropdown-option")).toBeHidden()
-    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
-      "BVerfG",
-    )
+    await combobox.fill("BVerfG")
+    await page.getByRole("option", { name: "BVerfG" }).click()
 
-    await page.getByLabel("Gericht", { exact: true }).fill("BGH")
+    await expect(page.getByRole("option")).toBeHidden()
+    await expect(combobox).toHaveValue("BVerfG")
 
-    await expect(page.getByLabel("dropdown-option")).toHaveCount(1)
+    await combobox.fill("BGH")
 
-    await page.keyboard.press("Escape") // reset to last saved value
+    await expect(page.getByRole("option")).toHaveCount(1)
 
-    await expect(page.getByLabel("dropdown-option")).toBeHidden()
-    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
-      "BVerfG",
-    )
+    await combobox.press("Escape") // reset to last saved value
 
-    await page.getByLabel("Gericht", { exact: true }).fill("BGH")
-    await page.keyboard.press("Tab") // reset to last saved value
+    await expect(page.getByRole("option")).toBeHidden()
+    await expect(combobox).toHaveValue("BVerfG")
 
-    await expect(page.getByLabel("dropdown-option")).toBeHidden()
-    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
-      "BVerfG",
-    )
+    await combobox.fill("BGH")
+    await combobox.press("Tab") // reset to last saved value
+
+    await expect(page.getByRole("option")).toBeHidden()
+    await expect(combobox).toHaveValue("BVerfG")
   })
 
   test("that setting a court sets the region automatically", async ({
@@ -187,7 +185,7 @@ test.describe("court", () => {
     await expect(page.getByLabel("Region", { exact: true })).toHaveValue("BW")
     await page.reload()
     // clear the court
-    await page.getByLabel("Auswahl zurücksetzen", { exact: true }).click()
+    await page.getByLabel("Entfernen", { exact: true }).click()
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("")
 
     await save(page)

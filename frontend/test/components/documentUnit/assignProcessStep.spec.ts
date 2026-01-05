@@ -8,6 +8,7 @@ import AssignProcessStep from "@/components/AssignProcessStep.vue"
 import { Decision } from "@/domain/decision"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
+import { User } from "@/domain/user"
 import errorMessages from "@/i18n/errors.json"
 import comboboxItemService from "@/services/comboboxItemService"
 import { ResponseError } from "@/services/httpClient"
@@ -38,19 +39,10 @@ const docUnitProcessSteps: DocumentationUnitProcessStep[] = [
   },
 ]
 
-const users = [
-  {
-    label: "T_U_1",
-    value: { id: "user-id-1", externalId: "user-id-1", label: "T_U_1" },
-  },
-  {
-    label: "T_U_2",
-    value: { id: "user-id-2", externalId: "user-id-2", label: "T_U_2" },
-  },
-  {
-    label: "T_U_3",
-    value: { id: "user-id-3", externalId: "user-id-3", label: "T_U_3" },
-  },
+const users: User[] = [
+  { id: "user-id-1", name: "T_U_1", initials: "U1" },
+  { id: "user-id-2", name: "T_U_2", initials: "U2" },
+  { id: "user-id-3", name: "T_U_3", initials: "U3" },
 ]
 
 function mockUseFetchReturn<T>(data: T): UseFetchReturn<T> {
@@ -166,7 +158,13 @@ describe("AssignProcessStep component", () => {
       }),
     )
     vi.spyOn(comboboxItemService, "getUsersForDocOffice").mockImplementation(
-      () => mockUseFetchReturn(users),
+      () => ({
+        useFetch: mockUseFetchReturn(users),
+        format: (user) => ({
+          label: user.name,
+          value: user,
+        }),
+      }),
     )
   })
 
@@ -331,7 +329,7 @@ describe("AssignProcessStep component", () => {
 
       // Assert that the callback was called with the correct user
       expect(capturedArgs).toBeDefined()
-      expect(capturedArgs!.user.externalId).toBe("user-id-2")
+      expect(capturedArgs!.user.id).toBe("user-id-2")
       expect(capturedArgs!.processStep.name).toBe("Neu")
     })
   })

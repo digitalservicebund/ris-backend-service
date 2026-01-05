@@ -105,7 +105,7 @@ test.describe(
         await test.step("Deleting court, resets responsible docoffice combobox", async () => {
           await page
             .locator("#documentationUnit")
-            .getByLabel("Auswahl zurücksetzen")
+            .getByLabel("Entfernen")
             .click()
           await page.keyboard.press("Escape")
 
@@ -141,9 +141,7 @@ test.describe(
         await test.step("DocOffice can be changed manually", async () => {
           await page.getByTestId("documentation-office-combobox").click()
 
-          await expect(
-            page.locator("[aria-label='dropdown-option'] >> nth=6"),
-          ).toBeVisible()
+          await expect(page.getByRole("option").nth(6)).toBeVisible()
 
           await expect(page.getByText("BAG", { exact: true })).toBeVisible()
           await expect(page.getByText("BFH", { exact: true })).toBeVisible()

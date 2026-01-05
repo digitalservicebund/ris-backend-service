@@ -98,7 +98,7 @@ describe("Combobox Element", () => {
     const input = screen.getByLabelText("test label")
     await fireEvent.focus(input)
     await user.keyboard("{escape}")
-    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
+    expect(screen.queryByRole("option")).not.toBeInTheDocument()
   })
 
   it("focus should open dropdown", async () => {
@@ -142,7 +142,7 @@ describe("Combobox Element", () => {
     const dropdownItems = screen.getAllByRole("option")
     await user.click(dropdownItems[1])
 
-    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
+    expect(screen.queryByRole("option")).not.toBeInTheDocument()
 
     const resetButton = screen.getByLabelText("Entfernen")
     await user.click(resetButton)
@@ -239,6 +239,7 @@ describe("Combobox Element", () => {
 
     await user.click(dropdownButton)
     await user.click(dropdownButton)
+    await vi.advanceTimersByTimeAsync(debounceTimeout)
 
     expect(screen.getAllByRole("option")).toHaveLength(1)
   })
@@ -288,13 +289,14 @@ describe("Combobox Element", () => {
     expect(dropdownItems[0]).toHaveTextContent("courtlabel2")
 
     await user.click(dropdownItems[0])
-    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
+    expect(screen.queryByRole("option")).not.toBeInTheDocument()
     expect(input).toHaveValue("courtlabel2")
 
-    const openDropdownContainer = screen.getByLabelText(
-      "Vorschläge anzeigen",
-    ) as HTMLElement
+    const openDropdownContainer = screen.getByRole("button", {
+      name: "Vorschläge anzeigen",
+    })
     await user.click(openDropdownContainer)
+    await vi.advanceTimersByTimeAsync(debounceTimeout)
     // the filter is still set to "testItem2", so we expect only that one item
     expect(screen.getAllByRole("option")).toHaveLength(1)
   })
@@ -411,7 +413,7 @@ describe("Combobox Element", () => {
 
     await user.keyboard("{enter}")
 
-    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
+    expect(screen.queryByRole("option")).not.toBeInTheDocument()
     // like in previous test: workaround for not being able to read testItem1 from the DOM
     expect(emitted()["update:modelValue"]).toHaveLength(1)
     expect(emitted()["update:modelValue"]).toEqual([
@@ -513,7 +515,7 @@ describe("Combobox Element", () => {
     const dropdownItems = screen.getAllByRole("option")
     await user.click(dropdownItems[1])
 
-    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
+    expect(screen.queryByRole("option")).not.toBeInTheDocument()
 
     expect(screen.queryByLabelText("Entfernen")).not.toBeInTheDocument()
   })

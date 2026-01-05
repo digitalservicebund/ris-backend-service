@@ -42,7 +42,7 @@ describe("Foreign Langauge Version Input", () => {
 
     // Assert
     expect(
-      screen.getByTestId("foreign-language-version-language"),
+      screen.getByRole("combobox", { name: "Sprache" }),
     ).toBeInTheDocument()
     expect(
       screen.getByTestId("foreign-language-version-link"),
@@ -60,7 +60,7 @@ describe("Foreign Langauge Version Input", () => {
         link: "https://link-to-tranlsation.en",
       } as ForeignLanguageVersion,
     })
-    const language = screen.getByRole("textbox", {
+    const language = screen.getByRole("combobox", {
       name: /sprache/i,
     })
     const link = screen.getByRole("textbox", {
@@ -87,7 +87,7 @@ describe("Foreign Langauge Version Input", () => {
         link: "https://link-to-tranlsation.en",
       } as ForeignLanguageVersion,
     })
-    const language = screen.getByRole("textbox", {
+    const language = screen.getByRole("combobox", {
       name: /sprache/i,
     })
     const link = screen.getByRole("textbox", {

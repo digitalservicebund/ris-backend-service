@@ -29,9 +29,9 @@ test.describe(
       })
       const coreData = page.getByLabel("Formaldaten")
       await coreData
-        .getByRole("textbox", { name: "Gericht", exact: true })
+        .getByRole("combobox", { name: "Gericht", exact: true })
         .fill("AG Aachen")
-      await page.getByText("AG Aachen").click()
+      await page.getByRole("option", { name: "AG Aachen" }).click()
       await coreData
         .getByRole("textbox", { name: "Entscheidungsdatum" })
         .fill("31.12.2019")

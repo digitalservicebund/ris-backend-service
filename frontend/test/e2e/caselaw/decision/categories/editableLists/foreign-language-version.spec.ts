@@ -42,9 +42,7 @@ test.describe(
         ).toBeVisible()
         await expect(otherCategoriesContainer.getByText("Link")).toBeVisible()
         await expect(
-          otherCategoriesContainer.getByTestId(
-            "foreign-language-version-language-input",
-          ),
+          otherCategoriesContainer.getByRole("combobox", { name: "Sprache" }),
         ).toBeVisible()
         await expect(
           otherCategoriesContainer.getByTestId(
@@ -55,14 +53,13 @@ test.describe(
 
       await test.step("'Sprache' zeigt bei Klick in die Combobox alle ISO-639-Sprachcodes", async () => {
         await otherCategoriesContainer
-          .getByTestId("foreign-language-version-language-input")
+          .getByRole("combobox", { name: "Sprache" })
           .click()
 
-        await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+        await expect(page.getByRole("progressbar")).toBeHidden()
 
         const dropdownOptions = await otherCategoriesContainer
-          .getByTestId("foreign-language-version-language-input")
-          .getByLabel("dropdown-option")
+          .getByRole("option")
           .all()
 
         const actualTexts = await Promise.all(
@@ -82,15 +79,16 @@ test.describe(
 
       await test.step("'Sprache' zeigt bei Suche zwei gefilterte ISO-639-Sprachcodes", async () => {
         await otherCategoriesContainer
-          .getByTestId("foreign-language-version-language")
-          .locator("input")
+          .getByRole("combobox", { name: "Sprache" })
           .fill("Aa")
 
-        await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+        // wait for the updated language list to be loaded
+        await expect(
+          otherCategoriesContainer.getByRole("option", { name: "Deutsch" }),
+        ).toBeHidden()
 
         const dropdownOptions = await otherCategoriesContainer
-          .getByTestId("foreign-language-version-language-input")
-          .getByLabel("dropdown-option")
+          .getByRole("option")
           .all()
 
         const actualTexts = await Promise.all(
@@ -132,15 +130,16 @@ test.describe(
         )
 
         await otherCategoriesContainer
-          .getByTestId("foreign-language-version-language")
-          .locator("input")
+          .getByRole("combobox", { name: "Sprache" })
           .fill("Fra")
 
-        await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+        // wait for the updated language list to be loaded
+        await expect(
+          otherCategoriesContainer.getByRole("option", { name: "Afrikaans" }),
+        ).toBeHidden()
 
         await otherCategoriesContainer
-          .getByTestId("foreign-language-version-language-input")
-          .getByLabel("dropdown-option")
+          .getByRole("option", { name: "Französisch" })
           .click()
 
         await otherCategoriesContainer

@@ -145,7 +145,7 @@ test.describe("eurlex", () => {
           }),
         ).toBeChecked()
 
-        await page.getByRole("button", { name: "Auswahl zurücksetzen" }).click()
+        await page.getByRole("button", { name: "Entfernen" }).click()
         await page.getByText("DS", { exact: true }).click()
         await page.getByLabel("Dokumentationsstelle zuweisen").click()
 

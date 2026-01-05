@@ -81,7 +81,7 @@ test.describe(
       })
 
       await test.step("The table is cleared when filter is deleted", async () => {
-        await page.getByLabel("Auswahl zurücksetzen", { exact: true }).click()
+        await page.getByLabel("Entfernen", { exact: true }).click()
         await expect(
           page.getByText(
             "Wählen Sie ein Periodikum um die Ausgaben anzuzeigen.",

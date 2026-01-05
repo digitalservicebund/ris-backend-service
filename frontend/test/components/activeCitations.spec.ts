@@ -262,7 +262,7 @@ describe("active citations", () => {
       await screen.findByLabelText("Art der Zitierung"),
       "Änderungen",
     )
-    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    const dropdownItems = screen.getAllByRole("option")
     expect(dropdownItems[0]).toHaveTextContent("Änderungen")
     await user.click(dropdownItems[0])
     const button = screen.getByLabelText("Aktivzitierung speichern")
@@ -283,7 +283,7 @@ describe("active citations", () => {
       await screen.findByLabelText("Dokumenttyp Aktivzitierung"),
       "Ant",
     )
-    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    const dropdownItems = screen.getAllByRole("option")
     expect(dropdownItems[0]).toHaveTextContent("EuGH-Vorlage")
     await user.click(dropdownItems[0])
     const button = screen.getByLabelText("Aktivzitierung speichern")
@@ -304,7 +304,7 @@ describe("active citations", () => {
       await screen.findByLabelText("Gericht Aktivzitierung"),
       "AG",
     )
-    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    const dropdownItems = screen.getAllByRole("option")
     expect(dropdownItems[0]).toHaveTextContent("AG Test")
     await user.click(dropdownItems[0])
     const button = screen.getByLabelText("Aktivzitierung speichern")

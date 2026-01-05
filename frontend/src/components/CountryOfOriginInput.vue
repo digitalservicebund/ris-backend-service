@@ -113,7 +113,7 @@ const fieldOfLawWithoutCountriesService: ComboboxItemService<FieldOfLaw> = (
             class="w-full"
             :invalid="slotProps.hasError"
             :item-service="
-              ComboboxItemService.getCountryFieldOfLawSearchByIdentifier
+              ComboboxItemServices.getCountryFieldOfLawSearchByIdentifier
             "
           ></ComboboxInput>
         </InputField>

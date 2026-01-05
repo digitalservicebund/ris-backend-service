@@ -28,10 +28,10 @@ test.describe(
           name: "Herkunftsland",
         },
       )
-      const countryInput = otherCategoriesContainer.getByRole("textbox", {
+      const countryInput = otherCategoriesContainer.getByRole("combobox", {
         name: "Landbezeichnung",
       })
-      const fieldOfLawInput = otherCategoriesContainer.getByRole("textbox", {
+      const fieldOfLawInput = otherCategoriesContainer.getByRole("combobox", {
         name: "Rechtlicher Rahmen",
       })
 
@@ -51,7 +51,7 @@ test.describe(
 
       await test.step("Rechtlichen Rahmen ausfüllen", async () => {
         await fieldOfLawInput.fill("AR-01-01-0")
-        await page.keyboard.press("Enter")
+        await page.getByRole("option", { name: "AR-01-01-01" }).click()
       })
 
       await test.step("Ohne Landbezeichnung kann nicht übernommen werden", async () => {
@@ -61,7 +61,7 @@ test.describe(
 
       await test.step("Landbezeichnung ausfüllen", async () => {
         await countryInput.fill("DEU")
-        await page.keyboard.press("Enter")
+        await page.getByRole("option", { name: "RE-07-DEU" }).click()
       })
 
       await test.step("Mit Landbezeichnung kann übernommen werden", async () => {
@@ -119,7 +119,7 @@ test.describe(
       )
 
       const otherCategoriesContainer = page.getByLabel("Weitere Rubriken")
-      const countryInput = otherCategoriesContainer.getByRole("textbox", {
+      const countryInput = otherCategoriesContainer.getByRole("combobox", {
         name: "Landbezeichnung",
       })
 
@@ -154,8 +154,7 @@ test.describe(
         await expect(countryInput).toBeVisible()
 
         await countryInput.fill("DEU")
-        await page.keyboard.press("Enter")
-
+        await page.getByRole("option", { name: "RE-07-DEU" }).click()
         await expect(countryInput).toHaveValue("RE-07-DEU")
 
         await acceptButton.click()

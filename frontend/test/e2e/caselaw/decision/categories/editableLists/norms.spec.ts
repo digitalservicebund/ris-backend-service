@@ -377,7 +377,7 @@ test.describe("norm", () => {
       // the result list of the first combobox will stay open blocking the save button
       page
         .getByTestId("legal-force-region-combobox")
-        .getByRole("button", { name: "Auswahl zurücksetzen" })
+        .getByRole("button", { name: "Entfernen" })
 
       await saveNormButton.click()
       await expect(page.getByText("Vereinbar (Berlin (Ost))")).toBeHidden()

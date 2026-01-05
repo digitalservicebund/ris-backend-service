@@ -38,8 +38,10 @@ test.describe(
           .fill("Stehende Bühnen")
         await section.getByRole("textbox", { name: "Datum" }).fill("12.2001")
         await section.getByRole("textbox", { name: "Tarifnorm" }).fill("§ 23")
-        await section.getByRole("textbox", { name: "Branche" }).fill("Bü")
-        await section.getByText("Bühne, Theater, Orchester").click()
+        await section.getByRole("combobox", { name: "Branche" }).fill("Bü")
+        await section
+          .getByRole("option", { name: "Bühne, Theater, Orchester" })
+          .click()
 
         await section
           .getByRole("button", { name: "Tarifvertrag speichern" })

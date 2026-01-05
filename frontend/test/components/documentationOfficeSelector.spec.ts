@@ -1,3 +1,4 @@
+import { userEvent } from "@testing-library/user-event/dist/cjs/index.js"
 import { render, screen, fireEvent } from "@testing-library/vue"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
@@ -105,14 +106,13 @@ describe("DocumentationOfficeSelector", () => {
   })
 
   it("should emit undefined for modelValue and false for hasError when the input is cleared", async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
     const modelValue: DocumentationOffice = {
       id: "1",
       abbreviation: "BGH",
     }
     const { emitted } = renderDocumentationOfficeSelector(modelValue)
-
-    const input = screen.getByDisplayValue("BGH")
-    await fireEvent.update(input, "")
+    await user.clear(screen.getByRole("combobox"))
 
     const emittedEvents = emitted() as {
       "update:modelValue"?: (DocumentationOffice | undefined)[][]

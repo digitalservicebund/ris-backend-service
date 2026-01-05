@@ -396,9 +396,7 @@ describe("NormReferenceEntry", () => {
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
 
     await user.type(abbreviationField, "1000")
-    const dropdownItems = screen.getAllByLabelText(
-      "dropdown-option",
-    ) as HTMLElement[]
+    const dropdownItems = screen.getAllByRole("option")
     expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
     await user.click(dropdownItems[0])
 
@@ -507,9 +505,7 @@ describe("NormReferenceEntry", () => {
 
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
     await user.type(abbreviationField, "1000")
-    const dropdownItems = screen.getAllByLabelText(
-      "dropdown-option",
-    ) as HTMLElement[]
+    const dropdownItems = screen.getAllByRole("option")
     expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
     await user.click(dropdownItems[0])
 
@@ -525,9 +521,7 @@ describe("NormReferenceEntry", () => {
       const { user } = renderComponent()
       const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
       await user.type(abbreviationField, "1000")
-      const dropdownItems = screen.getAllByLabelText(
-        "dropdown-option",
-      ) as HTMLElement[]
+      const dropdownItems = screen.getAllByRole("option")
       expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
       await user.click(dropdownItems[0])
 
@@ -560,9 +554,7 @@ describe("NormReferenceEntry", () => {
       await user.click(checkbox)
       const legalForceType = screen.getByLabelText("Gesetzeskraft Typ")
       await user.click(legalForceType)
-      const dropdownItemsLegalForceType = screen.getAllByLabelText(
-        "dropdown-option",
-      ) as HTMLElement[]
+      const dropdownItemsLegalForceType = screen.getAllByRole("option")
       expect(dropdownItemsLegalForceType[0]).toHaveTextContent("Nichtig")
       await user.click(dropdownItemsLegalForceType[0])
 
@@ -611,11 +603,11 @@ describe("NormReferenceEntry", () => {
       const checkbox = await screen.findByLabelText("Gesetzeskraft der Norm")
 
       await user.click(checkbox)
-      const regionInput = screen.getByLabelText("Gesetzeskraft Geltungsbereich")
+      const regionInput = screen.getByRole("combobox", {
+        name: "Gesetzeskraft Geltungsbereich",
+      })
       await user.click(regionInput)
-      const dropdownItemsLegalRegionInput = screen.getAllByLabelText(
-        "dropdown-option",
-      ) as HTMLElement[]
+      const dropdownItemsLegalRegionInput = screen.getAllByRole("option")
       expect(dropdownItemsLegalRegionInput[0]).toHaveTextContent("region")
       await user.click(dropdownItemsLegalRegionInput[0])
 

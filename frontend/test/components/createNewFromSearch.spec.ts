@@ -226,7 +226,7 @@ describe("Create new documentation unit from search", () => {
     await vi.advanceTimersByTimeAsync(300)
 
     // change documentation office after it was set automatically
-    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    const dropdownItems = screen.getAllByRole("option")
     expect(dropdownItems[1]).toHaveTextContent("DS")
     await fireEvent.click(dropdownItems[1])
 

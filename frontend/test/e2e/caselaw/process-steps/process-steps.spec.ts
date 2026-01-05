@@ -297,14 +297,9 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
           "Dokumentationsstelle auswählen",
         )
         await dropdown.click()
-        await pageWithBghUser
-          .getByLabel("dropdown-option")
-          .getByText("BFH")
-          .click()
+        await pageWithBghUser.getByRole("option").getByText("BFH").click()
 
-        await expect(
-          pageWithBghUser.locator('button[aria-label="dropdown-option"]'),
-        ).toBeHidden()
+        await expect(pageWithBghUser.getByRole("option")).toBeHidden()
         await pageWithBghUser.getByRole("button", { name: "Zuweisen" }).click()
         await pageWithBghUser.waitForLoadState()
       })

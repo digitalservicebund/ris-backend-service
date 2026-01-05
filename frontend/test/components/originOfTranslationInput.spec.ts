@@ -79,7 +79,7 @@ describe("OriginOfTranslationInput", () => {
         id: "id",
       } as OriginOfTranslation,
     })
-    const language = screen.getByRole("textbox", {
+    const language = screen.getByRole("combobox", {
       name: /sprache/i,
     })
 
@@ -103,7 +103,7 @@ describe("OriginOfTranslationInput", () => {
         } as LanguageCode,
       } as OriginOfTranslation,
     })
-    const language = screen.getByRole("textbox", {
+    const language = screen.getByRole("combobox", {
       name: /sprache/i,
     })
 

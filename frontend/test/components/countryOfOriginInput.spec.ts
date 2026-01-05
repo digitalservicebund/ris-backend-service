@@ -63,13 +63,13 @@ describe("Country of Origin Input", () => {
 
     // Assert
     await user.type(
-      screen.getByRole("textbox", { name: "Rechtlicher Rahmen" }),
+      screen.getByRole("combobox", { name: "Rechtlicher Rahmen" }),
       "RE-07-DEU",
     )
     expect(screen.queryByText("RE-07-DEU")).not.toBeInTheDocument()
 
     await user.type(
-      screen.getByRole("textbox", { name: "Rechtlicher Rahmen" }),
+      screen.getByRole("combobox", { name: "Rechtlicher Rahmen" }),
       "AR",
     )
     expect(screen.queryByText("AR-01-01-01")).toBeVisible()
@@ -81,13 +81,13 @@ describe("Country of Origin Input", () => {
 
     // Assert
     await user.type(
-      screen.getByRole("textbox", { name: "Landbezeichnung" }),
+      screen.getByRole("combobox", { name: "Landbezeichnung" }),
       "D",
     )
     expect(screen.queryByText("RE-07-DEU")).toBeVisible()
 
     await user.type(
-      screen.getByRole("textbox", { name: "Landbezeichnung" }),
+      screen.getByRole("combobox", { name: "Landbezeichnung" }),
       "AR",
     )
     expect(screen.queryByText("AR-01-01-01")).not.toBeInTheDocument()
@@ -104,7 +104,7 @@ describe("Country of Origin Input", () => {
 
     // Assert
     await user.type(
-      screen.getByRole("textbox", { name: "Landbezeichnung" }),
+      screen.getByRole("combobox", { name: "Landbezeichnung" }),
       "D",
     )
     await user.click(screen.getByText("RE-07-DEU"))
@@ -126,10 +126,10 @@ describe("Country of Origin Input", () => {
 
     // Assert
     expect(
-      screen.getByRole("textbox", { name: "Landbezeichnung" }),
+      screen.getByRole("combobox", { name: "Landbezeichnung" }),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole("textbox", { name: "Rechtlicher Rahmen" }),
+      screen.getByRole("combobox", { name: "Rechtlicher Rahmen" }),
     ).toBeInTheDocument()
     expect(
       screen.getByRole("button", { name: "Herkunftsland speichern" }),
@@ -150,10 +150,10 @@ describe("Country of Origin Input", () => {
 
     // Assert
     expect(
-      screen.getByRole("textbox", { name: "Landbezeichnung" }),
+      screen.getByRole("combobox", { name: "Landbezeichnung" }),
     ).toHaveValue("")
     expect(
-      screen.getByRole("textbox", { name: "Rechtlicher Rahmen" }),
+      screen.getByRole("combobox", { name: "Rechtlicher Rahmen" }),
     ).toHaveValue("AR-01-01-01")
     expect(
       screen.getByRole("button", { name: "Herkunftsland speichern" }),
@@ -178,10 +178,10 @@ describe("Country of Origin Input", () => {
 
     // Assert
     expect(
-      screen.getByRole("textbox", { name: "Landbezeichnung" }),
+      screen.getByRole("combobox", { name: "Landbezeichnung" }),
     ).toHaveValue("RE-07-DEU")
     expect(
-      screen.getByRole("textbox", { name: "Rechtlicher Rahmen" }),
+      screen.getByRole("combobox", { name: "Rechtlicher Rahmen" }),
     ).toHaveValue("AR-01-01-01")
     expect(
       screen.getByRole("button", { name: "Herkunftsland speichern" }),

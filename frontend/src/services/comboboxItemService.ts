@@ -83,7 +83,7 @@ const endpoints = {
   legalForceTypes: {
     path: "legalforcetype",
     format: (item: LegalForceType) => ({
-      label: capitalize(item.abbreviation),
+      label: item.abbreviation ? capitalize(item.abbreviation) : "",
       value: item,
     }),
   },

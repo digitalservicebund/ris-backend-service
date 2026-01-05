@@ -110,9 +110,7 @@ describe("Legal periodical edition list", () => {
     const periodicalField = screen.getByLabelText("Periodikum")
 
     await user.type(periodicalField, "BDZ")
-    const dropdownItems = screen.getAllByLabelText(
-      "dropdown-option",
-    ) as HTMLElement[]
+    const dropdownItems = screen.getAllByRole("option")
     expect(dropdownItems[0]).toHaveTextContent("BDZ | Bundesgesetzblatt")
     await user.click(dropdownItems[0])
     await expect(periodicalField).toHaveValue("BDZ | Bundesgesetzblatt")
@@ -136,9 +134,7 @@ describe("Legal periodical edition list", () => {
     const periodicalField = screen.getByLabelText("Periodikum")
 
     await user.type(periodicalField, "BDZ")
-    const dropdownItems = screen.getAllByLabelText(
-      "dropdown-option",
-    ) as HTMLElement[]
+    const dropdownItems = screen.getAllByRole("option") as HTMLElement[]
     expect(dropdownItems[0]).toHaveTextContent("BDZ | Bundesgesetzblatt")
     await user.click(dropdownItems[0])
     await expect(periodicalField).toHaveValue("BDZ | Bundesgesetzblatt")
@@ -215,9 +211,7 @@ describe("Legal periodical edition list", () => {
       const periodicalField = screen.getByLabelText("Periodikum")
 
       await user.type(periodicalField, "BDZ")
-      const dropdownItems = screen.getAllByLabelText(
-        "dropdown-option",
-      ) as HTMLElement[]
+      const dropdownItems = screen.getAllByRole("option") as HTMLElement[]
       expect(dropdownItems[0]).toHaveTextContent("BDZ | Bundesgesetzblatt")
       await user.click(dropdownItems[0])
       expect(periodicalField).toHaveValue("BDZ | Bundesgesetzblatt")

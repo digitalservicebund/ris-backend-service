@@ -393,11 +393,9 @@ async function setDocTypeToMatchDocUnit(page: Page, docUnit: Decision) {
       .getByLabel("Dokumenttyp", { exact: true })
       .fill(docUnit.coreData.documentType?.label ?? "")
 
-    await expect(
-      page.getByLabel("dropdown-option", { exact: true }),
-    ).toHaveCount(1)
+    await expect(page.getByRole("option")).toHaveCount(1)
 
-    await page.getByLabel("dropdown-option", { exact: true }).click()
+    await page.getByRole("option").click()
   })
 }
 
@@ -405,11 +403,9 @@ async function setCourtToBGH(page: Page) {
   await test.step("Set court to BGH", async () => {
     await page.getByLabel("Gericht", { exact: true }).fill("BGH")
 
-    await expect(
-      page.getByLabel("dropdown-option", { exact: true }),
-    ).toHaveCount(1)
+    await expect(page.getByRole("option")).toHaveCount(1)
 
-    await page.getByLabel("dropdown-option", { exact: true }).click()
+    await page.getByRole("option").click()
   })
 }
 

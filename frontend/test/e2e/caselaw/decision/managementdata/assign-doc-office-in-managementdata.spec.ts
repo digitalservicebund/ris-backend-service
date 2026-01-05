@@ -52,8 +52,10 @@ test.describe(
         const zuweisenElements = page.getByText("Zuweisen")
         await expect(zuweisenElements).toHaveCount(2)
         await expect(
-          page.locator("#documentationOfficeSelector"),
-        ).toHaveAttribute("placeholder", "Dokumentationsstelle auswählen")
+          page.getByRole("combobox", {
+            name: "Dokumentationsstelle auswählen",
+          }),
+        ).toBeVisible()
       })
 
       await test.step("Im Dropdown sind alle Dokumentationsstellen, ausgenommen die eigene.", async () => {
@@ -91,11 +93,9 @@ test.describe(
       await test.step("Ziel-Dokumentationsstelle auswählen und bestätigen", async () => {
         const dropdown = page.getByLabel("Dokumentationsstelle auswählen")
         await dropdown.click()
-        await page.getByLabel("dropdown-option").getByText("BGH").click()
+        await page.getByRole("option", { name: "BGH" }).click()
 
-        await expect(
-          page.locator('button[aria-label="dropdown-option"]'),
-        ).toBeHidden()
+        await expect(page.getByRole("option")).toBeHidden()
         await page.getByRole("button", { name: "Zuweisen" }).click()
         await page.waitForLoadState()
       })

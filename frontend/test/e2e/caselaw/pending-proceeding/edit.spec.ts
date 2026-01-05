@@ -19,7 +19,7 @@ test.describe("edit pending proceeding", () => {
         await expect(court).toHaveValue("")
         // switch again to BFH
         await court.fill("BFH")
-        await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+        await expect(page.getByRole("progressbar")).toBeHidden()
         await expect(court).toHaveValue("BFH")
         await page.getByText("BFH", { exact: true }).click()
         await expect(court).toHaveValue("BFH")

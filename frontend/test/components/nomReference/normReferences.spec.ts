@@ -149,9 +149,7 @@ describe("Norm references", () => {
 
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
     await user.type(abbreviationField, "1000g-BefV")
-    const dropdownItems = screen.getAllByLabelText(
-      "dropdown-option",
-    ) as HTMLElement[]
+    const dropdownItems = screen.getAllByRole("option")
     expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
     await user.click(dropdownItems[0])
     await screen.findByText(/RIS-Abkürzung bereits eingegeben/)
@@ -174,9 +172,7 @@ describe("Norm references", () => {
 
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
     await user.type(abbreviationField, "1000g-BefV")
-    const dropdownItems = screen.getAllByLabelText(
-      "dropdown-option",
-    ) as HTMLElement[]
+    const dropdownItems = screen.getAllByRole("option")
     expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
     await user.click(dropdownItems[0])
     await screen.findByText(/RIS-Abkürzung bereits eingegeben/)

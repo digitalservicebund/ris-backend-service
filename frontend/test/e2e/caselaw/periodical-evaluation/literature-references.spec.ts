@@ -54,9 +54,7 @@ test.describe("Literature references", () => {
           .getByLabel("Dokumenttyp Literaturfundstelle", { exact: true })
           .focus()
         // we expect a list of at least 15 values
-        await expect(
-          page.locator("[aria-label='dropdown-option'] >> nth=15"),
-        ).toBeVisible()
+        await expect(page.getByRole("option").nth(15)).toBeVisible()
       })
 
       await test.step("Input values are maintained when switching between literature and caselaw references", async () => {

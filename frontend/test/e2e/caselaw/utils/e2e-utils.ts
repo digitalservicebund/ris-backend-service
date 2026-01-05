@@ -572,9 +572,11 @@ export async function fillCombobox(
   ariaLabel: string,
   value: string,
 ) {
-  await fillInput(page, ariaLabel, value)
-  await expect(page.getByTestId("combobox-spinner")).toBeHidden()
-  await page.getByText(value, { exact: true }).click()
+  const combobox = page.getByRole("combobox", { name: ariaLabel, exact: true })
+  await expect(combobox).toBeVisible()
+  await combobox.fill(value)
+  await expect(combobox).toHaveValue(value)
+  await page.getByRole("option", { name: value, exact: true }).click()
 }
 
 export async function fillSelect(
@@ -734,9 +736,11 @@ export async function assignProcedureToDocUnit(
   await test.step("Internal user assigns new procedure to doc unit", async () => {
     await navigateToCategories(page, documentNumber)
     procedureName = generateString({ length: 10, prefix: prefix })
-    await page.getByLabel("Vorgang", { exact: true }).fill(procedureName)
     await page
-      .getByText(`${procedureName} neu erstellen`)
+      .getByRole("combobox", { name: "Vorgang", exact: true })
+      .fill(procedureName)
+    await page
+      .getByRole("option", { name: procedureName })
       .click({ timeout: 5_000 })
     await save(page)
   })
@@ -1209,14 +1213,11 @@ export async function selectUser(
 
   await expect(dialog.getByText("Neue Person")).toBeVisible()
   await page.getByLabel("Neue Person", { exact: true }).fill(searchTerm)
-  await expect(page.getByTestId("combobox-spinner")).toBeVisible()
-  await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+  await expect(page.getByRole("progressbar")).toBeHidden()
 
   await expect(dialog.getByText(expectedUser)).toBeVisible()
 
-  const firstItem = dialog
-    .getByRole("button", { name: "dropdown-option" })
-    .first()
+  const firstItem = dialog.getByRole("option").first()
   await expect(firstItem).toContainText(expectedUser)
   await firstItem.click()
 }
