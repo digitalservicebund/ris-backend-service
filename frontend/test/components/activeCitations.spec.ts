@@ -86,6 +86,7 @@ function renderComponent(activeCitations?: ActiveCitation[]) {
 
 function generateActiveCitation(options?: {
   uuid?: string
+  localId?: string
   documentNumber?: string
   court?: Court
   decisionDate?: string
@@ -95,6 +96,7 @@ function generateActiveCitation(options?: {
 }) {
   const activeCitation = new ActiveCitation({
     uuid: options?.uuid ?? crypto.randomUUID(),
+    localId: options?.localId ?? "0",
     documentNumber: options?.documentNumber ?? undefined,
     court: options?.court ?? {
       type: "type1",
@@ -353,8 +355,8 @@ describe("active citations", () => {
 
   it("correctly deletes manually added active citations", async () => {
     const { user } = renderComponent([
-      generateActiveCitation(),
-      generateActiveCitation(),
+      generateActiveCitation({ localId: "0" }),
+      generateActiveCitation({ localId: "1" }),
     ])
     const activeCitations = screen.getAllByLabelText("Listen Eintrag")
     expect(activeCitations.length).toBe(2)
@@ -365,8 +367,8 @@ describe("active citations", () => {
 
   it("correctly deletes active citations added by search", async () => {
     const { user } = renderComponent([
-      generateActiveCitation(),
-      generateActiveCitation(),
+      generateActiveCitation({ localId: "0" }),
+      generateActiveCitation({ localId: "1" }),
     ])
     const activeCitations = screen.getAllByLabelText("Listen Eintrag")
     expect(activeCitations.length).toBe(2)

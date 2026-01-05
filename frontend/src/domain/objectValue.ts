@@ -29,7 +29,7 @@ export const ProceedingTypeLabels: Record<ProceedingType, string> = {
 
 export default class ObjectValue implements EditableListItem {
   public id?: string
-  public newEntry?: boolean
+  public localId: string
   public amount?: number
   public currencyCode?: CurrencyCode
   public proceedingType?: ProceedingType
@@ -40,13 +40,7 @@ export default class ObjectValue implements EditableListItem {
 
   constructor(data: Partial<ObjectValue> = {}) {
     Object.assign(this, data)
-
-    if (this.id == undefined) {
-      this.id = crypto.randomUUID()
-      this.newEntry = true
-    } else if (data.newEntry == undefined) {
-      this.newEntry = false
-    }
+    this.localId = data.localId ?? crypto.randomUUID()
   }
 
   get renderSummary(): string {
@@ -72,10 +66,6 @@ export default class ObjectValue implements EditableListItem {
 
   get isEmpty(): boolean {
     return ObjectValue.fields.every((field) => this.fieldIsEmpty(this[field]))
-  }
-
-  equals(entry: ObjectValue): boolean {
-    return this.id === entry.id
   }
 
   private fieldIsEmpty(

@@ -13,8 +13,8 @@ import DummyListItem from "@/kitchensink/domain/dummyListItem"
 import routes from "~/test-helper/routes"
 
 const listWithEntries = ref<DummyListItem[]>([
-  new DummyListItem({ text: "foo", uuid: "123" }),
-  new DummyListItem({ text: "bar", uuid: "124" }),
+  new DummyListItem({ text: "foo", localId: "123" }),
+  new DummyListItem({ text: "bar", localId: "124" }),
 ])
 
 function summerizer(dataEntry: EditableListItem) {
@@ -135,8 +135,8 @@ describe("EditableList", () => {
       [
         [
           {
+            localId: "124",
             text: "bar",
-            uuid: "124",
           },
         ],
       ],
@@ -172,12 +172,12 @@ describe("EditableList", () => {
       [
         [
           {
+            localId: "123",
             text: "foo1",
-            uuid: "123",
           },
           {
+            localId: "124",
             text: "bar",
-            uuid: "124",
           },
         ],
       ],
@@ -294,8 +294,8 @@ describe("EditableList", () => {
         [
           [
             {
+              localId: "124",
               text: "bar",
-              uuid: "124",
             },
           ],
         ],
@@ -333,13 +333,10 @@ describe("EditableList", () => {
         [
           [
             {
+              localId: "123",
               text: "foo1",
-              uuid: "123",
             },
-            {
-              text: "bar",
-              uuid: "124",
-            },
+            { localId: "124", text: "bar" },
           ],
         ],
       ])

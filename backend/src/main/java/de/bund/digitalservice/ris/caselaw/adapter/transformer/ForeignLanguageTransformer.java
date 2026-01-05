@@ -26,7 +26,7 @@ public class ForeignLanguageTransformer {
       return null;
     }
     return ForeignLanguageVersionDTO.builder()
-        .id(foreignLanguageVersion.newEntry() ? null : foreignLanguageVersion.id())
+        .id(foreignLanguageVersion.id())
         .languageCode(LanguageCodeTransformer.transformToDTO(foreignLanguageVersion.languageCode()))
         .url(foreignLanguageVersion.link())
         .languageCode(LanguageCodeTransformer.transformToDTO(foreignLanguageVersion.languageCode()))

@@ -140,10 +140,6 @@ const shouldDisplayDismissalAttributes = computed(
   () => isLaborCourt.value || hasDismissalInput.value,
 )
 
-const shouldDisplayCollectiveAgreements = computed(
-  () => isLaborCourt.value || hasCollectiveAgreement.value,
-)
-
 const shouldDisplayEvsf = computed(() => isFinanceCourt.value || evsf.value)
 
 const shouldDisplayAppeal = computed(
@@ -178,7 +174,6 @@ const shouldDisplayNonApplicationNorms = computed(
         <DefinitionList label="Definition" />
       </CategoryWrapper>
       <CategoryWrapper
-        v-if="shouldDisplayCollectiveAgreements"
         label="Tarifvertrag"
         :should-show-button="!hasCollectiveAgreement"
       >

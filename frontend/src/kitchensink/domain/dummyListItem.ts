@@ -1,16 +1,12 @@
 import EditableListItem from "@/domain/editableListItem"
 
 export default class DummyListItem implements EditableListItem {
+  public localId: string // FE only
   public text?: string
-  public uuid?: string
 
   constructor(data: Partial<DummyListItem> = {}) {
     Object.assign(this, data)
-    this.uuid ??= crypto.randomUUID()
-  }
-
-  get id() {
-    return this.uuid
+    this.localId ??= crypto.randomUUID()
   }
 
   get renderSummary(): string {
@@ -22,6 +18,6 @@ export default class DummyListItem implements EditableListItem {
   }
 
   equals(entry: DummyListItem): boolean {
-    return this.id === entry.id
+    return this.localId === entry.localId
   }
 }

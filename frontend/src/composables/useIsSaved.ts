@@ -1,15 +1,14 @@
 import { computed } from "vue"
 
-export function useIsSaved<T extends { id?: unknown }>(
+export function useIsSaved<T extends { localId?: string }>(
   modelValue: T | undefined,
   modelValueList: T[] | undefined,
 ) {
   const isSaved = computed(() => {
-    return (
-      Array.isArray(modelValueList) &&
-      modelValueList.length > 0 &&
-      modelValueList.some((item) => modelValue && modelValue.id === item.id)
-    )
+    if (!modelValue?.localId) return false
+    if (!Array.isArray(modelValueList)) return false
+
+    return modelValueList.some((item) => item.localId === modelValue.localId)
   })
 
   return { isSaved }

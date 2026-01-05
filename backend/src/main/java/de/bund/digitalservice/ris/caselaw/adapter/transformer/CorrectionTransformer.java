@@ -37,7 +37,7 @@ public class CorrectionTransformer {
 
     var builder =
         CorrectionDTO.builder()
-            .id(domainObject.newEntry() ? null : domainObject.id())
+            .id(domainObject.id())
             .type(domainObject.type())
             .content(domainObject.content())
             .description(domainObject.description())

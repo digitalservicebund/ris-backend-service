@@ -10,10 +10,6 @@ export default class RelatedPendingProceeding
   constructor(data: Partial<RelatedPendingProceeding> = {}) {
     super()
     Object.assign(this, data)
-    if (this.uuid == undefined) {
-      this.uuid = crypto.randomUUID()
-      this.newEntry = true
-    }
   }
 
   get isReadOnly(): boolean {
@@ -25,18 +21,10 @@ export default class RelatedPendingProceeding
     )
   }
 
-  get id() {
-    return this.uuid
-  }
-
   get isEmpty(): boolean {
     return RelatedPendingProceeding.fields.every((field) =>
       this.fieldIsEmpty(this[field]),
     )
-  }
-
-  equals(entry: RelatedPendingProceeding): boolean {
-    return this.id === entry.id
   }
 
   private fieldIsEmpty(

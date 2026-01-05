@@ -91,7 +91,6 @@ export enum InputMethod {
           <InputField
             id="direct"
             label="Direkteingabe"
-            label-class="ris-label1-regular"
             :label-position="LabelPosition.RIGHT"
             @click="() => (inputMethod = InputMethod.DIRECT)"
           >
@@ -99,6 +98,7 @@ export enum InputMethod {
               id="direct"
               v-model="inputMethod"
               aria-label="Direkteingabe auswählen"
+              size="small"
               value="direct"
             />
           </InputField>
@@ -106,7 +106,6 @@ export enum InputMethod {
           <InputField
             id="search"
             label="Suche"
-            label-class="ris-label1-regular"
             :label-position="LabelPosition.RIGHT"
             @click="inputMethod = InputMethod.SEARCH"
           >
@@ -114,6 +113,7 @@ export enum InputMethod {
               id="search"
               v-model="inputMethod"
               aria-label="Sachgebietsuche auswählen"
+              size="small"
               value="search"
             />
           </InputField>

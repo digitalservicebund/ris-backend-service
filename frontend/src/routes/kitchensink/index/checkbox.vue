@@ -7,6 +7,7 @@ import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 
 const values = reactive({
   regular: false,
+  checked: true,
   disabled: false,
   disabledChecked: true,
   invalid: false,
@@ -17,16 +18,22 @@ const values = reactive({
 
 <template>
   <KitchensinkPage name="Checkbox">
-    <KitchensinkStory name="Regular">
-      <InputField
-        id="regularCheckbox"
-        v-slot="{ id }"
-        label="Regular"
-        :label-position="LabelPosition.RIGHT"
-      >
-        <Checkbox v-model="values.regular" binary :input-id="id" />
-      </InputField>
-    </KitchensinkStory>
+    <InputField
+      id="unchecked"
+      v-slot="{ id }"
+      label="Unchecked"
+      :label-position="LabelPosition.RIGHT"
+    >
+      <Checkbox v-model="values.regular" binary :input-id="id" />
+    </InputField>
+    <InputField
+      id="checked"
+      v-slot="{ id }"
+      label="Checked"
+      :label-position="LabelPosition.RIGHT"
+    >
+      <Checkbox v-model="values.checked" binary :input-id="id" />
+    </InputField>
 
     <KitchensinkStory name="Disabled">
       <InputField
@@ -52,15 +59,15 @@ const values = reactive({
 
     <KitchensinkStory name="Sizes">
       <InputField
-        id="mini"
+        id="small"
         v-slot="{ id }"
-        label="Normal"
+        label="Small"
         :label-position="LabelPosition.RIGHT"
       >
-        <Checkbox v-model="values.size" :input-id="id" value="Normal" />
+        <Checkbox v-model="values.size" :input-id="id" value="Small" />
       </InputField>
       <InputField
-        id="small"
+        id="large"
         v-slot="{ id }"
         label="Large"
         :label-position="LabelPosition.RIGHT"

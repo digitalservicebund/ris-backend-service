@@ -4,7 +4,6 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLogin;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLoginExternal;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLoginWithDocOffice;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import java.util.UUID;
 import org.springframework.test.web.servlet.MockMvc;
@@ -12,6 +11,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.shaded.org.checkerframework.checker.nullness.qual.Nullable;
+import tools.jackson.databind.ObjectMapper;
 
 public class RisWebTestClient {
   private final MockMvc mockMvc;

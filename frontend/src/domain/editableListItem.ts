@@ -1,9 +1,7 @@
 export default interface EditableListItem {
-  id?: string
+  localId: string
   documentNumber?: string
   renderSummary?: string
   hasMissingRequiredFields?: boolean
   missingRequiredFields?: string[]
-
-  equals(entry: EditableListItem): boolean
 }

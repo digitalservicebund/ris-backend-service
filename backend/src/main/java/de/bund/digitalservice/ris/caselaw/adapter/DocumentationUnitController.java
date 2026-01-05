@@ -54,6 +54,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.mapping.MappingException;
@@ -62,7 +63,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -219,7 +219,7 @@ public class DocumentationUnitController {
 
     } catch (Exception e) {
       attachmentService.deleteByS3Path(attachmentPath, uuid, userService.getUser(oidcUser));
-      return ResponseEntity.unprocessableEntity().build();
+      return ResponseEntity.unprocessableContent().build();
     }
   }
 
@@ -364,7 +364,7 @@ public class DocumentationUnitController {
       @AuthenticationPrincipal OidcUser oidcUser) {
 
     if (!uuid.equals(decision.uuid())) {
-      return ResponseEntity.unprocessableEntity().body(Decision.builder().build());
+      return ResponseEntity.unprocessableContent().body(Decision.builder().build());
     }
     try {
       var du = service.updateDocumentationUnit(decision);
@@ -439,7 +439,7 @@ public class DocumentationUnitController {
               uuid, userService.getEmail(oidcUser), userService.getUser(oidcUser));
       if (handoverMail == null || !handoverMail.isSuccess()) {
         log.warn("Failed to send mail for documentation unit {}", uuid);
-        return ResponseEntity.unprocessableEntity().body(handoverMail);
+        return ResponseEntity.unprocessableContent().body(handoverMail);
       }
       service.saveSuccessfulHandover(uuid);
       return ResponseEntity.ok(handoverMail);
@@ -609,7 +609,7 @@ public class DocumentationUnitController {
               .success(false)
               .statusMessages(List.of(e.getMessage()))
               .build();
-      return ResponseEntity.unprocessableEntity().body(result);
+      return ResponseEntity.unprocessableContent().body(result);
     } catch (Exception e) {
       var result =
           LdmlTransformationResult.builder()

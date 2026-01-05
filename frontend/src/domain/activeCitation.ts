@@ -25,12 +25,8 @@ export default class ActiveCitation
   ] as const
 
   constructor(data: Partial<ActiveCitation> = {}) {
-    super()
+    super(data)
     Object.assign(this, data)
-    if (this.uuid == undefined) {
-      this.uuid = crypto.randomUUID()
-      this.newEntry = true
-    }
   }
 
   get renderSummary(): string {
@@ -55,10 +51,6 @@ export default class ActiveCitation
     )
   }
 
-  get id() {
-    return this.uuid
-  }
-
   get isEmpty(): boolean {
     return ActiveCitation.fields.every((field) =>
       this.fieldIsEmpty(this[field]),
@@ -67,10 +59,6 @@ export default class ActiveCitation
 
   get isReadOnly(): boolean {
     return false
-  }
-
-  equals(entry: ActiveCitation): boolean {
-    return this.id === entry.id
   }
 
   get citationTypeIsSet(): boolean {

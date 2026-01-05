@@ -28,7 +28,7 @@ export type CoreData = {
   inputTypes?: string[]
   documentationOffice?: DocumentationOffice
   creatingDocOffice?: DocumentationOffice
-  yearsOfDispute?: string[]
+  yearsOfDispute?: number[]
   leadingDecisionNormReferences?: string[]
   sources?: Source[]
   isResolved?: boolean

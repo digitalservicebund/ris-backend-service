@@ -5,7 +5,7 @@ import { ref, watch, computed, nextTick, onBeforeUpdate } from "vue"
 import Tooltip from "./Tooltip.vue"
 import DefaultSummary from "@/components/DefaultSummary.vue"
 import { useScroll } from "@/composables/useScroll"
-import ListItem from "@/domain/editableListItem" // NOSONAR: Imported needed for generic component
+import ListItem from "@/domain/editableListItem" // NOSONAR: import is needed for extension
 import IconEdit from "~icons/ic/outline-edit"
 import IconAdd from "~icons/material-symbols/add"
 
@@ -27,16 +27,17 @@ const emit = defineEmits<{
 }>()
 
 const editEntry = ref<T | undefined>() as Ref<T | undefined>
-const modelValueList = ref<T[]>([...props.modelValue]) as Ref<T[]>
+const modelValueList = ref<T[]>(
+  (props.modelValue ?? []).map(withLocalId),
+) as Ref<T[]>
 const localNewEntry = ref<T | undefined>() as Ref<T | undefined>
 const editableListContainer = ref(null)
 const focusAnchors = ref<HTMLElement[]>([])
 const { scrollNearestRefIntoViewport } = useScroll()
 
 /**
- * Computed mergedValues is a computed helper list that ensure the update of the modelValue does not effect a local new value
- * (Which otherwise could not be differentiated to deleted values and would be overriden). This keeps the new entry value
- * separated from the modelValue, only when saved it will move to modelValue,
+ * Computed mergedValues is a computed helper list that ensures
+ * the update of the modelValue does not affect a local new value.
  */
 const mergedValues = computed(() => {
   return localNewEntry.value
@@ -44,49 +45,39 @@ const mergedValues = computed(() => {
     : [...modelValueList.value]
 })
 
-/**
- * Setting the edit entry, renders the edit component of the given entry, the summary component is invisible
- * @param entry
- */
+function withLocalId(item: T): T {
+  if (item.localId) return item
+
+  // we need to preserve the original prototype here → getters & methods stay intact
+  const clone = Object.create(Object.getPrototypeOf(item))
+  Object.assign(clone, item, {
+    localId: crypto.randomUUID(),
+  })
+
+  return clone
+}
+
 function setEditEntry(entry?: T) {
   editEntry.value = entry
 }
 
-/**
- * Returns if current entry is the one in edit mode
- * @param entry
- */
 function isEditEntry(entry: T) {
-  return editEntry.value && editEntry.value.id === entry.id
+  return editEntry.value?.localId === entry.localId
 }
 
-/**
- * Resetting the edit to undefined, to show all list items in summary mode
- */
 async function cancelEdit() {
   await toggleNewEntry(false)
   await scrollNearestRefIntoViewport(editableListContainer)
 }
 
-/**
- *
- * Removes a new list item, with the given entry, by propagating an updated list without the list item
- * at the given index to the parent component. Resets edited entry reset, to show list in summary mode.
- * @param entry
- */
 async function removeEntry(entry: T) {
-  const updatedEntries = [...props.modelValue].filter(
-    (item) => entry.id !== item.id,
-  )
+  const updatedEntries =
+    props.modelValue?.filter((item) => item.localId !== entry.localId) ?? []
   emit("update:modelValue", updatedEntries)
   setEditEntry()
   await scrollNearestRefIntoViewport(editableListContainer)
 }
 
-/**
- * Updating the modelValue with the local modelValue list, is not propagated, until the user actively
- * decides to click the save button in edit mode. The edit index is reset, to show list in summary mode.
- */
 async function updateModel() {
   emit("update:modelValue", mergedValues.value)
   await toggleNewEntry(true)
@@ -101,7 +92,7 @@ async function handleAddFromSummary(newEntry: T) {
 async function resetFocus() {
   await nextTick()
   const index = mergedValues.value.findIndex(
-    (item) => item.id === localNewEntry.value?.id,
+    (item) => item.localId === localNewEntry.value?.localId,
   )
   if (index !== -1 && focusAnchors.value[index - 1]) {
     focusAnchors.value[index - 1].focus()
@@ -120,45 +111,39 @@ async function toggleNewEntry(shouldDisplay: boolean) {
 }
 
 /**
- * When the modelValue changes, it is copied to a local copy. The user can update an item in that local model value list,
- * it is not saved until the save button is clicked.
+ * Watch modelValue and update local copy
  */
 watch(
   () => props.modelValue,
-  (newValue) => {
-    modelValueList.value = [...newValue].map((item) =>
-      editEntry.value !== undefined && editEntry.value.id === item.id
+  (newValue = []) => {
+    modelValueList.value = newValue.map((item) => {
+      const normalized = withLocalId(item)
+
+      return editEntry.value?.localId === normalized.localId
         ? editEntry.value
-        : item,
-    )
-    return modelValueList.value
+        : normalized
+    })
   },
-  {
-    immediate: true,
-    deep: true,
-  },
+  { immediate: true, deep: true },
 )
 
 /**
- * When the local model value list is empty, (e.g. on mount or by removing an item) a default entry is displayed
+ * Watch for empty modelValueList to automatically show a new entry
  */
 watch(
-  () => modelValueList,
+  () => modelValueList.value,
   async () => {
-    if (modelValueList.value.length == 0 && !localNewEntry.value) {
+    if (modelValueList.value.length === 0 && !localNewEntry.value) {
       await toggleNewEntry(true)
     }
   },
-  {
-    immediate: true,
-    deep: true,
-  },
+  { immediate: true, deep: true },
 )
-// Clear the refs before each DOM update to prevent stale references
+
 onBeforeUpdate(() => {
   focusAnchors.value = []
 })
-// Expose the method
+
 defineExpose({
   toggleNewEntry,
 })
@@ -172,14 +157,13 @@ defineExpose({
   >
     <div
       v-for="(entry, index) in mergedValues"
-      :key="index"
+      :key="entry.localId"
       aria-label="Listen Eintrag"
     >
       <div
         v-if="!isEditEntry(entry)"
-        :key="index"
         class="group flex gap-8 border-b-1 border-blue-300 py-16"
-        :class="{ 'border-t-1': index == 0 }"
+        :class="{ 'border-t-1': mergedValues.indexOf(entry) === 0 }"
       >
         <component
           :is="summaryComponent"
@@ -207,11 +191,13 @@ defineExpose({
                 setEditEntry(entry as T)
               }
             "
-            ><template #icon> <IconEdit /> </template
-          ></Button>
+          >
+            <template #icon> <IconEdit /> </template>
+          </Button>
         </Tooltip>
       </div>
-      <!-- ↓↓↓ Helper: hidden focussed HTMLElement to be able to set focus into EditComponent on next tab -->
+
+      <!-- hidden focus anchor -->
       <div
         :ref="
           (el) => {
@@ -224,20 +210,32 @@ defineExpose({
 
       <slot
         v-if="isEditEntry(entry)"
-        class="py-24"
         :model-value-list="modelValueList"
         name="edit"
-        :value="mergedValues[index]"
+        :value="entry"
         @add-entry="updateModel"
         @cancel-edit="cancelEdit"
         @remove-entry="removeEntry(entry as T)"
-        @update:value="(a: T) => (mergedValues[index] = a)"
+        @update:value="
+          (a: T) => {
+            const idx = mergedValues.findIndex((e) => e.localId === a.localId)
+            if (idx !== -1) mergedValues[idx] = a
+          }
+        "
       >
         <component
           :is="editComponent"
           v-if="editComponent"
-          v-model="mergedValues[index]"
-          :class="{ 'pt-0': index == 0 }"
+          v-model="
+            mergedValues[
+              mergedValues.findIndex((e) => e.localId === entry.localId)
+            ]
+          "
+          class="py-24"
+          :class="{
+            'pt-0':
+              mergedValues.findIndex((e) => e.localId === entry.localId) === 0,
+          }"
           :model-value-list="modelValueList"
           @add-entry="updateModel"
           @cancel-edit="cancelEdit"
@@ -254,7 +252,8 @@ defineExpose({
       severity="secondary"
       size="small"
       @click="toggleNewEntry(true)"
-      ><template #icon> <IconAdd /> </template
-    ></Button>
+    >
+      <template #icon> <IconAdd /> </template>
+    </Button>
   </div>
 </template>

@@ -127,10 +127,12 @@ describe("income types", () => {
   test("edit entry", async () => {
     const { user } = renderComponent([
       new IncomeType({
+        localId: "0",
         terminology: "foo",
         typeOfIncome: TypeOfIncome.GEWERBEBETRIEB,
       }),
       new IncomeType({
+        localId: "1",
         terminology: "bar",
         typeOfIncome: TypeOfIncome.ESTG,
       }),
@@ -164,10 +166,12 @@ describe("income types", () => {
   test("delete entry", async () => {
     const { user } = renderComponent([
       new IncomeType({
+        localId: "0",
         terminology: "foo",
         typeOfIncome: TypeOfIncome.GEWERBEBETRIEB,
       }),
       new IncomeType({
+        localId: "1",
         terminology: "bar",
         typeOfIncome: TypeOfIncome.ESTG,
       }),

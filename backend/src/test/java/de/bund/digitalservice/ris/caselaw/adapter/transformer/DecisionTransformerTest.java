@@ -1074,13 +1074,11 @@ class DecisionTransformerTest {
                                 .definedTerm("Test")
                                 .definingBorderNumber(1L)
                                 .id(UUID.fromString("f73990a0-a9c2-4948-bc6e-8dea1d0d0b2d"))
-                                .newEntry(true)
                                 .build(),
                             Definition.builder()
                                 .definedTerm("Zweiter")
                                 .definingBorderNumber(3L)
                                 .id(UUID.fromString("d9813057-195f-4735-b338-81b4408c2d52"))
-                                .newEntry(false)
                                 .build()))
                     .build())
             .build();
@@ -1089,7 +1087,13 @@ class DecisionTransformerTest {
     assertThat(decisionDTO.getDefinitions())
         .usingRecursiveFieldByFieldElementComparator()
         .contains(
-            DefinitionDTO.builder().value("Test").rank(1L).id(null).borderNumber(1L).build(),
+            DefinitionDTO.builder()
+                .value("Test")
+                .rank(1L)
+                .id(null)
+                .borderNumber(1L)
+                .id(UUID.fromString("f73990a0-a9c2-4948-bc6e-8dea1d0d0b2d"))
+                .build(),
             DefinitionDTO.builder()
                 .value("Zweiter")
                 .rank(2L)

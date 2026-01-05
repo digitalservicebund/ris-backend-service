@@ -59,10 +59,12 @@ function renderComponent(normReferences?: NormReference[]) {
 }
 
 function generateNormReference(options?: {
+  localId?: string
   normAbbreviation?: NormAbbreviation
   singleNorms?: SingleNorm[]
 }) {
   return new NormReference({
+    localId: options?.localId ?? "0",
     normAbbreviation: options?.normAbbreviation ?? {
       id: crypto.randomUUID.toString(),
       abbreviation: "ABC",
@@ -161,9 +163,12 @@ describe("Norm references", () => {
     )
     const { user } = renderComponent([
       generateNormReference({
+        localId: "0",
         normAbbreviation: { id: "123", abbreviation: "1000g-BefV" },
       }),
-      generateNormReference(),
+      generateNormReference({
+        localId: "1",
+      }),
     ])
     await user.click(screen.getByTestId("list-entry-1"))
 
@@ -186,6 +191,7 @@ describe("Norm references", () => {
     )
     const { user } = renderComponent([
       generateNormReference({
+        localId: "0",
         normAbbreviation: {
           id: "123",
           abbreviation: "1000g-BefV",
@@ -227,8 +233,11 @@ describe("Norm references", () => {
 
   it("deletes norm reference", async () => {
     const { user } = renderComponent([
-      generateNormReference(),
       generateNormReference({
+        localId: "0",
+      }),
+      generateNormReference({
+        localId: "1",
         normAbbreviation: {
           id: "123",
           abbreviation: "1000g-BefV",

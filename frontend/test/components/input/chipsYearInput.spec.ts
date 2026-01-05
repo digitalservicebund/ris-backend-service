@@ -8,14 +8,14 @@ type YearChipsInputProps = InstanceType<typeof ChipsYearInput>["$props"]
 function renderComponent(props?: Partial<YearChipsInputProps>) {
   const user = userEvent.setup()
 
-  let modelValue: string[] | undefined = props?.modelValue ?? []
+  let modelValue: number[] | undefined = props?.modelValue ?? []
 
   const effectiveProps: YearChipsInputProps = {
     id: props?.id ?? "identifier",
     modelValue,
     "onUpdate:modelValue":
       props?.["onUpdate:modelValue"] ??
-      ((val: string[] | undefined) => (modelValue = val)),
+      ((val: number[] | undefined) => (modelValue = val)),
     "onUpdate:validationError": props?.["onUpdate:validationError"],
     ariaLabel: props?.ariaLabel ?? "aria-label",
   }
@@ -44,12 +44,12 @@ describe("ChipsYearInput", () => {
     const onUpdate = vi.fn()
     const { user } = renderComponent({
       "onUpdate:modelValue": onUpdate,
-      modelValue: ["2020", "2021"],
+      modelValue: [2020, 2021],
     })
 
     const button = screen.getAllByLabelText("Eintrag löschen")[0]
     await user.click(button)
-    expect(onUpdate).toHaveBeenCalledWith(["2021"])
+    expect(onUpdate).toHaveBeenCalledWith([2021])
   })
 
   it("does not add chips if input already exists", async () => {
@@ -58,7 +58,7 @@ describe("ChipsYearInput", () => {
     const onUpdate = vi.fn()
     const { user } = renderComponent({
       id: id,
-      modelValue: ["2020", "2021"],
+      modelValue: [2020, 2021],
       "onUpdate:modelValue": onUpdate,
     })
 
@@ -69,7 +69,7 @@ describe("ChipsYearInput", () => {
   })
 
   it("shows dates in correct format", () => {
-    renderComponent({ modelValue: ["2020"] })
+    renderComponent({ modelValue: [2020] })
 
     const chips = screen.getAllByRole("listitem")
     expect(chips).toHaveLength(1)
@@ -82,7 +82,7 @@ describe("ChipsYearInput", () => {
 
     const input = screen.getByRole("textbox")
     await user.type(input, "2020{enter}")
-    expect(onUpdate).toHaveBeenCalledWith(["2020"])
+    expect(onUpdate).toHaveBeenCalledWith([2020])
   })
 
   it("does not accept incorrect year", async () => {
@@ -140,7 +140,7 @@ describe("ChipsYearInput", () => {
       ariaLabel: ariaLabel,
       "onUpdate:modelValue": onUpdate,
       "onUpdate:validationError": onError,
-      modelValue: ["2020", "2021"],
+      modelValue: [2020, 2021],
     })
 
     const input = screen.getByRole("textbox")
@@ -157,20 +157,20 @@ describe("ChipsYearInput", () => {
     const onUpdate = vi.fn()
     const { user } = renderComponent({
       "onUpdate:modelValue": onUpdate,
-      modelValue: ["2020", "2021"],
+      modelValue: [2020, 2021],
     })
 
     const chips = screen.getAllByLabelText("Eintrag löschen")
     await user.click(chips[1])
     await user.keyboard("{enter}")
-    expect(onUpdate).toHaveBeenCalledWith(["2020"])
+    expect(onUpdate).toHaveBeenCalledWith([2020])
   })
 
   it("edits the chip on double click", async () => {
     const onUpdate = vi.fn()
     const { user } = renderComponent({
       "onUpdate:modelValue": onUpdate,
-      modelValue: ["2020"],
+      modelValue: [2020],
     })
 
     const editButton = screen.getByRole("button", {
@@ -181,7 +181,7 @@ describe("ChipsYearInput", () => {
     await user.keyboard("{backspace}")
     await user.type(input, "2")
     await user.keyboard("{enter}")
-    expect(onUpdate).toHaveBeenCalledWith(["2022"])
+    expect(onUpdate).toHaveBeenCalledWith([2022])
   })
 
   it("validates the first chip after editing", async () => {
@@ -192,7 +192,7 @@ describe("ChipsYearInput", () => {
     const { user } = renderComponent({
       "onUpdate:modelValue": onUpdate,
       "onUpdate:validationError": onError,
-      modelValue: ["2021", "2022", "2023"],
+      modelValue: [2021, 2022, 2023],
       id: id,
       ariaLabel: ariaLabel,
     })
@@ -205,7 +205,7 @@ describe("ChipsYearInput", () => {
     await user.keyboard("{backspace}{backspace}")
     await user.type(input, "99")
     await user.keyboard("{enter}")
-    expect(onUpdate).not.toHaveBeenCalledWith(["2099"])
+    expect(onUpdate).not.toHaveBeenCalledWith([2099])
     expect(onError).toHaveBeenCalledWith({
       message: ariaLabel + " darf nicht in der Zukunft liegen",
       instance: id,

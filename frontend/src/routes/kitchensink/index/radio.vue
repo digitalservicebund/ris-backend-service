@@ -19,6 +19,7 @@ const radioValues = reactive({
           id="1"
           v-model="radioValues.group"
           name="regular"
+          size="small"
           value="1"
         />
       </InputField>
@@ -27,6 +28,7 @@ const radioValues = reactive({
           id="2"
           v-model="radioValues.group"
           name="regular"
+          size="small"
           value="2"
         />
       </InputField>
@@ -35,6 +37,7 @@ const radioValues = reactive({
           id="3"
           v-model="radioValues.group"
           name="regular"
+          size="small"
           value="3"
         />
       </InputField>
@@ -51,6 +54,7 @@ const radioValues = reactive({
           v-model="radioValues.disabled"
           disabled
           name="regular"
+          size="small"
           value="r1"
         />
       </InputField>
