@@ -2646,7 +2646,8 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
       // Assert
       var documentNumber = (String) response.getResponseBody().get(0);
-      assertThat(documentNumber).isEqualTo("XXRE202500001");
+      int year = LocalDate.now().getYear();
+      assertThat(documentNumber).isEqualTo("XXRE" + year + "00001");
       DecisionDTO decision = (DecisionDTO) repository.findByDocumentNumber(documentNumber).get();
       assertThat(decision.getCelexNumber()).isEqualTo(celexNumber + "(02)");
       assertThat(inputTypeRepository.findAll().get(0).getValue())
