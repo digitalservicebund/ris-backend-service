@@ -349,7 +349,9 @@ describe("Norm references", () => {
     expect(screen.getByText(/§ 1/)).toBeInTheDocument()
     expect(screen.getByText(/§ 2/)).toBeInTheDocument()
 
-    const deleteButtons = screen.getAllByLabelText("Einzelnorm löschen")
+    const deleteButtons = screen.getAllByRole("button", {
+      name: "Einzelnorm löschen",
+    })
 
     // Klicke auf den ersten Lösch-Button
     await user.click(deleteButtons[0])
