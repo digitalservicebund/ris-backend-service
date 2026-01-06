@@ -5,7 +5,7 @@ import AutoComplete, {
   AutoCompleteOptionSelectEvent,
 } from "primevue/autocomplete"
 import ProgressSpinner from "primevue/progressspinner"
-import { computed, Ref, ref, watch } from "vue"
+import { computed, nextTick, Ref, ref, watch } from "vue"
 import { ComboboxItem } from "@/components/input/types"
 import { ComboboxItemService } from "@/services/comboboxItemService"
 import IcOutlineClear from "~icons/ic/outline-clear?height=16"
@@ -113,10 +113,14 @@ const handleOptionSelect = (e: AutoCompleteOptionSelectEvent) => {
 }
 
 const handleChange = async (e: AutoCompleteChangeEvent) => {
-  // clears via the clear button do not trigger the @clear event so we handle it here
   const value: SelectionItem | string | undefined = e.value
 
-  if (value == undefined || value == "") {
+  // We only want to handle some cases where the value is empty. See also the comment in updateModelValue
+  if (
+    ((value == undefined || value === "") &&
+      e.originalEvent instanceof PointerEvent) || // clear via the clear button
+    value === "" // manually cleared the input by pressing backspace
+  ) {
     emit("update:modelValue", undefined)
     // we also want to run a new query when the filter is cleared
     filter.value = undefined
@@ -140,6 +144,33 @@ watch(
   },
   { immediate: true },
 )
+
+const updateModelValue = async (e: T | undefined) => {
+  if (e == null) {
+    // We want to keep showing the current value when the component is no longer focused with an invalid input
+    // As force-selection is active the autocomplete automatically resets the model-value when the focus is lost to
+    // null. It also clears the text-input. We therefore need to ensure that the text-input is again showing the current
+    // modelValue of our component. For this we need to update the internalValue. The internalValue already has the
+    // current modelValue as its value. Therefore, just setting it would not trigger an update. So we need to set it to
+    // undefined for 1 tick and then set the value to the modelValue again. This then tricks the autocomplete component
+    // to update the text-input.
+    // It is still possible to manually clear the autocomplete as in that case also our modelValue gets set to
+    // undefined as well.
+    internalValue.value = undefined
+    await nextTick()
+    internalValue.value = props.modelValue
+  }
+}
+
+function toLabel(option: ComboboxItem<T> | T) {
+  // the options passed via suggestions are already formatted and therefore have a label
+  if ("label" in option) {
+    return option.label
+  }
+
+  // but for some reason also the current value gets passed to this method and it is not yet formated
+  return format(option).label
+}
 </script>
 
 <template>
@@ -152,19 +183,20 @@ watch(
     class="relative w-full"
     :class="conditionalClasses"
     complete-on-focus
+    :default-value="internalValue"
     :disabled="readOnly"
     dropdown-mode="current"
     fluid
     force-selection
     :loading="isFetching"
-    :model-value="internalValue"
-    :option-label="(option) => format(option).label"
+    :option-label="toLabel"
     :placeholder="props.placeholder"
     :show-clear="!props.noClear"
     :suggestions="selectionItems"
     @change="handleChange"
     @complete="handleComplete"
     @option-select="handleOptionSelect"
+    @update:model-value="updateModelValue"
   >
     <template #loader>
       <ProgressSpinner class="absolute inset-y-0 right-8 my-auto mr-1" />
