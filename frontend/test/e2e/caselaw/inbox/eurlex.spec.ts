@@ -146,7 +146,10 @@ test.describe("eurlex", () => {
         ).toBeChecked()
 
         await page.getByRole("button", { name: "Entfernen" }).click()
-        await page.getByText("DS", { exact: true }).click()
+        await page
+          .getByRole("combobox", { name: "Dokumentationsstelle auswählen" })
+          .click()
+        await page.getByRole("option", { name: "DS", exact: true }).click()
         await page.getByLabel("Dokumentationsstelle zuweisen").click()
 
         await expect(

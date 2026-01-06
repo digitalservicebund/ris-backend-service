@@ -28,7 +28,7 @@ test.describe("inbox", () => {
           "AG Aachen",
           dayjs("2025-01-01").format("DD.MM.YYYY"),
           fileNumber1,
-          "AnU",
+          "Anerkenntnisurteil",
         )
 
         // Todo: Known error in firefox (NS_BINDING_ABORTED),
@@ -263,7 +263,7 @@ test.describe("inbox", () => {
           "AG Aachen",
           dayjs("2025-01-01").format("DD.MM.YYYY"),
           fileNumber,
-          "AnU",
+          "Anerkenntnisurteil",
         )
 
         // Todo: Known error in firefox (NS_BINDING_ABORTED),
@@ -278,7 +278,7 @@ test.describe("inbox", () => {
           "AG Aachen",
           dayjs("2025-01-01").format("DD.MM.YYYY"),
           fileNumber,
-          "AnU",
+          "Anerkenntnisurteil",
         )
       })
 
