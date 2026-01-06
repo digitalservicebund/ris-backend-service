@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.eurlex;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentS3DTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentS3Repository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
@@ -82,6 +84,7 @@ public class FmxImportService implements TransformationService {
   private final DocumentTypeRepository documentTypeRepository;
   private final FmxRepository fmxRepository;
   private final AttachmentRepository attachmentRepository;
+  private final AttachmentS3Repository attachmentS3Repository;
   private final DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
   private final EurLexResultRepository eurLexResultRepository;
   private final EurlexRetrievalService eurlexRetrievalService;
@@ -97,6 +100,7 @@ public class FmxImportService implements TransformationService {
       DocumentTypeRepository documentTypeRepository,
       FmxRepository fmxRepository,
       AttachmentRepository attachmentRepository,
+      AttachmentS3Repository attachmentS3Repository,
       DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository,
       EurLexResultRepository eurLexResultRepository,
       EurlexRetrievalService eurlexRetrievalService,
@@ -106,6 +110,7 @@ public class FmxImportService implements TransformationService {
     this.documentTypeRepository = documentTypeRepository;
     this.fmxRepository = fmxRepository;
     this.attachmentRepository = attachmentRepository;
+    this.attachmentS3Repository = attachmentS3Repository;
     this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
     this.eurLexResultRepository = eurLexResultRepository;
     this.eurlexRetrievalService = eurlexRetrievalService;
@@ -146,7 +151,16 @@ public class FmxImportService implements TransformationService {
             .uploadTimestamp(Instant.now())
             .build();
 
+    AttachmentS3DTO attachmentS3DTO =
+        AttachmentS3DTO.builder()
+            .documentationUnit(documentationUnitDTO)
+            .filename("Originalentscheidung")
+            .format("fmx")
+            .uploadTimestamp(Instant.now())
+            .build();
+
     attachmentRepository.save(attachmentDTO);
+    attachmentS3Repository.save(attachmentS3DTO);
   }
 
   private void extractMetaDataFromFmx(String fileContent, Decision decision, User user) {

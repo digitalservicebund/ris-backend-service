@@ -1,7 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentS3DTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentS3Repository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
@@ -45,6 +49,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @Service
 public class S3AttachmentService implements AttachmentService {
   private final AttachmentRepository repository;
+  private final AttachmentInlineRepository attachmentInlineRepository;
+  private final AttachmentS3Repository attachmentS3Repository;
   private final S3Client s3Client;
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
   private final DocumentationUnitHistoryLogService documentationUnitHistoryLogService;
@@ -63,10 +69,14 @@ public class S3AttachmentService implements AttachmentService {
 
   public S3AttachmentService(
       AttachmentRepository repository,
+      AttachmentInlineRepository attachmentInlineRepository,
+      AttachmentS3Repository attachmentS3Repository,
       @Qualifier("docxS3Client") S3Client s3Client,
       DatabaseDocumentationUnitRepository documentationUnitRepository,
       DocumentationUnitHistoryLogService documentationUnitHistoryLogService) {
     this.repository = repository;
+    this.attachmentInlineRepository = attachmentInlineRepository;
+    this.attachmentS3Repository = attachmentS3Repository;
     this.s3Client = s3Client;
     this.documentationUnitRepository = documentationUnitRepository;
     this.documentationUnitHistoryLogService = documentationUnitHistoryLogService;
@@ -105,8 +115,7 @@ public class S3AttachmentService implements AttachmentService {
 
   private Attachment attachImage(
       ByteBuffer byteBuffer, MediaType contentType, DocumentationUnitDTO documentationUnit) {
-    AttachmentDTO attachmentDTO;
-    attachmentDTO =
+    AttachmentDTO attachmentDTO =
         AttachmentDTO.builder()
             .s3ObjectPath(null)
             .content(byteBuffer.array())
@@ -116,8 +125,21 @@ public class S3AttachmentService implements AttachmentService {
             .uploadTimestamp(Instant.now())
             .build();
 
+    AttachmentInlineDTO attachmentInlineDTO =
+        AttachmentInlineDTO.builder()
+            .content(byteBuffer.array())
+            .documentationUnit(documentationUnit)
+            .format(contentType.getSubtype().toLowerCase())
+            .filename("unknown yet")
+            .uploadTimestamp(Instant.now())
+            .build();
+
     attachmentDTO = repository.save(attachmentDTO);
     attachmentDTO.setFilename(attachmentDTO.getId() + "." + attachmentDTO.getFormat());
+    attachmentInlineDTO = attachmentInlineRepository.save(attachmentInlineDTO);
+    attachmentInlineDTO.setFilename(
+        attachmentInlineDTO.getId() + "." + attachmentInlineDTO.getFormat());
+    attachmentInlineRepository.save(attachmentInlineDTO);
 
     return AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
   }
@@ -142,10 +164,24 @@ public class S3AttachmentService implements AttachmentService {
 
     attachmentDTO = repository.save(attachmentDTO);
 
-    UUID fileUuid = attachmentDTO.getId();
-    putObjectIntoBucket(fileUuid.toString(), byteBuffer, httpHeaders);
+    AttachmentS3DTO attachmentS3DTO =
+        AttachmentS3DTO.builder()
+            .s3ObjectPath("unknown yet")
+            .documentationUnit(documentationUnit)
+            .filename(fileName)
+            .format("docx")
+            .uploadTimestamp(Instant.now())
+            .build();
 
-    attachmentDTO.setS3ObjectPath(fileUuid.toString());
+    attachmentS3Repository.save(attachmentS3DTO);
+
+    String s3ObjectPath = attachmentS3DTO.getId().toString();
+    putObjectIntoBucket(s3ObjectPath, byteBuffer, httpHeaders);
+
+    attachmentDTO.setS3ObjectPath(s3ObjectPath);
+    attachmentS3DTO.setS3ObjectPath(s3ObjectPath);
+
+    attachmentS3Repository.save(attachmentS3DTO);
 
     Attachment attachment = AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
 
@@ -168,6 +204,7 @@ public class S3AttachmentService implements AttachmentService {
                   documentationUnitId, user, HistoryLogEventType.FILES, "Word-Dokument gelöscht");
             });
     repository.deleteByS3ObjectPath(s3Path);
+    attachmentS3Repository.deleteByS3ObjectPath(s3Path);
   }
 
   public void deleteAllObjectsFromBucketForDocumentationUnit(UUID uuid) {
