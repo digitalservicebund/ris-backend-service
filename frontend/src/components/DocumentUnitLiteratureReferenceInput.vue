@@ -102,7 +102,7 @@ watch(
         aria-label="Periodikum Literaturfundstelle"
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemServices.getLegalPeriodicals"
-        @focus="validationStore.remove('legalPeriodical')"
+        @show="validationStore.remove('legalPeriodical')"
       ></ComboboxInput>
     </InputField>
 
@@ -144,7 +144,7 @@ watch(
             :item-service="
               ComboboxItemServices.getDependentLiteratureDocumentTypes
             "
-            @focus="validationStore.remove('documentType')"
+            @show="validationStore.remove('documentType')"
           ></ComboboxInput>
         </InputField>
       </div>

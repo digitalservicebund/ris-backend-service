@@ -98,7 +98,7 @@ watch(
         aria-label="Periodikum"
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemServices.getLegalPeriodicals"
-        @focus="validationStore.remove('legalPeriodical')"
+        @show="validationStore.remove('legalPeriodical')"
       ></ComboboxInput>
     </InputField>
 

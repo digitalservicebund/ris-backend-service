@@ -23,7 +23,7 @@ import { PublicationState } from "@/domain/publicationStatus"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { Source } from "@/domain/source"
-import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemServices from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import FeatureToggleService from "@/services/featureToggleService"
 import { ResponseError } from "@/services/httpClient"
@@ -520,9 +520,9 @@ onBeforeUnmount(() => {
             aria-label="Dokumenttyp Literaturfundstelle"
             :has-error="slotProps.hasError"
             :item-service="
-              ComboboxItemService.getDependentLiteratureDocumentTypes
+              ComboboxItemServices.getDependentLiteratureDocumentTypes
             "
-            @focus="validationStore.remove('documentType')"
+            @show="validationStore.remove('documentType')"
           ></ComboboxInput>
         </InputField>
       </div>
@@ -564,8 +564,8 @@ onBeforeUnmount(() => {
                 v-model="relatedDocumentationUnit.court"
                 aria-label="Gericht"
                 :has-error="slotProps.hasError"
-                :item-service="ComboboxItemService.getCourts"
-                @focus="validationStore.remove('court')"
+                :item-service="ComboboxItemServices.getCourts"
+                @show="validationStore.remove('court')"
               >
               </ComboboxInput>
             </InputField>
@@ -613,7 +613,7 @@ onBeforeUnmount(() => {
                 v-model="relatedDocumentationUnit.documentType"
                 aria-label="Dokumenttyp"
                 :item-service="
-                  ComboboxItemService.getCaselawAndPendingProceedingDocumentTypes
+                  ComboboxItemServices.getCaselawAndPendingProceedingDocumentTypes
                 "
               ></ComboboxInput>
             </InputField>

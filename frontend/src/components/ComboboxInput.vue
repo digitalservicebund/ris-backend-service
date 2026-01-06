@@ -59,6 +59,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   "update:modelValue": [value?: T]
   focus: [void]
+  show: [void]
 }>()
 
 const filter = ref<string>()
@@ -197,6 +198,7 @@ function toLabel(option: ComboboxItem<T> | T) {
     @complete="handleComplete"
     @focus="$emit('focus')"
     @option-select="handleOptionSelect"
+    @show="$emit('show')"
     @update:model-value="updateModelValue"
   >
     <template #loader>

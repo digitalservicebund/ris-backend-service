@@ -14,7 +14,7 @@ import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
-import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemServices from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 
 const props = defineProps<{
@@ -197,9 +197,9 @@ onMounted(() => {
             v-model="ensuingDecision.court"
             aria-label="Gericht Nachgehende Entscheidung"
             :has-error="slotProps.hasError"
-            :item-service="ComboboxItemService.getCourts"
+            :item-service="ComboboxItemServices.getCourts"
             :read-only="ensuingDecision.hasForeignSource"
-            @focus="validationStore.remove('court')"
+            @show="validationStore.remove('court')"
           ></ComboboxInput>
         </InputField>
         <div v-if="!isPending" class="flex w-full justify-between gap-24">
@@ -255,7 +255,7 @@ onMounted(() => {
             id="documentType"
             v-model="ensuingDecision.documentType"
             aria-label="Dokumenttyp Nachgehende Entscheidung"
-            :item-service="ComboboxItemService.getCaselawDocumentTypes"
+            :item-service="ComboboxItemServices.getCaselawDocumentTypes"
             :read-only="ensuingDecision.hasForeignSource"
           ></ComboboxInput>
         </InputField>
