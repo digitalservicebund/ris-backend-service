@@ -195,6 +195,7 @@ function toLabel(option: ComboboxItem<T> | T) {
     :suggestions="selectionItems"
     @change="handleChange"
     @complete="handleComplete"
+    @focus="$emit('focus')"
     @option-select="handleOptionSelect"
     @update:model-value="updateModelValue"
   >
