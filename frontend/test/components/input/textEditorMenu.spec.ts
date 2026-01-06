@@ -20,6 +20,9 @@ import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServi
 import routes from "~pages"
 
 const DEFAULT_BORDER_STYLE = "1px solid black"
+const DEFAULT_BORDER_WIDTH = "1px"
+const DEFAULT_BORDER_COLOR = "black"
+const DEFAULT_BORDER_STYLE_TYPE = "solid"
 
 beforeAll(() => {
   mockDocumentForProsemirror()
@@ -210,10 +213,20 @@ describe("text editor toolbar", async () => {
       await clickTableBorderSubButton("Alle Rahmen")
       const cellStyle = getFirstCellHTML()
 
-      expect(cellStyle).toContain(`border-top: ${DEFAULT_BORDER_STYLE}`)
-      expect(cellStyle).toContain(`border-right: ${DEFAULT_BORDER_STYLE}`)
-      expect(cellStyle).toContain(`border-bottom: ${DEFAULT_BORDER_STYLE}`)
-      expect(cellStyle).toContain(`border-left: ${DEFAULT_BORDER_STYLE}`)
+      const hasIndividualBordersDefined =
+        cellStyle.includes(`border-top: ${DEFAULT_BORDER_STYLE}`) &&
+        cellStyle.includes(`border-right: ${DEFAULT_BORDER_STYLE}`) &&
+        cellStyle.includes(`border-bottom: ${DEFAULT_BORDER_STYLE}`) &&
+        cellStyle.includes(`border-left: ${DEFAULT_BORDER_STYLE}`)
+
+      const hasBordersDefinedInShorthand =
+        cellStyle.includes(`border-width: ${DEFAULT_BORDER_WIDTH}`) &&
+        cellStyle.includes(`border-style: ${DEFAULT_BORDER_STYLE_TYPE}`) &&
+        cellStyle.includes(`border-color: ${DEFAULT_BORDER_COLOR}`)
+
+      expect(hasIndividualBordersDefined || hasBordersDefinedInShorthand).toBe(
+        true,
+      )
     })
 
     test("should clear all border attributes when 'Kein Rahmen' is clicked", async () => {
