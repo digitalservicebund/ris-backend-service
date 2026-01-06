@@ -73,7 +73,9 @@ const {
   format,
 } = props.itemService(filter)
 
-const selectionItems = computed(() => {
+type SelectionItem = ComboboxItem<T> | { manualEntry: true; label: string }
+
+const selectionItems = computed<SelectionItem[]>(() => {
   const formatedExistingItems =
     existingItems.value?.map((item) => format(item)) ?? []
 
@@ -85,8 +87,8 @@ const selectionItems = computed(() => {
     return [
       ...formatedExistingItems,
       {
-        label: `${filter.value} neu erstellen`,
-        value: { label: filter.value! },
+        manualEntry: true,
+        label: filter.value,
       },
     ]
   }
@@ -100,13 +102,25 @@ const handleComplete = async (e: AutoCompleteCompleteEvent) => {
 }
 
 const handleOptionSelect = (e: AutoCompleteOptionSelectEvent) => {
-  emit("update:modelValue", e.value.value)
+  const value: SelectionItem = e.value
+  if ("manualEntry" in value) {
+    emit("update:modelValue", {
+      label: value.label,
+    } as T)
+  } else {
+    emit("update:modelValue", value.value)
+  }
 }
 
-const handleChange = (e: AutoCompleteChangeEvent) => {
+const handleChange = async (e: AutoCompleteChangeEvent) => {
   // clears via the clear button do not trigger the @clear event so we handle it here
-  if (e.value == undefined || e.value == "") {
+  const value: SelectionItem | string | undefined = e.value
+
+  if (value == undefined || value == "") {
     emit("update:modelValue", undefined)
+    // we also want to run a new query when the filter is cleared
+    filter.value = undefined
+    await fetchItems()
   }
 }
 
@@ -175,8 +189,17 @@ watch(
         <IconChevron />
       </button>
     </template>
-    <template #option="slotProps: { option: ComboboxItem<T> }">
+    <template #option="slotProps: { option: SelectionItem }">
       <div
+        v-if="'manualEntry' in slotProps.option"
+        class="flex min-h-48 flex-col justify-start gap-2 border-l-4 border-transparent px-12 py-10"
+      >
+        <span class="ris-label1-regular font-bold">
+          {{ slotProps.option?.label }} neu erstellen
+        </span>
+      </div>
+      <div
+        v-else
         class="flex min-h-48 flex-col justify-start gap-2 border-l-4 border-transparent px-12 py-10 data-[variant=active]:-ml-4 data-[variant=active]:border-blue-800 data-[variant=active]:bg-blue-200"
         :data-variant="
           slotProps.option.value &&
