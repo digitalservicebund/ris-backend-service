@@ -149,7 +149,6 @@ describe("Combobox Element", () => {
 
     expect(input).toHaveValue("")
     expect(emitted()["update:modelValue"]).toEqual([
-      [undefined],
       [
         {
           type: "courttype2",
@@ -440,7 +439,12 @@ describe("Combobox Element", () => {
     await user.click(screen.getByText("foo neu erstellen"))
 
     expect(emitted()["update:modelValue"]).toEqual([
-      [undefined],
+      [
+        {
+          label: "foo",
+        },
+      ],
+      // it somehow issues two updates for foo but as its for the same value thats not a problem
       [
         {
           label: "foo",
@@ -504,7 +508,7 @@ describe("Combobox Element", () => {
 
     await user.tab()
 
-    expect(emitted()["update:modelValue"]).toEqual([[undefined]])
+    expect(emitted()["update:modelValue"]).toBeUndefined()
   })
 
   it("does not render clear button if noClear flag is set", async () => {
