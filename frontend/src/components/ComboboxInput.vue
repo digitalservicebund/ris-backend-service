@@ -164,12 +164,12 @@ const updateModelValue = async (e: T | undefined) => {
 
 function toLabel(option: ComboboxItem<T> | T) {
   // the options passed via suggestions are already formatted and therefore have a label
-  if ("label" in option) {
+  if ("label" in option && !("uuid" in option)) {
     return option.label
   }
 
   // but for some reason also the current value gets passed to this method and it is not yet formated
-  return format(option).label
+  return format(option as T).label
 }
 </script>
 
