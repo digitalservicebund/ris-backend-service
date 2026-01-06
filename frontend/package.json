@@ -116,7 +116,7 @@
     "eslint-plugin-vue": "^10.6.2",
     "eslint-plugin-vue-scoped-css": "^2.12.0",
     "eslint-plugin-vuejs-accessibility": "^2.4.1",
-    "globals": "^16.5.0",
+    "globals": "^17.0.0",
     "jsdom": "^26.1.0",
     "license-checker": "^25.0.1",
     "msw": "^2.12.7",
