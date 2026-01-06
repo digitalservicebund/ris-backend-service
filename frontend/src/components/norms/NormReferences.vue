@@ -49,6 +49,23 @@ function generateUniqueSingleNormKey(singleNorm: SingleNorm): string {
     dateOfRelevance: singleNorm.dateOfRelevance ?? "",
   })
 }
+
+function handleRemoveSingleNorm({
+  data,
+  index,
+}: {
+  data: NormReference
+  index: number
+}) {
+  if (!norms.value) return
+
+  const normIndex = norms.value.findIndex((n) => n.localId === data.localId)
+
+  if (normIndex !== -1) {
+    const targetNorm = norms.value[normIndex]
+    targetNorm.singleNorms?.splice(index, 1)
+  }
+}
 </script>
 <template>
   <div :aria-label="label">
@@ -62,7 +79,12 @@ function generateUniqueSingleNormKey(singleNorm: SingleNorm): string {
           :create-entry="() => new NormReference()"
           :edit-component="NormReferenceInput"
           :summary-component="NormReferenceSummary"
-        />
+          ><template #summary="{ entry }">
+            <NormReferenceSummary
+              :data="entry"
+              @remove-single-norm="handleRemoveSingleNorm"
+            /> </template
+        ></EditableList>
       </div>
     </div>
   </div>

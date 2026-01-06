@@ -1,9 +1,8 @@
 <script lang="ts" setup>
+import Message from "primevue/message"
 import { ref } from "vue"
 import InboxList from "./shared/InboxList.vue"
 import InboxSearch from "./shared/InboxSearch.vue"
-import { InfoStatus } from "@/components/enumInfoStatus"
-import InfoModal from "@/components/InfoModal.vue"
 import { Page } from "@/components/Pagination.vue"
 import { Query } from "@/composables/useQueryFromRoute"
 import { InboxStatus } from "@/domain/decision"
@@ -137,14 +136,15 @@ async function handleReset() {
       @reset-search-results="handleReset"
       @search="updateQuery"
     />
-    <InfoModal
+    <Message
       v-if="serviceError"
       class="my-16"
       data-testid="service-error"
-      :description="serviceError.description"
-      :status="InfoStatus.ERROR"
-      :title="serviceError.title"
-    />
+      severity="error"
+    >
+      <p class="ris-body1-bold">{{ serviceError.title }}</p>
+      <p>{{ serviceError.description }}</p>
+    </Message>
     <InboxList
       :inbox-status="InboxStatus.EXTERNAL_HANDOVER"
       :loading="isLoading"

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
+import Message from "primevue/message"
 import { computed, ref, watch, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import DateUtil from "../../utils/dateUtil"
@@ -8,7 +9,6 @@ import CellHeaderItem from "@/components/CellHeaderItem.vue"
 import CellItem from "@/components/CellItem.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import TableHeader from "@/components/TableHeader.vue"
@@ -181,10 +181,10 @@ onMounted(async () => {
             ></Button>
           </div>
           <div v-if="saveResponseError">
-            <InfoModal
-              :description="saveResponseError.description"
-              :title="saveResponseError.title"
-            />
+            <Message severity="error">
+              <p class="ris-body1-bold">{{ saveResponseError.title }}</p>
+              <p>{{ saveResponseError.description }}</p>
+            </Message>
           </div>
         </div>
       </FlexContainer>
@@ -193,10 +193,10 @@ onMounted(async () => {
 
     <div class="flex h-full flex-col gap-24">
       <div v-if="deleteResponseError">
-        <InfoModal
-          :description="deleteResponseError.description"
-          :title="deleteResponseError.title"
-        />
+        <Message severity="error">
+          <p class="ris-body1-bold">{{ deleteResponseError.title }}</p>
+          <p>{{ deleteResponseError.description }}</p>
+        </Message>
       </div>
       <TableView class="relative table w-full border-separate">
         <TableHeader>
@@ -280,10 +280,10 @@ onMounted(async () => {
 
       <!-- Error State -->
       <div v-if="searchResponseError">
-        <InfoModal
-          :description="searchResponseError.description"
-          :title="searchResponseError.title"
-        />
+        <Message severity="error">
+          <p class="ris-body1-bold">{{ searchResponseError.title }}</p>
+          <p>{{ searchResponseError.description }}</p>
+        </Message>
       </div>
 
       <!-- Empty State -->

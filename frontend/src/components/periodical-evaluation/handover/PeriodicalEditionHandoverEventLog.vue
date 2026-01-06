@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import Message from "primevue/message"
 import { computed } from "vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import EventRecord, {
   EventRecordType,
   HandoverMail,
@@ -35,13 +35,15 @@ function getHeader(item: EventRecord) {
 <template>
   <div aria-label="Letzte Ereignisse">
     <h2 class="ris-label1-bold mb-16">Letzte Ereignisse</h2>
-    <InfoModal
+    <Message
       v-if="eventLogError"
       aria-label="Fehler beim Laden des Event Logs"
       class="mt-8"
-      :description="eventLogError.description"
-      :title="eventLogError.title"
-    />
+      severity="error"
+    >
+      <p class="ris-body1-bold">{{ eventLogError.title }}</p>
+      <p>{{ eventLogError.description }}</p>
+    </Message>
     <div v-else class="flex flex-col gap-24">
       <p v-if="isFirstTimeHandover">
         Diese Ausgabe wurde bisher nicht an die jDV übergeben

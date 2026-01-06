@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { useScrollLock } from "@vueuse/core"
 import { storeToRefs } from "pinia"
+import Message from "primevue/message"
 import { computed, Ref, ref, watch } from "vue"
 import AttachmentList from "@/components/AttachmentList.vue"
 import FileUpload from "@/components/FileUpload.vue"
 import FlexItem from "@/components/FlexItem.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { Decision } from "@/domain/decision"
@@ -152,12 +152,16 @@ const attachments = computed({
         @delete="handleOnDelete"
         @select="handleOnSelect"
       />
-      <InfoModal
+      <Message
         v-if="errors.length > 0 && !isLoading"
         class="mt-8"
-        :description="errors"
-        :title="errorTitle"
-      />
+        severity="error"
+      >
+        <p class="ris-body1-bold">{{ errorTitle }}</p>
+        <ul class="m-0 list-disc ps-20">
+          <li v-for="(error, index) in errors" :key="index">{{ error }}</li>
+        </ul>
+      </Message>
       <div class="flex-grow">
         <div class="flex h-full flex-col items-start">
           <FileUpload

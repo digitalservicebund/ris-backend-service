@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
+import Message from "primevue/message"
 import { useToast } from "primevue/usetoast"
 import { computed, Ref, ref } from "vue"
-import InfoModal from "@/components/InfoModal.vue"
 import PendingProceedingSummary from "@/components/PendingProceedingSummary.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import PortalPublicationStatusBadge from "@/components/publication/PortalPublicationStatusBadge.vue"
@@ -181,24 +181,42 @@ const hasRelatedPendingProceeding = computed(() => {
         </p>
       </div>
     </div>
-    <InfoModal
+    <Message
       v-if="docUnitPublicationError"
       aria-label="Fehler bei der Veröffentlichung/Zurückziehung"
-      :description="docUnitPublicationError.description"
-      :title="docUnitPublicationError.title"
-    />
-    <InfoModal
+      severity="error"
+    >
+      <p class="ris-body1-bold">{{ docUnitPublicationError.title }}</p>
+      <p>{{ docUnitPublicationError.description }}</p>
+    </Message>
+    <Message
       v-if="hasRelatedPendingProceedingsError"
       aria-label="Fehler beim Veröffentlichen zugehöriger anhängiger Verfahren"
-      description="Die zugehörigen anhängigen Verfahren konnten nicht vollständig als erledigt veröffentlicht werden. Bitte stellen Sie sicher, dass die anhängigen Verfahren bereits im Portal veröffentlicht sind und alle Pflichtfelder befüllt haben."
-      title="Zugehörige anhängige Verfahren nicht veröffentlicht"
-    />
-    <InfoModal
+      severity="error"
+    >
+      <p class="ris-body1-bold">
+        Zugehörige anhängige Verfahren nicht veröffentlicht
+      </p>
+      <p>
+        Die zugehörigen anhängigen Verfahren konnten nicht vollständig als
+        erledigt veröffentlicht werden. Bitte stellen Sie sicher, dass die
+        anhängigen Verfahren bereits im Portal veröffentlicht sind und alle
+        Pflichtfelder befüllt haben.
+      </p>
+    </Message>
+    <Message
       v-if="!isPortalPublicationEnabled"
       aria-label="Portal-Veröffentlichung deaktiviert"
-      description="Auf Produktion ist die manuelle Portal-Veröffentlichung deaktiviert. Sie können veröffentlichte Dokumentationseinheiten jedoch manuell zurückziehen. Beachten Sie, dass die Dokumentationseinheit durch die jDV-Delta-Migration erneut automatisiert veröffentlicht werden kann."
-      title="Portal-Veröffentlichung deaktiviert"
-    />
+      severity="info"
+    >
+      <p class="ris-body1-bold">Portal-Veröffentlichung deaktiviert</p>
+      <p>
+        Auf Produktion ist die manuelle Portal-Veröffentlichung deaktiviert. Sie
+        können veröffentlichte Dokumentationseinheiten jedoch manuell
+        zurückziehen. Beachten Sie, dass die Dokumentationseinheit durch die
+        jDV-Delta-Migration erneut automatisiert veröffentlicht werden kann.
+      </p>
+    </Message>
     <div class="flex flex-row gap-24">
       <PopupModal
         v-if="showPublicationWarningModal"

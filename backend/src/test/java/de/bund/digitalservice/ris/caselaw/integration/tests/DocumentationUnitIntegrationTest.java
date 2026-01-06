@@ -101,6 +101,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -2624,6 +2625,8 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
       when(documentNumberPatternConfig.getDocumentNumberPatterns())
           .thenReturn(Map.of("DS", "XXREYYYY*****"));
       assertThat(inputTypeRepository.findAll()).isEmpty();
+      var currentYear = Year.now().getValue();
+      var expectedDocNumber = "XXRE" + currentYear + "00001";
 
       // Act
       var response =
@@ -2646,8 +2649,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
       // Assert
       var documentNumber = (String) response.getResponseBody().get(0);
-      int year = LocalDate.now().getYear();
-      assertThat(documentNumber).isEqualTo("XXRE" + year + "00001");
+      assertThat(documentNumber).isEqualTo(expectedDocNumber);
       DecisionDTO decision = (DecisionDTO) repository.findByDocumentNumber(documentNumber).get();
       assertThat(decision.getCelexNumber()).isEqualTo(celexNumber + "(02)");
       assertThat(inputTypeRepository.findAll().get(0).getValue())

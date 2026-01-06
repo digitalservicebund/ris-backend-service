@@ -8,7 +8,6 @@ import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { PublicationState } from "@/domain/publicationStatus"
 import documentUnitService from "@/services/documentUnitService"
 import { ServiceResponse } from "@/services/httpClient"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const addToastMock = vi.fn()
@@ -27,9 +26,6 @@ function renderComponent() {
     user,
     ...render(PendingHandover, {
       global: {
-        directives: {
-          "ctrl-enter": onSearchShortcutDirective,
-        },
         plugins: [router],
         stubs: {
           InboxList: {
