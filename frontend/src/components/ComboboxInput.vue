@@ -105,7 +105,7 @@ const handleOptionSelect = (e: AutoCompleteOptionSelectEvent) => {
 
 const handleChange = (e: AutoCompleteChangeEvent) => {
   // clears via the clear button do not trigger the @clear event so we handle it here
-  if (e.value == undefined) {
+  if (e.value == undefined || e.value == "") {
     emit("update:modelValue", undefined)
   }
 }
