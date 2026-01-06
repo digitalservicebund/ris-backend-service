@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
+import Message from "primevue/message"
 import { computed, ref } from "vue"
-import { InfoStatus } from "@/components/enumInfoStatus"
-import InfoModal from "@/components/InfoModal.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 
@@ -82,10 +81,10 @@ const emptyText = computed(() =>
     </KitchensinkStory>
 
     <KitchensinkStory name="Error">
-      <!-- 
+      <!--
         ⚠️ PrimeVue’s theming system is static — it cannot access component state like `hasError`.
 
-        Because of this, the DataTable will always render the empty slot and apply vertical padding 
+        Because of this, the DataTable will always render the empty slot and apply vertical padding
         from `emptyMessageCell`, even in error states. This can lead to unwanted visual gaps.
 
         A workaround is to conditionally override the `emptyMessageCell` padding using pass-through options.
@@ -99,7 +98,9 @@ const emptyText = computed(() =>
 
         This keeps the layout clean, avoids styling workarounds, and makes the UI more maintainable.
       -->
-      <InfoModal v-if="hasError" :status="InfoStatus.ERROR" title="Fehler" />
+      <Message v-if="hasError" severity="error">
+        <p class="ris-body1-bold">Fehler</p>
+      </Message>
       <DataTable :value="[]">
         <Column field="code" header="Code" />
         <Column field="name" header="Name" />

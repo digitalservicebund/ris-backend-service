@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import Button from "primevue/button"
+import Message from "primevue/message"
 import { computed, ref } from "vue"
 import IconBadge from "@/components/IconBadge.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import { ValidationError } from "@/components/input/types"
 import IconAdd from "~icons/ic/baseline-add"
 import IconCheck from "~icons/ic/baseline-check"
@@ -68,10 +68,8 @@ function handleClick() {
         label="Zielrubrik ausgefüllt"
       />
     </div>
-    <InfoModal
-      v-if="errorMessage"
-      :aria-label="errorMessage"
-      :title="errorMessage"
-    />
+    <Message v-if="errorMessage" :aria-label="errorMessage" severity="error">
+      <p class="ris-body1-bold">{{ errorMessage }}</p>
+    </Message>
   </div>
 </template>

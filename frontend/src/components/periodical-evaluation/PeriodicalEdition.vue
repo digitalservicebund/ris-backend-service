@@ -2,11 +2,11 @@
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import InputText from "primevue/inputtext"
+import Message from "primevue/message"
 import { computed, onBeforeMount, ref } from "vue"
 import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
@@ -95,10 +95,10 @@ onBeforeMount(async () => {
     <div v-if="editionRef" class="mb-24 flex flex-col gap-24 bg-white p-24">
       <TitleElement>Ausgabe</TitleElement>
       <div v-if="saveEditionError">
-        <InfoModal
-          :description="saveEditionError.description"
-          :title="saveEditionError.title"
-        />
+        <Message severity="error">
+          <p class="ris-body1-bold">{{ saveEditionError.title }}</p>
+          <p>{{ saveEditionError.description }}</p>
+        </Message>
       </div>
       <InputField
         id="legalPeriodical"
