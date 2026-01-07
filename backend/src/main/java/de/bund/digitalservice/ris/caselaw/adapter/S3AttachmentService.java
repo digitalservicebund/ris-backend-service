@@ -121,10 +121,9 @@ public class S3AttachmentService implements AttachmentService {
             .uploadTimestamp(Instant.now())
             .build();
 
-    var fileName = attachmentInlineDTO.getId() + "." + attachmentInlineDTO.getFormat();
-
-    attachmentInlineDTO.setFilename(fileName);
     attachmentInlineDTO = attachmentInlineRepository.save(attachmentInlineDTO);
+    var fileName = attachmentInlineDTO.getId() + "." + attachmentInlineDTO.getFormat();
+    attachmentInlineDTO.setFilename(fileName);
     var persistedAttachmentLineDTO = attachmentInlineRepository.save(attachmentInlineDTO);
 
     return AttachmentInlineTransformer.transformToDomain(persistedAttachmentLineDTO);
@@ -188,14 +187,14 @@ public class S3AttachmentService implements AttachmentService {
   @Override
   public Optional<Image> findByDocumentationUnitIdAndFileName(
       UUID documentationUnitId, String imageName) {
-    return repository
+    return attachmentInlineRepository
         .findByDocumentationUnitIdAndFilename(documentationUnitId, imageName)
         .map(
-            attachmentDTO ->
+            attachmentInlineDTO ->
                 Image.builder()
-                    .content(attachmentDTO.getContent())
-                    .contentType(attachmentDTO.getFormat())
-                    .name(attachmentDTO.getFilename())
+                    .content(attachmentInlineDTO.getContent())
+                    .contentType(attachmentInlineDTO.getFormat())
+                    .name(attachmentInlineDTO.getFilename())
                     .build());
   }
 
