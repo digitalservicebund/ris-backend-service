@@ -54,7 +54,7 @@ public class S3AttachmentService implements AttachmentService {
   private final S3Client s3Client;
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
   private final DocumentationUnitHistoryLogService documentationUnitHistoryLogService;
-
+  private static final String UNKNOWN_YET = "unknown yet";
   private final MediaType wordMediaType =
       MediaType.parseMediaType(
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
@@ -121,7 +121,7 @@ public class S3AttachmentService implements AttachmentService {
             .content(byteBuffer.array())
             .documentationUnit(documentationUnit)
             .format(contentType.getSubtype().toLowerCase())
-            .filename("unknown yet")
+            .filename(UNKNOWN_YET)
             .uploadTimestamp(Instant.now())
             .build();
 
@@ -130,7 +130,7 @@ public class S3AttachmentService implements AttachmentService {
             .content(byteBuffer.array())
             .documentationUnit(documentationUnit)
             .format(contentType.getSubtype().toLowerCase())
-            .filename("unknown yet")
+            .filename(UNKNOWN_YET)
             .uploadTimestamp(Instant.now())
             .build();
 
@@ -155,7 +155,7 @@ public class S3AttachmentService implements AttachmentService {
 
     AttachmentDTO attachmentDTO =
         AttachmentDTO.builder()
-            .s3ObjectPath("unknown yet")
+            .s3ObjectPath(UNKNOWN_YET)
             .documentationUnit(documentationUnit)
             .filename(fileName)
             .format("docx")
@@ -166,7 +166,7 @@ public class S3AttachmentService implements AttachmentService {
 
     AttachmentS3DTO attachmentS3DTO =
         AttachmentS3DTO.builder()
-            .s3ObjectPath("unknown yet")
+            .s3ObjectPath(UNKNOWN_YET)
             .documentationUnit(documentationUnit)
             .filename(fileName)
             .format("docx")
