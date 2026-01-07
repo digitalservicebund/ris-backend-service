@@ -618,9 +618,8 @@ test.describe("category import of pending proceeding", () => {
         await page.getByLabel("Normen übernehmen").click()
 
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(3) // the last entry is the input field
-        await expect(
-          normContainer.getByTestId("editable-list-container"),
-        ).toHaveText("PBefGBGBRIS-Abkürzung * ")
+        await expect(normContainer).toContainText("PBefG")
+        await expect(normContainer).toContainText("BGB")
       })
 
       await test.step("'Übernommen' wird angezeigt", async () => {
@@ -643,9 +642,9 @@ test.describe("category import of pending proceeding", () => {
 
         await page.getByLabel("Normen übernehmen").click()
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(4) // the last entry is the input field
-        await expect(
-          normContainer.getByTestId("editable-list-container"),
-        ).toHaveText("PBefGBGBKBErrG, § 8RIS-Abkürzung * ")
+        await expect(normContainer).toContainText("PBefG")
+        await expect(normContainer).toContainText("BGB")
+        await expect(normContainer).toContainText("KBErrG, § 8")
       })
     },
   )
@@ -674,9 +673,8 @@ test.describe("category import of pending proceeding", () => {
         await page.getByLabel("Normen übernehmen").click()
 
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(3) // the last entry is the input field
-        await expect(
-          normContainer.getByTestId("editable-list-container"),
-        ).toHaveText("PBefGBGBRIS-Abkürzung * ")
+        await expect(normContainer).toContainText("PBefG")
+        await expect(normContainer).toContainText("BGB")
       })
 
       await test.step("'Übernommen' wird angezeigt", async () => {
@@ -699,9 +697,9 @@ test.describe("category import of pending proceeding", () => {
 
         await page.getByLabel("Normen übernehmen").click()
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(4) // the last entry is the input field
-        await expect(
-          normContainer.getByTestId("editable-list-container"),
-        ).toHaveText("PBefGBGBKBErrG, § 8RIS-Abkürzung * ")
+        await expect(normContainer).toContainText("PBefG")
+        await expect(normContainer).toContainText("BGB")
+        await expect(normContainer).toContainText("KBErrG, § 8")
       })
     },
   )
@@ -732,9 +730,8 @@ test.describe("category import of pending proceeding", () => {
         await page.getByLabel("Normen übernehmen").click()
 
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(3) // the last entry is the input field
-        await expect(
-          normContainer.getByTestId("editable-list-container"),
-        ).toHaveText("PBefGBGBRIS-Abkürzung * ")
+        await expect(normContainer).toContainText("PBefG")
+        await expect(normContainer).toContainText("BGB")
       })
 
       await test.step("'Übernommen' wird angezeigt", async () => {
@@ -757,9 +754,9 @@ test.describe("category import of pending proceeding", () => {
 
         await page.getByLabel("Normen übernehmen").click()
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(4) // the last entry is the input field
-        await expect(
-          normContainer.getByTestId("editable-list-container"),
-        ).toHaveText("PBefGBGBKBErrG, § 8RIS-Abkürzung * ")
+        await expect(normContainer).toContainText("PBefG")
+        await expect(normContainer).toContainText("BGB")
+        await expect(normContainer).toContainText("KBErrG, § 8")
       })
     },
   )

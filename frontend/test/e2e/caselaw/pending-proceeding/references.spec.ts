@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
+  fillCombobox,
   fillInput,
   navigateToPreview,
   navigateToReferences,
@@ -39,7 +40,7 @@ test.describe(
         await page.getByText("MM | Mieter Magazin", { exact: true }).click()
         await expect(
           page.getByLabel("Periodikum", { exact: true }),
-        ).toHaveValue("MM")
+        ).toHaveValue("MM | Mieter Magazin")
       })
 
       await test.step("citation shows citation example", async () => {
@@ -77,16 +78,12 @@ test.describe(
 
       await test.step("Edit legal periodical in reference, verify that it is updated in the list", async () => {
         await page.getByTestId("list-entry-0").click()
-        await fillInput(page, "Periodikum", "GVBl BB")
-        await page
-          .getByText(
-            "GVBl BB | Gesetz- und Verordnungsblatt für das Land Brandenburg",
-            { exact: true },
-          )
-          .click()
-        await expect(
-          page.getByLabel("Periodikum", { exact: true }),
-        ).toHaveValue("GVBl BB")
+        await fillCombobox(
+          page,
+          "Periodikum",
+          "GVBl BB",
+          "GVBl BB | Gesetz- und Verordnungsblatt für das Land Brandenburg",
+        )
         await expect(
           page.getByText("Zitierbeispiel: 1991, 676-681"),
         ).toBeVisible()
@@ -140,15 +137,12 @@ test.describe(
 
       await test.step("Add second reference, verify that it is shown in the list", async () => {
         await page.getByLabel("Weitere Angabe").click()
-        await fillInput(page, "Periodikum", "wdg")
-        await page
-          .getByText("WdG | Welt der Gesundheitsversorgung", {
-            exact: true,
-          })
-          .click()
-        await expect(
-          page.getByLabel("Periodikum", { exact: true }),
-        ).toHaveValue("WdG")
+        await fillCombobox(
+          page,
+          "Periodikum",
+          "wdg",
+          "WdG | Welt der Gesundheitsversorgung",
+        )
         await fillInput(page, "Zitatstelle", citation2)
         await fillInput(page, "Klammernzusatz", "ST")
         await page.getByLabel("Fundstelle speichern", { exact: true }).click()
@@ -161,15 +155,12 @@ test.describe(
       await save(page)
 
       await test.step("Add third reference, verify that it is shown in the list", async () => {
-        await fillInput(page, "Periodikum", "AllMBl")
-        await page
-          .getByText("AllMBl | Allgemeines Ministerialblatt", {
-            exact: true,
-          })
-          .click()
-        await expect(
-          page.getByLabel("Periodikum", { exact: true }),
-        ).toHaveValue("AllMBl")
+        await fillCombobox(
+          page,
+          "Periodikum",
+          "AllMBl",
+          "AllMBl | Allgemeines Ministerialblatt",
+        )
         await fillInput(page, "Zitatstelle", citation3)
         await fillInput(page, "Klammernzusatz", "L")
         await page.getByLabel("Fundstelle speichern", { exact: true }).click()
@@ -242,12 +233,12 @@ test.describe(
         await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(2)
       })
       await test.step("Add 'Periodikum' removes error there, but still shows error for 'Zitatstelle'", async () => {
-        await fillInput(page, "Periodikum", "wdg")
-        await page
-          .getByText("WdG | Welt der Gesundheitsversorgung", {
-            exact: true,
-          })
-          .click()
+        await fillCombobox(
+          page,
+          "Periodikum",
+          "wdg",
+          "WdG | Welt der Gesundheitsversorgung",
+        )
         await page.getByLabel("Fundstelle speichern", { exact: true }).click()
         await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(1)
       })
@@ -283,15 +274,12 @@ test.describe(
           page.getByLabel("Literaturfundstelle speichern", { exact: true }),
         ).toBeDisabled()
 
-        await fillInput(page, "Periodikum Literaturfundstelle", "AllMBl")
-        await page
-          .getByText("AllMBl | Allgemeines Ministerialblatt", {
-            exact: true,
-          })
-          .click()
-        await expect(
-          page.getByLabel("Periodikum Literaturfundstelle", { exact: true }),
-        ).toHaveValue("AllMBl")
+        await fillCombobox(
+          page,
+          "Periodikum Literaturfundstelle",
+          "AllMBl",
+          "AllMBl | Allgemeines Ministerialblatt",
+        )
         await fillInput(page, "Zitatstelle Literaturfundstelle", citation)
 
         await page
@@ -422,15 +410,12 @@ test.describe(
       })
 
       await test.step("Add literature reference, verify rendering in editable list", async () => {
-        await fillInput(page, "Periodikum Literaturfundstelle", "AllMBl")
-        await page
-          .getByText("AllMBl | Allgemeines Ministerialblatt", {
-            exact: true,
-          })
-          .click()
-        await expect(
-          page.getByLabel("Periodikum Literaturfundstelle", { exact: true }),
-        ).toHaveValue("AllMBl")
+        await fillCombobox(
+          page,
+          "Periodikum Literaturfundstelle",
+          "AllMBl",
+          "AllMBl | Allgemeines Ministerialblatt",
+        )
         await fillInput(page, "Zitatstelle Literaturfundstelle", citation1)
         await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
         await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
@@ -465,18 +450,12 @@ test.describe(
       })
 
       await test.step("Add second literature reference, verify it is added at the bottom", async () => {
-        await fillInput(page, "Periodikum Literaturfundstelle", "GVBl BB")
-        await page
-          .getByText(
-            "GVBl BB | Gesetz- und Verordnungsblatt für das Land Brandenburg",
-            {
-              exact: true,
-            },
-          )
-          .click()
-        await expect(
-          page.getByLabel("Periodikum Literaturfundstelle", { exact: true }),
-        ).toHaveValue("GVBl BB")
+        await fillCombobox(
+          page,
+          "Periodikum Literaturfundstelle",
+          "GVBl BB",
+          "GVBl BB | Gesetz- und Verordnungsblatt für das Land Brandenburg",
+        )
         await fillInput(page, "Zitatstelle Literaturfundstelle", citation2)
         await fillInput(page, "Autor Literaturfundstelle", "Kästner, Erich")
         await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ebs")

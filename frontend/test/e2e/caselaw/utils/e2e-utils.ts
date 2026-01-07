@@ -570,13 +570,16 @@ export async function fillInput(
 export async function fillCombobox(
   page: Page,
   ariaLabel: string,
-  value: string,
+  search: string,
+  valueToSelect?: string,
 ) {
   const combobox = page.getByRole("combobox", { name: ariaLabel, exact: true })
   await expect(combobox).toBeVisible()
-  await combobox.fill(value)
-  await expect(combobox).toHaveValue(value)
-  await page.getByRole("option", { name: value, exact: true }).click()
+  await combobox.fill(search)
+  await expect(combobox).toHaveValue(search)
+  await page
+    .getByRole("option", { name: valueToSelect ?? search, exact: true })
+    .click()
 }
 
 export async function fillSelect(
@@ -752,16 +755,10 @@ export async function searchForDocUnitWithFileNumberAndDecisionDate(
   fileNumber: string,
   date: string,
 ) {
-  await fillInput(page, "Gericht", "AG Aachen")
-  await page.getByText("AG Aachen", { exact: true }).click()
+  await fillCombobox(page, "Gericht", "AG Aachen")
   await fillInput(page, "Aktenzeichen", fileNumber)
   await fillInput(page, "Datum", date)
-  await fillInput(page, "Dokumenttyp", "AnU")
-
-  await page
-    .locator("button")
-    .filter({ hasText: "AnerkenntnisurteilAnU" })
-    .click()
+  await fillCombobox(page, "Dokumenttyp", "Anerkenntnisurteil")
 
   await page.getByText("Suchen").click()
 }
@@ -948,7 +945,7 @@ export async function searchForDocUnit(
     await fillCombobox(page, "Dokumenttyp", documentType)
   }
 
-  await page.getByText("Suchen").click()
+  await page.getByRole("button", { name: "Nach Entscheidung suchen" }).click()
 }
 
 export async function expectHistoryCount(page: Page, count: number) {

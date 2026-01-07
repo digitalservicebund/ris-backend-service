@@ -3,6 +3,7 @@ import dayjs from "dayjs"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import {
+  fillCombobox,
   fillInput,
   navigateToPeriodicalReferences,
   navigateToPreview,
@@ -86,16 +87,14 @@ test.describe(
 
         await test.step("DocOffice is automatically selected based on court", async () => {
           // AG Aachen is a BGH court
-          await fillInput(page, "Gericht", "AG Aachen")
-          await page.getByText("AG Aachen").click()
+          await fillCombobox(page, "Gericht", "AG Aachen")
           await page.getByLabel("Nach Entscheidung suchen").click()
           await expect(
             page.getByLabel("Dokumentationsstelle auswählen"),
           ).toHaveValue("BGH")
 
           // Verwaltungsgericht Aarau is a BVerwG court
-          await fillInput(page, "Gericht", "Verwaltungsgericht Aarau")
-          await page.getByText("Verwaltungsgericht Aarau").click()
+          await fillCombobox(page, "Gericht", "Verwaltungsgericht Aarau")
           await page.getByText("Suchen").click()
           await expect(
             page.getByLabel("Dokumentationsstelle auswählen"),
@@ -126,8 +125,7 @@ test.describe(
         })
 
         await test.step("Foreign courts are not assigned to a responsible doc office", async () => {
-          await fillInput(page, "Gericht", "Arbeits- und Sozialgericht Wien")
-          await page.getByText("Arbeits- und Sozialgericht Wien").click()
+          await fillCombobox(page, "Gericht", "Arbeits- und Sozialgericht Wien")
 
           const requestFinishedPromise = page.waitForEvent("requestfinished")
           await page.getByText("Suchen").click()
@@ -155,10 +153,11 @@ test.describe(
           await expect(page.getByText("BFH", { exact: true })).toBeHidden()
           await expect(page.getByText("BVerwG", { exact: true })).toBeVisible()
           await expect(
-            page.locator("button").filter({ hasText: "BVerfG" }),
+            page.getByRole("option", { name: "BVerfG", exact: true }),
           ).toBeVisible()
-
-          await page.locator("button").filter({ hasText: "BVerfG" }).click()
+          await page
+            .getByRole("option", { name: "BVerfG", exact: true })
+            .click()
 
           await expect(
             page.getByLabel("Dokumentationsstelle auswählen"),
@@ -191,7 +190,7 @@ test.describe(
             undefined,
             formattedDate,
             randomFileNumber,
-            "AnU",
+            "Anerkenntnisurteil",
           )
 
           await expect(
@@ -204,12 +203,7 @@ test.describe(
         })
 
         await test.step("Responsible doc office can be updated manually", async () => {
-          await fillInput(page, "Dokumentationsstelle auswählen", "DS")
-
-          await expect(
-            page.getByLabel("Dokumentationsstelle auswählen"),
-          ).toHaveValue("DS")
-          await page.getByText("DS", { exact: true }).click()
+          await fillCombobox(page, "Dokumentationsstelle auswählen", "DS")
           await expect(
             page.getByText("Übernehmen und weiter bearbeiten"),
           ).toBeEnabled()
@@ -335,7 +329,7 @@ test.describe(
               "AG Aachen",
               formattedDate,
               randomFileNumber,
-              "AnU",
+              "Anerkenntnisurteil",
             )
 
             await expect(
@@ -518,7 +512,7 @@ test.describe(
           "AG Aachen",
           formattedDate,
           generateString(),
-          "AnU",
+          "Anerkenntnisurteil",
         )
         await page.getByText("Übernehmen und weiter bearbeiten").click()
 
@@ -557,7 +551,7 @@ test.describe(
             "AG Aachen",
             formattedDate,
             randomFileNumber,
-            "AnU",
+            "Anerkenntnisurteil",
           )
 
           await expect(
@@ -666,18 +660,18 @@ test.describe(
         await fillInput(page, "Aktenzeichen", fileNumber)
       }
       if (court) {
-        await fillInput(page, "Gericht", court)
-        await page.getByText(court, { exact: true }).click()
+        await fillCombobox(page, "Gericht", court)
       }
       if (date) {
         await fillInput(page, "Datum", date)
       }
       if (documentType) {
-        await fillInput(page, "Dokumenttyp", documentType)
-        await page.getByText("Anerkenntnisurteil", { exact: true }).click()
+        await fillCombobox(page, "Dokumenttyp", documentType)
       }
 
-      await page.getByText("Suchen").click()
+      await page
+        .getByRole("button", { name: "Nach Entscheidung suchen" })
+        .click()
     }
   },
 )

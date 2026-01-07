@@ -1,6 +1,10 @@
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
-import { navigateToCategories, save } from "~/e2e/caselaw/utils/e2e-utils"
+import {
+  fillCombobox,
+  navigateToCategories,
+  save,
+} from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("edit pending proceeding", () => {
   test(
@@ -15,14 +19,7 @@ test.describe("edit pending proceeding", () => {
 
       // Gericht
       await test.step("court can be changed", async () => {
-        const court = page.getByLabel("Gericht", { exact: true })
-        await expect(court).toHaveValue("")
-        // switch again to BFH
-        await court.fill("BFH")
-        await expect(page.getByRole("progressbar")).toBeHidden()
-        await expect(court).toHaveValue("BFH")
-        await page.getByText("BFH", { exact: true }).click()
-        await expect(court).toHaveValue("BFH")
+        await fillCombobox(page, "Gericht", "BFH")
       })
 
       // Aktenzeichen

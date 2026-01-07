@@ -2,6 +2,7 @@ import { expect } from "@playwright/test"
 import dayjs from "dayjs"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
+  fillCombobox,
   fillInput,
   navigateToPeriodicalEvaluation,
 } from "~/e2e/caselaw/utils/e2e-utils"
@@ -53,25 +54,12 @@ test.describe(
       })
 
       await test.step("A periodical can be selected using a combo box.", async () => {
-        await fillInput(page, "Periodikum", "MMG")
-        const periodical = page.getByText(
-          "MMG | Medizin Mensch Gesellschaft" + "nicht amtlich",
-          {
-            exact: true,
-          },
+        await fillCombobox(
+          page,
+          "Periodikum",
+          "MMG",
+          "MMG | Medizin Mensch Gesellschaft",
         )
-        await expect(periodical).toBeVisible()
-
-        const requestPromise = page.waitForRequest((request) =>
-          request.url().includes("api/v1/caselaw/legalperiodicaledition"),
-        )
-        await periodical.click()
-
-        await requestPromise
-
-        await expect(
-          page.getByLabel("Periodikum", { exact: true }),
-        ).toHaveValue("MMG")
       })
 
       await test.step("An existing periodical edition appears in the results", async () => {
@@ -94,15 +82,12 @@ test.describe(
       })
 
       await test.step("The table is cleared when a periodical without edtions is selected", async () => {
-        await fillInput(page, "Periodikum", "ZAU")
-        await page
-          .getByText("ZAU | Zeitschrift für angewandte Umweltforschung", {
-            exact: true,
-          })
-          .click()
-        await expect(
-          page.getByLabel("Periodikum", { exact: true }),
-        ).toHaveValue("ZAU")
+        await fillCombobox(
+          page,
+          "Periodikum",
+          "ZAU",
+          "ZAU | Zeitschrift für angewandte Umweltforschung",
+        )
         await expect(
           page.getByText("Keine Suchergebnisse gefunden", { exact: true }),
         ).toBeVisible()
@@ -110,15 +95,12 @@ test.describe(
       })
 
       await test.step("By clicking on an edition, the detail view is opened.", async () => {
-        await fillInput(page, "Periodikum", "MMG")
-
-        const response = page.waitForResponse((response) =>
-          response.url().includes("api/v1/caselaw/legalperiodicaledition"),
+        await fillCombobox(
+          page,
+          "Periodikum",
+          "MMG",
+          "MMG | Medizin Mensch Gesellschaft",
         )
-        await page
-          .getByText("MMG | Medizin Mensch Gesellschaft", { exact: true })
-          .click()
-        await response
 
         const line = page.locator(`tr:has(td:has-text("${edition.name}"))`)
         await line.waitFor({ state: "visible" })
@@ -148,12 +130,12 @@ test.describe(
         await navigateToPeriodicalEvaluation(page)
 
         await test.step("A legal periodical can be selected", async () => {
-          await fillInput(page, "Periodikum", "wdg")
-          await page
-            .getByText("WdG | Welt der Gesundheitsversorgung", {
-              exact: true,
-            })
-            .click()
+          await fillCombobox(
+            page,
+            "Periodikum",
+            "wdg",
+            "WdG | Welt der Gesundheitsversorgung",
+          )
         })
 
         await test.step("A new evaluation is started using the “Neue Periodikumsauswertung button.", async () => {
@@ -210,15 +192,12 @@ test.describe(
 
           await test.step("The edition can be deleted", async () => {
             await navigateToPeriodicalEvaluation(page)
-            await fillInput(page, "Periodikum", "wdg")
-            await page
-              .getByText("WdG | Welt der Gesundheitsversorgung", {
-                exact: true,
-              })
-              .click()
-            await expect(
-              page.getByLabel("Periodikum", { exact: true }),
-            ).toHaveValue("WdG")
+            await fillCombobox(
+              page,
+              "Periodikum",
+              "wdg",
+              "WdG | Welt der Gesundheitsversorgung",
+            )
             await expect(page.locator(".table > tr >> nth=0")).toBeVisible()
             const line = page.getByText(name + "WdG0" + formattedDate)
 
@@ -238,10 +217,12 @@ test.describe(
           // make sure the edition is deleted also if the test fails
         } finally {
           await navigateToPeriodicalEvaluation(page)
-          await fillInput(page, "Periodikum", "wdg")
-          await page
-            .getByText("WdG | Welt der Gesundheitsversorgung", { exact: true })
-            .click()
+          await fillCombobox(
+            page,
+            "Periodikum",
+            "wdg",
+            "WdG | Welt der Gesundheitsversorgung",
+          )
           if (await page.locator(".table > tr >> nth=0").isVisible()) {
             const line = page.getByText(name + "WdG0" + formattedDate)
             await line.getByLabel("Ausgabe löschen", { exact: true }).click()
@@ -256,15 +237,12 @@ test.describe(
     }) => {
       await navigateToPeriodicalEvaluation(page)
 
-      await fillInput(page, "Periodikum", "MMG")
-
-      const response = page.waitForResponse((response) =>
-        response.url().includes("api/v1/caselaw/legalperiodicaledition"),
+      await fillCombobox(
+        page,
+        "Periodikum",
+        "MMG",
+        "MMG | Medizin Mensch Gesellschaft",
       )
-      await page
-        .getByText("MMG | Medizin Mensch Gesellschaft", { exact: true })
-        .click()
-      await response
 
       const line = page.locator(
         `tr:has(td:has-text("${editionWithReferences.name}"))`,

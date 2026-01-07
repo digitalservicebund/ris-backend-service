@@ -2,6 +2,7 @@ import { expect, Page } from "@playwright/test"
 import dayjs from "dayjs"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
+  fillCombobox,
   fillInput,
   navigateToPeriodicalEvaluation,
   navigateToPeriodicalReferences,
@@ -220,12 +221,8 @@ test.describe(
         await navigateToPeriodicalReferences(page, edition.id || "")
 
         await test.step("A pending proceeding docunit can be added as reference, search results can be filtered for pending proceeding doctypex", async () => {
-          await fillInput(page, "Dokumenttyp", "Anh")
+          await fillCombobox(page, "Dokumenttyp", "Anhängiges Verfahren")
           await fillInput(page, "Aktenzeichen", fileNumber)
-          await page
-            .locator("button")
-            .filter({ hasText: "Anhängiges Verfahren" })
-            .click()
 
           await page.getByText("Suchen").click()
 
@@ -731,7 +728,7 @@ test.describe(
           await periodical.click()
           await expect(
             pageWithExternalUser.getByLabel("Periodikum", { exact: true }),
-          ).toHaveValue("MMG")
+          ).toHaveValue("MMG | Medizin Mensch Gesellschaft")
         })
 
         await test.step("User can view but not edit or delete the editions", async () => {

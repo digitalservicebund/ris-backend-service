@@ -396,7 +396,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
         "AG Aachen",
         dayjs("2025-01-01").format("DD.MM.YYYY"),
         fileNumber,
-        "AnU",
+        "Anerkenntnisurteil",
       )
     })
 

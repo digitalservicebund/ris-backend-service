@@ -155,16 +155,26 @@ test.describe("court", () => {
     await expect(page.getByRole("option")).toBeHidden()
     await expect(combobox).toHaveValue("BVerfG")
 
-    await combobox.fill("BGH")
-
-    await expect(page.getByRole("option")).toHaveCount(1)
-
+    await combobox.press("Backspace")
+    await combobox.press("Backspace")
+    await combobox.press("Backspace")
+    await combobox.press("Backspace")
+    await combobox.press("Backspace")
+    await combobox.press("G")
+    await expect(page.getByRole("option", { name: "BGH" })).toBeVisible()
     await combobox.press("Escape") // reset to last saved value
 
     await expect(page.getByRole("option")).toBeHidden()
     await expect(combobox).toHaveValue("BVerfG")
 
-    await combobox.fill("BGH")
+    await combobox.press("Backspace")
+    await combobox.press("Backspace")
+    await combobox.press("Backspace")
+    await combobox.press("Backspace")
+    await combobox.press("Backspace")
+    await combobox.press("G")
+    await combobox.press("H")
+    await expect(page.getByRole("option", { name: "BGH" })).toBeVisible()
     await combobox.press("Tab") // reset to last saved value
 
     await expect(page.getByRole("option")).toBeHidden()
