@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentS3Repository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
@@ -79,7 +78,6 @@ class FmxImportServiceTest {
   @MockitoBean DocumentTypeRepository documentTypeRepository;
   @MockitoBean FmxRepository fmxRepository;
   @MockitoBean AttachmentRepository attachmentRepository;
-  @MockitoBean AttachmentS3Repository attachmentS3Repository;
   @MockitoBean DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
   @MockitoBean EurLexResultRepository eurLexResultRepository;
   @MockitoBean HttpEurlexRetrievalService retrievalService;
