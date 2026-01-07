@@ -97,13 +97,52 @@ const selectionItems = computed<SelectionItem[]>(() => {
   return formatedExistingItems
 })
 
+/**
+ * This resets the text input to show the modelValue.
+ */
+async function resetInput() {
+  // We are not able to directly control the value of the text-input. To reset it this we need to update the
+  // internalValue. The internalValue might already have the current modelValue as its value. Therefore, just setting it
+  // would not trigger an update. So we need to set it to a different value for 1 tick and then set the value to the
+  // modelValue again. This then tricks the autocomplete component to update the text-input.
+  // It is still possible to manually clear the autocomplete as in that case also our modelValue gets set to
+  // undefined as well.
+  if (internalValue.value === props.modelValue) {
+    if (props.modelValue === undefined) {
+      // special case to still trigger the update when the model value is undefined
+      internalValue.value = null as unknown as undefined
+    } else {
+      internalValue.value = undefined
+    }
+    await nextTick()
+    internalValue.value = props.modelValue
+  }
+
+  internalValue.value = props.modelValue
+}
+
 const handleComplete = async (e: AutoCompleteCompleteEvent) => {
   filter.value = e.query
   await fetchItems()
 }
 
-const handleOptionSelect = (e: AutoCompleteOptionSelectEvent) => {
-  const value: SelectionItem = e.value
+const handleOptionSelect = async (e: AutoCompleteOptionSelectEvent) => {
+  const value: SelectionItem | undefined = e.value
+
+  if (
+    e.originalEvent instanceof KeyboardEvent &&
+    e.originalEvent.key == "Tab"
+  ) {
+    // no select on tab => reset input
+    await resetInput()
+    return
+  }
+
+  if (value == undefined) {
+    emit("update:modelValue", undefined)
+    return
+  }
+
   if ("manualEntry" in value) {
     emit("update:modelValue", {
       label: value.label,
@@ -113,17 +152,26 @@ const handleOptionSelect = (e: AutoCompleteOptionSelectEvent) => {
   }
 }
 
+const handleClear = async () => {
+  // Only a clear via the clear button while nothing is selected triggers this event.
+  // We want to just reset the filter in that case
+  // Other cases where everything gets cleared are handled by handleChange.
+  filter.value = undefined
+  await fetchItems()
+}
+
 const handleChange = async (e: AutoCompleteChangeEvent) => {
   const value: SelectionItem | string | undefined = e.value
 
-  // We only want to handle some cases where the value is empty. See also the comment in updateModelValue
+  // Handle clear via the clear button & via backspace while something is selected.
+  // We want to reset the selection in that case.
+  // These cases do not trigger the clear event
   if (
     ((value == undefined || value === "") &&
       e.originalEvent instanceof PointerEvent) || // clear via the clear button
     value === "" // manually cleared the input by pressing backspace
   ) {
     emit("update:modelValue", undefined)
-    // we also want to run a new query when the filter is cleared
     filter.value = undefined
     await fetchItems()
   }
@@ -148,18 +196,11 @@ watch(
 
 const updateModelValue = async (e: T | undefined) => {
   if (e == null) {
-    // We want to keep showing the current value when the component is no longer focused with an invalid input
+    // We want to keep showing the current value when the component is no longer focused with an invalid input.
     // As force-selection is active the autocomplete automatically resets the model-value when the focus is lost to
     // null. It also clears the text-input. We therefore need to ensure that the text-input is again showing the current
-    // modelValue of our component. For this we need to update the internalValue. The internalValue already has the
-    // current modelValue as its value. Therefore, just setting it would not trigger an update. So we need to set it to
-    // undefined for 1 tick and then set the value to the modelValue again. This then tricks the autocomplete component
-    // to update the text-input.
-    // It is still possible to manually clear the autocomplete as in that case also our modelValue gets set to
-    // undefined as well.
-    internalValue.value = undefined
-    await nextTick()
-    internalValue.value = props.modelValue
+    // modelValue of our component.
+    await resetInput()
   }
 }
 
@@ -195,6 +236,7 @@ function toLabel(option: ComboboxItem<T> | T) {
     :show-clear="!props.noClear"
     :suggestions="selectionItems"
     @change="handleChange"
+    @clear="handleClear"
     @complete="handleComplete"
     @focus="$emit('focus')"
     @option-select="handleOptionSelect"
