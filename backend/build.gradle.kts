@@ -181,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.41.1"))
+    implementation(platform("software.amazon.awssdk:bom:2.40.16"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -189,7 +189,7 @@ dependencies {
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
-    implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.9")
+    implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.8")
     implementation("net.sf.saxon:Saxon-HE:12.9")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.5")
@@ -224,7 +224,7 @@ dependencies {
 
     implementation("io.getunleash:unleash-client-java:11.2.1")
     implementation("org.apache.commons:commons-text:1.15.0")
-    implementation("org.jsoup:jsoup:1.22.1")
+    implementation("org.jsoup:jsoup:1.21.2")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:7.5.0")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.5.0")
