@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentReposit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.AttachmentInlineTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.AttachmentTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
@@ -110,15 +111,6 @@ public class S3AttachmentService implements AttachmentService {
 
   private Attachment attachImage(
       ByteBuffer byteBuffer, MediaType contentType, DocumentationUnitDTO documentationUnit) {
-    AttachmentDTO attachmentDTO =
-        AttachmentDTO.builder()
-            .s3ObjectPath(null)
-            .content(byteBuffer.array())
-            .documentationUnit(documentationUnit)
-            .format(contentType.getSubtype().toLowerCase())
-            .filename(UNKNOWN_YET)
-            .uploadTimestamp(Instant.now())
-            .build();
 
     AttachmentInlineDTO attachmentInlineDTO =
         AttachmentInlineDTO.builder()
@@ -129,16 +121,13 @@ public class S3AttachmentService implements AttachmentService {
             .uploadTimestamp(Instant.now())
             .build();
 
-    attachmentDTO = repository.save(attachmentDTO);
+    var fileName = attachmentInlineDTO.getId() + "." + attachmentInlineDTO.getFormat();
 
-    String fileName = attachmentDTO.getId() + "." + attachmentDTO.getFormat();
-
-    attachmentDTO.setFilename(fileName);
     attachmentInlineDTO.setFilename(fileName);
     attachmentInlineDTO = attachmentInlineRepository.save(attachmentInlineDTO);
-    attachmentInlineRepository.save(attachmentInlineDTO);
+    var persistedAttachmentLineDTO = attachmentInlineRepository.save(attachmentInlineDTO);
 
-    return AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
+    return AttachmentInlineTransformer.transformToDomain(persistedAttachmentLineDTO);
   }
 
   private Attachment attachDocx(
