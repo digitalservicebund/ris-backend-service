@@ -13,7 +13,11 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentS3DTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentS3Repository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -62,6 +66,8 @@ class S3AttachmentServiceTest {
   @MockitoSpyBean S3AttachmentService service;
 
   @MockitoBean AttachmentRepository repository;
+  @MockitoBean AttachmentInlineRepository attachmentInlineRepository;
+  @MockitoBean AttachmentS3Repository attachmentS3Repository;
   @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
 
   @MockitoBean
@@ -88,6 +94,20 @@ class S3AttachmentServiceTest {
         .thenAnswer(
             invocation -> {
               AttachmentDTO unsavedAttachmentDTO = invocation.getArgument(0);
+              unsavedAttachmentDTO.setId(UUID.randomUUID());
+              return unsavedAttachmentDTO;
+            });
+    when(attachmentInlineRepository.save(any(AttachmentInlineDTO.class)))
+        .thenAnswer(
+            invocation -> {
+              AttachmentInlineDTO unsavedAttachmentDTO = invocation.getArgument(0);
+              unsavedAttachmentDTO.setId(UUID.randomUUID());
+              return unsavedAttachmentDTO;
+            });
+    when(attachmentS3Repository.save(any(AttachmentS3DTO.class)))
+        .thenAnswer(
+            invocation -> {
+              AttachmentS3DTO unsavedAttachmentDTO = invocation.getArgument(0);
               unsavedAttachmentDTO.setId(UUID.randomUUID());
               return unsavedAttachmentDTO;
             });
