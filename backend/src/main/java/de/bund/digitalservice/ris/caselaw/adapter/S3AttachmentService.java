@@ -130,10 +130,12 @@ public class S3AttachmentService implements AttachmentService {
             .build();
 
     attachmentDTO = repository.save(attachmentDTO);
-    attachmentDTO.setFilename(attachmentDTO.getId() + "." + attachmentDTO.getFormat());
+
+    String fileName = attachmentDTO.getId() + "." + attachmentDTO.getFormat();
+
+    attachmentDTO.setFilename(fileName);
+    attachmentInlineDTO.setFilename(fileName);
     attachmentInlineDTO = attachmentInlineRepository.save(attachmentInlineDTO);
-    attachmentInlineDTO.setFilename(
-        attachmentInlineDTO.getId() + "." + attachmentInlineDTO.getFormat());
     attachmentInlineRepository.save(attachmentInlineDTO);
 
     return AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
