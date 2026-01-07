@@ -15,10 +15,6 @@ test.describe(
     tag: ["@RISDEV-6639"],
   },
   () => {
-    // Todo: re-enable when portal is live again
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(true, "Portal is down")
-
     test.use({
       decisionsToBeCreated: [
         [
