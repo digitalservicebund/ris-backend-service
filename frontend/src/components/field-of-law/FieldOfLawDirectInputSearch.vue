@@ -2,7 +2,7 @@
 import { nextTick, ref } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
-import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemServices from "@/services/comboboxItemService"
 
 const emit = defineEmits<{
   "add-to-list": [item: FieldOfLaw]
@@ -28,7 +28,7 @@ const handleUpdateModelValue = async (newValue: unknown | undefined) => {
     <ComboboxInput
       id="directInputCombobox"
       aria-label="Direkteingabe-Sachgebietssuche eingeben"
-      :item-service="ComboboxItemService.getFieldOfLawSearchByIdentifier"
+      :item-service="ComboboxItemServices.getFieldOfLawSearchByIdentifier"
       :model-value="value"
       placeholder="Sachgebiet"
       @update:model-value="handleUpdateModelValue"
