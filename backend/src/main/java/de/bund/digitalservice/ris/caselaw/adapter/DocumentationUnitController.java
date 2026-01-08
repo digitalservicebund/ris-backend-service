@@ -353,15 +353,6 @@ public class DocumentationUnitController {
     }
   }
 
-  /**
-   * @deprecated This endpoint is being replaced by the PATCH method. Use {@link
-   *     #partialUpdateByUuid(OidcUser, UUID, RisJsonPatch)} instead. Update a documentation unit
-   *     completely.
-   * @param uuid id of the documentation unit
-   * @param decision updated documentation unit
-   * @return updated and saved documentation unit
-   */
-  @Deprecated(forRemoval = true)
   @PutMapping(
       value = "/{uuid}",
       consumes = MediaType.APPLICATION_JSON_VALUE,
