@@ -67,7 +67,7 @@ describe("PublicationActions", () => {
       ).not.toBeInTheDocument()
     })
 
-    it("should show error when publishing related pending proceedings fails", async () => {
+    it("should show success when publishing related pending proceedings", async () => {
       mockDocUnitStore(PortalPublicationStatus.UNPUBLISHED)
       await renderComponent({ isPublishable: true, publicationWarnings: [] })
 

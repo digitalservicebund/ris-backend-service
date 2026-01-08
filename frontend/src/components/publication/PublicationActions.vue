@@ -201,7 +201,8 @@ const hasRelatedPendingProceeding = computed(() => {
         Die zugehörigen anhängigen Verfahren konnten nicht vollständig als
         erledigt veröffentlicht werden. Bitte stellen Sie sicher, dass die
         anhängigen Verfahren bereits im Portal veröffentlicht sind und alle
-        Pflichtfelder befüllt haben.
+        Pflichtfelder befüllt haben. Veröffentlichen Sie diese dann manuell als
+        erledigt.
       </p>
     </Message>
     <Message
