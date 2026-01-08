@@ -9,7 +9,8 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.adapter.CaselawExceptionHandler;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
@@ -77,6 +78,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseDocumentationUnitHistoryLogRepository historyLogRepository;
   @Autowired private DatabaseUserRepository databaseUserRepository;
+  @Autowired private AttachmentInlineRepository attachmentInlineRepository;
 
   @MockitoBean(name = "portalS3Client")
   private S3Client s3Client;
@@ -321,17 +323,16 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testPublishWithAttachmentsSuccessfully() {
+    var inlineAttachment =
+        AttachmentInlineDTO.builder()
+            .content(new byte[] {1, 2, 3})
+            .filename("bild1.png")
+            .format("png")
+            .uploadTimestamp(Instant.now())
+            .build();
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSaveDecision(
-            repository,
-            buildValidDocumentationUnit(
-                List.of(
-                    AttachmentDTO.builder()
-                        .content(new byte[] {1, 2, 3})
-                        .filename("bild1.png")
-                        .format("png")
-                        .uploadTimestamp(Instant.now())
-                        .build())));
+            repository, buildValidDocumentationUnit(List.of(inlineAttachment)));
 
     risWebTestClient
         .withDefaultLogin()
@@ -354,23 +355,23 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   @Test
   void publishTwice_andRemoveAttachment_shouldPublishSuccessfullyAndDeleteAttachment()
       throws IOException {
+    var inlineAttachments =
+        List.of(
+            AttachmentInlineDTO.builder()
+                .content(new byte[] {1, 2, 3})
+                .filename("bild1.png")
+                .format("png")
+                .uploadTimestamp(Instant.now())
+                .build(),
+            AttachmentInlineDTO.builder()
+                .content(new byte[] {1, 2, 3})
+                .filename("bild2.png")
+                .format("png")
+                .uploadTimestamp(Instant.now())
+                .build());
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSaveDecision(
-            repository,
-            buildValidDocumentationUnit(
-                List.of(
-                    AttachmentDTO.builder()
-                        .content(new byte[] {1, 2, 3})
-                        .filename("bild1.png")
-                        .format("png")
-                        .uploadTimestamp(Instant.now())
-                        .build(),
-                    AttachmentDTO.builder()
-                        .content(new byte[] {1, 2, 3})
-                        .filename("bild2.png")
-                        .format("png")
-                        .uploadTimestamp(Instant.now())
-                        .build())));
+            repository, buildValidDocumentationUnit(inlineAttachments));
 
     risWebTestClient
         .withDefaultLogin()
@@ -391,9 +392,9 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
     assertThat(capturedRequests.get(3).key()).contains("changelogs/");
 
     var updatedDto = repository.findById(dto.getId()).orElseThrow();
-    updatedDto.setAttachments(
+    updatedDto.setAttachmentsInline(
         List.of(
-            AttachmentDTO.builder()
+            AttachmentInlineDTO.builder()
                 .content(new byte[] {1, 2, 3})
                 .filename("bild1.png")
                 .format("png")
@@ -553,7 +554,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   }
 
   private DecisionDTO.DecisionDTOBuilder<?, ?> buildValidDocumentationUnit(
-      List<AttachmentDTO> attachments) {
+      List<AttachmentInlineDTO> inlineAttachments) {
     CourtDTO court =
         databaseCourtRepository.saveAndFlush(
             CourtDTO.builder()
@@ -576,7 +577,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
         .date(LocalDate.now())
         .legalEffect(LegalEffectDTO.JA)
         .fileNumbers(List.of(FileNumberDTO.builder().value("123").rank(0L).build()))
-        .attachments(attachments)
+        .attachmentsInline(inlineAttachments)
         .grounds("lorem ipsum dolor sit amet");
   }
 }
