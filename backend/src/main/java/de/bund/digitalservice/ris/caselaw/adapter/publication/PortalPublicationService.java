@@ -46,7 +46,6 @@ import tools.jackson.databind.ObjectMapper;
 public class PortalPublicationService {
 
   private final DocumentationUnitRepository documentationUnitRepository;
-  private final AttachmentRepository attachmentRepository;
   private final S3Bucket portalBucket;
   private final ObjectMapper objectMapper;
   private final XmlUtilService xmlUtilService;
