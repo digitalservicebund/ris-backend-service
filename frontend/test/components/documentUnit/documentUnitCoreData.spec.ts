@@ -157,7 +157,7 @@ describe("Core Data", () => {
   test("renders year of dispute", async () => {
     const documentUnit = new Decision("1", {
       coreData: {
-        yearsOfDispute: ["2021", "2022"],
+        yearsOfDispute: [2021, 2022],
       },
       documentNumber: "ABCD2022000001",
     })
@@ -181,7 +181,7 @@ describe("Core Data", () => {
     const input = screen.getByTestId("year-of-dispute")
     await user.type(input, "2023{enter}")
 
-    expect(model.value.yearsOfDispute).toEqual(["2023"])
+    expect(model.value.yearsOfDispute).toEqual([2023])
   })
 
   test("renders jurisdiction type", async () => {

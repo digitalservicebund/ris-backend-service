@@ -4,13 +4,12 @@ import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
 import Dialog from "primevue/dialog"
+import Message from "primevue/message"
 import Select from "primevue/select"
 import { computed, ref, watch } from "vue"
-import { InfoStatus } from "./enumInfoStatus"
 import AssigneeBadge from "@/components/AssigneeBadge.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import IconBadge from "@/components/IconBadge.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import { useProcessStepBadge } from "@/composables/useProcessStepBadge"
 import { useValidationStore } from "@/composables/useValidationStore"
@@ -147,15 +146,16 @@ watch(
         v-if="fetchProcessStepsErrors.length > 0"
         class="mb-48 flex flex-col"
       >
-        <InfoModal
+        <Message
           v-for="(error, index) in fetchProcessStepsErrors"
           :key="index"
           :class="index !== 0 ? 'mt-16' : ''"
           data-testid="service-error"
-          :description="error.description"
-          :status="InfoStatus.ERROR"
-          :title="error.title"
-        />
+          severity="error"
+        >
+          <p class="ris-body1-bold">{{ error.title }}</p>
+          <p>{{ error.description }}</p>
+        </Message>
       </div>
 
       <div class="flex gap-32">

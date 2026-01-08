@@ -4,7 +4,6 @@ import { config } from "@vue/test-utils"
 import InputText from "primevue/inputtext"
 import EURLexSearch from "@/components/eurlex/EURLexSearch.vue"
 import eurlexService from "@/services/eurlexService"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 
 describe("eurlex search", () => {
   const eurlexMock = vi.spyOn(eurlexService, "get")
@@ -17,7 +16,6 @@ describe("eurlex search", () => {
   function renderComponent() {
     return render(EURLexSearch, {
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
         stubs: {
           EURLexSearchForm: {
             template: `
@@ -30,7 +28,7 @@ describe("eurlex search", () => {
                   </button>
                   <button
                     aria-label="Handle service error"
-                    @click="$emit('handle-service-error', { title: 'remote error title', description: [ 'remote error description 1', 'remote error description 2' ] })"
+                    @click="$emit('handle-service-error', { title: 'remote error title', description: 'remote error description' })"
                   >
                     Search
                   </button>
@@ -84,7 +82,7 @@ describe("eurlex search", () => {
     eurlexMock.mockResolvedValue({
       error: {
         title: "error title",
-        description: ["error description 1", "error description 2"],
+        description: "error description",
       },
       status: 500,
     })
@@ -94,8 +92,7 @@ describe("eurlex search", () => {
     )
 
     expect(screen.getByText("error title")).toBeVisible()
-    expect(screen.getByText("error description 1")).toBeVisible()
-    expect(screen.getByText("error description 2")).toBeVisible()
+    expect(screen.getByText("error description")).toBeVisible()
     expect(screen.getByText("Laden Sie die Seite bitte neu.")).toBeVisible()
   })
 
@@ -105,8 +102,7 @@ describe("eurlex search", () => {
     await user.click(screen.getByLabelText("Handle service error"))
 
     expect(screen.getByText("remote error title")).toBeVisible()
-    expect(screen.getByText("remote error description 1")).toBeVisible()
-    expect(screen.getByText("remote error description 2")).toBeVisible()
+    expect(screen.getByText("remote error description")).toBeVisible()
     expect(screen.getByText("Laden Sie die Seite bitte neu.")).toBeVisible()
   })
 })

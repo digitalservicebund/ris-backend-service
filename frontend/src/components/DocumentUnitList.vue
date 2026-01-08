@@ -4,6 +4,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjsTimezone from "dayjs/plugin/timezone"
 import dayjsUtc from "dayjs/plugin/utc"
 import Button from "primevue/button"
+import Message from "primevue/message"
 import { computed, ref } from "vue"
 import DocumentUnitListEntry from "../domain/documentUnitListEntry"
 import Tooltip from "./Tooltip.vue"
@@ -12,7 +13,6 @@ import CellItem from "@/components/CellItem.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import IconBadge from "@/components/IconBadge.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import TableHeader from "@/components/TableHeader.vue"
@@ -293,6 +293,7 @@ function onDelete() {
           <div class="flex flex-row -space-x-2">
             <Tooltip text="Bearbeiten">
               <router-link
+                tabindex="-1"
                 target="_blank"
                 :to="
                   listEntry.documentType?.jurisShortcut === 'Anh'
@@ -325,6 +326,7 @@ function onDelete() {
 
             <Tooltip text="Vorschau">
               <router-link
+                tabindex="-1"
                 target="_blank"
                 :to="{
                   name:
@@ -389,11 +391,10 @@ function onDelete() {
     </div>
     <!-- Error State -->
     <div v-if="searchResponseError" class="mt-24">
-      <InfoModal
-        data-testid="service-error"
-        :description="searchResponseError.description"
-        :title="searchResponseError.title"
-      />
+      <Message data-testid="service-error" severity="error">
+        <p class="ris-body1-bold">{{ searchResponseError.title }}</p>
+        <p>{{ searchResponseError.description }}</p>
+      </Message>
     </div>
 
     <!-- Empty State -->

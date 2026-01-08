@@ -221,7 +221,7 @@ const hasNonApplicationNorms = computed(() => {
       <PreviewContent>
         <div
           v-for="activeCitation in props.contentRelatedIndexing.activeCitations"
-          :key="activeCitation.id"
+          :key="activeCitation.uuid"
         >
           {{ activeCitation.renderSummary }}
         </div>
@@ -555,7 +555,7 @@ const hasNonApplicationNorms = computed(() => {
         <div
           v-for="relatedPendingProceeding in props.contentRelatedIndexing
             .relatedPendingProceedings"
-          :key="relatedPendingProceeding.id"
+          :key="relatedPendingProceeding.uuid"
         >
           {{ relatedPendingProceeding.renderSummary }}
         </div>

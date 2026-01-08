@@ -179,6 +179,65 @@ test.describe(
         ).toHaveText("Veröffentlicht")
       })
 
+      await test.step("Warnung erscheint, weil Anhängiges Verfahren noch unveröffentlicht", async () => {
+        const warning = page.getByRole("alert", {
+          name: "Fehler beim Veröffentlichen zugehöriger anhängiger Verfahren",
+        })
+        await expect(warning).toHaveText(
+          /Die zugehörigen anhängigen Verfahren konnten nicht vollständig als erledigt veröffentlicht werden./,
+        )
+      })
+
+      await test.step("Das verknüpfte anhängige Verfahren wurde nicht auf erledigt gesetzt", async () => {
+        await navigateToPreview(page, pendingProceeding.documentNumber, {
+          type: "pending-proceeding",
+        })
+        await expect(
+          page.getByText("Erledigung", { exact: true }),
+        ).toBeVisible()
+        await expect(page.getByText("Nein")).toBeVisible()
+        await expect(page.getByText("Erledigungsvermerk")).toBeHidden()
+        await expect(
+          page.getByText(
+            "Erledigt durch " + prefilledDocumentUnit.documentNumber,
+          ),
+        ).toBeHidden()
+      })
+
+      await test.step("Veröffentliche das verknüpfte anhängige Verfahren", async () => {
+        await navigateToCategories(page, pendingProceeding.documentNumber, {
+          type: "pending-proceeding",
+        })
+        const legalIssue = page.locator("#legalIssue")
+        await legalIssue.click()
+        await page.keyboard.type(`Rechtsfrage Text`)
+        await navigateToPublication(page, pendingProceeding.documentNumber, {
+          navigationBy: "click",
+        })
+        const publishButton = page.getByRole("button", {
+          name: "Veröffentlichen",
+        })
+        await publishButton.click()
+        await expect(
+          page.getByTestId("portal-publication-status-badge"),
+        ).toHaveText("Veröffentlicht")
+      })
+
+      await test.step("Veröffentliche die Entscheidung erneut", async () => {
+        await navigateToPublication(page, prefilledDocumentUnit.documentNumber)
+        const publishButton = page.getByRole("button", {
+          name: "Veröffentlichen",
+        })
+        await publishButton.click()
+        // The button is disabled until the publication is done
+        await expect(publishButton).toBeEnabled()
+
+        const successToast = page.getByRole("alert")
+        await expect(successToast).toHaveText(
+          "Die zugehörigen anhängigen Verfahren wurden als erledigt veröffentlicht.",
+        )
+      })
+
       await test.step("Das verknüpfte anhängige Verfahren wurde auf erledigt gesetzt", async () => {
         await navigateToPreview(page, pendingProceeding.documentNumber, {
           type: "pending-proceeding",

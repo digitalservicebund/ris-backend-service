@@ -59,10 +59,12 @@ function renderComponent(normReferences?: NormReference[]) {
 }
 
 function generateNormReference(options?: {
+  localId?: string
   normAbbreviation?: NormAbbreviation
   singleNorms?: SingleNorm[]
 }) {
   return new NormReference({
+    localId: options?.localId ?? "0",
     normAbbreviation: options?.normAbbreviation ?? {
       id: crypto.randomUUID.toString(),
       abbreviation: "ABC",
@@ -161,9 +163,12 @@ describe("Norm references", () => {
     )
     const { user } = renderComponent([
       generateNormReference({
+        localId: "0",
         normAbbreviation: { id: "123", abbreviation: "1000g-BefV" },
       }),
-      generateNormReference(),
+      generateNormReference({
+        localId: "1",
+      }),
     ])
     await user.click(screen.getByTestId("list-entry-1"))
 
@@ -186,6 +191,7 @@ describe("Norm references", () => {
     )
     const { user } = renderComponent([
       generateNormReference({
+        localId: "0",
         normAbbreviation: {
           id: "123",
           abbreviation: "1000g-BefV",
@@ -227,8 +233,11 @@ describe("Norm references", () => {
 
   it("deletes norm reference", async () => {
     const { user } = renderComponent([
-      generateNormReference(),
       generateNormReference({
+        localId: "0",
+      }),
+      generateNormReference({
+        localId: "1",
         normAbbreviation: {
           id: "123",
           abbreviation: "1000g-BefV",
@@ -322,6 +331,34 @@ describe("Norm references", () => {
     ])
 
     expect(screen.getByText("Mehrdeutiger Verweis")).toBeInTheDocument()
+  })
+
+  it("removes a single norm from a norm reference when delete button is clicked in summary", async () => {
+    const normReference = generateNormReference({
+      localId: "test-norm-id",
+      normAbbreviation: { abbreviation: "BGB" },
+      singleNorms: [
+        new SingleNorm({ singleNorm: "§ 1" }),
+        new SingleNorm({ singleNorm: "§ 2" }),
+      ],
+    })
+
+    const { user } = renderComponent([normReference])
+
+    // Prüfe initialen Zustand
+    expect(screen.getByText(/§ 1/)).toBeInTheDocument()
+    expect(screen.getByText(/§ 2/)).toBeInTheDocument()
+
+    const deleteButtons = screen.getAllByRole("button", {
+      name: "Einzelnorm löschen",
+    })
+
+    // Klicke auf den ersten Lösch-Button
+    await user.click(deleteButtons[0])
+
+    // Assert: § 1 sollte weg sein, § 2 sollte noch da sein
+    expect(screen.queryByText(/§ 1/)).not.toBeInTheDocument()
+    expect(screen.getByText(/§ 2/)).toBeInTheDocument()
   })
 
   describe("legal force", () => {

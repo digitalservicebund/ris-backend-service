@@ -17,8 +17,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
@@ -49,7 +49,8 @@ import org.testcontainers.utility.DockerImageName;
       "management.endpoint.health.probes.enabled=true",
       "management.health.livenessState.enabled=true",
       "management.health.readinessState.enabled=true",
-      "management.endpoint.health.group.readiness.include=readinessState,db,redis",
+      "management.endpoint.health.group.readiness.include=readinessState,redis,db",
+      "management.endpoint.health.validate-group-membership=false",
       "spring.security.oauth2.client.provider.keycloak.issuer-uri=localhost",
     })
 @AutoConfigureMockMvc

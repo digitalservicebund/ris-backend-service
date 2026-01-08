@@ -35,10 +35,15 @@ const server = setupServer(
 
 function renderComponent(options?: { modelValue?: NormReference }) {
   const user = userEvent.setup()
+
   const props = {
     modelValue: new NormReference({ ...options?.modelValue }),
-    plugins: [
-      [
+  }
+
+  const utils = render(NormReferenceInput, {
+    props,
+    global: {
+      plugins: [
         createTestingPinia({
           initialState: {
             docunitStore: {
@@ -56,9 +61,9 @@ function renderComponent(options?: { modelValue?: NormReference }) {
           },
         }),
       ],
-    ],
-  }
-  const utils = render(NormReferenceInput, { props })
+    },
+  })
+
   return { user, props, ...utils }
 }
 
@@ -399,17 +404,25 @@ describe("NormReferenceEntry", () => {
 
     const button = screen.getByLabelText("Norm speichern")
     await user.click(button)
-    expect(emitted("update:modelValue")).toEqual([
-      [
-        {
-          normAbbreviation: {
-            abbreviation: "1000g-BefV",
-          },
-          singleNorms: [],
-          normAbbreviationRawValue: undefined,
+
+    const emittedEvents = emitted() as {
+      "update:modelValue"?: NormReference[][]
+      addEntry?: void[][]
+      removeEntry?: void[][]
+      cancelEdit?: void[][]
+    }
+
+    expect(emittedEvents["update:modelValue"]).toHaveLength(1)
+
+    expect(emittedEvents["update:modelValue"]![0][0]).toEqual(
+      expect.objectContaining({
+        normAbbreviation: {
+          abbreviation: "1000g-BefV",
         },
-      ],
-    ])
+        singleNorms: [],
+        normAbbreviationRawValue: undefined,
+      }),
+    )
   })
 
   it("correctly updates the value of the single norm input", async () => {
@@ -555,29 +568,37 @@ describe("NormReferenceEntry", () => {
 
       const button = screen.getByLabelText("Norm speichern")
       await user.click(button)
-      expect(emitted("update:modelValue")).toEqual([
-        [
-          {
-            normAbbreviation: {
-              abbreviation: "ABC",
-              id: "123",
-            },
-            singleNorms: [
-              {
-                dateOfVersion: undefined,
-                dateOfRelevance: undefined,
-                singleNorm: undefined,
-                legalForce: {
-                  type: {
-                    abbreviation: "nichtig",
-                  },
+
+      const emittedEvents = emitted() as {
+        "update:modelValue"?: NormReference[][]
+        addEntry?: void[][]
+        removeEntry?: void[][]
+        cancelEdit?: void[][]
+      }
+
+      expect(emittedEvents["update:modelValue"]).toHaveLength(1)
+
+      expect(emittedEvents["update:modelValue"]![0][0]).toEqual(
+        expect.objectContaining({
+          normAbbreviation: {
+            abbreviation: "ABC",
+            id: "123",
+          },
+          singleNorms: [
+            {
+              singleNorm: undefined,
+              dateOfVersion: undefined,
+              dateOfRelevance: undefined,
+              legalForce: {
+                type: {
+                  abbreviation: "nichtig",
                 },
               },
-            ],
-            normAbbreviationRawValue: undefined,
-          },
-        ],
-      ])
+            },
+          ],
+          normAbbreviationRawValue: undefined,
+        }),
+      )
     })
 
     it("updates legal force region", async () => {
@@ -600,30 +621,37 @@ describe("NormReferenceEntry", () => {
 
       const button = screen.getByLabelText("Norm speichern")
       await user.click(button)
-      expect(emitted("update:modelValue")).toEqual([
-        [
-          {
-            normAbbreviation: {
-              abbreviation: "ABC",
-              id: "123",
-            },
-            singleNorms: [
-              {
-                dateOfVersion: undefined,
-                dateOfRelevance: undefined,
-                singleNorm: undefined,
-                legalForce: {
-                  region: {
-                    code: "BB",
-                    longText: "region",
-                  },
+      const emittedEvents = emitted() as {
+        "update:modelValue"?: NormReference[][]
+        addEntry?: void[][]
+        removeEntry?: void[][]
+        cancelEdit?: void[][]
+      }
+
+      expect(emittedEvents["update:modelValue"]).toHaveLength(1)
+
+      expect(emittedEvents["update:modelValue"]![0][0]).toEqual(
+        expect.objectContaining({
+          normAbbreviation: {
+            abbreviation: "ABC",
+            id: "123",
+          },
+          singleNorms: [
+            {
+              singleNorm: undefined,
+              dateOfVersion: undefined,
+              dateOfRelevance: undefined,
+              legalForce: {
+                region: {
+                  code: "BB",
+                  longText: "region",
                 },
               },
-            ],
-            normAbbreviationRawValue: undefined,
-          },
-        ],
-      ])
+            },
+          ],
+          normAbbreviationRawValue: undefined,
+        }),
+      )
     })
 
     it("legal force checkbox checked, when legal force set", async () => {

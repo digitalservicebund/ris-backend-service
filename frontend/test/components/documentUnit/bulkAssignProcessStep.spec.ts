@@ -72,9 +72,6 @@ function renderComponent(
           Menu: false,
           Button: false,
         },
-        directives: {
-          tooltip: {},
-        },
       },
     }),
   }

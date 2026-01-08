@@ -386,7 +386,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           },
           caselawReferences: [
             {
-              id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -396,7 +395,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           ],
           literatureReferences: [
             {
-              id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical?.[0],
@@ -468,7 +466,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           },
           caselawReferences: [
             {
-              id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -476,7 +473,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "caselaw",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -484,7 +480,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "caselaw",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -492,7 +487,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "caselaw",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -500,7 +494,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "caselaw",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -508,7 +501,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "caselaw",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -518,7 +510,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           ],
           literatureReferences: [
             {
-              id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical?.[0],
@@ -527,7 +518,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "literature",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical?.[0],
@@ -536,7 +526,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "literature",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical?.[0],
@@ -545,7 +534,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "literature",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical?.[0],
@@ -554,7 +542,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "literature",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical?.[0],
@@ -563,7 +550,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "literature",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical?.[0],
@@ -649,7 +635,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               {
                 type: "Berichtigungsbeschluss",
                 description: "Hauffen -> Haufen",
-                newEntry: true,
               },
             ],
           },
@@ -659,9 +644,8 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               {
                 definedTerm: "Test Definition",
                 definingBorderNumber: 2,
-                newEntry: true,
               },
-              { definedTerm: "Test Definition2", newEntry: true },
+              { definedTerm: "Test Definition2" },
             ],
             foreignLanguageVersions: [
               {
@@ -671,7 +655,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                   label: "Akan",
                   isoCode: "ak",
                 },
-                newEntry: true,
               },
               {
                 link: "Test Fremdsprachige Fassung2",
@@ -680,7 +663,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                   label: "Afar",
                   isoCode: "aa",
                 },
-                newEntry: true,
               },
             ],
             originOfTranslations: [
@@ -694,7 +676,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                 borderNumbers: [1],
                 urls: ["www.link-to-translation.fr"],
                 translationType: TranslationType.AMTLICH,
-                newEntry: true,
               },
             ],
             dismissalTypes: ["Test Kündigungsarten"],
@@ -707,13 +688,14 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             },
             appeal: {
               appellants: [
-                { id: "37213474-a727-4d85-8cc6-309d86944132", value: "Kläger" },
+                {
+                  id: "37213474-a727-4d85-8cc6-309d86944132",
+                  value: "Kläger",
+                },
               ],
             },
             collectiveAgreements: [
               {
-                id: "24028dd6-7298-4a80-a9a0-91ea5886f90e",
-                newEntry: true,
                 name: "Stehende Bühnen",
                 norm: "§ 23",
                 date: "12.2002",
@@ -725,8 +707,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             ],
             objectValues: [
               {
-                id: "99028dd6-8998-4a80-a9a0-91ea5886f90e",
-                newEntry: true,
                 amount: 123,
                 currencyCode: {
                   id: "c7a92695-5171-459a-bd79-5cc741064a25",
@@ -738,8 +718,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             ],
             abuseFees: [
               {
-                id: "77028aa6-7898-5b80-b8b1-91ea5886f90e",
-                newEntry: true,
                 amount: 223,
                 currencyCode: {
                   id: "c7a92695-5171-459a-bd79-5cc741064a25",
@@ -751,23 +729,17 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             ],
             countriesOfOrigin: [
               {
-                id: "9323f4ae-dd79-4952-9bb1-6a33d4b334d3",
-                newEntry: true,
                 country: country?.[0],
               },
             ],
             incomeTypes: [
               {
-                id: "aa9add9a-8655-4dbe-a187-1e3b4c2b15ad",
-                newEntry: true,
                 terminology: "Programmierer",
                 typeOfIncome: TypeOfIncome.GEWERBEBETRIEB,
               },
             ],
             relatedPendingProceedings: [
               {
-                id: "aa9add9a-8655-4dbe-a187-1e3b4c2b15ad",
-                newEntry: true,
                 documentNumber: "YYTestDoc0017",
                 court: courtBFH?.[0],
                 decisionDate: "2022-02-01",
@@ -835,8 +807,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           contentRelatedIndexing: {
             countriesOfOrigin: [
               {
-                id: "b86036b8-8ceb-4655-8392-bb6252b13994",
-                newEntry: true,
                 legacyValue: "legacy value",
               },
             ],
@@ -1168,7 +1138,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           name: "2024, " + generateString(),
           references: [
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 12-22, Heft 1",
               referenceSupplement: "L",
@@ -1180,7 +1149,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
@@ -1192,7 +1160,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "literature",
               citation: "2024, 23-25, Heft 1",
               author: "Picard, Jean-Luc",
@@ -1205,7 +1172,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "literature",
               citation: "2024, 26, Heft 1",
               author: "Janeway, Kathryn",
@@ -1326,7 +1292,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           name: "2024, " + generateString(),
           references: [
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 12-22, Heft 1",
               referenceSupplement: "L",
@@ -1338,7 +1303,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
@@ -1350,7 +1314,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
@@ -1362,7 +1325,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
@@ -1374,7 +1336,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",

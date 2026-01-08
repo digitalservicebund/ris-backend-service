@@ -52,7 +52,7 @@ describe("preview core data", () => {
       },
       previousProcedures: ["vorgang-0"],
       legalEffect: "Ja",
-      yearsOfDispute: ["2023"],
+      yearsOfDispute: [2023],
       sources: [{ value: SourceValue.Zeitschrift }],
       inputTypes: ["Papier", "E-Mail"],
       isResolved: true,

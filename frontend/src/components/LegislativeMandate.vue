@@ -36,7 +36,7 @@ const hasLegislativeMandate = computed({
           binary
           data-testid="legislative-mandate"
           :input-id="id"
-          size="large"
+          size="small"
         />
       </InputField>
     </div>

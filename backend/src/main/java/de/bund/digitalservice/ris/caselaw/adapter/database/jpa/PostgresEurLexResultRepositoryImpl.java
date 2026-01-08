@@ -8,6 +8,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Nulls;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.util.Strings;
-import org.hibernate.query.NullPrecedence;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -60,7 +60,7 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
     // Order by updatedAt with nulls last, then by created at and finally by decision date.
     List<Order> dateTimeDescOrder =
         List.of(
-            builder.desc(root.get(EurLexResultDTO_.updatedAt)).nullPrecedence(NullPrecedence.LAST),
+            builder.desc(root.get(EurLexResultDTO_.updatedAt)).nullPrecedence(Nulls.LAST),
             builder.desc(root.get(EurLexResultDTO_.createdAt)),
             builder.desc(root.get(EurLexResultDTO_.date)));
     builderQuery.orderBy(dateTimeDescOrder);

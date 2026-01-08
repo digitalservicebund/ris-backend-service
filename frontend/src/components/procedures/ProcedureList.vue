@@ -3,12 +3,11 @@ import { debouncedWatch } from "@vueuse/core"
 import { useRouteQuery } from "@vueuse/router"
 import dayjs from "dayjs"
 import InputText from "primevue/inputtext"
+import Message from "primevue/message"
 import InputSelect from "primevue/select"
 import { computed, onBeforeMount, ref, watch } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
-import { InfoStatus } from "@/components/enumInfoStatus"
 import ExpandableContent from "@/components/ExpandableContent.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import { DropdownItem } from "@/components/input/types"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
@@ -232,12 +231,10 @@ onBeforeMount(async () => {
       </div>
       <LoadingSpinner v-if="isFetchingProcedures" size="small" />
     </div>
-    <InfoModal
-      v-if="assignError"
-      :description="assignError.description"
-      :status="InfoStatus.ERROR"
-      :title="assignError.title"
-    />
+    <Message v-if="assignError" severity="error">
+      <p class="ris-body1-bold">{{ assignError.title }}</p>
+      <p>{{ assignError.description }}</p>
+    </Message>
 
     <div v-if="procedures" class="flex-1">
       <Pagination

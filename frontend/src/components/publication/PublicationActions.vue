@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
+import Message from "primevue/message"
+import { useToast } from "primevue/usetoast"
 import { computed, Ref, ref } from "vue"
-import InfoModal from "@/components/InfoModal.vue"
 import PendingProceedingSummary from "@/components/PendingProceedingSummary.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import PortalPublicationStatusBadge from "@/components/publication/PortalPublicationStatusBadge.vue"
@@ -36,6 +37,8 @@ const linkToPortal = computed(
 
 const docUnitPublicationError = ref<ResponseError | null>(null)
 
+const toastService = useToast()
+
 const showPublicationWarningModal = ref(false)
 const warningModalText = computed(
   () =>
@@ -52,11 +55,13 @@ const checkWarningsAndPublishDocUnit = async () => {
 
 const isPublishing = ref(false)
 const isPublished = ref(false)
+const hasRelatedPendingProceedingsError = ref(false)
 const publishDocUnit = async () => {
   showPublicationWarningModal.value = false
   docUnitPublicationError.value = null
+  hasRelatedPendingProceedingsError.value = false
   isPublishing.value = true
-  const { error } = await publishDocumentationUnitService.publishDocument(
+  const { data, error } = await publishDocumentationUnitService.publishDocument(
     store.documentUnit!.uuid!,
   )
   docUnitPublicationError.value = error ?? null
@@ -64,11 +69,22 @@ const publishDocUnit = async () => {
   isPublishing.value = false
   isPublished.value = error == null
   isWithdrawn.value = false
+
+  if (data?.relatedPendingProceedingsPublicationResult === "SUCCESS")
+    toastService.add({
+      severity: "success",
+      life: 5_000,
+      summary:
+        "Die zugehörigen anhängigen Verfahren wurden als erledigt veröffentlicht.",
+    })
+  if (data?.relatedPendingProceedingsPublicationResult === "ERROR")
+    hasRelatedPendingProceedingsError.value = true
 }
 
 const isWithdrawing = ref(false)
 const isWithdrawn = ref(false)
 const withdrawDocUnit = async () => {
+  hasRelatedPendingProceedingsError.value = false
   docUnitPublicationError.value = null
   isWithdrawing.value = true
   const { error } = await publishDocumentationUnitService.withdrawDocument(
@@ -165,18 +181,43 @@ const hasRelatedPendingProceeding = computed(() => {
         </p>
       </div>
     </div>
-    <InfoModal
+    <Message
       v-if="docUnitPublicationError"
       aria-label="Fehler bei der Veröffentlichung/Zurückziehung"
-      :description="docUnitPublicationError.description"
-      :title="docUnitPublicationError.title"
-    />
-    <InfoModal
+      severity="error"
+    >
+      <p class="ris-body1-bold">{{ docUnitPublicationError.title }}</p>
+      <p>{{ docUnitPublicationError.description }}</p>
+    </Message>
+    <Message
+      v-if="hasRelatedPendingProceedingsError"
+      aria-label="Fehler beim Veröffentlichen zugehöriger anhängiger Verfahren"
+      severity="error"
+    >
+      <p class="ris-body1-bold">
+        Zugehörige anhängige Verfahren nicht veröffentlicht
+      </p>
+      <p>
+        Die zugehörigen anhängigen Verfahren konnten nicht vollständig als
+        erledigt veröffentlicht werden. Bitte stellen Sie sicher, dass die
+        anhängigen Verfahren bereits im Portal veröffentlicht sind und alle
+        Pflichtfelder befüllt haben. Veröffentlichen Sie diese dann manuell als
+        erledigt.
+      </p>
+    </Message>
+    <Message
       v-if="!isPortalPublicationEnabled"
       aria-label="Portal-Veröffentlichung deaktiviert"
-      description="Auf Produktion ist die manuelle Portal-Veröffentlichung deaktiviert. Sie können veröffentlichte Dokumentationseinheiten jedoch manuell zurückziehen. Beachten Sie, dass die Dokumentationseinheit durch die jDV-Delta-Migration erneut automatisiert veröffentlicht werden kann."
-      title="Portal-Veröffentlichung deaktiviert"
-    />
+      severity="info"
+    >
+      <p class="ris-body1-bold">Portal-Veröffentlichung deaktiviert</p>
+      <p>
+        Auf Produktion ist die manuelle Portal-Veröffentlichung deaktiviert. Sie
+        können veröffentlichte Dokumentationseinheiten jedoch manuell
+        zurückziehen. Beachten Sie, dass die Dokumentationseinheit durch die
+        jDV-Delta-Migration erneut automatisiert veröffentlicht werden kann.
+      </p>
+    </Message>
     <div class="flex flex-row gap-24">
       <PopupModal
         v-if="showPublicationWarningModal"

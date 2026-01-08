@@ -400,9 +400,6 @@ describe("CategoryImport", () => {
     expect(
       (store.documentUnit as Decision).longTexts.corrections?.[0].type,
     ).toEqual("Unrichtigkeiten")
-    expect(
-      (store.documentUnit as Decision).longTexts.corrections?.[0].newEntry,
-    ).toBe(true)
   })
 
   it("should import related pending proceedings (Verknüpfung anhängiges Verfahren)", async () => {
@@ -456,10 +453,6 @@ describe("CategoryImport", () => {
       (store.documentUnit as Decision).contentRelatedIndexing
         ?.relatedPendingProceedings?.[0].documentNumber,
     ).toEqual("YYTestDoc0017")
-    expect(
-      (store.documentUnit as Decision).contentRelatedIndexing
-        ?.relatedPendingProceedings?.[0].newEntry,
-    ).toBe(true)
   })
 
   it("should import non-application norms (Nichtanwendungsgesetz)", async () => {

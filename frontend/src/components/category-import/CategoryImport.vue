@@ -342,10 +342,7 @@ function importReferences(key: "caselawReferences" | "literatureReferences") {
               isDuplicate(entry, reference, key),
             ),
         )
-        .map(
-          (reference) =>
-            new Reference({ ...reference, id: crypto.randomUUID() }),
-        )
+        .map((reference) => new Reference({ ...reference, id: undefined }))
 
       targetReferences.push(...uniqueImportableReferences)
     } else {
@@ -353,7 +350,7 @@ function importReferences(key: "caselawReferences" | "literatureReferences") {
         (reference) =>
           new Reference({
             ...reference,
-            id: crypto.randomUUID(),
+            id: undefined,
           }),
       )
     }
@@ -479,7 +476,7 @@ function importActiveCitations() {
     )
     .map((activeCitation) => ({
       ...activeCitation,
-      uuid: crypto.randomUUID(),
+      uuid: undefined,
       newEntry: true,
     }))
 
@@ -500,8 +497,7 @@ function importRelatedPendingProceedings() {
 
   const uniqueImportable = source.map((pendingProceeding) => ({
     ...pendingProceeding,
-    uuid: crypto.randomUUID(),
-    newEntry: true,
+    uuid: undefined,
   }))
 
   targetDocumentUnit.value!.contentRelatedIndexing.relatedPendingProceedings = [

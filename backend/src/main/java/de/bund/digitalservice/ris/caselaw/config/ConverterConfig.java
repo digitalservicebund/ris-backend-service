@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.gravity9.jsonpatch.JsonPatch;
 import de.bund.digitalservice.ris.caselaw.adapter.JurisXmlExporterWrapper;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
@@ -16,6 +17,9 @@ import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 @Configuration
 public class ConverterConfig {
@@ -57,17 +61,37 @@ public class ConverterConfig {
 
   @Bean
   @Primary
-  public ObjectMapper objectMapper() {
-    var objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new JavaTimeModule());
-    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    objectMapper.registerModule(YearJsonConverter.yearJsonConverter());
-    return objectMapper;
+  public JsonMapper jsonMapper() {
+    var legacyObjectMapper = legacyObjectMapper();
+
+    var module = new SimpleModule();
+    module.addDeserializer(JsonPatch.class, new JsonPatchDeserializer(legacyObjectMapper));
+    module.addSerializer(JsonPatch.class, new JsonPatchSerializer(legacyObjectMapper));
+
+    return JsonMapper.builder()
+        .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+        .addModule(module)
+        .build();
   }
 
   @Bean
   public XmlExporter jurisXmlExporter() {
-    return new JurisXmlExporterWrapper(objectMapper(), transformerFactory());
+    return new JurisXmlExporterWrapper(jsonMapper(), transformerFactory());
+  }
+
+  /**
+   * Jackson 2 object mapper to support dependencies that still depend on it.
+   *
+   * @deprecated use {@link #jsonMapper()} instead
+   */
+  @Bean
+  @Primary
+  @Deprecated(since = "2025-12-16")
+  public ObjectMapper legacyObjectMapper() {
+    var objectMapper = new ObjectMapper();
+    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    objectMapper.registerModule(new JavaTimeModule());
+    return objectMapper;
   }
 
   // @Bean

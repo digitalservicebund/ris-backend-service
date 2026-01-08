@@ -26,7 +26,7 @@ public class CountryOfOriginTransformer {
     }
 
     return CountryOfOriginDto.builder()
-        .id(domainObject.newEntry() ? null : domainObject.id())
+        .id(domainObject.id())
         .legacyValue(domainObject.legacyValue())
         .country(
             domainObject.country() != null

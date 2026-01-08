@@ -7,7 +7,7 @@ import { ValidationError } from "@/components/input/types"
 
 interface Props {
   id: string
-  modelValue?: string[]
+  modelValue?: number[]
   ariaLabel: string
   hasError?: boolean
   readOnly?: boolean
@@ -17,11 +17,13 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  "update:modelValue": [value?: string[]]
+  "update:modelValue": [value?: number[]]
   "update:validationError": [value?: ValidationError]
 }>()
 
-const localChips = computed<string[]>(() => props.modelValue ?? [])
+const localChips = computed<string[]>(
+  () => props.modelValue?.map((year) => `${year}`) ?? [],
+)
 
 function isValidYear(value: string) {
   return validateYear(value)
@@ -41,7 +43,10 @@ const chips = computed<string[]>({
 
     if (isValid) {
       clearValidationErrors()
-      emit("update:modelValue", newValues)
+      emit(
+        "update:modelValue",
+        newValues.map((yearString) => Number.parseInt(yearString, 10)),
+      )
     }
   },
 })

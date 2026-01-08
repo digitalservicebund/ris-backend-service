@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { onMounted, ref, watch } from "vue"
+import Message from "primevue/message"
+import { onMounted, ref } from "vue"
 import EURLexList from "@/components/eurlex/EURLexList.vue"
 import EURLexSearchForm from "@/components/eurlex/EURLexSearchForm.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import { Page } from "@/components/Pagination.vue"
 import EURLexResult from "@/domain/eurlex"
 import service from "@/services/eurlexService"
@@ -44,20 +44,6 @@ function handleServiceError(error?: ResponseError) {
   serviceError.value = error
 }
 
-watch(serviceError, () => {
-  const defaultDescription = "Laden Sie die Seite bitte neu."
-  if (serviceError.value) {
-    if (!serviceError.value?.description) {
-      serviceError.value.description = defaultDescription
-    } else if (serviceError.value?.description != defaultDescription) {
-      serviceError.value.description = [
-        ...serviceError.value.description,
-        defaultDescription,
-      ]
-    }
-  }
-})
-
 onMounted(async () => {
   await updatePage(0)
 })
@@ -69,12 +55,14 @@ onMounted(async () => {
     @handle-service-error="handleServiceError"
     @update-page="updatePage"
   ></EURLexSearchForm>
-  <InfoModal
-    v-if="serviceError"
-    class="my-16"
-    :description="serviceError.description"
-    :title="serviceError.title"
-  ></InfoModal>
+  <Message v-if="serviceError" class="my-16" severity="error">
+    <p class="ris-body1-bold">{{ serviceError.title }}</p>
+    <ul v-if="serviceError.description" class="m-0 list-disc ps-20">
+      <li>{{ serviceError.description }}</li>
+      <li>Laden Sie die Seite bitte neu.</li>
+    </ul>
+    <p v-else>Laden Sie die Seite bitte neu.</p>
+  </Message>
   <EURLexList
     :page-entries="searchResults"
     @assign="updatePage"

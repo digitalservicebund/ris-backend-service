@@ -9,7 +9,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
@@ -102,6 +101,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -125,6 +125,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import tools.jackson.core.type.TypeReference;
 
 @Sql(scripts = {"classpath:courts_init.sql"})
 @Sql(
@@ -1793,7 +1794,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         DocumentationUnitCreationParameters.builder()
             .reference(
                 Reference.builder()
-                    .id(UUID.randomUUID())
                     .referenceType(ReferenceType.CASELAW)
                     .legalPeriodical(LegalPeriodicalTransformer.transformToDomain(legalPeriodical))
                     .legalPeriodicalRawValue(legalPeriodical.getAbbreviation())
@@ -1880,7 +1880,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             .documentationOffice(creatingDocumentationOffice)
             .reference(
                 Reference.builder()
-                    .id(UUID.randomUUID())
                     .referenceType(ReferenceType.CASELAW)
                     .legalPeriodical(LegalPeriodicalTransformer.transformToDomain(legalPeriodical))
                     .legalPeriodicalRawValue(legalPeriodical.getAbbreviation())
@@ -2626,6 +2625,8 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
       when(documentNumberPatternConfig.getDocumentNumberPatterns())
           .thenReturn(Map.of("DS", "XXREYYYY*****"));
       assertThat(inputTypeRepository.findAll()).isEmpty();
+      var currentYear = Year.now().getValue();
+      var expectedDocNumber = "XXRE" + currentYear + "00001";
 
       // Act
       var response =
@@ -2648,7 +2649,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
       // Assert
       var documentNumber = (String) response.getResponseBody().get(0);
-      assertThat(documentNumber).isEqualTo("XXRE202500001");
+      assertThat(documentNumber).isEqualTo(expectedDocNumber);
       DecisionDTO decision = (DecisionDTO) repository.findByDocumentNumber(documentNumber).get();
       assertThat(decision.getCelexNumber()).isEqualTo(celexNumber + "(02)");
       assertThat(inputTypeRepository.findAll().get(0).getValue())

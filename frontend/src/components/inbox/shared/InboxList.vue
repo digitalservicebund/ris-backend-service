@@ -331,6 +331,7 @@ const emptyText = computed(() =>
 
               <router-link
                 v-else
+                tabindex="-1"
                 target="_blank"
                 :to="{
                   name: 'caselaw-documentUnit-documentNumber-categories',
@@ -354,6 +355,7 @@ const emptyText = computed(() =>
               </router-link>
 
               <router-link
+                tabindex="-1"
                 target="_blank"
                 :to="{
                   name:

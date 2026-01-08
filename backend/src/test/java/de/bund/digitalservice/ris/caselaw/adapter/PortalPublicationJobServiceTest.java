@@ -12,6 +12,9 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationJobService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationResult;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationJobStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationJobType;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
