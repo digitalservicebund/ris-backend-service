@@ -12,6 +12,8 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtRegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
@@ -20,14 +22,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentC
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitProcessStepRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseInputTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcessStepRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeletedDocumentationUnitDTO;
@@ -54,7 +54,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOffic
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcessStepTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcessStepRequest;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -73,7 +72,6 @@ import de.bund.digitalservice.ris.caselaw.domain.EurlexCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
-import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
@@ -140,7 +138,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
-  @Autowired private DatabaseRegionRepository regionRepository;
   @Autowired private DatabaseDeletedDocumentationIdsRepository deletedDocumentationIdsRepository;
   @Autowired private DatabaseLegalPeriodicalRepository legalPeriodicalRepository;
   @Autowired private OriginalXmlRepository originalXmlRepository;
@@ -154,12 +151,8 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseProcessStepRepository processStepRepository;
   @Autowired private DatabaseUserRepository databaseUserRepository;
 
-  @Autowired
-  private DatabaseDocumentationUnitProcessStepRepository
-      databaseDocumentationUnitProcessStepRepository;
-
   @MockitoBean private MailService mailService;
-  @MockitoBean private AttachmentService attachmentService;
+  @MockitoBean private AttachmentInlineRepository attachmentInlineRepository;
   @MockitoBean private HandoverReportRepository handoverReportRepository;
   @MockitoBean DocumentNumberPatternConfig documentNumberPatternConfig;
   @MockitoSpyBean private UserService userService;
@@ -2552,13 +2545,14 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOffice, "TEST123456789");
 
-    when(attachmentService.findByDocumentationUnitIdAndFileName(dto.getId(), "image.png"))
+    when(attachmentInlineRepository.findByDocumentationUnitIdAndFilename(dto.getId(), "image.png"))
         .thenReturn(
             Optional.of(
-                Image.builder()
+                AttachmentInlineDTO.builder()
                     .content(new byte[] {1, 2, 3})
-                    .contentType("png")
-                    .name("image.png")
+                    .filename("image.png")
+                    .format("png")
+                    .id(UUID.randomUUID())
                     .build()));
 
     byte[] imageBytes =

@@ -41,6 +41,7 @@ sentry:
     - de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException
     - org.apache.catalina.connector.ClientAbortException # client closed connection, e.g. combobox
     - org.springframework.web.context.request.async.AsyncRequestNotUsableException # client closed connection, e.g. combobox
+    - org.springframework.http.converter.HttpMessageNotWritableException # client closed connection (warning appears after switch to spring boot 4)
 
 server:
   shutdown: graceful

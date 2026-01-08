@@ -13,6 +13,8 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
@@ -62,6 +64,7 @@ class S3AttachmentServiceTest {
   @MockitoSpyBean S3AttachmentService service;
 
   @MockitoBean AttachmentRepository repository;
+  @MockitoBean AttachmentInlineRepository attachmentInlineRepository;
   @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
 
   @MockitoBean
@@ -88,6 +91,13 @@ class S3AttachmentServiceTest {
         .thenAnswer(
             invocation -> {
               AttachmentDTO unsavedAttachmentDTO = invocation.getArgument(0);
+              unsavedAttachmentDTO.setId(UUID.randomUUID());
+              return unsavedAttachmentDTO;
+            });
+    when(attachmentInlineRepository.save(any(AttachmentInlineDTO.class)))
+        .thenAnswer(
+            invocation -> {
+              AttachmentInlineDTO unsavedAttachmentDTO = invocation.getArgument(0);
               unsavedAttachmentDTO.setId(UUID.randomUUID());
               return unsavedAttachmentDTO;
             });
@@ -277,8 +287,8 @@ class S3AttachmentServiceTest {
       headers.set("X-Filename", "test-image.png");
 
       UUID id = UUID.randomUUID();
-      AttachmentDTO savedDto =
-          AttachmentDTO.builder()
+      AttachmentInlineDTO savedDto =
+          AttachmentInlineDTO.builder()
               .id(id)
               .content(imageBytes)
               .documentationUnit(documentationUnitDTO)
@@ -286,14 +296,14 @@ class S3AttachmentServiceTest {
               .filename("test-image.png")
               .build();
 
-      when(repository.save(any(AttachmentDTO.class))).thenReturn(savedDto);
+      when(attachmentInlineRepository.save(any(AttachmentInlineDTO.class))).thenReturn(savedDto);
 
       // Run
       var result =
           service.attachFileToDocumentationUnit(
               documentationUnitDTO.getId(), byteBuffer, headers, User.builder().build());
 
-      verify(repository, times(2)).save(any()); // initial + filename update
+      verify(attachmentInlineRepository, times(2)).save(any()); // initial + filename update
 
       assertEquals("png", result.format());
       assertEquals(id + ".png", result.name());

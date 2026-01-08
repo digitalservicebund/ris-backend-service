@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.argThat;
-import static org.mockito.Mockito.assertArg;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -23,11 +22,17 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Identification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.ManualPortalPublicationResult.RelatedPendingProceedingPublicationResult;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalBucket;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
@@ -59,6 +64,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.data.mapping.MappingException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import tools.jackson.core.JacksonException;
@@ -69,6 +75,7 @@ class PortalPublicationServiceTest {
 
   @MockitoBean private DocumentationUnitRepository documentationUnitRepository;
   @MockitoBean private AttachmentRepository attachmentRepository;
+  @MockitoBean private AttachmentInlineRepository attachmentInlineRepository;
   @MockitoBean private PortalBucket caseLawBucket;
   @MockitoBean private XmlUtilService xmlUtilService;
   @MockitoBean private ObjectMapper objectMapper;
@@ -83,17 +90,48 @@ class PortalPublicationServiceTest {
   private PortalPublicationService subject;
 
   private static PendingProceeding relatedPendingProceeding =
-      PendingProceeding.builder().documentNumber("Test document number 3").build();
+      PendingProceeding.builder()
+          .uuid(UUID.randomUUID())
+          .documentNumber("Test document number 3")
+          .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
+          .coreData(
+              CoreData.builder()
+                  .fileNumbers(List.of("FN-1"))
+                  .decisionDate(LocalDate.of(2024, 1, 1))
+                  .court(Court.builder().type("Court").build())
+                  .build())
+          .shortTexts(PendingProceedingShortTexts.builder().legalIssue("Issue").build())
+          .build();
   private static PendingProceeding relatedPendingProceedingWithResolutionNote =
       PendingProceeding.builder()
+          .uuid(UUID.randomUUID())
           .documentNumber("Test document number 4")
+          .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
+          .coreData(
+              CoreData.builder()
+                  .fileNumbers(List.of("FN-2"))
+                  .decisionDate(LocalDate.of(2024, 2, 2))
+                  .court(Court.builder().type("Court").build())
+                  .build())
           .shortTexts(
-              PendingProceedingShortTexts.builder().resolutionNote("Resolution note").build())
+              PendingProceedingShortTexts.builder()
+                  .legalIssue("Issue")
+                  .resolutionNote("Resolution note")
+                  .build())
           .build();
   private static PendingProceeding resolvedRelatedPendingProceeding =
       PendingProceeding.builder()
+          .uuid(UUID.randomUUID())
           .documentNumber("Test document number 5")
-          .coreData(CoreData.builder().isResolved(true).build())
+          .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
+          .coreData(
+              CoreData.builder()
+                  .isResolved(true)
+                  .fileNumbers(List.of("FN-3"))
+                  .decisionDate(LocalDate.of(2023, 3, 3))
+                  .court(Court.builder().type("Court").build())
+                  .build())
+          .shortTexts(PendingProceedingShortTexts.builder().legalIssue("Issue").build())
           .build();
 
   @BeforeAll
@@ -170,13 +208,13 @@ class PortalPublicationServiceTest {
     subject =
         new PortalPublicationService(
             documentationUnitRepository,
-            attachmentRepository,
             xmlUtilService,
             caseLawBucket,
             objectMapper,
             portalTransformer,
             featureToggleService,
-            historyLogService);
+            historyLogService,
+            attachmentInlineRepository);
     when(objectMapper.writeValueAsString(any())).thenReturn("");
     when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(true);
     when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(true);
@@ -193,18 +231,21 @@ class PortalPublicationServiceTest {
       when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
       when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.of(transformed));
       var content = new byte[] {1};
+      when(attachmentInlineRepository.findAllByDocumentationUnitId(testDocumentUnit.uuid()))
+          .thenReturn(
+              List.of(
+                  AttachmentInlineDTO.builder()
+                      .filename("bild1.png")
+                      .format("png")
+                      .content(content)
+                      .uploadTimestamp(Instant.now())
+                      .build()));
       when(attachmentRepository.findAllByDocumentationUnitId(testDocumentUnit.uuid()))
           .thenReturn(
               List.of(
                   AttachmentDTO.builder()
                       .filename("originalentscheidung")
                       .format("docx")
-                      .uploadTimestamp(Instant.now())
-                      .build(),
-                  AttachmentDTO.builder()
-                      .filename("bild1.png")
-                      .format("png")
-                      .content(content)
                       .uploadTimestamp(Instant.now())
                       .build()));
 
@@ -512,57 +553,268 @@ class PortalPublicationServiceTest {
             .withMessageContaining("Could not save LDML to bucket");
       }
 
-      @Test
-      void
-          publishDocumentationUnitWithChangeLog_withRelatedPendingProceedings_shouldResolveUnresolvedPendingProceedings()
-              throws DocumentationUnitNotExistsException {
-        UUID documentationUnitId = UUID.randomUUID();
-        User user = mock(User.class);
-        when(documentationUnitRepository.findByUuid(documentationUnitId))
-            .thenReturn(testDocumentUnit);
-        when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
-        when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
-        when(documentationUnitRepository.findByDocumentNumber(
-                relatedPendingProceeding.documentNumber()))
-            .thenReturn(relatedPendingProceeding);
-        when(documentationUnitRepository.findByDocumentNumber(
-                relatedPendingProceedingWithResolutionNote.documentNumber()))
-            .thenReturn(relatedPendingProceedingWithResolutionNote);
-        when(documentationUnitRepository.findByDocumentNumber(
-                resolvedRelatedPendingProceeding.documentNumber()))
-            .thenReturn(resolvedRelatedPendingProceeding);
+      @Nested
+      class RelatedPendingProceedingsResolution {
 
-        subject.publishDocumentationUnitWithChangelog(documentationUnitId, user);
+        @Test
+        void
+            publishDocumentationUnitWithChangeLog_withRelatedPendingProceedings_shouldResolveUnresolvedPendingProceedings()
+                throws DocumentationUnitNotExistsException {
+          UUID documentationUnitId = UUID.randomUUID();
+          User user = mock(User.class);
+          when(documentationUnitRepository.findByUuid(documentationUnitId))
+              .thenReturn(testDocumentUnit);
+          when(portalTransformer.transformToLdml(any())).thenReturn(testLdml);
+          when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
+          when(documentationUnitRepository.findByDocumentNumber(
+                  relatedPendingProceeding.documentNumber()))
+              .thenReturn(relatedPendingProceeding);
+          when(documentationUnitRepository.findByDocumentNumber(
+                  relatedPendingProceedingWithResolutionNote.documentNumber()))
+              .thenReturn(relatedPendingProceedingWithResolutionNote);
+          when(documentationUnitRepository.findByDocumentNumber(
+                  resolvedRelatedPendingProceeding.documentNumber()))
+              .thenReturn(resolvedRelatedPendingProceeding);
+          when(documentationUnitRepository.findByUuid(relatedPendingProceeding.uuid()))
+              .thenReturn(relatedPendingProceeding);
+          when(documentationUnitRepository.findByUuid(
+                  relatedPendingProceedingWithResolutionNote.uuid()))
+              .thenReturn(relatedPendingProceedingWithResolutionNote);
 
-        verify(documentationUnitRepository, times(1))
-            .save(
-                assertArg(
-                    documentationUnit -> {
-                      assertThat(documentationUnit.documentNumber())
-                          .isEqualTo(relatedPendingProceeding.documentNumber());
-                      assertThat(documentationUnit).isInstanceOf(PendingProceeding.class);
-                      assertThat(documentationUnit.coreData().isResolved()).isTrue();
-                      assertThat(
-                              ((PendingProceeding) documentationUnit).shortTexts().resolutionNote())
-                          .isEqualTo("Erledigt durch TEST123456789");
-                    }),
-                any());
-        verify(documentationUnitRepository, times(0))
-            .save(
-                argThat(
-                    documentationUnit ->
-                        documentationUnit
-                            .documentNumber()
-                            .equals(relatedPendingProceedingWithResolutionNote.documentNumber())),
-                any());
-        verify(documentationUnitRepository, times(0))
-            .save(
-                argThat(
-                    documentationUnit ->
-                        documentationUnit
-                            .documentNumber()
-                            .equals(resolvedRelatedPendingProceeding.documentNumber())),
-                any());
+          var result = subject.publishDocumentationUnitWithChangelog(documentationUnitId, user);
+
+          assertThat(result.relatedPendingProceedingsPublicationResult())
+              .isEqualTo(RelatedPendingProceedingPublicationResult.SUCCESS);
+
+          // unresolved without existing note: should be resolved and note auto-filled
+          verify(documentationUnitRepository, times(1))
+              .save(
+                  argThat(
+                      documentationUnit ->
+                          documentationUnit
+                                  .documentNumber()
+                                  .equals(relatedPendingProceeding.documentNumber())
+                              && documentationUnit.coreData().isResolved()
+                              && ((PendingProceeding) documentationUnit)
+                                  .shortTexts()
+                                  .resolutionNote()
+                                  .equals("Erledigt durch TEST123456789")),
+                  any());
+
+          // unresolved with existing note: should be resolved and keep existing note
+          verify(documentationUnitRepository, times(1))
+              .save(
+                  argThat(
+                      documentationUnit ->
+                          documentationUnit
+                                  .documentNumber()
+                                  .equals(
+                                      relatedPendingProceedingWithResolutionNote.documentNumber())
+                              && documentationUnit.coreData().isResolved()
+                              && ((PendingProceeding) documentationUnit)
+                                  .shortTexts()
+                                  .resolutionNote()
+                                  .equals("Resolution note")),
+                  any());
+          verify(documentationUnitRepository, times(0))
+              .save(
+                  argThat(
+                      documentationUnit ->
+                          documentationUnit
+                              .documentNumber()
+                              .equals(resolvedRelatedPendingProceeding.documentNumber())),
+                  any());
+        }
+
+        @Test
+        void
+            publishDocumentationUnitWithChangeLog_withNoRelatedPendingProceedings_shouldReturnNoAction()
+                throws DocumentationUnitNotExistsException {
+          UUID documentationUnitId = UUID.randomUUID();
+          User user = mock(User.class);
+          Decision decisionWithNoLinks =
+              testDocumentUnit.toBuilder().contentRelatedIndexing(null).build();
+          when(documentationUnitRepository.findByUuid(documentationUnitId))
+              .thenReturn(decisionWithNoLinks);
+          when(portalTransformer.transformToLdml(any())).thenReturn(testLdml);
+          when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn/>"));
+
+          var result = subject.publishDocumentationUnitWithChangelog(documentationUnitId, user);
+
+          assertThat(result.relatedPendingProceedingsPublicationResult())
+              .isEqualTo(RelatedPendingProceedingPublicationResult.NO_ACTION);
+          verify(documentationUnitRepository, never()).save(any(), any());
+        }
+
+        @Test
+        void
+            publishDocumentationUnitWithChangeLog_withUnpublishedRelatedPendingProceeding_shouldReturnError()
+                throws DocumentationUnitNotExistsException {
+          UUID documentationUnitId = UUID.randomUUID();
+          User user = mock(User.class);
+          PendingProceeding unpublished =
+              relatedPendingProceeding.toBuilder()
+                  .documentNumber("PP-UNPUBLISHED")
+                  .portalPublicationStatus(PortalPublicationStatus.UNPUBLISHED)
+                  .build();
+          Decision decision =
+              testDocumentUnit.toBuilder()
+                  .contentRelatedIndexing(
+                      ContentRelatedIndexing.builder()
+                          .relatedPendingProceedings(
+                              List.of(
+                                  RelatedPendingProceeding.builder()
+                                      .documentNumber(unpublished.documentNumber())
+                                      .build()))
+                          .build())
+                  .build();
+          when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(decision);
+          when(documentationUnitRepository.findByDocumentNumber(unpublished.documentNumber()))
+              .thenReturn(unpublished);
+          when(portalTransformer.transformToLdml(any())).thenReturn(testLdml);
+          when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn/>"));
+
+          var result = subject.publishDocumentationUnitWithChangelog(documentationUnitId, user);
+
+          assertThat(result.relatedPendingProceedingsPublicationResult())
+              .isEqualTo(RelatedPendingProceedingPublicationResult.ERROR);
+          verify(documentationUnitRepository, never()).save(eq(unpublished), any());
+        }
+
+        @Test
+        void
+            publishDocumentationUnitWithChangeLog_withResolvedPendingProceeding_shouldReturnNoAction()
+                throws DocumentationUnitNotExistsException {
+          UUID documentationUnitId = UUID.randomUUID();
+          User user = mock(User.class);
+          Decision decision =
+              testDocumentUnit.toBuilder()
+                  .contentRelatedIndexing(
+                      ContentRelatedIndexing.builder()
+                          .relatedPendingProceedings(
+                              List.of(
+                                  RelatedPendingProceeding.builder()
+                                      .documentNumber(
+                                          resolvedRelatedPendingProceeding.documentNumber())
+                                      .build()))
+                          .build())
+                  .build();
+          when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(decision);
+          when(documentationUnitRepository.findByDocumentNumber(
+                  resolvedRelatedPendingProceeding.documentNumber()))
+              .thenReturn(resolvedRelatedPendingProceeding);
+          when(portalTransformer.transformToLdml(any())).thenReturn(testLdml);
+          when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn/>"));
+
+          var result = subject.publishDocumentationUnitWithChangelog(documentationUnitId, user);
+
+          assertThat(result.relatedPendingProceedingsPublicationResult())
+              .isEqualTo(RelatedPendingProceedingPublicationResult.NO_ACTION);
+          verify(documentationUnitRepository, never()).save(any(), any());
+        }
+
+        @Test
+        void publishDocumentationUnitWithChangeLog_withMissingRequiredAttributes_shouldReturnError()
+            throws DocumentationUnitNotExistsException {
+          UUID documentationUnitId = UUID.randomUUID();
+          User user = mock(User.class);
+          PendingProceeding missingRequired =
+              relatedPendingProceeding.toBuilder()
+                  .documentNumber("PP-MISSING")
+                  .shortTexts(PendingProceedingShortTexts.builder().build()) // missing legalIssue
+                  .build();
+          Decision decision =
+              testDocumentUnit.toBuilder()
+                  .contentRelatedIndexing(
+                      ContentRelatedIndexing.builder()
+                          .relatedPendingProceedings(
+                              List.of(
+                                  RelatedPendingProceeding.builder()
+                                      .documentNumber(missingRequired.documentNumber())
+                                      .build()))
+                          .build())
+                  .build();
+          when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(decision);
+          when(documentationUnitRepository.findByDocumentNumber(missingRequired.documentNumber()))
+              .thenReturn(missingRequired);
+          when(portalTransformer.transformToLdml(any())).thenReturn(testLdml);
+          when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn/>"));
+
+          var result = subject.publishDocumentationUnitWithChangelog(documentationUnitId, user);
+
+          assertThat(result.relatedPendingProceedingsPublicationResult())
+              .isEqualTo(RelatedPendingProceedingPublicationResult.ERROR);
+          verify(documentationUnitRepository, never()).save(eq(missingRequired), any());
+        }
+
+        @Test
+        void
+            publishDocumentationUnitWithChangeLog_whenPublishingRelatedPendingProceedingFails_shouldReturnError()
+                throws DocumentationUnitNotExistsException {
+          UUID documentationUnitId = UUID.randomUUID();
+          User user = mock(User.class);
+          PendingProceeding toPublish =
+              relatedPendingProceeding.toBuilder().documentNumber("PP-PUBLISH-FAIL").build();
+          Decision decision =
+              testDocumentUnit.toBuilder()
+                  .contentRelatedIndexing(
+                      ContentRelatedIndexing.builder()
+                          .relatedPendingProceedings(
+                              List.of(
+                                  RelatedPendingProceeding.builder()
+                                      .documentNumber(toPublish.documentNumber())
+                                      .build()))
+                          .build())
+                  .build();
+          when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(decision);
+          when(documentationUnitRepository.findByDocumentNumber(toPublish.documentNumber()))
+              .thenReturn(toPublish);
+          when(documentationUnitRepository.findByUuid(toPublish.uuid())).thenReturn(toPublish);
+          // First publish (decision) succeeds, second publish (linked pending proceeding) fails
+          when(portalTransformer.transformToLdml(any()))
+              .thenReturn(testLdml)
+              .thenThrow(
+                  new LdmlTransformationException("LDML validation failed.", new Exception()));
+          when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn/>"));
+
+          var result = subject.publishDocumentationUnitWithChangelog(documentationUnitId, user);
+
+          assertThat(result.relatedPendingProceedingsPublicationResult())
+              .isEqualTo(RelatedPendingProceedingPublicationResult.ERROR);
+        }
+
+        @Test
+        void publishDocumentationUnitWithChangeLog_whenSavingUpdatedLinkedFails_shouldReturnError()
+            throws DocumentationUnitNotExistsException {
+          UUID documentationUnitId = UUID.randomUUID();
+          User user = mock(User.class);
+          PendingProceeding toSave =
+              relatedPendingProceeding.toBuilder().documentNumber("PP-SAVE-FAIL").build();
+          Decision decision =
+              testDocumentUnit.toBuilder()
+                  .contentRelatedIndexing(
+                      ContentRelatedIndexing.builder()
+                          .relatedPendingProceedings(
+                              List.of(
+                                  RelatedPendingProceeding.builder()
+                                      .documentNumber(toSave.documentNumber())
+                                      .build()))
+                          .build())
+                  .build();
+          when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(decision);
+          when(documentationUnitRepository.findByDocumentNumber(toSave.documentNumber()))
+              .thenReturn(toSave);
+          when(portalTransformer.transformToLdml(any())).thenReturn(testLdml);
+          when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn/>"));
+          doThrow(new MappingException("fail"))
+              .when(documentationUnitRepository)
+              .save(any(), any());
+
+          var result = subject.publishDocumentationUnitWithChangelog(documentationUnitId, user);
+
+          assertThat(result.relatedPendingProceedingsPublicationResult())
+              .isEqualTo(RelatedPendingProceedingPublicationResult.ERROR);
+        }
       }
     }
 
