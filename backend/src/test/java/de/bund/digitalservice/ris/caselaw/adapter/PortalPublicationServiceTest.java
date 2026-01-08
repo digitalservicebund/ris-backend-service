@@ -22,6 +22,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Identification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
@@ -73,6 +75,7 @@ class PortalPublicationServiceTest {
 
   @MockitoBean private DocumentationUnitRepository documentationUnitRepository;
   @MockitoBean private AttachmentRepository attachmentRepository;
+  @MockitoBean private AttachmentInlineRepository attachmentInlineRepository;
   @MockitoBean private PortalBucket caseLawBucket;
   @MockitoBean private XmlUtilService xmlUtilService;
   @MockitoBean private ObjectMapper objectMapper;
@@ -205,13 +208,13 @@ class PortalPublicationServiceTest {
     subject =
         new PortalPublicationService(
             documentationUnitRepository,
-            attachmentRepository,
             xmlUtilService,
             caseLawBucket,
             objectMapper,
             portalTransformer,
             featureToggleService,
-            historyLogService);
+            historyLogService,
+            attachmentInlineRepository);
     when(objectMapper.writeValueAsString(any())).thenReturn("");
     when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(true);
     when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(true);
@@ -228,18 +231,21 @@ class PortalPublicationServiceTest {
       when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
       when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.of(transformed));
       var content = new byte[] {1};
+      when(attachmentInlineRepository.findAllByDocumentationUnitId(testDocumentUnit.uuid()))
+          .thenReturn(
+              List.of(
+                  AttachmentInlineDTO.builder()
+                      .filename("bild1.png")
+                      .format("png")
+                      .content(content)
+                      .uploadTimestamp(Instant.now())
+                      .build()));
       when(attachmentRepository.findAllByDocumentationUnitId(testDocumentUnit.uuid()))
           .thenReturn(
               List.of(
                   AttachmentDTO.builder()
                       .filename("originalentscheidung")
                       .format("docx")
-                      .uploadTimestamp(Instant.now())
-                      .build(),
-                  AttachmentDTO.builder()
-                      .filename("bild1.png")
-                      .format("png")
-                      .content(content)
                       .uploadTimestamp(Instant.now())
                       .build()));
 

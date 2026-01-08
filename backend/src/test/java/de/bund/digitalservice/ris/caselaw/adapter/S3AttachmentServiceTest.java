@@ -287,8 +287,8 @@ class S3AttachmentServiceTest {
       headers.set("X-Filename", "test-image.png");
 
       UUID id = UUID.randomUUID();
-      AttachmentDTO savedDto =
-          AttachmentDTO.builder()
+      AttachmentInlineDTO savedDto =
+          AttachmentInlineDTO.builder()
               .id(id)
               .content(imageBytes)
               .documentationUnit(documentationUnitDTO)
@@ -296,14 +296,14 @@ class S3AttachmentServiceTest {
               .filename("test-image.png")
               .build();
 
-      when(repository.save(any(AttachmentDTO.class))).thenReturn(savedDto);
+      when(attachmentInlineRepository.save(any(AttachmentInlineDTO.class))).thenReturn(savedDto);
 
       // Run
       var result =
           service.attachFileToDocumentationUnit(
               documentationUnitDTO.getId(), byteBuffer, headers, User.builder().build());
 
-      verify(repository, times(2)).save(any()); // initial + filename update
+      verify(attachmentInlineRepository, times(2)).save(any()); // initial + filename update
 
       assertEquals("png", result.format());
       assertEquals(id + ".png", result.name());
