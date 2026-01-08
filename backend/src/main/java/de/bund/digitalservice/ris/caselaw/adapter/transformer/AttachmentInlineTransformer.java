@@ -2,7 +2,9 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class AttachmentInlineTransformer {
 
   public static Attachment transformToDomain(AttachmentInlineDTO dto) {
