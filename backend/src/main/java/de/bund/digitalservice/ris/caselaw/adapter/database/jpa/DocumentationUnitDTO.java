@@ -104,6 +104,15 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @OrderBy("uploadTimestamp asc")
   private List<AttachmentDTO> attachments = new ArrayList<>();
 
+  @Builder.Default
+  @OneToMany(
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      mappedBy = "documentationUnit")
+  @OrderBy("uploadTimestamp asc")
+  private List<AttachmentInlineDTO> attachmentsInline = new ArrayList<>();
+
   @ManyToMany(
       cascade = {CascadeType.MERGE},
       fetch = FetchType.LAZY)
