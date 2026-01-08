@@ -2,7 +2,7 @@ import { APIRequestContext, Cookie, Page, test } from "@playwright/test"
 import { mergeDeep } from "@tiptap/vue-3"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
-import jsonPatch from "fast-json-patch"
+import jsonPatch, { Operation } from "fast-json-patch"
 import { Page as Pagination } from "@/components/Pagination.vue"
 import { Addressee } from "@/domain/abuseFee"
 import { AppealAdmitter } from "@/domain/appealAdmitter"
@@ -103,6 +103,37 @@ async function deleteWithRetry(
       ${deleteResponse.status()} ${deleteResponse.statusText()}`)
     }
   }
+}
+
+async function patchAndApplyToDocument<T>(
+  request: APIRequestContext,
+  uuid: string,
+  csrfToken: Cookie | undefined,
+  documentUnit: T,
+  version: number,
+  patch: Operation[],
+): Promise<T> {
+  const patchResponse = await request.patch(
+    `/api/v1/caselaw/documentunits/${uuid}`,
+    {
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      data: {
+        documentationUnitVersion: version,
+        patch: patch,
+        errorPaths: [],
+      },
+    },
+  )
+
+  if (!patchResponse.ok()) {
+    throw new Error(
+      `Failed to patch document unit: ${patchResponse.status()} ${patchResponse.statusText()}`,
+    )
+  }
+
+  const patchResult = await patchResponse.json()
+  const updatedDoc = jsonPatch.applyPatch(documentUnit, patchResult)
+  return updatedDoc.newDocument
 }
 
 export const caselawTest = test.extend<MyFixtures & MyOptions>({
@@ -395,27 +426,16 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
 
     const frontendPatch = jsonPatch.compare(prefilledDocumentUnit, targetState)
 
-    const patchResponse = await request.patch(
-      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
-      {
-        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-        data: {
-          documentationUnitVersion: prefilledDocumentUnit.version,
-          patch: frontendPatch,
-          errorPaths: [],
-        },
-      },
+    const updatedDocumentUnit = await patchAndApplyToDocument(
+      request,
+      prefilledDocumentUnit.uuid,
+      csrfToken,
+      prefilledDocumentUnit,
+      prefilledDocumentUnit.version,
+      frontendPatch,
     )
 
-    if (!patchResponse.ok()) {
-      throw new Error(
-        `Failed to patch references: ${patchResponse.status()} ${patchResponse.statusText()}`,
-      )
-    }
-
-    const patchResult = await patchResponse.json()
-    const updatedDoc = jsonPatch.applyPatch(prefilledDocumentUnit, patchResult)
-    await use(updatedDoc.newDocument)
+    await use(updatedDocumentUnit)
 
     await deleteWithRetry(
       request,
@@ -566,27 +586,16 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
 
     const frontendPatch = jsonPatch.compare(prefilledDocumentUnit, targetState)
 
-    const patchResponse = await request.patch(
-      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
-      {
-        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-        data: {
-          documentationUnitVersion: prefilledDocumentUnit.version,
-          patch: frontendPatch,
-          errorPaths: [],
-        },
-      },
+    const updatedDocumentUnit = await patchAndApplyToDocument(
+      request,
+      prefilledDocumentUnit.uuid,
+      csrfToken,
+      prefilledDocumentUnit,
+      prefilledDocumentUnit.version,
+      frontendPatch,
     )
 
-    if (!patchResponse.ok()) {
-      throw new Error(
-        `Failed to patch prefilledDocumentUnit: ${patchResponse.status()} ${patchResponse.statusText()}`,
-      )
-    }
-
-    const patchResult = await patchResponse.json()
-    const updatedDoc = jsonPatch.applyPatch(prefilledDocumentUnit, patchResult)
-    await use(updatedDoc.newDocument)
+    await use(updatedDocumentUnit)
 
     await deleteWithRetry(
       request,
@@ -759,30 +768,16 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
       targetState,
     )
 
-    const patchResponse = await request.patch(
-      `/api/v1/caselaw/documentunits/${prefilledDocumentUnitWithLongTexts.uuid}`,
-      {
-        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-        data: {
-          documentationUnitVersion: prefilledDocumentUnitWithLongTexts.version,
-          patch: frontendPatch,
-          errorPaths: [],
-        },
-      },
-    )
-
-    if (!patchResponse.ok()) {
-      throw new Error(
-        `Failed to patch document: ${patchResponse.status()} ${patchResponse.statusText()}`,
-      )
-    }
-
-    const patchResult = await patchResponse.json()
-    const updatedDoc = jsonPatch.applyPatch(
+    const updatedDocumentUnit = await patchAndApplyToDocument(
+      request,
+      prefilledDocumentUnitWithLongTexts.uuid,
+      csrfToken,
       prefilledDocumentUnitWithLongTexts,
-      patchResult,
+      prefilledDocumentUnitWithLongTexts.version,
+      frontendPatch,
     )
-    await use(updatedDoc.newDocument)
+
+    await use(updatedDocumentUnit)
 
     await deleteWithRetry(
       request,
