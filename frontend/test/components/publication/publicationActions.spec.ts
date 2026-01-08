@@ -2,21 +2,18 @@ import { createTestingPinia } from "@pinia/testing"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { setActivePinia } from "pinia"
+import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import PublicationActions from "@/components/publication/PublicationActions.vue"
 import { Decision } from "@/domain/decision"
 import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
 import { ServiceResponse } from "@/services/httpClient"
-import publishDocumentationUnitService from "@/services/publishDocumentationUnitService"
+import publishDocumentationUnitService, {
+  PublicationResult,
+} from "@/services/publishDocumentationUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import routes from "~/test-helper/routes"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
-
-const publishMock = vi.spyOn(publishDocumentationUnitService, "publishDocument")
-const withdrawMock = vi.spyOn(
-  publishDocumentationUnitService,
-  "withdrawDocument",
-)
 
 describe("PublicationActions", () => {
   beforeEach(() => {
@@ -26,46 +23,105 @@ describe("PublicationActions", () => {
   afterEach(() => {
     vi.clearAllMocks()
   })
-  it("should list related pending proceedings", async () => {
-    mockDocUnitStore(PortalPublicationStatus.UNPUBLISHED, {
-      contentRelatedIndexing: {
-        relatedPendingProceedings: [
-          {
-            documentNumber: "YYTestDoc0017",
-            court: {
-              type: "BGH",
-              label: "BGH",
-            },
-            decisionDate: "2022-02-01",
-            fileNumber: "IV R 99/99",
-          },
-        ],
-      },
-    })
-    await renderComponent({ isPublishable: true, publicationWarnings: [] })
-    expect(
-      screen.getByText(
-        "Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft:",
-      ),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText(/bgh, 01\.02\.2022, iv r 99\/99 \|/i),
-    ).toBeInTheDocument()
-    expect(screen.getByText("YYTestDoc0017")).toBeInTheDocument()
-  })
 
-  it("should not list related pending proceedings", async () => {
-    mockDocUnitStore(PortalPublicationStatus.UNPUBLISHED, {
-      contentRelatedIndexing: {
-        relatedPendingProceedings: [],
-      },
+  describe("RelatedPendingProceedings", () => {
+    it("should list related pending proceedings", async () => {
+      mockDocUnitStore(PortalPublicationStatus.UNPUBLISHED, {
+        contentRelatedIndexing: {
+          relatedPendingProceedings: [
+            {
+              documentNumber: "YYTestDoc0017",
+              court: {
+                type: "BGH",
+                label: "BGH",
+              },
+              decisionDate: "2022-02-01",
+              fileNumber: "IV R 99/99",
+            },
+          ],
+        },
+      })
+      await renderComponent({ isPublishable: true, publicationWarnings: [] })
+      expect(
+        screen.getByText(
+          "Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft:",
+        ),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText(/bgh, 01\.02\.2022, iv r 99\/99 \|/i),
+      ).toBeInTheDocument()
+      expect(screen.getByText("YYTestDoc0017")).toBeInTheDocument()
     })
-    await renderComponent({ isPublishable: true, publicationWarnings: [] })
-    expect(
-      screen.queryByText(
-        "Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft:",
-      ),
-    ).not.toBeInTheDocument()
+
+    it("should not list empty related pending proceedings", async () => {
+      mockDocUnitStore(PortalPublicationStatus.UNPUBLISHED, {
+        contentRelatedIndexing: {
+          relatedPendingProceedings: [],
+        },
+      })
+      await renderComponent({ isPublishable: true, publicationWarnings: [] })
+      expect(
+        screen.queryByText(
+          "Mit dieser Entscheidung sind folgende anhängige Verfahren verknüpft:",
+        ),
+      ).not.toBeInTheDocument()
+    })
+
+    it("should show success when publishing related pending proceedings", async () => {
+      mockDocUnitStore(PortalPublicationStatus.UNPUBLISHED)
+      await renderComponent({ isPublishable: true, publicationWarnings: [] })
+
+      vi.spyOn(
+        publishDocumentationUnitService,
+        "publishDocument",
+      ).mockResolvedValue({
+        status: 200,
+        data: { relatedPendingProceedingsPublicationResult: "SUCCESS" },
+      })
+
+      await fireEvent.click(
+        screen.getByRole("button", { name: "Veröffentlichen" }),
+      )
+
+      expect(
+        screen.queryByLabelText(
+          "Fehler beim Veröffentlichen zugehöriger anhängiger Verfahren",
+        ),
+      ).not.toBeInTheDocument()
+      expect(toastAddMock).toHaveBeenCalledOnce()
+      expect(toastAddMock).toHaveBeenCalledWith({
+        life: 5000,
+        severity: "success",
+        summary:
+          "Die zugehörigen anhängigen Verfahren wurden als erledigt veröffentlicht.",
+      })
+    })
+
+    it("should show error when publishing related pending proceedings fails", async () => {
+      mockDocUnitStore(PortalPublicationStatus.UNPUBLISHED)
+      await renderComponent({ isPublishable: true, publicationWarnings: [] })
+
+      vi.spyOn(
+        publishDocumentationUnitService,
+        "publishDocument",
+      ).mockResolvedValue({
+        status: 200,
+        data: { relatedPendingProceedingsPublicationResult: "ERROR" },
+      })
+
+      await fireEvent.click(
+        screen.getByRole("button", { name: "Veröffentlichen" }),
+      )
+      // Wait for doc unit to be loaded
+      await nextTick()
+
+      expect(toastAddMock).not.toHaveBeenCalled()
+      expect(
+        screen.getByLabelText(
+          "Fehler beim Veröffentlichen zugehöriger anhängiger Verfahren",
+        ),
+      ).toBeInTheDocument()
+    })
   })
 
   describe("Status: Unpublished", () => {
@@ -191,7 +247,7 @@ describe("PublicationActions", () => {
       mockDocUnitStore(PortalPublicationStatus.PUBLISHED)
       publishMock.mockResolvedValue({
         status: 200,
-        data: undefined,
+        data: { relatedPendingProceedingsPublicationResult: "NO_ACTION" },
       })
       await renderComponent({ isPublishable: true, publicationWarnings: [] })
 
@@ -262,7 +318,10 @@ describe("PublicationActions", () => {
         vi.spyOn(
           publishDocumentationUnitService,
           "publishDocument",
-        ).mockResolvedValue({ status: 200, data: undefined })
+        ).mockResolvedValue({
+          status: 200,
+          data: { relatedPendingProceedingsPublicationResult: "NO_ACTION" },
+        })
 
         await fireEvent.click(
           screen.getByRole("button", { name: "Veröffentlichen" }),
@@ -283,7 +342,10 @@ describe("PublicationActions", () => {
             status: 500,
             error: { title: "Error-Titel", description: "Error-Beschreibung" },
           })
-          .mockResolvedValueOnce({ status: 200, data: undefined })
+          .mockResolvedValueOnce({
+            status: 200,
+            data: { relatedPendingProceedingsPublicationResult: "NO_ACTION" },
+          })
 
         // This one fails and shows error
         await fireEvent.click(
@@ -337,7 +399,7 @@ describe("PublicationActions", () => {
         await renderComponent({ isPublishable: true, publicationWarnings: [] })
 
         const { promise: publishPromise, resolve: resolvePublish } =
-          Promise.withResolvers<ServiceResponse<void>>()
+          Promise.withResolvers<ServiceResponse<PublicationResult>>()
         vi.spyOn(
           publishDocumentationUnitService,
           "publishDocument",
@@ -355,7 +417,10 @@ describe("PublicationActions", () => {
         ).toBeDisabled()
 
         // This simulates the server response
-        resolvePublish({ status: 200, data: undefined })
+        resolvePublish({
+          status: 200,
+          data: { relatedPendingProceedingsPublicationResult: "NO_ACTION" },
+        })
         await flushPromises()
 
         expect(
@@ -374,7 +439,10 @@ describe("PublicationActions", () => {
       vi.spyOn(
         publishDocumentationUnitService,
         "publishDocument",
-      ).mockResolvedValue({ status: 200, data: undefined })
+      ).mockResolvedValue({
+        status: 200,
+        data: { relatedPendingProceedingsPublicationResult: "NO_ACTION" },
+      })
 
       store.documentUnit = new Decision("q834", {
         portalPublicationStatus: PortalPublicationStatus.PUBLISHED,
@@ -392,7 +460,10 @@ describe("PublicationActions", () => {
       await renderComponent({ isPublishable: true, publicationWarnings: [] })
       const publishSpy = vi
         .spyOn(publishDocumentationUnitService, "publishDocument")
-        .mockResolvedValue({ status: 200, data: undefined })
+        .mockResolvedValue({
+          status: 200,
+          data: { relatedPendingProceedingsPublicationResult: "NO_ACTION" },
+        })
 
       await fireEvent.click(
         screen.getByRole("button", { name: "Veröffentlichen" }),
@@ -530,7 +601,7 @@ describe("PublicationActions", () => {
         ).not.toBeInTheDocument()
       })
 
-      it("should reset previous error when publish is successful", async () => {
+      it("should reset previous error when withdraw is successful", async () => {
         mockDocUnitStore(PortalPublicationStatus.PUBLISHED)
         await renderComponent({ isPublishable: true, publicationWarnings: [] })
         vi.spyOn(publishDocumentationUnitService, "withdrawDocument")
@@ -702,6 +773,17 @@ async function renderComponent(props: {
     },
   })
 }
+
+const publishMock = vi.spyOn(publishDocumentationUnitService, "publishDocument")
+const withdrawMock = vi.spyOn(
+  publishDocumentationUnitService,
+  "withdrawDocument",
+)
+
+const toastAddMock = vi.fn()
+vi.mock("primevue/usetoast", () => ({
+  useToast: () => ({ add: toastAddMock }),
+}))
 
 function mockDocUnitStore(
   portalPublicationStatus: PortalPublicationStatus,

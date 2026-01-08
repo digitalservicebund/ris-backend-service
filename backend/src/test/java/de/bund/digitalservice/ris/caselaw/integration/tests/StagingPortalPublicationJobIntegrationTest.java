@@ -10,7 +10,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
-import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationJobService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
@@ -25,7 +24,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationJobService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationJobStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationJobType;
@@ -65,8 +66,7 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
 
     @Bean
     @Primary
-    public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer fullLdmlTransformer(
-        DocumentBuilderFactory documentBuilderFactory) {
+    public PortalTransformer fullLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
       return new FullLdmlTransformer(documentBuilderFactory);
     }
   }
