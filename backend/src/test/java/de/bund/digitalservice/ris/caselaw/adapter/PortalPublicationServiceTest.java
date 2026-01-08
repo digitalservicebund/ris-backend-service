@@ -208,7 +208,6 @@ class PortalPublicationServiceTest {
     subject =
         new PortalPublicationService(
             documentationUnitRepository,
-            attachmentRepository,
             xmlUtilService,
             caseLawBucket,
             objectMapper,
