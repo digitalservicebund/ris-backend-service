@@ -1,5 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import com.nimbusds.oauth2.sdk.util.CollectionUtils;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
@@ -9,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.MailAttachmentImage;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
@@ -43,6 +47,8 @@ public class HandoverMailService implements MailService {
 
   private final HandoverRepository repository;
 
+  private final AttachmentInlineRepository attachmentInlineRepository;
+
   private final Environment env;
 
   @Value("${mail.exporter.senderAddress:export.test@neuris}")
@@ -55,10 +61,12 @@ public class HandoverMailService implements MailService {
       XmlExporter xmlExporter,
       HttpMailSender mailSender,
       HandoverRepository repository,
+      AttachmentInlineRepository attachmentInlineRepository,
       Environment env) {
     this.xmlExporter = xmlExporter;
     this.mailSender = mailSender;
     this.repository = repository;
+    this.attachmentInlineRepository = attachmentInlineRepository;
     this.env = env;
   }
 
@@ -80,6 +88,9 @@ public class HandoverMailService implements MailService {
       throw new HandoverException("Couldn't generate xml for documentationUnit.", ex);
     }
 
+    List<AttachmentInlineDTO> inlineAttachments =
+        attachmentInlineRepository.findAllByDocumentationUnitId(decision.uuid());
+
     String mailSubject = generateMailSubject(decision);
 
     HandoverMail handoverMail =
@@ -88,6 +99,7 @@ public class HandoverMailService implements MailService {
             receiverAddress,
             mailSubject,
             List.of(xml),
+            inlineAttachments,
             issuerAddress,
             HandoverEntityType.DOCUMENTATION_UNIT);
     if (!handoverMail.success()) {
@@ -124,6 +136,7 @@ public class HandoverMailService implements MailService {
             receiverAddress,
             mailSubject,
             xml,
+            Collections.emptyList(),
             issuerAddress,
             HandoverEntityType.EDITION);
     generateAndSendMail(handoverMail);
@@ -223,6 +236,7 @@ public class HandoverMailService implements MailService {
         handoverMail.mailSubject(),
         "neuris",
         handoverMail.attachments(),
+        handoverMail.imageAttachments(),
         handoverMail.entityId().toString());
   }
 
@@ -231,6 +245,7 @@ public class HandoverMailService implements MailService {
       String receiverAddress,
       String mailSubject,
       List<XmlTransformationResult> xml,
+      List<AttachmentInlineDTO> attachedImages,
       String issuerAddress,
       HandoverEntityType entityType) {
     var xmlHandoverMailBuilder =
@@ -247,12 +262,26 @@ public class HandoverMailService implements MailService {
       return xmlHandoverMailBuilder.success(false).build();
     }
 
+    List<MailAttachmentImage> mailAttachmentImages = Collections.emptyList();
+    if (!CollectionUtils.isEmpty(attachedImages)) {
+      mailAttachmentImages =
+          attachedImages.stream()
+              .map(
+                  attachmentImage ->
+                      MailAttachmentImage.builder()
+                          .fileName(attachmentImage.getFilename())
+                          .fileContent(attachmentImage.getContent())
+                          .build())
+              .toList();
+    }
+
     return xmlHandoverMailBuilder
         .receiverAddress(receiverAddress)
         .mailSubject(mailSubject)
         .handoverDate(xml.get(0).creationDate())
         .issuerAddress(issuerAddress)
         .attachments(renameAndCreateMailAttachments(xml))
+        .imageAttachments(mailAttachmentImages)
         .entityType(entityType)
         .build();
   }

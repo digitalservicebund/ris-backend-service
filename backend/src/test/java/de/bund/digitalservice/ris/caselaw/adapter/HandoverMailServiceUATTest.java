@@ -10,6 +10,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -92,6 +93,7 @@ class HandoverMailServiceUATTest {
           .mailSubject(DOC_UNIT_MAIL_SUBJECT)
           .attachments(
               List.of(MailAttachment.builder().fileName("test.xml").fileContent("xml").build()))
+          .imageAttachments(Collections.emptyList())
           .success(true)
           .statusMessages(List.of("succeed"))
           .handoverDate(CREATED_DATE)
@@ -108,6 +110,7 @@ class HandoverMailServiceUATTest {
               List.of(
                   MailAttachment.builder().fileName("test2.xml").fileContent("xml 2").build(),
                   MailAttachment.builder().fileName("test1.xml").fileContent("xml 1").build()))
+          .imageAttachments(Collections.emptyList())
           .success(true)
           .statusMessages(List.of("succeed", "succeed"))
           .handoverDate(CREATED_DATE)
@@ -146,6 +149,8 @@ class HandoverMailServiceUATTest {
   @MockitoBean private HttpMailSender mailSender;
 
   @MockitoBean private IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
+
+  @MockitoBean private AttachmentInlineRepository attachmentInlineRepository;
 
   @BeforeEach
   void setUp() throws ParserConfigurationException, TransformerException {
@@ -217,6 +222,7 @@ class HandoverMailServiceUATTest {
                     .fileName(DOC_UNIT_SAVED_MAIL.attachments().getFirst().fileName())
                     .fileContent(DOC_UNIT_SAVED_MAIL.attachments().getFirst().fileContent())
                     .build()),
+            Collections.emptyList(),
             DOC_UNIT_SAVED_MAIL.entityId().toString());
   }
 
@@ -235,6 +241,7 @@ class HandoverMailServiceUATTest {
             EDITION_SAVED_MAIL.mailSubject(),
             "neuris",
             EDITION_SAVED_MAIL.attachments(),
+            Collections.emptyList(),
             EDITION_SAVED_MAIL.entityId().toString());
   }
 
@@ -281,6 +288,7 @@ class HandoverMailServiceUATTest {
                         .fileName("document-number-1_2.xml")
                         .fileContent("xml 2")
                         .build()))
+            .imageAttachments(Collections.emptyList())
             .success(true)
             .statusMessages(List.of("succeed", "succeed"))
             .handoverDate(CREATED_DATE)
@@ -312,6 +320,7 @@ class HandoverMailServiceUATTest {
             EDITION_SAVED_MAIL.mailSubject(),
             "neuris",
             savedEditionWithNumberedAttachments.attachments(),
+            Collections.emptyList(),
             EDITION_SAVED_MAIL.entityId().toString());
   }
 
@@ -336,7 +345,8 @@ class HandoverMailServiceUATTest {
 
     verify(repository, never()).save(any(HandoverMail.class));
     verify(mailSender, never())
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
+        .sendMail(
+            anyString(), anyString(), anyString(), anyString(), anyList(), anyList(), anyString());
   }
 
   @Test
@@ -360,7 +370,8 @@ class HandoverMailServiceUATTest {
 
     verify(repository, never()).save(any(HandoverMail.class));
     verify(mailSender, never())
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
+        .sendMail(
+            anyString(), anyString(), anyString(), anyString(), anyList(), anyList(), anyString());
   }
 
   @Test
@@ -377,7 +388,8 @@ class HandoverMailServiceUATTest {
 
     verify(repository, never()).save(any(HandoverMail.class));
     verify(mailSender, never())
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
+        .sendMail(
+            anyString(), anyString(), anyString(), anyString(), anyList(), anyList(), anyString());
   }
 
   @Test
@@ -394,7 +406,8 @@ class HandoverMailServiceUATTest {
 
     verify(repository, never()).save(any(HandoverMail.class));
     verify(mailSender, never())
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
+        .sendMail(
+            anyString(), anyString(), anyString(), anyString(), anyList(), anyList(), anyString());
   }
 
   @Test
@@ -413,7 +426,8 @@ class HandoverMailServiceUATTest {
     // Verify that repository.save and mailSender.sendMail were not called
     verify(repository, never()).save(any(HandoverMail.class));
     verify(mailSender, never())
-        .sendMail(anyString(), anyString(), anyString(), anyString(), any(List.class), anyString());
+        .sendMail(
+            anyString(), anyString(), anyString(), anyString(), anyList(), anyList(), anyString());
   }
 
   @Test
@@ -431,7 +445,8 @@ class HandoverMailServiceUATTest {
     // Verify that repository.save and mailSender.sendMail were not called
     verify(repository, never()).save(any(HandoverMail.class));
     verify(mailSender, never())
-        .sendMail(anyString(), anyString(), anyString(), anyString(), any(List.class), anyString());
+        .sendMail(
+            anyString(), anyString(), anyString(), anyString(), anyList(), anyList(), anyString());
   }
 
   @Test
@@ -444,7 +459,8 @@ class HandoverMailServiceUATTest {
 
     verify(repository).save(any(HandoverMail.class));
     verify(mailSender)
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
+        .sendMail(
+            anyString(), anyString(), anyString(), anyString(), anyList(), anyList(), anyString());
   }
 
   @Test
@@ -456,7 +472,8 @@ class HandoverMailServiceUATTest {
 
     verify(repository, never()).save(any(HandoverMail.class));
     verify(mailSender, never())
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
+        .sendMail(
+            anyString(), anyString(), anyString(), anyString(), anyList(), anyList(), anyString());
   }
 
   @Test
@@ -470,6 +487,7 @@ class HandoverMailServiceUATTest {
             "neuris",
             Collections.singletonList(
                 MailAttachment.builder().fileName("test.xml").fileContent("xml").build()),
+            Collections.emptyList(),
             TEST_UUID.toString());
 
     Assert.assertThrows(
@@ -485,6 +503,7 @@ class HandoverMailServiceUATTest {
             "neuris",
             Collections.singletonList(
                 MailAttachment.builder().fileName("test.xml").fileContent("xml").build()),
+            Collections.emptyList(),
             TEST_UUID.toString());
   }
 
