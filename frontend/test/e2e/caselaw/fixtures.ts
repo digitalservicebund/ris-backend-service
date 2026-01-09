@@ -223,27 +223,16 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
 
     const frontendPatch = jsonPatch.compare(prefilledDocumentUnit, targetState)
 
-    const patchResponse = await request.patch(
-      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
-      {
-        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-        data: {
-          documentationUnitVersion: prefilledDocumentUnit.version,
-          patch: frontendPatch,
-          errorPaths: [],
-        },
-      },
+    const updatedDocumentUnit = await patchAndApplyToDocument(
+      request,
+      prefilledDocumentUnit.uuid,
+      csrfToken,
+      prefilledDocumentUnit,
+      prefilledDocumentUnit.version,
+      frontendPatch,
     )
 
-    if (!patchResponse.ok()) {
-      throw new Error(
-        `Failed to patch prefilledDocumentUnit: ${patchResponse.status()} ${patchResponse.statusText()}`,
-      )
-    }
-
-    const patchResult = await patchResponse.json()
-    const updatedDoc = jsonPatch.applyPatch(prefilledDocumentUnit, patchResult)
-    await use(updatedDoc.newDocument)
+    await use(updatedDocumentUnit)
 
     await deleteWithRetry(
       request,
