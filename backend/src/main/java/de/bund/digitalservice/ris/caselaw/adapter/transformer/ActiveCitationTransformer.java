@@ -2,7 +2,10 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO.ActiveCitationDTOBuilder;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawCitationBlindlinkDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawCitationLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CitationTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
@@ -58,5 +61,39 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
     }
 
     return activeCitationDTOBuilder.build();
+  }
+
+  public static CaselawCitationLinkDTO transformToCaselawCitationLinkDTO(
+      ActiveCitation activeCitation, DecisionDTO currentDto) {
+    if (activeCitation.hasNoValues()) {
+      return null;
+    }
+
+    return CaselawCitationLinkDTO.builder()
+        .id(activeCitation.getUuid())
+        .sourceDocument(currentDto)
+        // TODO: (Malte Laukötter, 2026-01-09) how to get the target document from the db so we can
+        // properly link it here
+        // .targetDocument(activeCitation.getDocumentNumber())
+        .citationType(CitationTypeDTO.builder().id(activeCitation.getCitationType().uuid()).build())
+        .build();
+  }
+
+  public static CaselawCitationBlindlinkDTO transformToCaselawCitationBlindlinkDTO(
+      ActiveCitation activeCitation, DecisionDTO currentDto) {
+    if (activeCitation.hasNoValues()) {
+      return null;
+    }
+
+    return CaselawCitationBlindlinkDTO.builder()
+        .id(activeCitation.getUuid())
+        .sourceDocument(currentDto)
+        .targetCourt(getCourtFromDomain(activeCitation.getCourt()))
+        .targetDate(activeCitation.getDecisionDate())
+        .targetDocumentNumber(activeCitation.getDocumentNumber())
+        .targetDocumentType(getDocumentTypeFromDomain(activeCitation.getDocumentType()))
+        .targetFileNumber(StringUtils.normalizeSpace(activeCitation.getFileNumber()))
+        .citationType(CitationTypeDTO.builder().id(activeCitation.getCitationType().uuid()).build())
+        .build();
   }
 }
