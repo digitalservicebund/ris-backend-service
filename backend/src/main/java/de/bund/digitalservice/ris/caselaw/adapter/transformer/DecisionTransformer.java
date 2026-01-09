@@ -315,9 +315,9 @@ public class DecisionTransformer extends DocumentableTransformer {
             .map(ActiveCitationTransformer::transformToDTO)
             .filter(Objects::nonNull)
             .map(
-                previousDecisionDTO -> {
-                  previousDecisionDTO.setRank(i.getAndIncrement());
-                  return previousDecisionDTO;
+                dto -> {
+                  dto.setRank(i.getAndIncrement());
+                  return dto;
                 })
             .toList());
   }
