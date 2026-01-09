@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 
 @Slf4j
 public class ActiveCitationTransformer extends RelatedDocumentationUnitTransformer {
@@ -64,17 +65,17 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
   }
 
   public static CaselawCitationLinkDTO transformToCaselawCitationLinkDTO(
-      ActiveCitation activeCitation, DecisionDTO currentDto) {
+      ActiveCitation activeCitation,
+      @NonNull DecisionDTO sourceDecisionDto,
+      @NonNull DecisionDTO targetDecisionDto) {
     if (activeCitation.hasNoValues()) {
       return null;
     }
 
     return CaselawCitationLinkDTO.builder()
         .id(activeCitation.getUuid())
-        .sourceDocument(currentDto)
-        // TODO: (Malte Laukötter, 2026-01-09) how to get the target document from the db so we can
-        // properly link it here
-        // .targetDocument(activeCitation.getDocumentNumber())
+        .sourceDocument(sourceDecisionDto)
+        .targetDocument(targetDecisionDto)
         .citationType(CitationTypeDTO.builder().id(activeCitation.getCitationType().uuid()).build())
         .build();
   }

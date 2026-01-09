@@ -146,7 +146,7 @@ public class DecisionTransformer extends DocumentableTransformer {
 
       addNormReferences(builder, contentRelatedIndexing);
 
-      addActiveCitations(builder, contentRelatedIndexing, currentDto);
+      addActiveCitations(builder, contentRelatedIndexing);
       addJobProfiles(builder, contentRelatedIndexing);
       addDefinitions(builder, contentRelatedIndexing);
       addDismissalGrounds(builder, contentRelatedIndexing);
@@ -304,9 +304,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   }
 
   private static void addActiveCitations(
-      DecisionDTOBuilder<?, ?> builder,
-      ContentRelatedIndexing contentRelatedIndexing,
-      DecisionDTO currentDto) {
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
     if (contentRelatedIndexing.activeCitations() == null) {
       return;
     }
@@ -317,33 +315,10 @@ public class DecisionTransformer extends DocumentableTransformer {
             .map(ActiveCitationTransformer::transformToDTO)
             .filter(Objects::nonNull)
             .map(
-                previousDecisionDTO -> {
-                  previousDecisionDTO.setRank(i.getAndIncrement());
-                  return previousDecisionDTO;
+                dto -> {
+                  dto.setRank(i.getAndIncrement());
+                  return dto;
                 })
-            .toList());
-    builder.caselawCitationLinks(
-        contentRelatedIndexing.activeCitations().stream()
-            // TODO: (Malte Laukötter, 2026-01-09) there are a couple of activeCitations with a
-            // document number for which the document does not exist. They can not be stored here
-            .filter(activeCitation -> activeCitation.getDocumentNumber() != null)
-            .map(
-                activeCitation ->
-                    ActiveCitationTransformer.transformToCaselawCitationLinkDTO(
-                        activeCitation, currentDto))
-            .filter(Objects::nonNull)
-            .toList());
-    builder.caselawCitationBlindlinks(
-        contentRelatedIndexing.activeCitations().stream()
-            // TODO: (Malte Laukötter, 2026-01-09) there are a couple of activeCitations with a
-            // document number for which the document does not exist. They must be stored here as
-            // well
-            .filter(activeCitation -> activeCitation.getDocumentNumber() == null)
-            .map(
-                activeCitation ->
-                    ActiveCitationTransformer.transformToCaselawCitationBlindlinkDTO(
-                        activeCitation, currentDto))
-            .filter(Objects::nonNull)
             .toList());
   }
 

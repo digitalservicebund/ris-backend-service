@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ActiveCitationTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
@@ -56,6 +57,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -205,7 +207,37 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       User user,
       DocumentationUnitProcessStep initialProcessStep) {
 
-    var documentationUnitDTO = repository.save(getTransformedEntity(docUnit));
+    DocumentationUnitDTO documentationUnitDTO;
+    if (docUnit instanceof Decision decision) {
+      var decisionDTO =
+          DecisionTransformer.transformToDTO(
+              DecisionDTO.builder()
+                  .documentationOffice(
+                      DocumentationOfficeTransformer.transformToDTO(
+                          docUnit.coreData().documentationOffice()))
+                  .creatingDocumentationOffice(
+                      DocumentationOfficeTransformer.transformToDTO(
+                          docUnit.coreData().creatingDocOffice()))
+                  .build(),
+              decision);
+
+      addCitationsToDecisionDTO(decisionDTO, decision);
+      documentationUnitDTO = decisionDTO;
+    } else if (docUnit instanceof PendingProceeding pendingProceeding) {
+      documentationUnitDTO =
+          PendingProceedingTransformer.transformToDTO(
+              PendingProceedingDTO.builder()
+                  .documentationOffice(
+                      DocumentationOfficeTransformer.transformToDTO(
+                          docUnit.coreData().documentationOffice()))
+                  .build(),
+              pendingProceeding);
+    } else {
+      throw new DocumentationUnitException(
+          "DocumentationUnit couldn't be transformed to DTO as"
+              + " it is neither Decision nor PendingProceeding.");
+    }
+    documentationUnitDTO = repository.save(documentationUnitDTO);
 
     List<SourceDTO> sources = new ArrayList<>();
     if (createdFromReference != null) {
@@ -305,32 +337,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     };
   }
 
-  private static DocumentationUnitDTO getTransformedEntity(DocumentationUnit docUnit) {
-    if (docUnit instanceof Decision decision) {
-      return DecisionTransformer.transformToDTO(
-          DecisionDTO.builder()
-              .documentationOffice(
-                  DocumentationOfficeTransformer.transformToDTO(
-                      docUnit.coreData().documentationOffice()))
-              .creatingDocumentationOffice(
-                  DocumentationOfficeTransformer.transformToDTO(
-                      docUnit.coreData().creatingDocOffice()))
-              .build(),
-          decision);
-    } else if (docUnit instanceof PendingProceeding pendingProceeding) {
-      return PendingProceedingTransformer.transformToDTO(
-          PendingProceedingDTO.builder()
-              .documentationOffice(
-                  DocumentationOfficeTransformer.transformToDTO(
-                      docUnit.coreData().documentationOffice()))
-              .build(),
-          pendingProceeding);
-    }
-    throw new DocumentationUnitException(
-        "DocumentationUnit couldn't be transformed to DTO as"
-            + " it is neither Decision nor PendingProceeding.");
-  }
-
   private ManagementDataDTO getCreatedBy(User user, DocumentationUnitDTO documentationUnitDTO) {
     ManagementDataDTO.ManagementDataDTOBuilder managementDataBuilder =
         ManagementDataDTO.builder()
@@ -400,8 +406,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
-      documentationUnitDTO =
-          DecisionTransformer.transformToDTO(decisionDTO, (Decision) documentationUnit);
+      Decision decision = (Decision) documentationUnit;
+
+      var updatedDecisionDTO = DecisionTransformer.transformToDTO(decisionDTO, decision);
+
+      addCitationsToDecisionDTO(updatedDecisionDTO, decision);
+
+      documentationUnitDTO = updatedDecisionDTO;
       repository.save(documentationUnitDTO);
     }
     if (documentationUnitDTO instanceof PendingProceedingDTO pendingProceedingDTO) {
@@ -1179,5 +1190,52 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     } else {
       documentationUnitDTO.getManagementData().setLastPublishedAtDateTime(now);
     }
+  }
+
+  private void addCitationsToDecisionDTO(DecisionDTO currentDto, Decision decision) {
+    List<CaselawCitationLinkDTO> links = new ArrayList<>();
+    List<CaselawCitationBlindlinkDTO> blindlinks = new ArrayList<>();
+    AtomicInteger nextRank = new AtomicInteger(1);
+
+    decision.contentRelatedIndexing().activeCitations().stream()
+        .filter(activeCitation -> !activeCitation.hasNoValues())
+        .forEach(
+            activeCitation -> {
+              if (activeCitation.getDocumentNumber() == null) {
+                var link =
+                    ActiveCitationTransformer.transformToCaselawCitationBlindlinkDTO(
+                        activeCitation, currentDto);
+                link.setRank(nextRank.getAndIncrement());
+                blindlinks.add(link);
+                return;
+              }
+
+              var optionalTargetDocument =
+                  repository.findByDocumentNumber(activeCitation.getDocumentNumber());
+
+              if (optionalTargetDocument.isEmpty()) {
+                var link =
+                    ActiveCitationTransformer.transformToCaselawCitationBlindlinkDTO(
+                        activeCitation, currentDto);
+                link.setRank(nextRank.getAndIncrement());
+                blindlinks.add(link);
+                return;
+              }
+
+              if (optionalTargetDocument.get() instanceof DecisionDTO targetDecisionDTO) {
+                var link =
+                    ActiveCitationTransformer.transformToCaselawCitationLinkDTO(
+                        activeCitation, currentDto, targetDecisionDTO);
+                link.setRank(nextRank.getAndIncrement());
+                links.add(link);
+                return;
+              }
+
+              throw new IllegalArgumentException(
+                  "Trying to add an active citation with a non decision documentation unit as the target."); // TODO: (Malte Laukötter, 2026-01-09) or should we just handle this as the blind link case as well?
+            });
+
+    currentDto.setCaselawCitationLinks(links);
+    currentDto.setCaselawCitationBlindlinks(blindlinks);
   }
 }

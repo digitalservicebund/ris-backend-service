@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -62,4 +63,6 @@ public class CaselawCitationBlindlinkDTO {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "citation_type_id", nullable = false)
   private CitationTypeDTO citationType;
+
+  @Column @NotNull private Integer rank;
 }
