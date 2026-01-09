@@ -5,6 +5,7 @@ import {
 } from "../utils/documentation-unit-api-util"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
+  fillCombobox,
   navigateToInbox,
   navigateToProcedures,
 } from "~/e2e/caselaw/utils/e2e-utils"
@@ -145,8 +146,8 @@ test.describe("eurlex", () => {
           }),
         ).toBeChecked()
 
-        await page.getByRole("button", { name: "Auswahl zurücksetzen" }).click()
-        await page.getByText("DS", { exact: true }).click()
+        await page.getByRole("button", { name: "Entfernen" }).click()
+        await fillCombobox(page, "Dokumentationsstelle auswählen", "DS")
         await page.getByLabel("Dokumentationsstelle zuweisen").click()
 
         await expect(
@@ -243,7 +244,7 @@ test.describe("eurlex", () => {
         const rows = page.locator("tr")
         const procedureName = generateString({ length: 10 })
         await page
-          .getByRole("textbox", { name: "Vorgang auswählen" })
+          .getByRole("combobox", { name: "Vorgang auswählen" })
           .fill(procedureName)
         await page.getByText(`${procedureName} neu erstellen`).click()
 

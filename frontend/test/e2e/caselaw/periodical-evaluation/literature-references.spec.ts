@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
+  fillCombobox,
   fillInput,
   navigateToPeriodicalReferences,
   navigateToPreview,
@@ -54,9 +55,7 @@ test.describe("Literature references", () => {
           .getByLabel("Dokumenttyp Literaturfundstelle", { exact: true })
           .focus()
         // we expect a list of at least 15 values
-        await expect(
-          page.locator("[aria-label='dropdown-option'] >> nth=15"),
-        ).toBeVisible()
+        await expect(page.getByRole("option").nth(15)).toBeVisible()
       })
 
       await test.step("Input values are maintained when switching between literature and caselaw references", async () => {
@@ -168,12 +167,8 @@ test.describe("Literature references", () => {
         ).toHaveValue("Anmerkung")
 
         // search for docunit
-        await fillInput(page, "Dokumenttyp", "Anh")
+        await fillCombobox(page, "Dokumenttyp", "Anhängiges Verfahren")
         await fillInput(page, "Aktenzeichen", fileNumber)
-        await page
-          .locator("button")
-          .filter({ hasText: "Anhängiges Verfahren" })
-          .click()
 
         await page.getByText("Suchen").click()
 
@@ -407,11 +402,12 @@ test.describe("Literature references", () => {
       await test.step("Change existing reference", async () => {
         await fillInput(page, "Zitatstelle *", `2021, 99${suffix}`)
         await fillInput(page, "Autor Literaturfundstelle", "Kirk, James T.")
-        await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
-        await page.getByText("Ean", { exact: true }).click()
-        await expect(
-          page.getByLabel("Dokumenttyp Literaturfundstelle", { exact: true }),
-        ).toHaveValue("Anmerkung")
+        await fillCombobox(
+          page,
+          "Dokumenttyp Literaturfundstelle",
+          "Ean",
+          "Anmerkung",
+        )
         await page.getByLabel("Fundstelle vermerken", { exact: true }).click()
 
         await expect(

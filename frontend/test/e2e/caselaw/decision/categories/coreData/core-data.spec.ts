@@ -176,66 +176,48 @@ test.describe("core data", () => {
   test("document type dropdown", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    // on start: closed dropdown, no input text
-    await expect(page.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
-      "",
-    )
-    await expect(page.getByText("AnU - Anerkenntnisurteil")).toBeHidden()
-    await expect(
-      page.getByLabel("dropdown-option", { exact: true }),
-    ).toBeHidden()
-
-    // open dropdown
-    await page
+    const dokumenttypArea = page
       .locator("#coreData div")
       .filter({ hasText: "Spruchkörper Dokumenttyp" })
-      .getByLabel("Dropdown öffnen")
-      .click()
-    await expect(
-      page.getByLabel("dropdown-option", { exact: true }),
-    ).not.toHaveCount(0)
+    const dokumenttypCombobox = dokumenttypArea.getByRole("combobox")
+    // on start: closed dropdown, no input text
+    await expect(dokumenttypCombobox).toHaveValue("")
+    await expect(page.getByText("AnU - Anerkenntnisurteil")).toBeHidden()
+    await expect(page.getByRole("option")).toBeHidden()
+
+    // open dropdown
+    await dokumenttypArea.getByLabel("Vorschläge anzeigen").click()
+    await expect(page.getByRole("option")).not.toHaveCount(0)
     await expect(page.getByText("Anerkenntnisurteil")).toBeVisible()
     await expect(page.getByText("EuGH-Vorlage")).toBeVisible()
 
     // type search string: 3 results for "zwischen"
-    await page.getByLabel("Dokumenttyp", { exact: true }).fill("zwischen")
-    await expect(page.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
-      "zwischen",
-    )
-    await expect(
-      page.getByLabel("dropdown-option", { exact: true }),
-    ).toHaveCount(3)
+    await dokumenttypCombobox.fill("zwischen")
+    await expect(dokumenttypCombobox).toHaveValue("zwischen")
+    await expect(page.getByRole("option")).toHaveCount(3)
 
     // use the clear icon
-    await page.getByLabel("Auswahl zurücksetzen", { exact: true }).click()
-    await expect(page.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
-      "",
-    )
-    await expect(
-      page.getByLabel("dropdown-option", { exact: true }),
-    ).not.toHaveCount(0)
+    await dokumenttypArea.getByLabel("Entfernen", { exact: true }).click()
+    await expect(dokumenttypCombobox).toHaveValue("")
+    await expect(page.getByRole("option")).not.toHaveCount(0)
     await expect(page.getByText("Anerkenntnisurteil")).toBeVisible()
 
     // close dropdown
-    await page.getByLabel("Dropdown schließen").click()
-    await expect(page.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
-      "",
-    )
+    await page.getByRole("heading", { name: "Formaldaten" }).click() // a click anywhere outside the dropdown
+    await expect(dokumenttypCombobox).toHaveValue("")
     await expect(
-      page.getByLabel("dropdown-option", { exact: true }),
+      page.getByRole("option", { name: "Anerkenntnisurteil" }),
     ).toBeHidden()
 
     // open dropdown again by focussing
-    await page.getByLabel("Dokumenttyp", { exact: true }).focus()
+    await dokumenttypCombobox.focus()
 
     // close dropdown using the esc key, user input text gets removed and last saved value restored
     await page.keyboard.down("Escape")
     await expect(
-      page.getByLabel("dropdown-option", { exact: true }),
+      page.getByRole("option", { name: "Anerkenntnisurteil" }),
     ).toBeHidden()
-    await expect(page.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
-      "",
-    )
+    await expect(dokumenttypCombobox).toHaveValue("")
   })
 
   // skipped as we don't show the Dokstelle anymore as of RISDEV-4177
@@ -717,7 +699,7 @@ test.describe("core data", () => {
       await test.step("set court to EuG", async () => {
         const court = page.getByLabel("Gericht", { exact: true })
         await court.fill("EuG")
-        await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+        await expect(page.getByRole("progressbar")).toBeHidden()
         await expect(court).toHaveValue("EuG")
         await page.getByText("EuG", { exact: true }).click()
         await expect(court).toHaveValue("EuG")

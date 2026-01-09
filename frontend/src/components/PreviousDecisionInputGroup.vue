@@ -15,7 +15,7 @@ import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
 import PreviousDecision from "@/domain/previousDecision"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
-import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemServices from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 
 const props = defineProps<{
@@ -196,11 +196,10 @@ onMounted(async () => {
             id="court"
             v-model="previousDecision.court"
             aria-label="Gericht Vorgehende Entscheidung"
-            clear-on-choosing-item
             :has-error="slotProps.hasError"
-            :item-service="ComboboxItemService.getCourts"
+            :item-service="ComboboxItemServices.getCourts"
             :read-only="previousDecision.hasForeignSource"
-            @focus="validationStore.remove('court')"
+            @show="validationStore.remove('court')"
           ></ComboboxInput>
         </InputField>
         <div v-if="!dateUnknown" class="flex w-full justify-between gap-24">
@@ -283,7 +282,7 @@ onMounted(async () => {
             id="documentType"
             v-model="previousDecision.documentType"
             aria-label="Dokumenttyp Vorgehende Entscheidung"
-            :item-service="ComboboxItemService.getCaselawDocumentTypes"
+            :item-service="ComboboxItemServices.getCaselawDocumentTypes"
             :read-only="previousDecision.hasForeignSource"
           ></ComboboxInput>
         </InputField>

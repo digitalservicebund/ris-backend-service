@@ -49,7 +49,7 @@ test.describe(
           await page.getByText("MM | Mieter Magazin", { exact: true }).click()
           await expect(
             page.getByLabel("Periodikum", { exact: true }),
-          ).toHaveValue("MM")
+          ).toHaveValue("MM | Mieter Magazin")
         })
 
         await test.step("citation shows citation example", async () => {
@@ -96,7 +96,9 @@ test.describe(
             .click()
           await expect(
             page.getByLabel("Periodikum", { exact: true }),
-          ).toHaveValue("GVBl BB")
+          ).toHaveValue(
+            "GVBl BB | Gesetz- und Verordnungsblatt für das Land Brandenburg",
+          )
           await expect(
             page.getByText("Zitierbeispiel: 1991, 676-681"),
           ).toBeVisible()
@@ -148,7 +150,7 @@ test.describe(
             .click()
           await expect(
             page.getByLabel("Periodikum", { exact: true }),
-          ).toHaveValue("WdG")
+          ).toHaveValue("WdG | Welt der Gesundheitsversorgung")
           await fillInput(page, "Zitatstelle", citation2)
           await fillInput(page, "Klammernzusatz", "ST")
           await page.getByLabel("Fundstelle speichern", { exact: true }).click()
@@ -167,7 +169,7 @@ test.describe(
             .click()
           await expect(
             page.getByLabel("Periodikum", { exact: true }),
-          ).toHaveValue("AllMBl")
+          ).toHaveValue("AllMBl | Allgemeines Ministerialblatt")
           await fillInput(page, "Zitatstelle", citation3)
           await fillInput(page, "Klammernzusatz", "L")
           await page.getByLabel("Fundstelle speichern", { exact: true }).click()
@@ -301,7 +303,7 @@ test.describe(
             .click()
           await expect(
             page.getByLabel("Periodikum Literaturfundstelle", { exact: true }),
-          ).toHaveValue("AllMBl")
+          ).toHaveValue("AllMBl | Allgemeines Ministerialblatt")
           await fillInput(page, "Zitatstelle Literaturfundstelle", citation)
 
           await page
@@ -469,7 +471,7 @@ test.describe(
             .click()
           await expect(
             page.getByLabel("Periodikum Literaturfundstelle", { exact: true }),
-          ).toHaveValue("AllMBl")
+          ).toHaveValue("AllMBl | Allgemeines Ministerialblatt")
           await fillInput(page, "Zitatstelle Literaturfundstelle", citation1)
           await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
           await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
@@ -513,7 +515,9 @@ test.describe(
             .click()
           await expect(
             page.getByLabel("Periodikum Literaturfundstelle", { exact: true }),
-          ).toHaveValue("GVBl BB")
+          ).toHaveValue(
+            "GVBl BB | Gesetz- und Verordnungsblatt für das Land Brandenburg",
+          )
           await fillInput(page, "Zitatstelle Literaturfundstelle", citation2)
           await fillInput(page, "Autor Literaturfundstelle", "Kästner, Erich")
           await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ebs")

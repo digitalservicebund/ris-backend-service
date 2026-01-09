@@ -186,7 +186,7 @@ test.describe("category import", () => {
         await page.getByText("MM | Mieter Magazin", { exact: true }).click()
         await expect(
           page.getByLabel("Periodikum", { exact: true }),
-        ).toHaveValue("MM")
+        ).toHaveValue("MM | Mieter Magazin")
 
         await fillInput(page, "Zitatstelle", "2024, 50-53, Heft 1")
         await fillInput(page, "Klammernzusatz", "LT")
@@ -284,7 +284,7 @@ test.describe("category import", () => {
         await page.getByText("MM | Mieter Magazin", { exact: true }).click()
         await expect(
           page.getByLabel("Periodikum Literaturfundstelle", { exact: true }),
-        ).toHaveValue("MM")
+        ).toHaveValue("MM | Mieter Magazin")
 
         await fillInput(
           page,
@@ -489,9 +489,8 @@ test.describe("category import", () => {
         await page.getByLabel("Normen übernehmen").click()
 
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(3) // the last entry is the input field
-        await expect(
-          normContainer.getByTestId("editable-list-container"),
-        ).toHaveText("PBefGBGBRIS-Abkürzung * ")
+        await expect(normContainer).toContainText("PBefG")
+        await expect(normContainer).toContainText("BGB")
       })
 
       await test.step("show success badge", async () => {
@@ -514,9 +513,9 @@ test.describe("category import", () => {
 
         await page.getByLabel("Normen übernehmen").click()
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(4) // the last entry is the input field
-        await expect(
-          normContainer.getByTestId("editable-list-container"),
-        ).toHaveText("PBefGBGBKBErrG, § 8RIS-Abkürzung * ")
+        await expect(normContainer).toContainText("PBefG")
+        await expect(normContainer).toContainText("BGB")
+        await expect(normContainer).toContainText("KBErrG, § 8")
       })
     },
   )

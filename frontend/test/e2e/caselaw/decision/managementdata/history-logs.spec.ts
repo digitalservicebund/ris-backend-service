@@ -257,7 +257,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
         "AG Aachen",
         dayjs("2025-01-01").format("DD.MM.YYYY"),
         fileNumber,
-        "AnU",
+        "Anerkenntnisurteil",
       )
     })
 

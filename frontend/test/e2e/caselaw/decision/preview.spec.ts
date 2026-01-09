@@ -97,10 +97,7 @@ test.describe("preview decision", () => {
       await page.keyboard.press("Enter")
 
       // Delete court entry
-      await page
-        .getByLabel("Auswahl zurücksetzen", { exact: true })
-        .first()
-        .click()
+      await page.getByLabel("Entfernen", { exact: true }).first().click()
 
       await save(page)
     })

@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
+  fillCombobox,
   navigateToCategories,
   navigateToHandover,
   navigateToPreview,
@@ -31,14 +32,7 @@ test.describe(
       })
 
       await test.step("Select BAG (labor court)", async () => {
-        await page.getByLabel("Gericht", { exact: true }).fill("BAG")
-        await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
-          "BAG",
-        )
-        await expect(
-          page.locator("button").filter({ hasText: /^BAG$/ }),
-        ).toBeVisible()
-        await page.locator("button").filter({ hasText: /^BAG$/ }).click()
+        await fillCombobox(page, "Gericht", "BAG")
         await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
           "BAG",
         )

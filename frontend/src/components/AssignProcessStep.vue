@@ -17,7 +17,7 @@ import { DocumentationUnit } from "@/domain/documentationUnit"
 import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
 import ProcessStep from "@/domain/processStep"
 import { User } from "@/domain/user"
-import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemServices from "@/services/comboboxItemService"
 import { ResponseError } from "@/services/httpClient"
 import processStepService from "@/services/processStepService"
 
@@ -48,13 +48,7 @@ const hasNoProcessStepSelectedError = ref(false)
  * Data restructuring from user props to combobox item.
  */
 const selectedUser = computed({
-  get: () =>
-    nextUser.value
-      ? {
-          label: nextUser.value.initials || nextUser.value.email || "",
-          value: nextUser.value,
-        }
-      : undefined,
+  get: () => nextUser.value,
   set: (newValue) => {
     nextUser.value = { ...newValue } as User
   },
@@ -185,7 +179,7 @@ watch(
               id="processStepPerson"
               v-model="selectedUser"
               aria-label="Neue Person"
-              :item-service="ComboboxItemService.getUsersForDocOffice"
+              :item-service="ComboboxItemServices.getUsersForDocOffice"
             ></ComboboxInput>
           </InputField>
         </div>

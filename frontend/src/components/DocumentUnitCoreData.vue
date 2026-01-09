@@ -20,7 +20,7 @@ import { CoreData, coreDataLabels } from "@/domain/coreData"
 import { Kind } from "@/domain/documentationUnitKind"
 import { pendingProceedingLabels } from "@/domain/pendingProceeding"
 import { SourceValue } from "@/domain/source"
-import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemServices from "@/services/comboboxItemService"
 
 const props = defineProps<{
   kind: Kind
@@ -241,9 +241,8 @@ onBeforeUnmount(() => {
           id="court"
           v-model="coreDataModel.court"
           aria-label="Gericht"
-          clear-on-choosing-item
           :has-error="slotProps.hasError"
-          :item-service="ComboboxItemService.getCourts"
+          :item-service="ComboboxItemServices.getCourts"
         ></ComboboxInput>
       </InputField>
       <!-- Child  -->
@@ -438,7 +437,7 @@ onBeforeUnmount(() => {
           :id="id"
           v-model="coreDataModel.documentType"
           aria-label="Dokumenttyp"
-          :item-service="ComboboxItemService.getCaselawDocumentTypes"
+          :item-service="ComboboxItemServices.getCaselawDocumentTypes"
         ></ComboboxInput>
       </InputField>
     </div>
@@ -532,7 +531,7 @@ onBeforeUnmount(() => {
             :id="id"
             v-model="coreDataModel.procedure"
             aria-label="Vorgang"
-            :item-service="ComboboxItemService.getProcedures"
+            :item-service="ComboboxItemServices.getProcedures"
             manual-entry
             no-clear
           ></ComboboxInput>

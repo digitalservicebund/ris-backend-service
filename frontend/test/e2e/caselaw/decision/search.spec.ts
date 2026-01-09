@@ -290,7 +290,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
         await expect(dialog.getByText("Neuer Schritt")).toBeVisible()
         await expect(dialog.getByText("Fachdokumentation")).toBeVisible()
         await expect(dialog.getByText("Neue Person")).toBeVisible()
-        await dialog.getByLabel("Dropdown öffnen").click()
+        await dialog.getByLabel("Vorschläge anzeigen").click()
 
         await dialog
           .getByRole("button", {
@@ -379,7 +379,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
         await expect(dialog.getByText("Neuer Schritt")).toBeVisible()
         await expect(dialog.getByText("Fachdokumentation")).toBeVisible()
         await expect(dialog.getByText("Neue Person")).toBeVisible()
-        await dialog.getByLabel("Dropdown öffnen").click()
+        await dialog.getByLabel("Vorschläge anzeigen").click()
 
         await dialog
           .getByRole("button", {

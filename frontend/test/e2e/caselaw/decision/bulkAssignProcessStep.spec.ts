@@ -229,7 +229,7 @@ test.describe(
           "AG Aachen",
           dayjs("2025-01-01").format("DD.MM.YYYY"),
           fileNumber,
-          "AnU",
+          "Anerkenntnisurteil",
         )
       })
 
