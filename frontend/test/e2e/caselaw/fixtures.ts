@@ -2,7 +2,7 @@ import { APIRequestContext, Cookie, Page, test } from "@playwright/test"
 import { mergeDeep } from "@tiptap/vue-3"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
-import jsonPatch from "fast-json-patch"
+import jsonPatch, { Operation } from "fast-json-patch"
 import { Page as Pagination } from "@/components/Pagination.vue"
 import { Addressee } from "@/domain/abuseFee"
 import { AppealAdmitter } from "@/domain/appealAdmitter"
@@ -105,6 +105,42 @@ async function deleteWithRetry(
   }
 }
 
+async function patchAndApplyToDocument<T>(
+  request: APIRequestContext,
+  uuid: string,
+  csrfToken: Cookie | undefined,
+  documentUnit: T,
+  version: number,
+  patch: Operation[],
+): Promise<T> {
+  const patchResponse = await request.patch(
+    `/api/v1/caselaw/documentunits/${uuid}`,
+    {
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      data: {
+        documentationUnitVersion: version,
+        patch: patch,
+        errorPaths: [],
+      },
+    },
+  )
+
+  if (!patchResponse.ok()) {
+    throw new Error(
+      `Failed to patch document unit: ${patchResponse.status()} ${patchResponse.statusText()}`,
+    )
+  }
+
+  const patchResult = await patchResponse.json()
+  const fullDocBeforePatch = jsonPatch.applyPatch(documentUnit, patch)
+  const updatedDoc = jsonPatch.applyPatch(
+    fullDocBeforePatch.newDocument,
+    patchResult,
+  )
+
+  return updatedDoc.newDocument
+}
+
 export const caselawTest = test.extend<MyFixtures & MyOptions>({
   context: async ({ browser }, use, testInfo) => {
     const context = await browser.newContext()
@@ -142,82 +178,68 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     }
     const prefilledDocumentUnit = await response.json()
 
-    const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
-    const court = await courtResponse.json()
+    const [courtRes, normRes, citationRes, fieldsRes, docTypeRes] =
+      await Promise.all([
+        request.get(`api/v1/caselaw/courts?q=AG+Aachen`),
+        request.get(`api/v1/caselaw/normabbreviation/search?q=BGB&sz=30&pg=0`),
+        request.get(`api/v1/caselaw/citationtypes?q=Abgrenzung`),
+        request.get(
+          `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01&sz=200&pg=0`,
+        ),
+        request.get(`api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`),
+      ])
 
-    const normAbbreviationResponse = await request.get(
-      `api/v1/caselaw/normabbreviation/search?q=BGB&sz=30&pg=0`,
-    )
-    const normAbbreviation = await normAbbreviationResponse.json()
+    const court = (await courtRes.json())?.[0]
+    const normAbbreviation = (await normRes.json())?.[0]
+    const citationType = (await citationRes.json())?.[0]
+    const fieldsOfLaw = (await fieldsRes.json())?.[0]
+    const documentType = (await docTypeRes.json())?.[0]
 
-    const citationTypeResponse = await request.get(
-      `api/v1/caselaw/citationtypes?q=Abgrenzung`,
-    )
-    const citationType = await citationTypeResponse.json()
-
-    const fieldsOfLawResponse = await request.get(
-      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01&sz=200&pg=0`,
-    )
-    const fieldsOfLaw = await fieldsOfLawResponse.json()
-    const documentTypeResponse = await request.get(
-      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
-    )
-    const documentType = await documentTypeResponse.json()
-
-    const updateResponse = await request.put(
-      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
-      {
-        data: {
-          ...prefilledDocumentUnit,
-          coreData: {
-            ...prefilledDocumentUnit.coreData,
-            court: court?.[0],
-            documentType: documentType?.[0],
-            fileNumbers: [generateString()],
-            decisionDate: "2019-12-31",
-            appraisalBody: "1. Senat, 2. Kammer",
-            sources: [
-              {
-                value: SourceValue.AngefordertesOriginal,
-              },
-            ],
-          },
-          contentRelatedIndexing: {
-            keywords: ["keyword"],
-            norms: [
-              {
-                normAbbreviation: normAbbreviation?.[0],
-              },
-            ],
-            activeCitations: [
-              {
-                documentNumber: "YYTestDoc0013",
-                court: court?.[0],
-                documentType: documentType?.[0],
-                decisionDate: "2022-02-01",
-                fileNumber: "123",
-                citationType: citationType?.[0],
-              },
-            ],
-            fieldsOfLaw: [fieldsOfLaw?.[0]],
-          },
-          shortTexts: {
-            headnote: "testHeadnote",
-            guidingPrinciple: "guidingPrinciple",
-            headline: "testHeadline",
-          },
-        },
-        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    const addedData = {
+      coreData: {
+        court: court,
+        documentType: documentType,
+        fileNumbers: [generateString()],
+        decisionDate: "2019-12-31",
+        appraisalBody: "1. Senat, 2. Kammer",
+        sources: [{ value: SourceValue.AngefordertesOriginal }],
       },
+      contentRelatedIndexing: {
+        keywords: ["keyword"],
+        norms: [{ normAbbreviation }],
+        activeCitations: [
+          {
+            documentNumber: "YYTestDoc0013",
+            court: court,
+            documentType: documentType,
+            decisionDate: "2022-02-01",
+            fileNumber: "123",
+            citationType: citationType,
+          },
+        ],
+        fieldsOfLaw: [fieldsOfLaw],
+      },
+      shortTexts: {
+        headnote: "testHeadnote",
+        guidingPrinciple: "guidingPrinciple",
+        headline: "testHeadline",
+      },
+    } as Decision
+
+    const targetState = mergeDeep(prefilledDocumentUnit, addedData)
+
+    const frontendPatch = jsonPatch.compare(prefilledDocumentUnit, targetState)
+
+    const updatedDocumentUnit = await patchAndApplyToDocument(
+      request,
+      prefilledDocumentUnit.uuid,
+      csrfToken,
+      prefilledDocumentUnit,
+      prefilledDocumentUnit.version,
+      frontendPatch,
     )
 
-    if (!updateResponse.ok()) {
-      throw new Error(
-        `Failed to update prefilledDocumentUnit: ${response.status()} ${response.statusText()}`,
-      )
-    }
-
-    await use(await updateResponse.json())
+    await use(updatedDocumentUnit)
 
     await deleteWithRetry(
       request,
@@ -347,68 +369,69 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
     })
+
     const prefilledDocumentUnit = await response.json()
 
-    const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
-    const court = await courtResponse.json()
+    const [courtRes, docTypeRes, litDocTypeRes, periodicalRes] =
+      await Promise.all([
+        request.get(`api/v1/caselaw/courts?q=AG+Aachen`),
+        request.get(`api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`),
+        request.get(
+          `api/v1/caselaw/documenttypes?q=Ean&category=DEPENDENT_LITERATURE`,
+        ),
+        request.get(`api/v1/caselaw/legalperiodicals?q=MMG`),
+      ])
 
-    const documentTypeResponse = await request.get(
-      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
-    )
-    const documentType = await documentTypeResponse.json()
+    const court = (await courtRes.json())?.[0]
+    const documentType = (await docTypeRes.json())?.[0]
+    const literatureDocumentType = (await litDocTypeRes.json())?.[0]
+    const legalPeriodical = (await periodicalRes.json())?.[0]
 
-    const literatureDocumentTypeResponse = await request.get(
-      `api/v1/caselaw/documenttypes?q=Ean&category=DEPENDENT_LITERATURE`,
-    )
-    const literatureDocumentType = await literatureDocumentTypeResponse.json()
-
-    const legalPeriodicalResponse = await request.get(
-      `api/v1/caselaw/legalperiodicals?q=MMG`,
-    )
-    const legalPeriodical = await legalPeriodicalResponse.json()
-
-    const updateResponse = await request.put(
-      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
-      {
-        data: {
-          ...prefilledDocumentUnit,
-          coreData: {
-            ...prefilledDocumentUnit.coreData,
-            court: court?.[0],
-            documentType: documentType?.[0],
-            fileNumbers: [generateString()],
-            decisionDate: "2019-12-31",
-            appraisalBody: "1. Senat, 2. Kammer",
-          },
-          shortTexts: {
-            headnote: "testHeadnote",
-            guidingPrinciple: "guidingPrinciple",
-          },
-          caselawReferences: [
-            {
-              citation: "2024, 1-2, Heft 1",
-              referenceSupplement: "L",
-              legalPeriodicalRawValue: "MMG",
-              legalPeriodical: legalPeriodical?.[0],
-              referenceType: "caselaw",
-            },
-          ],
-          literatureReferences: [
-            {
-              citation: "2024, 3-4, Heft 1",
-              legalPeriodicalRawValue: "MMG",
-              legalPeriodical: legalPeriodical?.[0],
-              author: "Krümelmonster",
-              documentType: literatureDocumentType?.[0],
-              referenceType: "literature",
-            },
-          ],
-        },
-        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    const targetState = mergeDeep(prefilledDocumentUnit, {
+      coreData: {
+        court: court,
+        documentType: documentType,
+        fileNumbers: [generateString()],
+        decisionDate: "2019-12-31",
+        appraisalBody: "1. Senat, 2. Kammer",
       },
+      shortTexts: {
+        headnote: "testHeadnote",
+        guidingPrinciple: "guidingPrinciple",
+      },
+      caselawReferences: [
+        {
+          citation: "2024, 1-2, Heft 1",
+          referenceSupplement: "L",
+          legalPeriodicalRawValue: "MMG",
+          legalPeriodical: legalPeriodical,
+          referenceType: "caselaw",
+        },
+      ],
+      literatureReferences: [
+        {
+          citation: "2024, 3-4, Heft 1",
+          legalPeriodicalRawValue: "MMG",
+          legalPeriodical: legalPeriodical,
+          author: "Krümelmonster",
+          documentType: literatureDocumentType,
+          referenceType: "literature",
+        },
+      ],
+    })
+
+    const frontendPatch = jsonPatch.compare(prefilledDocumentUnit, targetState)
+
+    const updatedDocumentUnit = await patchAndApplyToDocument(
+      request,
+      prefilledDocumentUnit.uuid,
+      csrfToken,
+      prefilledDocumentUnit,
+      prefilledDocumentUnit.version,
+      frontendPatch,
     )
 
-    await use(await updateResponse.json())
+    await use(updatedDocumentUnit)
 
     await deleteWithRetry(
       request,
@@ -429,141 +452,146 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     })
     const prefilledDocumentUnit = await response.json()
 
-    const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
-    const court = await courtResponse.json()
+    const [
+      courtRes,
+      documentTypeResponse,
+      literatureDocTypeResponse,
+      legalPeriodicalResponse,
+    ] = await Promise.all([
+      request.get(`api/v1/caselaw/courts?q=AG+Aachen`),
+      request.get(`api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`),
+      request.get(
+        `api/v1/caselaw/documenttypes?q=Ean&category=DEPENDENT_LITERATURE`,
+      ),
+      request.get(`api/v1/caselaw/legalperiodicals?q=MMG`),
+    ])
 
-    const documentTypeResponse = await request.get(
-      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
-    )
+    const court = await courtRes.json()
     const documentType = await documentTypeResponse.json()
-
-    const literatureDocumentTypeResponse = await request.get(
-      `api/v1/caselaw/documenttypes?q=Ean&category=DEPENDENT_LITERATURE`,
-    )
-    const literatureDocumentType = await literatureDocumentTypeResponse.json()
-
-    const legalPeriodicalResponse = await request.get(
-      `api/v1/caselaw/legalperiodicals?q=MMG`,
-    )
+    const literatureDocumentType = await literatureDocTypeResponse.json()
     const legalPeriodical = await legalPeriodicalResponse.json()
 
-    const updateResponse = await request.put(
-      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
-      {
-        data: {
-          ...prefilledDocumentUnit,
-          coreData: {
-            ...prefilledDocumentUnit.coreData,
-            court: court?.[0],
-            documentType: documentType?.[0],
-            fileNumbers: [generateString()],
-            decisionDate: "2019-12-31",
-            appraisalBody: "1. Senat, 2. Kammer",
-          },
-          shortTexts: {
-            headnote: "testHeadnote",
-            guidingPrinciple: "guidingPrinciple",
-          },
-          caselawReferences: [
-            {
-              citation: "2024, 1-2, Heft 1",
-              referenceSupplement: "L",
-              legalPeriodicalRawValue: "MMG",
-              legalPeriodical: legalPeriodical?.[0],
-              referenceType: "caselaw",
-            },
-            {
-              citation: "2024, 1-2, Heft 1",
-              referenceSupplement: "L",
-              legalPeriodicalRawValue: "MMG",
-              legalPeriodical: legalPeriodical?.[0],
-              referenceType: "caselaw",
-            },
-            {
-              citation: "2024, 1-2, Heft 1",
-              referenceSupplement: "L",
-              legalPeriodicalRawValue: "MMG",
-              legalPeriodical: legalPeriodical?.[0],
-              referenceType: "caselaw",
-            },
-            {
-              citation: "2024, 1-2, Heft 1",
-              referenceSupplement: "L",
-              legalPeriodicalRawValue: "MMG",
-              legalPeriodical: legalPeriodical?.[0],
-              referenceType: "caselaw",
-            },
-            {
-              citation: "2024, 1-2, Heft 1",
-              referenceSupplement: "L",
-              legalPeriodicalRawValue: "MMG",
-              legalPeriodical: legalPeriodical?.[0],
-              referenceType: "caselaw",
-            },
-            {
-              citation: "2024, 1-2, Heft 1",
-              referenceSupplement: "L",
-              legalPeriodicalRawValue: "MMG",
-              legalPeriodical: legalPeriodical?.[0],
-              referenceType: "caselaw",
-            },
-          ],
-          literatureReferences: [
-            {
-              citation: "2024, 3-4, Heft 1",
-              legalPeriodicalRawValue: "MMG",
-              legalPeriodical: legalPeriodical?.[0],
-              author: "Krümelmonster",
-              documentType: literatureDocumentType?.[0],
-              referenceType: "literature",
-            },
-            {
-              citation: "2024, 3-4, Heft 1",
-              legalPeriodicalRawValue: "MMG",
-              legalPeriodical: legalPeriodical?.[0],
-              author: "Krümelmonster",
-              documentType: literatureDocumentType?.[0],
-              referenceType: "literature",
-            },
-            {
-              citation: "2024, 3-4, Heft 1",
-              legalPeriodicalRawValue: "MMG",
-              legalPeriodical: legalPeriodical?.[0],
-              author: "Krümelmonster",
-              documentType: literatureDocumentType?.[0],
-              referenceType: "literature",
-            },
-            {
-              citation: "2024, 3-4, Heft 1",
-              legalPeriodicalRawValue: "MMG",
-              legalPeriodical: legalPeriodical?.[0],
-              author: "Krümelmonster",
-              documentType: literatureDocumentType?.[0],
-              referenceType: "literature",
-            },
-            {
-              citation: "2024, 3-4, Heft 1",
-              legalPeriodicalRawValue: "MMG",
-              legalPeriodical: legalPeriodical?.[0],
-              author: "Krümelmonster",
-              documentType: literatureDocumentType?.[0],
-              referenceType: "literature",
-            },
-            {
-              citation: "2024, 3-4, Heft 1",
-              legalPeriodicalRawValue: "MMG",
-              legalPeriodical: legalPeriodical?.[0],
-              author: "Krümelmonster",
-              documentType: literatureDocumentType?.[0],
-              referenceType: "literature",
-            },
-          ],
-        },
-        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    const targetState = mergeDeep(prefilledDocumentUnit, {
+      coreData: {
+        ...prefilledDocumentUnit.coreData,
+        court: court,
+        documentType: documentType,
+        fileNumbers: [generateString()],
+        decisionDate: "2019-12-31",
+        appraisalBody: "1. Senat, 2. Kammer",
       },
+      shortTexts: {
+        headnote: "testHeadnote",
+        guidingPrinciple: "guidingPrinciple",
+      },
+      caselawReferences: [
+        {
+          citation: "2024, 1-2, Heft 1",
+          referenceSupplement: "L",
+          legalPeriodicalRawValue: "MMG",
+          legalPeriodical: legalPeriodical?.[0],
+          referenceType: "caselaw",
+        },
+        {
+          citation: "2024, 1-2, Heft 1",
+          referenceSupplement: "L",
+          legalPeriodicalRawValue: "MMG",
+          legalPeriodical: legalPeriodical?.[0],
+          referenceType: "caselaw",
+        },
+        {
+          citation: "2024, 1-2, Heft 1",
+          referenceSupplement: "L",
+          legalPeriodicalRawValue: "MMG",
+          legalPeriodical: legalPeriodical?.[0],
+          referenceType: "caselaw",
+        },
+        {
+          citation: "2024, 1-2, Heft 1",
+          referenceSupplement: "L",
+          legalPeriodicalRawValue: "MMG",
+          legalPeriodical: legalPeriodical?.[0],
+          referenceType: "caselaw",
+        },
+        {
+          citation: "2024, 1-2, Heft 1",
+          referenceSupplement: "L",
+          legalPeriodicalRawValue: "MMG",
+          legalPeriodical: legalPeriodical?.[0],
+          referenceType: "caselaw",
+        },
+        {
+          citation: "2024, 1-2, Heft 1",
+          referenceSupplement: "L",
+          legalPeriodicalRawValue: "MMG",
+          legalPeriodical: legalPeriodical?.[0],
+          referenceType: "caselaw",
+        },
+      ],
+      literatureReferences: [
+        {
+          citation: "2024, 3-4, Heft 1",
+          legalPeriodicalRawValue: "MMG",
+          legalPeriodical: legalPeriodical?.[0],
+          author: "Krümelmonster",
+          documentType: literatureDocumentType?.[0],
+          referenceType: "literature",
+        },
+        {
+          citation: "2024, 3-4, Heft 1",
+          legalPeriodicalRawValue: "MMG",
+          legalPeriodical: legalPeriodical?.[0],
+          author: "Krümelmonster",
+          documentType: literatureDocumentType?.[0],
+          referenceType: "literature",
+        },
+        {
+          citation: "2024, 3-4, Heft 1",
+          legalPeriodicalRawValue: "MMG",
+          legalPeriodical: legalPeriodical?.[0],
+          author: "Krümelmonster",
+          documentType: literatureDocumentType?.[0],
+          referenceType: "literature",
+        },
+        {
+          citation: "2024, 3-4, Heft 1",
+          legalPeriodicalRawValue: "MMG",
+          legalPeriodical: legalPeriodical?.[0],
+          author: "Krümelmonster",
+          documentType: literatureDocumentType?.[0],
+          referenceType: "literature",
+        },
+        {
+          citation: "2024, 3-4, Heft 1",
+          legalPeriodicalRawValue: "MMG",
+          legalPeriodical: legalPeriodical?.[0],
+          author: "Krümelmonster",
+          documentType: literatureDocumentType?.[0],
+          referenceType: "literature",
+        },
+        {
+          citation: "2024, 3-4, Heft 1",
+          legalPeriodicalRawValue: "MMG",
+          legalPeriodical: legalPeriodical?.[0],
+          author: "Krümelmonster",
+          documentType: literatureDocumentType?.[0],
+          referenceType: "literature",
+        },
+      ],
+    })
+
+    const frontendPatch = jsonPatch.compare(prefilledDocumentUnit, targetState)
+
+    const updatedDocumentUnit = await patchAndApplyToDocument(
+      request,
+      prefilledDocumentUnit.uuid,
+      csrfToken,
+      prefilledDocumentUnit,
+      prefilledDocumentUnit.version,
+      frontendPatch,
     )
 
-    await use(await updateResponse.json())
+    await use(updatedDocumentUnit)
 
     await deleteWithRetry(
       request,
@@ -579,186 +607,173 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
     })
+
     const prefilledDocumentUnitWithLongTexts = await response.json()
 
-    const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
-    const court = await courtResponse.json()
+    const [courtRes, courtBFHRes, docTypeRes, fieldsRes, normRes] =
+      await Promise.all([
+        request.get(`api/v1/caselaw/courts?q=AG+Aachen`),
+        request.get(`api/v1/caselaw/courts?q=BFH`),
+        request.get(`api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`),
+        request.get(
+          `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=RE-07-DEU&sz=200&pg=0`,
+        ),
+        request.get(`api/v1/caselaw/normabbreviation/search?q=BGB&sz=30&pg=0`),
+      ])
 
-    const courtBFHResponse = await request.get(`api/v1/caselaw/courts?q=BFH`)
-    const courtBFH = await courtBFHResponse.json()
+    const court = (await courtRes.json())?.[0]
+    const courtBFH = (await courtBFHRes.json())?.[0]
+    const documentType = (await docTypeRes.json())?.[0]
+    const country = (await fieldsRes.json())?.[0]
+    const normAbbreviation = (await normRes.json())?.[0]
 
-    const documentTypeResponse = await request.get(
-      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
-    )
-    const documentType = await documentTypeResponse.json()
-
-    const fieldsOfLawResponse = await request.get(
-      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=RE-07-DEU&sz=200&pg=0`,
-    )
-    const country = await fieldsOfLawResponse.json()
-
-    const normAbbreviationResponse = await request.get(
-      `api/v1/caselaw/normabbreviation/search?q=BGB&sz=30&pg=0`,
-    )
-    const normAbbreviation = await normAbbreviationResponse.json()
-
-    const updateResponse = await request.put(
-      `/api/v1/caselaw/documentunits/${prefilledDocumentUnitWithLongTexts.uuid}`,
-      {
-        data: {
-          ...prefilledDocumentUnitWithLongTexts,
-          coreData: {
-            ...prefilledDocumentUnitWithLongTexts.coreData,
-            court: court?.[0],
-            documentType: documentType?.[0],
-            fileNumbers: [generateString()],
-            decisionDate: "2019-12-31",
-            appraisalBody: "1. Senat, 2. Kammer",
-          },
-          shortTexts: {
-            decisionNames: ["Test Entscheidungsname"],
-            headnote: "Test Orientierungssatz",
-            guidingPrinciple: "Test Leitsatz",
-            headline: "Test Titelzeile",
-            otherHeadnote: "Test Sonstiger Orientierungssatz",
-          },
-          longTexts: {
-            tenor: "Test Tenor",
-            reasons: "Test Gründe",
-            caseFacts: "Test Tatbestand",
-            decisionReasons: "Test Entscheidungsgründe",
-            dissentingOpinion: "Test Abweichende Meinung",
-            participatingJudges: [{ name: "Test Richter" }],
-            otherLongText: "Test Sonstiger Langtext",
-            outline: "Test Gliederung",
-            corrections: [
-              {
-                type: "Berichtigungsbeschluss",
-                description: "Hauffen -> Haufen",
-              },
-            ],
-          },
-          contentRelatedIndexing: {
-            evsf: "Test E-VSF",
-            definitions: [
-              {
-                definedTerm: "Test Definition",
-                definingBorderNumber: 2,
-              },
-              { definedTerm: "Test Definition2" },
-            ],
-            foreignLanguageVersions: [
-              {
-                link: "Test Fremdsprachige Fassung",
-                languageCode: {
-                  id: "fdbccbc3-0860-5c49-914a-759c31e68c85",
-                  label: "Akan",
-                  isoCode: "ak",
-                },
-              },
-              {
-                link: "Test Fremdsprachige Fassung2",
-                languageCode: {
-                  id: "0d430058-b2a5-540b-aa2d-e3627cdc1d8b",
-                  label: "Afar",
-                  isoCode: "aa",
-                },
-              },
-            ],
-            originOfTranslations: [
-              {
-                languageCode: {
-                  id: "5a36047e-3b85-52a2-812b-02420b4a8499",
-                  label: "Französisch",
-                  isoCode: "fr",
-                },
-                translators: ["Maxi Muster"],
-                borderNumbers: [1],
-                urls: ["www.link-to-translation.fr"],
-                translationType: TranslationType.AMTLICH,
-              },
-            ],
-            dismissalTypes: ["Test Kündigungsarten"],
-            dismissalGrounds: ["Test Kündigungsgründe"],
-            jobProfiles: ["Test Berufsbild"],
-            hasLegislativeMandate: true,
-            appealAdmission: {
-              admitted: true,
-              by: AppealAdmitter.FG,
-            },
-            appeal: {
-              appellants: [
-                {
-                  id: "37213474-a727-4d85-8cc6-309d86944132",
-                  value: "Kläger",
-                },
-              ],
-            },
-            collectiveAgreements: [
-              {
-                name: "Stehende Bühnen",
-                norm: "§ 23",
-                date: "12.2002",
-                industry: {
-                  id: "290b39dc-9368-4d1c-9076-7f96e05cb575",
-                  label: "Bühne, Theater, Orchester",
-                },
-              },
-            ],
-            objectValues: [
-              {
-                amount: 123,
-                currencyCode: {
-                  id: "c7a92695-5171-459a-bd79-5cc741064a25",
-                  label: "Dollar (USD)",
-                  isoCode: "USD",
-                },
-                proceedingType: ProceedingType.VERFASSUNGSBESCHWERDE,
-              },
-            ],
-            abuseFees: [
-              {
-                amount: 223,
-                currencyCode: {
-                  id: "c7a92695-5171-459a-bd79-5cc741064a25",
-                  label: "Dollar (USD)",
-                  isoCode: "USD",
-                },
-                addressee: Addressee.BEVOLLMAECHTIGTER,
-              },
-            ],
-            countriesOfOrigin: [
-              {
-                country: country?.[0],
-              },
-            ],
-            incomeTypes: [
-              {
-                terminology: "Programmierer",
-                typeOfIncome: TypeOfIncome.GEWERBEBETRIEB,
-              },
-            ],
-            relatedPendingProceedings: [
-              {
-                documentNumber: "YYTestDoc0017",
-                court: courtBFH?.[0],
-                decisionDate: "2022-02-01",
-                fileNumber: "IV R 99/99",
-              },
-            ],
-            nonApplicationNorms: [
-              {
-                normAbbreviation: normAbbreviation?.[0],
-                singleNorms: [{ singleNorm: "§ 1" }],
-              },
-            ],
-          },
-        },
-        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    const targetState = mergeDeep(prefilledDocumentUnitWithLongTexts, {
+      coreData: {
+        court: court,
+        documentType: documentType,
+        fileNumbers: [generateString()],
+        decisionDate: "2019-12-31",
+        appraisalBody: "1. Senat, 2. Kammer",
       },
+      shortTexts: {
+        decisionNames: ["Test Entscheidungsname"],
+        headnote: "Test Orientierungssatz",
+        guidingPrinciple: "Test Leitsatz",
+        headline: "Test Titelzeile",
+        otherHeadnote: "Test Sonstiger Orientierungssatz",
+      },
+      longTexts: {
+        tenor: "Test Tenor",
+        reasons: "Test Gründe",
+        caseFacts: "Test Tatbestand",
+        decisionReasons: "Test Entscheidungsgründe",
+        dissentingOpinion: "Test Abweichende Meinung",
+        participatingJudges: [{ name: "Test Richter" }],
+        otherLongText: "Test Sonstiger Langtext",
+        outline: "Test Gliederung",
+        corrections: [
+          { type: "Berichtigungsbeschluss", description: "Hauffen -> Haufen" },
+        ],
+      },
+      contentRelatedIndexing: {
+        evsf: "Test E-VSF",
+        definitions: [
+          { definedTerm: "Test Definition", definingBorderNumber: 2 },
+          { definedTerm: "Test Definition2" },
+        ],
+        foreignLanguageVersions: [
+          {
+            link: "Test Fremdsprachige Fassung",
+            languageCode: {
+              id: "fdbccbc3-0860-5c49-914a-759c31e68c85",
+              label: "Akan",
+              isoCode: "ak",
+            },
+          },
+          {
+            link: "Test Fremdsprachige Fassung2",
+            languageCode: {
+              id: "0d430058-b2a5-540b-aa2d-e3627cdc1d8b",
+              label: "Afar",
+              isoCode: "aa",
+            },
+          },
+        ],
+        originOfTranslations: [
+          {
+            languageCode: {
+              id: "5a36047e-3b85-52a2-812b-02420b4a8499",
+              label: "Französisch",
+              isoCode: "fr",
+            },
+            translators: ["Maxi Muster"],
+            borderNumbers: [1],
+            urls: ["www.link-to-translation.fr"],
+            translationType: TranslationType.AMTLICH,
+          },
+        ],
+        dismissalTypes: ["Test Kündigungsarten"],
+        dismissalGrounds: ["Test Kündigungsgründe"],
+        jobProfiles: ["Test Berufsbild"],
+        hasLegislativeMandate: true,
+        appealAdmission: { admitted: true, by: AppealAdmitter.FG },
+        appeal: {
+          appellants: [
+            { id: "37213474-a727-4d85-8cc6-309d86944132", value: "Kläger" },
+          ],
+        },
+        collectiveAgreements: [
+          {
+            name: "Stehende Bühnen",
+            norm: "§ 23",
+            date: "12.2002",
+            industry: {
+              id: "290b39dc-9368-4d1c-9076-7f96e05cb575",
+              label: "Bühne, Theater, Orchester",
+            },
+          },
+        ],
+        objectValues: [
+          {
+            amount: 123,
+            currencyCode: {
+              id: "c7a92695-5171-459a-bd79-5cc741064a25",
+              label: "Dollar (USD)",
+              isoCode: "USD",
+            },
+            proceedingType: ProceedingType.VERFASSUNGSBESCHWERDE,
+          },
+        ],
+        abuseFees: [
+          {
+            amount: 223,
+            currencyCode: {
+              id: "c7a92695-5171-459a-bd79-5cc741064a25",
+              label: "Dollar (USD)",
+              isoCode: "USD",
+            },
+            addressee: Addressee.BEVOLLMAECHTIGTER,
+          },
+        ],
+        countriesOfOrigin: [{ country }],
+        incomeTypes: [
+          {
+            terminology: "Programmierer",
+            typeOfIncome: TypeOfIncome.GEWERBEBETRIEB,
+          },
+        ],
+        relatedPendingProceedings: [
+          {
+            documentNumber: "YYTestDoc0017",
+            court: courtBFH,
+            decisionDate: "2022-02-01",
+            fileNumber: "IV R 99/99",
+          },
+        ],
+        nonApplicationNorms: [
+          {
+            normAbbreviation: normAbbreviation,
+            singleNorms: [{ singleNorm: "§ 1" }],
+          },
+        ],
+      },
+    })
+
+    const frontendPatch = jsonPatch.compare(
+      prefilledDocumentUnitWithLongTexts,
+      targetState,
     )
 
-    await use(await updateResponse.json())
+    const updatedDocumentUnit = await patchAndApplyToDocument(
+      request,
+      prefilledDocumentUnitWithLongTexts.uuid,
+      csrfToken,
+      prefilledDocumentUnitWithLongTexts,
+      prefilledDocumentUnitWithLongTexts.version,
+      frontendPatch,
+    )
+
+    await use(updatedDocumentUnit)
 
     await deleteWithRetry(
       request,
