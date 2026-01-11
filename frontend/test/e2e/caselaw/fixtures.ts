@@ -132,7 +132,12 @@ async function patchAndApplyToDocument<T>(
   }
 
   const patchResult = await patchResponse.json()
-  const updatedDoc = jsonPatch.applyPatch(documentUnit, patchResult)
+  const fullDocBeforePatch = jsonPatch.applyPatch(documentUnit, patch)
+  const updatedDoc = jsonPatch.applyPatch(
+    fullDocBeforePatch.newDocument,
+    patchResult,
+  )
+
   return updatedDoc.newDocument
 }
 
@@ -190,7 +195,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     const fieldsOfLaw = (await fieldsRes.json())?.[0]
     const documentType = (await docTypeRes.json())?.[0]
 
-    const targetState = mergeDeep(prefilledDocumentUnit, {
+    const addedData = {
       coreData: {
         court: court,
         documentType: documentType,
@@ -219,7 +224,9 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
         guidingPrinciple: "guidingPrinciple",
         headline: "testHeadline",
       },
-    })
+    } as Decision
+
+    const targetState = mergeDeep(prefilledDocumentUnit, addedData)
 
     const frontendPatch = jsonPatch.compare(prefilledDocumentUnit, targetState)
 
