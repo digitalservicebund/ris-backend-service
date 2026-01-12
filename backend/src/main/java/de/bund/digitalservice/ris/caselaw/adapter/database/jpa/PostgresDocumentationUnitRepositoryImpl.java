@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ActiveCitationTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
@@ -57,7 +56,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -209,6 +207,18 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     DocumentationUnitDTO documentationUnitDTO;
     if (docUnit instanceof Decision decision) {
+      // We need to create uuids for new active citations before transforming them to dtos as we
+      // want to use the same id in both the related_documenation table and the new
+      // caselaw_citation_x tables.
+      // TODO: (Malte Laukötter, 2026-01-09) remove this step once we only write the
+      // caselaw_citation_x tables and annotated the id in the DTOs with @GeneratedValue.
+      if (decision.contentRelatedIndexing() != null
+          && decision.contentRelatedIndexing().activeCitations() != null) {
+        decision.contentRelatedIndexing().activeCitations().stream()
+            .filter(activeCitation -> activeCitation.getUuid() == null)
+            .forEach(activeCitation -> activeCitation.setUuid(UUID.randomUUID()));
+      }
+
       var decisionDTO =
           DecisionTransformer.transformToDTO(
               DecisionDTO.builder()
@@ -221,8 +231,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                   .build(),
               decision);
 
-      addCitationsToDecisionDTO(decisionDTO, decision);
-      documentationUnitDTO = decisionDTO;
+      documentationUnitDTO = decisionDTO; // addCitationsToDecisionDTO(decisionDTO, decision);
     } else if (docUnit instanceof PendingProceeding pendingProceeding) {
       documentationUnitDTO =
           PendingProceedingTransformer.transformToDTO(
@@ -413,16 +422,16 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       // caselaw_citation_x tables.
       // TODO: (Malte Laukötter, 2026-01-09) remove this step once we only write the
       // caselaw_citation_x tables and annotated the id in the DTOs with @GeneratedValue.
-      decision.contentRelatedIndexing().activeCitations().stream()
-          .filter(activeCitation -> activeCitation.getUuid() == null)
-          .forEach(activeCitation -> activeCitation.setUuid(UUID.randomUUID()));
+      if (decision.contentRelatedIndexing() != null
+          && decision.contentRelatedIndexing().activeCitations() != null) {
+        decision.contentRelatedIndexing().activeCitations().stream()
+            .filter(activeCitation -> activeCitation.getUuid() == null)
+            .forEach(activeCitation -> activeCitation.setUuid(UUID.randomUUID()));
+      }
 
       var updatedDecisionDTO = DecisionTransformer.transformToDTO(decisionDTO, decision);
-
-      addCitationsToDecisionDTO(updatedDecisionDTO, decision);
-
-      documentationUnitDTO = updatedDecisionDTO;
-      repository.save(documentationUnitDTO);
+      // addCitationsToDecisionDTO(updatedDecisionDTO, decision);
+      repository.save(updatedDecisionDTO);
     }
     if (documentationUnitDTO instanceof PendingProceedingDTO pendingProceedingDTO) {
       if (!pendingProceedingDTO.isResolved
@@ -1201,7 +1210,15 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     }
   }
 
-  private void addCitationsToDecisionDTO(DecisionDTO currentDto, Decision decision) {
+  private DecisionDTO addCitationsToDecisionDTO(DecisionDTO dto, Decision decision) {
+    if (decision.contentRelatedIndexing() == null) {
+      return dto;
+    }
+
+    if (decision.contentRelatedIndexing().activeCitations() == null) {
+      return dto;
+    }
+    /*
     List<CaselawCitationLinkDTO> links = new ArrayList<>();
     List<CaselawCitationBlindlinkDTO> blindlinks = new ArrayList<>();
     AtomicInteger nextRank = new AtomicInteger(1);
@@ -1217,7 +1234,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               if (optionalTargetDocument.isEmpty()) {
                 var link =
                     ActiveCitationTransformer.transformToCaselawCitationBlindlinkDTO(
-                        activeCitation, currentDto);
+                        activeCitation, dto);
 
                 if (link == null) {
                   return;
@@ -1231,7 +1248,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               if (optionalTargetDocument.get() instanceof DecisionDTO targetDecisionDTO) {
                 var link =
                     ActiveCitationTransformer.transformToCaselawCitationLinkDTO(
-                        activeCitation, currentDto, targetDecisionDTO);
+                        activeCitation, dto, targetDecisionDTO);
 
                 if (link == null) {
                   return;
@@ -1244,9 +1261,14 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
               throw new IllegalArgumentException(
                   "Trying to add an active citation with a non decision documentation unit as the target."); // TODO: (Malte Laukötter, 2026-01-09) or should we just handle this as the blind link case as well?
-            });
+            });*/
 
-    currentDto.setCaselawCitationLinks(links);
-    currentDto.setCaselawCitationBlindlinks(blindlinks);
+    /*
+    dto.getCaselawCitationLinks().addAll(links);
+    currentDto.getCaselawCitationLinks().clear();
+    currentDto.getCaselawCitationLinks().addAll(links);
+    currentDto.getCaselawCitationBlindlinks().clear();
+    currentDto.getCaselawCitationBlindlinks().addAll(blindlinks);*/
+    return dto;
   }
 }
