@@ -10,11 +10,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
@@ -24,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.MailAttachmentImage;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
@@ -154,7 +157,16 @@ class HandoverMailServiceUATTest {
 
   @BeforeEach
   void setUp() throws ParserConfigurationException, TransformerException {
-    decision = Decision.builder().uuid(TEST_UUID).documentNumber("test-document-number").build();
+    decision =
+        Decision.builder()
+            .uuid(TEST_UUID)
+            .documentNumber("test-document-number")
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .fileNumbers(Collections.emptyList())
+                    .build())
+            .build();
 
     when(featureToggleService.isEnabled("neuris.text-check-noindex-handover")).thenReturn(true);
 
@@ -525,5 +537,99 @@ class HandoverMailServiceUATTest {
 
     assertThat(response.get(0)).usingRecursiveComparison().isEqualTo(DOC_UNIT_SAVED_MAIL);
     verify(repository).getHandoversByEntity(TEST_UUID, entityType);
+  }
+
+  @Test
+  void testSendDocumentationUnitWithImages()
+      throws ParserConfigurationException, TransformerException {
+    decision =
+        Decision.builder()
+            .uuid(TEST_UUID)
+            .documentNumber("test-document-number")
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .fileNumbers(Collections.emptyList())
+                    .build())
+            .build();
+    when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
+        .thenReturn(
+            List.of(
+                AttachmentInlineDTO.builder().filename("foo.png").build(),
+                AttachmentInlineDTO.builder().filename("bar.jpeg").build(),
+                AttachmentInlineDTO.builder().filename("baz.jpg").build(),
+                AttachmentInlineDTO.builder().filename("qux.gif").build(),
+                AttachmentInlineDTO.builder().filename("quux.JPEG").build(),
+                AttachmentInlineDTO.builder().filename("corge.GIF").build()));
+
+    HandoverMail savedMail =
+        DOC_UNIT_SAVED_MAIL.toBuilder()
+            .imageAttachments(
+                List.of(
+                    MailAttachmentImage.builder()
+                        .fileName("test-document-number_ds_foo.png")
+                        .build(),
+                    MailAttachmentImage.builder()
+                        .fileName("test-document-number_ds_bar.jpg")
+                        .build(),
+                    MailAttachmentImage.builder()
+                        .fileName("test-document-number_ds_baz.jpg")
+                        .build(),
+                    MailAttachmentImage.builder()
+                        .fileName("test-document-number_ds_qux.gif")
+                        .build(),
+                    MailAttachmentImage.builder()
+                        .fileName("test-document-number_ds_quux.jpg")
+                        .build(),
+                    MailAttachmentImage.builder()
+                        .fileName("test-document-number_ds_corge.gif")
+                        .build()))
+            .build();
+
+    when(repository.save(savedMail)).thenReturn(savedMail);
+
+    var response = service.handOver(decision, RECEIVER_ADDRESS, ISSUER_ADDRESS);
+
+    assertThat(response).usingRecursiveComparison().isEqualTo(savedMail);
+
+    verify(xmlExporter)
+        .transformToXml(
+            decision.toBuilder()
+                .documentNumber("TESTtest-document-number")
+                .coreData(
+                    decision.coreData().toBuilder()
+                        .court(
+                            Court.builder()
+                                .label("VGH Mannheim")
+                                .location("Mannheim")
+                                .type("VGH")
+                                .build())
+                        .fileNumbers(List.of("TEST"))
+                        .build())
+                .build(),
+            false);
+
+    verify(repository).save(savedMail);
+    verify(mailSender)
+        .sendMail(
+            SENDER_ADDRESS,
+            RECEIVER_ADDRESS,
+            DOC_UNIT_SAVED_MAIL.mailSubject(),
+            "neuris",
+            Collections.singletonList(
+                MailAttachment.builder()
+                    .fileName(savedMail.attachments().getFirst().fileName())
+                    .fileContent(savedMail.attachments().getFirst().fileContent())
+                    .build()),
+            List.of(
+                MailAttachmentImage.builder().fileName("test-document-number_ds_foo.png").build(),
+                MailAttachmentImage.builder().fileName("test-document-number_ds_bar.jpg").build(),
+                MailAttachmentImage.builder().fileName("test-document-number_ds_baz.jpg").build(),
+                MailAttachmentImage.builder().fileName("test-document-number_ds_qux.gif").build(),
+                MailAttachmentImage.builder().fileName("test-document-number_ds_quux.jpg").build(),
+                MailAttachmentImage.builder()
+                    .fileName("test-document-number_ds_corge.gif")
+                    .build()),
+            DOC_UNIT_SAVED_MAIL.entityId().toString());
   }
 }
