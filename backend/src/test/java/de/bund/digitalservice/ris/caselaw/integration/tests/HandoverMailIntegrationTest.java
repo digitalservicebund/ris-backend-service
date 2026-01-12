@@ -8,6 +8,7 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseHandoverReportRepository;
@@ -37,6 +38,7 @@ import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.MailAttachmentImage;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.User;
@@ -211,6 +213,14 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
                 .documentNumber(identifier)
                 .inboxStatus(InboxStatus.EXTERNAL_HANDOVER)
                 .headnote("xml")
+                .attachmentsInline(
+                    List.of(
+                        AttachmentInlineDTO.builder()
+                            .uploadTimestamp(Instant.now())
+                            .format("png")
+                            .filename("foo.png")
+                            .content(new byte[7])
+                            .build()))
                 .date(LocalDate.now()));
     UUID entityId = savedDocumentationUnitDTO.getId();
 
@@ -265,6 +275,8 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
                             .fileName("docnr12345678.xml")
                             .xml("citation: citation docunit: docnr12345678")
                             .build()))
+            .attachedImages(
+                entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT) ? "foo.png" : "")
             .statusCode("200")
             .statusMessages("message 1|message 2")
             .issuerAddress("test@test.com")
@@ -285,6 +297,10 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
                             .fileName("docnr12345678.xml")
                             .fileContent("citation: citation docunit: docnr12345678")
                             .build()))
+            .imageAttachments(
+                entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)
+                    ? List.of(MailAttachmentImage.builder().fileName("foo.png").build())
+                    : List.of())
             .success(true)
             .statusMessages(List.of("message 1", "message 2"))
             .issuerAddress("test@test.com") // set by AuthUtils
