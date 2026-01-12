@@ -1210,22 +1210,19 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         .filter(activeCitation -> !activeCitation.hasNoValues())
         .forEach(
             activeCitation -> {
-              if (activeCitation.getDocumentNumber() == null) {
-                var link =
-                    ActiveCitationTransformer.transformToCaselawCitationBlindlinkDTO(
-                        activeCitation, currentDto);
-                link.setRank(nextRank.getAndIncrement());
-                blindlinks.add(link);
-                return;
-              }
-
               var optionalTargetDocument =
-                  repository.findByDocumentNumber(activeCitation.getDocumentNumber());
+                  Optional.ofNullable(activeCitation.getDocumentNumber())
+                      .flatMap(repository::findByDocumentNumber);
 
               if (optionalTargetDocument.isEmpty()) {
                 var link =
                     ActiveCitationTransformer.transformToCaselawCitationBlindlinkDTO(
                         activeCitation, currentDto);
+
+                if (link == null) {
+                  return;
+                }
+
                 link.setRank(nextRank.getAndIncrement());
                 blindlinks.add(link);
                 return;
@@ -1235,6 +1232,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                 var link =
                     ActiveCitationTransformer.transformToCaselawCitationLinkDTO(
                         activeCitation, currentDto, targetDecisionDTO);
+
+                if (link == null) {
+                  return;
+                }
+
                 link.setRank(nextRank.getAndIncrement());
                 links.add(link);
                 return;
