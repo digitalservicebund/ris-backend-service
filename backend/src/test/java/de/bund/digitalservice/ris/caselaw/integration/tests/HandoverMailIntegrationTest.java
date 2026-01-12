@@ -217,8 +217,8 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
                     List.of(
                         AttachmentInlineDTO.builder()
                             .uploadTimestamp(Instant.now())
-                            .format("png")
-                            .filename("foo.png")
+                            .format("JPEG")
+                            .filename("foo.JPEG")
                             .content(new byte[7])
                             .build()))
                 .date(LocalDate.now()));
@@ -276,7 +276,9 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
                             .xml("citation: citation docunit: docnr12345678")
                             .build()))
             .attachedImages(
-                entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT) ? "foo.png" : "")
+                entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)
+                    ? "docnr12345678_ds_foo.jpg"
+                    : "")
             .statusCode("200")
             .statusMessages("message 1|message 2")
             .issuerAddress("test@test.com")
@@ -299,7 +301,8 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
                             .build()))
             .imageAttachments(
                 entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)
-                    ? List.of(MailAttachmentImage.builder().fileName("foo.png").build())
+                    ? List.of(
+                        MailAttachmentImage.builder().fileName("docnr12345678_ds_foo.jpg").build())
                     : List.of())
             .success(true)
             .statusMessages(List.of("message 1", "message 2"))

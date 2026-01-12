@@ -88,8 +88,7 @@ public class HandoverMailService implements MailService {
       throw new HandoverException("Couldn't generate xml for documentationUnit.", ex);
     }
 
-    List<AttachmentInlineDTO> inlineAttachments =
-        attachmentInlineRepository.findAllByDocumentationUnitId(decision.uuid());
+    List<MailAttachmentImage> mailAttachmentImages = getImageAttachments(decision);
 
     String mailSubject = generateMailSubject(decision);
 
@@ -99,7 +98,7 @@ public class HandoverMailService implements MailService {
             receiverAddress,
             mailSubject,
             List.of(xml),
-            inlineAttachments,
+            mailAttachmentImages,
             issuerAddress,
             HandoverEntityType.DOCUMENTATION_UNIT);
     if (!handoverMail.success()) {
@@ -245,7 +244,7 @@ public class HandoverMailService implements MailService {
       String receiverAddress,
       String mailSubject,
       List<XmlTransformationResult> xml,
-      List<AttachmentInlineDTO> attachedImages,
+      List<MailAttachmentImage> attachedImages,
       String issuerAddress,
       HandoverEntityType entityType) {
     var xmlHandoverMailBuilder =
@@ -262,26 +261,13 @@ public class HandoverMailService implements MailService {
       return xmlHandoverMailBuilder.success(false).build();
     }
 
-    List<MailAttachmentImage> mailAttachmentImages = Collections.emptyList();
-    if (!CollectionUtils.isEmpty(attachedImages)) {
-      mailAttachmentImages =
-          attachedImages.stream()
-              .map(
-                  attachmentImage ->
-                      MailAttachmentImage.builder()
-                          .fileName(attachmentImage.getFilename())
-                          .fileContent(attachmentImage.getContent())
-                          .build())
-              .toList();
-    }
-
     return xmlHandoverMailBuilder
         .receiverAddress(receiverAddress)
         .mailSubject(mailSubject)
         .handoverDate(xml.get(0).creationDate())
         .issuerAddress(issuerAddress)
         .attachments(renameAndCreateMailAttachments(xml))
-        .imageAttachments(mailAttachmentImages)
+        .imageAttachments(attachedImages)
         .entityType(entityType)
         .build();
   }
@@ -356,5 +342,33 @@ public class HandoverMailService implements MailService {
                             .fileNumbers(Collections.singletonList("TEST"))
                             .build()))
         .build();
+  }
+
+  private List<MailAttachmentImage> getImageAttachments(Decision decision) {
+    List<AttachmentInlineDTO> inlineAttachments =
+        attachmentInlineRepository.findAllByDocumentationUnitId(decision.uuid());
+    if (!CollectionUtils.isEmpty(inlineAttachments)) {
+      return inlineAttachments.stream()
+          .map(
+              attachmentImage -> {
+                var filename =
+                    decision.documentNumber()
+                        + "_"
+                        + decision.coreData().documentationOffice().abbreviation()
+                        + "_"
+                        + attachmentImage.getFilename().trim();
+                filename = filename.toLowerCase();
+                if (filename.endsWith(".jpeg")) {
+                  filename = filename.replace(".jpeg", ".jpg");
+                }
+                return MailAttachmentImage.builder()
+                    .fileName(filename)
+                    .fileContent(attachmentImage.getContent())
+                    .build();
+              })
+          .toList();
+    } else {
+      return Collections.emptyList();
+    }
   }
 }
