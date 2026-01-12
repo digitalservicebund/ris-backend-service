@@ -7,14 +7,18 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverMailDTO;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.MailAttachmentImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 
 public class HandoverMailTransformer {
   private HandoverMailTransformer() {}
 
   public static HandoverMailDTO transformToDTO(HandoverMail handoverMail) {
+    var attachedImages =
+        handoverMail.imageAttachments().stream().map(MailAttachmentImage::fileName).toList();
     var mail =
         HandoverMailDTO.builder()
             .entityId(handoverMail.entityId())
@@ -24,6 +28,7 @@ public class HandoverMailTransformer {
             .sentDate(handoverMail.getHandoverDate())
             .mailSubject(handoverMail.mailSubject())
             .issuerAddress(handoverMail.issuerAddress())
+            .attachedImages(String.join("|", attachedImages))
             .attachments(new ArrayList<>())
             .build();
 
@@ -69,6 +74,15 @@ public class HandoverMailTransformer {
                           .build();
                     })
                 .toList())
+        .imageAttachments(
+            handoverMailDTO.getAttachedImages() == null
+                    || handoverMailDTO.getAttachedImages().isBlank()
+                ? Collections.emptyList()
+                : Arrays.stream(handoverMailDTO.getAttachedImages().split("\\|"))
+                    .map(
+                        attachedImageFileName ->
+                            MailAttachmentImage.builder().fileName(attachedImageFileName).build())
+                    .toList())
         .build();
   }
 }
