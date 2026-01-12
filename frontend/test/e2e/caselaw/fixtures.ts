@@ -471,7 +471,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     const literatureDocumentType = await literatureDocTypeResponse.json()
     const legalPeriodical = await legalPeriodicalResponse.json()
 
-    const targetState = mergeDeep(prefilledDocumentUnit, {
+    const addedData = {
       coreData: {
         ...prefilledDocumentUnit.coreData,
         court: court,
@@ -578,7 +578,9 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           referenceType: "literature",
         },
       ],
-    })
+    } as Decision
+
+    const targetState = mergeDeep(prefilledDocumentUnit, addedData)
 
     const frontendPatch = jsonPatch.compare(prefilledDocumentUnit, targetState)
 
