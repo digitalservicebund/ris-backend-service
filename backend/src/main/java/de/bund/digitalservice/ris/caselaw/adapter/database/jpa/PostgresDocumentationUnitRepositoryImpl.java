@@ -408,6 +408,15 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
       Decision decision = (Decision) documentationUnit;
 
+      // We need to create uuids for new active citations before transforming them to dtos as we
+      // want to use the same id in both the related_documenation table and the new
+      // caselaw_citation_x tables.
+      // TODO: (Malte Laukötter, 2026-01-09) remove this step once we only write the
+      // caselaw_citation_x tables and annotated the id in the DTOs with @GeneratedValue.
+      decision.contentRelatedIndexing().activeCitations().stream()
+          .filter(activeCitation -> activeCitation.getUuid() == null)
+          .forEach(activeCitation -> activeCitation.setUuid(UUID.randomUUID()));
+
       var updatedDecisionDTO = DecisionTransformer.transformToDTO(decisionDTO, decision);
 
       addCitationsToDecisionDTO(updatedDecisionDTO, decision);
