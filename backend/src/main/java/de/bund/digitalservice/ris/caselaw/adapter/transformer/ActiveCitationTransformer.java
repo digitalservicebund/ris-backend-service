@@ -72,12 +72,22 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
       return null;
     }
 
-    return CaselawCitationLinkDTO.builder()
-        .id(activeCitation.getUuid())
-        .sourceDocument(sourceDecisionDto)
-        .targetDocument(targetDecisionDto)
-        .citationType(CitationTypeDTO.builder().id(activeCitation.getCitationType().uuid()).build())
-        .build();
+    var builder =
+        CaselawCitationLinkDTO.builder()
+            .id(activeCitation.getUuid())
+            .sourceDocument(sourceDecisionDto)
+            .targetDocument(targetDecisionDto);
+
+    CitationType citationType = activeCitation.getCitationType();
+
+    if (citationType != null && citationType.uuid() != null) {
+      CitationTypeDTO.CitationTypeDTOBuilder citationTypeDTOBuilder =
+          CitationTypeDTO.builder().id(citationType.uuid());
+
+      builder.citationType(citationTypeDTOBuilder.build());
+    }
+
+    return builder.build();
   }
 
   public static CaselawCitationBlindlinkDTO transformToCaselawCitationBlindlinkDTO(
@@ -86,15 +96,25 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
       return null;
     }
 
-    return CaselawCitationBlindlinkDTO.builder()
-        .id(activeCitation.getUuid())
-        .sourceDocument(currentDto)
-        .targetCourt(getCourtFromDomain(activeCitation.getCourt()))
-        .targetDate(activeCitation.getDecisionDate())
-        .targetDocumentNumber(activeCitation.getDocumentNumber())
-        .targetDocumentType(getDocumentTypeFromDomain(activeCitation.getDocumentType()))
-        .targetFileNumber(StringUtils.normalizeSpace(activeCitation.getFileNumber()))
-        .citationType(CitationTypeDTO.builder().id(activeCitation.getCitationType().uuid()).build())
-        .build();
+    var builder =
+        CaselawCitationBlindlinkDTO.builder()
+            .id(activeCitation.getUuid())
+            .sourceDocument(currentDto)
+            .targetCourt(getCourtFromDomain(activeCitation.getCourt()))
+            .targetDate(activeCitation.getDecisionDate())
+            .targetDocumentNumber(activeCitation.getDocumentNumber())
+            .targetDocumentType(getDocumentTypeFromDomain(activeCitation.getDocumentType()))
+            .targetFileNumber(StringUtils.normalizeSpace(activeCitation.getFileNumber()));
+
+    CitationType citationType = activeCitation.getCitationType();
+
+    if (citationType != null && citationType.uuid() != null) {
+      CitationTypeDTO.CitationTypeDTOBuilder citationTypeDTOBuilder =
+          CitationTypeDTO.builder().id(citationType.uuid());
+
+      builder.citationType(citationTypeDTOBuilder.build());
+    }
+
+    return builder.build();
   }
 }

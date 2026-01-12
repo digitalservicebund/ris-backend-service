@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 @Getter
 @Setter
@@ -45,7 +46,7 @@ public class CaselawCitationLinkDTO {
       referencedColumnName = "document_number")
   private DecisionDTO targetDocument;
 
-  @NonNull
+  @Nullable
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "citation_type_id", nullable = false)
   private CitationTypeDTO citationType;
