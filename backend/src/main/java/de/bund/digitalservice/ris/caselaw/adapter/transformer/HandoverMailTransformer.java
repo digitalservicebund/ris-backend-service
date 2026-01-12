@@ -11,14 +11,17 @@ import de.bund.digitalservice.ris.caselaw.domain.MailAttachmentImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public class HandoverMailTransformer {
   private HandoverMailTransformer() {}
 
   public static HandoverMailDTO transformToDTO(HandoverMail handoverMail) {
-    var attachedImages =
-        handoverMail.imageAttachments().stream().map(MailAttachmentImage::fileName).toList();
+    List<String> attachedImages =
+        handoverMail.imageAttachments() != null
+            ? handoverMail.imageAttachments().stream().map(MailAttachmentImage::fileName).toList()
+            : Collections.emptyList();
     var mail =
         HandoverMailDTO.builder()
             .entityId(handoverMail.entityId())

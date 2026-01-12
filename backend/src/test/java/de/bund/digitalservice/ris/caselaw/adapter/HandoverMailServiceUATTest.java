@@ -210,7 +210,7 @@ class HandoverMailServiceUATTest {
             decision.toBuilder()
                 .documentNumber("TESTtest-document-number")
                 .coreData(
-                    CoreData.builder()
+                    decision.coreData().toBuilder()
                         .court(
                             Court.builder()
                                 .label("VGH Mannheim")
@@ -547,7 +547,7 @@ class HandoverMailServiceUATTest {
             .uuid(TEST_UUID)
             .documentNumber("test-document-number")
             .coreData(
-                CoreData.builder()
+                decision.coreData().toBuilder()
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .fileNumbers(Collections.emptyList())
                     .build())
