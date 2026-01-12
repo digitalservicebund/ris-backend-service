@@ -156,7 +156,7 @@ public class DecisionDTO extends DocumentationUnitDTO {
       orphanRemoval = true,
       mappedBy = "sourceDocument")
   @Builder.Default
-  @OrderBy("id")
+  @OrderBy("rank")
   private List<CaselawCitationLinkDTO> caselawCitationLinks = new ArrayList<>();
 
   /**
@@ -170,7 +170,7 @@ public class DecisionDTO extends DocumentationUnitDTO {
       orphanRemoval = true,
       mappedBy = "sourceDocument")
   @Builder.Default
-  @OrderBy("id")
+  @OrderBy("rank")
   private List<CaselawCitationBlindlinkDTO> caselawCitationBlindlinks = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
