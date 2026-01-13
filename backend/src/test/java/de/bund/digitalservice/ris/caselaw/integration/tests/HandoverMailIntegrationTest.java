@@ -205,6 +205,12 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
   void testHandover(HandoverEntityType entityType) {
     String identifier = "docnr12345678";
 
+    String xml =
+        """
+        xml
+        <gruende><jurimg name="foo.jpg"></gruende>
+        """;
+
     DocumentationUnitDTO savedDocumentationUnitDTO =
         EntityBuilderTestUtil.createAndSaveDecision(
             repository,
@@ -212,13 +218,19 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
                 .documentationOffice(docOffice)
                 .documentNumber(identifier)
                 .inboxStatus(InboxStatus.EXTERNAL_HANDOVER)
-                .headnote("xml")
+                .headnote(xml)
                 .attachmentsInline(
                     List.of(
                         AttachmentInlineDTO.builder()
                             .uploadTimestamp(Instant.now())
                             .format("JPEG")
                             .filename("foo.JPEG")
+                            .content(new byte[7])
+                            .build(),
+                        AttachmentInlineDTO.builder()
+                            .uploadTimestamp(Instant.now())
+                            .format("JPEG")
+                            .filename("non-xml-image.JPEG") // this should not be handed over
                             .content(new byte[7])
                             .build()))
                 .date(LocalDate.now()));
@@ -269,7 +281,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
             .attachments(
                 entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)
                     ? List.of(
-                        HandoverMailAttachmentDTO.builder().fileName("test.xml").xml("xml").build())
+                        HandoverMailAttachmentDTO.builder().fileName("test.xml").xml(xml).build())
                     : List.of(
                         HandoverMailAttachmentDTO.builder()
                             .fileName("docnr12345678.xml")
@@ -293,7 +305,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
             .attachments(
                 entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)
                     ? List.of(
-                        MailAttachment.builder().fileName("test.xml").fileContent("xml").build())
+                        MailAttachment.builder().fileName("test.xml").fileContent(xml).build())
                     : List.of(
                         MailAttachment.builder()
                             .fileName("docnr12345678.xml")
