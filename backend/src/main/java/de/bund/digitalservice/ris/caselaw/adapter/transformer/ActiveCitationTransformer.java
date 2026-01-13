@@ -1,11 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveBlindlinkCaselawCitationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO.ActiveCitationDTOBuilder;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawCitationBlindlinkDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawCitationLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CitationTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LinkCaselawCitationDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
@@ -64,19 +64,18 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
     return activeCitationDTOBuilder.build();
   }
 
-  public static CaselawCitationLinkDTO transformToCaselawCitationLinkDTO(
-      ActiveCitation activeCitation,
+  public static @NonNull LinkCaselawCitationDTO transformToCaselawCitationLinkDTO(
+      @NonNull ActiveCitation activeCitation,
       @NonNull DecisionDTO sourceDecisionDto,
-      @NonNull DecisionDTO targetDecisionDto) {
-    if (activeCitation.hasNoValues()) {
-      return null;
-    }
+      @NonNull DecisionDTO targetDecisionDto,
+      @NonNull Integer rank) {
 
     var builder =
-        CaselawCitationLinkDTO.builder()
+        LinkCaselawCitationDTO.builder()
             .id(activeCitation.getUuid())
             .sourceDocument(sourceDecisionDto)
-            .targetDocument(targetDecisionDto);
+            .targetDocument(targetDecisionDto)
+            .rank(rank);
 
     CitationType citationType = activeCitation.getCitationType();
 
@@ -90,21 +89,20 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
     return builder.build();
   }
 
-  public static CaselawCitationBlindlinkDTO transformToCaselawCitationBlindlinkDTO(
-      ActiveCitation activeCitation, DecisionDTO currentDto) {
-    if (activeCitation.hasNoValues()) {
-      return null;
-    }
-
+  public static @NonNull ActiveBlindlinkCaselawCitationDTO transformToCaselawCitationBlindlinkDTO(
+      @NonNull ActiveCitation activeCitation,
+      @NonNull DecisionDTO currentDto,
+      @NonNull Integer rank) {
     var builder =
-        CaselawCitationBlindlinkDTO.builder()
+        ActiveBlindlinkCaselawCitationDTO.builder()
             .id(activeCitation.getUuid())
             .sourceDocument(currentDto)
             .targetCourt(getCourtFromDomain(activeCitation.getCourt()))
             .targetDate(activeCitation.getDecisionDate())
             .targetDocumentNumber(activeCitation.getDocumentNumber())
             .targetDocumentType(getDocumentTypeFromDomain(activeCitation.getDocumentType()))
-            .targetFileNumber(StringUtils.normalizeSpace(activeCitation.getFileNumber()));
+            .targetFileNumber(StringUtils.normalizeSpace(activeCitation.getFileNumber()))
+            .rank(rank);
 
     CitationType citationType = activeCitation.getCitationType();
 

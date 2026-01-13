@@ -7,8 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,8 +22,8 @@ import org.jspecify.annotations.Nullable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "caselaw_citation_blindlink", schema = "incremental_migration")
-public class CaselawCitationBlindlinkDTO {
+@Table(name = "citation_caselaw_link", schema = "incremental_migration")
+public class LinkCaselawCitationDTO {
   @Id
   // @GeneratedValue -- we currently manage the id manually to keep it in sync with
   // related_documentation
@@ -33,38 +31,18 @@ public class CaselawCitationBlindlinkDTO {
 
   @NonNull
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(
-      name = "source_document_number",
-      nullable = false,
-      referencedColumnName = "document_number")
+  @JoinColumn(name = "source_id", nullable = false)
   private DecisionDTO sourceDocument;
 
-  @Nullable
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "target_court_id")
-  private CourtDTO targetCourt;
-
-  @Nullable
-  @Column(name = "target_date")
-  private LocalDate targetDate;
-
-  @Nullable
-  @Column(name = "target_document_number")
-  private String targetDocumentNumber;
-
-  @Nullable
-  @Column(name = "target_file_number")
-  private String targetFileNumber;
-
-  @Nullable
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "target_document_type_id")
-  private DocumentTypeDTO targetDocumentType;
+  @NonNull
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "target_id", nullable = false)
+  private DecisionDTO targetDocument;
 
   @Nullable
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "citation_type_id", nullable = false)
   private CitationTypeDTO citationType;
 
-  @Column @NotNull private Integer rank;
+  @Column @NonNull private Integer rank;
 }
