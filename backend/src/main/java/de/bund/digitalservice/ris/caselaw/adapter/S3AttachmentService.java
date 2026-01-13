@@ -21,9 +21,13 @@ import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.image.ImageUtil;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,8 +45,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.AbortMultipartUploadRequest;
+import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadRequest;
+import software.amazon.awssdk.services.s3.model.CompletedMultipartUpload;
+import software.amazon.awssdk.services.s3.model.CompletedPart;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.UploadPartRequest;
 
 @Slf4j
 @Service
@@ -106,6 +115,115 @@ public class S3AttachmentService implements AttachmentService {
     } else {
       throw new ResponseStatusException(
           HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Only images and docx are supported");
+    }
+  }
+
+  public Attachment attachFileToDocumentationUnit(
+      UUID documentationUnitId, InputStream file, User user) {
+
+    var documentationUnit = documentationUnitRepository.findById(documentationUnitId).orElseThrow();
+
+    var attachmentDTO =
+        AttachmentDTO.builder()
+            .s3ObjectPath(UNKNOWN_YET)
+            .documentationUnit(documentationUnit)
+            .filename(UNKNOWN_YET)
+            .format("bin")
+            .uploadTimestamp(Instant.now())
+            .build();
+
+    attachmentDTO = repository.save(attachmentDTO);
+    var s3ObjectPath = attachmentDTO.getId().toString();
+
+    try {
+      streamFileToBucket(s3ObjectPath, file);
+    } catch (Exception e) {
+      log.warn("Failed to upload file to S3", e);
+      try {
+        repository.delete(attachmentDTO);
+      } catch (Exception deleteEx) {
+        log.warn("Failed to delete attachment record after failed multipart upload", deleteEx);
+      }
+    }
+
+    attachmentDTO.setS3ObjectPath(s3ObjectPath);
+    var attachment = AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
+
+    setLastUpdated(user, documentationUnit);
+    documentationUnitHistoryLogService.saveHistoryLog(
+        documentationUnitId, user, HistoryLogEventType.FILES, "File uploaded");
+
+    return attachment;
+  }
+
+  private void streamFileToBucket(String s3ObjectPath, InputStream file) throws IOException {
+
+    var createResponse =
+        s3Client.createMultipartUpload(
+            c ->
+                c.bucket(bucketName)
+                    .key(s3ObjectPath)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM_VALUE));
+    String uploadId = createResponse.uploadId();
+
+    final int PART_SIZE = 5 * 1024 * 1024; // 5MB
+    List<CompletedPart> completedParts = new ArrayList<>();
+    int partNumber = 1;
+
+    try (file) {
+      try {
+        byte[] buffer = new byte[PART_SIZE];
+        int bytesRead;
+        while ((bytesRead = file.read(buffer)) != -1) {
+          byte[] bytesToUpload =
+              (bytesRead == buffer.length) ? buffer : Arrays.copyOf(buffer, bytesRead);
+
+          UploadPartRequest uploadPartRequest =
+              UploadPartRequest.builder()
+                  .bucket(bucketName)
+                  .key(s3ObjectPath)
+                  .uploadId(uploadId)
+                  .partNumber(partNumber)
+                  .contentLength((long) bytesToUpload.length)
+                  .build();
+
+          var uploadPartResponse =
+              s3Client.uploadPart(uploadPartRequest, RequestBody.fromBytes(bytesToUpload));
+          completedParts.add(
+              CompletedPart.builder()
+                  .partNumber(partNumber)
+                  .eTag(uploadPartResponse.eTag())
+                  .build());
+          partNumber++;
+        }
+
+        CompletedMultipartUpload completedMultipartUpload =
+            CompletedMultipartUpload.builder().parts(completedParts).build();
+
+        CompleteMultipartUploadRequest completeRequest =
+            CompleteMultipartUploadRequest.builder()
+                .bucket(bucketName)
+                .key(s3ObjectPath)
+                .uploadId(uploadId)
+                .multipartUpload(completedMultipartUpload)
+                .build();
+
+        s3Client.completeMultipartUpload(completeRequest);
+      } catch (Exception e) {
+        log.warn("Multipart upload failed, aborting uploadId={}", uploadId, e);
+        try {
+          s3Client.abortMultipartUpload(
+              AbortMultipartUploadRequest.builder()
+                  .bucket(bucketName)
+                  .key(s3ObjectPath)
+                  .uploadId(uploadId)
+                  .build());
+        } catch (Exception abortEx) {
+          log.warn("Failed to abort multipart upload for id {}", uploadId, abortEx);
+        }
+        throw new ResponseStatusException(
+            HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload file", e);
+      }
     }
   }
 
