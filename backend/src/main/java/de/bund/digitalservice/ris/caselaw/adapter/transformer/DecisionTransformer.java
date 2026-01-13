@@ -728,6 +728,7 @@ public class DecisionTransformer extends DocumentableTransformer {
                 : decisionDTO.getDocumentalists().stream().map(DocumentalistDTO::getValue).toList())
         .previousDecisions(getPreviousDecisions(decisionDTO))
         .attachments(buildAttachments(decisionDTO))
+        .otherAttachments(buildOtherAttachments(decisionDTO))
         .ensuingDecisions(buildEnsuingDecisions(decisionDTO))
         .status(getStatus(decisionDTO))
         .inboxStatus(decisionDTO.getInboxStatus())
@@ -942,6 +943,14 @@ public class DecisionTransformer extends DocumentableTransformer {
         .map(AttachmentTransformer::transformToDomain)
         .filter(
             attachment -> "docx".equals(attachment.format()) || "fmx".equals(attachment.format()))
+        .toList();
+  }
+
+  private static List<Attachment> buildOtherAttachments(DecisionDTO decisionDTO) {
+    return decisionDTO.getAttachments().stream()
+        .map(AttachmentTransformer::transformToDomain)
+        .filter(
+            attachment -> !"docx".equals(attachment.format()) && !"fmx".equals(attachment.format()))
         .toList();
   }
 

@@ -34,6 +34,7 @@ public record Decision(
     @Size(min = 13, max = 14, message = "documentNumber has to be 13 or 14 characters long")
         String documentNumber,
     List<Attachment> attachments,
+    List<Attachment> otherAttachments,
     @Valid CoreData coreData,
     List<PreviousDecision> previousDecisions,
     List<EnsuingDecision> ensuingDecisions,
