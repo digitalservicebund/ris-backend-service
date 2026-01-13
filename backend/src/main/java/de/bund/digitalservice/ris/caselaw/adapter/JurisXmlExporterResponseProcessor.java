@@ -280,7 +280,7 @@ public class JurisXmlExporterResponseProcessor {
             "FWD: " + subject,
             "Anbei weitergeleitet von der jDV:",
             mailAttachments,
-            Collections.emptyList(), // TODO
+            Collections.emptyList(),
             "report-" + identifier);
       } else {
         throw new StatusImporterException("Couldn't find issuer address for entity: " + identifier);
