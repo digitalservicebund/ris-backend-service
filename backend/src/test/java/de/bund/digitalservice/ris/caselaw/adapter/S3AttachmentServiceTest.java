@@ -330,10 +330,10 @@ class S3AttachmentServiceTest {
     byte[] data = new byte[6 * 1024 * 1024];
     var in = new java.io.ByteArrayInputStream(data);
     var user = User.builder().build();
+    var filename = "test.zip";
 
     when(s3Client.createMultipartUpload(any(CreateMultipartUploadRequest.class)))
         .thenReturn(CreateMultipartUploadResponse.builder().uploadId("upload-123").build());
-    // also stub the convenience overload that takes a Consumer (lambda) to avoid null responses
     when(s3Client.createMultipartUpload(any(Consumer.class)))
         .thenReturn(CreateMultipartUploadResponse.builder().uploadId("upload-123").build());
     when(s3Client.uploadPart(any(UploadPartRequest.class), any(RequestBody.class)))
@@ -342,7 +342,7 @@ class S3AttachmentServiceTest {
         .thenReturn(CompleteMultipartUploadResponse.builder().build());
 
     // when
-    service.attachFileToDocumentationUnit(documentationUnitDTO.getId(), in, user);
+    service.streamFileToDocumentationUnit(documentationUnitDTO.getId(), in, filename, user);
 
     // then
     verify(repository, times(2)).save(any());

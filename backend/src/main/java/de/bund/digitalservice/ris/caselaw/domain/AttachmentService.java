@@ -10,7 +10,8 @@ public interface AttachmentService {
   Attachment attachFileToDocumentationUnit(
       UUID documentationUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders, User user);
 
-  Attachment attachFileToDocumentationUnit(UUID documentationUnitId, InputStream file, User user);
+  Attachment streamFileToDocumentationUnit(
+      UUID documentationUnitId, InputStream file, String filename, User user);
 
   void deleteByS3Path(String s3Path, UUID documentationUnitId, User user);
 

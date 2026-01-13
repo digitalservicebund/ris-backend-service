@@ -245,15 +245,21 @@ public class DocumentationUnitController {
   public ResponseEntity<Void> attachOtherFileToDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser,
       @PathVariable UUID uuid,
-      @RequestPart("file") MultipartFile file) {
+      @RequestPart("file") MultipartFile file,
+      @RequestHeader HttpHeaders httpHeaders) {
 
     if (file == null || file.isEmpty()) {
       return ResponseEntity.badRequest().build();
     }
 
+    if (!httpHeaders.containsHeader("X-Filename")) {
+      return ResponseEntity.badRequest().build();
+    }
+    String filename = httpHeaders.getFirst("X-Filename");
+
     try (InputStream is = file.getInputStream()) {
       User user = userService.getUser(oidcUser);
-      attachmentService.attachFileToDocumentationUnit(uuid, is, user);
+      attachmentService.streamFileToDocumentationUnit(uuid, is, filename, user);
       return ResponseEntity.status(HttpStatus.CREATED).build();
     } catch (IOException e) {
       log.error("Error reading uploaded file for documentation unit {}", uuid, e);

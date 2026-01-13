@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,8 +117,8 @@ public class S3AttachmentService implements AttachmentService {
     }
   }
 
-  public Attachment attachFileToDocumentationUnit(
-      UUID documentationUnitId, InputStream file, User user) {
+  public Attachment streamFileToDocumentationUnit(
+      UUID documentationUnitId, InputStream file, String filename, User user) {
 
     var documentationUnit = documentationUnitRepository.findById(documentationUnitId).orElseThrow();
 
@@ -127,7 +126,7 @@ public class S3AttachmentService implements AttachmentService {
         AttachmentDTO.builder()
             .s3ObjectPath(UNKNOWN_YET)
             .documentationUnit(documentationUnit)
-            .filename(UNKNOWN_YET)
+            .filename(filename)
             .format("bin")
             .uploadTimestamp(Instant.now())
             .build();
@@ -144,6 +143,8 @@ public class S3AttachmentService implements AttachmentService {
       } catch (Exception deleteEx) {
         log.error("Failed to delete attachment record after failed multipart upload", deleteEx);
       }
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload file", e);
     }
 
     attachmentDTO.setS3ObjectPath(s3ObjectPath);
@@ -156,74 +157,70 @@ public class S3AttachmentService implements AttachmentService {
     return attachment;
   }
 
-  private void streamFileToBucket(String s3ObjectPath, InputStream file) throws IOException {
+  private void streamFileToBucket(String s3ObjectPath, InputStream file) {
 
-    var createResponse =
+    var createdMultipartUpload =
         s3Client.createMultipartUpload(
             c ->
                 c.bucket(bucketName)
                     .key(s3ObjectPath)
                     .contentType(MediaType.APPLICATION_OCTET_STREAM_VALUE));
-    String uploadId = createResponse.uploadId();
+    String uploadId = createdMultipartUpload.uploadId();
 
-    final var PART_SIZE = 5 * 1024 * 1024; // 5MB
+    final var PART_SIZE = 5 * 1024 * 1024;
     List<CompletedPart> completedParts = new ArrayList<>();
     var partNumber = 1;
 
     try (file) {
-      try {
-        byte[] buffer = new byte[PART_SIZE];
-        int bytesRead;
-        while ((bytesRead = file.read(buffer)) != -1) {
-          var bytesToUpload =
-              (bytesRead == buffer.length) ? buffer : Arrays.copyOf(buffer, bytesRead);
+      while (true) {
+        byte[] buffer = file.readNBytes(PART_SIZE);
 
-          UploadPartRequest uploadPartRequest =
-              UploadPartRequest.builder()
-                  .bucket(bucketName)
-                  .key(s3ObjectPath)
-                  .uploadId(uploadId)
-                  .partNumber(partNumber)
-                  .contentLength((long) bytesToUpload.length)
-                  .build();
-
-          var uploadPartResponse =
-              s3Client.uploadPart(uploadPartRequest, RequestBody.fromBytes(bytesToUpload));
-          completedParts.add(
-              CompletedPart.builder()
-                  .partNumber(partNumber)
-                  .eTag(uploadPartResponse.eTag())
-                  .build());
-          partNumber++;
+        if (buffer.length == 0) {
+          break;
         }
 
-        CompletedMultipartUpload completedMultipartUpload =
-            CompletedMultipartUpload.builder().parts(completedParts).build();
-
-        CompleteMultipartUploadRequest completeRequest =
-            CompleteMultipartUploadRequest.builder()
+        var uploadPartRequest =
+            UploadPartRequest.builder()
                 .bucket(bucketName)
                 .key(s3ObjectPath)
                 .uploadId(uploadId)
-                .multipartUpload(completedMultipartUpload)
+                .partNumber(partNumber)
+                .contentLength((long) buffer.length)
                 .build();
 
-        s3Client.completeMultipartUpload(completeRequest);
-      } catch (Exception e) {
-        log.warn("Multipart upload failed, aborting uploadId={}", uploadId, e);
-        try {
-          s3Client.abortMultipartUpload(
-              AbortMultipartUploadRequest.builder()
-                  .bucket(bucketName)
-                  .key(s3ObjectPath)
-                  .uploadId(uploadId)
-                  .build());
-        } catch (Exception abortEx) {
-          log.warn("Failed to abort multipart upload for id {}", uploadId, abortEx);
-        }
-        throw new ResponseStatusException(
-            HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload file", e);
+        var uploadPartResponse =
+            s3Client.uploadPart(uploadPartRequest, RequestBody.fromBytes(buffer));
+        completedParts.add(
+            CompletedPart.builder().partNumber(partNumber).eTag(uploadPartResponse.eTag()).build());
+        partNumber++;
       }
+
+      var completedMultipartUpload =
+          CompletedMultipartUpload.builder().parts(completedParts).build();
+
+      var completeRequest =
+          CompleteMultipartUploadRequest.builder()
+              .bucket(bucketName)
+              .key(s3ObjectPath)
+              .uploadId(uploadId)
+              .multipartUpload(completedMultipartUpload)
+              .build();
+
+      s3Client.completeMultipartUpload(completeRequest);
+    } catch (Exception e) {
+      log.warn("Multipart upload failed, aborting uploadId={}", uploadId, e);
+      try {
+        s3Client.abortMultipartUpload(
+            AbortMultipartUploadRequest.builder()
+                .bucket(bucketName)
+                .key(s3ObjectPath)
+                .uploadId(uploadId)
+                .build());
+      } catch (Exception abortEx) {
+        log.warn("Failed to abort multipart upload for id {}", uploadId, abortEx);
+      }
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload file", e);
     }
   }
 
