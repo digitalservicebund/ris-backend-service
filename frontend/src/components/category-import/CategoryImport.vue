@@ -465,7 +465,7 @@ function importActiveCitations() {
   const targetActiveCitations =
     targetDocumentUnit.value!.contentRelatedIndexing.activeCitations ?? []
 
-  const uniqueImportableFieldsOfLaw = source
+  const uniqueImportable = source
     .filter(
       (activeCitation) =>
         !targetActiveCitations.find(
@@ -477,12 +477,11 @@ function importActiveCitations() {
     .map((activeCitation) => ({
       ...activeCitation,
       uuid: undefined,
-      newEntry: true,
     }))
 
   targetDocumentUnit.value!.contentRelatedIndexing.activeCitations = [
     ...targetActiveCitations,
-    ...uniqueImportableFieldsOfLaw,
+    ...uniqueImportable,
   ] as ActiveCitation[]
 }
 
