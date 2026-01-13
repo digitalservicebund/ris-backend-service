@@ -93,7 +93,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
   @BeforeEach
   void setUp() {
     docOffice = documentationOfficeRepository.findByAbbreviation("DS");
-
+    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(true);
     when(featureToggleService.isEnabled("neuris.text-check-noindex-handover")).thenReturn(true);
   }
 

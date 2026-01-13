@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
@@ -42,6 +43,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class HandoverMailService implements MailService {
 
+  private static final String HANDOVER_IMAGES_FEATURE_FLAG = "neuris.image-handover";
+
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private final XmlExporter xmlExporter;
@@ -54,6 +57,8 @@ public class HandoverMailService implements MailService {
 
   private final Environment env;
 
+  private final FeatureToggleService featureToggleService;
+
   @Value("${mail.exporter.senderAddress:export.test@neuris}")
   private String senderAddress;
 
@@ -65,12 +70,14 @@ public class HandoverMailService implements MailService {
       HttpMailSender mailSender,
       HandoverRepository repository,
       AttachmentInlineRepository attachmentInlineRepository,
-      Environment env) {
+      Environment env,
+      FeatureToggleService featureToggleService) {
     this.xmlExporter = xmlExporter;
     this.mailSender = mailSender;
     this.repository = repository;
     this.attachmentInlineRepository = attachmentInlineRepository;
     this.env = env;
+    this.featureToggleService = featureToggleService;
   }
 
   /**
@@ -314,8 +321,9 @@ public class HandoverMailService implements MailService {
               Optional.ofNullable(decision.coreData()).orElseGet(() -> CoreData.builder().build()))
           .build();
     }
+    String testPrefix = featureToggleService.isEnabled(HANDOVER_IMAGES_FEATURE_FLAG) ? "" : "TEST";
     return decision.toBuilder()
-        .documentNumber("TEST" + decision.documentNumber())
+        .documentNumber(testPrefix + decision.documentNumber())
         .coreData(
             Optional.ofNullable(decision.coreData())
                 .map(
@@ -348,6 +356,9 @@ public class HandoverMailService implements MailService {
   }
 
   private List<MailAttachmentImage> getImageAttachments(Decision decision, String xml) {
+    if (!featureToggleService.isEnabled(HANDOVER_IMAGES_FEATURE_FLAG)) {
+      return Collections.emptyList();
+    }
     List<String> jurimgFilenames = getJurimgFilenames(xml);
 
     if (jurimgFilenames.isEmpty()) {
