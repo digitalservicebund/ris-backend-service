@@ -63,6 +63,9 @@ logging:
 #    org.hibernate.type: TRACE
 #    org.hibernate.orm.jdbc.bind: trace
 spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
   cloud:
     kubernetes:
       config:
