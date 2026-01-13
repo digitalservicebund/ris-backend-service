@@ -138,11 +138,11 @@ public class S3AttachmentService implements AttachmentService {
     try {
       streamFileToBucket(s3ObjectPath, file);
     } catch (Exception e) {
-      log.warn("Failed to upload file to S3", e);
+      log.error("Failed to upload file to S3", e);
       try {
         repository.delete(attachmentDTO);
       } catch (Exception deleteEx) {
-        log.warn("Failed to delete attachment record after failed multipart upload", deleteEx);
+        log.error("Failed to delete attachment record after failed multipart upload", deleteEx);
       }
     }
 
@@ -166,16 +166,16 @@ public class S3AttachmentService implements AttachmentService {
                     .contentType(MediaType.APPLICATION_OCTET_STREAM_VALUE));
     String uploadId = createResponse.uploadId();
 
-    final int PART_SIZE = 5 * 1024 * 1024; // 5MB
+    final var PART_SIZE = 5 * 1024 * 1024; // 5MB
     List<CompletedPart> completedParts = new ArrayList<>();
-    int partNumber = 1;
+    var partNumber = 1;
 
     try (file) {
       try {
         byte[] buffer = new byte[PART_SIZE];
         int bytesRead;
         while ((bytesRead = file.read(buffer)) != -1) {
-          byte[] bytesToUpload =
+          var bytesToUpload =
               (bytesRead == buffer.length) ? buffer : Arrays.copyOf(buffer, bytesRead);
 
           UploadPartRequest uploadPartRequest =

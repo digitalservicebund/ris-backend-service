@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -21,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +42,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
@@ -52,10 +56,16 @@ import org.springframework.web.server.ResponseStatusException;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadRequest;
+import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadResponse;
+import software.amazon.awssdk.services.s3.model.CreateMultipartUploadRequest;
+import software.amazon.awssdk.services.s3.model.CreateMultipartUploadResponse;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.UploadPartRequest;
+import software.amazon.awssdk.services.s3.model.UploadPartResponse;
 
 @TestPropertySource(properties = "otc.obs.bucket-name:testBucket")
 @ExtendWith(SpringExtension.class)
@@ -70,6 +80,8 @@ class S3AttachmentServiceTest {
   @MockitoBean
   @Qualifier("docxS3Client")
   S3Client s3Client;
+
+  @MockitoBean S3Client streamS3Client;
 
   @MockitoBean DatabaseDocumentationUnitRepository documentationUnitRepository;
 
@@ -308,6 +320,57 @@ class S3AttachmentServiceTest {
       assertEquals("png", result.format());
       assertEquals(id + ".png", result.name());
     }
+  }
+
+  @Captor ArgumentCaptor<Consumer> consumerArgumentCaptor;
+
+  @Test
+  void testStreamUploadToS3_multipartIsUsed_andDomainIsPersisted() throws Exception {
+    // given
+    byte[] data = new byte[6 * 1024 * 1024];
+    var in = new java.io.ByteArrayInputStream(data);
+    var user = User.builder().build();
+
+    when(s3Client.createMultipartUpload(any(CreateMultipartUploadRequest.class)))
+        .thenReturn(CreateMultipartUploadResponse.builder().uploadId("upload-123").build());
+    // also stub the convenience overload that takes a Consumer (lambda) to avoid null responses
+    when(s3Client.createMultipartUpload(any(Consumer.class)))
+        .thenReturn(CreateMultipartUploadResponse.builder().uploadId("upload-123").build());
+    when(s3Client.uploadPart(any(UploadPartRequest.class), any(RequestBody.class)))
+        .thenReturn(UploadPartResponse.builder().eTag("etag").build());
+    when(s3Client.completeMultipartUpload(any(CompleteMultipartUploadRequest.class)))
+        .thenReturn(CompleteMultipartUploadResponse.builder().build());
+
+    // when
+    service.attachFileToDocumentationUnit(documentationUnitDTO.getId(), in, user);
+
+    // then
+    verify(repository, times(2)).save(any());
+    verify(s3Client, times(2)).uploadPart(any(UploadPartRequest.class), any(RequestBody.class));
+    verify(s3Client).completeMultipartUpload(any(CompleteMultipartUploadRequest.class));
+    verify(historyLogService)
+        .saveHistoryLog(
+            eq(documentationUnitDTO.getId()),
+            any(User.class),
+            eq(HistoryLogEventType.FILES),
+            eq("File uploaded"));
+
+    var uploadPartRequestCaptor = ArgumentCaptor.forClass(UploadPartRequest.class);
+    var requestBodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
+    verify(s3Client, times(2))
+        .uploadPart(uploadPartRequestCaptor.capture(), requestBodyCaptor.capture());
+    List<UploadPartRequest> capturedUploadRequests = uploadPartRequestCaptor.getAllValues();
+    List<RequestBody> capturedRequestBodies = requestBodyCaptor.getAllValues();
+    assertEquals(2, capturedUploadRequests.size());
+    assertEquals(2, capturedRequestBodies.size());
+    var first = capturedUploadRequests.get(0);
+    var second = capturedUploadRequests.get(1);
+    assertEquals(1, first.partNumber());
+    assertEquals(2, second.partNumber());
+    assertEquals("upload-123", first.uploadId());
+    assertEquals("upload-123", second.uploadId());
+    assertEquals(5L * 1024 * 1024, first.contentLength().longValue());
+    assertEquals((6L * 1024 * 1024) - (5L * 1024 * 1024), second.contentLength().longValue());
   }
 
   private ByteBuffer buildBuffer(String entry) {
