@@ -314,7 +314,7 @@ defineExpose({ validateNorm })
           value: 'Einzelnorm entfernen',
         }"
         aria-label="Einzelnorm löschen"
-        class="self-end"
+        class="min-w-48 self-end"
         text
         @click="removeSingleNormEntry"
       >
