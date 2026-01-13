@@ -44,6 +44,8 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepNotFoundEx
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -76,7 +78,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("api/v1/caselaw/documentunits")
@@ -220,6 +224,43 @@ public class DocumentationUnitController {
     } catch (Exception e) {
       attachmentService.deleteByS3Path(attachmentPath, uuid, userService.getUser(oidcUser));
       return ResponseEntity.unprocessableContent().build();
+    }
+  }
+
+  /**
+   * Attaches an additional file to an existing documentation unit identified by the provided UUID.
+   * The file is uploaded as part of a multipart form request.
+   *
+   * @param oidcUser the authenticated user making the request, obtained automatically from the
+   *     security context
+   * @param uuid the unique identifier of the documentation unit to which the file will be attached
+   * @param file the file to be attached to the documentation unit; must be a non-empty multipart
+   *     file
+   * @return a {@link ResponseEntity} representing the result of the operation; returns 201
+   *     (Created) on success, 400 (Bad Request) if the file is invalid or missing, and 500
+   *     (Internal Server Error) for any unexpected errors
+   */
+  @PutMapping(value = "/{uuid}/other-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
+  public ResponseEntity<Void> attachOtherFileToDocumentationUnit(
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @PathVariable UUID uuid,
+      @RequestPart("file") MultipartFile file) {
+
+    if (file == null || file.isEmpty()) {
+      return ResponseEntity.badRequest().build();
+    }
+
+    try (InputStream is = file.getInputStream()) {
+      User user = userService.getUser(oidcUser);
+      attachmentService.attachFileToDocumentationUnit(uuid, is, user);
+      return ResponseEntity.status(HttpStatus.CREATED).build();
+    } catch (IOException e) {
+      log.error("Error reading uploaded file for documentation unit {}", uuid, e);
+      return ResponseEntity.internalServerError().build();
+    } catch (Exception e) {
+      log.error("Error by attaching file to documentation unit {}", uuid, e);
+      return ResponseEntity.internalServerError().build();
     }
   }
 
