@@ -657,7 +657,7 @@ class HandoverMailServiceUATTest {
   }
 
   @Test
-  void testHandover_withImages_shouldOnlyHandoverImagesPresentInXML()
+  void testHandover_withImages_shouldOnlyHandoverImagesReferencedInXML()
       throws ParserConfigurationException, TransformerException {
     decision =
         Decision.builder()
@@ -688,8 +688,8 @@ class HandoverMailServiceUATTest {
                 AttachmentInlineDTO.builder().filename("bar.jpeg").build(),
                 AttachmentInlineDTO.builder().filename("baz.jpg").build(),
                 AttachmentInlineDTO.builder().filename("qux.gif").build(),
-                AttachmentInlineDTO.builder().filename("quux.JPEG").build(),
-                AttachmentInlineDTO.builder().filename("corge.GIF").build()));
+                AttachmentInlineDTO.builder().filename("unreferenced_image1.JPEG").build(),
+                AttachmentInlineDTO.builder().filename("unreferenced_image2.GIF").build()));
 
     HandoverMail savedMail =
         DOC_UNIT_SAVED_MAIL.toBuilder()
@@ -789,9 +789,7 @@ class HandoverMailServiceUATTest {
                 AttachmentInlineDTO.builder().filename("foo.png").build(),
                 AttachmentInlineDTO.builder().filename("bar.jpeg").build(),
                 AttachmentInlineDTO.builder().filename("baz.jpg").build(),
-                AttachmentInlineDTO.builder().filename("qux.gif").build(),
-                AttachmentInlineDTO.builder().filename("quux.JPEG").build(),
-                AttachmentInlineDTO.builder().filename("corge.GIF").build()));
+                AttachmentInlineDTO.builder().filename("qux.gif").build()));
 
     HandoverMail savedMail =
         DOC_UNIT_SAVED_MAIL.toBuilder()

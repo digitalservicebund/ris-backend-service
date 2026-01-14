@@ -356,7 +356,9 @@ public class HandoverMailService implements MailService {
   }
 
   private List<MailAttachmentImage> getImageAttachments(Decision decision, String xml) {
-    if (!featureToggleService.isEnabled(HANDOVER_IMAGES_FEATURE_FLAG)) {
+    if (!featureToggleService.isEnabled(HANDOVER_IMAGES_FEATURE_FLAG)
+        || decision == null
+        || decision.coreData() != null) {
       return Collections.emptyList();
     }
     List<String> jurimgFilenames = getJurimgFilenames(xml);
