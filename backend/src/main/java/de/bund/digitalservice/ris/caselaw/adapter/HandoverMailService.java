@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachmentImage;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -321,9 +322,10 @@ public class HandoverMailService implements MailService {
               Optional.ofNullable(decision.coreData()).orElseGet(() -> CoreData.builder().build()))
           .build();
     }
-    String testPrefix = featureToggleService.isEnabled(HANDOVER_IMAGES_FEATURE_FLAG) ? "" : "TEST";
+
+    String documentNumberPrefix = isHandoverWithoutPrefixAllowed(decision) ? "" : "TEST";
     return decision.toBuilder()
-        .documentNumber(testPrefix + decision.documentNumber())
+        .documentNumber(documentNumberPrefix + decision.documentNumber())
         .coreData(
             Optional.ofNullable(decision.coreData())
                 .map(
@@ -353,6 +355,21 @@ public class HandoverMailService implements MailService {
                             .fileNumbers(Collections.singletonList("TEST"))
                             .build()))
         .build();
+  }
+
+  private boolean isHandoverWithoutPrefixAllowed(Decision decision) {
+    if (decision.coreData() == null
+        || decision.coreData().documentationOffice() == null
+        || decision.managementData() == null) {
+      return false;
+    }
+    boolean isImageHandoverEnabled = featureToggleService.isEnabled(HANDOVER_IMAGES_FEATURE_FLAG);
+    boolean isUnpublished =
+        PublicationStatus.UNPUBLISHED.equals(decision.status().publicationStatus());
+    boolean isDocOfficeBpatg =
+        "BPatG".equals(decision.coreData().documentationOffice().abbreviation());
+    boolean isMigrated = "Migration".equals(decision.managementData().createdByName());
+    return isImageHandoverEnabled && isUnpublished && isDocOfficeBpatg && !isMigrated;
   }
 
   private List<MailAttachmentImage> getImageAttachments(Decision decision, String xml) {
