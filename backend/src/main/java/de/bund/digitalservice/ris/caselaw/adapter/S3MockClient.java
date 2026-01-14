@@ -45,6 +45,7 @@ import software.amazon.awssdk.services.s3.model.UploadPartResponse;
 
 public class S3MockClient implements S3Client {
   private static final Logger LOGGER = LoggerFactory.getLogger(S3MockClient.class);
+  public static final String MULTIPART = ".multipart";
 
   @Value("${local.file-storage}")
   private Path relativeLocalStorageDirectory;
@@ -157,10 +158,9 @@ public class S3MockClient implements S3Client {
   @Override
   public CreateMultipartUploadResponse createMultipartUpload(CreateMultipartUploadRequest request) {
     String uploadId = UUID.randomUUID().toString();
-    Path multipartBase = localStorageDirectory.resolve(".multipart").resolve(uploadId);
+    Path multipartBase = localStorageDirectory.resolve(MULTIPART).resolve(uploadId);
     try {
       Files.createDirectories(multipartBase);
-      // store the target key so we can validate on complete
       Files.writeString(multipartBase.resolve(".key"), request.key());
     } catch (IOException ex) {
       LOGGER.error("Couldn't create multipart upload dir", ex);
@@ -174,7 +174,7 @@ public class S3MockClient implements S3Client {
     int partNumber = request.partNumber();
     Path partFile =
         localStorageDirectory
-            .resolve(".multipart")
+            .resolve(MULTIPART)
             .resolve(uploadId)
             .resolve(String.valueOf(partNumber));
     try {
@@ -207,17 +207,14 @@ public class S3MockClient implements S3Client {
   public CompleteMultipartUploadResponse completeMultipartUpload(
       CompleteMultipartUploadRequest request) {
     String uploadId = request.uploadId();
-    Path multipartBase = localStorageDirectory.resolve(".multipart").resolve(uploadId);
+    Path multipartBase = localStorageDirectory.resolve(MULTIPART).resolve(uploadId);
     Path targetFile = localStorageDirectory.resolve(request.key());
 
-    // Ensure parent directories exist
     targetFile.toFile().getParentFile().mkdirs();
 
     try (FileOutputStream fos = new FileOutputStream(targetFile.toFile(), false)) {
       CompletedMultipartUpload multipart = request.multipartUpload();
-      // parts() may return an unmodifiable list from the SDK; copy into a mutable list
       List<CompletedPart> parts = new java.util.ArrayList<>(multipart.parts());
-      // sort parts by partNumber to ensure correct order
       parts.sort(Comparator.comparingInt(CompletedPart::partNumber));
 
       for (CompletedPart part : parts) {
@@ -235,7 +232,6 @@ public class S3MockClient implements S3Client {
         }
       }
 
-      // cleanup multipart temp files after successful completion
       try (java.util.stream.Stream<Path> stream = Files.walk(multipartBase)) {
         stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
       } catch (IOException e) {
@@ -252,7 +248,7 @@ public class S3MockClient implements S3Client {
   @Override
   public AbortMultipartUploadResponse abortMultipartUpload(AbortMultipartUploadRequest request) {
     String uploadId = request.uploadId();
-    Path multipartBase = localStorageDirectory.resolve(".multipart").resolve(uploadId);
+    Path multipartBase = localStorageDirectory.resolve(MULTIPART).resolve(uploadId);
     try {
       if (Files.exists(multipartBase)) {
         try (java.util.stream.Stream<Path> stream = Files.walk(multipartBase)) {
