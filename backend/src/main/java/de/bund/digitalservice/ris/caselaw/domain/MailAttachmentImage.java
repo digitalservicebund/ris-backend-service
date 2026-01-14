@@ -10,7 +10,12 @@ public record MailAttachmentImage(String fileName, byte[] fileContent) {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    return o instanceof MailAttachmentImage other && Arrays.equals(other.fileContent, fileContent);
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    MailAttachmentImage other = (MailAttachmentImage) o;
+    return Arrays.equals(other.fileContent, fileContent)
+        && Objects.equals(fileName, other.fileName);
   }
 
   @Override
