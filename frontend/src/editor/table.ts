@@ -3,6 +3,12 @@ import "../styles/tables.css"
 import { Node } from "prosemirror-model"
 import { hasAllBorders } from "./tableUtil"
 
+let oldBorder: number | undefined = undefined
+let resetReplacementTimeOut: NodeJS.Timeout
+const resetOldBorder = () => {
+  oldBorder = undefined
+}
+
 /**
  * Notwendig, weil das resizable: true die styles (border) der Tabelle entfernt.
  */
@@ -28,21 +34,62 @@ class CustomTableView extends TableView {
  * auf Tabellenknoten, Header und Zellen anzuwenden.
  */
 export const CustomTable = Table.extend({
+  addAttributes() {
+    return {
+      border: {
+        parseHTML: (element) => {
+          const borderValue = element.getAttribute("border")
+          if (borderValue) {
+            oldBorder = Number.parseInt(borderValue) || undefined
+          }
+          resetReplacementTimeOut = setTimeout(resetOldBorder, 2000)
+        },
+      },
+    }
+  },
   addGlobalAttributes() {
     return [
       {
         // apply to table container + cells + headers
-        types: ["table", "tableCell", "tableHeader"],
+        types: ["tableCell", "tableHeader"],
         attributes: {
           style: {
             renderHTML: (attributes) => {
-              const existingStyle = attributes.style || ""
+              clearTimeout(resetReplacementTimeOut)
+              resetReplacementTimeOut = setTimeout(resetOldBorder, 2000)
+
+              let existingStyle = attributes.style || ""
+
+              if (oldBorder && !existingStyle.includes("border")) {
+                existingStyle += existingStyle == "" ? "" : "; "
+                existingStyle +=
+                  "border: " + oldBorder + "px solid rgb(0, 0, 0)"
+              }
 
               const allBorders = hasAllBorders(existingStyle)
               const invisibleClass = allBorders ? "" : "invisible-table-cell"
 
+              attributes.style = existingStyle
+
               return {
                 class: invisibleClass,
+                style: existingStyle,
+              }
+            },
+          },
+          valign: {
+            renderHTML: (attributes) => {
+              let existingStyle = attributes.style || ""
+
+              if (attributes.valign) {
+                existingStyle += existingStyle == "" ? "" : "; "
+                existingStyle += "vertical-align: " + attributes.valign + ";"
+              }
+
+              attributes.style = existingStyle
+              attributes.valign = null
+
+              return {
                 style: existingStyle,
               }
             },
