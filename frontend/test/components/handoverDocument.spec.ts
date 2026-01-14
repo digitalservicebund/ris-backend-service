@@ -843,6 +843,45 @@ describe("HandoverDocumentationUnitView:", () => {
     expect(codeSnippet).toHaveAttribute("XML")
     expect(codeSnippet?.getAttribute("xml")).toBe("xml content")
   })
+
+  it("shows image attachments", async () => {
+    const { container } = renderComponent({
+      props: {
+        eventLog: [
+          new HandoverMail({
+            type: EventRecordType.HANDOVER,
+            attachments: [{ fileContent: "xml content", fileName: "file.xml" }],
+            imageAttachments: [
+              { fileName: "foo.png" },
+              { fileName: "bar.jpg" },
+            ],
+            statusMessages: ["success"],
+            success: true,
+            receiverAddress: "receiver address",
+            mailSubject: "mail subject",
+            date: "01.02.2000",
+          }),
+        ],
+      },
+      documentUnit: new Decision("123", {
+        coreData: {
+          fileNumbers: ["foo"],
+          court: { type: "type", location: "location", label: "label" },
+          decisionDate: "2022-02-01",
+          legalEffect: "legalEffect",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
+          },
+        },
+      }),
+    })
+
+    // Wait for XML Vorschau
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    expect(container).toHaveTextContent(`Anhänge: foo.png, bar.jpg`)
+  })
 })
 
 describe("renders uat test mode hint", () => {
