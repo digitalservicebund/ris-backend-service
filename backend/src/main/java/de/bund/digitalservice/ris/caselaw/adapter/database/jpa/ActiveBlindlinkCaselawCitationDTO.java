@@ -24,7 +24,7 @@ import org.jspecify.annotations.Nullable;
 @NoArgsConstructor
 @Builder
 @Table(name = "citation_caselaw_blindlink_active", schema = "incremental_migration")
-public class ActiveBlindlinkCaselawCitationDTO {
+public non-sealed class ActiveBlindlinkCaselawCitationDTO implements ActiveCaselawCitationDTO {
   @Id
   // @GeneratedValue -- we currently manage the id manually to keep it in sync with
   // related_documentation

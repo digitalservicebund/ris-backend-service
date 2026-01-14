@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.NormReferenceType;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbstractNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbuseFeeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCaselawCitationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CountryOfOriginDto;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
@@ -28,6 +29,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AbuseFee;
+import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
@@ -54,6 +56,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -61,6 +64,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
@@ -811,12 +815,7 @@ public class DecisionTransformer extends DocumentableTransformer {
     ContentRelatedIndexing.ContentRelatedIndexingBuilder contentRelatedIndexingBuilder =
         DocumentableTransformer.buildContentRelatedIndexing(decisionDTO).toBuilder();
 
-    if (decisionDTO.getActiveCitations() != null) {
-      contentRelatedIndexingBuilder.activeCitations(
-          decisionDTO.getActiveCitations().stream()
-              .map(ActiveCitationTransformer::transformToDomain)
-              .toList());
-    }
+    contentRelatedIndexingBuilder.activeCitations(buildActiveCitations(decisionDTO));
 
     if (decisionDTO.getJobProfiles() != null) {
       List<String> jobProfiles =
@@ -935,6 +934,27 @@ public class DecisionTransformer extends DocumentableTransformer {
     }
 
     return contentRelatedIndexingBuilder.build();
+  }
+
+  private static List<ActiveCitation> buildActiveCitations(DecisionDTO decisionDTO) {
+    Stream<? extends ActiveCaselawCitationDTO> activeCaselawCitationDTOs = Stream.empty();
+
+    if (decisionDTO.getActiveLinkCaselawCitations() != null) {
+      activeCaselawCitationDTOs =
+          Stream.concat(
+              activeCaselawCitationDTOs, decisionDTO.getActiveLinkCaselawCitations().stream());
+    }
+
+    if (decisionDTO.getActiveBlindlinkCaselawCitations() != null) {
+      activeCaselawCitationDTOs =
+          Stream.concat(
+              activeCaselawCitationDTOs, decisionDTO.getActiveBlindlinkCaselawCitations().stream());
+    }
+
+    return activeCaselawCitationDTOs
+        .sorted(Comparator.comparingInt(ActiveCaselawCitationDTO::getRank))
+        .map(ActiveCitationTransformer::transformToDomain)
+        .toList();
   }
 
   private static List<Attachment> buildAttachments(DecisionDTO decisionDTO) {
