@@ -36,6 +36,13 @@ class CustomTableView extends TableView {
 export const CustomTable = Table.extend({
   addAttributes() {
     return {
+      ...this.parent?.(),
+      style: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("style") || null,
+        renderHTML: (attributes) =>
+          attributes.style ? { style: attributes.style } : {},
+      },
       border: {
         parseHTML: (element) => {
           const borderValue = element.getAttribute("border")
