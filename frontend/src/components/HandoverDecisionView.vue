@@ -729,6 +729,16 @@ const isPublishable = computed<boolean>(
                       <span class="ris-label2-bold"> Betreff: </span>
                       {{ (item as HandoverMail).mailSubject }}
                     </div>
+                    <div
+                      v-if="(item as HandoverMail).imageAttachments.length > 0"
+                    >
+                      <span class="ris-label2-bold"> Anhänge: </span>
+                      {{
+                        (item as HandoverMail).imageAttachments
+                          .map((attachment) => attachment.fileName)
+                          .join(", ")
+                      }}
+                    </div>
                   </div>
 
                   <CodeSnippet
