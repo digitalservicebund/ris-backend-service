@@ -1,12 +1,16 @@
 <script setup lang="ts">
+import Button from "primevue/button"
 import { onBeforeMount, ref, watch } from "vue"
 import LoadingSpinner from "./LoadingSpinner.vue"
+import { useExtractions } from "@/components/extraction/useExtractions"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { Docx2HTML } from "@/domain/docx2html"
 import fileService from "@/services/attachmentService"
+import IconExtractions from "~icons/ic/baseline-auto-fix-high"
+import IconExtractionsOff from "~icons/ic/baseline-auto-fix-off"
 
 const props = defineProps<{
   documentationUnitId?: string
@@ -39,10 +43,25 @@ watch(
     await getAttachmentHTML()
   },
 )
+const editorRef = ref<InstanceType<typeof TextEditor>>()
+const { showExtractions, toggleShowExtractions } = useExtractions(editorRef)
 </script>
 
 <template>
   <TitleElement>Originaldokument</TitleElement>
+  <Button
+    id="toggle-extractions-button"
+    aria-label="Notiz anzeigen"
+    class="focus-visible:z-20"
+    data-testid="note-button"
+    severity="secondary"
+    size="small"
+    @click="toggleShowExtractions"
+  >
+    <template #icon>
+      <component :is="showExtractions ? IconExtractionsOff : IconExtractions" />
+    </template>
+  </Button>
   <FlexContainer
     v-if="fileAsHTML?.html"
     v-bind="$attrs"
@@ -58,6 +77,7 @@ watch(
     </div>
     <FlexItem v-else class="max-h-[70vh] min-h-[63vh] overflow-scroll">
       <TextEditor
+        ref="editorRef"
         aria-label="Dokumentenvorschau"
         data-testid="text-editor"
         element-id="text-editor"
