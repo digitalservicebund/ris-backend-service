@@ -63,7 +63,7 @@
     "@tiptap/extension-underline": "^3.15.3",
     "@tiptap/starter-kit": "^3.15.3",
     "@tiptap/vue-3": "^3.15.3",
-    "@unhead/vue": "^2.1.1",
+    "@unhead/vue": "^2.1.2",
     "@vueuse/core": "^14.1.0",
     "@vueuse/router": "^14.1.0",
     "axios": "^1.13.2",
