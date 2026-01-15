@@ -30,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AbuseFee;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -949,8 +950,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   private static List<Attachment> buildOtherAttachments(DecisionDTO decisionDTO) {
     return decisionDTO.getAttachments().stream()
         .map(AttachmentTransformer::transformToDomain)
-        .filter(
-            attachment -> !"docx".equals(attachment.format()) && !"fmx".equals(attachment.format()))
+        .filter(attachment -> attachment.type() == AttachmentType.OTHER)
         .toList();
   }
 

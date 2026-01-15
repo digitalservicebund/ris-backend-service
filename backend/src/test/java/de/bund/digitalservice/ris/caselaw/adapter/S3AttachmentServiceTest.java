@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.User;
@@ -342,7 +343,8 @@ class S3AttachmentServiceTest {
         .thenReturn(CompleteMultipartUploadResponse.builder().build());
 
     // when
-    service.streamFileToDocumentationUnit(documentationUnitDTO.getId(), in, filename, user);
+    service.streamFileToDocumentationUnit(
+        documentationUnitDTO.getId(), in, filename, user, AttachmentType.OTHER);
 
     // then
     verify(repository, times(2)).save(any());

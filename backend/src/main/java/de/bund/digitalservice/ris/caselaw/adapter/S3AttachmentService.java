@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOffic
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
@@ -118,7 +119,7 @@ public class S3AttachmentService implements AttachmentService {
   }
 
   public Attachment streamFileToDocumentationUnit(
-      UUID documentationUnitId, InputStream file, String filename, User user) {
+      UUID documentationUnitId, InputStream file, String filename, User user, AttachmentType type) {
 
     var documentationUnit = documentationUnitRepository.findById(documentationUnitId).orElseThrow();
 
@@ -129,6 +130,7 @@ public class S3AttachmentService implements AttachmentService {
             .filename(filename)
             .format("bin")
             .uploadTimestamp(Instant.now())
+            .attachmentType(type.name())
             .build();
 
     attachmentDTO = repository.save(attachmentDTO);

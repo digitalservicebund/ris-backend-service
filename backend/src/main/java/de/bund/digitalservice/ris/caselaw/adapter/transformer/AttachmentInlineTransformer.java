@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -13,6 +14,7 @@ public class AttachmentInlineTransformer {
         .format(dto.getFormat())
         .s3path(null)
         .uploadTimestamp(dto.getUploadTimestamp())
+        .type(AttachmentType.OTHER) // Images are always other attachments
         .build();
   }
 }

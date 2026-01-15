@@ -5,8 +5,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationEx
 import de.bund.digitalservice.ris.caselaw.adapter.publication.ManualPortalPublicationResult;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
+import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment2Html;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcessStepRequest;
 import de.bund.digitalservice.ris.caselaw.domain.BulkDocumentationUnitService;
@@ -201,7 +203,7 @@ public class DocumentationUnitController {
    * @return the into html converted content of the file with some additional metadata (ECLI)
    */
   @PutMapping(
-      value = {"/{uuid}/file", "/{uuid}/original-file"},
+      value = {"/{uuid}/file"},
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
   @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
@@ -223,6 +225,61 @@ public class DocumentationUnitController {
 
     } catch (Exception e) {
       attachmentService.deleteByS3Path(attachmentPath, uuid, userService.getUser(oidcUser));
+      return ResponseEntity.unprocessableContent().build();
+    }
+  }
+
+  /**
+   * Attach a content file (docx) to the documentation unit. This file is used to fill the
+   * categories of the documentation unit.
+   *
+   * <p>Do a conversion into html and parse the footer for ECLI information.
+   *
+   * @param uuid UUID of the documentation unit
+   * @param file the file to be uploaded
+   * @param httpHeaders http headers with the X-Filename information
+   * @return the into html converted content of the file with some additional metadata (ECLI)
+   */
+  @PutMapping(
+      value = {"/{uuid}/original-file"},
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
+  public ResponseEntity<Attachment2Html> attachOriginatingFileToDocumentationUnit(
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @PathVariable UUID uuid,
+      @RequestPart("file") MultipartFile file,
+      @RequestHeader HttpHeaders httpHeaders) {
+
+    if (file == null || file.isEmpty()) {
+      return ResponseEntity.badRequest().build();
+    }
+
+    if (!httpHeaders.containsHeader("X-Filename")) {
+      return ResponseEntity.badRequest().build();
+    }
+    String filename = httpHeaders.getFirst("X-Filename");
+
+    Attachment attachment = null;
+    try (InputStream is = file.getInputStream()) {
+      User user = userService.getUser(oidcUser);
+      attachment =
+          attachmentService.streamFileToDocumentationUnit(
+              uuid, is, filename, user, AttachmentType.ORIGINATING);
+    } catch (IOException e) {
+      log.error("Error reading uploaded file for documentation unit {}", uuid, e);
+      return ResponseEntity.internalServerError().build();
+    } catch (Exception e) {
+      log.error("Error by attaching file to documentation unit {}", uuid, e);
+      return ResponseEntity.internalServerError().build();
+    }
+
+    try {
+      var attachment2Html = converterService.getConvertedObject(attachment.s3path());
+      initializeCoreDataAndCheckDuplicates(uuid, attachment2Html, userService.getUser(oidcUser));
+      return ResponseEntity.status(HttpStatus.OK).body(attachment2Html);
+    } catch (Exception e) {
+      attachmentService.deleteByS3Path(attachment.s3path(), uuid, userService.getUser(oidcUser));
       return ResponseEntity.unprocessableContent().build();
     }
   }
@@ -259,7 +316,8 @@ public class DocumentationUnitController {
 
     try (InputStream is = file.getInputStream()) {
       User user = userService.getUser(oidcUser);
-      attachmentService.streamFileToDocumentationUnit(uuid, is, filename, user);
+      attachmentService.streamFileToDocumentationUnit(
+          uuid, is, filename, user, AttachmentType.OTHER);
       return ResponseEntity.status(HttpStatus.CREATED).build();
     } catch (IOException e) {
       log.error("Error reading uploaded file for documentation unit {}", uuid, e);
