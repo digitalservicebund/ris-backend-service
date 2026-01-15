@@ -135,6 +135,7 @@ class ActiveCitationIntegrationTest extends BaseIntegrationTest {
                                         .uuid(
                                             UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
                                         .build())
+                                .documentNumber("documentnr002")
                                 .build(),
                             ActiveCitation.builder()
                                 .citationType(
@@ -248,6 +249,7 @@ class ActiveCitationIntegrationTest extends BaseIntegrationTest {
                                         .uuid(
                                             UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
                                         .build())
+                                .documentNumber("documentnr002")
                                 .build()))
                     .build())
             .build();
@@ -335,6 +337,7 @@ class ActiveCitationIntegrationTest extends BaseIntegrationTest {
                                         .uuid(
                                             UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
                                         .build())
+                                .documentNumber("documentnr002")
                                 .build(),
                             ActiveCitation.builder().build()))
                     .build())
@@ -439,6 +442,7 @@ class ActiveCitationIntegrationTest extends BaseIntegrationTest {
                                         .uuid(
                                             UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
                                         .build())
+                                .documentNumber("documentnr002")
                                 .build()))
                     .build())
             .build();
@@ -650,6 +654,7 @@ class ActiveCitationIntegrationTest extends BaseIntegrationTest {
                                         .uuid(
                                             UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
                                         .build())
+                                .documentNumber("documentnr002")
                                 .build()))
                     .build())
             .build();

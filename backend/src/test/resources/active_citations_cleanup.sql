@@ -1,7 +1,4 @@
 delete from
-  incremental_migration.related_documentation;
-
-delete from
   incremental_migration.documentation_unit;
 
 delete from
