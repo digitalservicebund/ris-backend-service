@@ -399,7 +399,7 @@ public class HandoverMailService implements MailService {
                       decision.documentNumber(),
                       decision.coreData().documentationOffice().abbreviation(),
                       attachmentImage);
-              var imgName = filename.substring(filename.lastIndexOf("_") + 1);
+              var imgName = filename.split("_", 3)[2];
               if (!CollectionUtils.contains(jurimgFilenames, imgName)) {
                 return null;
               }

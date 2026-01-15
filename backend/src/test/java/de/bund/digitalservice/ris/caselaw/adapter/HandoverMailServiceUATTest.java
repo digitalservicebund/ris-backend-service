@@ -27,8 +27,11 @@ import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachmentImage;
+import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
@@ -202,8 +205,6 @@ class HandoverMailServiceUATTest {
 
   @Test
   void testSendDocumentationUnit() throws ParserConfigurationException, TransformerException {
-    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(false);
-
     var response = service.handOver(decision, RECEIVER_ADDRESS, ISSUER_ADDRESS);
 
     assertThat(response).usingRecursiveComparison().isEqualTo(DOC_UNIT_SAVED_MAIL);
@@ -618,7 +619,7 @@ class HandoverMailServiceUATTest {
     verify(xmlExporter)
         .transformToXml(
             decision.toBuilder()
-                .documentNumber("test-document-number")
+                .documentNumber("TESTtest-document-number")
                 .coreData(
                     decision.coreData().toBuilder()
                         .court(
@@ -723,7 +724,7 @@ class HandoverMailServiceUATTest {
     verify(xmlExporter)
         .transformToXml(
             decision.toBuilder()
-                .documentNumber("test-document-number")
+                .documentNumber("TESTtest-document-number")
                 .coreData(
                     decision.coreData().toBuilder()
                         .court(
@@ -758,7 +759,7 @@ class HandoverMailServiceUATTest {
   }
 
   @Test
-  void testHandover_withImagesAndDisabledFeatureFlag_shouldNotHandOverImagesAndAddTestPrefix()
+  void testHandover_withImagesAndDisabledFeatureFlag_shouldNotHandOverImages()
       throws ParserConfigurationException, TransformerException {
     when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(false);
     decision =
@@ -811,6 +812,75 @@ class HandoverMailServiceUATTest {
         .transformToXml(
             decision.toBuilder()
                 .documentNumber("TESTtest-document-number")
+                .coreData(
+                    decision.coreData().toBuilder()
+                        .court(
+                            Court.builder()
+                                .label("VGH Mannheim")
+                                .location("Mannheim")
+                                .type("VGH")
+                                .build())
+                        .fileNumbers(List.of("TEST"))
+                        .build())
+                .build(),
+            false);
+
+    verify(repository).save(savedMail);
+    verify(mailSender)
+        .sendMail(
+            SENDER_ADDRESS,
+            RECEIVER_ADDRESS,
+            DOC_UNIT_SAVED_MAIL.mailSubject(),
+            "neuris",
+            Collections.singletonList(
+                MailAttachment.builder()
+                    .fileName(savedMail.attachments().getFirst().fileName())
+                    .fileContent(savedMail.attachments().getFirst().fileContent())
+                    .build()),
+            Collections.emptyList(),
+            DOC_UNIT_SAVED_MAIL.entityId().toString());
+  }
+
+  @Test
+  void testHandover_withImageHandoverEnabledAndUnpublishedAndBpatgDocOffice_doesNotAddTestPrefix()
+      throws ParserConfigurationException, TransformerException {
+    decision =
+        Decision.builder()
+            .uuid(TEST_UUID)
+            .documentNumber("test-document-number")
+            .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
+            .coreData(
+                decision.coreData().toBuilder()
+                    .documentationOffice(
+                        DocumentationOffice.builder().abbreviation("BPatG").build())
+                    .fileNumbers(Collections.emptyList())
+                    .build())
+            .managementData(ManagementData.builder().createdByName("Max Mustermann").build())
+            .build();
+
+    var xml =
+        new XmlTransformationResult("xml", true, List.of("succeed"), "test.xml", CREATED_DATE);
+
+    HandoverMail savedMail =
+        DOC_UNIT_SAVED_MAIL.toBuilder()
+            .attachments(
+                List.of(
+                    MailAttachment.builder().fileName("test.xml").fileContent(xml.xml()).build()))
+            .imageAttachments(Collections.emptyList())
+            .build();
+
+    when(repository.save(savedMail)).thenReturn(savedMail);
+
+    when(xmlExporter.transformToXml(any(Decision.class), anyBoolean())).thenReturn(xml);
+
+    var response = service.handOver(decision, RECEIVER_ADDRESS, ISSUER_ADDRESS);
+
+    assertThat(response).usingRecursiveComparison().isEqualTo(savedMail);
+
+    verify(xmlExporter)
+        .transformToXml(
+            decision.toBuilder()
+                .documentNumber("test-document-number")
                 .coreData(
                     decision.coreData().toBuilder()
                         .court(
