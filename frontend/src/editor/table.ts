@@ -3,12 +3,6 @@ import "../styles/tables.css"
 import { Node } from "prosemirror-model"
 import { hasAllBorders } from "./tableUtil"
 
-let oldBorder: number | undefined = undefined
-let resetReplacementTimeOut: NodeJS.Timeout
-const resetOldBorder = () => {
-  oldBorder = undefined
-}
-
 /**
  * Notwendig, weil das resizable: true die styles (border) der Tabelle entfernt.
  */
@@ -43,15 +37,6 @@ export const CustomTable = Table.extend({
         renderHTML: (attributes) =>
           attributes.style ? { style: attributes.style } : {},
       },
-      border: {
-        parseHTML: (element) => {
-          const borderValue = element.getAttribute("border")
-          if (borderValue) {
-            oldBorder = Number.parseInt(borderValue) || undefined
-          }
-          resetReplacementTimeOut = setTimeout(resetOldBorder, 2000)
-        },
-      },
     }
   },
   addGlobalAttributes() {
@@ -61,17 +46,22 @@ export const CustomTable = Table.extend({
         types: ["tableCell", "tableHeader"],
         attributes: {
           style: {
-            renderHTML: (attributes) => {
-              clearTimeout(resetReplacementTimeOut)
-              resetReplacementTimeOut = setTimeout(resetOldBorder, 2000)
+            parseHTML: (element) => {
+              const table = element.closest("table")
+              const oldBorder = table?.getAttribute("border") || -1
 
-              let existingStyle = attributes.style || ""
+              let existingStyle = element.getAttribute("style") || ""
 
               if (oldBorder && !existingStyle.includes("border")) {
                 existingStyle += existingStyle == "" ? "" : "; "
                 existingStyle +=
                   "border: " + oldBorder + "px solid rgb(0, 0, 0)"
               }
+
+              return existingStyle
+            },
+            renderHTML: (attributes) => {
+              const existingStyle = attributes.style || ""
 
               const allBorders = hasAllBorders(existingStyle)
               const invisibleClass = allBorders ? "" : "invisible-table-cell"
