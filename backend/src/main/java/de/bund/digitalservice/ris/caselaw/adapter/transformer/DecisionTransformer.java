@@ -150,7 +150,6 @@ public class DecisionTransformer extends DocumentableTransformer {
 
       addNormReferences(builder, contentRelatedIndexing);
 
-      addActiveCitations(builder, contentRelatedIndexing);
       addJobProfiles(builder, contentRelatedIndexing);
       addDefinitions(builder, contentRelatedIndexing);
       addDismissalGrounds(builder, contentRelatedIndexing);
@@ -305,25 +304,6 @@ public class DecisionTransformer extends DocumentableTransformer {
     } else {
       builder.decisionNames(Collections.emptyList());
     }
-  }
-
-  private static void addActiveCitations(
-      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
-    if (contentRelatedIndexing.activeCitations() == null) {
-      return;
-    }
-
-    AtomicInteger i = new AtomicInteger(1);
-    builder.activeCitations(
-        contentRelatedIndexing.activeCitations().stream()
-            .map(ActiveCitationTransformer::transformToDTO)
-            .filter(Objects::nonNull)
-            .map(
-                dto -> {
-                  dto.setRank(i.getAndIncrement());
-                  return dto;
-                })
-            .toList());
   }
 
   private static void addJobProfiles(

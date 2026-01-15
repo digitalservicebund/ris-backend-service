@@ -138,18 +138,6 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @JoinColumn(name = "creating_documentation_office_id", referencedColumnName = "id")
   private DocumentationOfficeDTO creatingDocumentationOffice;
 
-  /**
-   * Aktivzitierung
-   *
-   * @deprecated use {@link #activeLinkCaselawCitations} and {@link
-   *     #activeBlindlinkCaselawCitations} instead
-   */
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-  @JoinColumn(name = "documentation_unit_id", nullable = false)
-  @Builder.Default
-  @OrderBy("rank")
-  private List<ActiveCitationDTO> activeCitations = new ArrayList<>();
-
   /** Aktivzitierungen (echte Links) */
   @OneToMany(
       cascade = CascadeType.ALL,
