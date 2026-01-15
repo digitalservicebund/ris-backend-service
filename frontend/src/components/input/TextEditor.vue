@@ -16,6 +16,7 @@ import { Underline } from "@tiptap/extension-underline"
 import { AnyExtension, Editor, EditorContent } from "@tiptap/vue-3"
 import { BubbleMenu } from "@tiptap/vue-3/menus"
 import { computed, onMounted, ref, watch } from "vue"
+import ExtractionHighlight from "@/components/extraction/ExtractionHighlight"
 import TextEditorFooter from "@/components/input/TextEditorFooter.vue"
 import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
@@ -137,6 +138,7 @@ const extensions: AnyExtension[] = [
     service: textCheckService,
   }),
   TrailingNode,
+  ...ExtractionHighlight,
 ]
 
 const editor: Editor = new Editor({
@@ -323,7 +325,7 @@ const resizeObserver = new ResizeObserver((entries) => {
   }
 })
 
-defineExpose({ jumpToMatch })
+defineExpose({ jumpToMatch, editor })
 </script>
 
 <template>
