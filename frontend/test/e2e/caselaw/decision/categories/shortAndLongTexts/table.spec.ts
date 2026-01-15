@@ -28,7 +28,7 @@ test.describe("Editor: table tests", () => {
         const tableExpectedParagraphText =
           "<p>some text so the table is exportable</p>"
         const tableClosingHTML = "</tbody></table>"
-        const tableXMLPreview = `<table class="invisible-table-cell" style="min-width: 25px;">`
+        const tableXMLPreview = `<table style="min-width: 25px;">`
         const inputField = page.getByTestId("Gründe")
         const menu = page.getByLabel("Gründe Button Leiste")
 
