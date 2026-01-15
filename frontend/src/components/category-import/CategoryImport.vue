@@ -57,6 +57,12 @@ async function searchForDocumentUnit() {
   sourceDocumentUnit.value = undefined
   errorMessage.value = undefined
 
+  if (response.status === 500) {
+    errorMessage.value =
+      "Die Suche konnte nicht ausgeführt werden. Laden Sie die Seite neu"
+    return
+  }
+
   if (!response.data) {
     errorMessage.value = "Keine Dokumentationseinheit gefunden."
     return
