@@ -171,12 +171,24 @@ test.describe(
 test.describe(
   "Editor toolbar use",
   {
-    annotation: {
-      type: "story",
-      description:
-        "https://digitalservicebund.atlassian.net/browse/RISDEV-4112",
-    },
-    tag: ["@RISDEV-4112", "@RISDEV-6646", "@RISDEV-9334"],
+    annotation: [
+      {
+        type: "story",
+        description:
+          "https://digitalservicebund.atlassian.net/browse/RISDEV-6642",
+      },
+      {
+        type: "story",
+        description:
+          "https://digitalservicebund.atlassian.net/browse/RISDEV-9334",
+      },
+      {
+        type: "story",
+        description:
+          "https://digitalservicebund.atlassian.net/browse/RISDEV-10447",
+      },
+    ],
+    tag: ["@RISDEV-6646", "@RISDEV-9334", "@RISDEV-10447"],
   },
   () => {
     test("Enter text and make it into an ordered list with decimal numbers", async ({
