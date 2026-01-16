@@ -44,6 +44,8 @@ import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.DocPropsCustomPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
+import org.docx4j.openpackaging.parts.WordprocessingML.ImageBmpPart;
+import org.docx4j.openpackaging.parts.WordprocessingML.ImageGifPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImageJpegPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImagePngPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MetafileEmfPart;
@@ -447,6 +449,22 @@ public class DocxConverterService {
                             images.put(
                                 relationship.getId(),
                                 new DocxImagePart(emfPart.getContentType(), emfPart.getBytes())));
+              } else if (part instanceof ImageGifPart imageGifPart) {
+                part.getSourceRelationships()
+                    .forEach(
+                        relationship ->
+                            images.put(
+                                relationship.getId(),
+                                new DocxImagePart(
+                                    imageGifPart.getContentType(), imageGifPart.getBytes())));
+              } else if (part instanceof ImageBmpPart imageBmpPart) {
+                part.getSourceRelationships()
+                    .forEach(
+                        relationship ->
+                            images.put(
+                                relationship.getId(),
+                                new DocxImagePart(
+                                    imageBmpPart.getContentType(), imageBmpPart.getBytes())));
               } else if (part instanceof ImagePngPart pngPart) {
                 part.getSourceRelationships()
                     .forEach(
