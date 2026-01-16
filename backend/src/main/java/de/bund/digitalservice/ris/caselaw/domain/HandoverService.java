@@ -218,7 +218,7 @@ public class HandoverService {
       }
       if (!isUnpublished || isMigrated) {
         throw new HandoverException(
-            "Handing over documentation unit with images is only allowed for unpublished decisions");
+            "Handing over with images is only allowed for decisions created in NeuRIS");
       }
       var isAllImagesAllowedFormat =
           inlineAttachments.stream()

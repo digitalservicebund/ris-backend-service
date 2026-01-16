@@ -161,7 +161,7 @@ class HandoverServiceTest {
             () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
         .isInstanceOf(HandoverException.class)
         .hasMessageContaining(
-            "Handing over documentation unit with images is only allowed for unpublished decisions");
+            "Handing over with images is only allowed for decisions created in NeuRIS");
 
     verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
   }
@@ -184,7 +184,7 @@ class HandoverServiceTest {
             () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
         .isInstanceOf(HandoverException.class)
         .hasMessageContaining(
-            "Handing over documentation unit with images is only allowed for unpublished decisions");
+            "Handing over with images is only allowed for decisions created in NeuRIS");
 
     verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
   }
