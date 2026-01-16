@@ -58,8 +58,8 @@ public class ActiveBlindlinkCaselawCitationDTO {
   private DocumentTypeDTO targetDocumentType;
 
   @Nullable
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "citation_type_id", nullable = false)
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "citation_type_id")
   private CitationTypeDTO citationType;
 
   @Column @NonNull private Integer rank;
