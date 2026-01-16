@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -14,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationTy
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +29,18 @@ class ActiveCitationIntegrationTest extends BaseIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
 
   DocumentationOfficeDTO docOfficeDTO;
 
   @BeforeEach
   void setUp() {
     docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
+  }
+
+  @AfterEach
+  void cleanUp() {
+    databaseDocumentationUnitRepository.deleteAll();
   }
 
   @Test
@@ -127,6 +135,7 @@ class ActiveCitationIntegrationTest extends BaseIntegrationTest {
                                         .uuid(
                                             UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
                                         .build())
+                                .documentNumber("documentnr002")
                                 .build(),
                             ActiveCitation.builder()
                                 .citationType(
@@ -240,6 +249,7 @@ class ActiveCitationIntegrationTest extends BaseIntegrationTest {
                                         .uuid(
                                             UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
                                         .build())
+                                .documentNumber("documentnr002")
                                 .build()))
                     .build())
             .build();
@@ -327,6 +337,7 @@ class ActiveCitationIntegrationTest extends BaseIntegrationTest {
                                         .uuid(
                                             UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
                                         .build())
+                                .documentNumber("documentnr002")
                                 .build(),
                             ActiveCitation.builder().build()))
                     .build())
@@ -431,6 +442,7 @@ class ActiveCitationIntegrationTest extends BaseIntegrationTest {
                                         .uuid(
                                             UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
                                         .build())
+                                .documentNumber("documentnr002")
                                 .build()))
                     .build())
             .build();
@@ -642,6 +654,7 @@ class ActiveCitationIntegrationTest extends BaseIntegrationTest {
                                         .uuid(
                                             UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
                                         .build())
+                                .documentNumber("documentnr002")
                                 .build()))
                     .build())
             .build();
