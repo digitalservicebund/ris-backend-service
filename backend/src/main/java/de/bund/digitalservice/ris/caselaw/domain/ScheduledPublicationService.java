@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Value;
@@ -82,8 +81,14 @@ Die Terminierte Abgabe von Dokument %s konnte nicht erfolgen.
 Bitte beheben Sie den Fehler und wiederholen Sie die Abgabe manuell.
 Technischer Fehler: %s""")
               .formatted(docNumber, error.getMessage());
-      List<MailAttachment> mailAttachments = Collections.emptyList();
-      this.mailSender.sendMail(senderAddress, email, subject, body, mailAttachments, docNumber);
+      this.mailSender.sendMail(
+          senderAddress,
+          email,
+          subject,
+          body,
+          Collections.emptyList(),
+          Collections.emptyList(),
+          docNumber);
     } catch (Exception e) {
       log.error("Could not send error notification to user {}", docUnit.documentNumber(), e);
     }

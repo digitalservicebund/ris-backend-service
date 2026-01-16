@@ -60,7 +60,7 @@ class ScheduledPublicationServiceTest {
 
     verify(handoverService, never()).handoverDocumentationUnitAsMail(any(), any(), any());
     verify(docUnitRepository, never()).save(any());
-    verify(httpMailSender, never()).sendMail(any(), any(), any(), any(), any(), any());
+    verify(httpMailSender, never()).sendMail(any(), any(), any(), any(), any(), any(), any());
   }
 
   @Test
@@ -75,7 +75,7 @@ class ScheduledPublicationServiceTest {
 
     verifyPublicationAndDocUnitUpdate(publishedDocUnit);
     verifyPublicationAndDocUnitUpdate(unpublishedDocUnit);
-    verify(httpMailSender, never()).sendMail(any(), any(), any(), any(), any(), any());
+    verify(httpMailSender, never()).sendMail(any(), any(), any(), any(), any(), any(), any());
   }
 
   @Test
@@ -127,12 +127,12 @@ class ScheduledPublicationServiceTest {
 
     verifyPublicationAndDocUnitUpdate(publishedDocUnit);
     verifyPublicationAndDocUnitUpdate(unpublishedDocUnit);
-    verify(httpMailSender, never()).sendMail(any(), any(), any(), any(), any(), any());
+    verify(httpMailSender, never()).sendMail(any(), any(), any(), any(), any(), any(), any());
   }
 
   private void mockHandoverWithSuccessStatus(boolean successStatus)
       throws DocumentationUnitNotExistsException {
-    var result = new HandoverMail(null, null, "", "", null, successStatus, null, null, null);
+    var result = new HandoverMail(null, null, "", "", null, null, successStatus, null, null, null);
     when(this.handoverService.handoverDocumentationUnitAsMail(any(), any(), any()))
         .thenReturn(result);
   }
@@ -205,6 +205,7 @@ class ScheduledPublicationServiceTest {
             eq("Terminierte Abgabe fehlgeschlagen: " + docUnit.documentNumber()),
             contains("Terminierte Abgabe von"),
             eq(Collections.emptyList()),
+            eq(Collections.emptyList()),
             eq(docUnit.documentNumber()));
   }
 
@@ -214,6 +215,6 @@ class ScheduledPublicationServiceTest {
         // second call succeeds
         .doNothing()
         .when(httpMailSender)
-        .sendMail(any(), any(), any(), any(), any(), any());
+        .sendMail(any(), any(), any(), any(), any(), any(), any());
   }
 }

@@ -70,6 +70,7 @@ const isFirstTimeHandover = computed(() => {
 })
 
 const textCheckAllToggle = useFeatureToggle("neuris.text-check-handover")
+const imageHandoverToggle = useFeatureToggle("neuris.image-handover")
 
 const preview = ref<Preview>()
 const frontendError = ref()
@@ -371,7 +372,7 @@ const isScheduled = computed<boolean>(
 )
 
 const hasImages = computed<boolean>(
-  () => !!preview.value?.xml?.includes("<img"),
+  () => !!preview.value?.xml?.includes("<jurimg"),
 )
 
 const isPublishable = computed<boolean>(
@@ -381,7 +382,7 @@ const isPublishable = computed<boolean>(
     !isCaseFactsInvalid.value &&
     !isDecisionReasonsInvalid.value &&
     !!preview.value?.success &&
-    !hasImages.value,
+    (!hasImages.value || imageHandoverToggle.value),
 )
 </script>
 
@@ -659,7 +660,7 @@ const isPublishable = computed<boolean>(
       </Message>
 
       <Message
-        v-if="hasImages"
+        v-if="hasImages && !imageHandoverToggle"
         aria-label="Übergabe an die jDV nicht möglich"
         class="mt-8"
         severity="info"
@@ -728,6 +729,16 @@ const isPublishable = computed<boolean>(
                     <div>
                       <span class="ris-label2-bold"> Betreff: </span>
                       {{ (item as HandoverMail).mailSubject }}
+                    </div>
+                    <div
+                      v-if="(item as HandoverMail).imageAttachments.length > 0"
+                    >
+                      <span class="ris-label2-bold"> Anhänge: </span>
+                      {{
+                        (item as HandoverMail).imageAttachments
+                          .map((attachment) => attachment.fileName)
+                          .join(", ")
+                      }}
                     </div>
                   </div>
 

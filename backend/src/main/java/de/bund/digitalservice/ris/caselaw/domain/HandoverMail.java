@@ -27,6 +27,7 @@ public record HandoverMail(
     String receiverAddress,
     String mailSubject,
     List<MailAttachment> attachments,
+    List<MailAttachmentImage> imageAttachments,
     @Getter boolean success,
     List<String> statusMessages,
     @Getter @JsonProperty(access = JsonProperty.Access.WRITE_ONLY, value = "date")

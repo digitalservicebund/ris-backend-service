@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.MailAttachmentImage;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,7 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
       String subject,
       String content,
       List<MailAttachment> mailAttachments,
+      List<MailAttachmentImage> imageAttachments,
       String tag) {
 
     ApiClient defaultClient = Configuration.getDefaultApiClient();
@@ -66,6 +68,13 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
       SendSmtpEmailAttachment attachment = new SendSmtpEmailAttachment();
       attachment.setName(a.fileName());
       attachment.setContent(a.fileContent().getBytes(StandardCharsets.UTF_8));
+      attachmentList.add(attachment);
+    }
+
+    for (MailAttachmentImage a : imageAttachments) {
+      SendSmtpEmailAttachment attachment = new SendSmtpEmailAttachment();
+      attachment.setName(a.fileName());
+      attachment.setContent(a.fileContent());
       attachmentList.add(attachment);
     }
 

@@ -139,7 +139,7 @@ class JurisXmlExporterResponseProcessorTest {
     verify(storeFactory, times(1)).createStore();
     verify(xmlHandoverRepository, times(1)).getLastXmlHandoverMail(DOCUMENT_UUID);
     verify(mailSender, times(1))
-        .sendMail(any(), any(), any(), any(), any(), eq("report-" + DOCUMENT_NUMBER));
+        .sendMail(any(), any(), any(), any(), any(), any(), eq("report-" + DOCUMENT_NUMBER));
     verify(inbox, times(1)).copyMessages(new Message[] {importMessage}, processed);
     verify(importMessage, times(1)).setFlag(Flag.DELETED, true);
   }
@@ -210,6 +210,7 @@ class JurisXmlExporterResponseProcessorTest {
             any(),
             any(),
             argThat(list -> list.get(0).equals(new MailAttachment("test.txt", "ÄÜÖäüöß"))),
+            any(),
             eq("report-" + DOCUMENT_NUMBER));
   }
 

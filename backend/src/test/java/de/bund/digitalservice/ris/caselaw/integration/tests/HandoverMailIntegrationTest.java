@@ -8,6 +8,7 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseHandoverReportRepository;
@@ -37,6 +38,7 @@ import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.MailAttachmentImage;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.User;
@@ -91,7 +93,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
   @BeforeEach
   void setUp() {
     docOffice = documentationOfficeRepository.findByAbbreviation("DS");
-
+    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(true);
     when(featureToggleService.isEnabled("neuris.text-check-noindex-handover")).thenReturn(true);
   }
 
@@ -203,6 +205,12 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
   void testHandover(HandoverEntityType entityType) {
     String identifier = "docnr12345678";
 
+    String xml =
+        """
+        xml
+        <gruende><jurimg name="foo.jpg"></gruende>
+        """;
+
     DocumentationUnitDTO savedDocumentationUnitDTO =
         EntityBuilderTestUtil.createAndSaveDecision(
             repository,
@@ -210,7 +218,21 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
                 .documentationOffice(docOffice)
                 .documentNumber(identifier)
                 .inboxStatus(InboxStatus.EXTERNAL_HANDOVER)
-                .headnote("xml")
+                .headnote(xml)
+                .attachmentsInline(
+                    List.of(
+                        AttachmentInlineDTO.builder()
+                            .uploadTimestamp(Instant.now())
+                            .format("JPEG")
+                            .filename("foo.JPEG")
+                            .content(new byte[7])
+                            .build(),
+                        AttachmentInlineDTO.builder()
+                            .uploadTimestamp(Instant.now())
+                            .format("JPEG")
+                            .filename("non-xml-image.JPEG") // this should not be handed over
+                            .content(new byte[7])
+                            .build()))
                 .date(LocalDate.now()));
     UUID entityId = savedDocumentationUnitDTO.getId();
 
@@ -259,12 +281,16 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
             .attachments(
                 entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)
                     ? List.of(
-                        HandoverMailAttachmentDTO.builder().fileName("test.xml").xml("xml").build())
+                        HandoverMailAttachmentDTO.builder().fileName("test.xml").xml(xml).build())
                     : List.of(
                         HandoverMailAttachmentDTO.builder()
                             .fileName("docnr12345678.xml")
                             .xml("citation: citation docunit: docnr12345678")
                             .build()))
+            .attachedImages(
+                entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)
+                    ? "docnr12345678_ds_foo.jpg"
+                    : "")
             .statusCode("200")
             .statusMessages("message 1|message 2")
             .issuerAddress("test@test.com")
@@ -279,12 +305,17 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
             .attachments(
                 entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)
                     ? List.of(
-                        MailAttachment.builder().fileName("test.xml").fileContent("xml").build())
+                        MailAttachment.builder().fileName("test.xml").fileContent(xml).build())
                     : List.of(
                         MailAttachment.builder()
                             .fileName("docnr12345678.xml")
                             .fileContent("citation: citation docunit: docnr12345678")
                             .build()))
+            .imageAttachments(
+                entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)
+                    ? List.of(
+                        MailAttachmentImage.builder().fileName("docnr12345678_ds_foo.jpg").build())
+                    : List.of())
             .success(true)
             .statusMessages(List.of("message 1", "message 2"))
             .issuerAddress("test@test.com") // set by AuthUtils
