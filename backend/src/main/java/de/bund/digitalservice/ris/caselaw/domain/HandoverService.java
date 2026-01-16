@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -26,12 +28,16 @@ import org.w3c.dom.Document;
 @Slf4j
 public class HandoverService {
 
+  private static final String HANDOVER_IMAGES_FEATURE_FLAG = "neuris.image-handover";
+
   private final DocumentationUnitRepository repository;
   private final LegalPeriodicalEditionRepository editionRepository;
   private final HandoverReportRepository handoverReportRepository;
   private final MailService mailService;
   private final DeltaMigrationRepository deltaMigrationRepository;
   private final DocumentationUnitHistoryLogService historyLogService;
+  private final AttachmentInlineRepository attachmentInlineRepository;
+  private final FeatureToggleService featureToggleService;
 
   @Value("${mail.exporter.recipientAddress:neuris@example.com}")
   private String recipientAddress;
@@ -42,7 +48,9 @@ public class HandoverService {
       DeltaMigrationRepository migrationService,
       HandoverReportRepository handoverReportRepository,
       LegalPeriodicalEditionRepository editionRepository,
-      DocumentationUnitHistoryLogService historyLogService) {
+      DocumentationUnitHistoryLogService historyLogService,
+      AttachmentInlineRepository attachmentInlineRepository,
+      FeatureToggleService featureToggleService) {
 
     this.repository = repository;
     this.mailService = mailService;
@@ -50,6 +58,8 @@ public class HandoverService {
     this.handoverReportRepository = handoverReportRepository;
     this.editionRepository = editionRepository;
     this.historyLogService = historyLogService;
+    this.attachmentInlineRepository = attachmentInlineRepository;
+    this.featureToggleService = featureToggleService;
   }
 
   /**
@@ -67,6 +77,7 @@ public class HandoverService {
     DocumentationUnit documentationUnit = repository.findByUuid(documentationUnitId);
 
     if (documentationUnit instanceof Decision decision) {
+      checkHandoverAllowed(decision);
       String description = "Dokeinheit an jDV übergeben";
       historyLogService.saveHistoryLog(
           decision.uuid(), user, HistoryLogEventType.HANDOVER, description);
@@ -186,6 +197,43 @@ public class HandoverService {
       return writer.toString();
     } catch (Exception e) {
       throw new HandoverException("Failed to prettify XML", e);
+    }
+  }
+
+  /**
+   * Checks if handover is allowed for decisions with images and throws a {@link HandoverException}
+   * if decision has images and is already published in jDV or any of the images are not in the
+   * correct format
+   */
+  private void checkHandoverAllowed(Decision decision) {
+    List<AttachmentInlineDTO> inlineAttachments =
+        attachmentInlineRepository.findAllByDocumentationUnitId(decision.uuid());
+    if (!inlineAttachments.isEmpty()) {
+      boolean isImageHandoverEnabled = featureToggleService.isEnabled(HANDOVER_IMAGES_FEATURE_FLAG);
+      boolean isUnpublished =
+          PublicationStatus.UNPUBLISHED.equals(decision.status().publicationStatus());
+      boolean isMigrated = "Migration".equals(decision.managementData().createdByName());
+      if (!isImageHandoverEnabled) {
+        throw new HandoverException("Handing over documentation unit with images is not allowed");
+      }
+      if (!isUnpublished || isMigrated) {
+        throw new HandoverException(
+            "Handing over documentation unit with images is only allowed for unpublished decisions");
+      }
+      var isAllImagesAllowedFormat =
+          inlineAttachments.stream()
+              .map(AttachmentInlineDTO::getFormat)
+              .map(String::toLowerCase)
+              .allMatch(
+                  format ->
+                      "jpg".equals(format)
+                          || "jpeg".equals(format)
+                          || "png".equals(format)
+                          || "gif".equals(format));
+      if (!isAllImagesAllowedFormat) {
+        throw new HandoverException(
+            "Handing over images is only allowed for jpg/jpeg, png or gif format");
+      }
     }
   }
 }

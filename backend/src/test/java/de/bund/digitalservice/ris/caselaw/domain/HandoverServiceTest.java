@@ -1,12 +1,15 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -51,6 +54,8 @@ class HandoverServiceTest {
   @MockitoBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @MockitoBean private AttachmentService attachmentService;
   @MockitoBean private Validator validator;
+  @MockitoBean private AttachmentInlineRepository attachmentInlineRepository;
+  @MockitoBean private FeatureToggleService featureToggleService;
 
   @Test
   void testHandoverByEmail() throws DocumentationUnitNotExistsException {
@@ -113,6 +118,100 @@ class HandoverServiceTest {
         DocumentationUnitNotExistsException.class,
         () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null));
     verify(repository).findByUuid(TEST_UUID);
+    verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
+  }
+
+  @Test
+  void testHandoverByEmail_withImagesAndFeatureFlagDisabled_shouldThrowHandoverException()
+      throws HandoverException, DocumentationUnitNotExistsException {
+    Decision decision =
+        Decision.builder()
+            .uuid(TEST_UUID)
+            .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
+            .managementData(ManagementData.builder().build())
+            .build();
+    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(false);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(decision);
+    when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
+        .thenReturn(List.of(AttachmentInlineDTO.builder().format("jpg").build()));
+
+    assertThatThrownBy(
+            () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
+        .isInstanceOf(HandoverException.class)
+        .hasMessageContaining("Handing over documentation unit with images is not allowed");
+
+    verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
+  }
+
+  @Test
+  void testHandoverByEmail_withImagesAndIsPublished_shouldThrowHandoverException()
+      throws HandoverException, DocumentationUnitNotExistsException {
+    Decision decision =
+        Decision.builder()
+            .uuid(TEST_UUID)
+            .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+            .managementData(ManagementData.builder().build())
+            .build();
+    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(true);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(decision);
+    when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
+        .thenReturn(List.of(AttachmentInlineDTO.builder().format("jpg").build()));
+
+    assertThatThrownBy(
+            () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
+        .isInstanceOf(HandoverException.class)
+        .hasMessageContaining(
+            "Handing over documentation unit with images is only allowed for unpublished decisions");
+
+    verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
+  }
+
+  @Test
+  void testHandoverByEmail_withImagesAndIsMigrated_shouldThrowHandoverException()
+      throws HandoverException, DocumentationUnitNotExistsException {
+    Decision decision =
+        Decision.builder()
+            .uuid(TEST_UUID)
+            .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
+            .managementData(ManagementData.builder().createdByName("Migration").build())
+            .build();
+    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(true);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(decision);
+    when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
+        .thenReturn(List.of(AttachmentInlineDTO.builder().format("jpg").build()));
+
+    assertThatThrownBy(
+            () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
+        .isInstanceOf(HandoverException.class)
+        .hasMessageContaining(
+            "Handing over documentation unit with images is only allowed for unpublished decisions");
+
+    verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
+  }
+
+  @Test
+  void testHandoverByEmail_withImagesInWrongFormat_shouldThrowHandoverException()
+      throws HandoverException, DocumentationUnitNotExistsException {
+    Decision decision =
+        Decision.builder()
+            .uuid(TEST_UUID)
+            .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
+            .managementData(ManagementData.builder().build())
+            .build();
+    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(true);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(decision);
+    when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
+        .thenReturn(
+            List.of(
+                AttachmentInlineDTO.builder().format("jpg").build(),
+                AttachmentInlineDTO.builder().format("wmf").build()));
+
+    assertThatThrownBy(
+            () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
+        .isInstanceOf(HandoverException.class)
+        .hasMessageContaining(
+            "Handing over images is only allowed for jpg/jpeg, png or gif format");
+
     verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
   }
 

@@ -39,6 +39,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachmentImage;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.User;
@@ -233,7 +234,8 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
                             .filename("non-xml-image.JPEG") // this should not be handed over
                             .content(new byte[7])
                             .build()))
-                .date(LocalDate.now()));
+                .date(LocalDate.now()),
+            PublicationStatus.UNPUBLISHED);
     UUID entityId = savedDocumentationUnitDTO.getId();
 
     assertThat(repository.findAll()).hasSize(1);
