@@ -2,7 +2,6 @@
 import Button from "primevue/button"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import { DisplayMode } from "@/components/enumDisplayMode"
-import Tooltip from "@/components/Tooltip.vue"
 import Reference from "@/domain/reference"
 import AddIcon from "~icons/ic/outline-library-add"
 
@@ -40,15 +39,15 @@ async function generateNewEntryFromExisting() {
         :summary="props.data.documentationUnit.renderSummary"
       ></DecisionSummary>
     </div>
-    <Tooltip text="Weitere Fundstelle zu dieser Entscheidung">
-      <Button
-        aria-label="Weitere Fundstelle zu dieser Entscheidung"
-        data-testid="import-categories"
-        size="small"
-        text
-        @click="generateNewEntryFromExisting"
-        ><template #icon> <AddIcon /> </template
-      ></Button>
-    </Tooltip>
+
+    <Button
+      v-tooltip.bottom="'Weitere Fundstelle zu dieser Entscheidung'"
+      aria-label="Weitere Fundstelle zu dieser Entscheidung"
+      data-testid="import-categories"
+      size="small"
+      text
+      @click="generateNewEntryFromExisting"
+      ><template #icon> <AddIcon /> </template
+    ></Button>
   </div>
 </template>
