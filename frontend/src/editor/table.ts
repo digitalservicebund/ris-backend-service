@@ -48,17 +48,15 @@ export const CustomTable = Table.extend({
           style: {
             parseHTML: (element) => {
               const table = element.closest("table")
-              const oldBorder = table?.getAttribute("border") || -1
+              const oldBorder = table?.getAttribute("border") ?? undefined
 
-              let existingStyle = element.getAttribute("style") || ""
+              const existingStyle = element.getAttribute("style") || ""
 
               if (oldBorder && !existingStyle.includes("border")) {
-                existingStyle += existingStyle == "" ? "" : "; "
-                existingStyle +=
-                  "border: " + oldBorder + "px solid rgb(0, 0, 0)"
+                element.style.border = `${oldBorder}px solid rgb(0, 0, 0)`
               }
 
-              return existingStyle
+              return element.style.cssText
             },
             renderHTML: (attributes) => {
               const existingStyle = attributes.style || ""
