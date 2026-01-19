@@ -13,9 +13,9 @@ import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtRegionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDeletedDocumentationIdsRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
@@ -152,7 +152,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseUserRepository databaseUserRepository;
 
   @MockitoBean private MailService mailService;
-  @MockitoBean private AttachmentInlineRepository attachmentInlineRepository;
+  @MockitoBean private DatabaseAttachmentInlineRepository attachmentInlineRepository;
   @MockitoBean private HandoverReportRepository handoverReportRepository;
   @MockitoBean DocumentNumberPatternConfig documentNumberPatternConfig;
   @MockitoSpyBean private UserService userService;

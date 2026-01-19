@@ -14,8 +14,8 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -64,7 +64,7 @@ class S3AttachmentServiceTest {
   @MockitoSpyBean S3AttachmentService service;
 
   @MockitoBean AttachmentRepository repository;
-  @MockitoBean AttachmentInlineRepository attachmentInlineRepository;
+  @MockitoBean DatabaseAttachmentInlineRepository attachmentInlineRepository;
   @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
 
   @MockitoBean

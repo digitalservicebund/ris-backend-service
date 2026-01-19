@@ -15,6 +15,7 @@ const errorMessage = ref<ResponseError>()
 const succeedMessage = ref<{ title: string; description: string }>()
 
 async function handoverDocument() {
+  errorMessage.value = undefined
   const response = await handoverDocumentationUnitService.handoverDocument(
     store.documentUnit!.uuid,
   )

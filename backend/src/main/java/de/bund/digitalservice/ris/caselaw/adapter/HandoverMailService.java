@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
@@ -54,7 +54,7 @@ public class HandoverMailService implements MailService {
 
   private final HandoverRepository repository;
 
-  private final AttachmentInlineRepository attachmentInlineRepository;
+  private final DatabaseAttachmentInlineRepository attachmentInlineRepository;
 
   private final Environment env;
 
@@ -70,7 +70,7 @@ public class HandoverMailService implements MailService {
       XmlExporter xmlExporter,
       HttpMailSender mailSender,
       HandoverRepository repository,
-      AttachmentInlineRepository attachmentInlineRepository,
+      DatabaseAttachmentInlineRepository attachmentInlineRepository,
       Environment env,
       FeatureToggleService featureToggleService) {
     this.xmlExporter = xmlExporter;
