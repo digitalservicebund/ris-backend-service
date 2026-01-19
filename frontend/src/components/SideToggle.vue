@@ -29,7 +29,7 @@ const postFix = computed(() => (props.isExpanded ? "schließen" : "öffnen"))
 
 const tooltipValue = computed(() => {
   const baseText = `${props.label} ${postFix.value}`
-  return props.shortcut ? `${baseText}\n${props.shortcut}` : baseText
+  return props.shortcut ? `${baseText} (${props.shortcut})` : baseText
 })
 
 const classes = computed(() => ({
