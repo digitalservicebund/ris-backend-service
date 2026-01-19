@@ -1,7 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -207,7 +205,7 @@ public class HandoverService {
    * correct format
    */
   private void checkHandoverAllowed(Decision decision) {
-    List<AttachmentInlineDTO> inlineAttachments =
+    List<Attachment> inlineAttachments =
         attachmentInlineRepository.findAllByDocumentationUnitId(decision.uuid());
     if (!inlineAttachments.isEmpty()) {
       boolean isImageHandoverEnabled = featureToggleService.isEnabled(HANDOVER_IMAGES_FEATURE_FLAG);
@@ -224,7 +222,7 @@ public class HandoverService {
       }
       var isAllImagesAllowedFormat =
           inlineAttachments.stream()
-              .map(AttachmentInlineDTO::getFormat)
+              .map(Attachment::format)
               .map(String::toLowerCase)
               .allMatch(
                   format ->

@@ -6,7 +6,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -113,7 +113,7 @@ class XmlMailServiceProdTest {
 
   @MockitoBean private FeatureToggleService featureToggleService;
 
-  @MockitoBean private AttachmentInlineRepository attachmentInlineRepository;
+  @MockitoBean private DatabaseAttachmentInlineRepository attachmentInlineRepository;
 
   @BeforeEach
   void setUp() throws ParserConfigurationException, TransformerException {

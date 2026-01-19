@@ -10,8 +10,8 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.adapter.CaselawExceptionHandler;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
@@ -78,7 +78,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseDocumentationUnitHistoryLogRepository historyLogRepository;
   @Autowired private DatabaseUserRepository databaseUserRepository;
-  @Autowired private AttachmentInlineRepository attachmentInlineRepository;
+  @Autowired private DatabaseAttachmentInlineRepository attachmentInlineRepository;
 
   @MockitoBean(name = "portalS3Client")
   private S3Client s3Client;

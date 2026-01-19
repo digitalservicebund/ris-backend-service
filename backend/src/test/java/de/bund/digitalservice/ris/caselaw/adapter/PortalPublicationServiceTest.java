@@ -23,8 +23,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
@@ -75,7 +75,7 @@ class PortalPublicationServiceTest {
 
   @MockitoBean private DocumentationUnitRepository documentationUnitRepository;
   @MockitoBean private AttachmentRepository attachmentRepository;
-  @MockitoBean private AttachmentInlineRepository attachmentInlineRepository;
+  @MockitoBean private DatabaseAttachmentInlineRepository attachmentInlineRepository;
   @MockitoBean private PortalBucket caseLawBucket;
   @MockitoBean private XmlUtilService xmlUtilService;
   @MockitoBean private ObjectMapper objectMapper;
