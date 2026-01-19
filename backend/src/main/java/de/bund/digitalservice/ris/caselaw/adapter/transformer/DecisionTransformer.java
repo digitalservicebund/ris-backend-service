@@ -950,7 +950,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   private static List<Attachment> buildOtherAttachments(DecisionDTO decisionDTO) {
     return decisionDTO.getAttachments().stream()
         .map(AttachmentTransformer::transformToDomain)
-        .filter(attachment -> attachment.type() == AttachmentType.OTHER)
+        .filter(attachment -> AttachmentType.OTHER == attachment.type())
         .toList();
   }
 

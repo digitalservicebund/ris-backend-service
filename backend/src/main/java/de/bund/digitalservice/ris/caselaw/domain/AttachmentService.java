@@ -18,4 +18,8 @@ public interface AttachmentService {
   void deleteAllObjectsFromBucketForDocumentationUnit(UUID documentationUnitId);
 
   Optional<Image> findByDocumentationUnitIdAndFileName(UUID documentationUnitId, String imageName);
+
+  StreamedFileResponseDto getFileStream(UUID documentationUnitId, UUID fileUuid);
+
+  StreamedFile getFileStreamDto(UUID documentationUnitId, UUID fileUuid);
 }

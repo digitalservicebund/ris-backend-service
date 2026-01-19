@@ -17,6 +17,8 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
+import de.bund.digitalservice.ris.caselaw.domain.StreamedFile;
+import de.bund.digitalservice.ris.caselaw.domain.StreamedFileResponseDto;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.image.ImageUtil;
@@ -43,13 +45,18 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.AbortMultipartUploadRequest;
 import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadRequest;
 import software.amazon.awssdk.services.s3.model.CompletedMultipartUpload;
 import software.amazon.awssdk.services.s3.model.CompletedPart;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.UploadPartRequest;
 
@@ -123,12 +130,14 @@ public class S3AttachmentService implements AttachmentService {
 
     var documentationUnit = documentationUnitRepository.findById(documentationUnitId).orElseThrow();
 
+    var extension = getExtension(filename);
+
     var attachmentDTO =
         AttachmentDTO.builder()
             .s3ObjectPath(UNKNOWN_YET)
             .documentationUnit(documentationUnit)
             .filename(filename)
-            .format("bin")
+            .format(extension)
             .uploadTimestamp(Instant.now())
             .attachmentType(type.name())
             .build();
@@ -157,6 +166,20 @@ public class S3AttachmentService implements AttachmentService {
         documentationUnitId, user, HistoryLogEventType.FILES, "File uploaded");
 
     return attachment;
+  }
+
+  public String getExtension(String filename) {
+    if (filename == null || !filename.contains(".")) {
+      return "";
+    }
+
+    int lastDotIndex = filename.lastIndexOf('.');
+
+    if (lastDotIndex > 0 && lastDotIndex < filename.length() - 1) {
+      return filename.substring(lastDotIndex + 1);
+    }
+
+    return "";
   }
 
   private void streamFileToBucket(String s3ObjectPath, InputStream file) {
@@ -262,6 +285,7 @@ public class S3AttachmentService implements AttachmentService {
             .filename(fileName)
             .format("docx")
             .uploadTimestamp(Instant.now())
+            .attachmentType(AttachmentType.ORIGINATING.toString())
             .build();
 
     attachmentDTO = repository.save(attachmentDTO);
@@ -313,6 +337,80 @@ public class S3AttachmentService implements AttachmentService {
                     .contentType(attachmentInlineDTO.getFormat())
                     .name(attachmentInlineDTO.getFilename())
                     .build());
+  }
+
+  @Override
+  public StreamedFileResponseDto getFileStream(UUID documentationUnitId, UUID fileUuid) {
+    var s3Path =
+        repository
+            .findById(fileUuid)
+            .map(AttachmentDTO::getS3ObjectPath)
+            .orElseThrow(() -> new AttachmentException("File not found"));
+
+    var getObjectRequest = GetObjectRequest.builder().bucket(bucketName).key(s3Path).build();
+
+    ResponseTransformer<GetObjectResponse, ResponseInputStream<GetObjectResponse>> transformer =
+        ResponseTransformer.toInputStream();
+
+    ResponseInputStream<GetObjectResponse> stream =
+        s3Client.getObject(getObjectRequest, transformer);
+
+    //    ResponseInputStream<GetObjectResponse> stream = s3StreamProvider.getS3Stream(bucketName,
+    // s3Path);
+
+    StreamingResponseBody responseBody =
+        outputStream -> {
+          try (stream) {
+            stream.transferTo(outputStream);
+            outputStream.flush();
+          } catch (IOException e) {
+            log.error("Failed to stream file from S3", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+          }
+        };
+
+    return new StreamedFileResponseDto(stream.response(), responseBody);
+  }
+
+  @Override
+  public StreamedFile getFileStreamDto(UUID documentationUnitId, UUID fileUuid) {
+    var attachment =
+        repository.findById(fileUuid).orElseThrow(() -> new AttachmentException("File not found"));
+    var s3Path = attachment.getS3ObjectPath();
+
+    if (s3Path == null) {
+      throw new AttachmentException("S3 path missing");
+    }
+
+    var getObjectRequest = GetObjectRequest.builder().bucket(bucketName).key(s3Path).build();
+
+    ResponseTransformer<GetObjectResponse, ResponseInputStream<GetObjectResponse>> transformer =
+        ResponseTransformer.toInputStream();
+
+    ResponseInputStream<GetObjectResponse> s3Stream = null;
+    GetObjectResponse resp = null;
+    try {
+      s3Stream = s3Client.getObject(getObjectRequest, transformer);
+      resp = s3Stream.response();
+    } catch (Exception e) {
+      log.error("Failed to stream file from S3", e);
+    }
+
+    long contentLength = -1L;
+    try {
+      Long cl = resp.contentLength();
+      if (cl != null) {
+        contentLength = cl;
+      }
+    } catch (Exception e) {
+      // ignore, treat as unknown length
+    }
+
+    String contentType = resp.contentType();
+    String eTag = resp.eTag();
+    String filename = attachment.getFilename() != null ? attachment.getFilename() : s3Path;
+
+    return new StreamedFile(s3Stream, contentLength, contentType, filename, eTag);
   }
 
   void checkDocx(ByteBuffer byteBuffer) {

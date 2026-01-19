@@ -83,6 +83,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 @RestController
 @RequestMapping("api/v1/caselaw/documentunits")
@@ -229,6 +230,44 @@ public class DocumentationUnitController {
     }
   }
 
+  @GetMapping(value = "/{uuid}/file/{fileUuid}")
+  @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#uuid)")
+  public ResponseEntity<StreamingResponseBody> downloadFile(
+      @PathVariable UUID uuid, @PathVariable UUID fileUuid) {
+
+    //    var streamedFile = attachmentService.getFileStreamDto(uuid, fileUuid);
+    var streamedFile = attachmentService.getFileStream(uuid, fileUuid);
+
+    //    HttpHeaders headers = new HttpHeaders();
+    //    if (streamedFile.contentLength() > 0) {
+    //      headers.setContentType(MediaType.parseMediaType(streamedFile.filename()));
+    //    }
+    //    if (streamedFile.contentLength() >= 0) {
+    //      headers.setContentLength(streamedFile.contentLength());
+    //    }
+    //    headers.setCacheControl(CacheControl.noCache());
+    //
+    // headers.setContentDisposition(ContentDisposition.attachment().filename(streamedFile.filename()).build());
+    //    if (streamedFile.eTag() != null) {
+    //      headers.setETag(streamedFile.eTag());
+    //    }
+
+    //    StreamingResponseBody body = outputStream -> {
+    //      try (StreamedFile sf = streamedFile) {
+    //        sf.inputStream().transferTo(outputStream);
+    //      } catch (IOException e) {
+    //        throw new UncheckedIOException(e);
+    //      }
+    //    };
+    //
+    //    return ResponseEntity.ok().headers(headers).body(body);
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + "someFile.docx" + "\"")
+        .contentType(MediaType.parseMediaType(streamedFile.response().contentType()))
+        .contentLength(streamedFile.response().contentLength())
+        .body(streamedFile.body());
+  }
+
   /**
    * Attach a content file (docx) to the documentation unit. This file is used to fill the
    * categories of the documentation unit.
@@ -243,7 +282,7 @@ public class DocumentationUnitController {
   @PutMapping(
       value = {"/{uuid}/original-file"},
       produces = MediaType.APPLICATION_JSON_VALUE,
-      consumes = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<Attachment2Html> attachOriginatingFileToDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser,
