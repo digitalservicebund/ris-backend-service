@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { type Component, computed } from "vue"
-import Tooltip from "./Tooltip.vue"
 import IconChevronLeft from "~icons/ic/baseline-chevron-left"
 import IconChevronRight from "~icons/ic/baseline-chevron-right"
 
@@ -28,6 +27,11 @@ const emit = defineEmits<{
 
 const postFix = computed(() => (props.isExpanded ? "schließen" : "öffnen"))
 
+const tooltipValue = computed(() => {
+  const baseText = `${props.label} ${postFix.value}`
+  return props.shortcut ? `${baseText}\n${props.shortcut}` : baseText
+})
+
 const classes = computed(() => ({
   "pl-24":
     props.openingDirection == OpeningDirection.RIGHT && !props.isExpanded,
@@ -54,28 +58,26 @@ export enum OpeningDirection {
 
 <template>
   <div class="relative bg-white" :class="classes">
-    <Tooltip
-      class="!absolute top-16 z-20"
+    <button
+      v-tooltip.bottom="{
+        value: tooltipValue,
+      }"
+      :aria-label="props.label + ' ' + postFix"
+      class="w-icon !absolute top-16 z-20 flex min-h-32 min-w-32 cursor-pointer items-center justify-center rounded-full border-1 border-solid border-gray-400 bg-white text-gray-900"
       :class="buttonClasses"
-      :shortcut="shortcut"
-      :text="props.label + ' ' + postFix"
+      @click="toggle"
     >
-      <button
-        :aria-label="props.label + ' ' + postFix"
-        class="w-icon relative flex min-h-32 min-w-32 cursor-pointer items-center justify-center rounded-full border-1 border-solid border-gray-400 bg-white text-gray-900"
-        @click="toggle"
-      >
-        <component :is="icon" v-if="icon" class="text-blue-800" />
-        <IconChevronLeft
-          v-else-if="
-            props.openingDirection === OpeningDirection.LEFT
-              ? !isExpanded
-              : isExpanded
-          "
-        />
-        <IconChevronRight v-else />
-      </button>
-    </Tooltip>
+      <component :is="icon" v-if="icon" class="text-blue-800" />
+      <IconChevronLeft
+        v-else-if="
+          props.openingDirection === OpeningDirection.LEFT
+            ? !isExpanded
+            : isExpanded
+        "
+      />
+      <IconChevronRight v-else />
+    </button>
+
     <div v-show="isExpanded">
       <slot />
     </div>
