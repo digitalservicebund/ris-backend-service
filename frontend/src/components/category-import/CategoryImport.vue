@@ -57,6 +57,12 @@ async function searchForDocumentUnit() {
   sourceDocumentUnit.value = undefined
   errorMessage.value = undefined
 
+  if (response.status === 500) {
+    errorMessage.value =
+      "Die Suche konnte nicht ausgeführt werden. Laden Sie die Seite neu"
+    return
+  }
+
   if (!response.data) {
     errorMessage.value = "Keine Dokumentationseinheit gefunden."
     return
@@ -465,7 +471,7 @@ function importActiveCitations() {
   const targetActiveCitations =
     targetDocumentUnit.value!.contentRelatedIndexing.activeCitations ?? []
 
-  const uniqueImportableFieldsOfLaw = source
+  const uniqueImportable = source
     .filter(
       (activeCitation) =>
         !targetActiveCitations.find(
@@ -477,12 +483,11 @@ function importActiveCitations() {
     .map((activeCitation) => ({
       ...activeCitation,
       uuid: undefined,
-      newEntry: true,
     }))
 
   targetDocumentUnit.value!.contentRelatedIndexing.activeCitations = [
     ...targetActiveCitations,
-    ...uniqueImportableFieldsOfLaw,
+    ...uniqueImportable,
   ] as ActiveCitation[]
 }
 

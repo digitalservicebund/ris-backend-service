@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import * as Sentry from "@sentry/vue"
+import Message from "primevue/message"
 import { computed, nextTick, ref, useTemplateRef } from "vue"
 import FieldOfLawDirectInputSearch from "@/components/field-of-law/FieldOfLawDirectInputSearch.vue"
 import FieldOfLawExpandableContainer, {
@@ -24,6 +25,7 @@ const description = ref("")
 const identifier = ref("")
 const norm = ref("")
 const searchErrorLabel = ref<string | undefined>(undefined)
+const searchFailed = ref(false)
 const results = ref<FieldOfLaw[]>()
 const currentPage = ref<Page<FieldOfLaw>>()
 const itemsPerPage = 10
@@ -49,6 +51,7 @@ const selectedNodes = computed({
 })
 
 async function submitSearch(page: number) {
+  searchFailed.value = false
   searchErrorLabel.value = undefined
   if (
     StringsUtil.isEmpty(identifier.value) &&
@@ -80,8 +83,7 @@ async function submitSearch(page: number) {
   } else {
     currentPage.value = undefined
     results.value = undefined
-    searchErrorLabel.value =
-      "Leider ist ein Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
+    searchFailed.value = true
   }
 }
 
@@ -188,6 +190,13 @@ function updateInputMethod(value: InputMethod) {
       @update:identifier="updateIdentifierSearchTerm"
       @update:norm="updateNormSearchTerm"
     />
+
+    <Message v-if="searchFailed" severity="error">
+      <p class="ris-body1-bold">
+        Leider ist ein Fehler aufgetreten. Bitte versuchen Sie es zu einem
+        späteren Zeitpunkt erneut.
+      </p>
+    </Message>
 
     <div
       v-if="inputMethod === InputMethod.SEARCH"

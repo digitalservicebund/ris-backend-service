@@ -15,6 +15,7 @@ test.describe(
       description:
         "https://digitalservicebund.atlassian.net/browse/RISDEV-4112",
     },
+    tag: ["@RISDEV-4112"],
   },
   () => {
     test("Enter text and make it into a bullet list, check that list style is applied", async ({
@@ -24,7 +25,7 @@ test.describe(
       const bulletList = `<ul class="list-disc"><li><p>This is a bullet list</p></li><li><p>Second bullet list item</p></li></ul>`
       const bulletListXMLPreview = `<ul class="list-disc">`
 
-      await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
       await clickCategoryButton("Gründe", page)
       const inputField = page.getByTestId("Gründe")
@@ -46,7 +47,7 @@ test.describe(
       expect(inputFieldInnerHTML).toContain(bulletList)
       await save(page)
 
-      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToHandover(page, prefilledDocumentUnit.documentNumber)
       await expect(page.getByText("XML Vorschau")).toBeVisible()
       await page.getByText("XML Vorschau").click()
 
@@ -60,7 +61,7 @@ test.describe(
       const orderedList = `<ol style="list-style-type: decimal;"><li><p>This is an ordered list</p></li><li><p>Second ordered list item</p></li></ol>`
       const orderedListXMLPreview = `<ol style="list-style-type: decimal;">`
 
-      await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
       await clickCategoryButton("Gründe", page)
       const inputField = page.getByTestId("Gründe")
@@ -84,7 +85,7 @@ test.describe(
 
       await save(page)
 
-      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToHandover(page, prefilledDocumentUnit.documentNumber)
       await expect(page.getByText("XML Vorschau")).toBeVisible()
       await page.getByText("XML Vorschau").click()
 
@@ -99,7 +100,7 @@ test.describe(
       const orderedList = `<ol style="list-style-type: decimal;"><li><p>This is a list</p></li></ol>`
       const noList = `<p>This is a list</p>`
 
-      await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
       await clickCategoryButton("Gründe", page)
       const inputField = page.getByTestId("Gründe")
@@ -139,7 +140,7 @@ test.describe(
       const orderedList = `<ol style="list-style-type: decimal;"><li><p>This is a list</p></li></ol>`
       const noList = `<p>This is a list</p>`
 
-      await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
       await clickCategoryButton("Gründe", page)
       const inputField = page.getByTestId("Gründe")
@@ -164,14 +165,39 @@ test.describe(
       inputFieldInnerHTML = await inputField.innerHTML()
       expect(inputFieldInnerHTML).toContain(noList)
     })
+  },
+)
 
+test.describe(
+  "Editor toolbar use",
+  {
+    annotation: [
+      {
+        type: "story",
+        description:
+          "https://digitalservicebund.atlassian.net/browse/RISDEV-6642",
+      },
+      {
+        type: "story",
+        description:
+          "https://digitalservicebund.atlassian.net/browse/RISDEV-9334",
+      },
+      {
+        type: "story",
+        description:
+          "https://digitalservicebund.atlassian.net/browse/RISDEV-10447",
+      },
+    ],
+    tag: ["@RISDEV-6646", "@RISDEV-9334", "@RISDEV-10447"],
+  },
+  () => {
     test("Enter text and make it into an ordered list with decimal numbers", async ({
       page,
       prefilledDocumentUnit,
     }) => {
       const orderedListXMLPreview = `<ol style="list-style-type: decimal;">`
 
-      await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
       await clickCategoryButton("Gründe", page)
       const inputField = page.getByTestId("Gründe")
@@ -208,7 +234,7 @@ test.describe(
 
       await save(page)
 
-      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToHandover(page, prefilledDocumentUnit.documentNumber)
       await expect(page.getByText("XML Vorschau")).toBeVisible()
       await page.getByText("XML Vorschau").click()
 
@@ -221,7 +247,7 @@ test.describe(
     }) => {
       const orderedListXMLPreview = `<ol style="list-style-type: lower-roman;">`
 
-      await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
       await clickCategoryButton("Gründe", page)
       const inputField = page.getByTestId("Gründe")
@@ -258,7 +284,7 @@ test.describe(
 
       await save(page)
 
-      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToHandover(page, prefilledDocumentUnit.documentNumber)
       await expect(page.getByText("XML Vorschau")).toBeVisible()
       await page.getByText("XML Vorschau").click()
 
@@ -271,7 +297,7 @@ test.describe(
     }) => {
       const orderedListXMLPreview = `<ol style="list-style-type: upper-roman;">`
 
-      await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
       await clickCategoryButton("Gründe", page)
       const inputField = page.getByTestId("Gründe")
@@ -308,7 +334,7 @@ test.describe(
 
       await save(page)
 
-      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToHandover(page, prefilledDocumentUnit.documentNumber)
       await expect(page.getByText("XML Vorschau")).toBeVisible()
       await page.getByText("XML Vorschau").click()
 
@@ -321,7 +347,7 @@ test.describe(
     }) => {
       const orderedListXMLPreview = `<ol style="list-style-type: lower-alpha;">`
 
-      await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
       await clickCategoryButton("Gründe", page)
       const inputField = page.getByTestId("Gründe")
@@ -358,7 +384,7 @@ test.describe(
 
       await save(page)
 
-      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToHandover(page, prefilledDocumentUnit.documentNumber)
       await expect(page.getByText("XML Vorschau")).toBeVisible()
       await page.getByText("XML Vorschau").click()
 
@@ -371,7 +397,7 @@ test.describe(
     }) => {
       const orderedListXMLPreview = `<ol style="list-style-type: upper-alpha;">`
 
-      await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
       await clickCategoryButton("Gründe", page)
       const inputField = page.getByTestId("Gründe")
@@ -408,7 +434,7 @@ test.describe(
 
       await save(page)
 
-      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToHandover(page, prefilledDocumentUnit.documentNumber)
       await expect(page.getByText("XML Vorschau")).toBeVisible()
       await page.getByText("XML Vorschau").click()
 
@@ -422,7 +448,7 @@ test.describe("Nested lists", () => {
     page,
     prefilledDocumentUnit,
   }) => {
-    await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+    await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
     await clickCategoryButton("Gründe", page)
     const inputField = page.getByTestId("Gründe")
@@ -490,7 +516,7 @@ test.describe("Nested lists", () => {
     // just checking on validity of XML through button being visible
     // this is to recognize that juris XML convertion did not break
     // due to the conversion being sensitive to custom attributes
-    await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+    await navigateToHandover(page, prefilledDocumentUnit.documentNumber)
     await expect(page.getByText("XML Vorschau")).toBeVisible()
   })
 })
