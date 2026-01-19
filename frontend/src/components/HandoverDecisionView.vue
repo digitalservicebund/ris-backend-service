@@ -33,6 +33,7 @@ import { DuplicateRelationStatus } from "@/domain/managementData"
 import PreviousDecision, {
   previousDecisionFieldLabels,
 } from "@/domain/previousDecision"
+import { PublicationState } from "@/domain/publicationStatus"
 import errorMessages from "@/i18n/errors.json"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 import { ResponseError } from "@/services/httpClient"
@@ -375,6 +376,15 @@ const hasImages = computed<boolean>(
   () => !!preview.value?.xml?.includes("<jurimg"),
 )
 
+const isPublishedInjDV = computed(
+  () =>
+    decision.value?.status?.publicationStatus === PublicationState.PUBLISHED,
+)
+
+const isMigrated = computed(
+  () => decision.value?.managementData?.createdByName === "Migration",
+)
+
 const isPublishable = computed<boolean>(
   () =>
     !isOutlineInvalid.value &&
@@ -382,6 +392,7 @@ const isPublishable = computed<boolean>(
     !isCaseFactsInvalid.value &&
     !isDecisionReasonsInvalid.value &&
     !!preview.value?.success &&
+    !(hasImages.value && (isPublishedInjDV.value || isMigrated)) &&
     (!hasImages.value || imageHandoverToggle.value),
 )
 </script>
@@ -668,7 +679,22 @@ const isPublishable = computed<boolean>(
         <p class="ris-body1-bold">Übergabe an die jDV nicht möglich</p>
         <p>
           Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV
-          übergeben werden
+          übergeben werden.
+        </p>
+      </Message>
+
+      <Message
+        v-if="
+          hasImages && imageHandoverToggle && (isPublishedInjDV || isMigrated)
+        "
+        aria-label="Übergabe an die jDV nicht möglich"
+        class="mt-8"
+        severity="info"
+      >
+        <p class="ris-body1-bold">Übergabe an die jDV nicht möglich</p>
+        <p>
+          Diese bereits veröffentlichte Entscheidung enthält Bilder und kann
+          deshalb nicht erneut an die jDV übergeben werden.
         </p>
       </Message>
 

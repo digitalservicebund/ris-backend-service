@@ -107,7 +107,7 @@ export type FailedValidationServerResponse = {
 
 export type ResponseError = {
   title: string
-  description?: string
+  description?: string | string[]
   validationErrors?: ValidationError[]
 }
 

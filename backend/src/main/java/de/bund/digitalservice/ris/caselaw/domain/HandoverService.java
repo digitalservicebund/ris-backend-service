@@ -69,6 +69,7 @@ public class HandoverService {
    * @param issuerAddress the email address of the issuer
    * @return the handover result
    * @throws DocumentationUnitNotExistsException if the documentation unit does not exist
+   * @throws HandoverException if the documentation unit cannot be handed over
    */
   public HandoverMail handoverDocumentationUnitAsMail(
       UUID documentationUnitId, String issuerAddress, @Nullable User user)
@@ -214,11 +215,12 @@ public class HandoverService {
           PublicationStatus.UNPUBLISHED.equals(decision.status().publicationStatus());
       boolean isMigrated = "Migration".equals(decision.managementData().createdByName());
       if (!isImageHandoverEnabled) {
-        throw new HandoverException("Handing over documentation unit with images is not allowed");
+        throw new HandoverNotAllowedException(
+            "Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV übergeben werden.");
       }
       if (!isUnpublished || isMigrated) {
-        throw new HandoverException(
-            "Handing over with images is only allowed for decisions created in NeuRIS");
+        throw new HandoverNotAllowedException(
+            "Die Übergabe einer Entscheidung mit Bildern an die jDV ist nur bei Neuanlagen gestattet.");
       }
       var isAllImagesAllowedFormat =
           inlineAttachments.stream()
@@ -231,8 +233,8 @@ public class HandoverService {
                           || "png".equals(format)
                           || "gif".equals(format));
       if (!isAllImagesAllowedFormat) {
-        throw new HandoverException(
-            "Handing over images is only allowed for jpg/jpeg, png or gif format");
+        throw new HandoverNotAllowedException(
+            "Diese Entscheidung enthält Bilder, die nicht den Formaten entsprechen, die an die jDV übergeben werden können (jpg, png, gif).");
       }
     }
   }

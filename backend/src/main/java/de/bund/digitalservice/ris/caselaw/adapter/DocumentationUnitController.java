@@ -22,7 +22,9 @@ import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatusRequest;
 import de.bund.digitalservice.ris.caselaw.domain.EurlexCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverNotAllowedException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
@@ -442,9 +444,16 @@ public class DocumentationUnitController {
       }
       service.saveSuccessfulHandover(uuid);
       return ResponseEntity.ok(handoverMail);
-    } catch (DocumentationUnitNotExistsException e) {
+    } catch (DocumentationUnitNotExistsException | HandoverException e) {
       log.error("Error handing over documentation unit '{}' as email", uuid, e);
       return ResponseEntity.internalServerError().build();
+    } catch (HandoverNotAllowedException e) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN)
+          .body(
+              HandoverMail.builder()
+                  .success(false)
+                  .statusMessages(List.of(e.getMessage()))
+                  .build());
     }
   }
 

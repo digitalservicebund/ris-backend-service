@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
-import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImportApiKeyException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.TextCheckNotAllowedCategoryTypeException;
 import lombok.extern.slf4j.Slf4j;
@@ -66,14 +65,6 @@ public class CaselawExceptionHandler extends ResponseEntityExceptionHandler {
     ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage());
 
     return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
-  }
-
-  @ExceptionHandler({HandoverException.class})
-  public ResponseEntity<Object> handleHandoverException(HandoverException ex) {
-
-    ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-
-    return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   public record ApiError(HttpStatus status, String message) {}

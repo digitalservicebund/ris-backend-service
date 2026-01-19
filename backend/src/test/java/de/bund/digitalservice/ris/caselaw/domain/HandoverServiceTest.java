@@ -138,7 +138,8 @@ class HandoverServiceTest {
     assertThatThrownBy(
             () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
         .isInstanceOf(HandoverException.class)
-        .hasMessageContaining("Handing over documentation unit with images is not allowed");
+        .hasMessageContaining(
+            "Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV übergeben werden.");
 
     verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
   }
@@ -161,7 +162,7 @@ class HandoverServiceTest {
             () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
         .isInstanceOf(HandoverException.class)
         .hasMessageContaining(
-            "Handing over with images is only allowed for decisions created in NeuRIS");
+            "Die Übergabe einer Entscheidung mit Bildern an die jDV ist nur bei Neuanlagen gestattet.");
 
     verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
   }
@@ -184,7 +185,7 @@ class HandoverServiceTest {
             () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
         .isInstanceOf(HandoverException.class)
         .hasMessageContaining(
-            "Handing over with images is only allowed for decisions created in NeuRIS");
+            "Die Übergabe einer Entscheidung mit Bildern an die jDV ist nur bei Neuanlagen gestattet.");
 
     verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
   }
@@ -210,7 +211,7 @@ class HandoverServiceTest {
             () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
         .isInstanceOf(HandoverException.class)
         .hasMessageContaining(
-            "Handing over images is only allowed for jpg/jpeg, png or gif format");
+            "Diese Entscheidung enthält Bilder, die nicht den Formaten entsprechen, die an die jDV übergeben werden können (jpg, png, gif).");
 
     verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
   }
