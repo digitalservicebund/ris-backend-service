@@ -191,7 +191,7 @@ function updateInputMethod(value: InputMethod) {
       @update:norm="updateNormSearchTerm"
     />
 
-    <Message v-if="searchFailed" severity="error">
+    <Message v-if="searchFailed" class="w-full" severity="error">
       <p class="ris-body1-bold">
         Leider ist ein Fehler aufgetreten. Bitte versuchen Sie es zu einem
         späteren Zeitpunkt erneut.
