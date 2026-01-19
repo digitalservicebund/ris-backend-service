@@ -1,0 +1,325 @@
+{
+  "$defs": {
+    "ExtractionRule": {
+      "description": "A rule for extracting information with a label and one or more patterns.",
+      "properties": {
+        "label": {
+          "description": "Label for extracted entities (e.g., 'date', 'court')",
+          "title": "Label",
+          "type": "string"
+        },
+        "type": {
+          "default": "extraction",
+          "description": "Rule type: 'extraction' for general extraction, 'section_marker' for section boundaries",
+          "enum": ["extraction", "section_marker"],
+          "title": "Type",
+          "type": "string"
+        },
+        "patterns": {
+          "description": "List of alternative patterns, each is a sequence of token constraints",
+          "items": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/$defs/TokenConstraint"
+                },
+                "type": "array"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "title": "Patterns",
+          "type": "array"
+        },
+        "greedy": {
+          "anyOf": [
+            {
+              "enum": ["FIRST", "LONGEST"],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Matching strategy for overlapping matches",
+          "title": "Greedy"
+        },
+        "conditions": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": ["is_short_line", "is_not_short_line", "is_table"],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "List of condition validator names to apply (e.g., ['is_short_line'])",
+          "title": "Conditions"
+        },
+        "normalizers": {
+          "anyOf": [
+            {
+              "items": {
+                "const": "date_to_iso",
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "List of normalizers to apply to matched text (e.g., ['date_to_iso'])",
+          "title": "Normalizers"
+        },
+        "priority": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Priority for this extraction (higher = more important)",
+          "title": "Priority"
+        },
+        "mark_tag": {
+          "default": false,
+          "description": "Mark the entire tag as extracted when this rule matches",
+          "title": "Mark Tag",
+          "type": "boolean"
+        },
+        "followed_by_section": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Label of section that should follow this extraction",
+          "title": "Followed By Section"
+        },
+        "inclusive": {
+          "default": false,
+          "description": "Whether section marker is part of the section",
+          "title": "Inclusive",
+          "type": "boolean"
+        },
+        "single_line": {
+          "default": false,
+          "description": "Whether section consists of a single line only",
+          "title": "Single Line",
+          "type": "boolean"
+        }
+      },
+      "required": ["label", "patterns"],
+      "title": "ExtractionRule",
+      "type": "object"
+    },
+    "TokenConstraint": {
+      "additionalProperties": true,
+      "description": "A single token constraint in a pattern, similar to spaCy's token patterns",
+      "properties": {
+        "TEXT": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text"
+        },
+        "LOWER": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lower"
+        },
+        "REGEX": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Regex"
+        },
+        "IN": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "In"
+        },
+        "NOT_IN": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Not In"
+        },
+        "IS_DIGIT": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Is Digit"
+        },
+        "IS_ALPHA": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Is Alpha"
+        },
+        "IS_TITLE": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Is Title"
+        },
+        "IS_SENT_START": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Is Sent Start"
+        },
+        "SHAPE": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Shape"
+        },
+        "OP": {
+          "anyOf": [
+            {
+              "enum": ["?", "*", "+", "!"],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Op"
+        }
+      },
+      "title": "TokenConstraint",
+      "type": "object"
+    }
+  },
+  "additionalProperties": true,
+  "description": "Configuration for a single extraction ruleset.",
+  "properties": {
+    "name": {
+      "description": "Unique module name (e.g., 'ner', 'sections')",
+      "title": "Name",
+      "type": "string"
+    },
+    "skip_sections": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "List of section labels to skip during extraction",
+      "title": "Skip Sections"
+    },
+    "rules": {
+      "description": "List of extraction rules for this module",
+      "items": {
+        "$ref": "#/$defs/ExtractionRule"
+      },
+      "title": "Rules",
+      "type": "array"
+    }
+  },
+  "required": ["name", "rules"],
+  "title": "RulesetDef",
+  "type": "object"
+}

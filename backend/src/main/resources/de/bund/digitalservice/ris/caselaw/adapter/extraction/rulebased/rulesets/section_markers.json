@@ -1,0 +1,70 @@
+{
+  "$schema": "_schema.json",
+  "name": "sections",
+  "rules": [
+    {
+      "label": "tenor",
+      "type": "section_marker",
+      "patterns": [[{ "LOWER": "tenor" }]],
+      "conditions": ["is_short_line"]
+    },
+    {
+      "label": "tenor2",
+      "type": "section_marker",
+      "patterns": [
+        [{ "LOWER": "beschlossen" }, { "TEXT": ":" }],
+        [
+          { "LOWER": "für" },
+          { "LOWER": "recht" },
+          { "LOWER": "erkannt" },
+          { "TEXT": ":" }
+        ]
+      ]
+    },
+    {
+      "label": "reasons",
+      "type": "section_marker",
+      "patterns": [
+        [{ "LOWER": "gründe" }],
+        [
+          { "LOWER": "g" },
+          { "LOWER": "r" },
+          { "LOWER": "ü" },
+          { "LOWER": "n" },
+          { "LOWER": "d" },
+          { "LOWER": "e" }
+        ]
+      ],
+      "conditions": ["is_short_line"]
+    },
+    {
+      "label": "case_facts",
+      "type": "section_marker",
+      "patterns": [[{ "LOWER": "tatbestand" }]],
+      "conditions": ["is_short_line"]
+    },
+    {
+      "label": "decision_reasons",
+      "type": "section_marker",
+      "patterns": [[{ "LOWER": "entscheidungsgründe" }]],
+      "conditions": ["is_short_line"]
+    },
+    {
+      "label": "previous_decisions",
+      "type": "section_marker",
+      "patterns": [
+        [{ "LOWER": "vorinstanzen" }, { "TEXT": ":" }],
+        [{ "LOWER": "vorinstanz" }, { "TEXT": ":" }]
+      ],
+      "conditions": ["is_short_line"]
+    },
+    {
+      "label": "other",
+      "type": "section_marker",
+      "patterns": [
+        [{ "LOWER": "verkündet" }, { "LOWER": "am" }, { "TEXT": ":" }]
+      ],
+      "conditions": ["is_short_line"]
+    }
+  ]
+}
