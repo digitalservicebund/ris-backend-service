@@ -886,39 +886,39 @@ describe("HandoverDocumentationUnitView:", () => {
 
     expect(container).toHaveTextContent(`Anhänge: foo.png, bar.jpg`)
   })
-})
 
-it("prevent handover published with images", async () => {
-  renderComponent({
-    documentUnit: new Decision("123", {
-      status: { publicationStatus: PublicationState.PUBLISHED },
-      coreData: {
-        fileNumbers: ["foo"],
-        court: { type: "type", location: "location", label: "label" },
-        decisionDate: "2022-02-01",
-        legalEffect: "legalEffect",
-        documentType: {
-          jurisShortcut: "ca",
-          label: "category",
+  it("prevent handover published with images", async () => {
+    renderComponent({
+      documentUnit: new Decision("123", {
+        status: { publicationStatus: PublicationState.PUBLISHED },
+        coreData: {
+          fileNumbers: ["foo"],
+          court: { type: "type", location: "location", label: "label" },
+          decisionDate: "2022-02-01",
+          legalEffect: "legalEffect",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
+          },
+        },
+      }),
+      stubs: {
+        CodeSnippet: {
+          template: '<div data-testid="code-snippet"/>',
         },
       },
-    }),
-    stubs: {
-      CodeSnippet: {
-        template: '<div data-testid="code-snippet"/>',
-      },
-    },
+    })
+
+    // Wait for XML Vorschau
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await nextTick()
+
+    expect(
+      screen.getByText(
+        "Diese bereits veröffentlichte Entscheidung enthält Bilder und kann deshalb nicht erneut an die jDV übergeben werden.",
+      ),
+    ).toBeInTheDocument()
   })
-
-  // Wait for XML Vorschau
-  await new Promise((resolve) => setTimeout(resolve, 0))
-  await nextTick()
-
-  expect(
-    screen.getByText(
-      "Diese bereits veröffentlichte Entscheidung enthält Bilder und kann deshalb nicht erneut an die jDV übergeben werden.",
-    ),
-  ).toBeInTheDocument()
 })
 
 describe("renders uat test mode hint", () => {

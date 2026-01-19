@@ -381,10 +381,6 @@ const isPublishedInjDV = computed(
     decision.value?.status?.publicationStatus === PublicationState.PUBLISHED,
 )
 
-const isMigrated = computed(
-  () => decision.value?.managementData?.createdByName === "Migration",
-)
-
 const isPublishable = computed<boolean>(
   () =>
     !isOutlineInvalid.value &&
@@ -392,7 +388,7 @@ const isPublishable = computed<boolean>(
     !isCaseFactsInvalid.value &&
     !isDecisionReasonsInvalid.value &&
     !!preview.value?.success &&
-    !(hasImages.value && (isPublishedInjDV.value || isMigrated.value)) &&
+    !(hasImages.value && isPublishedInjDV.value) &&
     (!hasImages.value || imageHandoverToggle.value),
 )
 </script>
