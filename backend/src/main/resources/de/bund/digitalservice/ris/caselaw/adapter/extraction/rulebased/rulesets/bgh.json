@@ -1,0 +1,29 @@
+{
+  "$schema": "_schema.json",
+  "name": "bgh",
+  "rules": [
+    {
+      "label": "norms",
+      "type": "section_marker",
+      "patterns": [
+        "^((?!Der|Ist|Gemäß|Nach|Siehe|Entsprechend)[A-Za-zÄÖÜäöüß\\.\\s]{2,15})?(§+|Art\\.|Artikel)\\s*\\d+(?:[a-z]\\b)?(\\s+Abs\\.\\s*\\d+)?"
+      ],
+      "inclusive": true,
+      "single_line": true,
+      "followed_by_section": "guiding_principle"
+    },
+    {
+      "label": "rubrum",
+      "type": "section_marker",
+      "patterns": ["^BGH, (Urteil|Versäumnisurteil|Beschluss) vom"],
+      "inclusive": true,
+      "single_line": true
+    },
+    {
+      "label": "other",
+      "type": "section_marker",
+      "patterns": ["^\\s*in der Strafsache\\s*$"],
+      "inclusive": true
+    }
+  ]
+}

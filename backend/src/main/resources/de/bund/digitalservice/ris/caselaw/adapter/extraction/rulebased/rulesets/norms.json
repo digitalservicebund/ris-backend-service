@@ -1,0 +1,41 @@
+{
+  "$schema": "_schema.json",
+  "name": "norms",
+  "vars": {
+    "NORM_ABBRVS": "^(GG|BGB|StGB|ZPO|StPO|FGO|VwGO|BRAO|AO|EStG|KStG|GewO|HGB|AktG|UrhG|VVG|PflegeZG|LPartG|WpHG|GBO|FamFG|SGB|ArbGG|BVerfGG)$"
+  },
+  "skip_sections": ["reasons", "case_facts", "decision_reasons"],
+  "rules": [
+    {
+      "label": "norm",
+      "type": "extraction",
+      "patterns": [
+        [
+          { "TEXT": "§" },
+          { "TEXT": { "REGEX": "^\\d+\\w*$" } },
+          { "TEXT": { "REGEX": "$NORM_ABBRVS" } }
+        ],
+        [
+          { "TEXT": "§" },
+          { "TEXT": { "REGEX": "^\\d+\\w*$" } },
+          { "TEXT": { "REGEX": "^(Abs|Satz)$" } },
+          { "TEXT": ".", "OP": "?" },
+          { "IS_DIGIT": true },
+          { "TEXT": { "REGEX": "$NORM_ABBRVS" } }
+        ],
+        [
+          { "TEXT": "§" },
+          { "TEXT": { "REGEX": "^\\d+\\w*$" } },
+          { "TEXT": { "REGEX": "^(Abs|Satz)$" } },
+          { "TEXT": ".", "OP": "?" },
+          { "IS_DIGIT": true },
+          { "TEXT": { "REGEX": "^Nr$" } },
+          { "TEXT": ".", "OP": "?" },
+          { "IS_DIGIT": true },
+          { "TEXT": { "REGEX": "$NORM_ABBRVS" } }
+        ]
+      ],
+      "greedy": "LONGEST"
+    }
+  ]
+}

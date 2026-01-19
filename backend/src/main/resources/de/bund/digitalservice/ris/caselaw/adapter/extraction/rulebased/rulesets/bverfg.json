@@ -1,0 +1,23 @@
+{
+  "$schema": "_schema.json",
+  "name": "bverfg",
+  "rules": [
+    {
+      "label": "date",
+      "type": "extraction",
+      "patterns": [
+        "am\\s+(\\d{1,2}\\.\\s+(?:Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\\s+\\d{4})(.*\\s+beschlossen:\\s?)$"
+      ],
+      "normalizers": ["date_to_iso"],
+      "priority": 3
+    },
+    {
+      "label": "file_number",
+      "type": "extraction",
+      "patterns": ["-\\s+(\\d+\\s+[A-Za-z]{3}?\\s?\\d+/\\d+)\\s+-"],
+      "conditions": ["is_table"],
+      "mark_tag": true,
+      "priority": 1
+    }
+  ]
+}

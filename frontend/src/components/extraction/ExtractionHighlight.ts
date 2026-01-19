@@ -6,7 +6,7 @@ import HighlightComponent from "./ExtractionHighlight.vue"
 const attributeMap = new Map<string, string>([
   ["extractionId", "data-extraction-id"],
   ["extractionClass", "data-extraction-class"],
-  ["normalizedValue", "data-normalized-value"],
+  ["normalizedText", "data-normalized-text"],
   ["targetPath", "data-target-path"],
 ])
 

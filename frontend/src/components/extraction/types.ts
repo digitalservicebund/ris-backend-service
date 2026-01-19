@@ -1,15 +1,15 @@
 interface CharInterval {
-  start_pos: number
-  end_pos: number
+  startPos: number
+  endPos: number
 }
 
 export interface Extraction {
   id: string // UUID string
-  extraction_class: string
-  extraction_text: string
-  char_interval: CharInterval | null
+  extractionClass: string
+  extractionText: string
+  charInterval: CharInterval | null
   attributes: Record<string, unknown> | null
   isSection?: boolean
   targetPath?: string
-  normalizedValue?: string
+  normalizedText?: string
 }

@@ -1,0 +1,47 @@
+{
+  "$schema": "_schema.json",
+  "name": "bfh",
+  "rules": [
+    {
+      "label": "headline",
+      "type": "section_marker",
+      "patterns": [[{ "IS_TITLE": true }, { "IS_ALPHA": true }]],
+      "conditions": ["is_not_short_line"],
+      "inclusive": true,
+      "followed_by_section": "guiding_principle"
+    },
+    {
+      "label": "table",
+      "type": "section_marker",
+      "patterns": [[{ "IS_ALPHA": true }]],
+      "conditions": ["is_table"],
+      "inclusive": true,
+      "single_line": true
+    },
+
+    {
+      "label": "document_type",
+      "type": "extraction",
+      "patterns": ["(?i)(urteil|beschluss|versäumnisurteil|entscheidung)"],
+      "conditions": ["is_table"],
+      "priority": 1
+    },
+    {
+      "label": "previous_decisions",
+      "type": "extraction",
+      "patterns": ["Vorinstanz:.*"]
+    },
+    {
+      "label": "case_facts",
+      "type": "section_marker",
+      "patterns": ["^\\s*(I|A)\\.\\s*$"],
+      "inclusive": true
+    },
+    {
+      "label": "decision_reasons",
+      "type": "section_marker",
+      "patterns": ["^\\s*(II|B)\\.\\s*$"],
+      "inclusive": true
+    }
+  ]
+}

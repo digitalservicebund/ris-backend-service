@@ -2,18 +2,24 @@ import { storeToRefs } from "pinia"
 import { Ref, ref } from "vue"
 import type { Extraction } from "./types"
 import TextEditor from "@/components/input/TextEditor.vue"
+import extractionService, {
+  ExtractionRequest,
+  ExtractionResponse,
+} from "@/services/extractionService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+
+const BACKEND: "python" | "java" = "java"
 
 type EditorRef = Ref<InstanceType<typeof TextEditor> | undefined>
 
-const SECTION_CLASSES = new Set([
-  "tenor",
-  "reasons",
-  "case_facts",
-  "decision_reasons",
-  "guiding_principle",
-  "headline",
-])
+async function getExtractionsFromPythonBackend(payload: ExtractionRequest) {
+  const data = (await fetch("http://localhost:8000/api/extract-html", {
+    method: "POST",
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json; charset=utf-8" },
+  }).then((r) => r.json())) as ExtractionResponse
+  return { data }
+}
 
 function useExtractions(editorRef: EditorRef) {
   const prevHtml = ref<string | null>(null)
@@ -26,22 +32,18 @@ function useExtractions(editorRef: EditorRef) {
     if (!showExtractions.value) {
       const editorHtml = editorRef.value?.editor.getHTML()
       if (!editorHtml) return
-      const html_str = unescapeHtml(editorHtml)
+      const html = unescapeHtml(editorHtml)
       const court = decision.value?.coreData.court?.label
-      const data = await fetch("http://localhost:8000/api/extract-html", {
-        method: "POST",
-        body: JSON.stringify({ html_str, court }),
-        headers: { "Content-Type": "application/json; charset=utf-8" },
-      }).then((r) => r.json())
-      const targetPaths = getTargetPaths(data)
-      const extractions = (data.extractions as Extraction[])
-        .map((e) => ({
-          ...e,
-          targetPath: targetPaths.get(e.id.toString()),
-          isSection: SECTION_CLASSES.has(e.extraction_class),
-        }))
-        .filter((e) => !!e.targetPath) as Extraction[]
-      const wrappedHtml = wrapHtmlString(html_str, extractions)
+      const payload: ExtractionRequest = { html, court }
+      const requestFunc =
+        BACKEND === "java"
+          ? extractionService.getExtractions
+          : getExtractionsFromPythonBackend
+      const { data } = await requestFunc(payload)
+      const extractions = data?.extractions ?? []
+      console.log(BACKEND, { extractions })
+      const filteredExtractions = extractions.filter((e) => !!e.targetPath)
+      const wrappedHtml = wrapHtmlString(html, filteredExtractions)
 
       prevHtml.value = editorHtml
       editorRef.value?.editor.commands.setContent(wrappedHtml)
@@ -53,24 +55,6 @@ function useExtractions(editorRef: EditorRef) {
   }
 
   return { showExtractions, toggleShowExtractions }
-}
-
-function getTargetPaths(result: {
-  extracted_json_prov?: unknown
-}): Map<string, string> {
-  const targetPaths = new Map<string, string>()
-  const collectLeafStrings = (obj: unknown, path: string = "") => {
-    if (typeof obj === "string") {
-      targetPaths.set(obj, path)
-    } else if (obj && typeof obj === "object") {
-      Object.entries(obj).forEach(([key, value]) => {
-        const newPath = path ? `${path}.${key}` : key
-        collectLeafStrings(value, newPath)
-      })
-    }
-  }
-  if (result.extracted_json_prov) collectLeafStrings(result.extracted_json_prov)
-  return targetPaths
 }
 
 function unescapeHtml(html: string): string {
@@ -91,9 +75,9 @@ function wrapHtmlString(htmlString: string, extractions: Extraction[]): string {
   const events: ExtractionEvent[] = []
 
   extractions.forEach((ext, index) => {
-    if (!ext.char_interval) return
-    const start = ext.char_interval.start_pos
-    const end = ext.char_interval.end_pos
+    if (!ext.charInterval) return
+    const start = ext.charInterval.startPos
+    const end = ext.charInterval.endPos
     const length = end - start
     const targetPath = ext.targetPath || ""
 
@@ -104,7 +88,7 @@ function wrapHtmlString(htmlString: string, extractions: Extraction[]): string {
       type: "start",
       length,
       index,
-      tag: `<${el} data-extraction-class="${ext.extraction_class}" data-extraction-id="${ext.id}" data-target-path="${targetPath}" data-normalized-value="${ext.normalizedValue || ""}">`,
+      tag: `<${el} data-extraction-class="${ext.extractionClass}" data-extraction-id="${ext.id}" data-target-path="${targetPath}" data-normalized-text="${ext.normalizedText || ""}">`,
     })
 
     events.push({
@@ -144,7 +128,7 @@ function wrapHtmlString(htmlString: string, extractions: Extraction[]): string {
   }
 
   if (currentIdx < htmlString.length) result += htmlString.substring(currentIdx)
-
+  console.log({ result })
   return result
 }
 
