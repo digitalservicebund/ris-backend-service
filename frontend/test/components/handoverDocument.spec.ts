@@ -755,7 +755,9 @@ describe("HandoverDocumentationUnitView:", () => {
 
     expect(codeSnippet).toBeInTheDocument()
     expect(codeSnippet).toHaveAttribute("XML")
-    expect(codeSnippet?.getAttribute("xml")).toBe("<xml>all good</xml>")
+    expect(codeSnippet?.getAttribute("xml")).toBe(
+      "<xml>all good <jurimg /></xml>",
+    )
   })
 
   it("should not allow to publish when publication is scheduled", async () => {
@@ -914,7 +916,7 @@ it("prevent handover published with images", async () => {
 
   expect(
     screen.getByText(
-      "Diese bereits veröffentlichte Entscheidung enthält Bilder",
+      "Diese bereits veröffentlichte Entscheidung enthält Bilder und kann deshalb nicht erneut an die jDV übergeben werden.",
     ),
   ).toBeInTheDocument()
 })

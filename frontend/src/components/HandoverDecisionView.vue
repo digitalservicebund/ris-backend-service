@@ -392,7 +392,7 @@ const isPublishable = computed<boolean>(
     !isCaseFactsInvalid.value &&
     !isDecisionReasonsInvalid.value &&
     !!preview.value?.success &&
-    !(hasImages.value && (isPublishedInjDV.value || isMigrated)) &&
+    !(hasImages.value && (isPublishedInjDV.value || isMigrated.value)) &&
     (!hasImages.value || imageHandoverToggle.value),
 )
 </script>
@@ -684,9 +684,7 @@ const isPublishable = computed<boolean>(
       </Message>
 
       <Message
-        v-if="
-          hasImages && imageHandoverToggle && (isPublishedInjDV || isMigrated)
-        "
+        v-if="hasImages && imageHandoverToggle && isPublishedInjDV"
         aria-label="Übergabe an die jDV nicht möglich"
         class="mt-8"
         severity="info"
