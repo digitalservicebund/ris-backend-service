@@ -1,6 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
+import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDecisionView from "@/components/HandoverDecisionView.vue"
 import { Decision } from "@/domain/decision"
@@ -12,6 +13,7 @@ import LegalForce from "@/domain/legalForce"
 import { DuplicateRelationStatus } from "@/domain/managementData"
 import NormReference from "@/domain/normReference"
 import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
+import { PublicationState } from "@/domain/publicationStatus"
 import SingleNorm from "@/domain/singleNorm"
 import featureToggleService from "@/services/featureToggleService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
@@ -70,7 +72,7 @@ describe("HandoverDocumentationUnitView:", () => {
     vi.spyOn(handoverDocumentationUnitService, "getPreview").mockResolvedValue({
       status: 200,
       data: new Preview({
-        xml: "<xml>all good</xml>",
+        xml: "<xml>all good <jurimg /></xml>",
         success: true,
       }),
     })
@@ -882,6 +884,39 @@ describe("HandoverDocumentationUnitView:", () => {
 
     expect(container).toHaveTextContent(`Anhänge: foo.png, bar.jpg`)
   })
+})
+
+it("prevent handover published with images", async () => {
+  renderComponent({
+    documentUnit: new Decision("123", {
+      status: { publicationStatus: PublicationState.PUBLISHED },
+      coreData: {
+        fileNumbers: ["foo"],
+        court: { type: "type", location: "location", label: "label" },
+        decisionDate: "2022-02-01",
+        legalEffect: "legalEffect",
+        documentType: {
+          jurisShortcut: "ca",
+          label: "category",
+        },
+      },
+    }),
+    stubs: {
+      CodeSnippet: {
+        template: '<div data-testid="code-snippet"/>',
+      },
+    },
+  })
+
+  // Wait for XML Vorschau
+  await new Promise((resolve) => setTimeout(resolve, 0))
+  await nextTick()
+
+  expect(
+    screen.getByText(
+      "Diese bereits veröffentlichte Entscheidung enthält Bilder",
+    ),
+  ).toBeInTheDocument()
 })
 
 describe("renders uat test mode hint", () => {
