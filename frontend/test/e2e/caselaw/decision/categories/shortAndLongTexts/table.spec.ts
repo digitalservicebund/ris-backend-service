@@ -353,10 +353,10 @@ test.describe("Editor: table tests", () => {
         {
           type: "story",
           description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-10446",
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-10447",
         },
       ],
-      tag: ["@RISDEV-6646", "@RISDEV-9331", "@RISDEV-10446"],
+      tag: ["@RISDEV-6646", "@RISDEV-9331", "@RISDEV-10447"],
     },
     () => {
       test("'Tabellenrahmen' => 'Alle Rahmen' and reset to 'Keine Rahmen'", async ({
@@ -695,10 +695,10 @@ test.describe("Editor: table tests", () => {
         {
           type: "story",
           description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-10446",
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-10447",
         },
       ],
-      tag: ["@RISDEV-6646", "@RISDEV-9331", "@RISDEV-10446"],
+      tag: ["@RISDEV-6646", "@RISDEV-9331", "@RISDEV-10447"],
     },
     () => {
       test("Select last cell in the first column, press 'arrow down' key, cell should lose focus", async ({
@@ -755,10 +755,10 @@ test.describe("Editor: table tests", () => {
         {
           type: "story",
           description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-10446",
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-10447",
         },
       ],
-      tag: ["@RISDEV-6646", "@RISDEV-9333", "@RISDEV-10446"],
+      tag: ["@RISDEV-6646", "@RISDEV-9333", "@RISDEV-10447"],
     },
     () => {
       // eslint-disable-next-line playwright/no-skipped-test

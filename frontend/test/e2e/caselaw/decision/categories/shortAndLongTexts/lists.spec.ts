@@ -185,10 +185,10 @@ test.describe(
       {
         type: "story",
         description:
-          "https://digitalservicebund.atlassian.net/browse/RISDEV-10447",
+          "https://digitalservicebund.atlassian.net/browse/RISDEV-10446",
       },
     ],
-    tag: ["@RISDEV-6646", "@RISDEV-9334", "@RISDEV-10447"],
+    tag: ["@RISDEV-6646", "@RISDEV-9334", "@RISDEV-10446"],
   },
   () => {
     test("Enter text and make it into an ordered list with decimal numbers", async ({
