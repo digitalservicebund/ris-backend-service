@@ -30,7 +30,7 @@ function fieldOfLawClicked(fieldOfLaw: FieldOfLaw) {
     <div
       v-for="fieldOfLaw in fieldsOfLaw"
       :key="fieldOfLaw.identifier"
-      class="field-of-law flex w-full flex-row items-center border-b-1 border-blue-300 py-16 first:mt-16 first:border-t-1"
+      class="field-of-law flex w-full flex-row items-center border-b-1 border-blue-300 py-16 first:border-t-1"
     >
       <div class="ris-label1-regular mr-8 flex-grow">
         <Button
@@ -41,6 +41,7 @@ function fieldOfLawClicked(fieldOfLaw: FieldOfLaw) {
             ' im Sachgebietsbaum anzeigen'
           "
           class="mr-8"
+          size="small"
           text
           @click="fieldOfLawClicked(fieldOfLaw)"
         >
@@ -59,13 +60,12 @@ function fieldOfLawClicked(fieldOfLaw: FieldOfLaw) {
         :aria-label="
           fieldOfLaw.identifier + ' ' + fieldOfLaw.text + ' aus Liste entfernen'
         "
-        class="!p-4"
-        severity="secondary"
+        size="small"
         text
         @click="removeFieldOfLaw(fieldOfLaw)"
       >
         <template #icon>
-          <MaterialSymbolsClose class="text-blue-800" />
+          <MaterialSymbolsClose />
         </template>
       </Button>
     </div>
