@@ -67,7 +67,7 @@ public class HandoverService {
    * @param issuerAddress the email address of the issuer
    * @return the handover result
    * @throws DocumentationUnitNotExistsException if the documentation unit does not exist
-   * @throws HandoverException if the documentation unit cannot be handed over
+   * @throws HandoverNotAllowedException if the documentation unit cannot be handed over
    */
   public HandoverMail handoverDocumentationUnitAsMail(
       UUID documentationUnitId, String issuerAddress, @Nullable User user)
@@ -200,9 +200,9 @@ public class HandoverService {
   }
 
   /**
-   * Checks if handover is allowed for decisions with images and throws a {@link HandoverException}
-   * if decision has images and is already published in jDV or any of the images are not in the
-   * correct format
+   * Checks if handover is allowed for decisions with images and throws a {@link
+   * HandoverNotAllowedException} if decision has images and is already published in jDV or any of
+   * the images are not in the correct format (.png, .jpg, .gif).
    */
   private void checkHandoverAllowed(Decision decision) {
     List<Attachment> inlineAttachments =
@@ -220,7 +220,7 @@ public class HandoverService {
         throw new HandoverNotAllowedException(
             "Die Übergabe einer Entscheidung mit Bildern an die jDV ist nur bei Neuanlagen gestattet.");
       }
-      var isAllImagesAllowedFormat =
+      var hasOnlyAllowedImageFormats =
           inlineAttachments.stream()
               .map(Attachment::format)
               .map(String::toLowerCase)
@@ -230,7 +230,7 @@ public class HandoverService {
                           || "jpeg".equals(format)
                           || "png".equals(format)
                           || "gif".equals(format));
-      if (!isAllImagesAllowedFormat) {
+      if (!hasOnlyAllowedImageFormats) {
         throw new HandoverNotAllowedException(
             "Diese Entscheidung enthält Bilder, die nicht den Formaten entsprechen, die an die jDV übergeben werden können (jpg, png, gif).");
       }
