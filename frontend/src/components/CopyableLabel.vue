@@ -6,8 +6,21 @@ import IconCheckRounded from "~icons/material-symbols/check-rounded"
 
 const props = withDefaults(
   defineProps<{
+    /** Visible text. */
     text: string
+
+    /**
+     * Value that should be copied. If no value is provided, copying will
+     * copy the `text` by default.
+     */
     value?: string
+
+    /**
+     * Human-readable description of the value that should be copied. This
+     * will be used to provide an accessible label for the control.
+     *
+     * @default "Wert"
+     */
     name?: string
   }>(),
   {
