@@ -15,13 +15,19 @@ test.describe("ensuring the exported XML is generated from imported decision as 
   test("xml preview shows expected xml", async ({ page }) => {
     const apiKey = await test.step("Generate API Key", async () => {
       await navigateToSettings(page)
+      const generateButton = page.getByRole("button", {
+        name: "Neuen API-Schlüssel erstellen",
+      })
       // eslint-disable-next-line playwright/no-conditional-in-test
-      if (await page.getByText("Neuen API-Schlüssel erstellen").isVisible()) {
-        await page.getByText("Neuen API-Schlüssel erstellen").click()
+      if (await generateButton.isVisible()) {
+        await generateButton.click()
       }
-      return await page
-        .getByTitle("API Key in die Zwischenablage kopieren")
-        .textContent()
+
+      const copyButton = page.getByLabel(
+        "API Key in die Zwischenablage kopieren",
+      )
+      await expect(copyButton).toBeVisible()
+      return await copyButton.textContent()
     })
 
     const docUnitId =

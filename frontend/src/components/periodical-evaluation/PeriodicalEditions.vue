@@ -236,7 +236,7 @@ onMounted(async () => {
                   size="small"
                 >
                   <template #icon>
-                    <IconEdit class="text-blue-800" />
+                    <IconEdit />
                   </template>
                 </Button>
               </router-link>
@@ -244,7 +244,9 @@ onMounted(async () => {
               <Button
                 v-tooltip.bottom="'Löschen'"
                 aria-label="Ausgabe löschen"
-                :disabled="!isInternalUser"
+                :disabled="
+                  !(edition.references?.length === 0 && isInternalUser)
+                "
                 size="small"
                 text
                 @click="handleDeleteEdition(edition)"
