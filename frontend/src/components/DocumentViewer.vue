@@ -180,6 +180,7 @@ onMounted(async () => {
         data-testid="side-toggle-navigation"
         :is-expanded="showNavigationPanelRef"
         label="Navigation"
+        shortcut="<"
         tabindex="0"
         @update:is-expanded="toggleNavigationPanel"
       >

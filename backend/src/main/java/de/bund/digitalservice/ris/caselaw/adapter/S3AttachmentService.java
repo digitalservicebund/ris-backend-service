@@ -2,8 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
@@ -64,7 +64,7 @@ import software.amazon.awssdk.services.s3.model.UploadPartRequest;
 @Service
 public class S3AttachmentService implements AttachmentService {
   private final AttachmentRepository repository;
-  private final AttachmentInlineRepository attachmentInlineRepository;
+  private final DatabaseAttachmentInlineRepository attachmentInlineRepository;
   private final S3Client s3Client;
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
   private final DocumentationUnitHistoryLogService documentationUnitHistoryLogService;
@@ -83,7 +83,7 @@ public class S3AttachmentService implements AttachmentService {
 
   public S3AttachmentService(
       AttachmentRepository repository,
-      AttachmentInlineRepository attachmentInlineRepository,
+      DatabaseAttachmentInlineRepository attachmentInlineRepository,
       @Qualifier("docxS3Client") S3Client s3Client,
       DatabaseDocumentationUnitRepository documentationUnitRepository,
       DocumentationUnitHistoryLogService documentationUnitHistoryLogService) {

@@ -6,7 +6,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.S3Bucket;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
@@ -54,7 +54,7 @@ public class PortalPublicationService {
 
   private static final String PUBLICATION_FEATURE_FLAG = "neuris.portal-publication";
   private static final String CHANGELOG_FEATURE_FLAG = "neuris.regular-changelogs";
-  private final AttachmentInlineRepository attachmentInlineRepository;
+  private final DatabaseAttachmentInlineRepository attachmentInlineRepository;
 
   public PortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
@@ -64,7 +64,7 @@ public class PortalPublicationService {
       PortalTransformer portalTransformer,
       FeatureToggleService featureToggleService,
       DocumentationUnitHistoryLogService historyLogService,
-      AttachmentInlineRepository attachmentInlineRepository) {
+      DatabaseAttachmentInlineRepository attachmentInlineRepository) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.portalBucket = portalBucket;

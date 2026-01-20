@@ -28,21 +28,63 @@ class CustomTableView extends TableView {
  * auf Tabellenknoten, Header und Zellen anzuwenden.
  */
 export const CustomTable = Table.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      style: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("style") || null,
+        renderHTML: (attributes) =>
+          attributes.style ? { style: attributes.style } : {},
+      },
+    }
+  },
   addGlobalAttributes() {
     return [
       {
         // apply to table container + cells + headers
-        types: ["table", "tableCell", "tableHeader"],
+        types: ["tableCell", "tableHeader"],
         attributes: {
           style: {
+            parseHTML: (element) => {
+              const table = element.closest("table")
+              const oldBorder = table?.getAttribute("border") ?? undefined
+
+              const existingStyle = element.getAttribute("style") || ""
+
+              if (oldBorder && !existingStyle.includes("border")) {
+                element.style.border = `${oldBorder}px solid rgb(0, 0, 0)`
+              }
+
+              return element.style.cssText
+            },
             renderHTML: (attributes) => {
               const existingStyle = attributes.style || ""
 
               const allBorders = hasAllBorders(existingStyle)
               const invisibleClass = allBorders ? "" : "invisible-table-cell"
 
+              attributes.style = existingStyle
+
               return {
                 class: invisibleClass,
+                style: existingStyle,
+              }
+            },
+          },
+          valign: {
+            renderHTML: (attributes) => {
+              let existingStyle = attributes.style || ""
+
+              if (attributes.valign) {
+                existingStyle += existingStyle == "" ? "" : "; "
+                existingStyle += "vertical-align: " + attributes.valign + ";"
+              }
+
+              attributes.style = existingStyle
+              attributes.valign = null
+
+              return {
                 style: existingStyle,
               }
             },

@@ -4,6 +4,7 @@ import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import Divider from "primevue/divider"
 import InputText from "primevue/inputtext"
+import Message from "primevue/message"
 import { computed, onMounted, Ref, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import SingleCategory from "@/components/category-import/SingleCategory.vue"
@@ -57,6 +58,12 @@ async function searchForDocumentUnit() {
   )
   sourceDocumentUnit.value = undefined
   errorMessage.value = undefined
+
+  if (response.status === 500) {
+    errorMessage.value =
+      "Die Suche konnte nicht ausgeführt werden. Laden Sie die Seite neu"
+    return
+  }
 
   if (!response.data) {
     errorMessage.value = "Keine Dokumentationseinheit gefunden."
@@ -466,7 +473,7 @@ function importActiveCitations() {
   const targetActiveCitations =
     targetDocumentUnit.value!.contentRelatedIndexing.activeCitations ?? []
 
-  const uniqueImportableFieldsOfLaw = source
+  const uniqueImportable = source
     .filter(
       (activeCitation) =>
         !targetActiveCitations.find(
@@ -478,12 +485,11 @@ function importActiveCitations() {
     .map((activeCitation) => ({
       ...activeCitation,
       uuid: undefined,
-      newEntry: true,
     }))
 
   targetDocumentUnit.value!.contentRelatedIndexing.activeCitations = [
     ...targetActiveCitations,
-    ...uniqueImportableFieldsOfLaw,
+    ...uniqueImportable,
   ] as ActiveCitation[]
 }
 
@@ -578,11 +584,12 @@ function importAppeal() {
     isDecision(sourceDocumentUnit.value)
   ) {
     const source = sourceDocumentUnit.value?.contentRelatedIndexing.appeal
+    const targetId = targetDocumentUnit.value.uuid
 
-    if (targetDocumentUnit.value) {
+    if (targetDocumentUnit.value && source) {
       targetDocumentUnit.value.contentRelatedIndexing.appeal = {
         ...source,
-        id: undefined,
+        id: targetId,
       }
     }
   }
@@ -690,9 +697,9 @@ onMounted(() => {
       ></Button>
     </div>
 
-    <span v-if="errorMessage" class="ris-label2-regular text-red-800">{{
-      errorMessage
-    }}</span>
+    <Message v-if="errorMessage" class="mt-8" severity="error">
+      {{ errorMessage }}
+    </Message>
 
     <div
       v-if="sourceDocumentUnit"

@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -51,6 +52,8 @@ class HandoverServiceTest {
   @MockitoBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @MockitoBean private AttachmentService attachmentService;
   @MockitoBean private Validator validator;
+  @MockitoBean private AttachmentInlineRepository attachmentInlineRepository;
+  @MockitoBean private FeatureToggleService featureToggleService;
 
   @Test
   void testHandoverByEmail() throws DocumentationUnitNotExistsException {
@@ -113,6 +116,101 @@ class HandoverServiceTest {
         DocumentationUnitNotExistsException.class,
         () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null));
     verify(repository).findByUuid(TEST_UUID);
+    verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
+  }
+
+  @Test
+  void testHandoverByEmail_withImagesAndFeatureFlagDisabled_shouldThrowHandoverException()
+      throws HandoverException, DocumentationUnitNotExistsException {
+    Decision decision =
+        Decision.builder()
+            .uuid(TEST_UUID)
+            .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
+            .managementData(ManagementData.builder().build())
+            .build();
+    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(false);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(decision);
+    when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
+        .thenReturn(List.of(Attachment.builder().format("jpg").build()));
+
+    assertThatThrownBy(
+            () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
+        .isInstanceOf(HandoverNotAllowedException.class)
+        .hasMessageContaining(
+            "Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV übergeben werden.");
+
+    verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
+  }
+
+  @Test
+  void testHandoverByEmail_withImagesAndIsPublished_shouldThrowHandoverException()
+      throws HandoverException, DocumentationUnitNotExistsException {
+    Decision decision =
+        Decision.builder()
+            .uuid(TEST_UUID)
+            .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+            .managementData(ManagementData.builder().build())
+            .build();
+    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(true);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(decision);
+    when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
+        .thenReturn(List.of(Attachment.builder().format("jpg").build()));
+
+    assertThatThrownBy(
+            () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
+        .isInstanceOf(HandoverNotAllowedException.class)
+        .hasMessageContaining(
+            "Die Übergabe einer Entscheidung mit Bildern an die jDV ist nur bei Neuanlagen gestattet.");
+
+    verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
+  }
+
+  @Test
+  void testHandoverByEmail_withImagesAndIsMigrated_shouldThrowHandoverException()
+      throws HandoverException, DocumentationUnitNotExistsException {
+    Decision decision =
+        Decision.builder()
+            .uuid(TEST_UUID)
+            .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
+            .managementData(ManagementData.builder().createdByName("Migration").build())
+            .build();
+    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(true);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(decision);
+    when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
+        .thenReturn(List.of(Attachment.builder().format("jpg").build()));
+
+    assertThatThrownBy(
+            () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
+        .isInstanceOf(HandoverNotAllowedException.class)
+        .hasMessageContaining(
+            "Die Übergabe einer Entscheidung mit Bildern an die jDV ist nur bei Neuanlagen gestattet.");
+
+    verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
+  }
+
+  @Test
+  void testHandoverByEmail_withImagesInWrongFormat_shouldThrowHandoverException()
+      throws HandoverException, DocumentationUnitNotExistsException {
+    Decision decision =
+        Decision.builder()
+            .uuid(TEST_UUID)
+            .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
+            .managementData(ManagementData.builder().build())
+            .build();
+    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(true);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(decision);
+    when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
+        .thenReturn(
+            List.of(
+                Attachment.builder().format("jpg").build(),
+                Attachment.builder().format("wmf").build()));
+
+    assertThatThrownBy(
+            () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
+        .isInstanceOf(HandoverNotAllowedException.class)
+        .hasMessageContaining(
+            "Diese Entscheidung enthält Bilder, die nicht den Formaten entsprechen, die an die jDV übergeben werden können (jpg, png, gif).");
+
     verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
   }
 

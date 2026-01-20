@@ -15,9 +15,25 @@ import {
 
 test.describe("ensuring the handover of documentunits works as expected", () => {
   test.use({
-    decisionToBeCreated: {
-      longTexts: { tenor: "<p>Text mit Fehler</p>" },
-    },
+    decisionsToBeCreated: [
+      [
+        {
+          longTexts: { tenor: "<p>Text mit Fehler</p>" },
+        },
+        {
+          coreData: {
+            court: { label: "BGH" },
+            decisionDate: "2023-01-01",
+            documentType: { label: "Beschluss", jurisShortcut: "Bes" },
+          },
+          longTexts: {
+            tenor:
+              '<p>Text mit Bild <img src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mNk+M9Qz0AEYBxVSF+FAAhKDveksOjmAAAAAElFTkSuQmCC" alt="green square"> und noch einem Bild <img src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mNkYPhfz0AEYBxVSF+FAP5FDvcfRYWgAAAAAElFTkSuQmCC" alt="blue square"></p>',
+          },
+        },
+      ],
+      { scope: "test" },
+    ],
   })
 
   test("handover page shows all possible missing required fields when no fields filled", async ({
@@ -429,12 +445,14 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
   )
 
   test(
-    "error count should correctly show number of errors",
+    "(text check) error count should correctly show number of errors",
     {
       tag: ["@RISDEV-254", "@RISDEV-6245", "@RISDEV-9094"],
     },
-    async ({ page, decision }) => {
-      await navigateToHandover(page, decision.createdDecision.documentNumber!)
+    async ({ page, decisions }) => {
+      const { createdDecisions } = decisions
+      const decision = createdDecisions[0]
+      await navigateToHandover(page, decision.documentNumber!)
       const handover = page.getByLabel("Rechtschreibprüfung")
 
       await test.step("Validate document has no errors", async () => {
@@ -451,18 +469,13 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       })
 
       await test.step("Validate document has text check errors", async () => {
-        await navigateToCategories(
-          page,
-          decision.createdDecision.documentNumber!,
-        )
+        await navigateToCategories(page, decision.documentNumber!)
         const tenorEditor = page.getByTestId("Tenor")
         await clearTextField(page, tenorEditor)
         await tenorEditor.locator("div").fill("Text mit Feler")
-        await navigateToHandover(
-          page,
-          decision.createdDecision.documentNumber!,
-          { navigationBy: "click" },
-        )
+        await navigateToHandover(page, decision.documentNumber!, {
+          navigationBy: "click",
+        })
 
         await expect(
           page.getByText("Es wurden Rechtschreibfehler identifiziert"),
@@ -526,6 +539,50 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
           page.getByRole("button", { name: "Trotzdem übergeben" }),
         ).toBeVisible()
       })
+    },
+  )
+
+  test(
+    "handover with images",
+    {
+      tag: ["@RISDEV-10254"],
+    },
+    async ({ page, decisions }) => {
+      const { createdDecisions } = decisions
+      const decision = createdDecisions[1]
+      await navigateToHandover(page, decision.documentNumber!)
+
+      await expect(page.getByText("XML Vorschau")).toBeVisible()
+
+      await page.getByText("XML Vorschau").click()
+
+      await expect(
+        page.getByText(`<p>Text mit Bild <jurimg alt="green square"`),
+      ).toBeVisible()
+
+      await expect(
+        page.getByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
+      ).toBeVisible()
+
+      await expect(
+        page.locator(
+          "text=Diese Dokumentationseinheit wurde bisher nicht an die jDV übergeben",
+        ),
+      ).toBeVisible()
+
+      await page
+        .getByLabel("Dokumentationseinheit an jDV übergeben", { exact: true })
+        .click()
+
+      await expect(page.getByText("Email wurde versendet")).toBeVisible()
+
+      await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
+
+      await expect(
+        page.getByText(
+          /Anhänge:\s+xxre[0-9]{9}_ds_[0-9a-fA-F-]{36}\.png, xxre[0-9]{9}_ds_[0-9a-fA-F-]{36}\.png/i,
+        ),
+      ).toBeVisible()
     },
   )
 })

@@ -4,6 +4,7 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.MailAttachmentImage;
 import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
 import de.bund.digitalservice.ris.domain.export.juris.response.JurisMailMockBuilder;
 import jakarta.mail.Folder;
@@ -67,6 +68,7 @@ public class JurisStub implements MailStoreFactory, HttpMailSender {
       String subject,
       String content,
       List<MailAttachment> mailAttachments,
+      List<MailAttachmentImage> imageAttachments,
       String tag) {
 
     LOGGER.info("Message sent: {}", subject);

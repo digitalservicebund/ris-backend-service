@@ -36,7 +36,6 @@ public class PostgresHandoverRepositoryImpl implements HandoverRepository {
   @Override
   @Transactional
   public HandoverMail save(HandoverMail handoverMail) {
-
     switch (handoverMail.entityType()) {
       case DOCUMENTATION_UNIT ->
           documentationUnitRepository.findById(handoverMail.entityId()).orElseThrow();

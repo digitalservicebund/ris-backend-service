@@ -52,7 +52,7 @@ const emit = defineEmits<{
           label="Mehrdeutiger Verweis"
         />
       </div>
-      <div v-else class="flex w-full flex-col gap-24">
+      <div v-else class="flex w-full flex-col gap-8">
         <div class="flex min-h-40 flex-row items-center">
           <component :is="IconBook" class="mr-8 ml-2" />
           <div class="ris-label1-regular mr-8">
@@ -67,7 +67,7 @@ const emit = defineEmits<{
           />
         </div>
 
-        <div v-if="data.singleNorms?.length" class="flex flex-col gap-24">
+        <div v-if="data.singleNorms?.length" class="flex flex-col gap-8">
           <div v-for="(singleNorm, index) in data.singleNorms" :key="index">
             <div
               v-if="!singleNorm.isEmpty"

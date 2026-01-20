@@ -53,6 +53,8 @@ import org.docx4j.openpackaging.parts.PartName;
 import org.docx4j.openpackaging.parts.Parts;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.openpackaging.parts.WordprocessingML.FooterPart;
+import org.docx4j.openpackaging.parts.WordprocessingML.ImageBmpPart;
+import org.docx4j.openpackaging.parts.WordprocessingML.ImageGifPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImageJpegPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImagePngPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
@@ -218,6 +220,7 @@ class DocxConverterServiceTest {
     MainDocumentPart mainDocumentPart = mock(MainDocumentPart.class);
     Parts parts = mock(Parts.class);
     HashMap<PartName, Part> partMap = new HashMap<>();
+
     PartName partName = new PartName("/emfPart");
     BinaryPartAbstractImage part = new MetafileEmfPart(partName);
     Relationship relationship = new Relationship();
@@ -227,6 +230,7 @@ class DocxConverterServiceTest {
         DocxConverterServiceTest.class.getClassLoader().getResourceAsStream("test.emf");
     part.setBinaryData(emfStream.readAllBytes());
     partMap.put(partName, part);
+
     partName = new PartName("/jpegPart");
     part = new ImageJpegPart(partName);
     relationship = new Relationship();
@@ -234,6 +238,7 @@ class DocxConverterServiceTest {
     part.getSourceRelationships().add(relationship);
     part.setBinaryData(new byte[] {});
     partMap.put(partName, part);
+
     partName = new PartName("/pngPart");
     part = new ImagePngPart(partName);
     relationship = new Relationship();
@@ -241,6 +246,23 @@ class DocxConverterServiceTest {
     part.getSourceRelationships().add(relationship);
     part.setBinaryData(new byte[] {});
     partMap.put(partName, part);
+
+    partName = new PartName("/gifPart");
+    part = new ImageGifPart(partName);
+    relationship = new Relationship();
+    relationship.setId("gifPart");
+    part.getSourceRelationships().add(relationship);
+    part.setBinaryData(new byte[] {});
+    partMap.put(partName, part);
+
+    partName = new PartName("/bmpPart");
+    part = new ImageBmpPart(partName);
+    relationship = new Relationship();
+    relationship.setId("bmpPart");
+    part.getSourceRelationships().add(relationship);
+    part.setBinaryData(new byte[] {});
+    partMap.put(partName, part);
+
     when(parts.getParts()).thenReturn(partMap);
     when(mlPackage.getParts()).thenReturn(parts);
     when(mlPackage.getMainDocumentPart()).thenReturn(mainDocumentPart);
@@ -257,13 +279,17 @@ class DocxConverterServiceTest {
 
       verify(converter).setImages(imageMapCaptor.capture());
       Map<String, DocxImagePart> imageMapValue = imageMapCaptor.getValue();
-      assertEquals(3, imageMapValue.values().size());
+      assertEquals(5, imageMapValue.values().size());
       assertTrue(imageMapValue.containsKey("emfPart"));
       assertEquals("image/x-emf", imageMapValue.get("emfPart").contentType());
       assertTrue(imageMapValue.containsKey("jpegPart"));
       assertEquals("image/jpeg", imageMapValue.get("jpegPart").contentType());
       assertTrue(imageMapValue.containsKey("pngPart"));
       assertEquals("image/png", imageMapValue.get("pngPart").contentType());
+      assertTrue(imageMapValue.containsKey("gifPart"));
+      assertEquals("image/gif", imageMapValue.get("gifPart").contentType());
+      assertTrue(imageMapValue.containsKey("bmpPart"));
+      assertEquals("image/bmp", imageMapValue.get("bmpPart").contentType());
     }
   }
 

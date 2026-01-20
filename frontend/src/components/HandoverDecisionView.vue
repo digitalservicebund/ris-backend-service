@@ -33,6 +33,7 @@ import { DuplicateRelationStatus } from "@/domain/managementData"
 import PreviousDecision, {
   previousDecisionFieldLabels,
 } from "@/domain/previousDecision"
+import { PublicationState } from "@/domain/publicationStatus"
 import errorMessages from "@/i18n/errors.json"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 import { ResponseError } from "@/services/httpClient"
@@ -70,6 +71,7 @@ const isFirstTimeHandover = computed(() => {
 })
 
 const textCheckAllToggle = useFeatureToggle("neuris.text-check-handover")
+const imageHandoverToggle = useFeatureToggle("neuris.image-handover")
 
 const preview = ref<Preview>()
 const frontendError = ref()
@@ -371,7 +373,12 @@ const isScheduled = computed<boolean>(
 )
 
 const hasImages = computed<boolean>(
-  () => !!preview.value?.xml?.includes("<img"),
+  () => !!preview.value?.xml?.includes("<jurimg"),
+)
+
+const isPublishedInjDV = computed(
+  () =>
+    decision.value?.status?.publicationStatus === PublicationState.PUBLISHED,
 )
 
 const isPublishable = computed<boolean>(
@@ -381,7 +388,8 @@ const isPublishable = computed<boolean>(
     !isCaseFactsInvalid.value &&
     !isDecisionReasonsInvalid.value &&
     !!preview.value?.success &&
-    !hasImages.value,
+    !(hasImages.value && isPublishedInjDV.value) &&
+    (!hasImages.value || imageHandoverToggle.value),
 )
 </script>
 
@@ -659,7 +667,7 @@ const isPublishable = computed<boolean>(
       </Message>
 
       <Message
-        v-if="hasImages"
+        v-if="hasImages && !imageHandoverToggle"
         aria-label="Übergabe an die jDV nicht möglich"
         class="mt-8"
         severity="info"
@@ -667,7 +675,20 @@ const isPublishable = computed<boolean>(
         <p class="ris-body1-bold">Übergabe an die jDV nicht möglich</p>
         <p>
           Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV
-          übergeben werden
+          übergeben werden.
+        </p>
+      </Message>
+
+      <Message
+        v-if="hasImages && imageHandoverToggle && isPublishedInjDV"
+        aria-label="Übergabe an die jDV nicht möglich"
+        class="mt-8"
+        severity="info"
+      >
+        <p class="ris-body1-bold">Übergabe an die jDV nicht möglich</p>
+        <p>
+          Diese bereits veröffentlichte Entscheidung enthält Bilder und kann
+          deshalb nicht erneut an die jDV übergeben werden.
         </p>
       </Message>
 
@@ -728,6 +749,16 @@ const isPublishable = computed<boolean>(
                     <div>
                       <span class="ris-label2-bold"> Betreff: </span>
                       {{ (item as HandoverMail).mailSubject }}
+                    </div>
+                    <div
+                      v-if="(item as HandoverMail).imageAttachments.length > 0"
+                    >
+                      <span class="ris-label2-bold"> Anhänge: </span>
+                      {{
+                        (item as HandoverMail).imageAttachments
+                          .map((attachment) => attachment.fileName)
+                          .join(", ")
+                      }}
                     </div>
                   </div>
 
