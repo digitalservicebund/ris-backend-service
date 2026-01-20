@@ -251,7 +251,6 @@ test.describe("category import", () => {
             .getByTestId("literature-reference-list")
             .getByLabel("Listen Eintrag"),
         ).toHaveCount(1)
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -325,7 +324,6 @@ test.describe("category import", () => {
         await expect(listEntryLocator.nth(1)).toHaveText(
           "MM 2024, 50-53, Heft 1, Einstein, Albert (Ean)sekundär",
         )
-        await save(page)
       })
     },
   )
@@ -351,7 +349,6 @@ test.describe("category import", () => {
         await expect(page.getByText("keyword", { exact: true })).toBeVisible()
 
         await expect(keywordsContainer.getByTestId("chip")).toHaveCount(2)
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -374,7 +371,6 @@ test.describe("category import", () => {
         await expect(chips[0]).toHaveText("existingKeyword")
         await expect(chips[1]).toHaveText("keyword") // verify that the previously imported keyword is still the second and not appended at the end
         await expect(chips[2]).toHaveText("newKeyword")
-        await save(page)
       })
     },
   )
@@ -432,7 +428,6 @@ test.describe("category import", () => {
           "Arbeitsvertrag: Abschluss, Klauseln, Arten, Betriebsübergang",
         ]
         await expect(fieldsOfLaw).toHaveText(correctOrder.join(""))
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -497,7 +492,6 @@ test.describe("category import", () => {
         await expect(
           normContainer.getByTestId("editable-list-container"),
         ).toHaveText("PBefGBGBRIS-Abkürzung * ")
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -575,7 +569,6 @@ test.describe("category import", () => {
         ).toHaveText(
           `Abgrenzung, AG Aachen, 01.02.2022, 123, Anerkenntnisurteil | YYTestDoc0013`,
         )
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -667,7 +660,6 @@ test.describe("category import", () => {
       await page.getByLabel("Kündigungsgründe übernehmen").click()
 
       await expect(page.getByText("Test Kündigungsgründe")).toBeVisible()
-      await save(page)
     })
 
     await test.step("show success badge", async () => {
@@ -696,7 +688,6 @@ test.describe("category import", () => {
       await page.getByLabel("Berufsbild übernehmen").click()
 
       await expect(page.getByText("Test Berufsbild")).toBeVisible()
-      await save(page)
     })
 
     await test.step("show success badge", async () => {
@@ -734,7 +725,6 @@ test.describe("category import", () => {
         await expect(
           page.getByRole("combobox", { name: "Rechtsmittel zugelassen durch" }),
         ).toHaveText("FG")
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -775,7 +765,6 @@ test.describe("category import", () => {
         await expect(page.getByText("2", { exact: true })).toMatchAriaSnapshot(
           `- text: ⚠Rd 2`,
         )
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -813,7 +802,6 @@ test.describe("category import", () => {
         await expect(
           page.getByText("Afar: Test Fremdsprachige Fassung2", { exact: true }),
         ).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -849,7 +837,6 @@ test.describe("category import", () => {
         await expect(
           page.getByText("1, www.link-to-translation.fr (Amtlich)"),
         ).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -882,7 +869,6 @@ test.describe("category import", () => {
         await expect(page.getByRole("textbox", { name: "E-VSF" })).toHaveValue(
           "Test E-VSF",
         )
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -918,7 +904,6 @@ test.describe("category import", () => {
       await expect(
         page.getByRole("checkbox", { name: "Gesetzgebungsauftrag" }),
       ).toBeChecked()
-      await save(page)
     })
 
     await test.step("show success badge", async () => {
@@ -950,7 +935,6 @@ test.describe("category import", () => {
         await page.getByLabel("Rechtsmittel übernehmen").click()
 
         await expect(page.getByTestId("appellants")).toHaveText("Kläger")
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -985,7 +969,6 @@ test.describe("category import", () => {
             "Stehende Bühnen, 12.2002, § 23 (Bühne, Theater, Orchester)",
           ),
         ).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1020,7 +1003,6 @@ test.describe("category import", () => {
         await expect(
           page.getByText("123 Dollar (USD), Verfassungsbeschwerde"),
         ).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1053,7 +1035,6 @@ test.describe("category import", () => {
         await expect(
           page.getByText("223 Dollar (USD), Bevollmächtigter"),
         ).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1084,7 +1065,6 @@ test.describe("category import", () => {
         await page.getByLabel("Herkunftsland übernehmen").click()
 
         await expect(page.getByText("RE-07-DEU Deutschland")).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1115,7 +1095,6 @@ test.describe("category import", () => {
         await expect(
           page.getByText("Gewerbebetrieb, Programmierer"),
         ).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1184,7 +1163,6 @@ test.describe("category import", () => {
         await page.getByLabel("Nichtanwendungsgesetz übernehmen").click()
 
         await expect(page.getByText("BGB, § 1")).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1219,7 +1197,6 @@ test.describe("category import", () => {
         await expect(
           page.getByLabel("Entscheidungsnamen").getByRole("listitem"),
         ).toHaveText("Test Entscheidungsname")
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1252,7 +1229,6 @@ test.describe("category import", () => {
         await expect(page.getByLabel("Titelzeile übernehmen")).toBeVisible()
         await page.getByLabel("Titelzeile übernehmen").click()
         await expect(page.getByText("Test Titelzeile")).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1284,7 +1260,6 @@ test.describe("category import", () => {
         await page.getByLabel("Leitsatz übernehmen").click()
 
         await expect(page.getByText("Test Leitsatz")).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1355,7 +1330,6 @@ test.describe("category import", () => {
         await expect(
           page.getByText("Test Sonstiger Orientierungssatz"),
         ).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1390,7 +1364,6 @@ test.describe("category import", () => {
         await page.getByLabel("Tenor übernehmen").click()
 
         await expect(page.getByText("Test Tenor")).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1453,7 +1426,6 @@ test.describe("category import", () => {
         await page.getByLabel("Tatbestand übernehmen").click()
 
         await expect(page.getByText("Test Tatbestand")).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1486,7 +1458,6 @@ test.describe("category import", () => {
         await page.getByLabel("Entscheidungsgründe übernehmen").click()
 
         await expect(page.getByText("Test Entscheidungsgründe")).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1521,7 +1492,6 @@ test.describe("category import", () => {
         await page.getByLabel("Abweichende Meinung übernehmen").click()
 
         await expect(page.getByText("Test Abweichende Meinung")).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1556,7 +1526,6 @@ test.describe("category import", () => {
         await page.getByLabel("Mitwirkende Richter übernehmen").click()
 
         await expect(page.getByText("Test Richter")).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1589,7 +1558,6 @@ test.describe("category import", () => {
         await page.getByLabel("Sonstiger Langtext übernehmen").click()
 
         await expect(page.getByText("Test Sonstiger Langtext")).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1622,7 +1590,6 @@ test.describe("category import", () => {
         await page.getByLabel("Gliederung übernehmen").click()
 
         await expect(page.getByText("Test Gliederung")).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
@@ -1653,7 +1620,6 @@ test.describe("category import", () => {
         await page.getByLabel("Berichtigung übernehmen").click()
 
         await expect(page.getByText("Hauffen -> Haufen")).toBeVisible()
-        await save(page)
       })
 
       await test.step("show success badge", async () => {
