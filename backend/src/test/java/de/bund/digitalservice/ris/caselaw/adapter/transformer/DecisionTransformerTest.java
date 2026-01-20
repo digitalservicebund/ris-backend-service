@@ -62,6 +62,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.Addressee;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreementIndustry;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -1704,15 +1705,37 @@ class DecisionTransformerTest {
 
   @Test
   void testTransformToDomain_withAttachments_shouldOnlyAddDocxAndFmxTypes() {
+    var originatingType = AttachmentType.ORIGINATING.name();
+    var otherType = AttachmentType.OTHER.name();
     DecisionDTO decisionDTO =
         generateSimpleDTOBuilder()
             .attachments(
                 List.of(
-                    AttachmentDTO.builder().filename("foo").format("fmx").build(),
-                    AttachmentDTO.builder().filename("bar").format("docx").build(),
-                    AttachmentDTO.builder().filename("baz").format("png").build(),
-                    AttachmentDTO.builder().filename("qux").format("jpg").build(),
-                    AttachmentDTO.builder().filename("quux").format("foo").build()))
+                    AttachmentDTO.builder()
+                        .filename("foo")
+                        .format("fmx")
+                        .attachmentType(originatingType)
+                        .build(),
+                    AttachmentDTO.builder()
+                        .filename("bar")
+                        .format("docx")
+                        .attachmentType(originatingType)
+                        .build(),
+                    AttachmentDTO.builder()
+                        .filename("baz")
+                        .format("png")
+                        .attachmentType(otherType)
+                        .build(),
+                    AttachmentDTO.builder()
+                        .filename("qux")
+                        .format("jpg")
+                        .attachmentType(otherType)
+                        .build(),
+                    AttachmentDTO.builder()
+                        .filename("quux")
+                        .format("foo")
+                        .attachmentType(otherType)
+                        .build()))
             .build();
 
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
@@ -2807,6 +2830,7 @@ class DecisionTransformerTest {
                 .duplicateRelations(List.of())
                 .build())
         .attachments(Collections.emptyList())
+        .otherAttachments(Collections.emptyList())
         .contentRelatedIndexing(
             ContentRelatedIndexing.builder()
                 .keywords(Collections.emptyList())
