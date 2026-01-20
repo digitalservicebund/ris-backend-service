@@ -22,6 +22,7 @@ test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-7247"] }, () => {
     let newProcedure: string
 
     await navigateToSearch(page)
+
     await test.step("Erstelle neue Dokumentationseinheit", async () => {
       await page
         .getByRole("button", {
@@ -126,6 +127,7 @@ test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-7247"] }, () => {
     const newTab = await pagePromise
 
     documentNumber = await verifyDocUnitOpensInNewTab(newTab, randomFileNumber)
+
     await test.step("Gehe als BGH-User zu Verwaltungsdaten", async () => {
       await navigateToManagementData(pageWithBghUser, documentNumber)
     })

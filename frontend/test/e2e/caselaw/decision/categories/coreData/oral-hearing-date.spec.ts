@@ -35,6 +35,7 @@ test.describe(
 
         await expect(page.getByText("01.02.2021")).toBeHidden()
       })
+
       await save(page)
 
       await test.step("Prüfe, dass der Wert gespeichert wird und beim Reload vorhanden ist", async () => {
@@ -84,10 +85,13 @@ test.describe(
       },
     }) => {
       await openSearchWithFileNumberPrefix(fileNumber, page)
+
       await test.step("Wähle Entscheidungsdatum '02.01.2023' in Suche", async () => {
         await fillInput(page, "Entscheidungsdatum Suche", "01.02.2021")
       })
+
       await triggerSearch(page)
+
       await test.step("Entscheidung mit 'Datum der mündlichen Verhandlung' ist in Ergebnisliste enthalten", async () => {
         await expect(page.getByText(documentNumber)).toBeVisible()
       })

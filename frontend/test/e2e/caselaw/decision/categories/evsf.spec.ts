@@ -25,6 +25,7 @@ test.describe(
       await navigateToCategories(page, documentNumber)
 
       const evsfButton = page.getByRole("button", { name: "E-VSF" })
+
       await test.step("E-VSF ist ohne Finanzgericht nicht sichtbar", async () => {
         await expect(evsfButton).toBeHidden()
       })

@@ -14,12 +14,14 @@ import { generateString } from "~/test-helper/dataGenerators"
 test.describe("procedure", () => {
   // If tests run in parallel, we do not want to delete other procedures -> random prefix
   const testPrefix = generateString({ length: 10 })
+
   test.beforeAll(async ({ browser }) => {
     const page = await browser.newPage()
     await navigateToProcedures(page, testPrefix)
     const listItems = page.getByLabel("Vorgang Listenelement")
     await expect(listItems).toHaveCount(0)
   })
+
   test("add new procedure in coreData", async ({
     page,
     documentNumber,
@@ -97,6 +99,7 @@ test.describe("procedure", () => {
       )
     })
   })
+
   test.afterAll(async ({ browser }) => {
     const page = await browser.newPage()
     await navigateToProcedures(page, testPrefix)

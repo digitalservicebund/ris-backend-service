@@ -147,6 +147,7 @@ test.describe("active citations", () => {
     ).toBeVisible()
     await expect(page.getByLabel("Treffer übernehmen")).toBeEnabled()
   })
+  // eslint-disable-next-line playwright/consistent-spacing-between-blocks
   ;[
     {
       type: "Parallelentscheidung",

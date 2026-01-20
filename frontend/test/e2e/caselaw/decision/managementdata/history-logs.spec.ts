@@ -24,6 +24,7 @@ import { generateString } from "~/test-helper/dataGenerators"
 /* eslint-disable playwright/expect-expect */
 test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
   const testPrefix = `e2e-${generateString({ length: 10 })}`
+
   test("Es wird geloggt, wenn eine Dokeinheit angelegt wird", async ({
     page,
     documentNumber,

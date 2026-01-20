@@ -29,6 +29,7 @@ test.describe(
           page.getByRole("button", { name: "Berufsbild" }),
         ).toBeVisible()
       })
+
       await clickCategoryButton("Berufsbild", page)
 
       await addFirstJobProfile(page)
@@ -50,6 +51,7 @@ test.describe(
           page.getByRole("button", { name: "Berufsbild" }),
         ).toBeVisible()
       })
+
       await clickCategoryButton("Berufsbild", page)
       await addFirstJobProfile(page)
 

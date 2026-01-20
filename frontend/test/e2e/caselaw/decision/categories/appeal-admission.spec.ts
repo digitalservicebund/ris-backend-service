@@ -27,6 +27,7 @@ test.describe(
       const apealAdmissionHeadline = page.getByRole("heading", {
         name: "Rechtsmittelzulassung",
       })
+
       await test.step("Rechtsmittelzulassung ist ohne Finanzgericht nicht sichtbar", async () => {
         await expect(apealAdmissionHeadline).toBeHidden()
       })
