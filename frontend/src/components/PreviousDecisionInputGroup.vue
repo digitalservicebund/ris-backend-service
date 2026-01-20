@@ -21,6 +21,7 @@ import documentUnitService from "@/services/documentUnitService"
 const props = defineProps<{
   modelValue?: PreviousDecision
   modelValueList?: PreviousDecision[]
+  index?: number
 }>()
 
 const emit = defineEmits<{
@@ -155,6 +156,7 @@ watch(
     lastSavedModelValue.value = new PreviousDecision({ ...props.modelValue })
     if (lastSavedModelValue.value.isEmpty) validationStore.reset()
   },
+  { deep: true },
 )
 
 onMounted(async () => {
@@ -200,6 +202,7 @@ onMounted(async () => {
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
             :read-only="previousDecision.hasForeignSource"
+            :remote-search-id="`previousDecisions.${index}.court`"
             @focus="validationStore.remove('court')"
           ></ComboboxInput>
         </InputField>
@@ -285,6 +288,7 @@ onMounted(async () => {
             aria-label="Dokumenttyp Vorgehende Entscheidung"
             :item-service="ComboboxItemService.getCaselawDocumentTypes"
             :read-only="previousDecision.hasForeignSource"
+            :remote-search-id="`previousDecisions.${index}.documentType`"
           ></ComboboxInput>
         </InputField>
       </div>

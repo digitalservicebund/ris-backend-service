@@ -51,7 +51,8 @@ const { showExtractions, toggleShowExtractions } = useExtractions(editorRef)
   <TitleElement>Originaldokument</TitleElement>
   <Button
     id="toggle-extractions-button"
-    aria-label="Notiz anzeigen"
+    v-tooltip.bottom="'Automatische Erkennung'"
+    aria-label="Automatische Erkennung"
     class="focus-visible:z-20"
     data-testid="note-button"
     severity="secondary"

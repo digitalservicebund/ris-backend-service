@@ -3,6 +3,8 @@ import { getHTMLFromFragment } from "@tiptap/core"
 import { NodeViewProps, NodeViewWrapper, NodeViewContent } from "@tiptap/vue-3"
 import { storeToRefs } from "pinia"
 import { ref, nextTick } from "vue"
+import { COMBOBOX_REMOTE_SEARCH_EVENT } from "@/components/ComboboxInput.vue"
+import { EDITABLE_LIST_FOCUS_EVENT } from "@/components/EditableList.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 import AddIcon from "~icons/ic/baseline-add"
@@ -11,7 +13,9 @@ import UndoIcon from "~icons/ic/baseline-check"
 // eslint-disable-next-line vue/prop-name-casing
 const props = defineProps<NodeViewProps>()
 
-const extractionClassLabels: Record<string, string> = {
+const FIELDS_WITH_OBJECTS = ["court", "documentType"]
+
+const EXTRACTION_CLASS_LABELS: Record<string, string> = {
   tenor: "Tenor",
   guiding_principle: "Leitsatz",
   reasons: "Gründe",
@@ -24,20 +28,16 @@ const extractionClassLabels: Record<string, string> = {
   document_type: "Dokumenttyp",
 }
 
-function toKebabCase(str: string): string {
-  return str.replaceAll("_", "-").toLowerCase()
-}
-
-function getClassLabel(extractionClass: string): string {
-  const label = extractionClassLabels[extractionClass] || extractionClass
-  return label
-}
+const getClassLabel = (extractionClass: string): string =>
+  EXTRACTION_CLASS_LABELS[extractionClass] || extractionClass
+const toKebabCase = (str: string) => str.replaceAll("_", "-").toLowerCase()
 
 const store = useDocumentUnitStore()
 const { documentUnit: decision } = storeToRefs(store)
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function setVal<T>(obj: any, path: string, value: T): void {
+  // TODO: find a better solution to resolve a target path like "previousDecisions.0.decisionDate"
   const keys = path.split(".")
   const last = keys.pop()!
 
@@ -76,7 +76,36 @@ const saveValue = async () => {
 
     const value = isHtml(targetPath) ? html : normalizedText || stringValue
 
-    setVal<string | undefined>(decision.value!, targetPath, value)
+    const pathParts = targetPath.split(".")
+
+    // expand previousDecision entry in expandable list if needed
+    if (targetPath.startsWith("previousDecisions")) {
+      const index = parseInt(pathParts[1])
+      window.dispatchEvent(
+        new CustomEvent(EDITABLE_LIST_FOCUS_EVENT, {
+          detail: { listId: "previousDecisions", index },
+        }),
+      )
+      await nextTick() // wait for DOM update
+    }
+
+    const field = targetPath.startsWith("previousDecisions")
+      ? pathParts[2] // e.g., previousDecisions.{index}.{field}
+      : pathParts[1] // e.g., coreData.{field}
+    // a) Fields with objects (e.g., court, documentType) trigger a query in ComboboxInput.vue to set the value
+    if (FIELDS_WITH_OBJECTS.includes(field)) {
+      window.dispatchEvent(
+        // TODO: define ComboboxRemoteSearchEvent
+        new CustomEvent(COMBOBOX_REMOTE_SEARCH_EVENT, {
+          detail: { id: targetPath, query: value },
+        }),
+      )
+    }
+    // b) Regular string fields are set directly on the decision object
+    else {
+      setVal<string | undefined>(decision.value!, targetPath, value)
+    }
+
     isAccepted.value = true
 
     console.log("UPDATE", targetPath, value)

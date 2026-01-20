@@ -10,9 +10,9 @@ class TargetPathModule implements ExtractionModule {
   private static final Map<String, String> targetPathMap =
       Map.ofEntries(
           Map.entry("date", "coreData.decisionDate"),
-          Map.entry("court", "coreData.court.label"),
-          Map.entry("document_type", "coreData.documentType.label"),
-          Map.entry("file_number", "coreData.fileNumbers.0"),
+          Map.entry("court", "coreData.court"),
+          Map.entry("document_type", "coreData.documentType"),
+          Map.entry("file_number", "coreData.fileNumbers.0"), // TODO: handle multiple file numbers
           Map.entry("headline", "shortTexts.headline"),
           Map.entry("guiding_principle", "shortTexts.guidingPrinciple"),
           Map.entry("tenor", "longTexts.tenor"),
@@ -22,9 +22,9 @@ class TargetPathModule implements ExtractionModule {
 
   private static final Map<String, String> pdTargetPath =
       Map.ofEntries(
-          Map.entry("court", "court.label"),
+          Map.entry("court", "court"),
           Map.entry("date", "decisionDate"),
-          Map.entry("document_type", "documentType.label"),
+          Map.entry("document_type", "documentType"),
           Map.entry("file_number", "fileNumber"));
 
   @Override
