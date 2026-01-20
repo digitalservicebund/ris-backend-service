@@ -579,14 +579,10 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
 
       await expect(
-        page.getByText("Anhänge: " + decision.documentNumber),
+        page.getByText(
+          /Anhänge:\s+xxre[0-9]{9}_ds_[0-9a-fA-F-]{36}\.png, xxre[0-9]{9}_ds_[0-9a-fA-F-]{36}\.png/i,
+        ),
       ).toBeVisible()
-
-      // await expect(
-      //   page.getByText(
-      //     /Anhänge: xxre[0-9]{9}_ds_[0-9a-fA-F-]{36}\.png, xxre[0-9]{9}_ds_[0-9a-fA-F-]{36}\.png/,
-      //   ),
-      // ).toBeVisible()
     },
   )
 })
