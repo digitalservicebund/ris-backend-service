@@ -32,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationS
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcessStepRequest;
 import de.bund.digitalservice.ris.caselaw.domain.BulkDocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
@@ -73,6 +74,7 @@ import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -99,6 +101,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -847,6 +850,107 @@ class DocumentationUnitControllerTest {
     verify(service, times(2)).getByUuid(TEST_UUID);
     verify(converterService).getConvertedObject("", "123", TEST_UUID);
   }
+
+  @Nested
+  class testOtherFileEndpoint {
+    @Test
+    void givenMissingMultipart_whenUploadingOtherFile_thenFail() {
+      // given
+      // when
+      when(userHasWriteAccess.apply(any())).thenReturn(true);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+
+      // then
+      risWebClient
+          .withLogin("DS", "Internal")
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/other-file")
+          .contentType(MediaType.MULTIPART_FORM_DATA)
+          .addHeader("X-Filename", "some-file.docx")
+          .exchange()
+          .expectStatus()
+          .isBadRequest();
+    }
+
+    @Test
+    void givenMissingHeaderParam_whenUploadingOtherFile_thenFail() {
+      // given
+      byte[] fileContent = "test content".getBytes();
+
+      MockMultipartFile mockFile =
+          new MockMultipartFile(
+              "file",
+              "some-file.docx",
+              String.valueOf(MediaType.APPLICATION_OCTET_STREAM),
+              fileContent);
+
+      // when
+      when(userHasWriteAccess.apply(any())).thenReturn(true);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+
+      // then
+      risWebClient
+          .withLogin("DS", "Internal")
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/other-file")
+          .contentType(MediaType.MULTIPART_FORM_DATA)
+          .addFile(mockFile)
+          .exchange()
+          .expectStatus()
+          .isBadRequest();
+    }
+
+    @Test
+    void givenValidFile_whenUploadingOtherFile_thenVerifyCreated() {
+      // given
+      byte[] fileContent = "test content".getBytes();
+
+      MockMultipartFile mockFile =
+          new MockMultipartFile(
+              "file",
+              "some-file.docx",
+              String.valueOf(MediaType.APPLICATION_OCTET_STREAM),
+              fileContent);
+
+      // when
+      when(userHasWriteAccess.apply(any())).thenReturn(true);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+
+      // then
+      risWebClient
+          .withLogin("DS", "Internal")
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/other-file")
+          .contentType(MediaType.MULTIPART_FORM_DATA)
+          .addFile(mockFile)
+          .addHeader("X-Filename", "some-file.docx")
+          .exchange()
+          .expectStatus()
+          .isCreated();
+
+      verify(attachmentService)
+          .streamFileToDocumentationUnit(
+              eq(TEST_UUID),
+              any(InputStream.class),
+              eq("some-file.docx"),
+              eq(user),
+              eq(AttachmentType.OTHER));
+    }
+  }
+
+  //  @Nested
+  //  class incorrectParamsTests {
+  //    @Test
+  //    void givenNoFileName_whenDownloading_then() {
+  //      risWebClient
+  //          .withDefaultLogin()
+  //          .get()
+  //          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
+  //          .exchange()
+  //          .expectStatus()
+  //          .isBadRequest();
+  //    }
+  //  }
 
   @Nested
   class TakeoverDocumentUnit {
