@@ -151,6 +151,7 @@ function emitAttachmentIndex(value: number) {
         <Button
           v-tooltip.bottom="tooltipValue('In neuem Tab öffnen')"
           aria-label="Vorschau in neuem Tab öffnen"
+          size="small"
           text
         >
           <template #icon>
