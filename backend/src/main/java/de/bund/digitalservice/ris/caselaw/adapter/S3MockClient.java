@@ -19,9 +19,9 @@ import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
+import software.amazon.awssdk.http.AbortableInputStream;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.AbortMultipartUploadRequest;
 import software.amazon.awssdk.services.s3.model.AbortMultipartUploadResponse;
@@ -37,6 +37,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Object;
@@ -120,21 +121,29 @@ public class S3MockClient implements S3Client {
       GetObjectRequest getObjectRequest,
       ResponseTransformer<GetObjectResponse, T> responseTransformer) {
 
-    byte[] bytes = new byte[] {};
-
     String fileName = getObjectRequest.key();
     File file = localStorageDirectory.resolve(fileName).toFile();
-    try (FileInputStream fl = new FileInputStream(file)) {
-      bytes = new byte[(int) file.length()];
-      int readBytes = fl.read(bytes);
-      if (readBytes != file.length()) {
-        LOGGER.warn("different size between file length and read bytes");
-      }
-    } catch (IOException ex) {
-      LOGGER.error("Couldn't get object from local storage.");
+
+    if (!file.exists()) {
+      LOGGER.error("File not found in local storage: {}", file.getAbsolutePath());
+      // In a real S3 client, this would throw a NoSuchKeyException
+      throw NoSuchKeyException.builder().message("The specified key does not exist.").build();
     }
 
-    return (T) ResponseBytes.fromByteArray(GetObjectResponse.builder().build(), bytes);
+    try {
+      GetObjectResponse objectResponse =
+          GetObjectResponse.builder()
+              .contentLength(file.length())
+              .contentType("application/octet-stream")
+              .build();
+      InputStream fileStream = new FileInputStream(file);
+      AbortableInputStream abortableInputStream = AbortableInputStream.create(fileStream);
+
+      return responseTransformer.transform(objectResponse, abortableInputStream);
+    } catch (Exception e) {
+      LOGGER.error("Error mock-streaming file: {}", fileName, e);
+      throw new RuntimeException("Failed to mock S3 getObject", e);
+    }
   }
 
   @Override

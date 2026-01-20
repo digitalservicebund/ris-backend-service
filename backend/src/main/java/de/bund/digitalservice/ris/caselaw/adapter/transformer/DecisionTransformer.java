@@ -942,8 +942,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   private static List<Attachment> buildAttachments(DecisionDTO decisionDTO) {
     return decisionDTO.getAttachments().stream()
         .map(AttachmentTransformer::transformToDomain)
-        .filter(
-            attachment -> "docx".equals(attachment.format()) || "fmx".equals(attachment.format()))
+        .filter(attachment -> AttachmentType.ORIGINATING == attachment.type())
         .toList();
   }
 

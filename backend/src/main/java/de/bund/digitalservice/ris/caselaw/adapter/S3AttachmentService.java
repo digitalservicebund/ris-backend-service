@@ -196,6 +196,8 @@ public class S3AttachmentService implements AttachmentService {
     List<CompletedPart> completedParts = new ArrayList<>();
     var partNumber = 1;
 
+    //    RequestBody.fromInputStream(file, PART_SIZE);
+
     try (file) {
       while (true) {
         byte[] buffer = file.readNBytes(PART_SIZE);
@@ -354,9 +356,6 @@ public class S3AttachmentService implements AttachmentService {
 
     ResponseInputStream<GetObjectResponse> stream =
         s3Client.getObject(getObjectRequest, transformer);
-
-    //    ResponseInputStream<GetObjectResponse> stream = s3StreamProvider.getS3Stream(bucketName,
-    // s3Path);
 
     StreamingResponseBody responseBody =
         outputStream -> {
