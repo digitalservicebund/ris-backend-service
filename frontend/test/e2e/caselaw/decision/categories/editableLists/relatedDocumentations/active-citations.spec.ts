@@ -230,7 +230,9 @@ test.describe("active citations", () => {
           await element.dispatchEvent("mouseenter")
 
           await expect(
-            page.getByText("Zielrubrik Orientierungssatz bereits ausgefüllt"),
+            page
+              .getByText("Zielrubrik Orientierungssatz bereits ausgefüllt")
+              .last(),
           ).toBeVisible()
         })
 
