@@ -37,14 +37,16 @@ test.describe(
           await page.getByLabel("Seitenpanel öffnen").click()
           await expect(page).toHaveURL(/showAttachmentPanel=true/)
           await expect(page.getByLabel("Notiz anzeigen")).toBeVisible()
-          await expect(page.getByLabel("Dokumente anzeigen")).toBeVisible()
+          await expect(
+            page.getByLabel("Originaldokument anzeigen"),
+          ).toBeVisible()
           await expect(page.getByLabel("Vorschau anzeigen")).toBeVisible()
           await expect(
             page.getByLabel("Rubriken-Import anzeigen"),
           ).toBeVisible()
           await expect(page.getByText("Notiz", { exact: true })).toBeVisible()
           await expect(page.getByLabel("Notiz Eingabefeld")).toHaveValue("")
-          await page.getByLabel("Dokumente anzeigen").click()
+          await page.getByLabel("Originaldokument anzeigen").click()
           await expect(
             page.getByText(
               "Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.",
@@ -127,7 +129,7 @@ test.describe(
             "some text",
           )
 
-          await page.getByLabel("Dokumente anzeigen").click()
+          await page.getByLabel("Originaldokument anzeigen").click()
           await expect(
             page.getByText(
               "Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.",
@@ -152,7 +154,7 @@ test.describe(
 
           await expect(page.getByText("Notiz", { exact: true })).toBeVisible()
 
-          await page.getByLabel("Dokumente anzeigen").click()
+          await page.getByLabel("Originaldokument anzeigen").click()
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
         })
 
@@ -311,7 +313,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
           await expect(page.getByText("Notiz", { exact: true })).toBeVisible()
           await page.keyboard.press("Tab")
           await expect(
-            page.getByRole("button", { name: "Dokumente anzeigen" }),
+            page.getByRole("button", { name: "Originaldokument anzeigen" }),
           ).toBeFocused()
           await page.keyboard.press("Enter")
           await expect(page.getByText("some-formatting.docx")).toBeVisible()

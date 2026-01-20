@@ -5,6 +5,6 @@ import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 
 <template>
   <KitchensinkPage name="File upload">
-    <FileUpload document-unit-uuid="uuid" />
+    <FileUpload id="id" aria-label="label" document-unit-uuid="uuid" />
   </KitchensinkPage>
 </template>

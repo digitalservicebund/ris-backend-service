@@ -66,7 +66,9 @@ test.describe("test navigation panel", () => {
       page.getByRole("link", { name: "Kurz- & Langtexte" }),
     ).toBeFocused()
     await page.keyboard.press("Tab")
-    await expect(page.getByRole("link", { name: "Dokumente" })).toBeFocused()
+    await expect(
+      page.getByRole("link", { name: "Originaldokument" }),
+    ).toBeFocused()
     await page.keyboard.press("Enter")
     await expect(
       page.getByText("Ziehen Sie Ihre Dateien in diesen Bereich."),

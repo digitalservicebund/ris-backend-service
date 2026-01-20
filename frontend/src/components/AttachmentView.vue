@@ -4,6 +4,7 @@ import LoadingSpinner from "./LoadingSpinner.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
+import TitleElement from "@/components/TitleElement.vue"
 import { Docx2HTML } from "@/domain/docx2html"
 import fileService from "@/services/attachmentService"
 
@@ -43,6 +44,7 @@ watch(
 </script>
 
 <template>
+  <TitleElement>Originaldokument</TitleElement>
   <FlexContainer
     v-if="fileAsHTML?.html"
     v-bind="$attrs"

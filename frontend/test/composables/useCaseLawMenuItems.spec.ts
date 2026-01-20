@@ -42,7 +42,7 @@ describe("useCaseLawMenuItems", () => {
 
     const topLabelNames = menuItems.value.map((item) => item.label)
     expect(topLabelNames).toContain("Rubriken")
-    expect(topLabelNames).toContain("Dokumente")
+    expect(topLabelNames).toContain("Originaldokument")
     expect(topLabelNames).toContain("Übergabe an jDV")
   })
 
@@ -52,7 +52,7 @@ describe("useCaseLawMenuItems", () => {
 
     const topLabelNames = menuItems.value.map((item) => item.label)
     expect(topLabelNames).toContain("Rubriken")
-    expect(topLabelNames).not.toContain("Dokumente")
+    expect(topLabelNames).not.toContain("Originaldokument")
     expect(topLabelNames).toContain("Übergabe an jDV")
 
     const categoriesSubMenu = menuItems.value.find(

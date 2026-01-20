@@ -198,8 +198,10 @@ describe("documentUnit list", () => {
     expect(screen.getByLabelText("Kurztext vorhanden")).toBeVisible()
 
     // expect Attachment
-    expect(screen.getAllByLabelText("Kein Anhang vorhanden")).toHaveLength(2)
-    expect(screen.getByLabelText("Anhang vorhanden")).toBeVisible()
+    expect(
+      screen.getAllByLabelText("Kein Originaldokument vorhanden"),
+    ).toHaveLength(2)
+    expect(screen.getByLabelText("Originaldokument vorhanden")).toBeVisible()
 
     // expect three view links
     expect(

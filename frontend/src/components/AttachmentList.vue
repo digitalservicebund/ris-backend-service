@@ -1,32 +1,62 @@
 <script lang="ts" setup>
+import { useScrollLock } from "@vueuse/core"
 import dayjs from "dayjs"
-import Tooltip from "./Tooltip.vue"
+import Button from "primevue/button"
+import { Ref, ref, watch } from "vue"
 import CellHeaderItem from "@/components/CellHeaderItem.vue"
 import CellItem from "@/components/CellItem.vue"
+import PopupModal from "@/components/PopupModal.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
-import Attachment from "@/domain/attachment"
+import { Attachment } from "@/domain/attachment"
 import IconDelete from "~icons/ic/baseline-close"
+import IconDownload from "~icons/ic/baseline-save-alt"
 
 const props = defineProps<{
   files?: Attachment[]
+  attachmentIdsWithActiveDownload: string[]
+  enableSelect?: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: "delete", id: number): void
+  (e: "delete", attachment: Attachment): void
+  (e: "download", attachment: Attachment): void
   (e: "select", id: number): void
 }>()
 
 /**
  * Propagates delete event to parent and closes modal again
  */
-const onDelete = (index: number) => {
-  emit("delete", index)
+const onDelete = (attachment?: Attachment) => {
+  if (attachment) emit("delete", attachment)
+  closeDeleteModal()
 }
 
 const onSelect = (index: number) => {
   emit("select", index)
+}
+
+const onDownload = (attachment: Attachment) => {
+  emit("download", attachment)
+}
+
+const showDeleteModal = ref(false)
+const attachmentToBeDeleted: Ref<Attachment | undefined> = ref()
+
+const scrollLock = useScrollLock(document)
+watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
+
+function openDeleteModal(attachment: Attachment) {
+  attachmentToBeDeleted.value = attachment
+  if (attachmentToBeDeleted.value != null) {
+    showDeleteModal.value = true
+  }
+}
+
+function closeDeleteModal() {
+  showDeleteModal.value = false
+  attachmentToBeDeleted.value = undefined
 }
 </script>
 
@@ -45,10 +75,10 @@ const onSelect = (index: number) => {
     <TableRow
       v-for="(file, index) in props.files"
       :key="index"
-      class="cursor-pointer"
+      :class="enableSelect ? 'cursor-pointer' : ''"
       :data-testid="`list-entry-${index}`"
     >
-      <CellItem @click="onSelect(index)">
+      <CellItem class="wrap-anywhere" @click="onSelect(index)">
         {{ file.name ?? "-" }}
       </CellItem>
       <CellItem @click="onSelect(index)">
@@ -62,18 +92,45 @@ const onSelect = (index: number) => {
             : "-"
         }}
       </CellItem>
-      <CellItem class="text-end">
-        <Tooltip text="Löschen">
-          <button
+      <CellItem class="min-w-[110px] justify-end">
+        <div class="flex flex-row justify-end -space-x-2">
+          <Button
+            v-tooltip.bottom="{
+              value: 'Löschen',
+              appendTo: 'body',
+            }"
             aria-label="Datei löschen"
-            class="cursor-pointer align-middle text-blue-800 focus:outline-none focus-visible:outline-blue-800"
-            @click="onDelete(index)"
-            @keyup.enter="null"
+            severity="secondary"
+            size="small"
+            @click="openDeleteModal(file)"
           >
-            <IconDelete />
-          </button>
-        </Tooltip>
+            <template #icon> <IconDelete /></template>
+          </Button>
+          <Button
+            v-tooltip.bottom="{
+              value: 'Herunterladen',
+              appendTo: 'body',
+            }"
+            aria-label="Datei herunterladen"
+            :loading="attachmentIdsWithActiveDownload.includes(file.id)"
+            severity="secondary"
+            size="small"
+            @click="onDownload(file)"
+          >
+            <template #icon> <IconDownload /></template>
+          </Button>
+        </div>
       </CellItem>
     </TableRow>
   </TableView>
+  <PopupModal
+    v-if="showDeleteModal"
+    aria-label="Anhang löschen"
+    :content-text="`Möchten Sie den Anhang ${attachmentToBeDeleted?.name} wirklich dauerhaft löschen?`"
+    header-text="Anhang löschen"
+    primary-button-text="Löschen"
+    primary-button-type="destructive"
+    @close-modal="closeDeleteModal"
+    @primary-action="onDelete(attachmentToBeDeleted)"
+  />
 </template>

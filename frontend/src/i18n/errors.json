@@ -23,11 +23,15 @@
     "title": "Umgebung konnte nicht geladen werden.",
     "description": ""
   },
+  "OTHER_FILE_TOO_LARGE_CASELAW": {
+    "title": "überschreitet das Limit von 100MB Größe.",
+    "description": "Laden Sie eine kleinere Datei hoch."
+  },
   "WRONG_MEDIA_TYPE_DOCX_REQUIRED": {
     "title": "hat ein falsches Format.",
     "description": "Laden Sie eine .docx-Version hoch."
   },
-  "FILE_TOO_LARGE_CASELAW": {
+  "ORIGINAL_DOCUMENT_TOO_LARGE_CASELAW": {
     "title": "überschreitet das Limit von 20MB Größe.",
     "description": "Laden Sie eine kleinere Datei hoch."
   },
@@ -157,6 +161,10 @@
   },
   "FILE_TOO_BIG": {
     "title": "Die Datei überschreitet die maximale Dateigröße von 20 MB.",
+    "description": ""
+  },
+  "FILE_UPLOAD_FAILED": {
+    "title": "Der Upload ist fehlgeschlagen. Bitte versuchen Sie es erneut oder wenden sich an den Support.",
     "description": ""
   },
   "NO_INTERNET_CONNECTION": {

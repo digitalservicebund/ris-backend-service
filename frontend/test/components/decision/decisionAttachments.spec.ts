@@ -3,7 +3,7 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DecisionAttachments from "@/components/DecisionAttachments.vue"
-import Attachment from "@/domain/attachment"
+import { Attachment } from "@/domain/attachment"
 import { Decision } from "@/domain/decision"
 import routes from "~/test-helper/routes"
 
@@ -51,6 +51,7 @@ describe("Document Unit Categories", () => {
     const name = "this-is-a-file-name.docx"
     const format = "docx"
     const attachment: Attachment = {
+      id: "123",
       name: name,
       format: format,
       s3path: "./path.docx",

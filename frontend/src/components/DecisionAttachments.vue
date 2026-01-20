@@ -1,13 +1,12 @@
 <script lang="ts" setup>
-import { useScrollLock } from "@vueuse/core"
 import { storeToRefs } from "pinia"
 import Message from "primevue/message"
-import { computed, Ref, ref, watch } from "vue"
+import { computed, Ref, ref } from "vue"
 import AttachmentList from "@/components/AttachmentList.vue"
 import FileUpload from "@/components/FileUpload.vue"
 import FlexItem from "@/components/FlexItem.vue"
-import PopupModal from "@/components/PopupModal.vue"
 import TitleElement from "@/components/TitleElement.vue"
+import { Attachment } from "@/domain/attachment"
 import { Decision } from "@/domain/decision"
 import attachmentService from "@/services/attachmentService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -25,10 +24,6 @@ const { documentUnit: decision } = storeToRefs(store) as {
 const errors = ref<string[]>([])
 const isLoading = ref(false)
 const acceptedFileFormats = [".docx"]
-const deletingAttachmentIndex: Ref<number> = ref(0)
-
-const showDeleteModal = ref(false)
-const deleteModalHeaderText = "Anhang löschen"
 
 const errorTitle = computed(() => {
   if (errors.value.length === 1) {
@@ -38,10 +33,10 @@ const errorTitle = computed(() => {
   } else return ""
 })
 
-const handleDeleteAttachment = async (index: number) => {
-  const fileToDelete = attachments.value[index]
-  if (fileToDelete.s3path == undefined) {
-    console.error("file path is undefined", index)
+const handleOnDelete = async (fileToDelete: Attachment) => {
+  errors.value = []
+  if (fileToDelete?.s3path == undefined) {
+    console.error("file path is undefined", fileToDelete)
     return
   }
 
@@ -49,7 +44,7 @@ const handleDeleteAttachment = async (index: number) => {
     (await attachmentService.delete(decision.value!.uuid, fileToDelete.s3path))
       .status < 300
   ) {
-    emit("attachmentIndexDeleted", index)
+    emit("attachmentIndexDeleted", attachments.value.indexOf(fileToDelete))
     await store.loadDocumentUnit(store.documentUnit!.documentNumber!)
   }
 }
@@ -60,24 +55,13 @@ const handleOnSelect = (index: number) => {
   }
 }
 
-const handleOnDelete = (index: number) => {
-  errors.value = []
-  deletingAttachmentIndex.value = index
-  openDeleteModal()
-}
-
-const deleteFile = async (index: number) => {
-  await handleDeleteAttachment(index)
-  closeDeleteModal()
-}
-
 async function upload(files: FileList) {
   errors.value = []
   let anySuccessful = false
   try {
     for (const file of Array.from(files)) {
       isLoading.value = true
-      const response = await attachmentService.upload(
+      const response = await attachmentService.uploadOriginalDocument(
         decision.value!.uuid,
         file,
       )
@@ -100,19 +84,22 @@ async function upload(files: FileList) {
   }
 }
 
-const scrollLock = useScrollLock(document)
-watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
-
-function openDeleteModal() {
-  const attachmentToBeDeleted =
-    attachments.value?.[deletingAttachmentIndex.value]?.name
-  if (attachmentToBeDeleted != null) {
-    showDeleteModal.value = true
+const attachmentIdsWithActiveDownload = ref<string[]>([])
+async function handleOnDownload(attachment: Attachment) {
+  errors.value = []
+  attachmentIdsWithActiveDownload.value = [
+    ...attachmentIdsWithActiveDownload.value,
+    attachment.id,
+  ]
+  const response = await attachmentService.download(
+    decision.value!.uuid,
+    attachment,
+  )
+  if (response.error) {
+    errors.value = [response.error.title]
   }
-}
-
-function closeDeleteModal() {
-  showDeleteModal.value = false
+  attachmentIdsWithActiveDownload.value =
+    attachmentIdsWithActiveDownload.value.filter((id) => id !== attachment.id)
 }
 
 const hasAttachments = computed<boolean>(() => {
@@ -134,22 +121,14 @@ const attachments = computed({
     data-testid="document-unit-attachments"
   >
     <div class="flex w-full flex-1 grow flex-col gap-24">
-      <PopupModal
-        v-if="showDeleteModal"
-        :aria-label="deleteModalHeaderText"
-        :content-text="`Möchten Sie den Anhang ${attachments?.[deletingAttachmentIndex]?.name} wirklich dauerhaft löschen?`"
-        :header-text="deleteModalHeaderText"
-        primary-button-text="Löschen"
-        primary-button-type="destructive"
-        @close-modal="closeDeleteModal"
-        @primary-action="deleteFile(deletingAttachmentIndex)"
-      />
-      <TitleElement>Dokumente</TitleElement>
+      <TitleElement>Originaldokument</TitleElement>
       <AttachmentList
         v-if="hasAttachments"
-        id="file-table"
+        :attachment-ids-with-active-download="attachmentIdsWithActiveDownload"
+        enable-select
         :files="attachments"
         @delete="handleOnDelete"
+        @download="handleOnDownload"
         @select="handleOnSelect"
       />
       <Message
@@ -165,7 +144,9 @@ const attachments = computed({
       <div class="flex-grow">
         <div class="flex h-full flex-col items-start">
           <FileUpload
+            id="file-upload"
             :accept="acceptedFileFormats.toString()"
+            aria-label="Originaldokument hochladen"
             :is-loading="isLoading"
             @files-selected="(files) => upload(files)"
           />
