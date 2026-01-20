@@ -30,6 +30,7 @@ const props = defineProps<{
   noClear?: boolean
   hasError?: boolean
   readOnly?: boolean
+  remoteSearchId?: string // unique identifier for remote search events (e.g. by ExtractionHighlight.vue) <- could be "id", but it's not unique currently
 }>()
 
 const emit = defineEmits<{
@@ -240,6 +241,30 @@ const closeDropdownAndRevertToLastSavedValue = () => {
   inputText.value = props.modelValue?.label
 }
 
+async function handleRemoteSearch(event: Event) {
+  const { id, query } = (event as CustomEvent).detail
+  if (id === props.remoteSearchId) {
+    console.log("Remote search triggered", { id, query })
+    inputText.value = query
+    filter.value = query
+    await updateCurrentItems()
+    // a) auto-set if only one result or exact match
+    if (
+      existingItems.value?.length === 1 ||
+      (existingItems.value?.length &&
+        existingItems.value[0].label.toLowerCase() === query.toLowerCase())
+    ) {
+      setChosenItem(existingItems.value[0])
+    }
+    // b) ambiguous result: open dropdown for user selection
+    else {
+      inputText.value = query // without, it would disappear again
+      showDropdown.value = true
+      dropdownItemsRef.value[0]?.focus()
+    }
+  }
+}
+
 watch(
   () => props.modelValue,
   (newValue, oldValue) => {
@@ -252,10 +277,12 @@ watch(
 
 onMounted(() => {
   window.addEventListener("click", handleClickOutside)
+  window.addEventListener(COMBOBOX_REMOTE_SEARCH_EVENT, handleRemoteSearch)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener("click", handleClickOutside)
+  window.removeEventListener(COMBOBOX_REMOTE_SEARCH_EVENT, handleRemoteSearch)
 })
 </script>
 
@@ -265,6 +292,8 @@ export type InputModelProps =
       label: string
     }
   | undefined
+
+export const COMBOBOX_REMOTE_SEARCH_EVENT = "combobox-remote-search"
 </script>
 
 <template>

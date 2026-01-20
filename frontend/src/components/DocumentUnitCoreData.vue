@@ -244,6 +244,7 @@ onBeforeUnmount(() => {
           clear-on-choosing-item
           :has-error="slotProps.hasError"
           :item-service="ComboboxItemService.getCourts"
+          remote-search-id="coreData.court"
         ></ComboboxInput>
       </InputField>
       <!-- Child  -->
@@ -439,6 +440,7 @@ onBeforeUnmount(() => {
           v-model="coreDataModel.documentType"
           aria-label="Dokumenttyp"
           :item-service="ComboboxItemService.getCaselawDocumentTypes"
+          remote-search-id="coreData.documentType"
         ></ComboboxInput>
       </InputField>
     </div>

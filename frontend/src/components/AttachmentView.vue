@@ -2,7 +2,6 @@
 import Button from "primevue/button"
 import { onBeforeMount, ref, watch } from "vue"
 import LoadingSpinner from "./LoadingSpinner.vue"
-import Tooltip from "./Tooltip.vue"
 import { useExtractions } from "@/components/extraction/useExtractions"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
@@ -51,23 +50,22 @@ const { showExtractions, toggleShowExtractions } = useExtractions(editorRef)
 
 <template>
   <div class="flex items-start">
-    <Tooltip text="Automatische Erkennung">
-      <Button
-        id="toggle-extractions-button"
-        aria-label="Notiz anzeigen"
-        class="focus-visible:z-20"
-        data-testid="note-button"
-        severity="secondary"
-        size="small"
-        @click="toggleShowExtractions"
-      >
-        <template #icon>
-          <component
-            :is="showExtractions ? IconExtractionsOff : IconExtractions"
-          />
-        </template>
-      </Button>
-    </Tooltip>
+    <Button
+      id="toggle-extractions-button"
+      v-tooltip.bottom="'Automatische Erkennung'"
+      aria-label="Automatische Erkennung"
+      class="focus-visible:z-20"
+      data-testid="note-button"
+      severity="secondary"
+      size="small"
+      @click="toggleShowExtractions"
+    >
+      <template #icon>
+        <component
+          :is="showExtractions ? IconExtractionsOff : IconExtractions"
+        />
+      </template>
+    </Button>
   </div>
   <FlexContainer
     v-if="fileAsHTML?.html"

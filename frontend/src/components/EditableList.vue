@@ -1,7 +1,15 @@
 <script lang="ts" setup generic="T extends ListItem">
 import Button from "primevue/button"
 import type { Component, Ref } from "vue"
-import { ref, watch, computed, nextTick, onBeforeUpdate } from "vue"
+import {
+  ref,
+  watch,
+  computed,
+  nextTick,
+  onBeforeUpdate,
+  onMounted,
+  onBeforeUnmount,
+} from "vue"
 import DefaultSummary from "@/components/DefaultSummary.vue"
 import { useScroll } from "@/composables/useScroll"
 import ListItem from "@/domain/editableListItem" // NOSONAR: import is needed for extension
@@ -13,12 +21,14 @@ interface Props {
   summaryComponent?: Component
   modelValue?: T[]
   createEntry: () => T
+  listId?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   editComponent: undefined,
   summaryComponent: DefaultSummary,
   modelValue: () => [],
+  listId: undefined,
 })
 
 const emit = defineEmits<{
@@ -143,9 +153,36 @@ onBeforeUpdate(() => {
   focusAnchors.value = []
 })
 
+async function handleListFocus(event: Event) {
+  // lets the "expandend" element (editEntry) set from the outside via event
+  const customEvent = event as CustomEvent<{ listId: string; index: number }>
+  const { listId, index } = customEvent.detail
+  if (listId === props.listId) {
+    if (index >= 0 && index < modelValueList.value.length) {
+      localNewEntry.value = undefined
+      console.log("SET EDIT ENTRY BY INDEX", index, modelValueList.value[index])
+      setEditEntry(modelValueList.value[index])
+    } else if (index >= modelValueList.value.length) {
+      await toggleNewEntry(true)
+    }
+  }
+}
+
+onMounted(() => {
+  window.addEventListener(EDITABLE_LIST_FOCUS_EVENT, handleListFocus)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener(EDITABLE_LIST_FOCUS_EVENT, handleListFocus)
+})
+
 defineExpose({
   toggleNewEntry,
 })
+</script>
+
+<script lang="ts">
+export const EDITABLE_LIST_FOCUS_EVENT = "editable-list-focus"
 </script>
 
 <template>
@@ -238,6 +275,7 @@ defineExpose({
             'pt-0':
               mergedValues.findIndex((e) => e.localId === entry.localId) === 0,
           }"
+          :index="index"
           :model-value-list="modelValueList"
           @add-entry="updateModel"
           @cancel-edit="cancelEdit"

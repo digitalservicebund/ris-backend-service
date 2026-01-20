@@ -26,6 +26,7 @@ const previousDecisions = computed({
             v-model="previousDecisions"
             :create-entry="() => new PreviousDecision()"
             :edit-component="PreviousDecisionInputGroup"
+            list-id="previousDecisions"
             :summary-component="DocumentationUnitSummary"
           />
         </div>
