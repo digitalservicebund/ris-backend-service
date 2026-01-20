@@ -235,32 +235,8 @@ public class DocumentationUnitController {
   public ResponseEntity<StreamingResponseBody> downloadFile(
       @PathVariable UUID uuid, @PathVariable UUID fileUuid) {
 
-    //    var streamedFile = attachmentService.getFileStreamDto(uuid, fileUuid);
     var streamedFile = attachmentService.getFileStream(uuid, fileUuid);
 
-    //    HttpHeaders headers = new HttpHeaders();
-    //    if (streamedFile.contentLength() > 0) {
-    //      headers.setContentType(MediaType.parseMediaType(streamedFile.filename()));
-    //    }
-    //    if (streamedFile.contentLength() >= 0) {
-    //      headers.setContentLength(streamedFile.contentLength());
-    //    }
-    //    headers.setCacheControl(CacheControl.noCache());
-    //
-    // headers.setContentDisposition(ContentDisposition.attachment().filename(streamedFile.filename()).build());
-    //    if (streamedFile.eTag() != null) {
-    //      headers.setETag(streamedFile.eTag());
-    //    }
-
-    //    StreamingResponseBody body = outputStream -> {
-    //      try (StreamedFile sf = streamedFile) {
-    //        sf.inputStream().transferTo(outputStream);
-    //      } catch (IOException e) {
-    //        throw new UncheckedIOException(e);
-    //      }
-    //    };
-    //
-    //    return ResponseEntity.ok().headers(headers).body(body);
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + "someFile.docx" + "\"")
         .contentType(MediaType.parseMediaType(streamedFile.response().contentType()))
