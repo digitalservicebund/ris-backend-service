@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
+  copyPasteTextFromAttachmentIntoEditor,
   navigateToAttachments,
   navigateToCategories,
   save,
@@ -8,7 +9,12 @@ import {
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 // eslint-disable-next-line playwright/no-skipped-test
-test.describe.skip(
+test.skip(
+  ({ browserName }) => browserName !== "chromium",
+  "Skipping in engines other than chromium, reason playwright diriven for firefox and safari does not support copy paste type='text/html' from clipboard",
+)
+
+test.describe(
   "base64 images are converted to attachments",
   {
     tag: ["@RISDEV-7971", "@RISDEV-3018"],
@@ -55,20 +61,15 @@ test.describe.skip(
       })
 
       await test.step("Copy image from docx  to Orientierungssatz", async () => {
-        const imgSrc = await page
-          .getByTestId("Dokumentenvorschau")
-          .locator("img")
-          .first()
-          .getAttribute("src")
-
-        await page.evaluate((src) => {
-          const container = document.querySelector(
-            '[data-testid="Orientierungssatz"] div',
-          )
-          const img = document.createElement("img")
-          img.src = src!
-          container?.appendChild(img)
-        }, imgSrc)
+        const attachmentLocator = page
+          .getByText("jpg:Word rotated 90 degrees", { exact: true })
+          .locator("..")
+        const inputField = page.getByTestId("Orientierungssatz")
+        await copyPasteTextFromAttachmentIntoEditor(
+          page,
+          attachmentLocator,
+          inputField,
+        )
       })
 
       const image = page.locator(
