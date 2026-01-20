@@ -50,7 +50,7 @@ async function copy() {
 
 <template>
   <div class="inline-flex items-center gap-8">
-    <span>{{ text }}</span>
+    <span data-testid="copyable-value">{{ text }}</span>
 
     <Button
       v-tooltip.bottom="{

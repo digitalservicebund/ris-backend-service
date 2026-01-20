@@ -583,11 +583,12 @@ function importAppeal() {
     isDecision(sourceDocumentUnit.value)
   ) {
     const source = sourceDocumentUnit.value?.contentRelatedIndexing.appeal
+    const targetId = targetDocumentUnit.value.uuid
 
-    if (targetDocumentUnit.value) {
+    if (targetDocumentUnit.value && source) {
       targetDocumentUnit.value.contentRelatedIndexing.appeal = {
         ...source,
-        id: undefined,
+        id: targetId,
       }
     }
   }
