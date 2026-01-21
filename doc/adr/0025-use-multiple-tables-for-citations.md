@@ -26,7 +26,7 @@ We also need to handle unpublishing of documents.
 
 ## Decision
 
-We want to create new tables to better organize the references. For each type of reference (e.g. caselaw cites caselaw, caselaw cites dependent literature, dependent literature cites caselaw, ...) we create the following tables:
+We want to create new tables to better organize the references. For each type of reference (e.g. caselaw cites caselaw, caselaw cites dependent literature, dependent literature cites caselaw, ...) we create the following tables, if we have a need for them:
 * `citation_{source}_to_{target}_link`
     * references both the active and passive side using an identifier
     * Rank column for sorting on the active side. The rank values are shared with `citation_{source}_to_{target}_blindlink_active`.
