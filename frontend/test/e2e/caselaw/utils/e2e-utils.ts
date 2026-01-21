@@ -190,11 +190,11 @@ export const navigateToAttachments = async (
     skipAssert?: boolean
   },
 ) => {
-  await test.step("Navigate to 'Dokumente'", async () => {
+  await test.step("Navigate to 'Originaldokument'", async () => {
     const queryParams = getAllQueryParamsFromUrl(page)
 
     if (options?.navigationBy === "click") {
-      await page.getByRole("link", { name: "Dokumente" }).click()
+      await page.getByRole("link", { name: "Originaldokument" }).click()
     } else {
       await page.goto(
         `/caselaw/documentunit/${documentNumber}/attachments${queryParams}`,

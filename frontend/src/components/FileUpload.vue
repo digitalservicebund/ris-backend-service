@@ -7,6 +7,8 @@ import IconUpload from "~icons/ic/baseline-upload-file"
 defineProps<{
   isLoading?: boolean
   accept?: string
+  ariaLabel: string
+  id: string
 }>()
 
 const emits = defineEmits<{
@@ -83,9 +85,9 @@ function onFileSelect(event: Event) {
         Ziehen Sie Ihre Dateien in diesen Bereich.
       </div>
       <FileInput
-        id="file-upload"
+        :id="id"
         :accept="accept"
-        aria-label="Upload File"
+        :aria-label="ariaLabel"
         @input="onFileSelect"
       >
         <span class="ris-link3-bold mt-[0.438rem] hover:underline"

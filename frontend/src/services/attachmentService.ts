@@ -1,12 +1,23 @@
 import httpClient, { ServiceResponse } from "./httpClient"
+import { Attachment } from "@/domain/attachment"
 import { Docx2HTML } from "@/domain/docx2html"
 import errorMessages from "@/i18n/errors.json"
 
 interface AttachmentService {
-  upload(
+  uploadOriginalDocument(
     documentUnitUuid: string,
     file: File,
   ): Promise<ServiceResponse<Docx2HTML>>
+
+  uploadOtherAttachment(
+    documentUnitUuid: string,
+    file: File,
+  ): Promise<ServiceResponse<unknown>>
+
+  download(
+    documentUnitUuid: string,
+    attachment: Attachment,
+  ): Promise<ServiceResponse<unknown>>
 
   delete(
     documentUnitUuid: string,
@@ -21,7 +32,7 @@ interface AttachmentService {
 }
 
 const service: AttachmentService = {
-  async upload(documentUnitUuid: string, file: File) {
+  async uploadOriginalDocument(documentUnitUuid: string, file: File) {
     const extension = file.name?.split(".").pop()
     if (!extension || extension.toLowerCase() !== "docx") {
       return {
@@ -46,8 +57,9 @@ const service: AttachmentService = {
     )
     if (response.status === 413) {
       response.error = {
-        title: errorMessages.FILE_TOO_LARGE_CASELAW.title,
-        description: errorMessages.FILE_TOO_LARGE_CASELAW.description,
+        title: errorMessages.ORIGINAL_DOCUMENT_TOO_LARGE_CASELAW.title,
+        description:
+          errorMessages.ORIGINAL_DOCUMENT_TOO_LARGE_CASELAW.description,
       }
     } else if (response.status === 415) {
       response.error = {
@@ -73,6 +85,79 @@ const service: AttachmentService = {
       response.error = undefined
     }
 
+    return response
+  },
+
+  async uploadOtherAttachment(documentUnitUuid: string, file: File) {
+    if (file.size > 100 * 1024 * 1024)
+      return {
+        status: 413,
+        error: {
+          title: errorMessages.OTHER_FILE_TOO_LARGE_CASELAW.title,
+          description: errorMessages.OTHER_FILE_TOO_LARGE_CASELAW.description,
+        },
+      } as ServiceResponse<unknown>
+
+    const form = new FormData()
+    form.append("file", file)
+
+    const response = await httpClient.put<FormData, unknown>(
+      `caselaw/documentunits/${documentUnitUuid}/other-file`,
+      {
+        headers: {
+          "X-Filename": file.name,
+          "X-Filesize": `${file.size}`,
+        },
+      },
+      form,
+    )
+    if (response.status === 413) {
+      response.error = {
+        title: errorMessages.OTHER_FILE_TOO_LARGE_CASELAW.title,
+        description: errorMessages.OTHER_FILE_TOO_LARGE_CASELAW.description,
+      }
+    } else if (response.status === 403) {
+      response.error = {
+        title: errorMessages.NOT_ALLOWED.title,
+        description: errorMessages.NOT_ALLOWED.description,
+      }
+    } else if (response.status >= 300) {
+      response.error = {
+        title: errorMessages.SERVER_ERROR.title,
+        description: errorMessages.SERVER_ERROR.description,
+      }
+    } else {
+      response.error = undefined
+    }
+
+    return response
+  },
+
+  async download(documentUnitUuid: string, attachment: Attachment) {
+    const response = await httpClient.get<BlobPart>(
+      `caselaw/documentunits/${documentUnitUuid}/file/${attachment.id}`,
+      { responseType: "blob" },
+    )
+    if (response.error || response.status > 300)
+      return {
+        status: 500,
+        error: {
+          title:
+            "Datei konnte nicht heruntergeladen werden. Versuchen sie es erneut oder wenden Sie sich an den Support.",
+        },
+      }
+
+    const blob = new Blob([response.data], {
+      type: response?.headers?.["content-type"],
+    })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = attachment.name
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
     return response
   },
 

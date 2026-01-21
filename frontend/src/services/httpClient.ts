@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios"
+import axios, { AxiosError, ResponseType } from "axios"
 import { ValidationError } from "@/components/input/types"
 import errorMessages from "@/i18n/errors.json"
 
@@ -7,11 +7,13 @@ type RequestOptions = {
     Accept?: string
     "Content-Type"?: string
     "X-Filename"?: string
+    "X-Filesize"?: string
     "X-API-KEY"?: string
   }
   params?: {
     [key: string]: string
   }
+  responseType?: ResponseType
   timeout?: number
 }
 
@@ -61,6 +63,7 @@ async function baseHttp<T>(
     })
     return {
       status: response.status,
+      headers: response.headers as Record<string, string>,
       data:
         response.data.content && !response.data.pageable
           ? response.data.content
@@ -113,6 +116,7 @@ export type ResponseError = {
 
 export type ServiceResponse<T> = {
   status: number
+  headers?: Record<string, string>
 } & (
   | {
       data: T

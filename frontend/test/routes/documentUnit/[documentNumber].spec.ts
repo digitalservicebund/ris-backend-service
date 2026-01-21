@@ -332,7 +332,7 @@ describe("Document Number Route", () => {
       expect(screen.getByTestId("preview")).toBeInTheDocument()
     })
 
-    it('detects "d" keypress and opens documents', async () => {
+    it('detects "o" keypress and opens Originaldokument', async () => {
       const { user, router } = renderComponent()
       await router.push({
         path: "/caselaw/documentUnit/1234567891234/references?showAttachmentPanel=false",
@@ -343,7 +343,7 @@ describe("Document Number Route", () => {
           "Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.",
         ),
       ).not.toBeInTheDocument()
-      await user.keyboard("d")
+      await user.keyboard("o")
       expect(
         screen.getByText(
           "Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.",
