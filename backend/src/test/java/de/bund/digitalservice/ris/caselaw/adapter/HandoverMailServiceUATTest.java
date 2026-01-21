@@ -172,7 +172,6 @@ class HandoverMailServiceUATTest {
             .build();
 
     when(featureToggleService.isEnabled("neuris.text-check-noindex-handover")).thenReturn(true);
-    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(true);
 
     edition =
         LegalPeriodicalEdition.builder()
@@ -761,7 +760,6 @@ class HandoverMailServiceUATTest {
   @Test
   void testHandover_withImagesAndDisabledFeatureFlag_shouldNotHandOverImages()
       throws ParserConfigurationException, TransformerException {
-    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(false);
     decision =
         Decision.builder()
             .uuid(TEST_UUID)

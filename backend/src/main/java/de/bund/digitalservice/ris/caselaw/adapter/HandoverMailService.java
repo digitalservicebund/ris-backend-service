@@ -15,7 +15,6 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachmentImage;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -43,8 +42,6 @@ import org.springframework.stereotype.Service;
 /** Implementation of the {@link MailService} interface that sends juris-XML files via email. */
 @Service
 public class HandoverMailService implements MailService {
-
-  private static final String HANDOVER_IMAGES_FEATURE_FLAG = "neuris.image-handover";
 
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -323,9 +320,8 @@ public class HandoverMailService implements MailService {
           .build();
     }
 
-    String documentNumberPrefix = isHandoverWithoutPrefixAllowed(decision) ? "" : "TEST";
     return decision.toBuilder()
-        .documentNumber(documentNumberPrefix + decision.documentNumber())
+        .documentNumber("TEST" + decision.documentNumber())
         .coreData(
             Optional.ofNullable(decision.coreData())
                 .map(
@@ -357,27 +353,7 @@ public class HandoverMailService implements MailService {
         .build();
   }
 
-  private boolean isHandoverWithoutPrefixAllowed(Decision decision) {
-    if (decision.coreData() == null
-        || decision.coreData().documentationOffice() == null
-        || decision.managementData() == null) {
-      return false;
-    }
-    boolean isImageHandoverEnabled = featureToggleService.isEnabled(HANDOVER_IMAGES_FEATURE_FLAG);
-    boolean isUnpublished =
-        PublicationStatus.UNPUBLISHED.equals(decision.status().publicationStatus());
-    boolean isDocOfficeBpatg =
-        "BPatG".equals(decision.coreData().documentationOffice().abbreviation());
-    boolean isMigrated = "Migration".equals(decision.managementData().createdByName());
-    return isImageHandoverEnabled && isUnpublished && isDocOfficeBpatg && !isMigrated;
-  }
-
   private List<MailAttachmentImage> getImageAttachments(Decision decision, String xml) {
-    if (!featureToggleService.isEnabled(HANDOVER_IMAGES_FEATURE_FLAG)
-        || decision == null
-        || decision.coreData() == null) {
-      return Collections.emptyList();
-    }
     List<String> jurimgFilenames = getJurimgFilenames(xml);
 
     if (jurimgFilenames.isEmpty()) {
