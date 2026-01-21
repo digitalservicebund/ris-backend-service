@@ -90,6 +90,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 @RequestMapping("api/v1/caselaw/documentunits")
 @Slf4j
 public class DocumentationUnitController {
+  public static final String X_FILENAME = "X-Filename";
   private final DocumentationUnitService service;
   private final BulkDocumentationUnitService abstractService;
   private final UserService userService;
@@ -271,10 +272,10 @@ public class DocumentationUnitController {
       return ResponseEntity.badRequest().build();
     }
 
-    if (!httpHeaders.containsHeader("X-Filename")) {
+    if (!httpHeaders.containsHeader(X_FILENAME)) {
       return ResponseEntity.badRequest().build();
     }
-    String filename = httpHeaders.getFirst("X-Filename");
+    String filename = httpHeaders.getFirst(X_FILENAME);
 
     Attachment attachment = null;
     try (InputStream is = file.getInputStream()) {
@@ -325,10 +326,10 @@ public class DocumentationUnitController {
       return ResponseEntity.badRequest().build();
     }
 
-    if (!httpHeaders.containsHeader("X-Filename")) {
+    if (!httpHeaders.containsHeader(X_FILENAME)) {
       return ResponseEntity.badRequest().build();
     }
-    String filename = httpHeaders.getFirst("X-Filename");
+    String filename = httpHeaders.getFirst(X_FILENAME);
 
     try (InputStream is = file.getInputStream()) {
       User user = userService.getUser(oidcUser);
