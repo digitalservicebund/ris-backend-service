@@ -287,7 +287,7 @@ public class S3AttachmentService implements AttachmentService {
             .filename(fileName)
             .format("docx")
             .uploadTimestamp(Instant.now())
-            .attachmentType(AttachmentType.ORIGINATING.toString())
+            .attachmentType(AttachmentType.ORIGINAL.name())
             .build();
 
     attachmentDTO = repository.save(attachmentDTO);

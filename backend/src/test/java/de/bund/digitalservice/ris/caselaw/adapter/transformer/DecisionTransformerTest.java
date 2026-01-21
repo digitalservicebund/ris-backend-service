@@ -1705,7 +1705,7 @@ class DecisionTransformerTest {
 
   @Test
   void testTransformToDomain_withAttachments_shouldOnlyAddDocxAndFmxTypes() {
-    var originatingType = AttachmentType.ORIGINATING.name();
+    var originalType = AttachmentType.ORIGINAL.name();
     var otherType = AttachmentType.OTHER.name();
     DecisionDTO decisionDTO =
         generateSimpleDTOBuilder()
@@ -1714,12 +1714,12 @@ class DecisionTransformerTest {
                     AttachmentDTO.builder()
                         .filename("foo")
                         .format("fmx")
-                        .attachmentType(originatingType)
+                        .attachmentType(originalType)
                         .build(),
                     AttachmentDTO.builder()
                         .filename("bar")
                         .format("docx")
-                        .attachmentType(originatingType)
+                        .attachmentType(originalType)
                         .build(),
                     AttachmentDTO.builder()
                         .filename("baz")

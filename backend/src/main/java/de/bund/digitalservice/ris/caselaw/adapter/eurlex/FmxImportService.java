@@ -145,7 +145,7 @@ public class FmxImportService implements TransformationService {
             .filename("Originalentscheidung")
             .format("fmx")
             .uploadTimestamp(Instant.now())
-            .attachmentType(AttachmentType.ORIGINATING.name())
+            .attachmentType(AttachmentType.ORIGINAL.name())
             .build();
 
     attachmentRepository.save(attachmentDTO);

@@ -281,7 +281,7 @@ public class DocumentationUnitController {
       User user = userService.getUser(oidcUser);
       attachment =
           attachmentService.streamFileToDocumentationUnit(
-              uuid, is, filename, user, AttachmentType.ORIGINATING);
+              uuid, is, filename, user, AttachmentType.ORIGINAL);
     } catch (IOException e) {
       log.error("Error reading uploaded file for documentation unit {}", uuid, e);
       return ResponseEntity.internalServerError().build();

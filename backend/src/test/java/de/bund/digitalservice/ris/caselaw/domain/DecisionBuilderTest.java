@@ -21,7 +21,7 @@ class DecisionBuilderTest {
             AttachmentDTO.builder()
                 .filename("doc.docx")
                 .format("docx")
-                .attachmentType(AttachmentType.ORIGINATING.name())
+                .attachmentType(AttachmentType.ORIGINAL.name())
                 .build()));
     documentationUnitDTO.setGrounds("reasons123");
     documentationUnitDTO.setDocumentationOffice(DocumentationOfficeDTO.builder().build());
