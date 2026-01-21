@@ -96,6 +96,7 @@ test.describe(
         })
       },
     )
+
     test(
       "add, edit, delete note, and default opening and display logic",
       {
@@ -237,6 +238,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
       // DS does not export note field, that's why we need BGH user here
       async ({ pageWithBghUser, prefilledDocumentUnitBgh }) => {
         const documentNumber = prefilledDocumentUnitBgh.documentNumber!
+
         await test.step("Confirm note is exported in XML on handover page", async () => {
           await navigateToHandover(pageWithBghUser, documentNumber)
           await expect(pageWithBghUser.getByText("XML Vorschau")).toBeVisible()

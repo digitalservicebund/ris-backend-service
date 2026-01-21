@@ -172,6 +172,7 @@ test.describe(
         })
       },
     )
+
     test(
       "Docoffice is empty and has to be set manually when new decision has empty court",
       {
@@ -297,6 +298,7 @@ test.describe(
         await deleteDocumentUnit(page, documentNumber)
       },
     )
+    // eslint-disable-next-line playwright/consistent-spacing-between-blocks
     ;[
       {
         type: "Rechtsprechung",

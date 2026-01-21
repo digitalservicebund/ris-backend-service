@@ -65,6 +65,7 @@ test.describe("deviating document numbers", () => {
       })
 
       await save(page)
+
       await test.step("Expect all three deviating document numbers to be visible in preview", async () => {
         await navigateToPreview(page, documentNumber)
         await expect(

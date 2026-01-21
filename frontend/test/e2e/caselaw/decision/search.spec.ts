@@ -119,9 +119,11 @@ test.describe("Große Suche nach Entscheidungen", () => {
   test("Suche nach Gerichtstyp", async ({ page, decisions }) => {
     const { fileNumberPrefix, createdDecisions } = decisions
     await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
+
     await test.step("Wähle Gerichtstyp 'BFH' in Suche", async () => {
       await fillInput(page, "Gerichtstyp Suche", "BFH")
     })
+
     await triggerSearch(page)
     const docUnitSearchResults = createdDecisions.filter(
       (p) => p.coreData.court?.label === "BFH",
@@ -132,9 +134,11 @@ test.describe("Große Suche nach Entscheidungen", () => {
   test("Suche nach Gerichtsort", async ({ page, decisions }) => {
     const { fileNumberPrefix, createdDecisions } = decisions
     await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
+
     await test.step("Wähle Gerichtsort 'Aachen' in Suche", async () => {
       await fillInput(page, "Gerichtsort Suche", "Aachen")
     })
+
     await triggerSearch(page)
     const docUnitSearchResults = createdDecisions.filter(
       (p) => p.coreData.court?.label === "AG Aachen",
@@ -146,9 +150,11 @@ test.describe("Große Suche nach Entscheidungen", () => {
     const { fileNumberPrefix, createdDecisions } = decisions
     await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
     const docNumber = createdDecisions[4].documentNumber
+
     await test.step(`Wähle Dokumentnummer '${docNumber}' in Suche`, async () => {
       await fillInput(page, "Dokumentnummer Suche", docNumber)
     })
+
     await triggerSearch(page)
     const docUnitSearchResults = createdDecisions.filter(
       (p) => p.documentNumber === docNumber,
@@ -159,25 +165,31 @@ test.describe("Große Suche nach Entscheidungen", () => {
   test("Suche nach Status", async ({ page }) => {
     await navigateToSearch(page)
     await fillInput(page, "Dokumentnummer Suche", "YYTestDoc001")
+
     await test.step(`Wähle Status 'Veröffentlicht' in Suche`, async () => {
       await page.getByLabel("Status Suche").click()
       await page
         .getByRole("option", { name: "Veröffentlicht", exact: true })
         .click()
     })
+
     await triggerSearch(page)
+
     await test.step(`Prüfe, dass 5 Ergebnisse gefunden wurde`, async () => {
       await expect(page.getByText("5 Ergebnisse gefunden")).toBeVisible()
       //Veröffentlicht Status kann nur übers seeding script generiert werden
       await expect(page.getByText("YYTestDoc0013")).toBeVisible()
     })
+
     await test.step(`Setze Status-Filter zurück`, async () => {
       await page.getByLabel("Status Suche").click()
       await page
         .getByRole("option", { name: "Nicht ausgewählt", exact: true })
         .click()
     })
+
     await triggerSearch(page)
+
     await test.step(`Prüfe, dass 7 Ergebnisse gefunden wurden`, async () => {
       await expect(page.getByText("7 Ergebnisse gefunden")).toBeVisible()
     })
@@ -186,9 +198,11 @@ test.describe("Große Suche nach Entscheidungen", () => {
   test("Suche nach Entscheidungsdatum", async ({ page, decisions }) => {
     const { fileNumberPrefix, createdDecisions } = decisions
     await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
+
     await test.step("Wähle Entscheidungsdatum '02.01.2023' in Suche", async () => {
       await fillInput(page, "Entscheidungsdatum Suche", "02.01.2023")
     })
+
     await triggerSearch(page)
     const docUnitSearchResultsSpecificDate = createdDecisions.filter(
       (p) => p.coreData.decisionDate === "2023-01-02",
@@ -198,6 +212,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
     await test.step("Wähle Entsheidungsdatum Ende '31.01.2023' in Suche", async () => {
       await fillInput(page, "Entscheidungsdatum Suche Ende", "31.01.2023")
     })
+
     await triggerSearch(page)
     const docUnitSearchResultsDateRange = createdDecisions.filter(
       (p) =>
@@ -225,6 +240,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
           .getByRole("option", { name: "Ersterfassung", exact: true })
           .click()
       })
+
       await triggerSearch(page)
 
       await test.step(`Prüfe, dass alle Ergebnisse gefunden wurden`, async () => {
@@ -246,6 +262,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
         await page.getByLabel("Prozessschritt").click()
         await page.getByRole("option", { name: "Fertig", exact: true }).click()
       })
+
       await triggerSearch(page)
 
       await test.step(`Prüfe, dass keine Ergebnisse gefunden wurde`, async () => {
@@ -253,12 +270,14 @@ test.describe("Große Suche nach Entscheidungen", () => {
           page.getByText("Keine Suchergebnisse gefunden"),
         ).toBeVisible()
       })
+
       await test.step(`Setze Schritt-Filter zurück`, async () => {
         await page.getByLabel("Prozessschritt").click()
         await page
           .getByRole("option", { name: "Nicht ausgewählt", exact: true })
           .click()
       })
+
       await triggerSearch(page)
 
       await test.step(`Prüfe, dass alle Ergebnisse gefunden wurden`, async () => {
@@ -428,6 +447,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
 
   test("Datumsvalidierung", async ({ page }) => {
     await navigateToSearch(page)
+
     await test.step("Wähle Entscheidungsdatum Ende '02.01.2023' in Suche", async () => {
       await fillInput(page, "Entscheidungsdatum Suche Ende", "02.01.2022")
       await page.getByLabel("Entscheidungsdatum Suche Ende").blur()
@@ -640,12 +660,14 @@ test.describe("Große Suche nach Entscheidungen", () => {
   test("Entscheidung neu erstellen und löschen", async ({ page }) => {
     const fileNumber = generateString()
     await navigateToSearch(page)
+
     await test.step("Klicke auf 'Neue Entscheidung'", async () => {
       await page
         .getByRole("button", { name: "Neue Entscheidung" })
         .first()
         .click()
     })
+
     await test.step("Öffnet Rubriken von neuer Entscheidung", async () => {
       await expect(page).toHaveURL(
         /\/caselaw\/documentunit\/[A-Z0-9]{13}\/attachments$/,
@@ -660,9 +682,11 @@ test.describe("Große Suche nach Entscheidungen", () => {
         }),
       ).toBeVisible()
     })
+
     await navigateToCategories(page, documentNumberToBeDeleted!, {
       navigationBy: "click",
     })
+
     await test.step("Setze eindeutiges Aktenzeichen", async () => {
       await page
         .getByLabel("Aktenzeichen")
@@ -670,6 +694,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
         .fill(fileNumber)
       await save(page)
     })
+
     await test.step("Suche nach neuer Dokumentnummer", async () => {
       await navigateToSearch(page, { navigationBy: "click" })
       await fillInput(page, "Dokumentnummer Suche", documentNumberToBeDeleted)
@@ -677,13 +702,16 @@ test.describe("Große Suche nach Entscheidungen", () => {
       await fillInput(page, "Aktenzeichen Suche", fileNumber)
       await triggerSearch(page)
     })
+
     await test.step(`Prüfe, dass 1 Ergebnis gefunden wurde`, async () => {
       await expect(page.getByText("1 Ergebnis gefunden")).toBeVisible()
       await expect(page.getByText(documentNumberToBeDeleted!)).toBeVisible()
     })
+
     await test.step("Lösche Entscheidung", async () => {
       await deleteDocumentUnit(page, documentNumberToBeDeleted!)
     })
+
     await test.step("Suche nach neuer Dokumentnummer ergibt kein Ergebnis", async () => {
       await navigateToSearch(page, { navigationBy: "click" })
       await fillInput(page, "Dokumentnummer Suche", documentNumberToBeDeleted)
@@ -700,12 +728,14 @@ test.describe("Große Suche nach Entscheidungen", () => {
   test("Neuanlage aus Suche", { tag: ["@RISDEV-7139"] }, async ({ page }) => {
     const fileNumber = generateString()
     await navigateToSearch(page)
+
     await test.step("Suche nach Gericht, Datum und Aktenzeichen", async () => {
       await fillInput(page, "Aktenzeichen Suche", fileNumber)
       await fillInput(page, "Gerichtstyp Suche", "BFH")
       await fillInput(page, "Entscheidungsdatum Suche", "05.07.2022")
       await triggerSearch(page)
     })
+
     await test.step("Ohne Ergebnisse kann Neuanlage aus Suchparametern erfolgen", async () => {
       await expect(
         page.getByText("folgenden Formaldaten übernehmen"),
@@ -714,11 +744,13 @@ test.describe("Große Suche nach Entscheidungen", () => {
         page.getByText(`${fileNumber}, BFH, 05.07.2022`),
       ).toBeVisible()
     })
+
     await test.step("Klicke 'Übernehmen und fortfahren'", async () => {
       await page
         .getByRole("button", { name: "Übernehmen und fortfahren" })
         .click()
     })
+
     await test.step("Öffnet Rubriken von neuer Entscheidung", async () => {
       await expect(page).toHaveURL(
         /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
@@ -733,6 +765,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
         }),
       ).toBeVisible()
     })
+
     await test.step("Rubriken sind bereits mit Suchparametern befüllt", async () => {
       await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
         "BFH",

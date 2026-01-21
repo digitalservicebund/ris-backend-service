@@ -156,6 +156,7 @@ test.describe(
             page.getByText("WdG " + citation2 + " (ST)"),
           ).toBeVisible()
         })
+
         await save(page)
 
         await test.step("Add third reference, verify that it is shown in the list", async () => {
@@ -175,7 +176,9 @@ test.describe(
             page.getByText("AllMBl " + citation3 + " (L)"),
           ).toBeVisible()
         })
+
         await save(page)
+
         await test.step("Delete second of 3 reference and verify it disappears, order of remaining items stays the same", async () => {
           await page.getByTestId("list-entry-1").click()
           await page.getByLabel("Eintrag löschen", { exact: true }).click()
@@ -201,6 +204,7 @@ test.describe(
             page.getByText("GVBl BB " + citation1 + " (S)"),
           ).toBeVisible()
         })
+
         await test.step("Delete last reference and verify the list is empty", async () => {
           await page.getByTestId("list-entry-0").click()
           await page.getByLabel("Eintrag löschen", { exact: true }).click()
@@ -245,6 +249,7 @@ test.describe(
             2,
           )
         })
+
         await test.step("Add 'Periodikum' removes error there, but still shows error for 'Zitatstelle'", async () => {
           await fillInput(page, "Periodikum", "wdg")
           await page
@@ -257,11 +262,13 @@ test.describe(
             1,
           )
         })
+
         await test.step("Add 'Zitatstelle' removes error, reference can be saved", async () => {
           await fillInput(page, "Zitatstelle", citation)
           await page.getByLabel("Fundstelle speichern", { exact: true }).click()
           await expect(page.getByText("Pflichtfeld nicht befüllt")).toBeHidden()
         })
+
         await test.step("Add 'Periodikum' with empty Klammernzusatz (referenceSupplement)", async () => {
           await fillInput(page, "Periodikum", "wdg")
           await fillInput(page, "Zitatstelle", citation)

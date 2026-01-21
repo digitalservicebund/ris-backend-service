@@ -181,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.41.9"))
+    implementation(platform("software.amazon.awssdk:bom:2.41.10"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -222,7 +222,7 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260102.1")
 
-    implementation("io.getunleash:unleash-client-java:11.2.1")
+    implementation("io.getunleash:unleash-client-java:12.0.1")
     implementation("org.apache.commons:commons-text:1.15.0")
     implementation("org.jsoup:jsoup:1.22.1")
 

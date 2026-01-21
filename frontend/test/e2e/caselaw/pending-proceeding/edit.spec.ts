@@ -228,8 +228,7 @@ test.describe("edit pending proceeding", () => {
           "ul.m-0.flex.flex-row.flex-wrap.gap-8.p-0 > li",
         )
         await expect(listItems).toHaveCount(keywords.length)
-        const actualTexts = await listItems.allTextContents()
-        expect(actualTexts).toEqual(keywords)
+        await expect(listItems).toContainText(keywords)
       })
 
       await test.step("In der Vorschau stehen alle Schlagwörter korrekt", async () => {
@@ -238,8 +237,7 @@ test.describe("edit pending proceeding", () => {
           "div.ris-body1-regular.text-black > div",
         )
         await expect(actualKeywords).toHaveCount(keywords.length)
-        const actualTexts = await actualKeywords.allTextContents()
-        expect(actualTexts).toEqual(keywords)
+        await expect(actualKeywords).toContainText(keywords)
       })
 
       await test.step("Ersetze das Schlagwort „Prod:Release;V2.0“ durch das Schlagwort „Special_Quotes”.", async () => {
@@ -262,8 +260,7 @@ test.describe("edit pending proceeding", () => {
           "ul.m-0.flex.flex-row.flex-wrap.gap-8.p-0 > li",
         )
         await expect(listItems).toHaveCount(newKeywords.length)
-        const actualTexts = await listItems.allTextContents()
-        expect(actualTexts).toEqual(newKeywords)
+        await expect(listItems).toContainText(newKeywords)
       })
 
       await test.step("In der Vorschau stehen alle neuen Schlagwörter korrekt.", async () => {
@@ -272,8 +269,7 @@ test.describe("edit pending proceeding", () => {
           "div.ris-body1-regular.text-black > div",
         )
         await expect(actualKeywords).toHaveCount(newKeywords.length)
-        const actualTexts = await actualKeywords.allTextContents()
-        expect(actualTexts).toEqual(newKeywords)
+        await expect(actualKeywords).toContainText(newKeywords)
       })
 
       await test.step("Die Schlagwörter werden alphabetisch sortiert übernommen.", async () => {
@@ -289,8 +285,7 @@ test.describe("edit pending proceeding", () => {
           "ul.m-0.flex.flex-row.flex-wrap.gap-8.p-0 > li",
         )
         await expect(listItems).toHaveCount(newKeywordsAlphabetically.length)
-        const actualTexts = await listItems.allTextContents()
-        expect(actualTexts).toEqual(newKeywordsAlphabetically)
+        await expect(listItems).toContainText(newKeywordsAlphabetically)
       })
 
       await test.step("In der Vorschau stehen alle Schlagwörter alphabetisch korrekt.", async () => {
@@ -301,8 +296,7 @@ test.describe("edit pending proceeding", () => {
         await expect(actualKeywords).toHaveCount(
           newKeywordsAlphabetically.length,
         )
-        const actualTexts = await actualKeywords.allTextContents()
-        expect(actualTexts).toEqual(newKeywordsAlphabetically)
+        await expect(actualKeywords).toContainText(newKeywordsAlphabetically)
       })
 
       await test.step("Lösche alle Schlagwörter.", async () => {
@@ -343,8 +337,7 @@ test.describe("edit pending proceeding", () => {
           "ul.m-0.flex.flex-row.flex-wrap.gap-8.p-0 > li",
         )
         await expect(listItems).toHaveCount(1)
-        const actualTexts = await listItems.allTextContents()
-        expect(actualTexts).toEqual(["TestDuplicat?"])
+        await expect(listItems).toContainText("TestDuplicat?")
       })
 
       await test.step("In der Vorschau ist das Schlagwort nur einmal aufgelistet.", async () => {
@@ -353,8 +346,7 @@ test.describe("edit pending proceeding", () => {
           "div.ris-body1-regular.text-black > div",
         )
         await expect(actualKeywords).toHaveCount(1)
-        const actualTexts = await actualKeywords.allTextContents()
-        expect(actualTexts).toEqual(["TestDuplicat?"])
+        await expect(actualKeywords).toContainText("TestDuplicat?")
       })
     },
   )

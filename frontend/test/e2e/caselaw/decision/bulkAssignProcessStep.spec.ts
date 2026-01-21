@@ -41,6 +41,7 @@ test.describe(
       decisions,
     }) => {
       const { fileNumberPrefix, createdDecisions } = decisions
+
       // all new doc units are created with step Ersterfassung
       await test.step(`Wähle Schritt 'Ersterfassung'`, async () => {
         await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
@@ -176,6 +177,7 @@ test.describe(
       decisions,
     }) => {
       const { fileNumberPrefix, createdDecisions } = decisions
+
       // all new doc units are created with step Ersterfassung
       await test.step(`Wähle Schritt 'Ersterfassung'`, async () => {
         await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
@@ -274,6 +276,7 @@ test.describe(
       pageWithBghUser,
     }) => {
       const publishedDocnumberDS = "YYTestDoc0001"
+
       await test.step("Nach Dokeinheit einer fremden Dokstelle suchen", async () => {
         await navigateToSearch(pageWithBghUser)
         await pageWithBghUser
@@ -316,6 +319,7 @@ test.describe(
       decisions,
     }) => {
       const { fileNumberPrefix, createdDecisions } = decisions
+
       // all new doc units are created with step Ersterfassung
       await test.step(`Starte Suche`, async () => {
         await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
@@ -363,6 +367,7 @@ test.describe(
       decisions,
     }) => {
       const { fileNumberPrefix, createdDecisions } = decisions
+
       // all new doc units are created with step Ersterfassung
       await test.step(`Starte Suche`, async () => {
         await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
@@ -426,6 +431,7 @@ test.describe(
       decisions,
     }) => {
       const { fileNumberPrefix, createdDecisions } = decisions
+
       // all new doc units are created with step Ersterfassung
       await test.step(`Starte Suche`, async () => {
         await openSearchWithFileNumberPrefix(fileNumberPrefix, page)

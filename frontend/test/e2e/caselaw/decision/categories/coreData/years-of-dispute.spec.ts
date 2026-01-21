@@ -155,6 +155,7 @@ test.describe(
         }
 
         await save(page)
+
         await test.step("Expect all three years to be visible in preview", async () => {
           await navigateToPreview(page, documentNumber)
           for (const year of testData) {
