@@ -60,7 +60,7 @@ We want to create new tables to better organize the references. For each type of
     * This table does not exist in our (caselaw) database.
 * `citation_sli_to_caselaw_blindlink_passive`
     * An SLI cites a caselaw decision.
-    * The caselaw decision exist. The ULI does not.
+    * The caselaw decision exist. The SLI does not.
 
 ### Publishing
 
