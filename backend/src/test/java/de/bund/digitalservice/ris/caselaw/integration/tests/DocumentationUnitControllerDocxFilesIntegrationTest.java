@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
@@ -406,6 +407,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
             .uploadTimestamp(Instant.now())
             .filename("fooFile")
             .format("docx")
+            .attachmentType(AttachmentType.OTHER.name())
             .build());
 
     assertThat(attachmentRepository.findAll()).hasSize(1);
@@ -462,6 +464,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
             .uploadTimestamp(Instant.now())
             .filename("fooFile")
             .format("docx")
+            .attachmentType(AttachmentType.OTHER.name())
             .build());
 
     assertThat(attachmentRepository.findAll()).hasSize(1);
@@ -544,6 +547,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
             .uploadTimestamp(Instant.now())
             .filename("fooFile")
             .format("docx")
+            .attachmentType(AttachmentType.OTHER.name())
             .build());
 
     assertThat(attachmentRepository.findAll()).hasSize(1);
