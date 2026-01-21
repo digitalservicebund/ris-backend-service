@@ -277,5 +277,9 @@
   "NEXT_PROCESS_STEP_FOR_DOCUMENATION_UNIT_COULD_NOT_BE_LOADED": {
     "title": "Der nächste Schritt konnte nicht geladen werden.",
     "description": "Wählen Sie einen Schritt aus der Liste aus oder öffnen Sie den Dialog erneut."
+  },
+  "PATCH_SIZE_TOO_BIG": {
+    "title": "Letzte Änderung überschreitet Speicherlimit",
+    "description": "Machen Sie die Änderung rückgängig und reduzieren Sie die Datengröße [z.B. Bild(er) komprimieren]."
   }
 }
