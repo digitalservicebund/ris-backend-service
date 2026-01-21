@@ -355,6 +355,7 @@ test.describe(
       const suffix = edition.suffix || ""
       await navigateToPeriodicalReferences(page, edition.id || "")
       const secondPage = await context.newPage()
+
       await test.step("Open up edition on second page", async () => {
         await navigateToPeriodicalReferences(secondPage, edition.id)
         await expect(secondPage.getByLabel("Listen Eintrag")).toHaveCount(1)
@@ -410,6 +411,7 @@ test.describe(
       context,
     }) => {
       const suffix = editionWithReferences.suffix || ""
+
       await test.step("When editing a reference, the citation is a single input containing the joined value of prefix, citation and suffix", async () => {
         const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
 

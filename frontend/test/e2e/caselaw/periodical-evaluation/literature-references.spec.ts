@@ -86,6 +86,7 @@ test.describe("Literature references", () => {
     },
     async ({ page, prefilledDocumentUnit, edition }) => {
       const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
+
       await test.step("Literature references are validated for required inputs", async () => {
         await navigateToPeriodicalReferences(page, edition.id || "")
         await page.getByLabel("Literatur Fundstelle").click()

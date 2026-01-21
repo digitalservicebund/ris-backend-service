@@ -51,6 +51,7 @@ test.describe(
           page.getByRole("button", { name: "Kündigung" }),
         ).toBeVisible()
       })
+
       await page.getByRole("button", { name: "Kündigung" }).click()
 
       await test.step("enter dismissal type", async () => {
@@ -74,6 +75,7 @@ test.describe(
           page.getByLabel("Kündigungsgründe").getByRole("listitem"),
         ).toHaveText("Einführung neuer Technologien")
       })
+
       await save(page)
 
       await test.step("XML preview should display 'Kündigungs' fields in 'paratrubriken'", async () => {

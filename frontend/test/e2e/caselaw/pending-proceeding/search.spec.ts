@@ -62,9 +62,11 @@ test.describe(
         pageWithBfhUser,
         Kind.PENDING_PROCEEDING,
       )
+
       await test.step("Wähle Gerichtstyp 'BFH' in Suche", async () => {
         await fillInput(pageWithBfhUser, "Gerichtstyp Suche", "BFH")
       })
+
       await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResults = createdPendingProceedings.filter(
         (p) => p.coreData.court?.label === "BFH",
@@ -82,9 +84,11 @@ test.describe(
         pageWithBfhUser,
         Kind.PENDING_PROCEEDING,
       )
+
       await test.step("Wähle Gerichtsort 'Aachen' in Suche", async () => {
         await fillInput(pageWithBfhUser, "Gerichtsort Suche", "Aachen")
       })
+
       await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResults = createdPendingProceedings.filter(
         (p) => p.coreData.court?.label === "AG Aachen",
@@ -102,9 +106,11 @@ test.describe(
         pageWithBfhUser,
         Kind.PENDING_PROCEEDING,
       )
+
       await test.step("Wähle Mitteilungsdatum '02.01.2023' in Suche", async () => {
         await fillInput(pageWithBfhUser, "Mitteilungsdatum Suche", "02.01.2023")
       })
+
       await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResultsSpecificDate = createdPendingProceedings.filter(
         (p) => p.coreData.decisionDate === "2023-01-02",
@@ -121,6 +127,7 @@ test.describe(
           "31.01.2023",
         )
       })
+
       await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResultsDateRange = createdPendingProceedings.filter(
         (p) =>
@@ -142,6 +149,7 @@ test.describe(
         pageWithBfhUser,
         Kind.PENDING_PROCEEDING,
       )
+
       await test.step("Wähle Erledigungsmitteilung '01.01.2024' in Suche", async () => {
         await fillInput(
           pageWithBfhUser,
@@ -149,6 +157,7 @@ test.describe(
           "01.01.2024",
         )
       })
+
       await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResultsSpecificDate = createdPendingProceedings.filter(
         (p) => p.coreData.resolutionDate === "2024-01-01",
@@ -165,6 +174,7 @@ test.describe(
           "30.12.2024",
         )
       })
+
       await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResultsDateRange = createdPendingProceedings.filter(
         (p) =>
@@ -187,11 +197,13 @@ test.describe(
         pageWithBfhUser,
         Kind.PENDING_PROCEEDING,
       )
+
       await test.step("Wähle Erledigt Checkbox in Suche aus", async () => {
         await pageWithBfhUser
           .getByRole("checkbox", { name: "Erledigt Filter" })
           .check()
       })
+
       await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResults = createdPendingProceedings.filter(
         (p) => p.coreData.isResolved,
@@ -210,9 +222,11 @@ test.describe(
         Kind.PENDING_PROCEEDING,
       )
       const docNumber = createdPendingProceedings[4].documentNumber
+
       await test.step(`Wähle Dokumentnummer '${docNumber}' in Suche`, async () => {
         await fillInput(pageWithBfhUser, "Dokumentnummer Suche", docNumber)
       })
+
       await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResults = createdPendingProceedings.filter(
         (p) => p.documentNumber === docNumber,
@@ -230,13 +244,16 @@ test.describe(
         pageWithBfhUser,
         Kind.PENDING_PROCEEDING,
       )
+
       await test.step(`Wähle Status 'Veröffentlicht' in Suche`, async () => {
         await pageWithBfhUser.getByLabel("Status Suche").click()
         await pageWithBfhUser
           .getByRole("option", { name: "Veröffentlicht", exact: true })
           .click()
       })
+
       await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
+
       await test.step(`Prüfe, dass 1 Ergebnis gefunden wurde`, async () => {
         await expect(
           pageWithBfhUser.getByText("1 Ergebnis gefunden"),
@@ -258,12 +275,14 @@ test.describe(
         pageWithBfhUser,
         Kind.PENDING_PROCEEDING,
       )
+
       await test.step("Klicke auf 'Neues anhängiges Verfahren'", async () => {
         await pageWithBfhUser
           .getByRole("button", { name: "Neues Anhängiges Verfahren" })
           .first()
           .click()
       })
+
       await test.step("Öffnet Rubriken von neuem Anhängigem Verfahren", async () => {
         await expect(pageWithBfhUser).toHaveURL(
           /\/caselaw\/pending-proceeding\/[A-Z0-9]{13}\/categories$/,
@@ -278,6 +297,7 @@ test.describe(
           }),
         ).toBeVisible()
       })
+
       await test.step("Suche nach neuer Dokumentnummer", async () => {
         await openSearchWithFileNumberPrefix(
           "",
@@ -291,6 +311,7 @@ test.describe(
         )
         await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       })
+
       await test.step(`Prüfe, dass 1 Ergebnis gefunden wurde`, async () => {
         await expect(
           pageWithBfhUser.getByText("1 Ergebnis gefunden"),
@@ -299,9 +320,11 @@ test.describe(
           pageWithBfhUser.getByText(documentNumberToBeDeleted!),
         ).toBeVisible()
       })
+
       await test.step("Lösche Anhängiges Verfahren", async () => {
         await deleteDocumentUnit(pageWithBfhUser, documentNumberToBeDeleted!)
       })
+
       await test.step("Suche nach neuer Dokumentnummer ergibt kein Ergebnis", async () => {
         await openSearchWithFileNumberPrefix(
           "",
@@ -327,12 +350,14 @@ test.describe(
         pageWithBfhUser,
         Kind.PENDING_PROCEEDING,
       )
+
       await test.step("Suche nach Gericht, Datum und Aktenzeichen", async () => {
         await fillInput(pageWithBfhUser, "Aktenzeichen Suche", fileNumber)
         await fillInput(pageWithBfhUser, "Gerichtstyp Suche", "BFH")
         await fillInput(pageWithBfhUser, "Mitteilungsdatum Suche", "05.07.2022")
         await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       })
+
       await test.step("Ohne Ergebnisse kann Neuanlage aus Suchparametern erfolgen", async () => {
         await expect(
           pageWithBfhUser.getByText("folgenden Formaldaten übernehmen"),
@@ -341,11 +366,13 @@ test.describe(
           pageWithBfhUser.getByText(`${fileNumber}, BFH, 05.07.2022`),
         ).toBeVisible()
       })
+
       await test.step("Klicke 'Übernehmen und fortfahren'", async () => {
         await pageWithBfhUser
           .getByRole("button", { name: "Übernehmen und fortfahren" })
           .click()
       })
+
       await test.step("Öffnet Rubriken von neuem Anhängigem Verfahren", async () => {
         await expect(pageWithBfhUser).toHaveURL(
           /\/caselaw\/pending-proceeding\/[A-Z0-9]{13}\/categories$/,
@@ -360,6 +387,7 @@ test.describe(
           }),
         ).toBeVisible()
       })
+
       await test.step("Rubriken sind bereits mit Suchparametern befüllt", async () => {
         await expect(
           pageWithBfhUser.getByLabel("Gericht", { exact: true }),
@@ -374,6 +402,7 @@ test.describe(
           pageWithBfhUser.getByLabel("Aktenzeichen").getByRole("listitem"),
         ).toHaveText(fileNumber)
       })
+
       await test.step("Lösche Entscheidung", async () => {
         await deleteDocumentUnit(pageWithBfhUser, documentNumberToBeDeleted!)
       })
@@ -383,6 +412,7 @@ test.describe(
       pageWithBghUser,
     }) => {
       await navigateToSearch(pageWithBghUser)
+
       await test.step("Es werden keine Tabs angezeigt", async () => {
         await expect(
           pageWithBghUser.getByTestId("search-tab-pending-proceeding"),
