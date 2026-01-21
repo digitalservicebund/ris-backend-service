@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
-import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
@@ -55,8 +54,6 @@ public class HandoverMailService implements MailService {
 
   private final Environment env;
 
-  private final FeatureToggleService featureToggleService;
-
   @Value("${mail.exporter.senderAddress:export.test@neuris}")
   private String senderAddress;
 
@@ -68,14 +65,12 @@ public class HandoverMailService implements MailService {
       HttpMailSender mailSender,
       HandoverRepository repository,
       DatabaseAttachmentInlineRepository attachmentInlineRepository,
-      Environment env,
-      FeatureToggleService featureToggleService) {
+      Environment env) {
     this.xmlExporter = xmlExporter;
     this.mailSender = mailSender;
     this.repository = repository;
     this.attachmentInlineRepository = attachmentInlineRepository;
     this.env = env;
-    this.featureToggleService = featureToggleService;
   }
 
   /**
