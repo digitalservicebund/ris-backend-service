@@ -1,4 +1,5 @@
 import { computed, onUnmounted, ref } from "vue"
+import errorMessages from "@/i18n/errors.json"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -33,8 +34,24 @@ export function useSaveToRemote(autoSaveInterval = 0) {
       if (lastSaveError.value == undefined) {
         lastSavedOn.value = new Date()
       }
-    } catch {
-      lastSaveError.value = { title: "Verbindung fehlgeschlagen" }
+    } catch (e) {
+      const isPatchSizeTooBig =
+        e instanceof Error &&
+        e.message === errorMessages.PATCH_SIZE_TOO_BIG.title
+      if (isPatchSizeTooBig) {
+        const isNewError =
+          lastSaveError.value?.title !== errorMessages.PATCH_SIZE_TOO_BIG.title
+        if (isNewError) {
+          alert(
+            errorMessages.PATCH_SIZE_TOO_BIG.title +
+              ": " +
+              errorMessages.PATCH_SIZE_TOO_BIG.description,
+          )
+        }
+        lastSaveError.value = errorMessages.PATCH_SIZE_TOO_BIG
+      } else {
+        lastSaveError.value = { title: "Verbindung fehlgeschlagen" }
+      }
     } finally {
       saveIsInProgress.value = false
     }
