@@ -7,7 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AttachmentInlineRepository extends JpaRepository<AttachmentInlineDTO, UUID> {
+public interface DatabaseAttachmentInlineRepository
+    extends JpaRepository<AttachmentInlineDTO, UUID> {
   List<AttachmentInlineDTO> findAllByDocumentationUnitId(UUID documentationUnitId);
 
   Optional<AttachmentInlineDTO> findByDocumentationUnitIdAndFilename(

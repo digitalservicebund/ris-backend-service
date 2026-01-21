@@ -82,13 +82,17 @@ test.describe(
       await test.step("Check and reset warning on other doc unit", async () => {
         const prefilledDocNumber = prefilledDocumentUnit.documentNumber
         await navigateToManagementData(page, prefilledDocNumber)
+
         await test.step("Duplicate warning should be ignored on other doc unit as well", async () => {
           await expect(page.getByLabel("Warnung ignorieren")).toBeChecked()
         })
+
         await expectNoDuplicateWarning(page)
+
         await test.step("Reset duplicate warning", async () => {
           await page.getByLabel("Warnung ignorieren").uncheck()
         })
+
         await expectDuplicateWarning(page)
       })
     })

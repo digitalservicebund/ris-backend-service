@@ -29,6 +29,7 @@ test.describe(
           name: "Fremdsprachige Fassung",
         },
       )
+
       await test.step("Fremdsprachige Fassung wird in den weiteren Rubriken angezeigt", async () => {
         await expect(foreignLanguageVersionButton).toBeVisible()
         await expect(otherCategoriesContainer.getByText("Sprache")).toBeHidden()

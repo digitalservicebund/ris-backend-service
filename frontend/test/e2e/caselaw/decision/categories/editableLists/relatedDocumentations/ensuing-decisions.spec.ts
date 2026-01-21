@@ -27,6 +27,7 @@ test.describe("ensuing decisions", () => {
     await expect(page.getByLabel("Vermerk")).toBeVisible()
     await expect(page.getByLabel("Datum unbekannt")).toBeVisible()
   })
+
   test("change to 'anhaengig' removes date with value and vice versa", async ({
     page,
     documentNumber,

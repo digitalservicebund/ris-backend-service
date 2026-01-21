@@ -61,6 +61,7 @@ test.describe(
         { scope: "test" },
       ],
     })
+
     test(
       "Entscheidung kann veröffentlicht und zurückgezogen werden",
       {
@@ -272,6 +273,7 @@ test.describe(
         await expect(
           page.getByRole("heading", { name: "Plausibilitätsprüfung" }),
         ).toBeVisible()
+
         await test.step("Zeigt alle benötigten, nicht ausgefüllten Rubriken an", async () => {
           await expect(
             page.getByText(

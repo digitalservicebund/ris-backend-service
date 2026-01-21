@@ -23,6 +23,7 @@ test.describe("deviating decision dates", () => {
 
       await expect(page.getByText("01.02.2021")).toBeHidden()
     })
+
     await save(page)
 
     await test.step("Check if deviating decision dates are persisted in reload", async () => {

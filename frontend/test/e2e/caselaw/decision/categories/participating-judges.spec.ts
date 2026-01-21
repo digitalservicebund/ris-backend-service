@@ -29,6 +29,7 @@ test.describe(
           page.getByRole("button", { name: "Mitwirkende Richter" }),
         ).toBeVisible()
       })
+
       await page.getByRole("button", { name: "Mitwirkende Richter" }).click()
 
       await test.step("Übernehmen is disabled if name is empty", async () => {

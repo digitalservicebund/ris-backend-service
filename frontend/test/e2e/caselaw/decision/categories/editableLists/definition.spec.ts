@@ -38,6 +38,7 @@ test.describe(
       const saveDefinitionButton = page.getByRole("button", {
         name: "Definition speichern",
       })
+
       await test.step("Definition kann ohne Randnummer gespeichert werden", async () => {
         await saveDefinitionButton.click()
         await save(page)
@@ -139,6 +140,7 @@ test.describe(
         .getByRole("button", {
           name: "Eintrag löschen",
         })
+
       await test.step("Der erste Eintrag kann gelöscht werden", async () => {
         await page
           .getByTestId("Definitionen")
@@ -153,6 +155,7 @@ test.describe(
       const saveDefinitionButton = page.getByRole("button", {
         name: "Definition speichern",
       })
+
       await test.step("Der zweite Eintrag kann editiert werden", async () => {
         await page
           .getByTestId("Definitionen")
@@ -175,6 +178,7 @@ test.describe(
     }) => {
       const documentNumber = prefilledDocumentUnitWithTexts.documentNumber
       await navigateToPreview(page, documentNumber)
+
       await test.step("Definition erscheint in der Vorschau", async () => {
         await expect(
           page.getByText("Definition", { exact: true }),

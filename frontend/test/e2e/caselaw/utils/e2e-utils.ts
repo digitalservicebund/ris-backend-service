@@ -731,6 +731,7 @@ export async function assignProcedureToDocUnit(
   prefix: string,
 ) {
   let procedureName = ""
+
   await test.step("Internal user assigns new procedure to doc unit", async () => {
     await navigateToCategories(page, documentNumber)
     procedureName = generateString({ length: 10, prefix: prefix })
@@ -740,6 +741,7 @@ export async function assignProcedureToDocUnit(
       .click({ timeout: 5_000 })
     await save(page)
   })
+
   return procedureName
 }
 
@@ -1052,6 +1054,7 @@ export async function checkResultListContent(
     documentationUnits.length > 1
       ? `${documentationUnits.length} Ergebnisse gefunden`
       : "1 Ergebnis gefunden"
+
   await test.step(`Prüfe, dass ${expectedResultsCountText}`, async () => {
     await expect(page.getByText(expectedResultsCountText)).toBeVisible()
   })
@@ -1088,9 +1091,11 @@ export async function checkContentOfPendingProceedingResultRow(
       await expect(docNumberCell.locator("div > svg:first-child")).toBeHidden()
     }
   })
+
   await test.step("Dokumentnummer", async () => {
     await expect(docNumberCell).toHaveText(expectedItem.documentNumber)
   })
+
   await test.step("Gericht", async () => {
     await expect(courtCell).toHaveText(
       [expectedItem.coreData.court?.type, expectedItem.coreData.court?.location]
@@ -1098,17 +1103,20 @@ export async function checkContentOfPendingProceedingResultRow(
         .join(" ") || "-",
     )
   })
+
   await test.step("Mitteilungsdatum", async () => {
     const formattedDate = expectedItem.coreData.decisionDate
       ? dayjs(expectedItem.coreData.decisionDate).format("DD.MM.YYYY")
       : "-"
     await expect(decisionDateCell).toHaveText(formattedDate)
   })
+
   await test.step("Aktenzeichen", async () => {
     await expect(fileNumberCell).toHaveText(
       expectedItem.coreData.fileNumbers?.[0] ?? "-",
     )
   })
+
   await test.step("Veröffentlichungsstatus", async () => {
     await expect(statusCell).toHaveText("Unveröffentlicht")
   })
@@ -1149,9 +1157,11 @@ export async function checkContentOfDecisionResultRow(
       await expect(docNumberCell.locator("div > svg:first-child")).toBeHidden()
     }
   })
+
   await test.step("Dokumentnummer", async () => {
     await expect(docNumberCell).toHaveText(expectedItem.documentNumber)
   })
+
   await test.step("Gericht", async () => {
     await expect(courtCell).toHaveText(
       [expectedItem.coreData.court?.type, expectedItem.coreData.court?.location]
@@ -1159,27 +1169,32 @@ export async function checkContentOfDecisionResultRow(
         .join(" ") || "-",
     )
   })
+
   await test.step("Entscheidungsdatum", async () => {
     const formattedDate = expectedItem.coreData.decisionDate
       ? dayjs(expectedItem.coreData.decisionDate).format("DD.MM.YYYY")
       : "-"
     await expect(decisionDateCell).toHaveText(formattedDate)
   })
+
   await test.step("Aktenzeichen", async () => {
     await expect(fileNumberCell).toHaveText(
       expectedItem.coreData.fileNumbers?.[0] ?? "-",
     )
   })
+
   await test.step("Spruchkörper", async () => {
     await expect(appraisalBodyCell).toHaveText(
       expectedItem.coreData.appraisalBody ?? "-",
     )
   })
+
   await test.step("Dokumenttyp", async () => {
     await expect(documentTypCell).toHaveText(
       expectedItem.coreData.documentType?.label ?? "-",
     )
   })
+
   await test.step("Veröffentlichungsstatus", async () => {
     await expect(statusCell).toHaveText(
       expectedItem.status?.publicationStatus === PublicationState.UNPUBLISHED

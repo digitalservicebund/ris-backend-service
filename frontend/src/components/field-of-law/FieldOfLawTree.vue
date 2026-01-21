@@ -110,7 +110,7 @@ defineExpose({ collapseTree })
           aria-label="Normen anzeigen"
           data-testid="showNorms"
           label="Mit Normen"
-          label-class="ris-label2-regular"
+          label-class="ris-label1-regular"
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox v-model="showNormsModelValue" binary input-id="showNorms" />

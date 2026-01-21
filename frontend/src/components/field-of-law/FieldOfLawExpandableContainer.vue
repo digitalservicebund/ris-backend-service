@@ -98,6 +98,7 @@ export enum InputMethod {
               id="direct"
               v-model="inputMethod"
               aria-label="Direkteingabe auswählen"
+              name="input-method-group"
               size="small"
               value="direct"
             />
@@ -113,6 +114,7 @@ export enum InputMethod {
               id="search"
               v-model="inputMethod"
               aria-label="Sachgebietsuche auswählen"
+              name="input-method-group"
               size="small"
               value="search"
             />

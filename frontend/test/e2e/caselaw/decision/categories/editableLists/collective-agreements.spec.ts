@@ -29,6 +29,7 @@ test.describe(
           page.getByRole("button", { name: "Tarifvertrag" }),
         ).toBeVisible()
       })
+
       await page.getByRole("button", { name: "Tarifvertrag" }).click()
 
       await test.step("enter collective agreement", async () => {

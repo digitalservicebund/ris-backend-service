@@ -147,6 +147,7 @@ test.describe("active citations", () => {
     ).toBeVisible()
     await expect(page.getByLabel("Treffer übernehmen")).toBeEnabled()
   })
+  // eslint-disable-next-line playwright/consistent-spacing-between-blocks
   ;[
     {
       type: "Parallelentscheidung",
@@ -230,7 +231,9 @@ test.describe("active citations", () => {
           await element.dispatchEvent("mouseenter")
 
           await expect(
-            page.getByText("Zielrubrik Orientierungssatz bereits ausgefüllt"),
+            page
+              .getByText("Zielrubrik Orientierungssatz bereits ausgefüllt")
+              .last(),
           ).toBeVisible()
         })
 

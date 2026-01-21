@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, watch } from "vue"
 import type { Component } from "vue"
-import Tooltip from "../Tooltip.vue"
 import IconDropdown from "~icons/ic/baseline-arrow-drop-down"
 
 const props = defineProps<EditorButton>()
@@ -15,6 +14,13 @@ const clickedInside = ref(false)
 
 const button = ref<HTMLElement>()
 const children = ref<HTMLElement[]>([])
+
+/**
+ * Helper to format tooltip with shortcut on a new line
+ */
+const getTooltip = (label: string, shortcut?: string) => {
+  return shortcut ? `${label}\n(${shortcut})` : label
+}
 
 function onClickToggle(button: EditorButton) {
   clickedInside.value = true
@@ -64,55 +70,52 @@ export interface EditorButton {
 </script>
 
 <template>
-  <Tooltip :shortcut="shortcut" :text="ariaLabel">
-    <!-- eslint-disable vuejs-accessibility/no-static-element-interactions -->
-    <div @keydown.esc="showDropdown = false">
-      <div class="flex flex-row">
+  <!-- eslint-disable vuejs-accessibility/no-static-element-interactions -->
+  <div @keydown.esc="showDropdown = false">
+    <div class="flex flex-row">
+      <button
+        ref="button"
+        v-tooltip.bottom="getTooltip(ariaLabel, shortcut)"
+        :aria-label="ariaLabel"
+        class="focus:shadow-focus flex cursor-pointer p-8 text-blue-800 hover:bg-blue-200 focus:outline-none disabled:bg-transparent disabled:text-gray-600"
+        :class="{
+          'bg-blue-200': isActive && !childButtons,
+        }"
+        :disabled="disabled"
+        :tabindex="tabIndex"
+        @click="onClickToggle(props)"
+        @keydown.m="onClickToggle(props)"
+        @mousedown.prevent=""
+      >
+        <component :is="icon" />
+        <IconDropdown v-if="type === 'menu'" class="-mr-8" />
+      </button>
+      <div v-if="isLast" class="h-24 w-1 self-center bg-blue-300"></div>
+    </div>
+    <div
+      v-if="showDropdown"
+      class="absolute z-50 mt-1 flex flex-row items-center border-1 border-solid border-blue-800 bg-white"
+    >
+      <div v-for="(childButton, index) in childButtons" :key="index">
         <button
-          ref="button"
-          :aria-label="ariaLabel"
-          class="focus:shadow-focus flex cursor-pointer p-8 text-blue-800 hover:bg-blue-200 focus:outline-none disabled:bg-transparent disabled:text-gray-600"
+          ref="children"
+          v-tooltip.bottom="
+            getTooltip(childButton.ariaLabel, childButton.shortcut)
+          "
+          :aria-label="childButton.ariaLabel"
+          class="focus:shadow-focus z-50 cursor-pointer items-center p-8 text-blue-900 hover:bg-blue-200 focus:outline-none disabled:bg-transparent disabled:text-gray-600"
           :class="{
-            'bg-blue-200': isActive && !childButtons,
+            'bg-blue-200': isActive,
           }"
           :disabled="disabled"
           :tabindex="tabIndex"
-          @click="onClickToggle(props)"
-          @keydown.m="onClickToggle(props)"
+          @click="emits('toggle', childButton)"
+          @keydown.m="emits('toggle', childButton)"
           @mousedown.prevent=""
         >
-          <component :is="icon" />
-          <IconDropdown v-if="type === 'menu'" class="-mr-8" />
+          <component :is="childButton.icon" />
         </button>
-        <div v-if="isLast" class="h-24 w-1 self-center bg-blue-300"></div>
-      </div>
-      <div
-        v-if="showDropdown"
-        class="absolute z-50 mt-1 flex flex-row items-center border-1 border-solid border-blue-800 bg-white"
-      >
-        <div v-for="(childButton, index) in childButtons" :key="index">
-          <Tooltip
-            :shortcut="childButton.shortcut"
-            :text="childButton.ariaLabel"
-          >
-            <button
-              ref="children"
-              :aria-label="childButton.ariaLabel"
-              class="focus:shadow-focus z-50 cursor-pointer items-center p-8 text-blue-900 hover:bg-blue-200 focus:outline-none disabled:bg-transparent disabled:text-gray-600"
-              :class="{
-                'bg-blue-200': isActive,
-              }"
-              :disabled="disabled"
-              :tabindex="tabIndex"
-              @click="emits('toggle', childButton)"
-              @keydown.m="emits('toggle', childButton)"
-              @mousedown.prevent=""
-            >
-              <component :is="childButton.icon" />
-            </button>
-          </Tooltip>
-        </div>
       </div>
     </div>
-  </Tooltip>
+  </div>
 </template>

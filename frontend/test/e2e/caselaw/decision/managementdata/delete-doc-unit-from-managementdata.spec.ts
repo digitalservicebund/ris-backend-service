@@ -18,6 +18,7 @@ test.describe(
       let documentNumber: string
       const fileNumber = "e2e-" + generateString()
       await navigateToSearch(page)
+
       await test.step("Erstelle neue Dokumentationseinheit", async () => {
         await page
           .getByRole("button", {
@@ -46,6 +47,7 @@ test.describe(
       await navigateToManagementData(page, documentNumber!, {
         navigationBy: "click",
       })
+
       await test.step("Lösche die Dokumentationseinheit", async () => {
         await page
           .getByRole("button", { name: "Dokumentationseinheit löschen" })

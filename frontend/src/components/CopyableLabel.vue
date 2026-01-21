@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from "vue"
-import Tooltip from "@/components/Tooltip.vue"
+import Button from "primevue/button"
+import { ref, computed } from "vue"
 import IconBaselineContentCopy from "~icons/ic/baseline-content-copy"
 import IconCheckRounded from "~icons/material-symbols/check-rounded"
 
@@ -31,6 +31,10 @@ const props = withDefaults(
 
 const copySuccess = ref(false)
 
+const tooltipText = computed(() =>
+  copySuccess.value ? "Kopiert!" : "Kopieren",
+)
+
 async function copy() {
   try {
     await navigator.clipboard.writeText(props.value ?? props.text)
@@ -45,20 +49,23 @@ async function copy() {
 </script>
 
 <template>
-  <button
-    :aria-label="`${name} in die Zwischenablage kopieren`"
-    class="inline-flex items-center gap-8 text-left"
-    :title="`${name} in die Zwischenablage kopieren`"
-    type="button"
-    @click="copy"
-  >
-    {{ text }}
-    <Tooltip text="Kopieren">
-      <IconBaselineContentCopy
-        v-if="!copySuccess"
-        class="flex-none text-blue-900"
-      />
-      <IconCheckRounded v-else class="flex-none text-blue-900" />
-    </Tooltip>
-  </button>
+  <div class="inline-flex items-center gap-8">
+    <span data-testid="copyable-value">{{ text }}</span>
+
+    <Button
+      v-tooltip.bottom="{
+        value: tooltipText,
+      }"
+      :aria-label="`${name} in die Zwischenablage kopieren`"
+      class="!p-1"
+      size="small"
+      text
+      @click="copy"
+    >
+      <template #icon>
+        <IconBaselineContentCopy v-if="!copySuccess" />
+        <IconCheckRounded v-else />
+      </template>
+    </Button>
+  </div>
 </template>

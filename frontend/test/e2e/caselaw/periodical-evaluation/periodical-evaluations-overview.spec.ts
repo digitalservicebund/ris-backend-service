@@ -266,21 +266,10 @@ test.describe(
         .click()
       await response
 
-      const line = page.locator(
-        `tr:has(td:has-text("${editionWithReferences.name}"))`,
-      )
+      const line = page.locator("tr", { hasText: editionWithReferences.name })
       await line.waitFor({ state: "visible" })
-      await expect(line).toBeVisible()
-      // delete button should not be clickable
-      await expect(
-        line.getByLabel("Ausgabe löschen", { exact: true }),
-      ).toBeHidden()
-
-      await expect(
-        line
-          .getByLabel("Ausgabe kann nicht gelöscht werden", { exact: true })
-          .first(),
-      ).toBeVisible()
+      const deleteButton = line.getByLabel("Ausgabe löschen", { exact: true })
+      await expect(deleteButton).toBeDisabled()
     })
   },
 )
