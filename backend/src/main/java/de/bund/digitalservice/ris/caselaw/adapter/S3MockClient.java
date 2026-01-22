@@ -239,11 +239,7 @@ public class S3MockClient implements S3Client {
         }
       }
 
-      try (java.util.stream.Stream<Path> stream = Files.walk(multipartBase)) {
-        stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-      } catch (IOException e) {
-        LOGGER.warn("Could not clean up multipart temp files for uploadId {}", uploadId, e);
-      }
+      cleanupMultipartTempFiles(multipartBase, uploadId);
 
     } catch (IOException ex) {
       LOGGER.error("Couldn't complete multipart upload", ex);
@@ -252,18 +248,20 @@ public class S3MockClient implements S3Client {
     return CompleteMultipartUploadResponse.builder().build();
   }
 
+  private void cleanupMultipartTempFiles(Path multipartBase, String uploadId) {
+    try (java.util.stream.Stream<Path> stream = Files.walk(multipartBase)) {
+      stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+    } catch (IOException e) {
+      LOGGER.warn("Could not clean up multipart temp files for uploadId {}", uploadId, e);
+    }
+  }
+
   @Override
   public AbortMultipartUploadResponse abortMultipartUpload(AbortMultipartUploadRequest request) {
     String uploadId = request.uploadId();
     Path multipartBase = localStorageDirectory.resolve(MULTIPART).resolve(uploadId);
-    try {
-      if (Files.exists(multipartBase)) {
-        try (java.util.stream.Stream<Path> stream = Files.walk(multipartBase)) {
-          stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-        }
-      }
-    } catch (IOException e) {
-      LOGGER.warn("Could not abort multipart upload {}", uploadId, e);
+    if (Files.exists(multipartBase)) {
+      cleanupMultipartTempFiles(multipartBase, uploadId);
     }
     return AbortMultipartUploadResponse.builder().build();
   }

@@ -18,6 +18,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.util.List;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,14 +60,14 @@ class S3MockClientTest {
           tempDir,
           new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                throws IOException {
+            public @NonNull FileVisitResult visitFile(
+                @NonNull Path file, @NonNull BasicFileAttributes attrs) throws IOException {
               Files.delete(file);
               return FileVisitResult.CONTINUE;
             }
 
             @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc)
+            public @NonNull FileVisitResult postVisitDirectory(@NonNull Path dir, IOException exc)
                 throws IOException {
               Files.delete(dir);
               return FileVisitResult.CONTINUE;
@@ -76,7 +77,7 @@ class S3MockClientTest {
   }
 
   @Test
-  void putGetDelete_and_listObjectsV2() throws Exception {
+  void putGetDelete_and_listObjectsV2() {
     String key = "some/folder/test.txt";
     byte[] content = "hello s3 mock".getBytes(StandardCharsets.UTF_8);
 
@@ -120,7 +121,7 @@ class S3MockClientTest {
   }
 
   @Test
-  void multipart_upload_and_complete() throws Exception {
+  void multipart_upload_and_complete() {
     String key = "mp/test.bin";
 
     CreateMultipartUploadRequest createReq =
@@ -204,7 +205,7 @@ class S3MockClientTest {
   }
 
   @Test
-  void completeMultipart_withMissingPart_assemblesOnlyExistingParts() throws Exception {
+  void completeMultipart_withMissingPart_assemblesOnlyExistingParts() {
     String key = "partial/test.bin";
     CreateMultipartUploadRequest createReq =
         CreateMultipartUploadRequest.builder().key(key).build();
@@ -250,7 +251,7 @@ class S3MockClientTest {
   }
 
   @Test
-  void abortMultipartUpload_cleansUpTempFiles() throws Exception {
+  void abortMultipartUpload_cleansUpTempFiles() {
     String key = "abort/test.bin";
     CreateMultipartUploadRequest createReq =
         CreateMultipartUploadRequest.builder().key(key).build();
@@ -273,7 +274,7 @@ class S3MockClientTest {
   }
 
   @Test
-  void listObjectsV2_withoutPrefix_listsRootFiles() throws Exception {
+  void listObjectsV2_withoutPrefix_listsRootFiles() {
     String key1 = "root1.txt";
     String key2 = "root2.txt";
     byte[] content = "root-content".getBytes(StandardCharsets.UTF_8);
