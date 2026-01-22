@@ -362,6 +362,17 @@ describe("Document Number Route", () => {
       expect(screen.getByTestId("category-import")).toBeInTheDocument()
     })
 
+    it('detects "a" keypress and opens other attachments', async () => {
+      const { user, router } = renderComponent()
+      await router.push({
+        path: "/caselaw/documentUnit/1234567891234/references?showAttachmentPanel=false",
+      })
+
+      expect(screen.queryByText("Weitere Anhänge")).not.toBeInTheDocument()
+      await user.keyboard("a")
+      expect(screen.getByText("Weitere Anhänge")).toBeInTheDocument()
+    })
+
     it('detects ">" keypress and opens both panels', async () => {
       const { user, router } = renderComponent()
       await router.push({
