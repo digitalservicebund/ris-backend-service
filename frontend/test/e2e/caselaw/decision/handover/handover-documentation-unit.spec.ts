@@ -585,4 +585,70 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       ).toBeVisible()
     },
   )
+
+  test(
+    "prevent handover of published decision with images",
+    {
+      tag: ["@RISDEV-10256"],
+    },
+    async ({ page }) => {
+      await navigateToHandover(page, "YYTestDoc0013")
+
+      await expect(page.getByText("XML Vorschau")).toBeVisible()
+
+      await page.getByText("XML Vorschau").click()
+
+      await expect(
+        page.getByText(`<div>tenorx <jurimg alt="Bild 1"`),
+      ).toBeVisible()
+
+      await expect(
+        page.getByLabel("Dokumentationseinheit an jDV übergeben", {
+          exact: true,
+        }),
+      ).toBeDisabled()
+
+      await expect(
+        page.getByText(
+          "Diese bereits veröffentlichte Entscheidung enthält Bilder und kann deshalb nicht erneut an die jDV übergeben werden.",
+        ),
+      ).toBeVisible()
+    },
+  )
+
+  test(
+    "handover with images in wrong format shows error",
+    {
+      tag: ["@RISDEV-10256"],
+    },
+    async ({ page }) => {
+      await navigateToHandover(page, "YYTestDoc0020")
+
+      await expect(page.getByText("XML Vorschau")).toBeVisible()
+
+      await page.getByText("XML Vorschau").click()
+
+      await expect(
+        page.getByText(`<div>tenorx <jurimg alt="Bild 2"`),
+      ).toBeVisible()
+
+      await expect(
+        page.getByLabel("Dokumentationseinheit an jDV übergeben", {
+          exact: true,
+        }),
+      ).toBeEnabled()
+
+      await page
+        .getByLabel("Dokumentationseinheit an jDV übergeben", {
+          exact: true,
+        })
+        .click()
+
+      await expect(
+        page.getByText(
+          "Diese Entscheidung enthält Bilder, die nicht den Formaten entsprechen, die an die jDV übergeben werden können (jpg, png, gif).",
+        ),
+      ).toBeVisible()
+    },
+  )
 })

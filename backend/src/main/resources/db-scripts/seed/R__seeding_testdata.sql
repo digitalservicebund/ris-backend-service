@@ -586,6 +586,40 @@ VALUES
       NULL,
       NULL,
       'EU'
+  ),
+  (
+      gen_random_uuid (),
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.court
+          WHERE
+              type
+                  = 'BVerfG'
+      ),
+      '2020-02-02',
+      'YYTestDoc0020',
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.document_type
+          WHERE
+              abbreviation = 'Urt'
+      ),
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.documentation_office
+          WHERE
+              abbreviation = 'DS'
+      ),
+      NULL,
+      NULL,
+      NULL,
+      NULL
   );
 
 INSERT INTO
@@ -764,7 +798,7 @@ VALUES
         NULL,
         'guiding principle',
         NULL,
-        'tenorx'
+        'tenorx <img src="/api/v1/caselaw/documentunits/YYTestDoc0013/image/bild1.png" alt="Bild 1">'
     ),
     (
         (SELECT
@@ -824,6 +858,19 @@ VALUES
         'guiding principle',
         NULL,
         'tenorx'
+    ),
+    (
+        (SELECT
+             id
+         FROM
+             incremental_migration.documentation_unit
+         WHERE
+             document_number
+                 = 'YYTestDoc0020'),
+        NULL,
+        'guiding principle',
+        NULL,
+        'tenorx <img src="/api/v1/caselaw/documentunits/YYTestDoc0020/image/bild2.wmf" alt="Bild 2">'
     );
 
 
@@ -1194,6 +1241,20 @@ VALUES
           WHERE
               document_number = 'YYTestDoc0019'
       )
+  ),
+  (
+      gen_random_uuid (),
+      '2024-03-14 18:38:43.043877 +00:00',
+      'UNPUBLISHED',
+      false,
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.documentation_unit
+          WHERE
+              document_number = 'YYTestDoc0020'
+      )
   )
     ;
 
@@ -1274,6 +1335,9 @@ UPDATE incremental_migration.documentation_unit SET current_status_id =
     (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0019'))
 WHERE document_number = 'YYTestDoc0019';
 
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0020'))
+WHERE document_number = 'YYTestDoc0020';
 
 UPDATE
   incremental_migration.decision
@@ -1281,6 +1345,20 @@ SET
   note = 'dies ist eine test notiz'
 WHERE
   incremental_migration.decision.id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0015');
+
+UPDATE
+    incremental_migration.decision
+SET
+    legal_effect = 'JA'
+WHERE
+    incremental_migration.decision.id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0013');
+
+UPDATE
+    incremental_migration.decision
+SET
+    legal_effect = 'JA'
+WHERE
+    incremental_migration.decision.id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0020');
 
 INSERT INTO
   incremental_migration.file_number (id, value, documentation_unit_id, rank)
@@ -1362,8 +1440,55 @@ VALUES
                 document_number = 'YYTestDoc0017'
         ),
         1
+    ),
+  (
+      gen_random_uuid (),
+      'fileNumber0',
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.documentation_unit
+          WHERE
+              document_number = 'YYTestDoc0020'
+      ),
+      2
+  );
+
+INSERT INTO
+    incremental_migration.attachment_inline (id, upload_timestamp, format, filename, documentation_unit_id, content)
+VALUES
+    (
+        gen_random_uuid (),
+        now(),
+     'png',
+     'bild1.png',
+        (
+            SELECT
+                id
+            FROM
+                incremental_migration.documentation_unit
+            WHERE
+                document_number = 'YYTestDoc0013'
+        ),
+        '89504E470D0A1A0A0000000D494844520000000A0000000A08060000008D32CFBD000000154944415478DA6364F8CF50CF4004601C55485F8500084A0EF7A4B0E8E60000000049454E44AE426082'
+    ),
+    (
+        gen_random_uuid (),
+        now(),
+        'wmf',
+        'bild2.wmf',
+        (
+            SELECT
+                id
+            FROM
+                incremental_migration.documentation_unit
+            WHERE
+                document_number = 'YYTestDoc0020'
+        ),
+        '89504E470D0A1A0A0000000D494844520000000A0000000A08060000008D32CFBD000000154944415478DA636460F85FCF4004601C55485F8500FE450EF71F4585A00000000049454E44AE426082'
     );
-    ;
+;
 
 INSERT INTO
     incremental_migration.keyword (id, value)
