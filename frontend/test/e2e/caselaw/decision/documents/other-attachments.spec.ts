@@ -129,7 +129,7 @@ test.describe("Weitere Anhänge", { tag: ["@RISDEV-8920"] }, () => {
         await expect(
           page.getByRole("alert").getByRole("list").getByRole("listitem"),
         ).toHaveText(
-          "too_large überschreitet das Limit von 100MB Größe. Laden Sie eine kleinere Datei hoch.",
+          "too_large.bin überschreitet das Limit von 100MB Größe. Laden Sie eine kleinere Datei hoch.",
         )
       })
 
@@ -177,6 +177,7 @@ test.describe("Weitere Anhänge", { tag: ["@RISDEV-8920"] }, () => {
           .getByTestId("attachment-list")
           .getByText("max_size.mp4")
         await expect(fileName1).toBeVisible()
+
         const fileName2 = page
           .getByTestId("attachment-list")
           .getByText("no_extension")
