@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -413,6 +414,44 @@ class S3AttachmentServiceTest {
 
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
     assertTrue(exception.getReason().contains("Failed to upload file"));
+    verify(repository).delete(any(AttachmentDTO.class));
+  }
+
+  @Test
+  void testStreamUploadToS3_whenDeleteOnFailPartFails_abortsAndThrows() {
+    // given
+    byte[] data = new byte[6 * 1024 * 1024];
+    var in = new java.io.ByteArrayInputStream(data);
+    var user = User.builder().build();
+    var filename = "test-fail.zip";
+    var attachmentId = UUID.randomUUID();
+    var attachment =
+        AttachmentDTO.builder()
+            .id(attachmentId)
+            .attachmentType(AttachmentType.OTHER.name())
+            .filename(filename)
+            .format("zip")
+            .build();
+
+    when(s3Client.createMultipartUpload(any(CreateMultipartUploadRequest.class)))
+        .thenReturn(CreateMultipartUploadResponse.builder().uploadId("upload-fail").build());
+    when(s3Client.uploadPart(any(UploadPartRequest.class), any(RequestBody.class)))
+        .thenThrow(SdkException.create("upload failed", null));
+    when(repository.save(any(AttachmentDTO.class))).thenReturn(attachment);
+    doThrow(new RuntimeException("delete failed"))
+        .when(repository)
+        .delete(any(AttachmentDTO.class));
+
+    // when / then
+    ResponseStatusException exFromStream =
+        assertThrows(
+            ResponseStatusException.class,
+            () ->
+                service.streamFileToDocumentationUnit(
+                    documentationUnitDTO.getId(), in, "test.zip", user, AttachmentType.OTHER));
+
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exFromStream.getStatusCode());
+    assertTrue(exFromStream.getReason().contains("Failed to upload file"));
     verify(repository).delete(any(AttachmentDTO.class));
   }
 
