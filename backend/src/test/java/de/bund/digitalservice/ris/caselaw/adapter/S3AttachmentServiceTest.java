@@ -405,7 +405,7 @@ class S3AttachmentServiceTest {
     assertEquals(getObjectResponse.contentType(), streamed.response().contentType());
     assertEquals(getObjectResponse.contentLength(), streamed.response().contentLength());
 
-    var streamOutput = new java.io.ByteArrayOutputStream();
+    var streamOutput = new ByteArrayOutputStream();
     streamed.body().writeTo(streamOutput);
     assertEquals(new String(data), streamOutput.toString());
   }
