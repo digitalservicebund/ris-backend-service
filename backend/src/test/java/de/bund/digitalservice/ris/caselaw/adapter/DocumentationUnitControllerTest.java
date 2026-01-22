@@ -906,6 +906,37 @@ class DocumentationUnitControllerTest {
     }
 
     @Test
+    void givenEmptyFile_whenUploadingOtherFile_thenReturnBadRequest() {
+      // given
+      byte[] emptyContent = new byte[0];
+
+      MockMultipartFile emptyFile =
+          new MockMultipartFile(
+              "file",
+              "empty-file.docx",
+              String.valueOf(MediaType.APPLICATION_OCTET_STREAM),
+              emptyContent);
+
+      // when
+      when(userHasWriteAccess.apply(any())).thenReturn(true);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+
+      // then
+      risWebClient
+          .withLogin("DS", "Internal")
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/other-file")
+          .contentType(MediaType.MULTIPART_FORM_DATA)
+          .addFile(emptyFile)
+          .addHeader("X-Filename", "empty-file.docx")
+          .exchange()
+          .expectStatus()
+          .isBadRequest();
+
+      verify(attachmentService, never()).attachFileToDocumentationUnit(any(), any(), any(), any());
+    }
+
+    @Test
     void givenValidFile_whenUploadingOtherFile_thenVerifyCreated() {
       // given
       byte[] fileContent = "test content".getBytes();
@@ -1070,6 +1101,38 @@ class DocumentationUnitControllerTest {
           .exchange()
           .expectStatus()
           .isBadRequest();
+    }
+
+    @Test
+    void givenEmptyFile_whenUploadingOriginalFile_thenReturnBadRequest() {
+      // given
+      byte[] emptyContent = new byte[0];
+
+      MockMultipartFile emptyFile =
+          new MockMultipartFile(
+              "file",
+              "empty-file.docx",
+              String.valueOf(MediaType.APPLICATION_OCTET_STREAM),
+              emptyContent);
+
+      // when
+      when(userHasWriteAccess.apply(any())).thenReturn(true);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+
+      // then
+      risWebClient
+          .withLogin("DS", "Internal")
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/original-file")
+          .contentType(MediaType.MULTIPART_FORM_DATA)
+          .addFile(emptyFile)
+          .addHeader("X-Filename", "empty-file.docx")
+          .exchange()
+          .expectStatus()
+          .isBadRequest();
+
+      verify(attachmentService, never())
+          .streamFileToDocumentationUnit(any(), any(), any(), any(), any());
     }
 
     @Test
