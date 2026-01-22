@@ -130,19 +130,17 @@ public class S3MockClient implements S3Client {
       throw NoSuchKeyException.builder().message("The specified key does not exist.").build();
     }
 
-    try {
-      GetObjectResponse objectResponse =
-          GetObjectResponse.builder()
-              .contentLength(file.length())
-              .contentType("application/octet-stream")
-              .build();
-      InputStream fileStream = new FileInputStream(file);
-      AbortableInputStream abortableInputStream = AbortableInputStream.create(fileStream);
+    GetObjectResponse objectResponse =
+        GetObjectResponse.builder()
+            .contentLength(file.length())
+            .contentType("application/octet-stream")
+            .build();
 
+    try (InputStream fileStream = new FileInputStream(file);
+        AbortableInputStream abortableInputStream = AbortableInputStream.create(fileStream)) {
       return responseTransformer.transform(objectResponse, abortableInputStream);
     } catch (Exception e) {
-      LOGGER.error("Error mock-streaming file: {}", fileName, e);
-      throw new RuntimeException("Failed to mock S3 getObject", e);
+      throw new IllegalStateException("Failed to mock S3 getObject for file: " + fileName, e);
     }
   }
 
