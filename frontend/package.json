@@ -83,7 +83,7 @@
     "@eslint/compat": "^2.0.1",
     "@eslint/js": "^9.39.2",
     "@iconify-json/ic": "^1.2.4",
-    "@iconify-json/material-symbols": "^1.2.51",
+    "@iconify-json/material-symbols": "^1.2.52",
     "@iconify-json/mdi": "^1.2.3",
     "@namics/stylelint-bem": "^10.1.0",
     "@pinia/testing": "^1.0.3",
