@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -66,6 +67,7 @@ import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
+import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationOfficeNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -938,19 +940,126 @@ class DocumentationUnitControllerTest {
     }
   }
 
-  //  @Nested
-  //  class incorrectParamsTests {
-  //    @Test
-  //    void givenNoFileName_whenDownloading_then() {
-  //      risWebClient
-  //          .withDefaultLogin()
-  //          .get()
-  //          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
-  //          .exchange()
-  //          .expectStatus()
-  //          .isBadRequest();
-  //    }
-  //  }
+  @Nested
+  class testOriginalFileEndpoint {
+    @Test
+    void givenMissingMultipart_whenUploadingOriginalFile_thenFail() {
+      // given
+      // when
+      when(userHasWriteAccess.apply(any())).thenReturn(true);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+
+      // then
+      risWebClient
+          .withLogin("DS", "Internal")
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/original-file")
+          .contentType(MediaType.MULTIPART_FORM_DATA)
+          .addHeader("X-Filename", "some-file.docx")
+          .exchange()
+          .expectStatus()
+          .isBadRequest();
+    }
+
+    @Test
+    void givenMissingHeaderParam_whenUploadingOtherFile_thenFail() {
+      // given
+      byte[] fileContent = "test content".getBytes();
+
+      MockMultipartFile mockFile =
+          new MockMultipartFile(
+              "file",
+              "some-file.docx",
+              String.valueOf(MediaType.APPLICATION_OCTET_STREAM),
+              fileContent);
+
+      // when
+      when(userHasWriteAccess.apply(any())).thenReturn(true);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+
+      // then
+      risWebClient
+          .withLogin("DS", "Internal")
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/original-file")
+          .contentType(MediaType.MULTIPART_FORM_DATA)
+          .addFile(mockFile)
+          .exchange()
+          .expectStatus()
+          .isBadRequest();
+    }
+
+    @Test
+    void givenValidFile_whenUploadingOtherFile_thenVerifyCreated()
+        throws DocumentationUnitNotExistsException {
+      // given
+      byte[] fileContent = "test content".getBytes();
+
+      MockMultipartFile mockFile =
+          new MockMultipartFile(
+              "file",
+              "some-file.docx",
+              String.valueOf(MediaType.APPLICATION_OCTET_STREAM),
+              fileContent);
+      var expectedHtml =
+          new Docx2Html("<html></html>", Collections.emptyList(), Collections.emptyMap());
+      var attachment =
+          Attachment.builder()
+              .s3path("123")
+              .id(UUID.randomUUID())
+              .type(AttachmentType.ORIGINAL)
+              .uploadTimestamp(Instant.ofEpochMilli(123))
+              .format("docx")
+              .build();
+
+      when(attachmentService.attachFileToDocumentationUnit(
+              eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
+          .thenReturn(Attachment.builder().s3path("fooPath").build());
+
+      Decision docUnit =
+          Decision.builder()
+              .documentNumber("myDocNumber1")
+              .coreData(CoreData.builder().documentationOffice(docOffice).build())
+              .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+              .build();
+
+      // when
+      when(userHasWriteAccess.apply(any())).thenReturn(true);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+      when(converterService.getConvertedObject("some-file.docx")).thenReturn(expectedHtml);
+      when(service.getByUuid(TEST_UUID)).thenReturn(docUnit);
+      doNothing().when(duplicateCheckService).checkDuplicates(any());
+      doNothing().when(docUnitAttachmentService).initializeCoreData(any(), any(), any());
+      when(attachmentService.streamFileToDocumentationUnit(
+              eq(TEST_UUID),
+              any(InputStream.class),
+              eq("some-file.docx"),
+              eq(user),
+              eq(AttachmentType.ORIGINAL)))
+          .thenReturn(attachment);
+
+      // then
+      risWebClient
+          .withLogin("DS", "Internal")
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/original-file")
+          .contentType(MediaType.MULTIPART_FORM_DATA)
+          .addFile(mockFile)
+          .addHeader("X-Filename", "some-file.docx")
+          .exchange()
+          .expectStatus()
+          .isOk();
+
+      verify(converterService).getConvertedObject(attachment.s3path());
+      verify(attachmentService)
+          .streamFileToDocumentationUnit(
+              eq(TEST_UUID),
+              any(InputStream.class),
+              eq("some-file.docx"),
+              eq(user),
+              eq(AttachmentType.ORIGINAL));
+    }
+  }
 
   @Nested
   class TakeoverDocumentUnit {
