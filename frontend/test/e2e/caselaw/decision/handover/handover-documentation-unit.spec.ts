@@ -589,7 +589,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
   test(
     "prevent handover of published decision with images",
     {
-      tag: ["@RISDEV-10257"],
+      tag: ["@RISDEV-10256"],
     },
     async ({ page }) => {
       await navigateToHandover(page, "YYTestDoc0013")
@@ -619,7 +619,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
   test(
     "handover with images in wrong format shows error",
     {
-      tag: ["@RISDEV-10257"],
+      tag: ["@RISDEV-10256"],
     },
     async ({ page }) => {
       await navigateToHandover(page, "YYTestDoc0020")
