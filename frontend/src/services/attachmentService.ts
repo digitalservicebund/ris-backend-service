@@ -53,7 +53,10 @@ const service: AttachmentService = {
         },
       }
 
-    const response = await httpClient.put<File, Docx2HTML>(
+    const form = new FormData()
+    form.append("file", file)
+
+    const response = await httpClient.put<FormData, Docx2HTML>(
       `caselaw/documentunits/${documentUnitUuid}/original-file`,
       {
         headers: {
@@ -63,7 +66,7 @@ const service: AttachmentService = {
           "X-Filesize": `${file.size}`,
         },
       },
-      file,
+      form,
     )
     if (response.status === 413) {
       response.error = {
