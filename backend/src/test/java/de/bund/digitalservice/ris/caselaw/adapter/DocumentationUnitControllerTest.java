@@ -64,6 +64,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.StreamedFileResponse;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -110,6 +111,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import tools.jackson.core.type.TypeReference;
 
 @ExtendWith(SpringExtension.class)
@@ -1976,6 +1978,45 @@ class DocumentationUnitControllerTest {
 
         verify(abstractService, never()).bulkAssignProcessStep(any(), any(), any());
       }
+    }
+  }
+
+  @Nested
+  class DownloadFile {
+    @Test
+    void testDownloadFile_shouldReturnStreamedFileResponse() {
+      UUID fileUuid = UUID.randomUUID();
+      byte[] data = "test file content".getBytes();
+
+      GetObjectResponse getObjectResponse =
+          GetObjectResponse.builder()
+              .contentType(
+                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+              .contentLength((long) data.length)
+              .build();
+
+      StreamedFileResponse streamedFileResponse =
+          new StreamedFileResponse(getObjectResponse, outputStream -> outputStream.write(data));
+
+      when(attachmentService.getFileStream(TEST_UUID, fileUuid)).thenReturn(streamedFileResponse);
+
+      risWebClient
+          .withDefaultLogin()
+          .get()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/" + fileUuid)
+          .exchange()
+          .expectStatus()
+          .isOk()
+          .expectHeader()
+          .contentType(
+              MediaType.parseMediaType(
+                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+          .expectHeader()
+          .valueEquals(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"someFile.docx\"")
+          .expectHeader()
+          .valueEquals(HttpHeaders.CONTENT_LENGTH, String.valueOf(data.length));
+
+      verify(attachmentService).getFileStream(TEST_UUID, fileUuid);
     }
   }
 }
