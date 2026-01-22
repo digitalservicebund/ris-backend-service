@@ -1705,8 +1705,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
   testFilesOptions: [[], { option: true }],
 
   testFiles: async ({ testFilesOptions }, use, testInfo) => {
-    const temporaryTestDirectoryName = "testfiles"
-    const temporaryTestPath = testInfo.outputPath(temporaryTestDirectoryName)
+    const temporaryTestPath = testInfo.outputPath("testfiles")
 
     // Ensure temp directory exists
     await fs.mkdir(temporaryTestPath, { recursive: true })

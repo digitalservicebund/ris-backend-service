@@ -1,5 +1,5 @@
 import fs from "fs"
-import { expect } from "@playwright/test"
+import { Download, expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   createDataTransfer,
@@ -12,32 +12,54 @@ test.describe("upload an original document to a doc unit", () => {
     await navigateToAttachments(page, documentNumber)
   })
 
-  test("upload and delete docx file per file chooser", async ({ page }) => {
-    await uploadTestfile(page, "sample.docx")
+  test(
+    "upload, download and delete docx file per file chooser",
+    { tag: ["@RISDEV-9850"] },
+    async ({ page }) => {
+      await uploadTestfile(page, "sample.docx")
 
-    const tableView = page.getByRole("cell", {
-      name: "Dateiname",
-      exact: true,
-    })
+      const tableView = page.getByRole("cell", {
+        name: "Dateiname",
+        exact: true,
+      })
 
-    const attachmentView = page.locator("#attachment-view")
+      const attachmentView = page.locator("#attachment-view")
 
-    await expect(attachmentView).toBeVisible()
-    await expect(tableView).toBeVisible()
+      await expect(attachmentView).toBeVisible()
+      await expect(tableView).toBeVisible()
 
-    // delete file
-    await page.getByLabel("Datei löschen").click()
-    await page.getByLabel("Löschen", { exact: true }).click() // confirm
-    await expect(page.getByText("Anhang löschen")).toBeHidden()
-    await expect(page.getByText("sample.docx")).toBeHidden()
+      await test.step("Downloade die Datei", async () => {
+        const downloadButton = page.getByRole("button", {
+          name: "sample.docx herunterladen",
+        })
+        const downloadPromise = page.waitForEvent("download")
 
-    await page.reload()
-    await expect(
-      page.getByText("Ziehen Sie Ihre Dateien in diesen Bereich."),
-    ).toBeVisible()
-    await expect(tableView).toBeHidden()
-    await expect(attachmentView).toBeHidden()
-  })
+        await downloadButton.click()
+
+        // While it is downloading, the download button is disabled and shows a loading spinner
+        await expect(downloadButton).toBeDisabled()
+        // Wait for loading state to be finished
+        await expect(downloadButton).toBeEnabled()
+
+        const downloadEvent = await downloadPromise
+        expect(downloadEvent.suggestedFilename()).toBe("sample.docx")
+        await compareWithOriginalFile(downloadEvent)
+      })
+
+      // delete file
+      await page.getByLabel("Datei löschen").click()
+      await page.getByLabel("Löschen", { exact: true }).click() // confirm
+      await expect(page.getByText("Anhang löschen")).toBeHidden()
+      await expect(page.getByText("sample.docx")).toBeHidden()
+
+      await page.reload()
+      await expect(
+        page.getByText("Ziehen Sie Ihre Dateien in diesen Bereich."),
+      ).toBeVisible()
+      await expect(tableView).toBeHidden()
+      await expect(attachmentView).toBeHidden()
+    },
+  )
 
   test("upload and delete multiple docx files per file chooser", async ({
     page,
@@ -46,10 +68,10 @@ test.describe("upload an original document to a doc unit", () => {
       await uploadTestfile(page, ["sample.docx", "some-formatting.docx"])
 
       await expect(
-        page.getByRole("cell", { name: "sample.docx" }),
+        page.getByRole("cell", { name: "sample.docx", exact: true }),
       ).toBeVisible()
       await expect(
-        page.getByRole("cell", { name: "some-formatting.docx" }),
+        page.getByRole("cell", { name: "some-formatting.docx", exact: true }),
       ).toBeVisible()
 
       await expect(
@@ -170,3 +192,17 @@ test.describe("upload an original document to a doc unit", () => {
     ).toBeVisible()
   })
 })
+
+async function compareWithOriginalFile(download: Download) {
+  const chunks = []
+  for await (const chunk of await download.createReadStream()) {
+    chunks.push(chunk)
+  }
+  const downloadedBuffer = Buffer.concat(chunks)
+
+  const originalBuffer = fs.readFileSync(
+    "./test/e2e/caselaw/testfiles/sample.docx",
+  )
+
+  expect(downloadedBuffer).toEqual(originalBuffer)
+}

@@ -28,6 +28,7 @@ test.describe("Weitere Anhänge", { tag: ["@RISDEV-8920"] }, () => {
         await page.getByRole("button", { name: "Seitenpanel öffnen" }).click()
         await page.keyboard.press("a")
       })
+
       // We store the icon displayed with empty files because it should change after uploading files.
       const sidePanelTabButtonIcon = await page
         .getByRole("button", { name: "Anhänge anzeigen" })

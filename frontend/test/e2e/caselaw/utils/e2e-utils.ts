@@ -326,6 +326,7 @@ export const uploadTestfile = async (
 ) => {
   const fileNames = Array.isArray(filename) ? filename : [filename]
   const stepName = fileNames.length > 1 ? "Dateien werden" : "Datei wird"
+
   await test.step(`${fileNames.length} ${stepName} hochgeladen`, async () => {
     const basePath = options?.basePath ?? "./test/e2e/caselaw/testfiles/"
     const [fileChooser] = await Promise.all([
