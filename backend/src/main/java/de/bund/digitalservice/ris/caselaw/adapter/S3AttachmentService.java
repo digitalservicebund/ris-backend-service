@@ -195,7 +195,7 @@ public class S3AttachmentService implements AttachmentService {
     List<CompletedPart> completedParts = new ArrayList<>();
     var partNumber = 1;
 
-    //    RequestBody.fromInputStream(file, PART_SIZE);
+    // TODO: try something like: RequestBody.fromInputStream(file, PART_SIZE);
 
     try (file) {
       while (true) {

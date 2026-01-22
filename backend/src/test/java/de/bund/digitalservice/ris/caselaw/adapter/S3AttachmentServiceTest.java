@@ -47,6 +47,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -378,7 +379,46 @@ class S3AttachmentServiceTest {
   }
 
   @Test
+  void testStreamUploadToS3_whenUploadPartFails_abortsAndDeletesDomain() throws Exception {
+    // given
+    byte[] data = new byte[6 * 1024 * 1024];
+    var in = new java.io.ByteArrayInputStream(data);
+    var user = User.builder().build();
+    var filename = "test-fail.zip";
+    var attachmentId = UUID.randomUUID();
+
+    when(s3Client.createMultipartUpload(any(CreateMultipartUploadRequest.class)))
+        .thenReturn(CreateMultipartUploadResponse.builder().uploadId("upload-fail").build());
+    when(s3Client.uploadPart(any(UploadPartRequest.class), any(RequestBody.class)))
+        .thenThrow(SdkException.create("upload failed", null));
+    when(repository.save(any(AttachmentDTO.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
+    doNothing().when(repository).delete(any(AttachmentDTO.class));
+    when(repository.save(any(AttachmentDTO.class)))
+        .thenReturn(
+            AttachmentDTO.builder()
+                .id(attachmentId)
+                .attachmentType(AttachmentType.OTHER.name())
+                .filename(filename)
+                .format("zip")
+                .build());
+
+    // when / then
+    ResponseStatusException exception =
+        assertThrows(
+            ResponseStatusException.class,
+            () ->
+                service.streamFileToDocumentationUnit(
+                    documentationUnitDTO.getId(), in, "test.zip", user, AttachmentType.OTHER));
+
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
+    assertTrue(exception.getReason().contains("Failed to upload file"));
+    verify(repository).delete(any(AttachmentDTO.class));
+  }
+
+  @Test
   void testGetFileStream_returnsStreamedFileResponse() throws Exception {
+    // given
     UUID fileUuid = UUID.randomUUID();
     String s3Path = UUID.randomUUID().toString();
 
@@ -400,8 +440,10 @@ class S3AttachmentServiceTest {
     when(s3Client.getObject(any(GetObjectRequest.class), any(ResponseTransformer.class)))
         .thenReturn(responseInputStream);
 
+    // when
     var streamed = service.getFileStream(documentationUnitDTO.getId(), fileUuid);
 
+    // then
     assertEquals(getObjectResponse.contentType(), streamed.response().contentType());
     assertEquals(getObjectResponse.contentLength(), streamed.response().contentLength());
 
