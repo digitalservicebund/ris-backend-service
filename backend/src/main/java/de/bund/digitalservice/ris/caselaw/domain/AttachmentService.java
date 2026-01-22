@@ -19,7 +19,5 @@ public interface AttachmentService {
 
   Optional<Image> findByDocumentationUnitIdAndFileName(UUID documentationUnitId, String imageName);
 
-  StreamedFileResponseDto getFileStream(UUID documentationUnitId, UUID fileUuid);
-
-  StreamedFile getFileStreamDto(UUID documentationUnitId, UUID fileUuid);
+  StreamedFileResponse getFileStream(UUID documentationUnitId, UUID fileUuid);
 }

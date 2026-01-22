@@ -17,8 +17,7 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
-import de.bund.digitalservice.ris.caselaw.domain.StreamedFile;
-import de.bund.digitalservice.ris.caselaw.domain.StreamedFileResponseDto;
+import de.bund.digitalservice.ris.caselaw.domain.StreamedFileResponse;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.image.ImageUtil;
@@ -342,7 +341,7 @@ public class S3AttachmentService implements AttachmentService {
   }
 
   @Override
-  public StreamedFileResponseDto getFileStream(UUID documentationUnitId, UUID fileUuid) {
+  public StreamedFileResponse getFileStream(UUID documentationUnitId, UUID fileUuid) {
     var s3Path =
         repository
             .findById(fileUuid)
@@ -368,48 +367,7 @@ public class S3AttachmentService implements AttachmentService {
           }
         };
 
-    return new StreamedFileResponseDto(stream.response(), responseBody);
-  }
-
-  @Override
-  public StreamedFile getFileStreamDto(UUID documentationUnitId, UUID fileUuid) {
-    var attachment =
-        repository.findById(fileUuid).orElseThrow(() -> new AttachmentException("File not found"));
-    var s3Path = attachment.getS3ObjectPath();
-
-    if (s3Path == null) {
-      throw new AttachmentException("S3 path missing");
-    }
-
-    var getObjectRequest = GetObjectRequest.builder().bucket(bucketName).key(s3Path).build();
-
-    ResponseTransformer<GetObjectResponse, ResponseInputStream<GetObjectResponse>> transformer =
-        ResponseTransformer.toInputStream();
-
-    ResponseInputStream<GetObjectResponse> s3Stream = null;
-    GetObjectResponse resp = null;
-    try {
-      s3Stream = s3Client.getObject(getObjectRequest, transformer);
-      resp = s3Stream.response();
-    } catch (Exception e) {
-      log.error("Failed to stream file from S3", e);
-    }
-
-    long contentLength = -1L;
-    try {
-      Long cl = resp.contentLength();
-      if (cl != null) {
-        contentLength = cl;
-      }
-    } catch (Exception e) {
-      // ignore, treat as unknown length
-    }
-
-    String contentType = resp.contentType();
-    String eTag = resp.eTag();
-    String filename = attachment.getFilename() != null ? attachment.getFilename() : s3Path;
-
-    return new StreamedFile(s3Stream, contentLength, contentType, filename, eTag);
+    return new StreamedFileResponse(stream.response(), responseBody);
   }
 
   void checkDocx(ByteBuffer byteBuffer) {
