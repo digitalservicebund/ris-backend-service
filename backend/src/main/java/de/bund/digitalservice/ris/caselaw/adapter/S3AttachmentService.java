@@ -229,7 +229,7 @@ public class S3AttachmentService implements AttachmentService {
       s3Client.completeMultipartUpload(completeRequest);
     } catch (Exception e) {
       log.atWarn()
-          .setKeyValue("uploadId", uploadId)
+          .addKeyValue("uploadId", uploadId)
           .setCause(e)
           .log("Multipart upload failed, aborting uploadId={}", uploadId, e);
       try {
