@@ -51,7 +51,6 @@ import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.AbortMultipartUploadRequest;
 import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadRequest;
-import software.amazon.awssdk.services.s3.model.CompletedMultipartUpload;
 import software.amazon.awssdk.services.s3.model.CompletedPart;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -195,8 +194,6 @@ public class S3AttachmentService implements AttachmentService {
     List<CompletedPart> completedParts = new ArrayList<>();
     var partNumber = 1;
 
-    // TODO: try something like: RequestBody.fromInputStream(file, PART_SIZE);
-
     try (file) {
       while (true) {
         byte[] buffer = file.readNBytes(PART_SIZE);
@@ -221,15 +218,12 @@ public class S3AttachmentService implements AttachmentService {
         partNumber++;
       }
 
-      var completedMultipartUpload =
-          CompletedMultipartUpload.builder().parts(completedParts).build();
-
       var completeRequest =
           CompleteMultipartUploadRequest.builder()
               .bucket(bucketName)
               .key(s3ObjectPath)
               .uploadId(uploadId)
-              .multipartUpload(completedMultipartUpload)
+              .multipartUpload(mpu -> mpu.parts(completedParts))
               .build();
 
       s3Client.completeMultipartUpload(completeRequest);

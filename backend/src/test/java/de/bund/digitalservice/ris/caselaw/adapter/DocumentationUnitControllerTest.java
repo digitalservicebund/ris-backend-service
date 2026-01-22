@@ -1014,8 +1014,7 @@ class DocumentationUnitControllerTest {
     }
 
     @Test
-    void givenAttachmentServiceThrows_whenUploadingOtherFile_thenVerifyServerError()
-        throws Exception {
+    void givenAttachmentServiceThrows_whenUploadingOtherFile_thenVerifyServerError() {
       // given
       byte[] fileContent = "test content".getBytes();
       MockMultipartFile mockFile =
@@ -1247,8 +1246,7 @@ class DocumentationUnitControllerTest {
     }
 
     @Test
-    void givenAttachmentServiceThrows_whenUploadingOriginalFile_thenVerifyServerError()
-        throws Exception {
+    void givenAttachmentServiceThrows_whenUploadingOriginalFile_thenVerifyServerError() {
       // given
       byte[] fileContent = "test content".getBytes();
       MockMultipartFile mockFile =
