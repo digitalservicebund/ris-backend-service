@@ -405,12 +405,13 @@ class S3AttachmentServiceTest {
                 .build());
 
     // when / then
+    var docUnitId = documentationUnitDTO.getId();
     ResponseStatusException exception =
         assertThrows(
             ResponseStatusException.class,
             () ->
                 service.streamFileToDocumentationUnit(
-                    documentationUnitDTO.getId(), in, "test.zip", user, AttachmentType.OTHER));
+                    docUnitId, in, "test.zip", user, AttachmentType.OTHER));
 
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
     assertTrue(exception.getReason().contains("Failed to upload file"));
@@ -443,12 +444,13 @@ class S3AttachmentServiceTest {
         .delete(any(AttachmentDTO.class));
 
     // when / then
+    var docUnitId = documentationUnitDTO.getId();
     ResponseStatusException exFromStream =
         assertThrows(
             ResponseStatusException.class,
             () ->
                 service.streamFileToDocumentationUnit(
-                    documentationUnitDTO.getId(), in, "test.zip", user, AttachmentType.OTHER));
+                    docUnitId, in, "test.zip", user, AttachmentType.OTHER));
 
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exFromStream.getStatusCode());
     assertTrue(exFromStream.getReason().contains("Failed to upload file"));
