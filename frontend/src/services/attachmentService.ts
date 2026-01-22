@@ -43,14 +43,24 @@ const service: AttachmentService = {
         },
       }
     }
+    if (file.size > 20 * 1024 * 1024)
+      return {
+        status: 413,
+        error: {
+          title: errorMessages.ORIGINAL_DOCUMENT_TOO_LARGE_CASELAW.title,
+          description:
+            errorMessages.ORIGINAL_DOCUMENT_TOO_LARGE_CASELAW.description,
+        },
+      }
 
     const response = await httpClient.put<File, Docx2HTML>(
-      `caselaw/documentunits/${documentUnitUuid}/file`,
+      `caselaw/documentunits/${documentUnitUuid}/original-file`,
       {
         headers: {
           "Content-Type":
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           "X-Filename": file.name,
+          "X-Filesize": `${file.size}`,
         },
       },
       file,
