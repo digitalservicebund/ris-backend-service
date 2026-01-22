@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -15,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.MessageDigest;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -175,5 +177,117 @@ class S3MockClientTest {
     System.arraycopy(part2, 0, expected, part1.length, part2.length);
 
     assertArrayEquals(expected, finalContent);
+  }
+
+  @Test
+  void uploadPart_returnsCorrectMd5Etag() throws Exception {
+    String key = "md5/test.bin";
+    CreateMultipartUploadRequest createReq =
+        CreateMultipartUploadRequest.builder().key(key).build();
+    var createResp = client.createMultipartUpload(createReq);
+    String uploadId = createResp.uploadId();
+
+    byte[] part = "hello-md5".getBytes(StandardCharsets.UTF_8);
+    UploadPartRequest upReq = UploadPartRequest.builder().uploadId(uploadId).partNumber(1).build();
+    var upResp = client.uploadPart(upReq, RequestBody.fromBytes(part));
+
+    MessageDigest md = MessageDigest.getInstance("MD5");
+    md.update(part);
+    byte[] digest = md.digest();
+    StringBuilder sb = new StringBuilder();
+    for (byte b : digest) {
+      sb.append(String.format("%02x", b));
+    }
+    String expectedEtag = sb.toString();
+
+    assertEquals(expectedEtag, upResp.eTag());
+  }
+
+  @Test
+  void completeMultipart_withMissingPart_assemblesOnlyExistingParts() throws Exception {
+    String key = "partial/test.bin";
+    CreateMultipartUploadRequest createReq =
+        CreateMultipartUploadRequest.builder().key(key).build();
+    var createResp = client.createMultipartUpload(createReq);
+    String uploadId = createResp.uploadId();
+
+    byte[] part1 = "first-part".getBytes(StandardCharsets.UTF_8);
+
+    UploadPartRequest up1Req = UploadPartRequest.builder().uploadId(uploadId).partNumber(1).build();
+    var up1Resp = client.uploadPart(up1Req, RequestBody.fromBytes(part1));
+
+    CompletedPart cp1 = CompletedPart.builder().partNumber(1).eTag(up1Resp.eTag()).build();
+    CompletedPart cp2 = CompletedPart.builder().partNumber(2).eTag("nonexistent").build();
+    CompletedMultipartUpload multipart = CompletedMultipartUpload.builder().parts(cp1, cp2).build();
+
+    CompleteMultipartUploadRequest completeReq =
+        CompleteMultipartUploadRequest.builder()
+            .uploadId(uploadId)
+            .key(key)
+            .multipartUpload(multipart)
+            .build();
+
+    client.completeMultipartUpload(completeReq);
+
+    GetObjectRequest getReq = GetObjectRequest.builder().key(key).build();
+    ResponseTransformer<software.amazon.awssdk.services.s3.model.GetObjectResponse, byte[]>
+        transformer =
+            new ResponseTransformer<>() {
+              @Override
+              public byte[] transform(
+                  software.amazon.awssdk.services.s3.model.GetObjectResponse response,
+                  AbortableInputStream inputStream)
+                  throws Exception {
+                try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                  inputStream.transferTo(baos);
+                  return baos.toByteArray();
+                }
+              }
+            };
+
+    byte[] finalContent = client.getObject(getReq, transformer);
+    assertArrayEquals(part1, finalContent);
+  }
+
+  @Test
+  void abortMultipartUpload_cleansUpTempFiles() throws Exception {
+    String key = "abort/test.bin";
+    CreateMultipartUploadRequest createReq =
+        CreateMultipartUploadRequest.builder().key(key).build();
+    var createResp = client.createMultipartUpload(createReq);
+    String uploadId = createResp.uploadId();
+
+    byte[] part = "to-be-aborted".getBytes(StandardCharsets.UTF_8);
+    UploadPartRequest upReq = UploadPartRequest.builder().uploadId(uploadId).partNumber(1).build();
+    client.uploadPart(upReq, RequestBody.fromBytes(part));
+
+    Path multipartBase = tempDir.resolve(S3MockClient.MULTIPART).resolve(uploadId);
+    assertTrue(Files.exists(multipartBase));
+
+    client.abortMultipartUpload(
+        software.amazon.awssdk.services.s3.model.AbortMultipartUploadRequest.builder()
+            .uploadId(uploadId)
+            .build());
+
+    assertFalse(Files.exists(multipartBase));
+  }
+
+  @Test
+  void listObjectsV2_withoutPrefix_listsRootFiles() throws Exception {
+    String key1 = "root1.txt";
+    String key2 = "root2.txt";
+    byte[] content = "root-content".getBytes(StandardCharsets.UTF_8);
+
+    client.putObject(PutObjectRequest.builder().key(key1).build(), RequestBody.fromBytes(content));
+    client.putObject(PutObjectRequest.builder().key(key2).build(), RequestBody.fromBytes(content));
+
+    ListObjectsV2Request listReq = ListObjectsV2Request.builder().build();
+    var listResp = client.listObjectsV2(listReq);
+    List<?> contents = listResp.contents();
+    assertFalse(contents.isEmpty());
+
+    boolean found1 = listResp.contents().stream().anyMatch(o -> o.key().equals(key1));
+    boolean found2 = listResp.contents().stream().anyMatch(o -> o.key().equals(key2));
+    assertTrue(found1 && found2);
   }
 }
