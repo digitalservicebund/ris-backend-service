@@ -321,31 +321,32 @@ export const uploadTestfile = async (
   filename: string | string[],
   options?: {
     skipAssert?: boolean
+    basePath?: string
   },
 ) => {
-  const [fileChooser] = await Promise.all([
-    page.waitForEvent("filechooser"),
-    page.getByText("Oder hier auswählen").click(),
-  ])
   const fileNames = Array.isArray(filename) ? filename : [filename]
-  await fileChooser.setFiles(
-    fileNames.map((file) => "./test/e2e/caselaw/testfiles/" + file),
-  )
-  await fileChooser.setFiles(
-    fileNames.map((file) => "./test/e2e/caselaw/testfiles/" + file),
-  )
-  await expect(async () => {
-    await expect(page.getByLabel("Ladestatus")).not.toBeAttached()
-  }).toPass({ timeout: 15000 })
+  const stepName = fileNames.length > 1 ? "Dateien werden" : "Datei wird"
+  await test.step(`${fileNames.length} ${stepName} hochgeladen`, async () => {
+    const basePath = options?.basePath ?? "./test/e2e/caselaw/testfiles/"
+    const [fileChooser] = await Promise.all([
+      page.waitForEvent("filechooser"),
+      page.getByText("Oder hier auswählen").click(),
+    ])
+    await fileChooser.setFiles(fileNames.map((file) => basePath + file))
+    await fileChooser.setFiles(fileNames.map((file) => basePath + file))
+    await expect(async () => {
+      await expect(page.getByLabel("Ladestatus")).not.toBeAttached()
+    }).toPass({ timeout: 15000 })
 
-  // Assert upload block
-  if (options?.skipAssert) return
-  await expect(page.getByText("Hochgeladen am")).toBeVisible()
+    // Assert upload block
+    if (options?.skipAssert) return
+    await expect(page.getByText("Hochgeladen am")).toBeVisible()
 
-  for (const file of fileNames) {
-    const lastFileName = page.getByRole("cell", { name: file }).last()
-    await expect(lastFileName).toBeVisible()
-  }
+    for (const file of fileNames) {
+      const lastFileName = page.getByRole("cell", { name: file }).last()
+      await expect(lastFileName).toBeVisible()
+    }
+  })
 }
 
 export async function save(page: Page) {

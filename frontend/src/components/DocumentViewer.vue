@@ -137,7 +137,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("category-import")
       break
-    case "w":
+    case "a":
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("other-attachments")
       break

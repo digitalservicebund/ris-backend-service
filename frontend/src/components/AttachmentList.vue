@@ -111,7 +111,7 @@ function closeDeleteModal() {
               value: 'Herunterladen',
               appendTo: 'body',
             }"
-            aria-label="Datei herunterladen"
+            :aria-label="`${file.name} herunterladen`"
             :loading="attachmentIdsWithActiveDownload.includes(file.id)"
             severity="secondary"
             size="small"
