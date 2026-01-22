@@ -25,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -43,7 +44,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
@@ -54,14 +54,18 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.server.ResponseStatusException;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadRequest;
 import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadResponse;
 import software.amazon.awssdk.services.s3.model.CreateMultipartUploadRequest;
 import software.amazon.awssdk.services.s3.model.CreateMultipartUploadResponse;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Exception;
@@ -323,8 +327,6 @@ class S3AttachmentServiceTest {
     }
   }
 
-  @Captor ArgumentCaptor<Consumer> consumerArgumentCaptor;
-
   @Test
   void testStreamUploadToS3_multipartIsUsed_andDomainIsPersisted() throws Exception {
     // given
@@ -373,6 +375,39 @@ class S3AttachmentServiceTest {
     assertEquals("upload-123", second.uploadId());
     assertEquals(5L * 1024 * 1024, first.contentLength().longValue());
     assertEquals((6L * 1024 * 1024) - (5L * 1024 * 1024), second.contentLength().longValue());
+  }
+
+  @Test
+  void testGetFileStream_returnsStreamedFileResponse() throws Exception {
+    UUID fileUuid = UUID.randomUUID();
+    String s3Path = UUID.randomUUID().toString();
+
+    when(repository.findById(fileUuid))
+        .thenReturn(Optional.of(AttachmentDTO.builder().s3ObjectPath(s3Path).build()));
+
+    byte[] data = "hello world".getBytes();
+
+    var getObjectResponse =
+        GetObjectResponse.builder()
+            .contentType("application/octet-stream")
+            .contentLength((long) data.length)
+            .build();
+
+    var responseInputStream =
+        new ResponseInputStream<GetObjectResponse>(
+            getObjectResponse, new ByteArrayInputStream(data));
+
+    when(s3Client.getObject(any(GetObjectRequest.class), any(ResponseTransformer.class)))
+        .thenReturn(responseInputStream);
+
+    var streamed = service.getFileStream(documentationUnitDTO.getId(), fileUuid);
+
+    assertEquals(getObjectResponse.contentType(), streamed.response().contentType());
+    assertEquals(getObjectResponse.contentLength(), streamed.response().contentLength());
+
+    var streamOutput = new java.io.ByteArrayOutputStream();
+    streamed.body().writeTo(streamOutput);
+    assertEquals(new String(data), streamOutput.toString());
   }
 
   private ByteBuffer buildBuffer(String entry) {
