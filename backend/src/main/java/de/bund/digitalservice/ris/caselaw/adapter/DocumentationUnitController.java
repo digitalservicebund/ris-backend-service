@@ -254,7 +254,7 @@ public class DocumentationUnitController {
    *
    * @param uuid UUID of the documentation unit
    * @param file the file to be uploaded
-   * @param httpHeaders http headers with the X-Filename information
+   * @param filename http headers with the X-Filename information
    * @return the into html converted content of the file with some additional metadata (ECLI)
    */
   @PutMapping(
@@ -266,16 +266,11 @@ public class DocumentationUnitController {
       @AuthenticationPrincipal OidcUser oidcUser,
       @PathVariable UUID uuid,
       @RequestPart("file") MultipartFile file,
-      @RequestHeader HttpHeaders httpHeaders) {
+      @RequestHeader(X_FILENAME) String filename) {
 
     if (file == null || file.isEmpty()) {
       return ResponseEntity.badRequest().build();
     }
-
-    if (!httpHeaders.containsHeader(X_FILENAME)) {
-      return ResponseEntity.badRequest().build();
-    }
-    String filename = httpHeaders.getFirst(X_FILENAME);
 
     Attachment attachment = null;
     try (InputStream is = file.getInputStream()) {
@@ -310,9 +305,9 @@ public class DocumentationUnitController {
    * @param uuid the unique identifier of the documentation unit to which the file will be attached
    * @param file the file to be attached to the documentation unit; must be a non-empty multipart
    *     file
-   * @return a {@link ResponseEntity} representing the result of the operation; returns 201
-   *     (Created) on success, 400 (Bad Request) if the file is invalid or missing, and 500
-   *     (Internal Server Error) for any unexpected errors
+   * @return a {@link org.springframework.http.ResponseEntity} representing the result of the
+   *     operation; returns 201 (Created) on success, 400 (Bad Request) if the file is invalid or
+   *     missing, and 500 (Internal Server Error) for any unexpected errors
    */
   @PutMapping(value = "/{uuid}/other-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
@@ -320,16 +315,11 @@ public class DocumentationUnitController {
       @AuthenticationPrincipal OidcUser oidcUser,
       @PathVariable UUID uuid,
       @RequestPart("file") MultipartFile file,
-      @RequestHeader HttpHeaders httpHeaders) {
+      @RequestHeader(X_FILENAME) String filename) {
 
     if (file == null || file.isEmpty()) {
       return ResponseEntity.badRequest().build();
     }
-
-    if (!httpHeaders.containsHeader(X_FILENAME)) {
-      return ResponseEntity.badRequest().build();
-    }
-    String filename = httpHeaders.getFirst(X_FILENAME);
 
     try (InputStream is = file.getInputStream()) {
       User user = userService.getUser(oidcUser);
