@@ -3,6 +3,7 @@ import Button from "primevue/button"
 import { computed } from "vue"
 import { RouteLocationRaw } from "vue-router"
 import FileNavigator from "@/components/FileNavigator.vue"
+import { useInternalUser } from "@/composables/useInternalUser"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import { isDecision } from "@/utils/typeGuards"
@@ -57,6 +58,8 @@ function emitSidePanelMode(value: SelectablePanelContent) {
 function emitAttachmentIndex(value: number) {
   emit("attachmentIndex:update", value)
 }
+
+const isInternalUser = useInternalUser()
 </script>
 
 <template>
@@ -125,7 +128,7 @@ function emitAttachmentIndex(value: number) {
       </Button>
 
       <Button
-        v-if="isDecision(documentUnit)"
+        v-if="isDecision(documentUnit) && isInternalUser"
         id="other-attachments"
         v-tooltip.bottom="tooltipValue('Anhänge', 'a')"
         aria-label="Anhänge anzeigen"

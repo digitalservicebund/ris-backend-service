@@ -14,6 +14,7 @@ import DecisionPreview from "@/components/preview/DecisionPreview.vue"
 import PendingProceedingPreview from "@/components/preview/PendingProceedingPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import TitleElement from "@/components/TitleElement.vue"
+import { useInternalUser } from "@/composables/useInternalUser"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
@@ -93,6 +94,8 @@ function setDefaultState() {
 
   setSidePanelMode("note")
 }
+
+const isInternalUser = useInternalUser()
 
 /**
  * Checks whether the panel should be expanded when it is mounted.
@@ -196,7 +199,9 @@ onMounted(() => {
           v-else-if="panelMode === 'category-import'"
           :document-number="importDocumentNumber"
         />
-        <OtherAttachments v-else-if="panelMode === 'other-attachments'" />
+        <OtherAttachments
+          v-else-if="panelMode === 'other-attachments' && isInternalUser"
+        />
       </div>
     </SideToggle>
   </FlexItem>
