@@ -26,12 +26,18 @@ const {
   handleOnDelete,
   handleOnDownload,
   upload,
-} = useAttachments(emit, {
-  getList: (decision) => decision.attachments,
-  setList: (decision, newValues) => (decision.attachments = newValues),
-  uploadFn: (uuid, file) =>
-    attachmentService.uploadOriginalDocument(uuid, file),
-})
+} = useAttachments(
+  {
+    attachmentsUploaded: (success) => emit("attachmentsUploaded", success),
+    attachmentIndexDeleted: (index) => emit("attachmentIndexDeleted", index),
+  },
+  {
+    getList: (decision) => decision.attachments,
+    setList: (decision, newValues) => (decision.attachments = newValues),
+    uploadFn: (uuid, file) =>
+      attachmentService.uploadOriginalDocument(uuid, file),
+  },
+)
 
 const store = useDocumentUnitStore()
 const { documentUnit: decision } = storeToRefs(store) as {

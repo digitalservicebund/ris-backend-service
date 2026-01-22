@@ -6,17 +6,21 @@ import attachmentService from "@/services/attachmentService"
 import { ServiceResponse } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
+interface AttachmentHandlers {
+  getList: (decision: Decision) => Attachment[]
+  setList: (decision: Decision, newValues: Attachment[]) => void
+  uploadFn: (uuid: string, file: File) => Promise<ServiceResponse<unknown>>
+}
+
+interface AttachmentEvents {
+  attachmentsUploaded?: (anySuccessful: boolean) => void
+  attachmentIndexDeleted?: (index: number) => void
+  attachmentIndexSelected?: (index: number) => void
+}
+
 export function useAttachments(
-  emit:
-    | (((event: "attachmentsUploaded", anySuccessful: boolean) => void) &
-        ((event: "attachmentIndexSelected", index: number) => void) &
-        ((event: "attachmentIndexDeleted", index: number) => void))
-    | undefined,
-  options: {
-    getList: (decision: Decision) => Attachment[]
-    setList: (decision: Decision, newValues: Attachment[]) => void
-    uploadFn: (uuid: string, file: File) => Promise<unknown>
-  },
+  events: AttachmentEvents,
+  options: AttachmentHandlers,
 ) {
   const store = useDocumentUnitStore()
   const { documentUnit: decision } = storeToRefs(store) as {
@@ -48,9 +52,7 @@ export function useAttachments(
       fileToDelete.s3path,
     )
     if (status < 300) {
-      if (emit) {
-        emit("attachmentIndexDeleted", attachments.value.indexOf(fileToDelete))
-      }
+      events.attachmentIndexDeleted?.(attachments.value.indexOf(fileToDelete))
       await store.loadDocumentUnit(store.documentUnit!.documentNumber)
     } else {
       errors.value = [
@@ -82,10 +84,7 @@ export function useAttachments(
     try {
       for (const file of Array.from(files)) {
         isLoading.value = true
-        const response = (await options.uploadFn(
-          decision.value.uuid,
-          file,
-        )) as ServiceResponse<unknown>
+        const response = await options.uploadFn(decision.value.uuid, file)
         if (response.status === 200 && response.data) {
           anySuccessful = true
         } else if (response.error?.title) {
@@ -96,9 +95,7 @@ export function useAttachments(
       }
     } finally {
       isLoading.value = false
-      if (emit) {
-        emit("attachmentsUploaded", anySuccessful)
-      }
+      events.attachmentsUploaded?.(anySuccessful)
       await store.loadDocumentUnit(store.documentUnit!.documentNumber)
     }
     return anySuccessful

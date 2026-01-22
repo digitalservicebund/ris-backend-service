@@ -15,11 +15,15 @@ const {
   handleOnDelete,
   handleOnDownload,
   upload,
-} = useAttachments(undefined, {
-  getList: (decision) => decision.otherAttachments,
-  setList: (decision, newValues) => (decision.otherAttachments = newValues),
-  uploadFn: (uuid, file) => attachmentService.uploadOtherAttachment(uuid, file),
-})
+} = useAttachments(
+  {},
+  {
+    getList: (decision) => decision.otherAttachments,
+    setList: (decision, newValues) => (decision.otherAttachments = newValues),
+    uploadFn: (uuid, file) =>
+      attachmentService.uploadOtherAttachment(uuid, file),
+  },
+)
 </script>
 
 <template>
