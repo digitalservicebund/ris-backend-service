@@ -211,7 +211,7 @@ dependencies {
 
     implementation("tools.jackson.core:jackson-core:3.0.3")
     implementation("tools.jackson.core:jackson-databind:3.0.3")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:2.20")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.21")
     implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.0.3")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1")
 
