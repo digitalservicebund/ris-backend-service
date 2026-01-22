@@ -240,7 +240,7 @@ public class DocumentationUnitController {
     var streamedFile = attachmentService.getFileStream(uuid, fileUuid);
 
     return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + "someFile.docx" + "\"")
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
         .contentType(MediaType.parseMediaType(streamedFile.response().contentType()))
         .contentLength(streamedFile.response().contentLength())
         .body(streamedFile.body());
