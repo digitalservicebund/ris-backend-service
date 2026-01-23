@@ -2,10 +2,10 @@
 import { useScrollLock } from "@vueuse/core"
 import dayjs from "dayjs"
 import Button from "primevue/button"
+import Dialog from "primevue/dialog"
 import { Ref, ref, watch } from "vue"
 import CellHeaderItem from "@/components/CellHeaderItem.vue"
 import CellItem from "@/components/CellItem.vue"
-import PopupModal from "@/components/PopupModal.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
@@ -123,14 +123,33 @@ function closeDeleteModal() {
       </CellItem>
     </TableRow>
   </TableView>
-  <PopupModal
-    v-if="showDeleteModal"
-    aria-label="Anhang löschen"
-    :content-text="`Möchten Sie den Anhang ${attachmentToBeDeleted?.name} wirklich dauerhaft löschen?`"
-    header-text="Anhang löschen"
-    primary-button-text="Löschen"
-    primary-button-type="destructive"
-    @close-modal="closeDeleteModal"
-    @primary-action="onDelete(attachmentToBeDeleted)"
-  />
+  <Dialog
+    v-model:visible="showDeleteModal"
+    class="max-h-[768px] max-w-[640px]"
+    :closable="false"
+    dismissable-mask
+    header="Anhang löschen"
+    modal
+  >
+    <p>
+      Möchten Sie den Anhang <b>{{ attachmentToBeDeleted?.name }}</b> wirklich
+      dauerhaft löschen?
+    </p>
+    <div class="modal-buttons-container flex w-full flex-row gap-[1rem] pt-32">
+      <Button
+        aria-label="Anhang löschen"
+        label="Löschen"
+        severity="primary"
+        size="small"
+        @click="onDelete(attachmentToBeDeleted)"
+      ></Button>
+      <Button
+        aria-label="Abbrechen"
+        label="Abbrechen"
+        severity="secondary"
+        size="small"
+        @click="showDeleteModal = false"
+      ></Button>
+    </div>
+  </Dialog>
 </template>
