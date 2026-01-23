@@ -19,14 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 
 @Service
 @Slf4j
 public class HandoverService {
-
-  private static final String HANDOVER_IMAGES_FEATURE_FLAG = "neuris.image-handover";
 
   private final DocumentationUnitRepository repository;
   private final LegalPeriodicalEditionRepository editionRepository;
@@ -35,7 +34,7 @@ public class HandoverService {
   private final DeltaMigrationRepository deltaMigrationRepository;
   private final DocumentationUnitHistoryLogService historyLogService;
   private final AttachmentInlineRepository attachmentInlineRepository;
-  private final FeatureToggleService featureToggleService;
+  private final Environment env;
 
   @Value("${mail.exporter.recipientAddress:neuris@example.com}")
   private String recipientAddress;
@@ -48,7 +47,7 @@ public class HandoverService {
       LegalPeriodicalEditionRepository editionRepository,
       DocumentationUnitHistoryLogService historyLogService,
       AttachmentInlineRepository attachmentInlineRepository,
-      FeatureToggleService featureToggleService) {
+      Environment env) {
 
     this.repository = repository;
     this.mailService = mailService;
@@ -57,7 +56,7 @@ public class HandoverService {
     this.editionRepository = editionRepository;
     this.historyLogService = historyLogService;
     this.attachmentInlineRepository = attachmentInlineRepository;
-    this.featureToggleService = featureToggleService;
+    this.env = env;
   }
 
   /**
@@ -208,11 +207,10 @@ public class HandoverService {
     List<Attachment> inlineAttachments =
         attachmentInlineRepository.findAllByDocumentationUnitId(decision.uuid());
     if (!inlineAttachments.isEmpty()) {
-      boolean isImageHandoverEnabled = featureToggleService.isEnabled(HANDOVER_IMAGES_FEATURE_FLAG);
       boolean isUnpublished =
           PublicationStatus.UNPUBLISHED.equals(decision.status().publicationStatus());
       boolean isMigrated = "Migration".equals(decision.managementData().createdByName());
-      if (!isImageHandoverEnabled) {
+      if (env.matchesProfiles("uat")) {
         throw new HandoverNotAllowedException(
             "Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV übergeben werden.");
       }

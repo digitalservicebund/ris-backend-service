@@ -63,6 +63,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.jdbc.Sql;
 import tools.jackson.core.type.TypeReference;
 
@@ -87,6 +88,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
   @Autowired private LegalPeriodicalEditionRepository legalPeriodicalEditionRepository;
   @Autowired private DatabaseIgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
   @Autowired private DocumentationUnitHistoryLogService docUnitHistoryLogService;
+  @Autowired private Environment environment;
 
   private DocumentationOfficeDTO docOffice;
   private final UUID oidcLoggedInUserId = UUID.fromString("c0a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5");
@@ -94,7 +96,6 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
   @BeforeEach
   void setUp() {
     docOffice = documentationOfficeRepository.findByAbbreviation("DS");
-    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(true);
     when(featureToggleService.isEnabled("neuris.text-check-noindex-handover")).thenReturn(true);
   }
 
