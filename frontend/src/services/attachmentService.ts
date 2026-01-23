@@ -155,8 +155,8 @@ const service: AttachmentService = {
       return {
         status: 500,
         error: {
-          title:
-            "Datei konnte nicht heruntergeladen werden. Versuchen sie es erneut oder wenden Sie sich an den Support.",
+          title: errorMessages.FILE_DOWNLOAD_FAILED.title,
+          description: errorMessages.FILE_DOWNLOAD_FAILED.description,
         },
       }
 
@@ -180,7 +180,10 @@ const service: AttachmentService = {
     )
     response.error =
       response.status >= 300
-        ? { title: errorMessages.FILE_DELETE_FAILED.title }
+        ? {
+            title: errorMessages.FILE_DELETE_FAILED.title,
+            description: errorMessages.FILE_DELETE_FAILED.description,
+          }
         : undefined
 
     return response
@@ -202,7 +205,10 @@ const service: AttachmentService = {
     )
     response.error =
       response.status >= 300
-        ? { title: errorMessages.DOCX_COULD_NOT_BE_LOADED.title }
+        ? {
+            title: errorMessages.DOCX_COULD_NOT_BE_LOADED.title,
+            description: errorMessages.DOCX_COULD_NOT_BE_LOADED.description,
+          }
         : undefined
 
     return response

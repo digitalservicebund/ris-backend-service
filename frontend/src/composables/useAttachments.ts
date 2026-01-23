@@ -2,6 +2,7 @@ import { storeToRefs } from "pinia"
 import { ref, computed, Ref } from "vue"
 import { Attachment } from "@/domain/attachment"
 import { Decision } from "@/domain/decision"
+import errorMessages from "@/i18n/errors.json"
 import attachmentService from "@/services/attachmentService"
 import { ServiceResponse } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -55,9 +56,7 @@ export function useAttachments(
       events.attachmentIndexDeleted?.(attachments.value.indexOf(fileToDelete))
       await store.loadDocumentUnit(store.documentUnit!.documentNumber)
     } else {
-      errors.value = [
-        "Datei konnte nicht gelöscht werden. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support.",
-      ]
+      errors.value = [errorMessages.FILE_DELETE_FAILED.title]
     }
   }
 

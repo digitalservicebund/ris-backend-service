@@ -24,7 +24,7 @@
     "description": ""
   },
   "OTHER_FILE_TOO_LARGE_CASELAW": {
-    "title": "überschreitet das Limit von 100MB Größe.",
+    "title": "überschreitet das Limit von 100 MB Größe.",
     "description": "Laden Sie eine kleinere Datei hoch."
   },
   "WRONG_MEDIA_TYPE_DOCX_REQUIRED": {
@@ -105,6 +105,10 @@
   },
   "FILE_DELETE_FAILED": {
     "title": "Datei konnte nicht gelöscht werden.",
+    "description": ""
+  },
+  "FILE_DOWNLOAD_FAILED": {
+    "title": "Datei konnte nicht heruntergeladen werden.",
     "description": ""
   },
   "DOCX_COULD_NOT_BE_LOADED": {
