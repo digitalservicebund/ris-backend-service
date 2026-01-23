@@ -339,13 +339,11 @@ public class S3AttachmentService implements AttachmentService {
 
   @Override
   public StreamedFileResponse getFileStream(UUID documentationUnitId, UUID fileUuid) {
-    var s3Path =
-        repository
-            .findById(fileUuid)
-            .map(AttachmentDTO::getS3ObjectPath)
-            .orElseThrow(() -> new AttachmentException("File not found"));
+    var attachmentDTO =
+        repository.findById(fileUuid).orElseThrow(() -> new AttachmentException("File not found"));
 
-    var getObjectRequest = GetObjectRequest.builder().bucket(bucketName).key(s3Path).build();
+    var getObjectRequest =
+        GetObjectRequest.builder().bucket(bucketName).key(attachmentDTO.getS3ObjectPath()).build();
 
     ResponseTransformer<GetObjectResponse, ResponseInputStream<GetObjectResponse>> transformer =
         ResponseTransformer.toInputStream();
@@ -364,7 +362,7 @@ public class S3AttachmentService implements AttachmentService {
           }
         };
 
-    return new StreamedFileResponse(stream.response(), responseBody);
+    return new StreamedFileResponse(stream.response(), responseBody, attachmentDTO.getFilename());
   }
 
   void checkDocx(ByteBuffer byteBuffer) {

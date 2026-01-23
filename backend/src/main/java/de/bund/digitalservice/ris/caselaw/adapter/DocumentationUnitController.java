@@ -236,14 +236,15 @@ public class DocumentationUnitController {
   @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#uuid)")
   public ResponseEntity<StreamingResponseBody> downloadFile(
       @PathVariable UUID uuid, @PathVariable UUID fileUuid) {
-
-    var streamedFile = attachmentService.getFileStream(uuid, fileUuid);
+    var fileResponse = attachmentService.getFileStream(uuid, fileUuid);
 
     return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
-        .contentType(MediaType.parseMediaType(streamedFile.response().contentType()))
-        .contentLength(streamedFile.response().contentLength())
-        .body(streamedFile.body());
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION,
+            "attachment; filename=\"" + fileResponse.filename() + "\"")
+        .contentType(MediaType.parseMediaType(fileResponse.response().contentType()))
+        .contentLength(fileResponse.response().contentLength())
+        .body(fileResponse.body());
   }
 
   /**

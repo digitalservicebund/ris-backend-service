@@ -2048,6 +2048,7 @@ class DocumentationUnitControllerTest {
     void testDownloadFile_shouldReturnStreamedFileResponse() {
       UUID fileUuid = UUID.randomUUID();
       byte[] data = "test file content".getBytes();
+      var filename = "testfile.docx";
 
       GetObjectResponse getObjectResponse =
           GetObjectResponse.builder()
@@ -2057,7 +2058,8 @@ class DocumentationUnitControllerTest {
               .build();
 
       StreamedFileResponse streamedFileResponse =
-          new StreamedFileResponse(getObjectResponse, outputStream -> outputStream.write(data));
+          new StreamedFileResponse(
+              getObjectResponse, outputStream -> outputStream.write(data), filename);
 
       when(attachmentService.getFileStream(TEST_UUID, fileUuid)).thenReturn(streamedFileResponse);
 
@@ -2073,7 +2075,7 @@ class DocumentationUnitControllerTest {
               MediaType.parseMediaType(
                   "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
           .expectHeader()
-          .valueEquals(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"someFile.docx\"")
+          .valueEquals(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"testfile.docx\"")
           .expectHeader()
           .valueEquals(HttpHeaders.CONTENT_LENGTH, String.valueOf(data.length));
 
