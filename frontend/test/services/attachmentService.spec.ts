@@ -25,15 +25,16 @@ describe("attachmentService", () => {
           "Content-Type":
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           "X-Filename": "test.docx",
+          "X-Filesize": "3",
         },
       }
 
       await service.uploadOriginalDocument("123", testFile)
 
       expect(httpPutMock).toHaveBeenCalledWith(
-        "caselaw/documentunits/123/file",
+        "caselaw/documentunits/123/original-file",
         expectedHeaders,
-        testFile,
+        expect.any(FormData),
       )
     })
 
