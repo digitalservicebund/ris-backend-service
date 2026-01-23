@@ -88,7 +88,9 @@ export function useAttachments(
           anySuccessful = true
         } else if (response.error?.title) {
           errors.value.push(
-            `${file.name} ${response.error.title} ${response.error.description}`,
+            [file.name, response.error?.title, response.error?.description]
+              .filter(Boolean)
+              .join(" "),
           )
         }
       }
