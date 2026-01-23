@@ -30,7 +30,7 @@ async function attachmentIndexDeleted(
   await requestDocumentUnitFromServer()
   extraContentSidePanelStore.onAttachmentDeleted(
     index,
-    documentUnit.value ? documentUnit.value.attachments.length - 1 : 0,
+    documentUnit.value ? documentUnit.value.attachments.length : 0,
   )
 }
 
