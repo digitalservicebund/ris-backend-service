@@ -26,6 +26,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -53,7 +54,7 @@ class HandoverServiceTest {
   @MockitoBean private AttachmentService attachmentService;
   @MockitoBean private Validator validator;
   @MockitoBean private AttachmentInlineRepository attachmentInlineRepository;
-  @MockitoBean private FeatureToggleService featureToggleService;
+  @MockitoBean private Environment environment;
 
   @Test
   void testHandoverByEmail() throws DocumentationUnitNotExistsException {
@@ -120,7 +121,7 @@ class HandoverServiceTest {
   }
 
   @Test
-  void testHandoverByEmail_withImagesAndFeatureFlagDisabled_shouldThrowHandoverException()
+  void testHandoverByEmail_withImagesInUAT_shouldThrowHandoverException()
       throws HandoverException, DocumentationUnitNotExistsException {
     Decision decision =
         Decision.builder()
@@ -128,8 +129,8 @@ class HandoverServiceTest {
             .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
             .managementData(ManagementData.builder().build())
             .build();
-    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(false);
     when(repository.findByUuid(TEST_UUID)).thenReturn(decision);
+    when(environment.matchesProfiles("uat")).thenReturn(true);
     when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
         .thenReturn(List.of(Attachment.builder().format("jpg").build()));
 
@@ -151,7 +152,6 @@ class HandoverServiceTest {
             .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
             .managementData(ManagementData.builder().build())
             .build();
-    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(true);
     when(repository.findByUuid(TEST_UUID)).thenReturn(decision);
     when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
         .thenReturn(List.of(Attachment.builder().format("jpg").build()));
@@ -174,7 +174,6 @@ class HandoverServiceTest {
             .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
             .managementData(ManagementData.builder().createdByName("Migration").build())
             .build();
-    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(true);
     when(repository.findByUuid(TEST_UUID)).thenReturn(decision);
     when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
         .thenReturn(List.of(Attachment.builder().format("jpg").build()));
@@ -197,7 +196,6 @@ class HandoverServiceTest {
             .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
             .managementData(ManagementData.builder().build())
             .build();
-    when(featureToggleService.isEnabled("neuris.image-handover")).thenReturn(true);
     when(repository.findByUuid(TEST_UUID)).thenReturn(decision);
     when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
         .thenReturn(

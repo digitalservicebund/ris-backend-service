@@ -919,6 +919,50 @@ describe("HandoverDocumentationUnitView:", () => {
       ),
     ).toBeInTheDocument()
   })
+
+  it("prevent handover with images in uat", async () => {
+    renderComponent({
+      env: { environment: "uat" },
+      documentUnit: new Decision("123", {
+        status: { publicationStatus: PublicationState.UNPUBLISHED },
+        coreData: {
+          fileNumbers: ["foo"],
+          court: { type: "type", location: "location", label: "label" },
+          decisionDate: "2022-02-01",
+          legalEffect: "legalEffect",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
+          },
+        },
+      }),
+      stubs: {
+        CodeSnippet: {
+          template: '<div data-testid="code-snippet"/>',
+        },
+      },
+    })
+
+    // Wait for XML Vorschau
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await nextTick()
+
+    expect(
+      screen.getByText(
+        "Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV übergeben werden. Dieses Feature steht nur in der Prod-Umgebung zur Verfügung.",
+      ),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        "In UAT können keine Entscheidungen mit Bildern an die jDV übergeben werden",
+      ),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText(
+        "Diese bereits veröffentlichte Entscheidung enthält Bilder und kann deshalb nicht erneut an die jDV übergeben werden.",
+      ),
+    ).not.toBeInTheDocument()
+  })
 })
 
 describe("renders uat test mode hint", () => {
