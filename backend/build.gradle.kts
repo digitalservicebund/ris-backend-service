@@ -213,7 +213,7 @@ dependencies {
     implementation("tools.jackson.core:jackson-databind:3.0.3")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.21")
     implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.0.3")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.0")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
@@ -273,7 +273,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.2.0.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.2.1.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
