@@ -206,7 +206,7 @@ public class DocumentationUnitController {
    * @return the into html converted content of the file with some additional metadata (ECLI)
    */
   @PutMapping(
-      value = {"/{uuid}/file"},
+      value = "/{uuid}/file",
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
   @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")

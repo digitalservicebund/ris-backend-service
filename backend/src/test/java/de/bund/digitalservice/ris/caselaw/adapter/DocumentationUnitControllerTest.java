@@ -1290,6 +1290,47 @@ class DocumentationUnitControllerTest {
   }
 
   @Nested
+  class DownloadFile {
+    @Test
+    void testDownloadFile_shouldReturnStreamedFileResponse() {
+      UUID fileUuid = UUID.randomUUID();
+      byte[] data = "test file content".getBytes();
+      var filename = "testfile.docx";
+
+      GetObjectResponse getObjectResponse =
+          GetObjectResponse.builder()
+              .contentType(
+                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+              .contentLength((long) data.length)
+              .build();
+
+      StreamedFileResponse streamedFileResponse =
+          new StreamedFileResponse(
+              getObjectResponse, outputStream -> outputStream.write(data), filename);
+
+      when(attachmentService.getFileStream(TEST_UUID, fileUuid)).thenReturn(streamedFileResponse);
+
+      risWebClient
+          .withDefaultLogin()
+          .get()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/" + fileUuid)
+          .exchange()
+          .expectStatus()
+          .isOk()
+          .expectHeader()
+          .contentType(
+              MediaType.parseMediaType(
+                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+          .expectHeader()
+          .valueEquals(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"testfile.docx\"")
+          .expectHeader()
+          .valueEquals(HttpHeaders.CONTENT_LENGTH, String.valueOf(data.length));
+
+      verify(attachmentService).getFileStream(TEST_UUID, fileUuid);
+    }
+  }
+
+  @Nested
   class TakeoverDocumentUnit {
     @Test
     void testTakeoverDocumentationUnit_withSameDocOfficeAsDocUnit_shouldSucceed()
@@ -2043,47 +2084,6 @@ class DocumentationUnitControllerTest {
 
         verify(abstractService, never()).bulkAssignProcessStep(any(), any(), any());
       }
-    }
-  }
-
-  @Nested
-  class DownloadFile {
-    @Test
-    void testDownloadFile_shouldReturnStreamedFileResponse() {
-      UUID fileUuid = UUID.randomUUID();
-      byte[] data = "test file content".getBytes();
-      var filename = "testfile.docx";
-
-      GetObjectResponse getObjectResponse =
-          GetObjectResponse.builder()
-              .contentType(
-                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-              .contentLength((long) data.length)
-              .build();
-
-      StreamedFileResponse streamedFileResponse =
-          new StreamedFileResponse(
-              getObjectResponse, outputStream -> outputStream.write(data), filename);
-
-      when(attachmentService.getFileStream(TEST_UUID, fileUuid)).thenReturn(streamedFileResponse);
-
-      risWebClient
-          .withDefaultLogin()
-          .get()
-          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/" + fileUuid)
-          .exchange()
-          .expectStatus()
-          .isOk()
-          .expectHeader()
-          .contentType(
-              MediaType.parseMediaType(
-                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-          .expectHeader()
-          .valueEquals(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"testfile.docx\"")
-          .expectHeader()
-          .valueEquals(HttpHeaders.CONTENT_LENGTH, String.valueOf(data.length));
-
-      verify(attachmentService).getFileStream(TEST_UUID, fileUuid);
     }
   }
 }
