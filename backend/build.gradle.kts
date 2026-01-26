@@ -11,9 +11,9 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "4.0.1"
+    id("org.springframework.boot") version "4.0.2"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.diffplug.spotless") version "8.1.0"
+    id("com.diffplug.spotless") version "8.2.0"
     id("org.sonarqube") version "7.2.2.6593"
     id("com.github.jk1.dependency-license-report") version "3.0.1"
     id("com.adarshr.test-logger") version "4.0.0"
@@ -181,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.41.10"))
+    implementation(platform("software.amazon.awssdk:bom:2.41.13"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -209,11 +209,11 @@ dependencies {
     // for local development:
 //     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.121.jar"))
 
-    implementation("tools.jackson.core:jackson-core:3.0.3")
-    implementation("tools.jackson.core:jackson-databind:3.0.3")
+    implementation("tools.jackson.core:jackson-core:3.0.4")
+    implementation("tools.jackson.core:jackson-databind:3.0.4")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.21")
-    implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.0.3")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1")
+    implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.0.4")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.0")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
@@ -222,7 +222,7 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260102.1")
 
-    implementation("io.getunleash:unleash-client-java:12.0.1")
+    implementation("io.getunleash:unleash-client-java:12.1.0")
     implementation("org.apache.commons:commons-text:1.15.0")
     implementation("org.jsoup:jsoup:1.22.1")
 
@@ -273,7 +273,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.2.0.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.2.1.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
