@@ -95,12 +95,24 @@ test.describe("Editor: table tests", () => {
   test.describe(
     "Click on every table menu button for cursor inside a cell",
     {
-      annotation: {
-        type: "story",
-        description:
-          "https://digitalservicebund.atlassian.net/browse/RISDEV-6646",
-      },
-      tag: ["@RISDEV-6646"],
+      annotation: [
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-6646",
+        },
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-9331",
+        },
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-10447",
+        },
+      ],
+      tag: ["@RISDEV-6646", "@RISDEV-9331", "@RISDEV-10447"],
     },
     () => {
       test("'Tabellenrahmen' => 'Alle Rahmen' and reset to 'Keine Rahmen'", async ({
