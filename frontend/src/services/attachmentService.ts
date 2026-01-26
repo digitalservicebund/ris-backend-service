@@ -23,7 +23,7 @@ interface AttachmentService {
 const service: AttachmentService = {
   async upload(documentUnitUuid: string, file: File) {
     const extension = file.name?.split(".").pop()
-    if (!extension || extension.toLowerCase() !== "docx") {
+    if (extension?.toLowerCase() !== "docx") {
       return {
         status: 415,
         error: {
