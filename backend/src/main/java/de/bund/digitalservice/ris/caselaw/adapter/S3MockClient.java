@@ -136,8 +136,9 @@ public class S3MockClient implements S3Client {
             .contentType("application/octet-stream")
             .build();
 
-    try (InputStream fileStream = new FileInputStream(file);
-        AbortableInputStream abortableInputStream = AbortableInputStream.create(fileStream)) {
+    try {
+      InputStream fileStream = new FileInputStream(file);
+      AbortableInputStream abortableInputStream = AbortableInputStream.create(fileStream);
       return responseTransformer.transform(objectResponse, abortableInputStream);
     } catch (Exception e) {
       throw new IllegalStateException("Failed to mock S3 getObject for file: " + fileName, e);
