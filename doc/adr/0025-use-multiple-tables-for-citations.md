@@ -26,41 +26,40 @@ We also need to handle unpublishing of documents.
 
 ## Decision
 
-We want to create new tables to better organize the references. For each type of reference (e.g. caselaw cites caselaw, caselaw cites dependent literature, dependent literature cites caselaw, ...) we create the following tables, if we have a need for them:
-* `citation_{source}_to_{target}_link`
-    * references both the active and passive side using an identifier
-    * Rank column for sorting on the active side. The rank values are shared with `citation_{source}_to_{target}_blindlink_active`.
-* `citation_{source}_to_{target}_blindlink_active`
-    * references the active side using an identifier
-    * references the passive side using various information based on the type of reference
-    * Rank column for sorting on the active side. The rank values are shared with `citation_{source}_to_{target}_link`.
-* `citation_{source}_to_{target}_blindlink_passive`
-    * references the passive side using an identifier
-    * references the active side using various information based on the type of reference
+We want to create new tables to better organize the references. For each type of reference (caselaw, independent literature, dependent literature, administrative regulation) we create the following tables, if we have a need for them:
+* `citation_{type}_link_active` (in the `caselaw` case just `citation_caselaw_link`)
+    * Active citations having caselaw documents as sources
+    * references both the source and target using an identifier
+    * Rank column for sorting on the active side. The rank values are shared with `citation_{type}_blindlink_active`.
+* `citation_{type}_blindlink_active`
+    * Active citations having caselaw documents as sources
+    * references the source using an identifier
+    * references the target using various information based on the type of reference
+    * Rank column for sorting on the active side. The rank values are shared with `citation_{type}_link`.
+* `citation_{type}_blindlink_passive`
+    * Passive citations having caselaw documents as targets
+    * references the target using an identifier
+    * references the source side using various information based on the type of reference
+* `citation_{type}_link_passive`
+  * In cases in which we need to store additional information about passive links targeting caselaw documents
+  * The reference in the global ref schema is referenced using its id
 
-### Example for independent literature (SLI) and caselaw decisions
 
-* `citation_caselaw_to_sli_link`
-    * A caselaw decision cites an SLI.
+### Example for dependent literature (ULI) and caselaw decisions
+
+* `citation_uli_link_active`
+    * A caselaw decision cites an ULI.
     * Both the SLI and the caselaw decision exist.
-* `citation_caselaw_to_sli_blindlink_active`
-    * A caselaw decision cites an SLI.
-    * The caselaw decision exist. The SLI does not.
-* `citation_caselaw_to_sli_blindlink_passive`
-    * A caselaw decision cites an SLI.
-    * The SLI exist. The caselaw decision does not.
-    * This table does not exist in our (caselaw) database.
-* `citation_sli_to_caselaw_link`
-    * An SLI cites a caselaw decision.
+* `citation_uli_blindlink_active`
+    * A caselaw decision cites an ULI.
+    * The caselaw decision exist. The ULI does not.
+* `citation_uli_blindlink_passive`
+    * An ULI cites a caselaw decision.
+    * The caselaw decision exist. The ULI does not.
+* `citation_uli_link_passive`
+    * An ULI cites a caselaw decision.
     * Both the SLI and the caselaw decision exist.
-    * This table does not exist in our (caselaw) database but in the global ref-schema.
-* `citation_sli_to_caselaw_blindlink_active`
-    * An SLI cites a caselaw decision.
-    * The SLI exist. The caselaw decision does not.
-    * This table does not exist in our (caselaw) database.
-* `citation_sli_to_caselaw_blindlink_passive`
-    * An SLI cites a caselaw decision.
-    * The caselaw decision exist. The SLI does not.
+    * This table has only additional information about this reference. The reference itself lives in the global ref schema
 
 ### Publishing
 
@@ -89,10 +88,6 @@ into the link tables. We only create blind-links during the main part of the mig
 blind-links with an existing target in a post-processing step to links. Afterward, we remove active and passive
 blind-links for which the link also exists in the link table.
 
-### ULI
-
-- [ ] write something about how they interact with Fundstellen
-
 ## Consequences
 
 - We have a better and clearer database structure that enables us to do more advanced work with references.
@@ -105,4 +100,4 @@ blind-links for which the link also exists in the link table.
 * We no longer store the raw values for document types for blind-links: There are no missing entries for caselaw citations
 * We do not create extra tables for the fields shared between the three reference tables as these are only very few fields (e.g. for caselaw citations it's only the citation_type_id).
 * We use the id of a doc unit for the foreign key and not the document_number. Using the document_number created problems with hibernate.
-* We prefix the columns in the tables with `active_` or `passive_` to identify the side of the relation for which the column stores information.
+* We prefix the columns in the tables with `source_` or `target_` to identify the side of the relation for which the column stores information.
