@@ -14,7 +14,7 @@ public class AttachmentInlineTransformer {
         .format(dto.getFormat())
         .s3path(null)
         .uploadTimestamp(dto.getUploadTimestamp())
-        .type(AttachmentType.OTHER) // Images are always other attachments
+        .type(AttachmentType.OTHER)
         .build();
   }
 }

@@ -127,6 +127,7 @@ public class S3AttachmentService implements AttachmentService {
       UUID documentationUnitId, InputStream file, String filename, User user, AttachmentType type) {
 
     var documentationUnit = documentationUnitRepository.findById(documentationUnitId).orElseThrow();
+    var documentationUnitNumber = documentationUnit.getDocumentNumber();
 
     var extension = getExtension(filename);
 
@@ -141,7 +142,12 @@ public class S3AttachmentService implements AttachmentService {
             .build();
 
     attachmentDTO = repository.save(attachmentDTO);
-    var s3ObjectPath = attachmentDTO.getId().toString();
+    var s3ObjectPath =
+        "%s/%s.%s"
+            .formatted(
+                documentationUnitNumber,
+                attachmentDTO.getId().toString(),
+                attachmentDTO.getFormat());
 
     try {
       streamFileToBucket(s3ObjectPath, file);
