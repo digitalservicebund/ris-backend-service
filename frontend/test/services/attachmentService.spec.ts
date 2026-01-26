@@ -91,44 +91,44 @@ describe("attachmentService", () => {
     })
 
     it("should map HTTP 413 to correct error message", async () => {
-      const smallFile = new File(["foo"], "test.pdf")
+      const largeFile = new File(["foo"], "test.pdf")
       httpPutMock.mockResolvedValue({ status: 413 } as ServiceResponse<unknown>)
 
-      const result = await service.uploadOtherAttachment("123", smallFile)
+      const result = await service.uploadOtherAttachment("123", largeFile)
 
       expect(result.status).toBe(413)
       expect(result.error).toEqual(errorMessages.OTHER_FILE_TOO_LARGE_CASELAW)
     })
 
     it("should map HTTP 403 to correct error message", async () => {
-      const smallFile = new File(["foo"], "test.pdf")
+      const file = new File(["foo"], "test.pdf")
       httpPutMock.mockResolvedValue({ status: 403 } as ServiceResponse<unknown>)
 
-      const result = await service.uploadOtherAttachment("123", smallFile)
+      const result = await service.uploadOtherAttachment("123", file)
 
       expect(result.status).toBe(403)
       expect(result.error).toEqual(errorMessages.NOT_ALLOWED)
     })
 
     it("should map HTTP >= 300 to server error", async () => {
-      const smallFile = new File(["foo"], "test.pdf")
+      const file = new File(["foo"], "test.pdf")
       httpPutMock.mockResolvedValue({ status: 500 } as ServiceResponse<unknown>)
 
-      const result = await service.uploadOtherAttachment("123", smallFile)
+      const result = await service.uploadOtherAttachment("123", file)
 
       expect(result.status).toBe(500)
       expect(result.error).toEqual(errorMessages.SERVER_ERROR)
     })
 
     it("should set error to undefined on success (HTTP 200)", async () => {
-      const smallFile = new File(["foo"], "test.pdf")
+      const file = new File(["foo"], "test.pdf")
       httpPutMock.mockResolvedValue({
         status: 200,
         data: {},
         error: undefined,
       } as ServiceResponse<unknown>)
 
-      const result = await service.uploadOtherAttachment("123", smallFile)
+      const result = await service.uploadOtherAttachment("123", file)
 
       expect(result.status).toBe(200)
       expect(result.error).toBeUndefined()

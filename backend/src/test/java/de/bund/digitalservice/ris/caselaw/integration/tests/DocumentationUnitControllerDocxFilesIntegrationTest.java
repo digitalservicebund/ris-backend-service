@@ -560,6 +560,32 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
         .isForbidden();
   }
 
+  @Test
+  void testRemoveDocumentationUnit_shouldRemoveAttachments() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
+
+    attachmentRepository.save(
+        AttachmentDTO.builder()
+            .s3ObjectPath("fooPath")
+            .documentationUnit(dto)
+            .uploadTimestamp(Instant.now())
+            .filename("fooFile")
+            .format("docx")
+            .attachmentType(AttachmentType.OTHER.name())
+            .build());
+
+    assertThat(attachmentRepository.findAll()).hasSize(1);
+    risWebTestClient
+        .withDefaultLogin()
+        .delete()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .exchange()
+        .expectStatus()
+        .isOk();
+    assertThat(attachmentRepository.findAll()).isEmpty();
+  }
+
   private void mockS3ClientToReturnFile(byte[] file) {
     when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
         .thenReturn(PutObjectResponse.builder().build());
