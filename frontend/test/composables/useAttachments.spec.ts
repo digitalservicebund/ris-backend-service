@@ -260,7 +260,7 @@ describe("useAttachments", () => {
       )
       expect(result).toBe(false)
       expect(errors.value).toEqual([
-        "test.pdf " + errorMessages.FILE_UPLOAD_FAILED.title,
+        "'test.pdf' " + errorMessages.FILE_UPLOAD_FAILED.title,
       ])
     })
   })

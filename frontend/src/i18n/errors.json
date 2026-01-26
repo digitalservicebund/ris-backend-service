@@ -24,7 +24,7 @@
     "description": ""
   },
   "OTHER_FILE_TOO_LARGE_CASELAW": {
-    "title": "überschreitet das Limit von 100 MB Größe.",
+    "title": "überschreitet die zulässige Dateigröße von 100 MB.",
     "description": "Laden Sie eine kleinere Datei hoch."
   },
   "WRONG_MEDIA_TYPE_DOCX_REQUIRED": {
@@ -32,7 +32,7 @@
     "description": "Laden Sie eine .docx-Version hoch."
   },
   "ORIGINAL_DOCUMENT_TOO_LARGE_CASELAW": {
-    "title": "überschreitet das Limit von 20MB Größe.",
+    "title": "überschreitet die zulässige Dateigröße von 20 MB.",
     "description": "Laden Sie eine kleinere Datei hoch."
   },
   "DOCX_PARSING_ERROR": {

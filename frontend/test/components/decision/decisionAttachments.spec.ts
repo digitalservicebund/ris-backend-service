@@ -1,6 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DecisionAttachments from "@/components/DecisionAttachments.vue"
 import { Attachment } from "@/domain/attachment"
@@ -64,5 +65,27 @@ describe("Document Unit Categories", () => {
     expect(screen.queryByText(name)).toBeVisible()
     expect(screen.queryByText(format)).toBeVisible()
     expect(screen.getByTestId("uploaded-at-cell")).toBeInTheDocument()
+  })
+
+  test("opens delete modal when 'Datei löschen' is clicked", async () => {
+    const name = "this-is-a-file-name.docx"
+    const format = "docx"
+    const attachment: Attachment = {
+      id: "123",
+      name: name,
+      format: format,
+      s3path: "./path.docx",
+      uploadTimestamp: "11.04.2024",
+    }
+    renderComponent([attachment])
+
+    screen.getByLabelText("Datei löschen").click()
+    await nextTick()
+    expect(screen.getByRole("dialog")).toHaveTextContent(
+      "Möchten Sie den Anhang this-is-a-file-name.docx wirklich dauerhaft löschen?",
+    )
+    screen.getByLabelText("Abbrechen").click()
+    await nextTick()
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
   })
 })

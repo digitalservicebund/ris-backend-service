@@ -66,7 +66,7 @@ function closeDeleteModal() {
     class="relative table w-full border-separate"
     data-testid="attachment-list"
   >
-    <TableHeader>
+    <TableHeader class="z-10">
       <CellHeaderItem> Dateiname</CellHeaderItem>
       <CellHeaderItem> Format</CellHeaderItem>
       <CellHeaderItem> Hochgeladen am</CellHeaderItem>
@@ -92,7 +92,7 @@ function closeDeleteModal() {
             : "-"
         }}
       </CellItem>
-      <CellItem class="min-w-[110px] justify-end">
+      <CellItem class="flex">
         <div class="flex flex-row justify-end -space-x-2">
           <Button
             v-tooltip.bottom="{
