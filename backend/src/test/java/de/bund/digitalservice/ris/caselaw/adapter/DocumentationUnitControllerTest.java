@@ -996,7 +996,7 @@ class DocumentationUnitControllerTest {
       // when
       when(userHasWriteAccess.apply(any())).thenReturn(true);
       when(userService.getUser(any(OidcUser.class))).thenReturn(user);
-      when(converterService.getConvertedObject("some-file.docx")).thenReturn(expectedHtml);
+      when(converterService.getConvertedObject(any())).thenReturn(expectedHtml);
       doNothing().when(duplicateCheckService).checkDuplicates(any());
       doNothing().when(docUnitAttachmentService).initializeCoreData(any(), any(), any());
 
@@ -1030,7 +1030,11 @@ class DocumentationUnitControllerTest {
       doThrow(new RuntimeException("error"))
           .when(attachmentService)
           .streamFileToDocumentationUnit(
-              eq(TEST_UUID), any(InputStream.class), any(), any(), eq(AttachmentType.OTHER));
+              eq(TEST_UUID),
+              any(InputStream.class),
+              any(String.class),
+              any(User.class),
+              eq(AttachmentType.OTHER));
 
       // when
       when(userHasWriteAccess.apply(any())).thenReturn(true);
