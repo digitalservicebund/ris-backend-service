@@ -231,9 +231,11 @@ public class DocumentationUnitController {
   }
 
   @GetMapping(value = "/{uuid}/file/{fileUuid}")
-  @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#uuid)")
+  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<StreamingResponseBody> downloadFile(
-      @PathVariable UUID uuid, @PathVariable UUID fileUuid) {
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @PathVariable UUID uuid,
+      @PathVariable UUID fileUuid) {
     var fileResponse = attachmentService.getFileStream(uuid, fileUuid);
 
     return ResponseEntity.ok()

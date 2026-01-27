@@ -857,7 +857,7 @@ class DocumentationUnitControllerTest {
   }
 
   @Nested
-  class testOtherFileEndpoint {
+  class AttachOtherFileToDocumentationUnit {
     @Test
     void givenMissingMultipart_whenUploadingOtherFile_thenFail() {
       // given
@@ -1293,6 +1293,7 @@ class DocumentationUnitControllerTest {
   class DownloadFile {
     @Test
     void testDownloadFile_shouldReturnStreamedFileResponse() {
+      when(userHasWriteAccess.apply(any())).thenReturn(true);
       UUID fileUuid = UUID.randomUUID();
       byte[] data = "test file content".getBytes();
       var filename = "testfile.docx";
