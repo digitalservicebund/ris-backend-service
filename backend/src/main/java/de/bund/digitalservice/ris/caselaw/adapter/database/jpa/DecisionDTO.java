@@ -32,9 +32,9 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.type.SqlTypes;
 
 @Getter
 @Setter
@@ -145,6 +145,43 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   private List<ActiveCitationDTO> activeCitations = new ArrayList<>();
 
+  /**
+   * Aktivzitierungen (echte Links) CURRENTLY NO GUARANTEE TO INCLUDE THE CORRECT DATA. ONLY USE FOR
+   * WRITING!
+   */
+  // TODO: (Malte Laukötter, 2026-01-09) remove comment once they can be read as well
+  @OneToMany(
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true,
+      mappedBy = "sourceDocument")
+  @Builder.Default
+  @OrderBy("rank")
+  private List<LinkCaselawCitationDTO> activeLinkCaselawCitations = new ArrayList<>();
+
+  /**
+   * Aktivzitierungen (blind Links) CURRENTLY NO GUARANTEE TO INCLUDE THE CORRECT DATA. ONLY USE FOR
+   * WRITING!
+   */
+  // TODO: (Malte Laukötter, 2026-01-09) remove comment once they can be read as well
+  @OneToMany(
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true,
+      mappedBy = "sourceDocument")
+  @Builder.Default
+  @OrderBy("rank")
+  private List<ActiveBlindlinkCaselawCitationDTO> activeBlindlinkCaselawCitations =
+      new ArrayList<>();
+
+  /** Passivezitierungen (echte Links) CURRENTLY NO GUARANTEE TO INCLUDE THE CORRECT DATA. */
+  // TODO: (Malte Laukötter, 2026-01-09) remove comment once they can be read
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "targetDocument")
+  @Builder.Default
+  @OrderBy(
+      "id") // do not sort the passive links by rank as the rank has the sorting for the active side
+  private List<LinkCaselawCitationDTO> passiveLinkCaselawCitations = new ArrayList<>();
+
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
@@ -164,6 +201,13 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @Builder.Default
   @OrderBy("rank")
   private List<PendingDecisionDTO> pendingDecisions = new ArrayList<>();
+
+  /** Verknüpfte anhängige Verfahren */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @Builder.Default
+  @OrderBy("rank")
+  private List<RelatedPendingProceedingDTO> relatedPendingProceedings = new ArrayList<>();
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
@@ -237,11 +281,8 @@ public class DecisionDTO extends DocumentationUnitDTO {
   private Set<DuplicateRelationDTO> duplicateRelations2 = new HashSet<>();
 
   /** Fremdsprachige Fassung */
-  @OneToMany(
-      mappedBy = "documentationUnit",
-      cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY,
-      orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
   private List<ForeignLanguageVersionDTO> foreignLanguageVersions = new ArrayList<>();
@@ -266,13 +307,62 @@ public class DecisionDTO extends DocumentationUnitDTO {
   /** Rechtsmittel zugelassen durch */
   @Column(name = "appeal_admitted_by")
   @Enumerated(EnumType.STRING)
-  @JdbcType(PostgreSQLEnumJdbcType.class)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   private AppealAdmitter appealAdmittedBy;
 
   /** Rechtsmittel */
   @OneToOne(mappedBy = "decision", cascade = CascadeType.ALL, orphanRemoval = true)
   @PrimaryKeyJoinColumn
   private AppealDTO appeal;
+
+  /** Herkunft der Übersetzung */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "decision_id", nullable = false)
+  @OrderBy("rank")
+  @Builder.Default
+  private List<OriginOfTranslationDTO> originOfTranslations = new ArrayList<>();
+
+  /** Gegenstandswert */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "decision_id", nullable = false)
+  @OrderBy("rank")
+  @Builder.Default
+  private List<ObjectValueDTO> objectValues = new ArrayList<>();
+
+  /** Berichtigung */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "decision_id", nullable = false)
+  @Builder.Default
+  @OrderBy("rank")
+  private List<CorrectionDTO> corrections = new ArrayList<>();
+
+  /** Gebühren */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "decision_id", nullable = false)
+  @OrderBy("rank")
+  @Builder.Default
+  private List<AbuseFeeDTO> abuseFees = new ArrayList<>();
+
+  /** Herkunftsland */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @OrderBy("rank")
+  @Builder.Default
+  private List<CountryOfOriginDto> countriesOfOrigin = new ArrayList<>();
+
+  /** Einkunftsart */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "decision_id", nullable = false)
+  @OrderBy("rank")
+  @Builder.Default
+  private List<IncomeTypeDTO> incomeTypes = new ArrayList<>();
+
+  /** Nichtanwendungsgesetz */
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @Builder.Default
+  @OrderBy("rank")
+  private List<NonApplicationNormDTO> nonApplicationNorms = new ArrayList<>();
 
   @Override
   @SuppressWarnings("java:S2097") // Class type check is not recognized by Sonar

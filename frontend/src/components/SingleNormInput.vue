@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import Checkbox from "primevue/checkbox"
 import InputText from "primevue/inputtext"
 import { computed, onMounted, ref } from "vue"
@@ -8,7 +9,6 @@ import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import YearInput from "@/components/input/YearInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
-import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import LegalForce from "@/domain/legalForce"
 import SingleNorm, { SingleNormValidationInfo } from "@/domain/singleNorm"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -33,6 +33,7 @@ const validationStore = useValidationStore<(typeof SingleNorm.fields)[number]>()
 const legalForceValidationStore =
   useValidationStore<(typeof LegalForce.fields)[number]>()
 const singleNormInput = ref<InstanceType<typeof InputText> | null>(null)
+const isNormValidating = ref(false)
 
 const singleNorm = computed({
   get: () => {
@@ -103,41 +104,49 @@ const legalForceRegion = computed({
   },
 })
 
-const isCourtWithLegalForce = computed(() => {
-  return constitutionalCourtTypes.items.includes(
-    store.documentUnit?.coreData.court?.type ?? "",
-  )
-})
+const isCourtWithLegalForce = computed(
+  () =>
+    store.documentUnit?.coreData.court?.jurisdictionType ===
+    "Verfassungsgerichtsbarkeit",
+)
 
 /**
  * Validates a given single norm against with a given norm abbreviation against a validation endpoint.
  * The validation endpint either responds with "Ok" oder "Validation error". In the latter case a validation error is emitted to the parent.
  */
 async function validateNorm() {
+  if (isNormValidating.value) {
+    return
+  }
+
+  isNormValidating.value = true
   validationStore.reset()
   emit("update:validationError", undefined, "singleNorm")
-
-  if (singleNorm.value?.singleNorm) {
-    const singleNormValidationInfo: SingleNormValidationInfo = {
-      singleNorm: singleNorm.value?.singleNorm,
-      normAbbreviation: props.normAbbreviation,
-    }
-    const response = await documentUnitService.validateSingleNorm(
-      singleNormValidationInfo,
-    )
-
-    if (response.data !== "Ok") {
-      validationStore.add("Inhalt nicht valide", "singleNorm")
-
-      emit(
-        "update:validationError",
-        {
-          message: "Inhalt nicht valide",
-          instance: "singleNorm",
-        },
-        "singleNorm",
+  try {
+    if (singleNorm.value?.singleNorm) {
+      const singleNormValidationInfo: SingleNormValidationInfo = {
+        singleNorm: singleNorm.value?.singleNorm,
+        normAbbreviation: props.normAbbreviation,
+      }
+      const response = await documentUnitService.validateSingleNorm(
+        singleNormValidationInfo,
       )
+
+      if (response.data !== "Ok") {
+        validationStore.add("Inhalt nicht valide", "singleNorm")
+
+        emit(
+          "update:validationError",
+          {
+            message: "Inhalt nicht valide",
+            instance: "singleNorm",
+          },
+          "singleNorm",
+        )
+      }
     }
+  } finally {
+    isNormValidating.value = false
   }
 }
 /**
@@ -199,118 +208,98 @@ onMounted(async () => {
   )
   inputElement?.focus() // This works without TypeScript errors
 })
+
+defineExpose({ validateNorm })
 </script>
 
 <template>
-  <div class="mb-24 flex flex-col gap-24 pb-24">
-    <div
-      v-if="isCourtWithLegalForce"
-      class="flex flex-row justify-between gap-24"
-    >
-      <InputField
-        :id="'legalForce' + index"
-        v-slot="{ id }"
-        label="Mit Gesetzeskraft"
-        label-class="ris-label1-regular"
-        :label-position="LabelPosition.RIGHT"
-      >
-        <Checkbox
-          v-model="hasLegalForce"
-          aria-label="Gesetzeskraft der Norm"
-          binary
-          data-testid="legal-force-checkbox"
-          :input-id="id"
-          size="large"
-        />
-      </InputField>
-      <button
-        aria-label="Einzelnorm löschen"
-        class="text-blue-800 focus:shadow-[inset_0_0_0_0.25rem] focus:shadow-blue-800 focus:outline-none"
-        tabindex="0"
-        @click="removeSingleNormEntry"
-      >
-        <IconClear />
-      </button>
-    </div>
-    <div
-      class="gap-24"
-      :class="
-        isCourtWithLegalForce
-          ? 'grid grid-cols-3'
-          : 'flex flex-row justify-between'
-      "
-    >
-      <InputField
-        id="singleNorm"
-        v-slot="slotProps"
-        label="Einzelnorm"
-        :validation-error="validationStore.getByField('singleNorm')"
-      >
-        <InputText
+  <div
+    class="flex gap-24"
+    :class="!!isCourtWithLegalForce ? 'items-center' : 'items-end'"
+  >
+    <div class="flex flex-1 flex-col gap-16">
+      <div v-if="isCourtWithLegalForce" class="pt-8">
+        <InputField
+          :id="'legalForce' + index"
+          v-slot="{ id }"
+          label="Mit Gesetzeskraft"
+          label-class="ris-label1-regular"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <Checkbox
+            v-model="hasLegalForce"
+            aria-label="Gesetzeskraft der Norm"
+            binary
+            data-testid="legal-force-checkbox"
+            :input-id="id"
+            size="small"
+          />
+        </InputField>
+      </div>
+
+      <div class="grid grid-cols-3 gap-24">
+        <InputField
           id="singleNorm"
-          ref="singleNormInput"
-          v-model.trim="singleNorm.singleNorm"
-          aria-label="Einzelnorm der Norm"
-          fluid
-          :invalid="slotProps.hasError"
-          size="small"
-          @blur="validateNorm"
-          @focus="validationStore.remove('singleNorm')"
-        ></InputText>
-      </InputField>
-      <InputField
-        id="dateOfVersion"
-        v-slot="slotProps"
-        label="Fassungsdatum"
-        :validation-error="validationStore.getByField('dateOfVersion')"
-        @update:validation-error="
-          (validationError) =>
-            updateDateFormatValidation(validationError, 'dateOfVersion')
-        "
-      >
-        <DateInput
+          v-slot="slotProps"
+          label="Einzelnorm"
+          :validation-error="validationStore.getByField('singleNorm')"
+        >
+          <InputText
+            id="singleNorm"
+            ref="singleNormInput"
+            v-model.trim="singleNorm.singleNorm"
+            aria-label="Einzelnorm der Norm"
+            fluid
+            :invalid="slotProps.hasError"
+            size="small"
+            @blur="validateNorm"
+            @focus="validationStore.remove('singleNorm')"
+          />
+        </InputField>
+
+        <InputField
           id="dateOfVersion"
-          v-model="singleNorm.dateOfVersion"
-          aria-label="Fassungsdatum der Norm"
-          :has-error="slotProps.hasError"
-          @focus="validationStore.remove('dateOfVersion')"
-          @update:validation-error="slotProps.updateValidationError"
-        />
-      </InputField>
-      <InputField
-        id="dateOfRelevance"
-        v-slot="slotProps"
-        label="Jahr"
-        :validation-error="validationStore.getByField('dateOfRelevance')"
-        @update:validation-error="
-          (validationError) =>
-            updateDateFormatValidation(validationError, 'dateOfRelevance')
-        "
-      >
-        <YearInput
+          v-slot="slotProps"
+          label="Fassungsdatum"
+          :validation-error="validationStore.getByField('dateOfVersion')"
+          @update:validation-error="
+            (v) => updateDateFormatValidation(v, 'dateOfVersion')
+          "
+        >
+          <DateInput
+            id="dateOfVersion"
+            v-model="singleNorm.dateOfVersion"
+            aria-label="Fassungsdatum der Norm"
+            :has-error="slotProps.hasError"
+            @focus="validationStore.remove('dateOfVersion')"
+            @update:validation-error="slotProps.updateValidationError"
+          />
+        </InputField>
+
+        <InputField
           id="dateOfRelevance"
-          v-model="singleNorm.dateOfRelevance"
-          aria-label="Jahr der Norm"
-          :has-error="slotProps.hasError"
-          @focus="validationStore.remove('dateOfRelevance')"
-          @update:validation-error="slotProps.updateValidationError"
-        />
-      </InputField>
-      <button
-        v-if="!isCourtWithLegalForce"
-        aria-label="Einzelnorm löschen"
-        class="mt-[25px] h-[50px] text-blue-800 focus:shadow-[inset_0_0_0_0.25rem] focus:shadow-blue-800 focus:outline-none"
-        tabindex="0"
-        @click="removeSingleNormEntry"
+          v-slot="slotProps"
+          label="Jahr"
+          :validation-error="validationStore.getByField('dateOfRelevance')"
+          @update:validation-error="
+            (v) => updateDateFormatValidation(v, 'dateOfRelevance')
+          "
+        >
+          <YearInput
+            id="dateOfRelevance"
+            v-model="singleNorm.dateOfRelevance"
+            aria-label="Jahr der Norm"
+            :has-error="slotProps.hasError"
+            @focus="validationStore.remove('dateOfRelevance')"
+            @update:validation-error="slotProps.updateValidationError"
+          />
+        </InputField>
+      </div>
+
+      <div
+        v-if="hasLegalForce && isCourtWithLegalForce"
+        class="grid grid-cols-3 gap-24"
       >
-        <IconClear />
-      </button>
-    </div>
-    <div
-      v-if="hasLegalForce && isCourtWithLegalForce"
-      class="grid grid-cols-3 gap-24"
-    >
-      <div>
         <InputField
           id="type"
           v-slot="slotProps"
@@ -325,27 +314,41 @@ onMounted(async () => {
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getLegalForceTypes"
             @focus="legalForceValidationStore.remove('type')"
-          ></ComboboxInput>
+          />
         </InputField>
-      </div>
-      <div class="col-span-2">
-        <InputField
-          id="region"
-          v-slot="slotProps"
-          label="Geltungsbereich *"
-          :validation-error="legalForceValidationStore.getByField('region')"
-        >
-          <ComboboxInput
-            id="legalForceRegion"
-            v-model="legalForceRegion"
-            aria-label="Gesetzeskraft Geltungsbereich"
-            data-testid="legal-force-region-combobox"
-            :has-error="slotProps.hasError"
-            :item-service="ComboboxItemService.getLegalForceRegions"
-            @focus="legalForceValidationStore.remove('region')"
-          ></ComboboxInput>
-        </InputField>
+
+        <div class="col-span-2">
+          <InputField
+            id="region"
+            v-slot="slotProps"
+            label="Geltungsbereich *"
+            :validation-error="legalForceValidationStore.getByField('region')"
+          >
+            <ComboboxInput
+              id="legalForceRegion"
+              v-model="legalForceRegion"
+              aria-label="Gesetzeskraft Geltungsbereich"
+              data-testid="legal-force-region-combobox"
+              :has-error="slotProps.hasError"
+              :item-service="ComboboxItemService.getLegalForceRegions"
+              @focus="legalForceValidationStore.remove('region')"
+            />
+          </InputField>
+        </div>
       </div>
     </div>
+
+    <Button
+      v-tooltip.bottom="{
+        value: 'Einzelnorm entfernen',
+      }"
+      aria-label="Einzelnorm löschen"
+      text
+      @click="removeSingleNormEntry"
+    >
+      <template #icon>
+        <IconClear class="order-last" />
+      </template>
+    </Button>
   </div>
 </template>

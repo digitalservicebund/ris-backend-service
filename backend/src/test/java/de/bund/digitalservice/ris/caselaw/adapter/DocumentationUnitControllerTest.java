@@ -13,9 +13,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
@@ -30,6 +28,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
@@ -93,7 +92,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -105,6 +104,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import tools.jackson.core.type.TypeReference;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = DocumentationUnitController.class)
@@ -143,7 +143,6 @@ class DocumentationUnitControllerTest {
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private final User user = buildDSuser();
-  private final ObjectMapper mapper = new ObjectMapper();
 
   @BeforeEach
   void setup() throws DocumentationUnitNotExistsException {
@@ -743,7 +742,7 @@ class DocumentationUnitControllerTest {
     PageRequest pageRequest = PageRequest.of(0, 10);
 
     when(service.searchLinkableDocumentationUnits(
-            linkedDocumentationUnit, docOffice, Optional.of("KORE0000000000"), pageRequest))
+            linkedDocumentationUnit, docOffice, Optional.of("KORE0000000000"), false, pageRequest))
         .thenReturn(new PageImpl<>(List.of(), pageRequest, 0));
 
     risWebClient
@@ -759,7 +758,7 @@ class DocumentationUnitControllerTest {
 
     verify(service)
         .searchLinkableDocumentationUnits(
-            linkedDocumentationUnit, docOffice, Optional.of("KORE0000000000"), pageRequest);
+            linkedDocumentationUnit, docOffice, Optional.of("KORE0000000000"), false, pageRequest);
   }
 
   @Test

@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.TableRowElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.UnhandledElement;
 import jakarta.xml.bind.JAXBElement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
 public class DocxTableBuilder extends DocxBuilder {
   private static final Logger LOGGER = LoggerFactory.getLogger(DocxTableBuilder.class);
   private Tbl table;
+  private List<Integer> columnWidthsPx = Collections.emptyList();
 
   private DocxTableBuilder() {}
 
@@ -46,6 +48,7 @@ public class DocxTableBuilder extends DocxBuilder {
 
   public DocxTableBuilder setTable(Tbl table) {
     this.table = table;
+    this.columnWidthsPx = getColumnWidthsPxFromGrid(table);
 
     return this;
   }
@@ -95,6 +98,16 @@ public class DocxTableBuilder extends DocxBuilder {
             })
         .forEach(
             tblStylePr -> addTableStyleProperties(tableElement, tblStylePr, tblLookValue.get()));
+  }
+
+  private List<Integer> getColumnWidthsPxFromGrid(Tbl table) {
+    if (table == null || table.getTblGrid() == null || table.getTblGrid().getGridCol() == null) {
+      return Collections.emptyList();
+    }
+
+    return table.getTblGrid().getGridCol().stream()
+        .map(gridCol -> DocxUnitConverter.convertTwipToPixel(gridCol.getW().longValue()))
+        .toList();
   }
 
   private AtomicInteger getTableLookValue(CTTblLook tblLook) {
@@ -418,7 +431,10 @@ public class DocxTableBuilder extends DocxBuilder {
       switch (border.getVal()) {
         case SINGLE:
           break;
-        case DASHED:
+        case DOTTED:
+          type = "dotted";
+          break;
+        case DASHED, DASH_SMALL_GAP:
           type = "dashed";
           break;
         case NONE, NIL:
@@ -483,13 +499,19 @@ public class DocxTableBuilder extends DocxBuilder {
       result.ifPresent(s -> usedStyles.set(Integer.parseInt(s, 2)));
     }
 
+    var colIndex = new AtomicInteger(0);
+
     tr.getContent()
         .forEach(
             element -> {
               if (element instanceof JAXBElement<?> jaxbElement) {
                 if (jaxbElement.getDeclaredType() == Tc.class) {
                   cells.add(
-                      parseTc((Tc) jaxbElement.getValue(), usedStyles.get(), unhandledElements));
+                      parseTc(
+                          (Tc) jaxbElement.getValue(),
+                          usedStyles.get(),
+                          unhandledElements,
+                          colIndex));
                 } else {
                   LOGGER.error("unknown tc element: {}", jaxbElement.getDeclaredType());
                 }
@@ -542,7 +564,10 @@ public class DocxTableBuilder extends DocxBuilder {
   }
 
   private TableCellElement parseTc(
-      Tc tc, Integer trUsedStyles, List<UnhandledElement> unhandledElements) {
+      Tc tc,
+      Integer trUsedStyles,
+      List<UnhandledElement> unhandledElements,
+      AtomicInteger colIndex) {
     Integer usedStyles = trUsedStyles;
     if (tc.getTcPr() != null && tc.getTcPr().getCnfStyle() != null) {
       int value = Integer.parseInt(tc.getTcPr().getCnfStyle().getVal(), 2);
@@ -565,19 +590,19 @@ public class DocxTableBuilder extends DocxBuilder {
             });
 
     var cell = new TableCellElement(paragraphElements, usedStyles);
-    addTcStyle(cell, tc);
+    addTcStyle(cell, tc, colIndex);
 
     return cell;
   }
 
-  private void addTcStyle(TableCellElement cellElement, Tc tc) {
+  private void addTcStyle(TableCellElement cellElement, Tc tc, AtomicInteger colIndex) {
     if (table.getTblPr().getTblStyle() != null) {
       var tblStyleKey = table.getTblPr().getTblStyle().getVal();
       Style style = converter.getStyles().get(tblStyleKey);
-      addTcStyle(cellElement, style.getTcPr());
+      addTcStyle(cellElement, style.getTcPr(), colIndex);
     }
 
-    addTcStyle(cellElement, tc.getTcPr());
+    addTcStyle(cellElement, tc.getTcPr(), colIndex);
   }
 
   private void addExternalTcStyle(TableCellElement cellElement, TcPr tcPr) {
@@ -586,18 +611,7 @@ public class DocxTableBuilder extends DocxBuilder {
     }
 
     if (tcPr.getTcBorders() != null) {
-      if (tcPr.getTcBorders().getBottom() != null) {
-        cellElement.setBottomBorder(parseCtBorder(tcPr.getTcBorders().getBottom()));
-      }
-      if (tcPr.getTcBorders().getTop() != null) {
-        cellElement.setTopBorder(parseCtBorder(tcPr.getTcBorders().getTop()));
-      }
-      if (tcPr.getTcBorders().getLeft() != null) {
-        cellElement.setLeftBorder(parseCtBorder(tcPr.getTcBorders().getLeft()));
-      }
-      if (tcPr.getTcBorders().getRight() != null) {
-        cellElement.setRightBorder(parseCtBorder(tcPr.getTcBorders().getRight()));
-      }
+      setBorders(cellElement, tcPr);
     }
 
     if (tcPr.getGridSpan() != null) {
@@ -609,23 +623,82 @@ public class DocxTableBuilder extends DocxBuilder {
     }
   }
 
-  private void addTcStyle(TableCellElement cellElement, TcPr tcPr) {
-    if (tcPr != null) {
-      if (tcPr.getTcBorders() != null) {
-        var tcBorders = tcPr.getTcBorders();
-        cellElement.setInitialBorders(
-            parseCtBorder(tcBorders.getTop()),
-            parseCtBorder(tcBorders.getRight()),
-            parseCtBorder(tcBorders.getBottom()),
-            parseCtBorder(tcBorders.getLeft()));
-      }
+  private void setBorders(TableCellElement cellElement, TcPr tcPr) {
+    if (tcPr.getTcBorders().getBottom() != null) {
+      cellElement.setBottomBorder(parseCtBorder(tcPr.getTcBorders().getBottom()));
+    }
+    if (tcPr.getTcBorders().getTop() != null) {
+      cellElement.setTopBorder(parseCtBorder(tcPr.getTcBorders().getTop()));
+    }
+    if (tcPr.getTcBorders().getLeft() != null) {
+      cellElement.setLeftBorder(parseCtBorder(tcPr.getTcBorders().getLeft()));
+    }
+    if (tcPr.getTcBorders().getRight() != null) {
+      cellElement.setRightBorder(parseCtBorder(tcPr.getTcBorders().getRight()));
+    }
+  }
 
-      if (tcPr.getGridSpan() != null) {
-        cellElement.setColumnSpan(tcPr.getGridSpan().getVal().intValue());
-      }
+  private void addTcStyle(TableCellElement cellElement, TcPr tcPr, AtomicInteger colIndex) {
+    int span = 1;
 
-      if (tcPr.getShd() != null) {
-        cellElement.setBackgroundColor(parseCTShd(tcPr.getShd()));
+    if (tcPr == null) {
+      return;
+    }
+
+    if (tcPr.getTcBorders() != null) {
+      var tcBorders = tcPr.getTcBorders();
+      cellElement.setInitialBorders(
+          parseCtBorder(tcBorders.getTop()),
+          parseCtBorder(tcBorders.getRight()),
+          parseCtBorder(tcBorders.getBottom()),
+          parseCtBorder(tcBorders.getLeft()));
+    }
+
+    if (tcPr.getGridSpan() != null) {
+      span = tcPr.getGridSpan().getVal().intValue();
+      cellElement.setColumnSpan(span);
+    }
+
+    if (tcPr.getShd() != null) {
+      cellElement.setBackgroundColor(parseCTShd(tcPr.getShd()));
+    }
+
+    if (tcPr.getVAlign() != null) {
+      var alignment = tcPr.getVAlign().getVal().toString().toLowerCase();
+      if (alignment.equals("center")) {
+        alignment = "middle";
+      }
+      cellElement.addStyle("vertical-align", alignment);
+    }
+
+    int widthPx = 0;
+    if (tcPr.getTcW() != null && tcPr.getTcW().getW() != null) {
+      widthPx = DocxUnitConverter.convertTwipToPixel(tcPr.getTcW().getW().longValue());
+    }
+
+    if (widthPx > 0) {
+      cellElement.setWidthPx(widthPx);
+    } else {
+      setCellWidthFromGlobal(cellElement, span, colIndex);
+    }
+
+    colIndex.addAndGet(span);
+  }
+
+  private void setCellWidthFromGlobal(
+      TableCellElement cellElement, int span, AtomicInteger colIndex) {
+
+    if (columnWidthsPx != null && !columnWidthsPx.isEmpty()) {
+      var columnIndex = colIndex.get();
+      var finalWidth = 0;
+      for (int i = 0; i < span; i++) {
+        var colPos = columnIndex + i;
+        if (colPos < columnWidthsPx.size()) {
+          finalWidth += columnWidthsPx.get(colPos);
+        }
+      }
+      if (finalWidth > 0) {
+        cellElement.setWidthPx(finalWidth);
       }
     }
   }

@@ -12,7 +12,6 @@ import DecisionTexts from "@/components/texts/DecisionTexts.vue"
 
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useScroll } from "@/composables/useScroll"
-import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import { Kind } from "@/domain/documentationUnitKind"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -30,13 +29,11 @@ const { scrollIntoViewportById } = useScroll()
  * Determines whether legal forces should be deleted based on the court type and presence of a selected court.
  * @returns boolean
  */
-const shouldDeleteLegalForces = computed(() => {
-  return (
-    !constitutionalCourtTypes.items.includes(
-      documentUnit.value!.coreData.court?.type ?? "",
-    ) || !documentUnit.value!.coreData.court
-  )
-})
+const shouldDeleteLegalForces = computed(
+  () =>
+    documentUnit.value?.coreData.court?.jurisdictionType ===
+    "Verfassungsgerichtsbarkeit",
+)
 
 /**
  * Deletes the legal forces from all single norms in the norms of the updated document unit.

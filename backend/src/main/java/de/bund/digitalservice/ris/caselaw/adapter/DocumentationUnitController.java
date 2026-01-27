@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.ManualPortalPublicationResult;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment2Html;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
@@ -22,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverNotAllowedException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
@@ -52,6 +55,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.mapping.MappingException;
@@ -60,7 +64,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -217,7 +220,7 @@ public class DocumentationUnitController {
 
     } catch (Exception e) {
       attachmentService.deleteByS3Path(attachmentPath, uuid, userService.getUser(oidcUser));
-      return ResponseEntity.unprocessableEntity().build();
+      return ResponseEntity.unprocessableContent().build();
     }
   }
 
@@ -362,7 +365,7 @@ public class DocumentationUnitController {
       @AuthenticationPrincipal OidcUser oidcUser) {
 
     if (!uuid.equals(decision.uuid())) {
-      return ResponseEntity.unprocessableEntity().body(Decision.builder().build());
+      return ResponseEntity.unprocessableContent().body(Decision.builder().build());
     }
     try {
       var du = service.updateDocumentationUnit(decision);
@@ -437,13 +440,20 @@ public class DocumentationUnitController {
               uuid, userService.getEmail(oidcUser), userService.getUser(oidcUser));
       if (handoverMail == null || !handoverMail.isSuccess()) {
         log.warn("Failed to send mail for documentation unit {}", uuid);
-        return ResponseEntity.unprocessableEntity().body(handoverMail);
+        return ResponseEntity.unprocessableContent().body(handoverMail);
       }
       service.saveSuccessfulHandover(uuid);
       return ResponseEntity.ok(handoverMail);
     } catch (DocumentationUnitNotExistsException | HandoverException e) {
       log.error("Error handing over documentation unit '{}' as email", uuid, e);
       return ResponseEntity.internalServerError().build();
+    } catch (HandoverNotAllowedException e) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN)
+          .body(
+              HandoverMail.builder()
+                  .success(false)
+                  .statusMessages(List.of(e.getMessage()))
+                  .build());
     }
   }
 
@@ -488,6 +498,7 @@ public class DocumentationUnitController {
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
       @RequestParam(value = "documentNumber") Optional<String> documentNumberToExclude,
+      @RequestParam(value = "onlyPendingProceedings") Optional<Boolean> onlyPendingProceedings,
       @RequestBody RelatedDocumentationUnit relatedDocumentationUnit,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
@@ -496,6 +507,7 @@ public class DocumentationUnitController {
         relatedDocumentationUnit,
         documentationOffice,
         documentNumberToExclude,
+        onlyPendingProceedings.orElse(false),
         PageRequest.of(page, size));
   }
 
@@ -605,7 +617,7 @@ public class DocumentationUnitController {
               .success(false)
               .statusMessages(List.of(e.getMessage()))
               .build();
-      return ResponseEntity.unprocessableEntity().body(result);
+      return ResponseEntity.unprocessableContent().body(result);
     } catch (Exception e) {
       var result =
           LdmlTransformationResult.builder()
@@ -623,12 +635,12 @@ public class DocumentationUnitController {
    */
   @PutMapping(value = "/{uuid}/publish")
   @PreAuthorize("@userHasWriteAccess.apply(#uuid)")
-  public ResponseEntity<Void> publishDocumentationUnit(
+  public ResponseEntity<ManualPortalPublicationResult> publishDocumentationUnit(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
     User user = userService.getUser(oidcUser);
     try {
-      portalPublicationService.publishDocumentationUnitWithChangelog(uuid, user);
-      return ResponseEntity.ok().build();
+      var result = portalPublicationService.publishDocumentationUnitWithChangelog(uuid, user);
+      return ResponseEntity.ok(result);
     } catch (DocumentationUnitNotExistsException e) {
       log.atError()
           .setMessage("Could not find documentation unit to publish to portal")

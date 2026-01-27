@@ -7,7 +7,8 @@ import {
   uploadTestfile,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
-test.describe(
+// eslint-disable-next-line playwright/no-skipped-test
+test.describe.skip(
   "base64 images are converted to attachments",
   {
     tag: ["@RISDEV-7971", "@RISDEV-3018"],

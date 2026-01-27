@@ -85,7 +85,7 @@ public class NumberingListEntryIndexGenerator {
     if (listLevel == null
         || listLevel.getJaxbAbstractLvl() == null
         || listLevel.getJaxbAbstractLvl().getStart() == null
-        || listLevel.getJaxbAbstractLvl().getStart().getVal() != null) {
+        || listLevel.getJaxbAbstractLvl().getStart().getVal() == null) {
 
       return "1";
     }
@@ -107,7 +107,7 @@ public class NumberingListEntryIndexGenerator {
     if (listLevel == null
         || listLevel.getJaxbAbstractLvl() == null
         || listLevel.getJaxbAbstractLvl().getLvlRestart() == null
-        || listLevel.getJaxbAbstractLvl().getLvlRestart().getVal() != null) {
+        || listLevel.getJaxbAbstractLvl().getLvlRestart().getVal() == null) {
 
       return "";
     }

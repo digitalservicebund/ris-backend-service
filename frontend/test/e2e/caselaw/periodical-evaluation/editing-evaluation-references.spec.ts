@@ -9,8 +9,6 @@ import {
   searchForDocUnitWithFileNumberAndDecisionDate,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
-const formattedDate = dayjs().format("DD.MM.YYYY")
-
 /* eslint-disable playwright/no-conditional-in-test */
 
 test.describe(
@@ -357,6 +355,7 @@ test.describe(
       const suffix = edition.suffix || ""
       await navigateToPeriodicalReferences(page, edition.id || "")
       const secondPage = await context.newPage()
+
       await test.step("Open up edition on second page", async () => {
         await navigateToPeriodicalReferences(secondPage, edition.id)
         await expect(secondPage.getByLabel("Listen Eintrag")).toHaveCount(1)
@@ -412,6 +411,7 @@ test.describe(
       context,
     }) => {
       const suffix = editionWithReferences.suffix || ""
+
       await test.step("When editing a reference, the citation is a single input containing the joined value of prefix, citation and suffix", async () => {
         const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
 
@@ -735,29 +735,16 @@ test.describe(
         })
 
         await test.step("User can view but not edit or delete the editions", async () => {
-          await expect(
-            pageWithExternalUser
-              .getByLabel("Ausgabe kann nicht editiert werden")
-              .first(),
-          ).toBeVisible()
-          await expect(
-            pageWithExternalUser
-              .getByLabel("Ausgabe kann nicht gelöscht werden")
-              .first(),
-          ).toBeVisible()
+          // Define the specific row first
+          const editionRow = pageWithExternalUser.getByRole("row", {
+            name: new RegExp(edition.name || ""),
+          })
 
           await expect(
-            pageWithExternalUser.getByText(
-              (edition.name || "") + "MMG" + "0" + formattedDate,
-            ),
-          ).toBeVisible()
+            editionRow.getByLabel("Ausgabe bearbeiten"),
+          ).toBeDisabled()
 
-          await expect(
-            pageWithExternalUser.getByLabel("Ausgabe editieren"),
-          ).toBeHidden()
-          await expect(
-            pageWithExternalUser.getByLabel("Ausgabe löschen"),
-          ).toBeHidden()
+          await expect(editionRow.getByLabel("Ausgabe löschen")).toBeDisabled()
         })
       },
     )

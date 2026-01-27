@@ -6,9 +6,23 @@ import { flushPromises } from "@vue/test-utils"
 import { beforeAll, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
+import { clickOrderedListSubButton } from "~/test-helper/listUtil"
 import { mockDocumentForProsemirror } from "~/test-helper/prosemirror-document-mock"
+import {
+  clickTableBorderSubButton,
+  clickTableCellAlignmentSubButton,
+  getFirstCellHTML,
+  insertTable,
+  getOrderedListHTML,
+  hasOrderedList,
+} from "~/test-helper/tableUtil"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 import routes from "~pages"
+
+const DEFAULT_BORDER_STYLE = "1px solid black"
+const DEFAULT_BORDER_WIDTH = "1px"
+const DEFAULT_BORDER_COLOR = "black"
+const DEFAULT_BORDER_STYLE_TYPE = "solid"
 
 beforeAll(() => {
   mockDocumentForProsemirror()
@@ -171,6 +185,303 @@ describe("text editor toolbar", async () => {
       expect(
         screen.queryByLabelText("Randnummern entfernen"),
       ).not.toBeInTheDocument()
+    })
+  })
+
+  describe("table border commands", () => {
+    test("should set borderTop attribute on single cell when 'Rahmen oben' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableBorderSubButton("Rahmen oben")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).toContain(`border-top: ${DEFAULT_BORDER_STYLE}`)
+      expect(cellStyle).not.toContain(`border-left:`)
+    })
+
+    test("should set all four border attributes on cell when 'Rahmen' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableBorderSubButton("Alle Rahmen")
+      const cellStyle = getFirstCellHTML()
+
+      const hasIndividualBordersDefined =
+        cellStyle.includes(`border-top: ${DEFAULT_BORDER_STYLE}`) &&
+        cellStyle.includes(`border-right: ${DEFAULT_BORDER_STYLE}`) &&
+        cellStyle.includes(`border-bottom: ${DEFAULT_BORDER_STYLE}`) &&
+        cellStyle.includes(`border-left: ${DEFAULT_BORDER_STYLE}`)
+
+      const hasBordersDefinedInShorthand =
+        cellStyle.includes(`border-width: ${DEFAULT_BORDER_WIDTH}`) &&
+        cellStyle.includes(`border-style: ${DEFAULT_BORDER_STYLE_TYPE}`) &&
+        cellStyle.includes(`border-color: ${DEFAULT_BORDER_COLOR}`)
+
+      expect(hasIndividualBordersDefined || hasBordersDefinedInShorthand).toBe(
+        true,
+      )
+    })
+
+    test("should clear all border attributes when 'Kein Rahmen' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+
+      await clickTableBorderSubButton("Kein Rahmen")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).not.toContain(`border-top`)
+      expect(cellStyle).not.toContain(`border-right`)
+      expect(cellStyle).not.toContain(`border-bottom`)
+      expect(cellStyle).not.toContain(`border-left`)
+    })
+
+    test("should set left border attribute when 'Rahmen links' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableBorderSubButton("Rahmen links")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).toContain(`border-left: ${DEFAULT_BORDER_STYLE}`)
+      expect(cellStyle).not.toContain(`border-top:`)
+    })
+
+    test("should set right border attribute when 'Rahmen rechts' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableBorderSubButton("Rahmen rechts")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).toContain(`border-right: ${DEFAULT_BORDER_STYLE}`)
+      expect(cellStyle).not.toContain(`border-top:`)
+    })
+
+    test("should set bottom border attribute when 'Rahmen unten' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableBorderSubButton("Rahmen unten")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).toContain(`border-bottom: ${DEFAULT_BORDER_STYLE}`)
+      expect(cellStyle).not.toContain(`border-top:`)
+    })
+  })
+
+  describe("table cell alignemnt commands", () => {
+    test("should set vertical-align attribute on single cell when 'Oben ausrichten' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableCellAlignmentSubButton("Oben ausrichten")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).toContain(`vertical-align: top`)
+    })
+
+    test("should set vertical-align attribute on single cell when 'Mittig ausrichten' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableCellAlignmentSubButton("Mittig ausrichten")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).toContain(`vertical-align: middle`)
+    })
+
+    test("should set vertical-align attribute on single cell when 'Unten ausrichten' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await insertTable()
+      await clickTableCellAlignmentSubButton("Unten ausrichten")
+      const cellStyle = getFirstCellHTML()
+
+      expect(cellStyle).toContain(`vertical-align: bottom`)
+    })
+  })
+
+  describe("ordered list commands", () => {
+    test("should create numeric list when 'Numerisch (1, 2, 3)' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await clickOrderedListSubButton("Numerisch (1, 2, 3)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: decimal")
+    })
+
+    test("should create lowercase Latin list when 'Lateinisch klein (a, b, c)' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await clickOrderedListSubButton("Lateinisch klein (a, b, c)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: lower-alpha")
+    })
+
+    test("should create uppercase Latin list when 'Lateinisch groß (A, B, C)' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await clickOrderedListSubButton("Lateinisch groß (A, B, C)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: upper-alpha")
+    })
+
+    test("should create lowercase Roman list when 'Römisch klein (i, ii, iii)' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await clickOrderedListSubButton("Römisch klein (i, ii, iii)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: lower-roman")
+    })
+
+    test("should create uppercase Roman list when 'Römisch groß (I, II, III)' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await clickOrderedListSubButton("Römisch groß (I, II, III)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: upper-roman")
+    })
+
+    test("should change list style when switching from numeric to lowercase Latin", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+
+      await clickOrderedListSubButton("Numerisch (1, 2, 3)")
+      expect(getOrderedListHTML()).toContain("list-style-type: decimal")
+
+      await clickOrderedListSubButton("Lateinisch klein (a, b, c)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: lower-alpha")
+    })
+
+    test("should remove list when clicking the same list style twice", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+
+      await clickOrderedListSubButton("Numerisch (1, 2, 3)")
+      expect(hasOrderedList()).toBe(true)
+
+      await clickOrderedListSubButton("Numerisch (1, 2, 3)")
+
+      expect(hasOrderedList()).toBe(false)
+    })
+
+    test("should change list style when switching between different Roman numerals", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+
+      await clickOrderedListSubButton("Römisch klein (i, ii, iii)")
+      expect(getOrderedListHTML()).toContain("list-style-type: lower-roman")
+
+      await clickOrderedListSubButton("Römisch groß (I, II, III)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: upper-roman")
+    })
+
+    test("should create lowercase Greek list when 'Griechisch klein (α, β, γ)' is clicked", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+      await clickOrderedListSubButton("Griechisch klein (α, β, γ)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: lower-greek")
+    })
+
+    test("should change list style when switching from Latin to Greek", async () => {
+      await renderComponent()
+      const editorField = screen.getByTestId("Gründe")
+
+      await userEvent.click(editorField.firstElementChild!)
+      expect(editorField.firstElementChild).toHaveFocus()
+
+      await clickOrderedListSubButton("Lateinisch klein (a, b, c)")
+      expect(getOrderedListHTML()).toContain("list-style-type: lower-alpha")
+
+      await clickOrderedListSubButton("Griechisch klein (α, β, γ)")
+
+      expect(hasOrderedList()).toBe(true)
+      const listStyle = getOrderedListHTML()
+
+      expect(listStyle).toContain("list-style-type: lower-greek")
     })
   })
 })

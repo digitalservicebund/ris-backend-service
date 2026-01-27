@@ -85,7 +85,7 @@ test.describe(
         })
 
         const headNoteEditor = page.getByTestId("Orientierungssatz")
-        const headNoteEditorTextArea = headNoteEditor.locator("div")
+        const headNoteEditorTextArea = headNoteEditor.locator(".tiptap")
 
         await test.step("add jDV globally ignored word in headnote (Orientierungssatz)", async () => {
           await headNoteEditorTextArea.fill("")
@@ -180,6 +180,7 @@ test.describe(
 
         const secondHeadNoteEditorFieldArea =
           secondHeadNoteEditor.locator("div")
+
         await test.step("type same text in headnote (Orientierungssatz)", async () => {
           await clearTextField(pageWithBghUser, secondHeadNoteEditorFieldArea) // Use pageWithBghUser for clearTextField
           await secondHeadNoteEditor.locator("div").fill(wordWithTypo)

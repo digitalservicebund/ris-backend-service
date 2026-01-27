@@ -2,12 +2,12 @@
 import { UUID } from "crypto"
 import { useInterval } from "@vueuse/core"
 import Button from "primevue/button"
+import Message from "primevue/message"
 import { computed, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import PeriodicalEditionReferenceInput from "./PeriodicalEditionReferenceInput.vue"
 import PeriodicalEditionReferenceSummary from "./PeriodicalEditionReferenceSummary.vue"
 import EditableList from "@/components/EditableList.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import Reference from "@/domain/reference"
 import { ResponseError } from "@/services/httpClient"
@@ -33,18 +33,7 @@ const references = computed({
 
 async function saveReferences(references: Reference[]) {
   store.edition!.references = references
-  const response = await store.saveEdition()
-  if (response.error) {
-    const message =
-      "Fehler beim Speichern der Fundstellen. Bitte laden Sie die Seite neu."
-    alert(message)
-    responseError.value = {
-      title: message,
-    }
-  } else
-    store.edition!.references = response.data.references?.map(
-      (decision) => new Reference({ ...decision }),
-    )
+  await store.saveEdition()
 }
 
 async function addNewEntry() {
@@ -80,20 +69,22 @@ watch(loadEditionIntervalCounter, async () => {
     <div class="flex w-full flex-col gap-24 bg-white p-24">
       <TitleElement data-testid="references-title">Fundstellen</TitleElement>
       <div v-if="responseError">
-        <InfoModal
-          :description="responseError.description"
-          :title="responseError.title"
-        />
+        <Message severity="error">
+          <p class="ris-body1-bold">{{ responseError.title }}</p>
+          <p>{{ responseError.description }}</p>
+        </Message>
       </div>
-      <Button
-        v-if="references.length > 3"
-        aria-label="Weitere Angabe Top"
-        label="Weitere Angabe"
-        severity="secondary"
-        size="small"
-        @click="addNewEntry"
-        ><template #icon> <IconAdd /> </template
-      ></Button>
+      <div>
+        <Button
+          v-if="references.length > 3"
+          aria-label="Weitere Angabe Top"
+          label="Weitere Angabe"
+          severity="secondary"
+          size="small"
+          @click="addNewEntry"
+          ><template #icon> <IconAdd /> </template
+        ></Button>
+      </div>
       <div aria-label="Fundstellen">
         <EditableList
           ref="editableListRef"

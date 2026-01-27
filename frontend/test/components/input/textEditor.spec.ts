@@ -7,6 +7,11 @@ import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
 import { longTextLabels } from "@/domain/decision"
+import {
+  clickTableBorderSubButton,
+  clickTableCellAlignmentSubButton,
+  insertTable,
+} from "~/test-helper/tableUtil"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
 useFeatureToggleServiceMock()
@@ -17,6 +22,7 @@ describe("text editor", async () => {
     editable?: boolean
     value?: string
     fieldSize?: TextAreaInputAttributes["fieldSize"]
+    hideTextCheck?: boolean
   }) => {
     userEvent.setup()
     const router = createRouter({
@@ -40,6 +46,7 @@ describe("text editor", async () => {
         ariaLabel: options?.ariaLabel,
         editable: options?.editable,
         fieldSize: options?.fieldSize,
+        hideTextCheck: options?.hideTextCheck,
       },
       global: { plugins: [router, createTestingPinia()] },
     })
@@ -157,6 +164,9 @@ describe("text editor", async () => {
     expect(
       screen.getByLabelText("Tabelle", { exact: true }),
     ).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Tabellenrahmen", { exact: true }),
+    ).toBeInTheDocument()
     expect(screen.getByLabelText("Zitat einfügen")).toBeInTheDocument()
     expect(
       screen.getByLabelText("Randnummern neu erstellen"),
@@ -205,6 +215,63 @@ describe("text editor", async () => {
     expect(screen.getByLabelText("Rechtschreibprüfung")).toBeInTheDocument()
   })
 
+  it("shows all table border buttons after menu is expanded", async () => {
+    await renderComponent({
+      value: "Test Value",
+      ariaLabel: "Gründe",
+      editable: true,
+    })
+
+    const editorField = screen.getByTestId("Gründe")
+
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+    }
+
+    expect(
+      screen.getByLabelText("Tabellenrahmen", { exact: true }),
+    ).toBeInTheDocument()
+    expect(screen.queryByLabelText("Alle Rahmen")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Kein Rahmen")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Rahmen links")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Rahmen rechts")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Rahmen oben")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Rahmen unten")).not.toBeInTheDocument()
+
+    await fireEvent.click(
+      screen.getByLabelText("Tabellenrahmen", { exact: true }),
+    )
+
+    expect(
+      screen.getByLabelText("Tabellenrahmen", { exact: true }),
+    ).toBeInTheDocument()
+    expect(screen.getByLabelText("Alle Rahmen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Kein Rahmen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Rahmen links")).toBeInTheDocument()
+    expect(screen.getByLabelText("Rahmen rechts")).toBeInTheDocument()
+    expect(screen.getByLabelText("Rahmen oben")).toBeInTheDocument()
+    expect(screen.getByLabelText("Rahmen unten")).toBeInTheDocument()
+  })
+
+  it("hides Rechtschreibprüfung when it should be hidden", async () => {
+    await renderComponent({
+      value: "Test Value",
+      ariaLabel: "Gründe",
+      editable: true,
+      hideTextCheck: true,
+    })
+
+    const editorField = screen.getByTestId("Gründe")
+
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+    }
+
+    expect(
+      screen.queryByLabelText("Rechtschreibprüfung"),
+    ).not.toBeInTheDocument()
+  })
+
   it.each([
     longTextLabels.tenor,
     longTextLabels.participatingJudges,
@@ -249,5 +316,70 @@ describe("text editor", async () => {
     expect(
       screen.getByLabelText("Randnummern neu erstellen"),
     ).toBeInTheDocument()
+  })
+
+  describe("table selection warning", () => {
+    const WARNING_TEXT = "Keine Tabellenzeile ausgewählt"
+    test("should show warning when a border command is executed without cell selection", async () => {
+      await renderComponent({
+        value: "<p></p>",
+        ariaLabel: "Gründe",
+        editable: true,
+      })
+      const editorField = screen.getByTestId("Gründe")
+      await fireEvent.focus(editorField.firstElementChild!)
+
+      await clickTableBorderSubButton("Alle Rahmen")
+      await flushPromises()
+
+      expect(screen.getByText(WARNING_TEXT)).toBeInTheDocument()
+    })
+
+    test("should show warning when a cell alignment command is executed without cell selection", async () => {
+      await renderComponent({
+        value: "<p></p>",
+        ariaLabel: "Gründe",
+        editable: true,
+      })
+      const editorField = screen.getByTestId("Gründe")
+      await fireEvent.focus(editorField.firstElementChild!)
+
+      await clickTableCellAlignmentSubButton("Oben ausrichten")
+      await flushPromises()
+
+      expect(screen.getByText(WARNING_TEXT)).toBeInTheDocument()
+    })
+
+    test("should hide warning immediately after a cell is focused", async () => {
+      await renderComponent({
+        value: "<p></p>",
+        ariaLabel: "Gründe",
+        editable: true,
+      })
+      const editorField = screen.getByTestId("Gründe").firstElementChild
+      await fireEvent.focus(editorField!)
+
+      await clickTableBorderSubButton("Alle Rahmen")
+      expect(screen.getByText(WARNING_TEXT)).toBeInTheDocument()
+
+      await insertTable()
+      if (!editorField) return
+
+      // Die TableCell muss programmatisch ausgewählt werden, da die direkte DOM-Interaktion in JSDOM
+      // instabil ist. ProseMirror/prosemirror-tables ruft Funktionen (wie elementFromPoint) auf,
+      // die in der Mock-Browser-Umgebung nicht existieren, was zu Abstürzen führt.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const editorInstance = (editorField as any)?.__vue_app__?.config
+        ?.globalProperties?.$editor
+
+      if (editorInstance) {
+        // Die erste Zelle in einer neuen Tabelle liegt oft an Position 3
+        editorInstance.commands.setTextSelection(3).run()
+      }
+
+      await flushPromises()
+
+      expect(screen.queryByText(WARNING_TEXT)).not.toBeInTheDocument()
+    })
   })
 })

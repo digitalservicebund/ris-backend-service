@@ -4,15 +4,14 @@ import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjsTimezone from "dayjs/plugin/timezone"
 import dayjsUtc from "dayjs/plugin/utc"
 import Button from "primevue/button"
+import Message from "primevue/message"
 import { computed, ref } from "vue"
 import DocumentUnitListEntry from "../domain/documentUnitListEntry"
-import Tooltip from "./Tooltip.vue"
 import CellHeaderItem from "@/components/CellHeaderItem.vue"
 import CellItem from "@/components/CellItem.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import IconBadge from "@/components/IconBadge.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import TableHeader from "@/components/TableHeader.vue"
@@ -178,55 +177,57 @@ function onDelete() {
               >{{ listEntry.documentNumber }}
             </FlexItem>
 
-            <Tooltip :text="attachmentText(listEntry)">
-              <IconAttachedFile
-                :aria-label="attachmentText(listEntry)"
-                class="flex-end h-20 w-20"
-                :class="
-                  listEntry.hasAttachments ? 'text-blue-800' : 'text-gray-500'
-                "
-                data-testid="file-attached-icon"
-              />
-            </Tooltip>
+            <IconAttachedFile
+              v-tooltip.bottom="{
+                value: attachmentText(listEntry),
+              }"
+              :aria-label="attachmentText(listEntry)"
+              class="flex-end h-20 w-20"
+              :class="
+                listEntry.hasAttachments ? 'text-blue-800' : 'text-gray-500'
+              "
+              data-testid="file-attached-icon"
+            />
+            <IconSubject
+              v-tooltip.bottom="{
+                value: headNoteOrPrincipleText(listEntry),
+              }"
+              :aria-label="headNoteOrPrincipleText(listEntry)"
+              class="flex-end flex h-20 w-20"
+              :class="
+                listEntry.hasHeadnoteOrPrinciple
+                  ? 'text-blue-800'
+                  : 'text-gray-500'
+              "
+              data-testid="headnote-principle-icon"
+            />
 
-            <Tooltip :text="headNoteOrPrincipleText(listEntry)">
-              <IconSubject
-                :aria-label="headNoteOrPrincipleText(listEntry)"
-                class="flex-end flex h-20 w-20"
-                :class="
-                  listEntry.hasHeadnoteOrPrinciple
-                    ? 'text-blue-800'
-                    : 'text-gray-500'
-                "
-                data-testid="headnote-principle-icon"
-              />
-            </Tooltip>
-
-            <Tooltip :text="noteTooltip(listEntry)">
-              <IconNote
-                :aria-label="noteTooltip(listEntry)"
-                class="flex-end flex h-20 w-20"
-                :class="!!listEntry.note ? 'text-blue-800' : 'text-gray-500'"
-                data-testid="note-icon"
-              />
-            </Tooltip>
-
-            <Tooltip
-              :text="schedulingTooltip(listEntry.scheduledPublicationDateTime)"
-            >
-              <IconClock
-                :aria-label="
-                  schedulingTooltip(listEntry.scheduledPublicationDateTime)
-                "
-                class="flex-end flex h-20 w-20"
-                :class="
-                  listEntry.scheduledPublicationDateTime
-                    ? 'text-blue-800'
-                    : 'text-gray-500'
-                "
-                data-testid="scheduling-icon"
-              />
-            </Tooltip>
+            <IconNote
+              v-tooltip.bottom="{
+                value: noteTooltip(listEntry),
+              }"
+              :aria-label="noteTooltip(listEntry)"
+              class="flex-end flex h-20 w-20"
+              :class="!!listEntry.note ? 'text-blue-800' : 'text-gray-500'"
+              data-testid="note-icon"
+            />
+            <IconClock
+              v-tooltip.bottom="{
+                value: schedulingTooltip(
+                  listEntry.scheduledPublicationDateTime,
+                ),
+              }"
+              :aria-label="
+                schedulingTooltip(listEntry.scheduledPublicationDateTime)
+              "
+              class="flex-end flex h-20 w-20"
+              :class="
+                listEntry.scheduledPublicationDateTime
+                  ? 'text-blue-800'
+                  : 'text-gray-500'
+              "
+              data-testid="scheduling-icon"
+            />
           </FlexContainer>
         </CellItem>
         <CellItem>
@@ -291,91 +292,97 @@ function onDelete() {
         </CellItem>
         <CellItem class="flex">
           <div class="flex flex-row -space-x-2">
-            <Tooltip text="Bearbeiten">
-              <router-link
-                target="_blank"
-                :to="
-                  listEntry.documentType?.jurisShortcut === 'Anh'
-                    ? {
-                        name: 'caselaw-pending-proceeding-documentNumber-categories',
-                        params: { documentNumber: listEntry.documentNumber },
-                      }
-                    : {
-                        name: 'caselaw-documentUnit-documentNumber-categories',
-                        params: { documentNumber: listEntry.documentNumber },
-                      }
-                "
-              >
-                <Button
-                  aria-label="Dokumentationseinheit bearbeiten"
-                  :disabled="
-                    !listEntry.isEditable ||
-                    listEntry.status?.publicationStatus ==
-                      PublicationState.EXTERNAL_HANDOVER_PENDING
-                  "
-                  severity="secondary"
-                  size="small"
-                >
-                  <template #icon>
-                    <IconEdit />
-                  </template>
-                </Button>
-              </router-link>
-            </Tooltip>
-
-            <Tooltip text="Vorschau">
-              <router-link
-                target="_blank"
-                :to="{
-                  name:
-                    listEntry.documentType?.jurisShortcut === 'Anh'
-                      ? 'caselaw-pending-proceeding-documentNumber-preview'
-                      : 'caselaw-documentUnit-documentNumber-preview',
-                  params: { documentNumber: listEntry.documentNumber },
-                }"
-              >
-                <Button
-                  aria-label="Dokumentationseinheit ansehen"
-                  class="z-10"
-                  severity="secondary"
-                  size="small"
-                >
-                  <template #icon>
-                    <IconView />
-                  </template>
-                </Button>
-              </router-link>
-            </Tooltip>
-            <Tooltip text="Löschen">
+            <router-link
+              tabindex="-1"
+              target="_blank"
+              :to="
+                listEntry.documentType?.jurisShortcut === 'Anh'
+                  ? {
+                      name: 'caselaw-pending-proceeding-documentNumber-categories',
+                      params: { documentNumber: listEntry.documentNumber },
+                    }
+                  : {
+                      name: 'caselaw-documentUnit-documentNumber-categories',
+                      params: { documentNumber: listEntry.documentNumber },
+                    }
+              "
+            >
               <Button
-                aria-label="Dokumentationseinheit löschen"
+                v-tooltip.bottom="{
+                  value: 'Bearbeiten',
+                }"
+                aria-label="Dokumentationseinheit bearbeiten"
                 :disabled="
-                  !listEntry.isDeletable ||
+                  !listEntry.isEditable ||
                   listEntry.status?.publicationStatus ==
-                    'EXTERNAL_HANDOVER_PENDING'
+                    PublicationState.EXTERNAL_HANDOVER_PENDING
                 "
                 severity="secondary"
                 size="small"
-                @click="
-                  setSelectedDocumentUnitListEntry(
-                    documentUnitListEntries?.find(
-                      (entry) => entry.uuid == listEntry.uuid,
-                    ) as DocumentUnitListEntry,
-                  )
-                "
-                @keyup.enter="
-                  setSelectedDocumentUnitListEntry(
-                    documentUnitListEntries?.find(
-                      (entry) => entry.uuid == listEntry.uuid,
-                    ) as DocumentUnitListEntry,
-                  )
-                "
               >
                 <template #icon>
-                  <IconDelete />
+                  <IconEdit />
                 </template>
               </Button>
-            </Tooltip>
+            </router-link>
+
+            <router-link
+              tabindex="-1"
+              target="_blank"
+              :to="{
+                name:
+                  listEntry.documentType?.jurisShortcut === 'Anh'
+                    ? 'caselaw-pending-proceeding-documentNumber-preview'
+                    : 'caselaw-documentUnit-documentNumber-preview',
+                params: { documentNumber: listEntry.documentNumber },
+              }"
+            >
+              <Button
+                v-tooltip.bottom="{
+                  value: 'Vorschau',
+                }"
+                aria-label="Dokumentationseinheit ansehen"
+                class="z-10"
+                severity="secondary"
+                size="small"
+              >
+                <template #icon>
+                  <IconView />
+                </template>
+              </Button>
+            </router-link>
+
+            <Button
+              v-tooltip.bottom="{
+                value: 'Löschen',
+              }"
+              aria-label="Dokumentationseinheit löschen"
+              :disabled="
+                !listEntry.isDeletable ||
+                listEntry.status?.publicationStatus ==
+                  'EXTERNAL_HANDOVER_PENDING'
+              "
+              severity="secondary"
+              size="small"
+              @click="
+                setSelectedDocumentUnitListEntry(
+                  documentUnitListEntries?.find(
+                    (entry) => entry.uuid == listEntry.uuid,
+                  ) as DocumentUnitListEntry,
+                )
+              "
+              @keyup.enter="
+                setSelectedDocumentUnitListEntry(
+                  documentUnitListEntries?.find(
+                    (entry) => entry.uuid == listEntry.uuid,
+                  ) as DocumentUnitListEntry,
+                )
+              "
+            >
+              <template #icon>
+                <IconDelete />
+              </template>
+            </Button>
           </div>
         </CellItem>
       </TableRow>
@@ -389,11 +396,10 @@ function onDelete() {
     </div>
     <!-- Error State -->
     <div v-if="searchResponseError" class="mt-24">
-      <InfoModal
-        data-testid="service-error"
-        :description="searchResponseError.description"
-        :title="searchResponseError.title"
-      />
+      <Message data-testid="service-error" severity="error">
+        <p class="ris-body1-bold">{{ searchResponseError.title }}</p>
+        <p>{{ searchResponseError.description }}</p>
+      </Message>
     </div>
 
     <!-- Empty State -->

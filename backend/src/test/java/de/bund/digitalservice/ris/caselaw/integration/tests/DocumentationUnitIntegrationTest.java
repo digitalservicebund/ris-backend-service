@@ -9,26 +9,25 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtRegionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDeletedDocumentationIdsRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitProcessStepRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseInputTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcessStepRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeletedDocumentationUnitDTO;
@@ -55,7 +54,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOffic
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcessStepTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcessStepRequest;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -74,7 +72,6 @@ import de.bund.digitalservice.ris.caselaw.domain.EurlexCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
-import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
@@ -102,6 +99,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -125,6 +123,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import tools.jackson.core.type.TypeReference;
 
 @Sql(scripts = {"classpath:courts_init.sql"})
 @Sql(
@@ -139,7 +138,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
-  @Autowired private DatabaseRegionRepository regionRepository;
   @Autowired private DatabaseDeletedDocumentationIdsRepository deletedDocumentationIdsRepository;
   @Autowired private DatabaseLegalPeriodicalRepository legalPeriodicalRepository;
   @Autowired private OriginalXmlRepository originalXmlRepository;
@@ -153,12 +151,8 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseProcessStepRepository processStepRepository;
   @Autowired private DatabaseUserRepository databaseUserRepository;
 
-  @Autowired
-  private DatabaseDocumentationUnitProcessStepRepository
-      databaseDocumentationUnitProcessStepRepository;
-
   @MockitoBean private MailService mailService;
-  @MockitoBean private AttachmentService attachmentService;
+  @MockitoBean private DatabaseAttachmentInlineRepository attachmentInlineRepository;
   @MockitoBean private HandoverReportRepository handoverReportRepository;
   @MockitoBean DocumentNumberPatternConfig documentNumberPatternConfig;
   @MockitoSpyBean private UserService userService;
@@ -1541,6 +1535,34 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             du6.getDocumentNumber());
   }
 
+  @Test
+  void testSearchLinkableDocumentationUnits_shouldOnlyFindPendingProceedings() {
+    createDocumentationUnit(
+        LocalDate.parse("2023-02-02"), List.of("AkteZ"), "DS", PublicationStatus.PUBLISHED, null);
+    EntityBuilderTestUtil.createAndSavePendingProceeding(
+        repository,
+        PendingProceedingDTO.builder()
+            .documentNumber("DOCNUMBER_002")
+            .documentationOffice(documentationOffice));
+
+    RisBodySpec<SliceTestImpl<RelatedDocumentationUnit>> risBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .put()
+            .uri(
+                "/api/v1/caselaw/documentunits/search-linkable-documentation-units?pg=0&sz=30&onlyPendingProceedings=true")
+            .bodyValue(RelatedDocumentationUnit.builder().build())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<>() {});
+    List<RelatedDocumentationUnit> content = risBody.returnResult().getResponseBody().getContent();
+    assertThat(content).hasSize(1);
+    assertThat(content)
+        .extracting(RelatedDocumentationUnit::getDocumentNumber)
+        .containsExactlyInAnyOrder("DOCNUMBER_002");
+  }
+
   private DocumentationUnitDTO createDocumentationUnit(
       LocalDate decisionDate,
       List<String> fileNumbers,
@@ -1765,7 +1787,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         DocumentationUnitCreationParameters.builder()
             .reference(
                 Reference.builder()
-                    .id(UUID.randomUUID())
                     .referenceType(ReferenceType.CASELAW)
                     .legalPeriodical(LegalPeriodicalTransformer.transformToDomain(legalPeriodical))
                     .legalPeriodicalRawValue(legalPeriodical.getAbbreviation())
@@ -1852,7 +1873,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             .documentationOffice(creatingDocumentationOffice)
             .reference(
                 Reference.builder()
-                    .id(UUID.randomUUID())
                     .referenceType(ReferenceType.CASELAW)
                     .legalPeriodical(LegalPeriodicalTransformer.transformToDomain(legalPeriodical))
                     .legalPeriodicalRawValue(legalPeriodical.getAbbreviation())
@@ -2525,13 +2545,14 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOffice, "TEST123456789");
 
-    when(attachmentService.findByDocumentationUnitIdAndFileName(dto.getId(), "image.png"))
+    when(attachmentInlineRepository.findByDocumentationUnitIdAndFilename(dto.getId(), "image.png"))
         .thenReturn(
             Optional.of(
-                Image.builder()
+                AttachmentInlineDTO.builder()
                     .content(new byte[] {1, 2, 3})
-                    .contentType("png")
-                    .name("image.png")
+                    .filename("image.png")
+                    .format("png")
+                    .id(UUID.randomUUID())
                     .build()));
 
     byte[] imageBytes =
@@ -2598,6 +2619,8 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
       when(documentNumberPatternConfig.getDocumentNumberPatterns())
           .thenReturn(Map.of("DS", "XXREYYYY*****"));
       assertThat(inputTypeRepository.findAll()).isEmpty();
+      var currentYear = Year.now().getValue();
+      var expectedDocNumber = "XXRE" + currentYear + "00001";
 
       // Act
       var response =
@@ -2620,7 +2643,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
       // Assert
       var documentNumber = (String) response.getResponseBody().get(0);
-      assertThat(documentNumber).isEqualTo("XXRE202500001");
+      assertThat(documentNumber).isEqualTo(expectedDocNumber);
       DecisionDTO decision = (DecisionDTO) repository.findByDocumentNumber(documentNumber).get();
       assertThat(decision.getCelexNumber()).isEqualTo(celexNumber + "(02)");
       assertThat(inputTypeRepository.findAll().get(0).getValue())

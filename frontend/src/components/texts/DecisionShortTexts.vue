@@ -5,6 +5,7 @@ import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
+import { useValidationStore } from "@/composables/useValidationStore"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
 import { Decision, shortTextLabels } from "@/domain/decision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -18,8 +19,11 @@ const store = useDocumentUnitStore()
 const { documentUnit: decision } = storeToRefs(store) as {
   documentUnit: Ref<Decision | undefined>
 }
+
+const validationStore = useValidationStore<["decisionNames"][number]>()
+
 const decisionNames = computed({
-  get: () => decision.value?.shortTexts.decisionNames,
+  get: () => decision.value?.shortTexts.decisionNames ?? [],
   set: (newValue) => {
     decision.value!.shortTexts.decisionNames = newValue
   },
@@ -90,13 +94,20 @@ const otherHeadnote = computed({
         :label="shortTextLabels.decisionNames"
         :should-show-button="!decision?.shortTexts?.decisionNames?.length"
       >
-        <InputField id="fileNumber" :label="shortTextLabels.decisionNames">
+        <InputField
+          id="decisionNames"
+          v-slot="slotProps"
+          :label="shortTextLabels.decisionNames"
+        >
           <ChipsInput
-            id="decisionNames"
+            :id="slotProps.id"
             v-model="decisionNames"
             :aria-label="shortTextLabels.decisionNames"
             :data-testid="shortTextLabels.decisionNames"
-          ></ChipsInput>
+            :has-error="slotProps.hasError"
+            @focus="validationStore.remove('decisionNames')"
+            @update:validation-error="slotProps.updateValidationError"
+          />
         </InputField>
       </CategoryWrapper>
 

@@ -1,12 +1,12 @@
 import { expect, Page } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
-  navigateToCategories,
-  navigateToPreview,
-  navigateToHandover,
-  save,
-  openSearchWithFileNumberPrefix,
   fillInput,
+  navigateToCategories,
+  navigateToHandover,
+  navigateToPreview,
+  openSearchWithFileNumberPrefix,
+  save,
   triggerSearch,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
@@ -30,16 +30,34 @@ test.describe(
       await addTwoDateValues(page)
 
       await test.step("Lösche einen Datumswert", async () => {
-        await page.keyboard.press("ArrowLeft")
+        await page.keyboard.press("Shift+Tab")
         await page.keyboard.press("Enter")
 
         await expect(page.getByText("01.02.2021")).toBeHidden()
       })
+
       await save(page)
 
       await test.step("Prüfe, dass der Wert gespeichert wird und beim Reload vorhanden ist", async () => {
         await page.reload()
         await expect(page.getByText("01.02.2020")).toBeVisible()
+      })
+
+      await test.step("Bearbeite den Wert", async () => {
+        await page.getByLabel("Eintrag bearbeiten").dblclick()
+        const inputField = page
+          .getByLabel("Datum der mündlichen Verhandlung")
+          .getByRole("textbox")
+        await inputField.fill("01.02.2025")
+        await page.keyboard.press("Enter")
+        await expect(page.getByText("01.02.2020")).toBeHidden()
+        await await expect(page.getByText("01.02.2025")).toBeVisible()
+      })
+
+      await test.step("Prüfe, dass der Wert gespeichert wird und beim Reload vorhanden ist", async () => {
+        await save(page)
+        await page.reload()
+        await expect(page.getByText("01.02.2025")).toBeVisible()
       })
     })
 
@@ -67,10 +85,13 @@ test.describe(
       },
     }) => {
       await openSearchWithFileNumberPrefix(fileNumber, page)
+
       await test.step("Wähle Entscheidungsdatum '02.01.2023' in Suche", async () => {
         await fillInput(page, "Entscheidungsdatum Suche", "01.02.2021")
       })
+
       await triggerSearch(page)
+
       await test.step("Entscheidung mit 'Datum der mündlichen Verhandlung' ist in Ergebnisliste enthalten", async () => {
         await expect(page.getByText(documentNumber)).toBeVisible()
       })
@@ -152,13 +173,12 @@ test.describe(
 
 async function addTwoDateValues(page: Page) {
   await test.step("Füge zwei Datumswerte hinzu", async () => {
-    await page
-      .getByText("Datum der mündlichen Verhandlung", { exact: true })
-      .fill("01.02.2020")
+    const inputField = page
+      .getByLabel("Datum der mündlichen Verhandlung")
+      .getByRole("textbox")
+    await inputField.fill("01.02.2020")
     await page.keyboard.press("Enter")
-    await page
-      .getByText("Datum der mündlichen Verhandlung", { exact: true })
-      .fill("01.02.2021")
+    await inputField.fill("01.02.2021")
     await page.keyboard.press("Enter")
 
     await expect(page.getByText("01.02.2020")).toBeVisible()

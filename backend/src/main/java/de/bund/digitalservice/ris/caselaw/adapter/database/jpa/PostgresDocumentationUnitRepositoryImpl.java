@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ActiveCitationTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
@@ -56,10 +57,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -205,7 +208,48 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       User user,
       DocumentationUnitProcessStep initialProcessStep) {
 
-    var documentationUnitDTO = repository.save(getTransformedEntity(docUnit));
+    DocumentationUnitDTO documentationUnitDTO;
+    if (docUnit instanceof Decision decision) {
+      // We need to create uuids for new active citations before transforming them to dtos as we
+      // want to use the same id in both the related_documenation table and the new
+      // caselaw_citation_x tables.
+      // TODO: (Malte Laukötter, 2026-01-09) remove this step once we only write the
+      // caselaw_citation_x tables and annotated the id in the DTOs with @GeneratedValue.
+      if (decision.contentRelatedIndexing() != null
+          && decision.contentRelatedIndexing().activeCitations() != null) {
+        decision.contentRelatedIndexing().activeCitations().stream()
+            .filter(activeCitation -> activeCitation.getUuid() == null)
+            .forEach(activeCitation -> activeCitation.setUuid(UUID.randomUUID()));
+      }
+
+      var decisionDTO =
+          DecisionTransformer.transformToDTO(
+              DecisionDTO.builder()
+                  .documentationOffice(
+                      DocumentationOfficeTransformer.transformToDTO(
+                          docUnit.coreData().documentationOffice()))
+                  .creatingDocumentationOffice(
+                      DocumentationOfficeTransformer.transformToDTO(
+                          docUnit.coreData().creatingDocOffice()))
+                  .build(),
+              decision);
+      addCitationsToDecisionDTO(decisionDTO, decision);
+      documentationUnitDTO = decisionDTO;
+    } else if (docUnit instanceof PendingProceeding pendingProceeding) {
+      documentationUnitDTO =
+          PendingProceedingTransformer.transformToDTO(
+              PendingProceedingDTO.builder()
+                  .documentationOffice(
+                      DocumentationOfficeTransformer.transformToDTO(
+                          docUnit.coreData().documentationOffice()))
+                  .build(),
+              pendingProceeding);
+    } else {
+      throw new DocumentationUnitException(
+          "DocumentationUnit couldn't be transformed to DTO as"
+              + " it is neither Decision nor PendingProceeding.");
+    }
+    documentationUnitDTO = repository.save(documentationUnitDTO);
 
     List<SourceDTO> sources = new ArrayList<>();
     if (createdFromReference != null) {
@@ -305,32 +349,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     };
   }
 
-  private static DocumentationUnitDTO getTransformedEntity(DocumentationUnit docUnit) {
-    if (docUnit instanceof Decision decision) {
-      return DecisionTransformer.transformToDTO(
-          DecisionDTO.builder()
-              .documentationOffice(
-                  DocumentationOfficeTransformer.transformToDTO(
-                      docUnit.coreData().documentationOffice()))
-              .creatingDocumentationOffice(
-                  DocumentationOfficeTransformer.transformToDTO(
-                      docUnit.coreData().creatingDocOffice()))
-              .build(),
-          decision);
-    } else if (docUnit instanceof PendingProceeding pendingProceeding) {
-      return PendingProceedingTransformer.transformToDTO(
-          PendingProceedingDTO.builder()
-              .documentationOffice(
-                  DocumentationOfficeTransformer.transformToDTO(
-                      docUnit.coreData().documentationOffice()))
-              .build(),
-          pendingProceeding);
-    }
-    throw new DocumentationUnitException(
-        "DocumentationUnit couldn't be transformed to DTO as"
-            + " it is neither Decision nor PendingProceeding.");
-  }
-
   private ManagementDataDTO getCreatedBy(User user, DocumentationUnitDTO documentationUnitDTO) {
     ManagementDataDTO.ManagementDataDTOBuilder managementDataBuilder =
         ManagementDataDTO.builder()
@@ -400,9 +418,23 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
-      documentationUnitDTO =
-          DecisionTransformer.transformToDTO(decisionDTO, (Decision) documentationUnit);
-      repository.save(documentationUnitDTO);
+      Decision decision = (Decision) documentationUnit;
+
+      // We need to create uuids for new active citations before transforming them to dtos as we
+      // want to use the same id in both the related_documenation table and the new
+      // caselaw_citation_x tables.
+      // TODO: (Malte Laukötter, 2026-01-09) remove this step once we only write the
+      // caselaw_citation_x tables and annotated the id in the DTOs with @GeneratedValue.
+      if (decision.contentRelatedIndexing() != null
+          && decision.contentRelatedIndexing().activeCitations() != null) {
+        decision.contentRelatedIndexing().activeCitations().stream()
+            .filter(activeCitation -> activeCitation.getUuid() == null)
+            .forEach(activeCitation -> activeCitation.setUuid(UUID.randomUUID()));
+      }
+
+      var updatedDecisionDTO = DecisionTransformer.transformToDTO(decisionDTO, decision);
+      addCitationsToDecisionDTO(updatedDecisionDTO, decision);
+      repository.save(updatedDecisionDTO);
     }
     if (documentationUnitDTO instanceof PendingProceedingDTO pendingProceedingDTO) {
       if (!pendingProceedingDTO.isResolved
@@ -948,6 +980,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       RelatedDocumentationUnit relatedDocumentationUnit,
       DocumentationOffice documentationOffice,
       String documentNumberToExclude,
+      boolean onlyPendingProceedings,
       Pageable pageable) {
 
     // CriteriaBuilder and CriteriaQuery setup
@@ -965,13 +998,15 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     LocalDate decisionDate = relatedDocumentationUnit.getDecisionDate();
     String fileNumber = relatedDocumentationUnit.getFileNumber();
     DocumentType documentType = relatedDocumentationUnit.getDocumentType();
+    String documentNumber = relatedDocumentationUnit.getDocumentNumber();
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
     // 1. Filter by document number
     if (documentNumberToExclude != null) {
       Predicate documentNumberPredicate =
-          criteriaBuilder.notEqual(root.get("documentNumber"), documentNumberToExclude);
+          criteriaBuilder.notEqual(
+              root.get(DocumentationUnitDTO_.documentNumber), documentNumberToExclude);
       conditions = criteriaBuilder.and(conditions, documentNumberPredicate);
     }
 
@@ -979,7 +1014,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     if (courtType != null) {
       Predicate courtTypePredicate =
           criteriaBuilder.like(
-              criteriaBuilder.upper(root.get("court").get("type")),
+              criteriaBuilder.upper(root.get(DocumentationUnitDTO_.court).get(CourtDTO_.type)),
               "%" + courtType.toUpperCase() + "%");
       conditions = criteriaBuilder.and(conditions, courtTypePredicate);
     }
@@ -988,23 +1023,26 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     if (courtLocation != null) {
       Predicate courtLocationPredicate =
           criteriaBuilder.like(
-              criteriaBuilder.upper(root.get("court").get("location")),
+              criteriaBuilder.upper(root.get(DocumentationUnitDTO_.court).get(CourtDTO_.location)),
               "%" + courtLocation.toUpperCase() + "%");
       conditions = criteriaBuilder.and(conditions, courtLocationPredicate);
     }
 
     // 4. Filter by decision date
     if (decisionDate != null) {
-      Predicate decisionDatePredicate = criteriaBuilder.equal(root.get("date"), decisionDate);
+      Predicate decisionDatePredicate =
+          criteriaBuilder.equal(root.get(DocumentationUnitDTO_.date), decisionDate);
       conditions = criteriaBuilder.and(conditions, decisionDatePredicate);
     }
 
     // 5. Filter by file number
     if (fileNumber != null) {
-      Join<DocumentationUnitDTO, String> fileNumberJoin = root.join("fileNumbers", JoinType.LEFT);
+      Join<DocumentationUnitDTO, FileNumberDTO> fileNumberJoin =
+          root.join(DocumentationUnitDTO_.fileNumbers, JoinType.LEFT);
       Predicate fileNumberPredicate =
           criteriaBuilder.like(
-              criteriaBuilder.upper(fileNumberJoin.get("value")), fileNumber.toUpperCase() + "%");
+              criteriaBuilder.upper(fileNumberJoin.get(FileNumberDTO_.value)),
+              fileNumber.toUpperCase() + "%");
       conditions = criteriaBuilder.and(conditions, fileNumberPredicate);
     }
 
@@ -1012,31 +1050,54 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     if (documentType != null) {
       Predicate documentTypePredicate =
           criteriaBuilder.equal(
-              root.get("documentType"), DocumentTypeTransformer.transformToDTO(documentType));
+              root.get(DocumentationUnitDTO_.documentType),
+              DocumentTypeTransformer.transformToDTO(documentType));
       conditions = criteriaBuilder.and(conditions, documentTypePredicate);
     }
 
-    // 7. Filter by publication status
-    final String PUBLICATION_STATUS = "publicationStatus";
-    final String STATUS = "status";
+    // 7. Filter by document number
+    if (documentNumber != null) {
+      conditions =
+          criteriaBuilder.and(
+              conditions,
+              criteriaBuilder.like(
+                  criteriaBuilder.upper(root.get(DocumentationUnitDTO_.documentNumber)),
+                  "%" + documentNumber.trim().toUpperCase() + "%"));
+    }
+
+    // 8. Filter by onlyPendingProceedings
+    if (onlyPendingProceedings) {
+      conditions =
+          criteriaBuilder.and(
+              conditions, criteriaBuilder.equal(root.type(), PendingProceedingDTO.class));
+    }
+
+    // 9. Filter by publication status
     Predicate documentationOfficeIdPredicate =
         criteriaBuilder.equal(
-            root.get("documentationOffice").get("id"), documentationOfficeDTO.getId());
+            root.get(DocumentationUnitDTO_.documentationOffice).get(DocumentationOfficeDTO_.id),
+            documentationOfficeDTO.getId());
 
     Predicate publicationStatusPredicate =
         criteriaBuilder.or(
             criteriaBuilder.equal(
-                root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.PUBLISHED),
+                root.get(DocumentationUnitDTO_.status).get(StatusDTO_.publicationStatus),
+                PublicationStatus.PUBLISHED),
             criteriaBuilder.equal(
-                root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.PUBLISHING));
+                root.get(DocumentationUnitDTO_.status).get(StatusDTO_.publicationStatus),
+                PublicationStatus.PUBLISHING));
 
     Predicate externalHandoverPendingPredicate =
         criteriaBuilder.and(
             criteriaBuilder.equal(
-                root.get(STATUS).get(PUBLICATION_STATUS),
+                root.get(DocumentationUnitDTO_.status).get(StatusDTO_.publicationStatus),
                 PublicationStatus.EXTERNAL_HANDOVER_PENDING),
             criteriaBuilder.equal(
-                root.get("creatingDocumentationOffice").get("id"), documentationOfficeDTO.getId()));
+                criteriaBuilder
+                    .treat(root, DecisionDTO.class)
+                    .get(DecisionDTO_.creatingDocumentationOffice)
+                    .get(DocumentationOfficeDTO_.id),
+                documentationOfficeDTO.getId()));
 
     Predicate finalPredicate =
         criteriaBuilder.or(
@@ -1150,5 +1211,48 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     } else {
       documentationUnitDTO.getManagementData().setLastPublishedAtDateTime(now);
     }
+  }
+
+  private void addCitationsToDecisionDTO(@NonNull DecisionDTO dto, @NonNull Decision decision) {
+    if (decision.contentRelatedIndexing() == null) {
+      return;
+    }
+
+    if (decision.contentRelatedIndexing().activeCitations() == null) {
+      return;
+    }
+
+    List<LinkCaselawCitationDTO> links = new ArrayList<>();
+    List<ActiveBlindlinkCaselawCitationDTO> blindlinks = new ArrayList<>();
+    AtomicInteger nextRank = new AtomicInteger(1);
+
+    decision.contentRelatedIndexing().activeCitations().stream()
+        .filter(activeCitation -> !activeCitation.hasNoValues())
+        .forEach(
+            activeCitation -> {
+              var optionalTargetDocument =
+                  Optional.ofNullable(activeCitation.getDocumentNumber())
+                      .flatMap(repository::findByDocumentNumber);
+
+              if (optionalTargetDocument.isEmpty()) {
+                blindlinks.add(
+                    ActiveCitationTransformer.transformToCaselawCitationBlindlinkDTO(
+                        activeCitation, dto, nextRank.getAndIncrement()));
+                return;
+              }
+
+              if (optionalTargetDocument.get() instanceof DecisionDTO targetDecisionDTO) {
+                links.add(
+                    ActiveCitationTransformer.transformToCaselawCitationLinkDTO(
+                        activeCitation, dto, targetDecisionDTO, nextRank.getAndIncrement()));
+                return;
+              }
+
+              throw new IllegalArgumentException(
+                  "Trying to add an active citation with a non decision documentation unit as the target."); // TODO: (Malte Laukötter, 2026-01-09) or should we just handle this as the blind link case as well?
+            });
+
+    dto.setActiveLinkCaselawCitations(links);
+    dto.setActiveBlindlinkCaselawCitations(blindlinks);
   }
 }

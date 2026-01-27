@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Slice;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import tools.jackson.core.type.TypeReference;
 
 @Sql(
     scripts = {"classpath:fields_of_law_init.sql"},
@@ -227,7 +227,7 @@ class FieldOfLawIntegrationTest extends BaseIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=FL-01")
+            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=FL-01&sz=200&pg=0")
             .exchange()
             .expectStatus()
             .isOk()

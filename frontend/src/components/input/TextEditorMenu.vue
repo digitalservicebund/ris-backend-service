@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { commands, selectActiveState } from "@guardian/prosemirror-invisibles"
 import { Editor } from "@tiptap/vue-3"
-import { computed, ref } from "vue"
+import { computed, ref, markRaw, h } from "vue"
 import { useRoute } from "vue-router"
 import TextEditorButton, {
   EditorButton,
@@ -15,8 +15,8 @@ import IconAlignCenter from "~icons/ic/sharp-format-align-center"
 import IconAlignLeft from "~icons/ic/sharp-format-align-left"
 import IconAlignRight from "~icons/ic/sharp-format-align-right"
 import IconBold from "~icons/ic/sharp-format-bold"
-import IndentDecrease from "~icons/ic/sharp-format-indent-decrease"
-import IndentIncrease from "~icons/ic/sharp-format-indent-increase"
+import IconIndentDecrease from "~icons/ic/sharp-format-indent-decrease"
+import IconIndentIncrease from "~icons/ic/sharp-format-indent-increase"
 import IconItalic from "~icons/ic/sharp-format-italic"
 import IconUnorderedList from "~icons/ic/sharp-format-list-bulleted"
 import IconOrderedList from "~icons/ic/sharp-format-list-numbered"
@@ -27,8 +27,17 @@ import IconRedo from "~icons/ic/sharp-redo"
 import IconSubscript from "~icons/ic/sharp-subscript"
 import IconSuperscript from "~icons/ic/sharp-superscript"
 import IconUndo from "~icons/ic/sharp-undo"
+import IconBorderAll from "~icons/material-symbols/border-all-outline"
+import IconBorderBottom from "~icons/material-symbols/border-bottom"
+import IconBorderClear from "~icons/material-symbols/border-clear"
+import IconBorderLeft from "~icons/material-symbols/border-left"
+import IconBorderRight from "~icons/material-symbols/border-right"
+import IconBorderTop from "~icons/material-symbols/border-top"
 import IconParagraph from "~icons/material-symbols/format-paragraph"
 import IconSpellCheck from "~icons/material-symbols/spellcheck"
+import IconVerticalAlignBottom from "~icons/material-symbols/vertical-align-bottom"
+import IconVerticalAlignCenter from "~icons/material-symbols/vertical-align-center"
+import IconVerticalAlignTop from "~icons/material-symbols/vertical-align-top"
 import MdiTableColumnPlusAfter from "~icons/mdi/table-column-plus-after"
 import MdiTableColumnRemove from "~icons/mdi/table-column-remove"
 import MdiTablePlus from "~icons/mdi/table-plus"
@@ -42,10 +51,15 @@ interface Props {
   buttonsDisabled: boolean
   editor: Editor
   containerWidth?: number
+  hideTextCheck?: boolean
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits<{ onEditorExpandedChanged: [boolean] }>()
+const emit = defineEmits<{
+  onEditorExpandedChanged: [boolean]
+  noCellSelected: [boolean]
+}>()
+
 const route = useRoute()
 const isPendingProceeding = computed(() =>
   route.path.includes("pending-proceeding"),
@@ -61,6 +75,45 @@ const borderNumberCategories = [
 const shouldShowAddBorderNumbersButton = computed(() =>
   borderNumberCategories.includes(props.ariaLabel),
 )
+
+const DEFAULT_BORDER_VALUE = "1px solid black"
+
+const validateCellSelection = (callback: () => unknown) => {
+  const isCellSelected =
+    props.editor.isActive("tableCell") || props.editor.isActive("tableHeader")
+
+  if (!isCellSelected) {
+    emit("noCellSelected", true)
+    return
+  }
+
+  emit("noCellSelected", false)
+  return callback()
+}
+
+const createTextIcon = (text: string) => {
+  return markRaw({
+    render: () =>
+      h(
+        "span",
+        {
+          style: {
+            fontFamily: "var(--font-sans)",
+            fontSize: "14pt",
+            display: "flex",
+            fontWeight: "bold",
+            alignItems: "center",
+            justifyContent: "center",
+            lineHeight: "1",
+            width: "24px",
+            height: "24px",
+          },
+          class: "text-blue-900",
+        },
+        text,
+      ),
+  })
+}
 
 const buttons = computed(() => {
   const buttons = [
@@ -170,13 +223,57 @@ const buttons = computed(() => {
       callback: () => props.editor.chain().focus().setTextAlign("right").run(),
     },
     {
-      type: "orderedList",
+      type: "menu",
       icon: IconOrderedList,
       ariaLabel: "Nummerierte Liste",
-      shortcut: "Strg + ⇧ + 7",
-      group: "indent",
+      group: "orderedListGroup",
       isCollapsable: false,
-      callback: () => props.editor.chain().focus().toggleOrderedList().run(),
+      childButtons: [
+        {
+          type: "numericList",
+          icon: "1.",
+          ariaLabel: "Numerisch (1, 2, 3)",
+          style: "numeric",
+        },
+        {
+          type: "lowercaseAlphabeticalList",
+          icon: "a.",
+          ariaLabel: "Lateinisch klein (a, b, c)",
+          style: "smallLatin",
+        },
+        {
+          type: "uppercaseAlphabeticalList",
+          icon: "A.",
+          ariaLabel: "Lateinisch groß (A, B, C)",
+          style: "capitalLatin",
+        },
+        {
+          type: "lowercaseRomanList",
+          icon: "i.",
+          ariaLabel: "Römisch klein (i, ii, iii)",
+          style: "smallRoman",
+        },
+        {
+          type: "uppercaseRomanList",
+          icon: "I.",
+          ariaLabel: "Römisch groß (I, II, III)",
+          style: "capitalRoman",
+        },
+        {
+          type: "lowercaseGreekList",
+          icon: "ε.",
+          ariaLabel: "Griechisch klein (α, β, γ)",
+          style: "smallGreek",
+        },
+      ].map(({ type, icon, ariaLabel, style }) => ({
+        type,
+        icon: createTextIcon(icon),
+        ariaLabel,
+        group: "orderedListGroup",
+        isCollapsable: false,
+        callback: () =>
+          props.editor.chain().focus().toggleOrderedList(style).run(),
+      })),
     },
     {
       type: "bulletList",
@@ -189,7 +286,7 @@ const buttons = computed(() => {
     },
     {
       type: "outdent",
-      icon: IndentDecrease,
+      icon: IconIndentDecrease,
       ariaLabel: "Einzug verringern",
       group: "indent",
       isCollapsable: false,
@@ -197,7 +294,7 @@ const buttons = computed(() => {
     },
     {
       type: "indent",
-      icon: IndentIncrease,
+      icon: IconIndentIncrease,
       ariaLabel: "Einzug vergrößern",
       group: "indent",
       isCollapsable: false,
@@ -267,6 +364,137 @@ const buttons = computed(() => {
           .run(),
     },
     {
+      type: "menu",
+      icon: IconBorderTop,
+      ariaLabel: "Tabellenrahmen",
+      group: "Tabelle",
+      isCollapsable: false,
+      childButtons: [
+        {
+          type: "borderAll",
+          icon: IconBorderAll,
+          ariaLabel: "Alle Rahmen",
+          group: "Tabellenrahmen",
+          isCollapsable: false,
+          callback: (borderValue?: string) =>
+            validateCellSelection(() =>
+              props.editor.commands.setBorderAll(
+                borderValue ?? DEFAULT_BORDER_VALUE,
+              ),
+            ),
+        },
+        {
+          type: "borderClear",
+          icon: IconBorderClear,
+          ariaLabel: "Kein Rahmen",
+          group: "Tabellenrahmen",
+          isCollapsable: false,
+          callback: () =>
+            validateCellSelection(() =>
+              props.editor.commands.clearCellBorders(),
+            ),
+        },
+        {
+          type: "borderLeft",
+          icon: IconBorderLeft,
+          ariaLabel: "Rahmen links",
+          group: "Tabellenrahmen",
+          isCollapsable: false,
+          callback: (borderValue?: string) =>
+            validateCellSelection(() =>
+              props.editor.commands.setBorder(
+                "left",
+                borderValue ?? DEFAULT_BORDER_VALUE,
+              ),
+            ),
+        },
+        {
+          type: "borderRight",
+          icon: IconBorderRight,
+          ariaLabel: "Rahmen rechts",
+          group: "Tabellenrahmen",
+          isCollapsable: false,
+          callback: (borderValue?: string) =>
+            validateCellSelection(() =>
+              props.editor.commands.setBorder(
+                "right",
+                borderValue ?? DEFAULT_BORDER_VALUE,
+              ),
+            ),
+        },
+        {
+          type: "borderTop",
+          icon: IconBorderTop,
+          ariaLabel: "Rahmen oben",
+          group: "Tabellenrahmen",
+          isCollapsable: false,
+          callback: (borderValue?: string) =>
+            validateCellSelection(() =>
+              props.editor.commands.setBorder(
+                "top",
+                borderValue ?? DEFAULT_BORDER_VALUE,
+              ),
+            ),
+        },
+        {
+          type: "borderBottom",
+          icon: IconBorderBottom,
+          ariaLabel: "Rahmen unten",
+          group: "Tabellenrahmen",
+          isCollapsable: false,
+          callback: (borderValue?: string) =>
+            validateCellSelection(() =>
+              props.editor.commands.setBorder(
+                "bottom",
+                borderValue ?? DEFAULT_BORDER_VALUE,
+              ),
+            ),
+        },
+      ],
+    },
+    {
+      type: "menu",
+      icon: IconVerticalAlignTop,
+      ariaLabel: "Vertikale Ausrichtung in Tabellen",
+      group: "Tabelle",
+      isCollapsable: false,
+      childButtons: [
+        {
+          type: "alignTop",
+          icon: IconVerticalAlignTop,
+          ariaLabel: "Oben ausrichten",
+          group: "Zellenausrichtung",
+          isCollapsable: false,
+          callback: () =>
+            validateCellSelection(() =>
+              props.editor.commands.setVerticalAlign("top"),
+            ),
+        },
+        {
+          type: "alignMiddle",
+          icon: IconVerticalAlignCenter,
+          ariaLabel: "Mittig ausrichten",
+          group: "Zellenausrichtung",
+          isCollapsable: false,
+          callback: () =>
+            validateCellSelection(() =>
+              props.editor.commands.setVerticalAlign("middle"),
+            ),
+        },
+        {
+          type: "alignBottom",
+          icon: IconVerticalAlignBottom,
+          ariaLabel: "Unten ausrichten",
+          group: "Zellenausrichtung",
+          isCollapsable: false,
+          callback: () =>
+            validateCellSelection(() =>
+              props.editor.commands.setVerticalAlign("bottom"),
+            ),
+        },
+      ],
+    },
+    {
       type: "blockquote",
       icon: IconBlockquote,
       ariaLabel: "Zitat einfügen",
@@ -300,16 +528,18 @@ const buttons = computed(() => {
     })
   }
 
-  buttons.push({
-    type: "textCheck",
-    icon: IconSpellCheck,
-    ariaLabel: "Rechtschreibprüfung",
-    group: "textCheck",
-    isCollapsable: false,
-    callback: async () => {
-      props.editor.chain().focus().textCheck().run()
-    },
-  })
+  if (!props.hideTextCheck) {
+    buttons.push({
+      type: "textCheck",
+      icon: IconSpellCheck,
+      ariaLabel: "Rechtschreibprüfung",
+      group: "textCheck",
+      isCollapsable: false,
+      callback: async () => {
+        props.editor.chain().focus().textCheck().run()
+      },
+    })
+  }
 
   return buttons
 })
@@ -421,7 +651,7 @@ const ariaLabel = props.ariaLabel ? props.ariaLabel : null
   <div
     ref="menuBar"
     :aria-label="ariaLabel + ' Button Leiste'"
-    class="flex flex-row flex-wrap justify-between ps-8 pe-8 pt-8 pb-4"
+    class="flex flex-row flex-wrap justify-between gap-2 ps-8 pe-8 pt-8 pb-4"
     :tabindex="
       menuBar?.matches(':focus-within') || props.buttonsDisabled ? -1 : 0
     "
@@ -429,7 +659,7 @@ const ariaLabel = props.ariaLabel ? props.ariaLabel : null
     @keydown.left.stop.prevent="focusPreviousButton"
     @keydown.right.stop.prevent="focusNextButton"
   >
-    <div class="flex flex-row">
+    <div class="flex min-w-0 flex-1 flex-row flex-wrap gap-1">
       <TextEditorButton
         v-for="(button, index) in collapsedButtons"
         :key="index"
@@ -440,7 +670,7 @@ const ariaLabel = props.ariaLabel ? props.ariaLabel : null
         @toggle="handleButtonClick"
       />
     </div>
-    <div class="flex flex-row">
+    <div class="flex flex-shrink-0 flex-row gap-1">
       <TextEditorButton
         v-for="(button, index) in fixButtons"
         :key="index"

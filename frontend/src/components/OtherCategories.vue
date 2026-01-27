@@ -1,15 +1,21 @@
 <script lang="ts" setup>
 import { computed } from "vue"
+import AbuseFees from "./AbuseFees.vue"
 import Appeal from "@/components/Appeal.vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import CollectiveAgreements from "@/components/CollectiveAgreements.vue"
+import CountriesOfOrigin from "@/components/CountriesOfOrigin.vue"
 import DefinitionList from "@/components/DefinitionList.vue"
 import DismissalInputs from "@/components/DismissalInputs.vue"
 import ForeignLanguageVersions from "@/components/ForeignLanguageVersions.vue"
+import IncomeTypes from "@/components/IncomeTypes.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
+import NonApplicationNorms from "@/components/norms/NonApplicationNorms.vue"
+import ObjectValues from "@/components/ObjectValues.vue"
+import OriginOfTranslations from "@/components/OriginOfTranslations.vue"
+import PendingProceedings from "@/components/PendingProceedings.vue"
 import TextInputCategory from "@/components/texts/TextInputCategory.vue"
-import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import laborCourtTypes from "@/data/laborCourtTypes.json"
 import { contentRelatedIndexingLabels } from "@/domain/decision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -54,6 +60,18 @@ const hasForeignLanguageVersion = computed(() => {
     : false
 })
 
+const hasOriginOfTranslations = computed(() => {
+  return contentRelatedIndexing.value.originOfTranslations
+    ? contentRelatedIndexing.value.originOfTranslations?.length > 0
+    : false
+})
+
+const hasCountriesOfOrigin = computed(() => {
+  return contentRelatedIndexing.value.countriesOfOrigin
+    ? contentRelatedIndexing.value.countriesOfOrigin?.length > 0
+    : false
+})
+
 const hasAppeal = computed(() => {
   return (
     contentRelatedIndexing.value.appeal?.appellants?.length ||
@@ -70,13 +88,41 @@ const hasAppeal = computed(() => {
   )
 })
 
-const shouldDisplayLegislativeMandateCategory = computed(() => {
-  return (
-    constitutionalCourtTypes.items.includes(
-      store.documentUnit?.coreData.court?.type ?? "",
-    ) || hasLegislativeMandate.value
-  )
+const hasObjectValues = computed(() => {
+  return contentRelatedIndexing.value.objectValues?.length
+    ? contentRelatedIndexing.value.objectValues?.length > 0
+    : false
 })
+
+const hasIncomeTypes = computed(() => {
+  return contentRelatedIndexing.value.incomeTypes
+    ? contentRelatedIndexing.value.incomeTypes?.length > 0
+    : false
+})
+
+const hasAbuseFees = computed(() => {
+  return contentRelatedIndexing.value.abuseFees?.length
+    ? contentRelatedIndexing.value.abuseFees?.length > 0
+    : false
+})
+
+const hasRelatedPendingProceedings = computed(() => {
+  return contentRelatedIndexing.value.relatedPendingProceedings?.length
+    ? contentRelatedIndexing.value.relatedPendingProceedings?.length > 0
+    : false
+})
+
+const hasNonApplicationNorms = computed(() => {
+  return contentRelatedIndexing.value.nonApplicationNorms?.length
+    ? contentRelatedIndexing.value.nonApplicationNorms?.length > 0
+    : false
+})
+
+const isConstitutionalCourt = computed(
+  () =>
+    store.documentUnit?.coreData.court?.jurisdictionType ===
+    "Verfassungsgerichtsbarkeit",
+)
 
 const isLaborCourt = computed(() =>
   laborCourtTypes.items.includes(
@@ -94,14 +140,26 @@ const shouldDisplayDismissalAttributes = computed(
   () => isLaborCourt.value || hasDismissalInput.value,
 )
 
-const shouldDisplayCollectiveAgreements = computed(
-  () => isLaborCourt.value || hasCollectiveAgreement.value,
-)
-
 const shouldDisplayEvsf = computed(() => isFinanceCourt.value || evsf.value)
 
 const shouldDisplayAppeal = computed(
   () => isFinanceCourt.value || hasAppeal.value,
+)
+
+const shouldDisplayIncomeType = computed(
+  () => isFinanceCourt.value || hasIncomeTypes.value,
+)
+
+const shouldDisplayAbuseFees = computed(
+  () => isConstitutionalCourt.value || hasAbuseFees.value,
+)
+
+const shouldDisplayLegislativeMandateCategory = computed(() => {
+  return isConstitutionalCourt.value || hasLegislativeMandate.value
+})
+
+const shouldDisplayNonApplicationNorms = computed(
+  () => isFinanceCourt.value || hasNonApplicationNorms.value,
 )
 </script>
 
@@ -116,12 +174,10 @@ const shouldDisplayAppeal = computed(
         <DefinitionList label="Definition" />
       </CategoryWrapper>
       <CategoryWrapper
-        v-if="shouldDisplayCollectiveAgreements"
-        v-slot="slotProps"
         label="Tarifvertrag"
         :should-show-button="!hasCollectiveAgreement"
       >
-        <CollectiveAgreements label="Tarifvertrag" @reset="slotProps.reset" />
+        <CollectiveAgreements label="Tarifvertrag" />
       </CategoryWrapper>
       <CategoryWrapper
         v-if="shouldDisplayDismissalAttributes"
@@ -149,6 +205,12 @@ const shouldDisplayAppeal = computed(
       >
         <ForeignLanguageVersions label="Fremdsprachige Fassung" />
       </CategoryWrapper>
+      <CategoryWrapper
+        label="Herkunft der Übersetzung"
+        :should-show-button="!hasOriginOfTranslations"
+      >
+        <OriginOfTranslations label="Herkunft der Übersetzung" />
+      </CategoryWrapper>
       <TextInputCategory
         v-if="shouldDisplayEvsf"
         id="evsf"
@@ -164,6 +226,49 @@ const shouldDisplayAppeal = computed(
         :should-show-button="!hasAppeal"
       >
         <Appeal :label="contentRelatedIndexingLabels.appeal" />
+      </CategoryWrapper>
+      <CategoryWrapper
+        label="Gegenstandswert"
+        :should-show-button="!hasObjectValues"
+      >
+        <ObjectValues :label="contentRelatedIndexingLabels.objectValues" />
+      </CategoryWrapper>
+      <CategoryWrapper
+        v-if="shouldDisplayAbuseFees"
+        :label="contentRelatedIndexingLabels.abuseFees"
+        :should-show-button="!hasAbuseFees"
+      >
+        <AbuseFees :label="contentRelatedIndexingLabels.abuseFees" />
+      </CategoryWrapper>
+      <CategoryWrapper
+        :label="contentRelatedIndexingLabels.countriesOfOrigin"
+        :should-show-button="!hasCountriesOfOrigin"
+      >
+        <CountriesOfOrigin
+          :label="contentRelatedIndexingLabels.countriesOfOrigin"
+        />
+      </CategoryWrapper>
+      <CategoryWrapper
+        v-if="shouldDisplayIncomeType"
+        :label="contentRelatedIndexingLabels.incomeTypes"
+        :should-show-button="!hasIncomeTypes"
+      >
+        <IncomeTypes :label="contentRelatedIndexingLabels.incomeTypes" />
+      </CategoryWrapper>
+      <CategoryWrapper
+        :label="contentRelatedIndexingLabels.relatedPendingProceedings"
+        :should-show-button="!hasRelatedPendingProceedings"
+      >
+        <PendingProceedings
+          :label="contentRelatedIndexingLabels.relatedPendingProceedings"
+        />
+      </CategoryWrapper>
+      <CategoryWrapper
+        v-if="shouldDisplayNonApplicationNorms"
+        :label="contentRelatedIndexingLabels.nonApplicationNorms"
+        :should-show-button="!hasNonApplicationNorms"
+      >
+        <NonApplicationNorms />
       </CategoryWrapper>
     </div>
   </div>

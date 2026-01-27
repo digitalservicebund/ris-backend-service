@@ -2,9 +2,9 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.config.ConverterConfig;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
@@ -39,6 +39,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(SpringExtension.class)
 @Import({ConverterConfig.class})
@@ -79,7 +80,10 @@ class XmlExporterTest {
         .jobProfiles(generateJobProfiles())
         .dismissalTypes(List.of("type 1", "type 2"))
         .dismissalGrounds(List.of("ground 1", "ground 2"))
-        .collectiveAgreements(List.of("agreement 1", "agreement 2"))
+        .collectiveAgreements(
+            List.of(
+                CollectiveAgreement.builder().name("agreement 1").build(),
+                CollectiveAgreement.builder().name("agreement 2").build()))
         .hasLegislativeMandate(true)
         .build();
   }

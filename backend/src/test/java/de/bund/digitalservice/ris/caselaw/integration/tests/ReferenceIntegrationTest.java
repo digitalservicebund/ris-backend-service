@@ -93,7 +93,6 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSaveDecision(repository, documentationOffice);
 
-    UUID referenceId = UUID.randomUUID();
     Decision decisionFromFrontend =
         Decision.builder()
             .uuid(dto.getId())
@@ -102,7 +101,6 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
             .caselawReferences(
                 List.of(
                     Reference.builder()
-                        .id(referenceId)
                         .citation("2024, S.3")
                         .referenceSupplement("Klammerzusatz")
                         .footnote("footnote")
@@ -132,8 +130,8 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
                   .isEqualTo(DEFAULT_DOCUMENT_NUMBER);
               assertThat(response.getResponseBody().caselawReferences()).hasSize(1);
               assertThat(response.getResponseBody().caselawReferences())
-                  .extracting("citation", "referenceSupplement", "footnote", "id")
-                  .containsExactly(tuple("2024, S.3", "Klammerzusatz", "footnote", referenceId));
+                  .extracting("citation", "referenceSupplement", "footnote")
+                  .containsExactly(tuple("2024, S.3", "Klammerzusatz", "footnote"));
               assertThat(response.getResponseBody().caselawReferences())
                   .extracting("legalPeriodical")
                   .usingRecursiveComparison()
@@ -146,7 +144,6 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSaveDecision(repository, documentationOffice);
 
-    UUID referenceId = UUID.randomUUID();
     Decision decisionFromFrontend =
         Decision.builder()
             .uuid(dto.getId())
@@ -155,7 +152,6 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
             .literatureReferences(
                 List.of(
                     Reference.builder()
-                        .id(referenceId)
                         .citation("2024, S.3")
                         .author("Heinz Otto")
                         .documentType(eanDocumentType)
@@ -185,8 +181,8 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
                   .isEqualTo(DEFAULT_DOCUMENT_NUMBER);
               assertThat(response.getResponseBody().literatureReferences()).hasSize(1);
               assertThat(response.getResponseBody().literatureReferences())
-                  .extracting("citation", "author", "documentType", "id")
-                  .containsExactly(tuple("2024, S.3", "Heinz Otto", eanDocumentType, referenceId));
+                  .extracting("citation", "author", "documentType")
+                  .containsExactly(tuple("2024, S.3", "Heinz Otto", eanDocumentType));
               assertThat(response.getResponseBody().literatureReferences())
                   .extracting("legalPeriodical")
                   .usingRecursiveComparison()
@@ -199,37 +195,41 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
     DecisionDTO dto =
         (DecisionDTO) EntityBuilderTestUtil.createAndSaveDecision(repository, documentationOffice);
 
-    UUID referenceId = UUID.randomUUID();
-    UUID literatureCitationId = UUID.randomUUID();
+    var savedDocUnitDto =
+        repository.save(
+            dto.toBuilder()
+                .caselawReferences(
+                    List.of(
+                        CaselawReferenceDTO.builder()
+                            .documentationUnitRank(1)
+                            .documentationUnit(dto)
+                            .citation("2024, S.3")
+                            .legalPeriodicalRawValue("BVerwGE")
+                            .legalPeriodical(
+                                LegalPeriodicalDTO.builder()
+                                    .id(bverwgeLegalPeriodical.uuid())
+                                    .build())
+                            .build()))
+                .literatureReferences(
+                    List.of(
+                        LiteratureReferenceDTO.builder()
+                            .documentationUnitRank(1)
+                            .documentationUnit(dto)
+                            .citation("2024, S.3")
+                            .author("Curie, Marie")
+                            .legalPeriodicalRawValue("BVerwGE")
+                            .documentTypeRawValue("Ean")
+                            .documentType(
+                                DocumentTypeDTO.builder().id(eanDocumentType.uuid()).build())
+                            .legalPeriodical(
+                                LegalPeriodicalDTO.builder()
+                                    .id(bverwgeLegalPeriodical.uuid())
+                                    .build())
+                            .build()))
+                .build());
 
-    repository.save(
-        dto.toBuilder()
-            .caselawReferences(
-                List.of(
-                    CaselawReferenceDTO.builder()
-                        .documentationUnitRank(1)
-                        .documentationUnit(dto)
-                        .id(referenceId)
-                        .citation("2024, S.3")
-                        .legalPeriodicalRawValue("BVerwGE")
-                        .legalPeriodical(
-                            LegalPeriodicalDTO.builder().id(bverwgeLegalPeriodical.uuid()).build())
-                        .build()))
-            .literatureReferences(
-                List.of(
-                    LiteratureReferenceDTO.builder()
-                        .documentationUnitRank(1)
-                        .documentationUnit(dto)
-                        .id(literatureCitationId)
-                        .citation("2024, S.3")
-                        .author("Curie, Marie")
-                        .legalPeriodicalRawValue("BVerwGE")
-                        .documentTypeRawValue("Ean")
-                        .documentType(DocumentTypeDTO.builder().id(eanDocumentType.uuid()).build())
-                        .legalPeriodical(
-                            LegalPeriodicalDTO.builder().id(bverwgeLegalPeriodical.uuid()).build())
-                        .build()))
-            .build());
+    UUID caselawReferenceId = savedDocUnitDto.getCaselawReferences().getFirst().getId();
+    UUID literatureReferenceId = savedDocUnitDto.getLiteratureReferences().getFirst().getId();
 
     Decision decisionFromFrontend =
         Decision.builder()
@@ -254,8 +254,8 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
               assertThat(response.getResponseBody().caselawReferences()).isEmpty();
             });
 
-    assertThat(referenceRepository.findById(referenceId)).isEmpty();
-    assertThat(literatureCitationRepository.findById(literatureCitationId)).isEmpty();
+    assertThat(referenceRepository.findById(caselawReferenceId)).isEmpty();
+    assertThat(literatureCitationRepository.findById(literatureReferenceId)).isEmpty();
   }
 
   @Test

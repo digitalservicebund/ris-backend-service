@@ -3,7 +3,6 @@ import dayjs from "dayjs"
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import { computed, Ref } from "vue"
-import Tooltip from "./Tooltip.vue"
 import DocumentationUnitSummary from "@/components/DocumentationUnitSummary.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import ActiveCitation from "@/domain/activeCitation"
@@ -62,52 +61,54 @@ async function generateHeadnote() {
 
     <!-- Button group -->
     <div class="flex flex-row -space-x-2">
-      <Tooltip v-if="isParallelDecision" text="Rubriken importieren">
-        <Button
-          id="category-import"
-          aria-label="Rubriken-Import anzeigen"
-          data-testid="import-categories"
-          size="small"
-          text
-          @click="openCategoryImport(data.documentNumber)"
-        >
-          <template #icon><IconImportCategories /></template
-        ></Button>
-      </Tooltip>
-      <Tooltip
+      <Button
         v-if="isParallelDecision"
-        :text="
-          !!decision!.shortTexts.headnote
-            ? 'Zielrubrik Orientierungssatz bereits ausgefüllt'
-            : 'O-Satz generieren'
-        "
+        id="category-import"
+        v-tooltip.bottom="{
+          value: 'Rubriken importieren',
+        }"
+        aria-label="Rubriken-Import anzeigen"
+        data-testid="import-categories"
+        size="small"
+        text
+        @click="openCategoryImport(data.documentNumber)"
       >
-        <Button
-          id="generate-headnote"
-          aria-label="O-Satz generieren"
-          data-testid="generate-headnote"
-          :disabled="!!decision!.shortTexts.headnote"
-          size="small"
-          text
-          @click="generateHeadnote"
-        >
-          <template #icon><IconGenerateText /></template
-        ></Button>
-      </Tooltip>
-      <Tooltip text="Kopieren">
-        <Button
-          id="category-import"
-          aria-label="Rubriken-Import anzeigen"
-          data-testid="copy-summary"
-          :disabled="!!decision!.shortTexts.headnote"
-          size="small"
-          text
-          @click="copySummary"
-          @keypress.enter="copySummary"
-        >
-          <template #icon><IconBaselineContentCopy /></template
-        ></Button>
-      </Tooltip>
+        <template #icon><IconImportCategories /></template
+      ></Button>
+
+      <Button
+        v-if="isParallelDecision"
+        id="generate-headnote"
+        v-tooltip.bottom="{
+          value: !!decision!.shortTexts.headnote
+            ? 'Zielrubrik Orientierungssatz bereits ausgefüllt'
+            : 'O-Satz generieren',
+        }"
+        aria-label="O-Satz generieren"
+        data-testid="generate-headnote"
+        :disabled="!!decision!.shortTexts.headnote"
+        size="small"
+        text
+        @click="generateHeadnote"
+      >
+        <template #icon><IconGenerateText /></template
+      ></Button>
+
+      <Button
+        id="category-import"
+        v-tooltip.bottom="{
+          value: 'Kopieren',
+        }"
+        aria-label="Rubriken-Import anzeigen"
+        data-testid="copy-summary"
+        :disabled="!!decision!.shortTexts.headnote"
+        size="small"
+        text
+        @click="copySummary"
+        @keypress.enter="copySummary"
+      >
+        <template #icon><IconBaselineContentCopy /></template
+      ></Button>
     </div>
   </div>
 </template>

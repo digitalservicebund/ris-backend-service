@@ -1,4 +1,3 @@
-import fs from "fs"
 import { expect, JSHandle, Locator, Page, Request } from "@playwright/test"
 import dayjs from "dayjs"
 import { Browser } from "playwright"
@@ -187,14 +186,21 @@ export const navigateToAttachments = async (
   page: Page,
   documentNumber: string,
   options?: {
+    navigationBy?: "click" | "url"
     skipAssert?: boolean
   },
 ) => {
   await test.step("Navigate to 'Dokumente'", async () => {
     const queryParams = getAllQueryParamsFromUrl(page)
-    await page.goto(
-      `/caselaw/documentunit/${documentNumber}/attachments${queryParams}`,
-    )
+
+    if (options?.navigationBy === "click") {
+      await page.getByRole("link", { name: "Dokumente" }).click()
+    } else {
+      await page.goto(
+        `/caselaw/documentunit/${documentNumber}/attachments${queryParams}`,
+      )
+    }
+
     if (options?.skipAssert) return
 
     await expect(page.getByTestId("document-unit-attachments")).toBeVisible({
@@ -208,12 +214,17 @@ export const navigateToManagementData = async (
   documentNumber: string,
   options?: {
     type?: "pending-proceeding" | "documentunit"
+    navigationBy?: "click" | "url"
   },
 ) => {
   await test.step("Navigate to 'Verwaltungsdaten'", async () => {
     const documentType = options?.type ?? "documentunit"
     const baseUrl = `/caselaw/${documentType}/${documentNumber}/managementdata`
-    await getRequest(baseUrl, page)
+    if (options?.navigationBy === "click") {
+      await page.getByRole("link", { name: "Verwaltungsdaten" }).click()
+    } else {
+      await getRequest(baseUrl, page)
+    }
     await expect(page.getByTestId("title").first()).toHaveText(
       "Verwaltungsdaten",
     )
@@ -269,43 +280,26 @@ export const navigateToSettings = async (page: Page) => {
   })
 }
 
-export async function openInPortal(
+export async function requestHtmlFromPortalApi(
   browser: Browser,
   documentNumber: string,
-): Promise<Page> {
-  const cookieFilePath = `test/e2e/caselaw/.auth/staging-portal-user.json`
-  let page: Page | undefined
-  if (fs.existsSync(cookieFilePath)) {
-    const context = await browser.newContext({
-      storageState: cookieFilePath,
-    })
-    page = await context.newPage()
+): Promise<{ status: number; content?: string }> {
+  const context = await browser.newContext({
+    httpCredentials: {
+      username: process.env.PORTAL_STAGING_BASIC_AUTH_USER as string,
+      password: process.env.PORTAL_STAGING_BASIC_AUTH_PASSWORD as string,
+      origin: "https://ris-portal.dev.ds4g.net",
+    },
+  })
 
-    const cookies = await context.cookies()
-    const sessionCookie = cookies.find(
-      (cookie) => cookie.name === "AUTH_SESSION_ID",
-    )
-
-    if (sessionCookie !== null) {
-      await page.goto(
-        `https://ris-portal.dev.ds4g.net/v1/case-law/${documentNumber}.html`,
-      )
-      return page
-    }
-  } else {
-    page = await browser.newPage()
-  }
-
-  await page.goto(
-    `https://ris-portal.dev.ds4g.net/auth?redirectTo=/v1/case-law/${documentNumber}.html`,
+  const response = await context.request.get(
+    `https://ris-portal.dev.ds4g.net/v1/case-law/${documentNumber}.html`,
   )
-
-  await page.fill("#username", process.env.E2E_TEST_USER as string)
-  await page.fill("#password", process.env.E2E_TEST_PASSWORD as string)
-  await page.locator("input#kc-login").click()
-
-  await page.context().storageState({ path: cookieFilePath })
-  return page
+  if (response.ok()) {
+    return { status: response.status(), content: await response.text() }
+  } else {
+    return { status: response.status() }
+  }
 }
 
 export const handoverDocumentationUnit = async (
@@ -590,7 +584,7 @@ export async function fillSelect(
 ) {
   const dropdown = page.getByRole("combobox", { name: ariaLabel, exact: true })
   await dropdown.click()
-  await page.getByRole("option", { name: optionLabel }).click()
+  await page.getByRole("option", { name: optionLabel, exact: true }).click()
   await expect(dropdown).toHaveText(optionLabel)
 }
 
@@ -737,6 +731,7 @@ export async function assignProcedureToDocUnit(
   prefix: string,
 ) {
   let procedureName = ""
+
   await test.step("Internal user assigns new procedure to doc unit", async () => {
     await navigateToCategories(page, documentNumber)
     procedureName = generateString({ length: 10, prefix: prefix })
@@ -746,6 +741,7 @@ export async function assignProcedureToDocUnit(
       .click({ timeout: 5_000 })
     await save(page)
   })
+
   return procedureName
 }
 
@@ -1058,6 +1054,7 @@ export async function checkResultListContent(
     documentationUnits.length > 1
       ? `${documentationUnits.length} Ergebnisse gefunden`
       : "1 Ergebnis gefunden"
+
   await test.step(`Prüfe, dass ${expectedResultsCountText}`, async () => {
     await expect(page.getByText(expectedResultsCountText)).toBeVisible()
   })
@@ -1094,9 +1091,11 @@ export async function checkContentOfPendingProceedingResultRow(
       await expect(docNumberCell.locator("div > svg:first-child")).toBeHidden()
     }
   })
+
   await test.step("Dokumentnummer", async () => {
     await expect(docNumberCell).toHaveText(expectedItem.documentNumber)
   })
+
   await test.step("Gericht", async () => {
     await expect(courtCell).toHaveText(
       [expectedItem.coreData.court?.type, expectedItem.coreData.court?.location]
@@ -1104,17 +1103,20 @@ export async function checkContentOfPendingProceedingResultRow(
         .join(" ") || "-",
     )
   })
+
   await test.step("Mitteilungsdatum", async () => {
     const formattedDate = expectedItem.coreData.decisionDate
       ? dayjs(expectedItem.coreData.decisionDate).format("DD.MM.YYYY")
       : "-"
     await expect(decisionDateCell).toHaveText(formattedDate)
   })
+
   await test.step("Aktenzeichen", async () => {
     await expect(fileNumberCell).toHaveText(
       expectedItem.coreData.fileNumbers?.[0] ?? "-",
     )
   })
+
   await test.step("Veröffentlichungsstatus", async () => {
     await expect(statusCell).toHaveText("Unveröffentlicht")
   })
@@ -1155,9 +1157,11 @@ export async function checkContentOfDecisionResultRow(
       await expect(docNumberCell.locator("div > svg:first-child")).toBeHidden()
     }
   })
+
   await test.step("Dokumentnummer", async () => {
     await expect(docNumberCell).toHaveText(expectedItem.documentNumber)
   })
+
   await test.step("Gericht", async () => {
     await expect(courtCell).toHaveText(
       [expectedItem.coreData.court?.type, expectedItem.coreData.court?.location]
@@ -1165,27 +1169,32 @@ export async function checkContentOfDecisionResultRow(
         .join(" ") || "-",
     )
   })
+
   await test.step("Entscheidungsdatum", async () => {
     const formattedDate = expectedItem.coreData.decisionDate
       ? dayjs(expectedItem.coreData.decisionDate).format("DD.MM.YYYY")
       : "-"
     await expect(decisionDateCell).toHaveText(formattedDate)
   })
+
   await test.step("Aktenzeichen", async () => {
     await expect(fileNumberCell).toHaveText(
       expectedItem.coreData.fileNumbers?.[0] ?? "-",
     )
   })
+
   await test.step("Spruchkörper", async () => {
     await expect(appraisalBodyCell).toHaveText(
       expectedItem.coreData.appraisalBody ?? "-",
     )
   })
+
   await test.step("Dokumenttyp", async () => {
     await expect(documentTypCell).toHaveText(
       expectedItem.coreData.documentType?.label ?? "-",
     )
   })
+
   await test.step("Veröffentlichungsstatus", async () => {
     await expect(statusCell).toHaveText(
       expectedItem.status?.publicationStatus === PublicationState.UNPUBLISHED

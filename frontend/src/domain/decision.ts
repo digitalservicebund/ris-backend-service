@@ -1,9 +1,12 @@
 import dayjs from "dayjs"
 import DocumentationUnitProcessStep from "./documentationUnitProcessStep"
+import AbuseFee from "@/domain/abuseFee"
 import ActiveCitation from "@/domain/activeCitation"
 import Attachment from "@/domain/attachment"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { CoreData } from "@/domain/coreData"
+import Correction from "@/domain/correction"
+import CountryOfOrigin from "@/domain/countryOfOrigin"
 import Definition from "@/domain/definition"
 import { Kind } from "@/domain/documentationUnitKind"
 import EnsuingDecision from "@/domain/ensuingDecision"
@@ -11,7 +14,10 @@ import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
 import LegalForce from "@/domain/legalForce"
 import { ManagementData } from "@/domain/managementData"
 import NormReference from "@/domain/normReference"
+import ObjectValue from "@/domain/objectValue"
+import OriginOfTranslation from "@/domain/originOfTranslation"
 import ParticipatingJudge from "@/domain/participatingJudge"
+import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
 import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
 import PreviousDecision from "@/domain/previousDecision"
 import ProcessStep from "@/domain/processStep"
@@ -49,6 +55,7 @@ export type LongTexts = {
   participatingJudges?: ParticipatingJudge[]
   otherLongText?: string
   outline?: string
+  corrections?: Correction[]
 }
 export const longTextLabels: {
   [longTextKey in keyof Required<LongTexts>]: string
@@ -61,6 +68,7 @@ export const longTextLabels: {
   participatingJudges: "Mitwirkende Richter",
   otherLongText: "Sonstiger Langtext",
   outline: "Gliederung",
+  corrections: "Berichtigung",
 }
 export const contentRelatedIndexingLabels: {
   [contentRelatedIndexingKey in keyof Required<ContentRelatedIndexing>]: string
@@ -77,8 +85,15 @@ export const contentRelatedIndexingLabels: {
   definitions: "Definition",
   hasLegislativeMandate: "Gesetzgebungsauftrag",
   foreignLanguageVersions: "Fremdsprachige Fassung",
+  originOfTranslations: "Herkunft der Übersetzung",
   appealAdmission: "Rechtsmittelzulassung",
   appeal: "Rechtsmittel",
+  objectValues: "Gegenstandswert",
+  abuseFees: "Gebühren",
+  countriesOfOrigin: "Herkunftsland",
+  incomeTypes: "Einkunftsart",
+  relatedPendingProceedings: "Verknüpfung anhängiges Verfahren",
+  nonApplicationNorms: "Nichtanwendungsgesetz",
 }
 export const allLabels = {
   caselawReferences: "Rechtsprechungsfundstellen",
@@ -164,6 +179,12 @@ export class Decision {
           (judge) => new ParticipatingJudge({ ...judge }),
         )
 
+    if (data.longTexts?.corrections)
+      data.longTexts.corrections =
+        data.longTexts.corrections.map(
+          (data) => new Correction({ ...data }),
+        )
+
     if (data.previousDecisions)
       data.previousDecisions = data.previousDecisions.map(
         (decision) => new PreviousDecision({ ...decision }),
@@ -186,6 +207,20 @@ export class Decision {
                   legalForce: norm.legalForce
                     ? new LegalForce({ ...norm.legalForce })
                     : undefined,
+                }),
+            ),
+          }),
+      )
+
+    if (data.contentRelatedIndexing?.nonApplicationNorms)
+      data.contentRelatedIndexing.nonApplicationNorms = data.contentRelatedIndexing.nonApplicationNorms.map(
+        (norm) =>
+          new NormReference({
+            ...norm,
+            singleNorms: norm.singleNorms?.map(
+              (norm) =>
+                new SingleNorm({
+                  ...norm,
                 }),
             ),
           }),
@@ -215,10 +250,41 @@ export class Decision {
       data.literatureReferences = data.literatureReferences.map(
         (literatureReference) => new Reference({ ...literatureReference }),
       )
+
     if (data.contentRelatedIndexing?.foreignLanguageVersions)
       data.contentRelatedIndexing.foreignLanguageVersions =
           data.contentRelatedIndexing.foreignLanguageVersions.map(
               (foreignVersion) => new ForeignLanguageVersion({ ...foreignVersion }),
+          )
+
+    if (data.contentRelatedIndexing?.originOfTranslations)
+      data.contentRelatedIndexing.originOfTranslations =
+          data.contentRelatedIndexing.originOfTranslations.map(
+              (originOfTranslation) => new OriginOfTranslation({ ...originOfTranslation }),
+          )
+
+    if (data.contentRelatedIndexing?.objectValues)
+      data.contentRelatedIndexing.objectValues =
+          data.contentRelatedIndexing.objectValues.map(
+              (objectValue) => new ObjectValue({ ...objectValue }),
+          )
+
+    if (data.contentRelatedIndexing?.abuseFees)
+      data.contentRelatedIndexing.abuseFees =
+          data.contentRelatedIndexing.abuseFees.map(
+              (abuseFee) => new AbuseFee({ ...abuseFee }),
+          )
+
+    if (data.contentRelatedIndexing?.countriesOfOrigin)
+      data.contentRelatedIndexing.countriesOfOrigin =
+        data.contentRelatedIndexing.countriesOfOrigin.map(
+          (value) => new CountryOfOrigin({ ...value }),
+        )
+
+    if (data.contentRelatedIndexing?.relatedPendingProceedings)
+      data.contentRelatedIndexing.relatedPendingProceedings =
+          data.contentRelatedIndexing.relatedPendingProceedings.map(
+              (value) => new RelatedPendingProceeding({ ...value }),
           )
 
     Object.assign(this, data)

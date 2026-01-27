@@ -24,8 +24,10 @@ test.describe(
       async ({ page, documentNumber }) => {
         await navigateToCategories(page, documentNumber)
 
+        const inputField = page.getByLabel("Eingangsart").getByRole("textbox")
+
         await test.step("Eingangsart Eingabefeld mit Hinweis wird angezeigt", async () => {
-          await expect(page.getByLabel("Eingangsart")).toBeVisible()
+          await expect(inputField).toBeVisible()
           await expect(
             page.getByText(
               "Papier, BLK-DB-Schnittstelle, EUR-LEX-Schnittstelle, E-Mail",
@@ -34,79 +36,62 @@ test.describe(
         })
 
         await test.step("Neu hinzugefügte Eingangsarten sind sichtbar", async () => {
-          await page.getByLabel("Eingangsart", { exact: true }).fill("E-Mail")
+          await inputField.fill("E-Mail")
           await page.keyboard.press("Enter")
-          await page.getByLabel("Eingangsart", { exact: true }).fill("Papier")
+          await inputField.fill("Papier")
           await page.keyboard.press("Enter")
 
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_inputTypes")
-              .getByText("E-Mail"),
+            page.getByTestId("input-types").getByText("E-Mail"),
           ).toBeVisible()
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_inputTypes")
-              .getByText("Papier"),
+            page.getByTestId("input-types").getByText("Papier"),
           ).toBeVisible()
         })
 
-        await test.step("Navigiere zurück mit Pfeil-links, lösche letzten Eintrag mit enter", async () => {
+        await test.step("Navigiere zurück mit Shift+Tab, lösche letzten Eintrag mit enter", async () => {
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_inputTypes")
-              .getByText("Papier"),
+            page.getByTestId("input-types").getByText("Papier"),
           ).toBeVisible()
-          await page.keyboard.press("ArrowLeft")
+          await page.keyboard.press("Shift+Tab")
           await page.keyboard.press("Enter")
 
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_inputTypes")
-              .getByText("Papier"),
+            page.getByTestId("input-types").getByText("Papier"),
           ).toBeHidden()
         })
 
-        await test.step("Navigiere raus und rein, navigiere zurück mit Pfeil-links, lösche chip mit enter", async () => {
+        await test.step("Navigiere raus und rein, navigiere zurück mit Shift+Tab, lösche chip mit enter", async () => {
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_inputTypes")
-              .getByText("E-Mail"),
+            page.getByTestId("input-types").getByText("E-Mail"),
           ).toBeVisible()
           await page.keyboard.press("Tab")
           await page.keyboard.press("Tab")
-          await page.keyboard.down("Shift")
-          await page.keyboard.press("Tab")
+          await page.keyboard.press("Shift+Tab")
 
-          await page.keyboard.press("ArrowLeft")
+          await page.keyboard.press("Shift+Tab")
           await page.keyboard.press("Enter")
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_inputTypes")
-              .getByText("E-Mail"),
+            page.getByTestId("input-types").getByText("E-Mail"),
           ).toBeHidden()
         })
 
         await save(page)
 
         await test.step("Füge die gelöschten Einträge wieder hinzu, sie sind auch nach reload da", async () => {
-          await page.getByLabel("Eingangsart", { exact: true }).fill("E-Mail")
+          await inputField.fill("E-Mail")
           await page.keyboard.press("Enter")
 
-          await page.getByLabel("Eingangsart", { exact: true }).fill("Papier")
+          await inputField.fill("Papier")
           await page.keyboard.press("Enter")
           await save(page)
 
           await page.reload()
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_inputTypes")
-              .getByText("E-Mail"),
+            page.getByTestId("input-types").getByText("E-Mail"),
           ).toBeVisible()
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_inputTypes")
-              .getByText("Papier"),
+            page.getByTestId("input-types").getByText("Papier"),
           ).toBeVisible()
         })
       },
@@ -118,26 +103,24 @@ test.describe(
       async ({ page, documentNumber }) => {
         await navigateToCategories(page, documentNumber)
         const testData = ["E-Mail", "Papier", "EUR-LEX-Schnittstelle"]
+        const inputField = page.getByLabel("Eingangsart").getByRole("textbox")
 
         for (const inputType of testData) {
           await test.step(
             "Eingangsart '" + inputType + "' wird hinzugefügt",
             async () => {
-              await page
-                .getByLabel("Eingangsart", { exact: true })
-                .fill(inputType)
+              await inputField.fill(inputType)
               await page.keyboard.press("Enter")
 
               await expect(
-                page
-                  .getByTestId("chips-input-wrapper_inputTypes")
-                  .getByText(inputType),
+                page.getByTestId("input-types").getByText(inputType),
               ).toBeVisible()
             },
           )
         }
 
         await save(page)
+
         await test.step("Alle Eingangsarten sind in der Vorschau sichtbar", async () => {
           await navigateToPreview(page, documentNumber)
           await expect(
@@ -152,9 +135,14 @@ test.describe(
         await test.step("Sind alle Eingangsarten entfernt, ist die Kategorie in der Preview nicht mehr sichtbar", async () => {
           await navigateToCategories(page, documentNumber)
 
-          for (let i = 0; i < testData.length; i++) {
-            await page.getByLabel("Löschen").first().click()
-          }
+          await inputField.click()
+          await page.keyboard.press("Shift+Tab")
+          await page.keyboard.press("Enter")
+          await page.keyboard.press("Shift+Tab")
+          await page.keyboard.press("Enter")
+          await page.keyboard.press("Shift+Tab")
+          await page.keyboard.press("Enter")
+
           await save(page)
           await navigateToPreview(page, documentNumber)
           await expect(page.getByText("Eingangsart")).toBeHidden()
@@ -183,14 +171,13 @@ test.describe(
             "Eingangsart '" + inputType + "' wird hinzugefügt",
             async () => {
               await page
-                .getByLabel("Eingangsart", { exact: true })
+                .getByLabel("Eingangsart")
+                .getByRole("textbox")
                 .fill(inputType)
               await page.keyboard.press("Enter")
 
               await expect(
-                page
-                  .getByTestId("chips-input-wrapper_inputTypes")
-                  .getByText(inputType),
+                page.getByTestId("input-types").getByText(inputType),
               ).toBeVisible()
             },
           )

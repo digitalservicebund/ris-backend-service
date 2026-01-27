@@ -2,6 +2,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { flushPromises } from "@vue/test-utils"
 import { setActivePinia } from "pinia"
 import { useSaveToRemote } from "@/composables/useSaveToRemote"
+import errorMessages from "@/i18n/errors.json"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 vi.mock("vue", async (importActual) => {
@@ -207,5 +208,27 @@ describe("useSaveToRemote", () => {
     await triggerSave()
     expect(formattedLastSavedOn.value).toBeUndefined()
     expect(lastSaveError.value).toEqual({ title: "error" })
+  })
+
+  it("shows alert one time when PATCH_SIZE_TOO_BIG error occurs", async () => {
+    const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {})
+    const store = useDocumentUnitStore()
+
+    const updateSpy = vi.spyOn(store, "updateDocumentUnit")
+    updateSpy.mockRejectedValue(
+      new Error(errorMessages.PATCH_SIZE_TOO_BIG.title),
+    )
+
+    const { triggerSave } = useSaveToRemote()
+    // Trigger save more than once to make sure the alert is just shown once
+    await triggerSave()
+    await triggerSave()
+
+    expect(alertSpy).toHaveBeenCalledOnce()
+    expect(alertSpy).toHaveBeenCalledWith(
+      errorMessages.PATCH_SIZE_TOO_BIG.title +
+        ": " +
+        errorMessages.PATCH_SIZE_TOO_BIG.description,
+    )
   })
 })

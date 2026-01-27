@@ -31,7 +31,7 @@ jobs:
     name: ${{ inputs.project }} (${{ inputs.shard_index }}, ${{ inputs.shard_total }})
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
@@ -40,7 +40,7 @@ jobs:
           cache-dependency-path: ./frontend/package-lock.json
       - name: cache node modules
         id: cache-node
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ./frontend/node_modules
@@ -48,14 +48,14 @@ jobs:
       - name: Install node modules
         if: steps.cache-node.outputs.cache-hit != 'true'
         run: |
-          npm ci
+          npm ci --ignore-scripts
         working-directory: ./frontend
       - name: Get Playwright version
         working-directory: ./frontend
         run: echo "PLAYWRIGHT_VERSION=$(jq -r '.packages["node_modules/@playwright/test"].version' package-lock.json)" >> $GITHUB_ENV
       - name: Cache browser binaries
         id: cache-browser-binaries
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
@@ -84,6 +84,8 @@ jobs:
           IMPORTER_PASSWORD: ${{ secrets.IMPORTER_PASSWORD }}
           GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }}
           GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
+          PORTAL_STAGING_BASIC_AUTH_USER: ${{ secrets.PORTAL_STAGING_BASIC_AUTH_USER }}
+          PORTAL_STAGING_BASIC_AUTH_PASSWORD: ${{ secrets.PORTAL_STAGING_BASIC_AUTH_PASSWORD }}
         run: |
           echo "Running ${{ inputs.project }} tests ${{ inputs.runs }} times"
 
@@ -97,7 +99,7 @@ jobs:
           npx playwright test --project ${{ inputs.project }} --repeat-each ${{ inputs.runs}} $reporter_config $workers_config --retries=3 --max-failures=5 --shard=${{ inputs.shard_index }}/${{ inputs.shard_total }}
         working-directory: ./frontend
       - name: Upload screenshots and traces of failed tests
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: ${{ failure() }}
         with:
           name: failed-${{ inputs.project }}-tests
@@ -131,14 +133,14 @@ jobs:
           done
         working-directory: ./frontend
       - name: Upload json reports
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: ${{ always() }}
         with:
           name: test-results-${{ inputs.project }}-${{ inputs.shard_index }}
           path: ./frontend/test-results.json
           retention-days: 1
       - name: Upload test result blobs reports
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
           name: test-results-blob-${{ inputs.project }}-${{ inputs.shard_index }}

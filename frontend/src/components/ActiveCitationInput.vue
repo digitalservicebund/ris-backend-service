@@ -30,10 +30,10 @@ const emit = defineEmits<{
 }>()
 
 const { scrollIntoViewportById } = useScroll()
-const { isSaved } = useIsSaved(props.modelValue, props.modelValueList)
 const lastSearchInput = ref(new ActiveCitation())
 const lastSavedModelValue = ref(new ActiveCitation({ ...props.modelValue }))
 const activeCitation = ref(new ActiveCitation({ ...props.modelValue }))
+const { isSaved } = useIsSaved(props.modelValue, props.modelValueList)
 
 const validationStore =
   useValidationStore<(typeof ActiveCitation.fields)[number]>()

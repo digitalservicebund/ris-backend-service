@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ForeignLanguageVersionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LanguageCodeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
@@ -30,6 +29,7 @@ class ForeignLanguageVersionTransformerTest {
             .id(UUID.randomUUID())
             .languageCode(languageCodeDTO)
             .url("https://example.com")
+            .rank(2L)
             .build();
 
     LanguageCode expectedLanguageCode =
@@ -53,8 +53,7 @@ class ForeignLanguageVersionTransformerTest {
 
   @Test
   void transformToDTO_withNullInput_returnsNull() {
-    DecisionDTO decision = new DecisionDTO();
-    assertNull(ForeignLanguageTransformer.transformToDTO(null, decision));
+    assertNull(ForeignLanguageTransformer.transformToDTO(null, 1));
   }
 
   @Test
@@ -75,7 +74,7 @@ class ForeignLanguageVersionTransformerTest {
 
     // Act
     ForeignLanguageVersionDTO foreignLanguageVersionDTO =
-        ForeignLanguageTransformer.transformToDTO(foreignLanguageVersion, new DecisionDTO());
+        ForeignLanguageTransformer.transformToDTO(foreignLanguageVersion, 1);
 
     // Assert
     assertNotNull(foreignLanguageVersionDTO);
@@ -84,5 +83,6 @@ class ForeignLanguageVersionTransformerTest {
     assertEquals(
         expectedLanguageCodeDTO.getId(), foreignLanguageVersionDTO.getLanguageCode().getId());
     assertEquals(foreignLanguageVersion.link(), foreignLanguageVersionDTO.getUrl());
+    assertEquals(2L, foreignLanguageVersionDTO.getRank());
   }
 }

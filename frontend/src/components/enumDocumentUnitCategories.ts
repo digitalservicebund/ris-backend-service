@@ -6,6 +6,7 @@ export enum DocumentUnitCategoriesEnum {
   KEYWORDS = "keywords",
   FIELDS_OF_LAW = "fieldsOfLaw",
   NORMS = "norms",
+  NON_APPLICATION_NORMS = "nonApplicationNorms",
   ACTIVE_CITATIONS = "activeCitations",
   APPEAL_ADMISSION = "appealAdmission",
 }

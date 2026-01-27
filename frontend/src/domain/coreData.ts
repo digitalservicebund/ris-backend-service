@@ -1,4 +1,5 @@
 import { Court } from "@/domain/court"
+import { CourtBranchLocation } from "@/domain/courtBranchLocation"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentType } from "@/domain/documentType"
 import { Procedure } from "@/domain/procedure"
@@ -11,6 +12,7 @@ export type CoreData = {
   deviatingFileNumbers?: string[]
   court?: Court
   deviatingCourts?: string[]
+  courtBranchLocation?: CourtBranchLocation
   documentType?: DocumentType
   procedure?: Procedure
   previousProcedures?: string[]
@@ -26,7 +28,7 @@ export type CoreData = {
   inputTypes?: string[]
   documentationOffice?: DocumentationOffice
   creatingDocOffice?: DocumentationOffice
-  yearsOfDispute?: string[]
+  yearsOfDispute?: number[]
   leadingDecisionNormReferences?: string[]
   sources?: Source[]
   isResolved?: boolean
@@ -41,6 +43,7 @@ export const coreDataLabels: {
   oralHearingDates: "Datum der mündlichen Verhandlung",
   court: "Gericht",
   deviatingCourts: "Fehlerhaftes Gericht",
+  courtBranchLocation: "Sitz der Außenstelle",
   fileNumbers: "Aktenzeichen",
   deviatingFileNumbers: "Abweichendes Aktenzeichen",
   deviatingDocumentNumbers: "Abweichende Dokumentnummer",

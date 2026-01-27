@@ -3,11 +3,10 @@ import { NormAbbreviation } from "./normAbbreviation"
 import SingleNorm from "./singleNorm"
 
 export default class NormReference implements EditableListItem {
+  public localId: string
   public normAbbreviation?: NormAbbreviation
   public singleNorms?: SingleNorm[]
   public normAbbreviationRawValue?: string
-  public hasForeignSource: boolean = false
-  // public uuid?: string
 
   static readonly requiredFields = ["normAbbreviation"] as const
   static readonly fields = [
@@ -17,6 +16,7 @@ export default class NormReference implements EditableListItem {
 
   constructor(data: Partial<NormReference> = {}) {
     Object.assign(this, data)
+    this.localId = data.localId ?? crypto.randomUUID()
   }
 
   get id() {
@@ -27,20 +27,6 @@ export default class NormReference implements EditableListItem {
 
   get hasAmbiguousNormReference(): boolean {
     return !this.normAbbreviation && !!this.normAbbreviationRawValue
-  }
-
-  equals(entry: NormReference): boolean {
-    if (entry.isEmpty) return true
-    let isEquals = false
-    if (this.normAbbreviation) {
-      isEquals = entry.normAbbreviation
-        ? this.normAbbreviation?.abbreviation ==
-          entry.normAbbreviation.abbreviation
-        : false
-    } else if (this.normAbbreviationRawValue) {
-      isEquals = this.normAbbreviationRawValue == entry.normAbbreviationRawValue
-    }
-    return isEquals
   }
 
   get renderSummary(): string {
@@ -92,9 +78,7 @@ export default class NormReference implements EditableListItem {
     } else return false
   }
 
-  private fieldIsEmpty(
-    value: NormReference[(typeof NormReference.fields)[number]],
-  ) {
+  fieldIsEmpty(value: NormReference[(typeof NormReference.fields)[number]]) {
     return value === undefined || !value || Object.keys(value).length === 0
   }
 }

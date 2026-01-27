@@ -1,0 +1,45 @@
+name: Check for Conflicts of LDML branch with main
+
+on:
+  schedule:
+    - cron: '0 9 * * 1-5'
+
+permissions:
+  contents: read
+
+jobs:
+  sync-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Attempt Merge in Temporary Branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Configure Git
+          git config --global user.name "LDML Branch Conflict Checker Bot"
+          git config --global user.email "kim.kern+conflict-checker-bot@digitalservice.bund.de"
+
+          # Define branches
+          FEATURE_BRANCH="RISDEV-9114_update_ldml_to_latest_version"
+
+          # Checkout feature and create temp branch
+          git checkout ${FEATURE_BRANCH}
+
+          # Try to merge main
+          if git merge origin/main; then
+            echo "Merge successful automatically."
+            exit 0
+          else
+            echo "Merge failed! Conflicts detected. Please update ldml branch manually."
+            exit 1
+          fi
+      - name: Send status to Slack
+        uses: digitalservicebund/notify-on-failure-gha@814d0c4b2ad6a3443e89c991f8657b10126510bf # v1.5.0
+        if: ${{ failure() }}
+        with:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

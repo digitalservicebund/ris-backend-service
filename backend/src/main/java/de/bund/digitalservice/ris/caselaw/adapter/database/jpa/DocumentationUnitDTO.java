@@ -104,6 +104,15 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @OrderBy("uploadTimestamp asc")
   private List<AttachmentDTO> attachments = new ArrayList<>();
 
+  @Builder.Default
+  @OneToMany(
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      mappedBy = "documentationUnit")
+  @OrderBy("uploadTimestamp asc")
+  private List<AttachmentInlineDTO> attachmentsInline = new ArrayList<>();
+
   @ManyToMany(
       cascade = {CascadeType.MERGE},
       fetch = FetchType.LAZY)
@@ -270,6 +279,10 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @Enumerated(EnumType.STRING)
   @Column(name = "portal_publication_status", nullable = false, insertable = false)
   PortalPublicationStatus portalPublicationStatus = PortalPublicationStatus.UNPUBLISHED;
+
+  @OneToOne
+  @JoinColumn(name = "court_branch_location_id")
+  private CourtBranchLocationDTO courtBranchLocation;
 
   @Override
   @Nullable

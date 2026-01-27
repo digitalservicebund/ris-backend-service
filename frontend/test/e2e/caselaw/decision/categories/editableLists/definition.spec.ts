@@ -38,6 +38,7 @@ test.describe(
       const saveDefinitionButton = page.getByRole("button", {
         name: "Definition speichern",
       })
+
       await test.step("Definition kann ohne Randnummer gespeichert werden", async () => {
         await saveDefinitionButton.click()
         await save(page)
@@ -51,7 +52,7 @@ test.describe(
 
       await test.step("Eintrag mit nicht existierender Randnummer kann nicht hinzugefügt werden", async () => {
         await fillInput(page, "Definierter Begriff", "Sachgesamtheit")
-        await fillInput(page, "Definition des Begriffs", "1")
+        await fillInput(page, "Stelle im Text (Randnummer)", "1")
         await saveDefinitionButton.focus()
         await expect(page.getByText("Randnummer existiert nicht")).toBeVisible()
         await expect(saveDefinitionButton).toBeDisabled()
@@ -67,7 +68,7 @@ test.describe(
       })
 
       await test.step("Eintrag mit existierender Randnummer kann hinzugefügt werden", async () => {
-        await page.getByLabel("Definition des Begriffs").focus()
+        await page.getByLabel("Stelle im Text (Randnummer)").focus()
         await saveDefinitionButton.focus()
         await expect(page.getByText("Randnummer existiert nicht")).toBeHidden()
         await expect(saveDefinitionButton).toBeEnabled()
@@ -97,7 +98,9 @@ test.describe(
 
       await test.step("Bei gelöschter Randnummer wird der Eintrag als fehlerhaft markiert", async () => {
         await navigateToCategories(page, documentNumber)
-        await page.getByTestId("Gründe").click()
+        const editor = page.getByTestId("Gründe")
+        await editor.click()
+        await editor.getByText("Text", { exact: true }).click()
         await page.keyboard.press(`ControlOrMeta+Alt+-`)
         await save(page)
         await expect(
@@ -132,9 +135,12 @@ test.describe(
         )
       })
 
-      const deleteDefinitionButton = page.getByRole("button", {
-        name: "Eintrag löschen",
-      })
+      const deleteDefinitionButton = page
+        .getByTestId("Definitionen")
+        .getByRole("button", {
+          name: "Eintrag löschen",
+        })
+
       await test.step("Der erste Eintrag kann gelöscht werden", async () => {
         await page
           .getByTestId("Definitionen")
@@ -149,6 +155,7 @@ test.describe(
       const saveDefinitionButton = page.getByRole("button", {
         name: "Definition speichern",
       })
+
       await test.step("Der zweite Eintrag kann editiert werden", async () => {
         await page
           .getByTestId("Definitionen")
@@ -171,6 +178,7 @@ test.describe(
     }) => {
       const documentNumber = prefilledDocumentUnitWithTexts.documentNumber
       await navigateToPreview(page, documentNumber)
+
       await test.step("Definition erscheint in der Vorschau", async () => {
         await expect(
           page.getByText("Definition", { exact: true }),

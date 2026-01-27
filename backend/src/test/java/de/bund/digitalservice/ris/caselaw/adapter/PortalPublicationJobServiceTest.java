@@ -12,6 +12,9 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationJobService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationResult;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationJobStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationJobType;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -49,14 +52,14 @@ class PortalPublicationJobServiceTest {
   void shouldPublishASingleDocUnit() throws DocumentationUnitNotExistsException {
     var jobs = List.of(createPublicationJob("123", PublicationJobType.PUBLISH));
     when(this.publicationJobRepository.findNextPendingJobsBatch()).thenReturn(jobs);
+    when(this.portalPublicationService.publishDocumentationUnit("123"))
+        .thenReturn(new PortalPublicationResult(List.of("123.xml"), List.of()));
 
     this.service.executePendingJobs();
 
     verify(portalPublicationService, times(1)).publishDocumentationUnit("123");
     verify(portalPublicationService, never()).withdrawDocumentationUnit(anyString());
-    // currently disabled
-    //    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of("123.xml"),
-    // List.of());
+    verify(portalPublicationService, times(1)).uploadChangelog(List.of("123.xml"), List.of());
     verify(publicationJobRepository, times(1)).saveAll(jobs);
     assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PublicationJobStatus.SUCCESS);
   }
@@ -65,14 +68,14 @@ class PortalPublicationJobServiceTest {
   void shouldDeleteASingleDocUnit() throws DocumentationUnitNotExistsException {
     var jobs = List.of(createPublicationJob("456", PublicationJobType.DELETE));
     when(this.publicationJobRepository.findNextPendingJobsBatch()).thenReturn(jobs);
+    when(this.portalPublicationService.withdrawDocumentationUnit("456"))
+        .thenReturn(new PortalPublicationResult(List.of(), List.of("456.xml")));
 
     this.service.executePendingJobs();
 
     verify(portalPublicationService, never()).publishDocumentationUnit(anyString());
     verify(portalPublicationService, times(1)).withdrawDocumentationUnit("456");
-    // currently disabled
-    //    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of(),
-    // List.of("456.xml"));
+    verify(portalPublicationService, times(1)).uploadChangelog(List.of(), List.of("456.xml"));
     verify(publicationJobRepository, times(1)).saveAll(jobs);
     assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PublicationJobStatus.SUCCESS);
   }

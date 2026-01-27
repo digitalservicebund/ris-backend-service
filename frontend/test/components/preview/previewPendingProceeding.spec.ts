@@ -4,7 +4,6 @@ import { beforeAll } from "vitest"
 import PendingProceedingPreview from "@/components/preview/PendingProceedingPreview.vue"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { SourceValue } from "@/domain/source"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
 beforeAll(() => {
@@ -18,7 +17,6 @@ function renderComponent() {
         documentNumber: "1234567891234",
       },
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           [
             createTestingPinia({
@@ -33,6 +31,7 @@ function renderComponent() {
                         jurisdictionType: "Verfassungsgerichtsbarkeit",
                         regions: ["DEU"],
                       },
+                      courtBranchLocation: { value: "Augsburg", id: "1" },
                       leadingDecisionNormReferences: [
                         "NSW WEG $ 14 (BGH-intern)",
                       ],
@@ -56,7 +55,7 @@ function renderComponent() {
                       },
                       previousProcedures: ["vorgang-0"],
                       legalEffect: "Ja",
-                      yearsOfDispute: ["2023"],
+                      yearsOfDispute: [2023],
                       sources: [{ value: SourceValue.Zeitschrift }],
                       isResolved: true,
                       resolutionDate: "2025-06-12",
@@ -86,6 +85,7 @@ describe("preview", () => {
 
     expect(await screen.findByText("Gericht")).toBeInTheDocument()
     expect(await screen.findByText("Fehlerhaftes Gericht")).toBeInTheDocument()
+    expect(await screen.findByText("Sitz der Außenstelle")).toBeInTheDocument()
     expect(await screen.findByText("Aktenzeichen")).toBeInTheDocument()
     expect(
       await screen.findByText("Abweichendes Aktenzeichen"),

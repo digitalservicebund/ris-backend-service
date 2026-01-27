@@ -14,7 +14,6 @@ import { DocumentType } from "@/domain/documentType"
 import PreviousDecision from "@/domain/previousDecision"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
@@ -46,7 +45,6 @@ function renderComponent(previousDecisions?: PreviousDecision[]) {
     user,
     ...render(PreviousDecisions, {
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
         stubs: {
           routerLink: {
             template: "<a><slot/></a>",
@@ -77,6 +75,7 @@ function renderComponent(previousDecisions?: PreviousDecision[]) {
 
 function generatePreviousDecision(options?: {
   uuid?: string
+  localId?: string
   documentNumber?: string
   court?: Court
   decisionDate?: string
@@ -86,6 +85,7 @@ function generatePreviousDecision(options?: {
 }) {
   const previousDecision = new PreviousDecision({
     uuid: options?.uuid ?? crypto.randomUUID(),
+    localId: options?.localId ?? "0",
     documentNumber: options?.documentNumber ?? undefined,
     court: options?.court ?? {
       type: "type1",
@@ -318,8 +318,8 @@ describe("PreviousDecisions", () => {
 
   it("correctly deletes manually added previous decisions", async () => {
     const { user } = renderComponent([
-      generatePreviousDecision(),
-      generatePreviousDecision(),
+      generatePreviousDecision({ localId: "0" }),
+      generatePreviousDecision({ localId: "1" }),
     ])
     const previousDecisions = screen.getAllByLabelText("Listen Eintrag")
     expect(previousDecisions.length).toBe(2)
@@ -330,8 +330,8 @@ describe("PreviousDecisions", () => {
 
   it("correctly deletes previous decisions added by search", async () => {
     const { user } = renderComponent([
-      generatePreviousDecision(),
-      generatePreviousDecision(),
+      generatePreviousDecision({ localId: "0" }),
+      generatePreviousDecision({ localId: "1" }),
     ])
     const previousDecisions = screen.getAllByLabelText("Listen Eintrag")
     expect(previousDecisions.length).toBe(2)

@@ -26,30 +26,13 @@ const service: HandoverDocumentationUnitService = {
     )
 
     if (response.status >= 300 || !response.data?.success) {
-      let description = "Die Dokumentationseinheit kann nicht übergeben werden."
-      if (
-        response.data?.statusMessages &&
-        response.data.statusMessages.length > 0
-      ) {
-        description += '<ul class="list-disc">'
-      }
-      response.data?.statusMessages?.forEach(
-        (value) =>
-          (description +=
-            '<li class="ris-body2-regular ris-body1-bold ml-[1rem] list-item">' +
-            value +
-            "</li>"),
-      )
-      if (
-        response.data?.statusMessages &&
-        response.data.statusMessages.length > 0
-      ) {
-        description += "</ul>"
-      }
-
       response.error = {
         title: errorMessages.DOCUMENT_UNIT_HANDOVER_FAILED.title,
-        description,
+        description:
+          response.data?.statusMessages &&
+          response.data.statusMessages.length > 0
+            ? response.data?.statusMessages
+            : errorMessages.DOCUMENT_UNIT_HANDOVER_FAILED.description,
       }
     }
 
@@ -88,22 +71,9 @@ const service: HandoverDocumentationUnitService = {
   },
 
   async getPreview(documentUnitUuid: string) {
-    const response = await httpClient.get<HandoverMail>(
+    return await httpClient.get<HandoverMail>(
       `caselaw/documentunits/${documentUnitUuid}/preview-xml`,
     )
-
-    if (response.status >= 300 || !response.data?.success) {
-      response.error = {
-        title: errorMessages.DOCUMENT_UNIT_LOADING_XML_PREVIEW.title,
-        description:
-          response.data?.statusMessages &&
-          response.data.statusMessages.length > 0
-            ? response.data?.statusMessages
-            : errorMessages.DOCUMENT_UNIT_LOADING_XML_PREVIEW.description,
-      }
-    }
-
-    return response
   },
 }
 

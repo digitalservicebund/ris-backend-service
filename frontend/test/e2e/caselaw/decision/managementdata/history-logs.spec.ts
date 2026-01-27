@@ -23,7 +23,8 @@ import { generateString } from "~/test-helper/dataGenerators"
 
 /* eslint-disable playwright/expect-expect */
 test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
-  const testPrefix = `e2e_${generateString({ length: 10 })}`
+  const testPrefix = `e2e-${generateString({ length: 10 })}`
+
   test("Es wird geloggt, wenn eine Dokeinheit angelegt wird", async ({
     page,
     documentNumber,
@@ -62,10 +63,14 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
     })
 
     await test.step("Nach einer Bearbeitung wird ein Historien-Log erstellt", async () => {
-      await navigateToCategories(page, documentNumber)
+      await navigateToCategories(page, documentNumber, {
+        navigationBy: "click",
+      })
       await page.getByLabel("ECLI", { exact: true }).fill("ECLI-12345")
       await save(page)
-      await navigateToManagementData(page, documentNumber)
+      await navigateToManagementData(page, documentNumber, {
+        navigationBy: "click",
+      })
       await expectHistoryCount(page, 4)
       await expectHistoryLogRow(
         page,
@@ -76,10 +81,14 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
     })
 
     await test.step("Nach einer erneuten Bearbeitung durch den selben User wird der bestehende Log aktualisiert", async () => {
-      await navigateToCategories(page, documentNumber)
+      await navigateToCategories(page, documentNumber, {
+        navigationBy: "click",
+      })
       await page.getByLabel("ECLI", { exact: true }).fill("ECLI-anderer-Wert")
       await save(page)
-      await navigateToManagementData(page, documentNumber)
+      await navigateToManagementData(page, documentNumber, {
+        navigationBy: "click",
+      })
       await expectHistoryCount(page, 4)
       await expectHistoryLogRow(
         page,
@@ -104,7 +113,9 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
     })
 
     await test.step("Nach einer Übergabe wird ein Historien-Log erstellt", async () => {
-      await navigateToManagementData(page, documentNumber)
+      await navigateToManagementData(page, documentNumber, {
+        navigationBy: "click",
+      })
       await expectHistoryCount(page, 5)
       await expectHistoryLogRow(
         page,
@@ -131,7 +142,9 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
     })
 
     await test.step("In der Historie sind zwei Historien-Events", async () => {
-      await navigateToManagementData(page, documentNumber)
+      await navigateToManagementData(page, documentNumber, {
+        navigationBy: "click",
+      })
       await expectHistoryCount(page, 5)
       await expectHistoryLogRow(
         page,
@@ -155,7 +168,8 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await navigateToCategories(pageWithExternalUser, documentNumber)
       await clickCategoryButton("Entscheidungsnamen", pageWithExternalUser)
       await pageWithExternalUser
-        .getByLabel("Entscheidungsname")
+        .getByLabel("Entscheidungsnamen")
+        .getByRole("textbox")
         .fill("ein Name")
       await save(pageWithExternalUser)
     })
@@ -187,7 +201,9 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       // when navigating with a concurrent navigation triggered
       // eslint-disable-next-line playwright/no-wait-for-timeout,playwright/no-conditional-in-test
       if (browserName === "firefox") await page.waitForTimeout(500)
-      await navigateToManagementData(page, documentNumber)
+      await navigateToManagementData(page, documentNumber, {
+        navigationBy: "click",
+      })
       await expectHistoryCount(page, 5)
       await expectHistoryLogRow(
         page,
@@ -204,14 +220,18 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
     })
 
     await test.step("Lösche Word-Dokument", async () => {
-      await navigateToAttachments(page, documentNumber)
+      await navigateToAttachments(page, documentNumber, {
+        navigationBy: "click",
+      })
       await page.getByTestId("list-entry-0").getByLabel("Datei löschen").click()
       // Dialog bestätigen
       await page.getByLabel("Löschen", { exact: true }).click()
     })
 
     await test.step("In der Historie gibt es zusätzlich ein Dokument gelöscht Historien-Event", async () => {
-      await navigateToManagementData(page, documentNumber)
+      await navigateToManagementData(page, documentNumber, {
+        navigationBy: "click",
+      })
       await expectHistoryCount(page, 6)
       await expectHistoryLogRow(
         page,

@@ -1,14 +1,13 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
+import Message from "primevue/message"
 import { computed, ref, watch, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import DateUtil from "../../utils/dateUtil"
-import Tooltip from "../Tooltip.vue"
 import CellHeaderItem from "@/components/CellHeaderItem.vue"
 import CellItem from "@/components/CellItem.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import TableHeader from "@/components/TableHeader.vue"
@@ -181,10 +180,10 @@ onMounted(async () => {
             ></Button>
           </div>
           <div v-if="saveResponseError">
-            <InfoModal
-              :description="saveResponseError.description"
-              :title="saveResponseError.title"
-            />
+            <Message severity="error">
+              <p class="ris-body1-bold">{{ saveResponseError.title }}</p>
+              <p>{{ saveResponseError.description }}</p>
+            </Message>
           </div>
         </div>
       </FlexContainer>
@@ -193,10 +192,10 @@ onMounted(async () => {
 
     <div class="flex h-full flex-col gap-24">
       <div v-if="deleteResponseError">
-        <InfoModal
-          :description="deleteResponseError.description"
-          :title="deleteResponseError.title"
-        />
+        <Message severity="error">
+          <p class="ris-body1-bold">{{ deleteResponseError.title }}</p>
+          <p>{{ deleteResponseError.description }}</p>
+        </Message>
       </div>
       <TableView class="relative table w-full border-separate">
         <TableHeader>
@@ -221,52 +220,41 @@ onMounted(async () => {
             </span>
           </CellItem>
           <CellItem class="flex">
-            <div class="float-end flex">
-              <Tooltip v-if="isInternalUser" text="Bearbeiten">
-                <router-link
-                  class="flex cursor-pointer border-2 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
-                  target="_blank"
-                  :to="{
-                    name: 'caselaw-periodical-evaluation-editionId-references',
-                    params: { editionId: edition.id },
-                  }"
+            <div class="float-end flex flex-row -space-x-2">
+              <router-link
+                v-tooltip.bottom="'Bearbeiten'"
+                target="_blank"
+                :to="{
+                  name: 'caselaw-periodical-evaluation-editionId-references',
+                  params: { editionId: edition.id },
+                }"
+              >
+                <Button
+                  aria-label="Ausgabe bearbeiten"
+                  :disabled="!isInternalUser"
+                  severity="secondary"
+                  size="small"
                 >
-                  <IconEdit class="text-blue-800" />
-                </router-link>
-              </Tooltip>
+                  <template #icon>
+                    <IconEdit />
+                  </template>
+                </Button>
+              </router-link>
 
-              <div
-                v-else
-                aria-label="Ausgabe kann nicht editiert werden"
-                class="border-2 border-solid border-gray-600 p-4 text-gray-600"
+              <Button
+                v-tooltip.bottom="'Löschen'"
+                aria-label="Ausgabe löschen"
+                :disabled="
+                  !(edition.references?.length === 0 && isInternalUser)
+                "
+                size="small"
+                text
+                @click="handleDeleteEdition(edition)"
               >
-                <IconEdit />
-              </div>
-              <Tooltip
-                v-if="edition.references?.length == 0 && isInternalUser"
-                text="Löschen"
-              >
-                <button
-                  aria-label="Ausgabe löschen"
-                  class="flex cursor-pointer border-2 border-l-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
-                  @click="
-                    handleDeleteEdition(edition as LegalPeriodicalEdition)
-                  "
-                  @keyup.enter="
-                    handleDeleteEdition(edition as LegalPeriodicalEdition)
-                  "
-                >
-                  <IconDelete class="text-blue-800" />
-                </button>
-              </Tooltip>
-
-              <div
-                v-else
-                aria-label="Ausgabe kann nicht gelöscht werden"
-                class="border-2 border-l-0 border-solid border-gray-600 p-4 text-gray-600"
-              >
-                <IconDelete />
-              </div>
+                <template #icon>
+                  <IconDelete />
+                </template>
+              </Button>
             </div>
           </CellItem>
         </TableRow>
@@ -280,10 +268,10 @@ onMounted(async () => {
 
       <!-- Error State -->
       <div v-if="searchResponseError">
-        <InfoModal
-          :description="searchResponseError.description"
-          :title="searchResponseError.title"
-        />
+        <Message severity="error">
+          <p class="ris-body1-bold">{{ searchResponseError.title }}</p>
+          <p>{{ searchResponseError.description }}</p>
+        </Message>
       </div>
 
       <!-- Empty State -->

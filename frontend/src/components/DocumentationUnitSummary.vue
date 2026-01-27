@@ -4,6 +4,7 @@ import DecisionSummary from "@/components/DecisionSummary.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import ListItem from "@/domain/editableListItem" // NOSONAR: import is needed for extension
+import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
 import IconBaselineDescription from "~icons/ic/baseline-description"
 import IconError from "~icons/ic/baseline-error"
 import IconOutlineDescription from "~icons/ic/outline-description"
@@ -31,7 +32,8 @@ const showErrorBadge = computed(() => {
           ? IconBaselineDescription
           : IconOutlineDescription
       "
-      :summary="props.data.renderSummary"
+      :is-pending-proceeding="data instanceof RelatedPendingProceeding"
+      :summary="props.data.renderSummary ?? ''"
     ></DecisionSummary>
 
     <IconBadge

@@ -2,9 +2,12 @@ import { Decision } from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
 import { DuplicateRelationStatus } from "@/domain/managementData"
 import PendingProceeding from "@/domain/pendingProceeding"
+import { RisJsonPatch } from "@/domain/risJsonPatch"
 import errorMessages from "@/i18n/errors.json"
 import service from "@/services/documentUnitService"
-import HttpClient from "@/services/httpClient"
+import HttpClient, {
+  FailedValidationServerResponse,
+} from "@/services/httpClient"
 
 describe("documentUnitService", () => {
   describe("createNew", () => {
@@ -313,6 +316,129 @@ describe("documentUnitService", () => {
       expect(httpMock).toHaveBeenCalledWith(
         `caselaw/documentunits/documentNumber`,
       )
+    })
+  })
+
+  describe("update", () => {
+    it("should throw PATCH_SIZE_TOO_BIG error when patch exceeds 12 MB", async () => {
+      const patchWithOver12Mb: RisJsonPatch = {
+        documentationUnitVersion: 1,
+        patch: [
+          {
+            op: "replace",
+            path: "/managementData/hugeField",
+            value: "x".repeat(13000000), // ~12.4 MB
+          },
+        ],
+        errorPaths: [],
+      }
+
+      await expect(
+        service.update("documentUnitUuid", patchWithOver12Mb),
+      ).rejects.toThrow(errorMessages.PATCH_SIZE_TOO_BIG.title)
+
+      const patchJson = JSON.stringify(patchWithOver12Mb)
+      const totalBytes = new Blob([patchJson]).size
+      expect(totalBytes).toBeGreaterThan(12 * 1024 * 1024)
+    })
+
+    it("should return validation error", async () => {
+      vi.spyOn(HttpClient, "patch").mockResolvedValue({
+        status: 400,
+        data: "Validation failed",
+      })
+      const risJsonPatch: RisJsonPatch = {
+        documentationUnitVersion: 1,
+        patch: [
+          {
+            op: "replace",
+            path: "/managementData/lastUpdatedAtDateTime",
+            value: "2026-01-16T09:30:00.352783Z",
+          },
+        ],
+        errorPaths: [],
+      }
+
+      const response = await service.update("documentNumber", risJsonPatch)
+
+      expect(response.error?.validationErrors).toEqual(
+        (response.data as FailedValidationServerResponse).errors,
+      )
+      expect(response.data).toEqual("Validation failed")
+    })
+
+    it("should return DOCUMENT_UNIT_UPDATE_FAILED with 400 and missing validation text", async () => {
+      vi.spyOn(HttpClient, "patch").mockResolvedValue({
+        status: 400,
+        data: "Other text",
+      })
+      const risJsonPatch: RisJsonPatch = {
+        documentationUnitVersion: 1,
+        patch: [
+          {
+            op: "replace",
+            path: "/managementData/lastUpdatedAtDateTime",
+            value: "2026-01-16T09:30:00.352783Z",
+          },
+        ],
+        errorPaths: [],
+      }
+
+      const response = await service.update("documentNumber", risJsonPatch)
+
+      expect(response.error?.title).toEqual(
+        errorMessages.DOCUMENT_UNIT_UPDATE_FAILED.title,
+      )
+      expect(response.error?.validationErrors).toEqual(undefined)
+      expect(response.data).toEqual(undefined)
+    })
+
+    it("should return NOT_ALLOWED with 403", async () => {
+      vi.spyOn(HttpClient, "patch").mockResolvedValue({
+        status: 403,
+        data: "Some data",
+      })
+      const risJsonPatch: RisJsonPatch = {
+        documentationUnitVersion: 1,
+        patch: [
+          {
+            op: "replace",
+            path: "/managementData/lastUpdatedAtDateTime",
+            value: "2026-01-16T09:30:00.352783Z",
+          },
+        ],
+        errorPaths: [],
+      }
+
+      const response = await service.update("documentNumber", risJsonPatch)
+
+      expect(response.error?.title).toEqual(errorMessages.NOT_ALLOWED.title)
+      expect(response.data).toEqual(undefined)
+    })
+
+    it("should return DOCUMENT_UNIT_UPDATE_FAILED with 404", async () => {
+      vi.spyOn(HttpClient, "patch").mockResolvedValue({
+        status: 404,
+        data: "Some data",
+      })
+      const risJsonPatch: RisJsonPatch = {
+        documentationUnitVersion: 1,
+        patch: [
+          {
+            op: "replace",
+            path: "/managementData/lastUpdatedAtDateTime",
+            value: "2026-01-16T09:30:00.352783Z",
+          },
+        ],
+        errorPaths: [],
+      }
+
+      const response = await service.update("documentNumber", risJsonPatch)
+
+      expect(response.error?.title).toEqual(
+        errorMessages.DOCUMENT_UNIT_UPDATE_FAILED.title,
+      )
+      expect(response.data).toEqual(undefined)
     })
   })
 })

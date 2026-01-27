@@ -30,7 +30,7 @@ import lombok.experimental.SuperBuilder;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class RelatedDocumentationDTO {
 
-  @Id @GeneratedValue private UUID id;
+  @Id @GeneratedValue @AssignedIdOrUuid private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   private CourtDTO court;

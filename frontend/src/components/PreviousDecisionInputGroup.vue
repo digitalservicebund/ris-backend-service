@@ -182,7 +182,7 @@ onMounted(async () => {
           binary
           :disabled="previousDecision.hasForeignSource"
           :input-id="id"
-          size="large"
+          size="small"
         />
       </InputField>
       <div class="flex justify-between gap-24">

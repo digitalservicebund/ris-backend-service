@@ -1,13 +1,12 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
+import Message from "primevue/message"
 import { computed, onBeforeMount, Ref, ref } from "vue"
 import { RouterLink } from "vue-router"
 import ExpandableContent from "./ExpandableContent.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
-import { InfoStatus } from "@/components/enumInfoStatus"
 import HandoverDuplicateCheckView from "@/components/HandoverDuplicateCheckView.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import BorderNumberCheck from "@/components/publication/BorderNumberCheck.vue"
 import ScheduledPublishingDateTime from "@/components/ScheduledPublishingDateTime.vue"
@@ -16,7 +15,11 @@ import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
 import { coreDataLabels } from "@/domain/coreData"
-import { contentRelatedIndexingLabels, Decision } from "@/domain/decision"
+import {
+  contentRelatedIndexingLabels,
+  Decision,
+  longTextLabels,
+} from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
 import EnsuingDecision, {
   ensuingDecisionFieldLabels,
@@ -30,6 +33,8 @@ import { DuplicateRelationStatus } from "@/domain/managementData"
 import PreviousDecision, {
   previousDecisionFieldLabels,
 } from "@/domain/previousDecision"
+import { PublicationState } from "@/domain/publicationStatus"
+import errorMessages from "@/i18n/errors.json"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -93,8 +98,18 @@ async function fetchPreview() {
   const previewResponse = await handoverDocumentationUnitService.getPreview(
     decision.value!.uuid,
   )
+
   if (previewResponse.error) {
     previewError.value = previewResponse.error
+  } else if (previewResponse.status >= 300 || !previewResponse.data?.success) {
+    previewError.value = {
+      title: errorMessages.DOCUMENT_UNIT_LOADING_XML_PREVIEW.title,
+      description:
+        previewResponse.data?.statusMessages &&
+        previewResponse.data.statusMessages.length > 0
+          ? previewResponse.data?.statusMessages
+          : errorMessages.DOCUMENT_UNIT_LOADING_XML_PREVIEW.description,
+    }
   } else if (previewResponse.data?.xml) {
     preview.value = previewResponse.data
   }
@@ -157,22 +172,41 @@ const pendingDuplicates = ref(
 )
 
 // Labels of non-empty fields that won't be exported to the jDV
-const fieldsWithoutJdvExport = computed<string[]>(() => {
+// prettier-ignore
+const fieldsWithoutJdvExport = computed<string[]>(() => { // NOSONAR typescript:S3776
   const fieldLabels: string[] = []
   if (decision.value?.contentRelatedIndexing?.evsf)
     fieldLabels.push(contentRelatedIndexingLabels.evsf)
   if (decision.value?.contentRelatedIndexing?.foreignLanguageVersions?.length)
     fieldLabels.push(contentRelatedIndexingLabels.foreignLanguageVersions)
+  if (decision.value?.contentRelatedIndexing?.originOfTranslations?.length)
+    fieldLabels.push(contentRelatedIndexingLabels.originOfTranslations)
   if (decision.value?.contentRelatedIndexing?.appealAdmission != null)
     fieldLabels.push(contentRelatedIndexingLabels.appealAdmission)
   if (decision.value?.contentRelatedIndexing?.appeal != null)
     fieldLabels.push(contentRelatedIndexingLabels.appeal)
+  if (decision.value?.contentRelatedIndexing?.objectValues?.length)
+    fieldLabels.push(contentRelatedIndexingLabels.objectValues)
+  if (decision.value?.contentRelatedIndexing?.abuseFees?.length)
+    fieldLabels.push(contentRelatedIndexingLabels.abuseFees)
+  if (decision.value?.contentRelatedIndexing?.countriesOfOrigin?.length)
+    fieldLabels.push(contentRelatedIndexingLabels.countriesOfOrigin)
+  if (decision.value?.contentRelatedIndexing?.incomeTypes?.length)
+    fieldLabels.push(contentRelatedIndexingLabels.incomeTypes)
+  if (decision.value?.contentRelatedIndexing?.relatedPendingProceedings?.length)
+    fieldLabels.push(contentRelatedIndexingLabels.relatedPendingProceedings)
+  if (decision.value?.contentRelatedIndexing?.nonApplicationNorms?.length)
+    fieldLabels.push(contentRelatedIndexingLabels.nonApplicationNorms)
   if (decision.value?.coreData?.celexNumber)
     fieldLabels.push(coreDataLabels.celexNumber)
   if (decision.value?.coreData?.hasDeliveryDate)
     fieldLabels.push(coreDataLabels.hasDeliveryDate)
   if (decision.value?.coreData?.oralHearingDates?.length)
     fieldLabels.push(coreDataLabels.oralHearingDates)
+  if (decision.value?.longTexts?.corrections?.length)
+    fieldLabels.push(longTextLabels.corrections)
+  if (decision.value?.coreData?.courtBranchLocation)
+    fieldLabels.push(coreDataLabels.courtBranchLocation)
   return fieldLabels
 })
 
@@ -338,7 +372,12 @@ const isScheduled = computed<boolean>(
 )
 
 const hasImages = computed<boolean>(
-  () => !!preview.value?.xml?.includes("<img"),
+  () => !!preview.value?.xml?.includes("<jurimg"),
+)
+
+const isPublishedInjDV = computed(
+  () =>
+    decision.value?.status?.publicationStatus === PublicationState.PUBLISHED,
 )
 
 const isPublishable = computed<boolean>(
@@ -348,7 +387,8 @@ const isPublishable = computed<boolean>(
     !isCaseFactsInvalid.value &&
     !isDecisionReasonsInvalid.value &&
     !!preview.value?.success &&
-    !hasImages.value,
+    !(hasImages.value && isPublishedInjDV.value) &&
+    (!hasImages.value || env.value?.environment !== "uat"),
 )
 </script>
 
@@ -373,11 +413,11 @@ const isPublishable = computed<boolean>(
 
             <div class="ris-body1-regular flex flex-col">
               <div v-if="fieldsMissing" class="flex flex-col gap-24">
-                <div>
+                <div class="flex flex-col gap-8">
                   <p>
                     Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:
                   </p>
-                  <ul class="list-disc">
+                  <ul class="ml-32 list-disc">
                     <li v-for="field in missingCoreDataFields" :key="field">
                       {{ field }}
                     </li>
@@ -504,7 +544,7 @@ const isPublishable = computed<boolean>(
           <RouterLink class="inline-block" :to="categoriesRoute">
             <Button
               aria-label="Rubriken bearbeiten"
-              class="w-fit"
+              class="mt-16 w-fit"
               label="Rubriken bearbeiten"
               severity="secondary"
               size="small"
@@ -567,20 +607,35 @@ const isPublishable = computed<boolean>(
       >
         <CodeSnippet title="" :xml="preview.xml" />
       </ExpandableContent>
-      <InfoModal
+      <Message
         v-if="errorMessage"
         aria-label="Fehler bei jDV Übergabe"
         class="mt-8"
-        :description="errorMessage.description"
-        :title="errorMessage.title"
-      />
-      <InfoModal
+        severity="error"
+      >
+        <p class="ris-body1-bold">{{ errorMessage.title }}</p>
+        <ul
+          v-if="Array.isArray(errorMessage.description)"
+          class="m-0 list-disc ps-20"
+        >
+          <li
+            v-for="(description, index) in errorMessage.description"
+            :key="index"
+          >
+            {{ description }}
+          </li>
+        </ul>
+        <p v-else>{{ errorMessage.description }}</p>
+      </Message>
+      <Message
         v-else-if="succeedMessage"
         aria-label="Erfolg der jDV Übergabe"
         class="mt-8"
-        v-bind="succeedMessage"
-        :status="InfoStatus.SUCCEED"
-      />
+        severity="success"
+      >
+        <p class="ris-body1-bold">{{ succeedMessage.title }}</p>
+        <p>{{ succeedMessage.description }}</p>
+      </Message>
       <PopupModal
         v-if="showHandoverWarningModal"
         aria-label="Bestätigung für Übergabe bei Fehlern"
@@ -592,25 +647,54 @@ const isPublishable = computed<boolean>(
         @primary-action="confirmHandoverDialog"
       />
 
-      <InfoModal
-        v-if="env?.environment === 'uat'"
-        :description="[
-          'Dokumentationseinheiten werden in der jDV ohne Dokumentnummer erstellt',
-          'Diese sind auffindbar über Gericht=VGH Mannheim und Aktenzeichen und/oder Entscheidungsdatum der Entscheidung',
-          'Die Dokumentationseinheiten müssen manuell in der jDV gelöscht werden',
-        ]"
-        :status="InfoStatus.INFO"
-        title="UAT Testmodus für die Übergabe an die jDV"
-      />
+      <Message v-if="env?.environment === 'uat'" severity="info">
+        <p class="ris-body1-bold">UAT Testmodus für die Übergabe an die jDV</p>
+        <ul class="m-0 list-disc ps-20">
+          <li>
+            Dokumentationseinheiten werden in der jDV ohne Dokumentnummer
+            erstellt
+          </li>
+          <li>
+            Diese sind auffindbar über Gericht=VGH Mannheim und Aktenzeichen
+            und/oder Entscheidungsdatum der Entscheidung
+          </li>
+          <li>
+            Die Dokumentationseinheiten müssen manuell in der jDV gelöscht
+            werden
+          </li>
+          <li>
+            In UAT können keine Entscheidungen mit Bildern an die jDV übergeben
+            werden
+          </li>
+        </ul>
+      </Message>
 
-      <InfoModal
-        v-if="hasImages"
+      <Message
+        v-if="hasImages && env?.environment === 'uat'"
         aria-label="Übergabe an die jDV nicht möglich"
         class="mt-8"
-        description="Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV übergeben werden"
-        :status="InfoStatus.INFO"
-        title="Übergabe an die jDV nicht möglich"
-      />
+        severity="info"
+      >
+        <p class="ris-body1-bold">Übergabe an die jDV nicht möglich</p>
+        <p>
+          Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV
+          übergeben werden. Dieses Feature steht nur in der Prod-Umgebung zur
+          Verfügung.
+        </p>
+      </Message>
+
+      <Message
+        v-if="hasImages && env?.environment !== 'uat' && isPublishedInjDV"
+        aria-label="Übergabe an die jDV nicht möglich"
+        class="mt-8"
+        severity="info"
+      >
+        <p class="ris-body1-bold">Übergabe an die jDV nicht möglich</p>
+        <p>
+          Diese bereits veröffentlichte Entscheidung enthält Bilder und kann
+          deshalb nicht erneut an die jDV übergeben werden.
+        </p>
+      </Message>
 
       <div>
         <Button
@@ -669,6 +753,16 @@ const isPublishable = computed<boolean>(
                     <div>
                       <span class="ris-label2-bold"> Betreff: </span>
                       {{ (item as HandoverMail).mailSubject }}
+                    </div>
+                    <div
+                      v-if="(item as HandoverMail).imageAttachments.length > 0"
+                    >
+                      <span class="ris-label2-bold"> Anhänge: </span>
+                      {{
+                        (item as HandoverMail).imageAttachments
+                          .map((attachment) => attachment.fileName)
+                          .join(", ")
+                      }}
                     </div>
                   </div>
 

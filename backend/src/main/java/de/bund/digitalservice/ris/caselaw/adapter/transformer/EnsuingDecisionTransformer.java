@@ -23,7 +23,7 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
       return null;
     }
     return EnsuingDecisionDTO.builder()
-        .id(ensuingDecision.isNewEntry() ? null : ensuingDecision.getUuid())
+        .id(ensuingDecision.getUuid())
         .court(getCourtFromDomain(ensuingDecision.getCourt()))
         .date(ensuingDecision.getDecisionDate())
         .documentNumber(ensuingDecision.getDocumentNumber())

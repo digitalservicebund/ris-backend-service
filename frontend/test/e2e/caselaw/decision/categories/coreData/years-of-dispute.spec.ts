@@ -1,10 +1,10 @@
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
-  navigateToCategories,
-  navigateToPreview,
-  navigateToHandover,
   handoverDocumentationUnit,
+  navigateToCategories,
+  navigateToHandover,
+  navigateToPreview,
   save,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
@@ -52,80 +52,72 @@ test.describe(
           await test.step(
             "Add year " + year + ", press enter, check for visibility",
             async () => {
-              await page.getByLabel("Streitjahr", { exact: true }).fill(year)
+              await page
+                .getByTestId("year-of-dispute")
+                .getByRole("textbox")
+                .fill(year)
               await page.keyboard.press("Enter")
 
               await expect(
-                page
-                  .getByTestId("chips-input-wrapper_yearOfDispute")
-                  .getByText(year),
+                page.getByTestId("year-of-dispute").getByText(year),
               ).toBeVisible()
             },
           )
         }
 
         await test.step("Expect 15 years of dispute to be visible in same order", async () => {
-          const chipsLocator = page.getByTestId("chip")
+          const chipsLocator = page
+            .getByRole("listitem")
+            .getByLabel("Eintrag bearbeiten")
           const chips = await chipsLocator.all()
           await expect(chipsLocator).toHaveCount(15)
           for (let i = 0; i < chips.length; i++) {
-            const chipValue = chips[i].getByTestId("chip-value")
+            const chipValue = chips[i]
             await expect(chipValue).toHaveText(testData[i])
           }
         })
 
         await test.step("Navigate back by arrow left, delete last chip on enter", async () => {
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_yearOfDispute")
-              .getByText("2024"),
+            page.getByTestId("year-of-dispute").getByText("2024"),
           ).toBeVisible()
-          await page.keyboard.press("ArrowLeft")
+          await page.keyboard.press("Shift+Tab")
           await page.keyboard.press("Enter")
 
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_yearOfDispute")
-              .getByText("2024"),
+            page.getByTestId("year-of-dispute").getByText("2024"),
           ).toBeHidden()
         })
 
         await test.step("Tab out, tab in, navigate back by arrow left, delete last chip on enter", async () => {
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_yearOfDispute")
-              .getByText("2023"),
+            page.getByTestId("year-of-dispute").getByText("2023"),
           ).toBeVisible()
           await page.keyboard.press("Tab")
           await page.keyboard.press("Tab")
-          await page.keyboard.down("Shift")
-          await page.keyboard.press("Tab")
+          await page.keyboard.press("Shift+Tab")
 
-          await page.keyboard.press("ArrowLeft")
+          await page.keyboard.press("Shift+Tab")
           await page.keyboard.press("Enter")
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_yearOfDispute")
-              .getByText("2023"),
+            page.getByTestId("year-of-dispute").getByText("2023"),
           ).toBeHidden()
         })
 
         await save(page)
 
         await test.step("Add deleted years again, check if testdata persists on reload", async () => {
-          await page.getByLabel("Streitjahr", { exact: true }).fill("2023")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("2023")
           await page.keyboard.press("Enter")
 
-          await page.getByLabel("Streitjahr", { exact: true }).fill("2024")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("2024")
           await page.keyboard.press("Enter")
           await save(page)
 
           await page.reload()
           for (const year of testData) {
             await expect(
-              page
-                .getByTestId("chips-input-wrapper_yearOfDispute")
-                .getByText(year),
+              page.getByTestId("year-of-dispute").getByText(year),
             ).toBeVisible()
           }
         })
@@ -149,19 +141,21 @@ test.describe(
           await test.step(
             "Add year " + year + ", press enter, check for visibility",
             async () => {
-              await page.getByLabel("Streitjahr", { exact: true }).fill(year)
+              await page
+                .getByLabel("Streitjahr")
+                .getByRole("textbox")
+                .fill(year)
               await page.keyboard.press("Enter")
 
               await expect(
-                page
-                  .getByTestId("chips-input-wrapper_yearOfDispute")
-                  .getByText(year),
+                page.getByTestId("year-of-dispute").getByText(year),
               ).toBeVisible()
             },
           )
         }
 
         await save(page)
+
         await test.step("Expect all three years to be visible in preview", async () => {
           await navigateToPreview(page, documentNumber)
           for (const year of testData) {
@@ -175,7 +169,7 @@ test.describe(
           await navigateToCategories(page, documentNumber)
 
           for (let i = 0; i < testData.length; i++) {
-            await page.getByLabel("Löschen").first().click()
+            await page.getByLabel("Eintrag löschen").first().click()
           }
           await save(page)
           await navigateToPreview(page, documentNumber)
@@ -210,13 +204,14 @@ test.describe(
           await test.step(
             "Add year " + year + ", press enter, check for visibility",
             async () => {
-              await page.getByLabel("Streitjahr", { exact: true }).fill(year)
+              await page
+                .getByLabel("Streitjahr")
+                .getByRole("textbox")
+                .fill(year)
               await page.keyboard.press("Enter")
 
               await expect(
-                page
-                  .getByTestId("chips-input-wrapper_yearOfDispute")
-                  .getByText(year),
+                page.getByTestId("year-of-dispute").getByText(year),
               ).toBeVisible()
             },
           )
@@ -256,48 +251,42 @@ test.describe(
         await navigateToCategories(page, documentNumber)
 
         await test.step("Add two identical years of dispute not possible, shows error", async () => {
-          await page.getByLabel("Streitjahr", { exact: true }).fill("2022")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("2022")
           await page.keyboard.press("Enter")
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_yearOfDispute")
-              .getByText("2022"),
+            page.getByTestId("year-of-dispute").getByText("2022"),
           ).toBeVisible()
 
-          await page.getByLabel("Streitjahr", { exact: true }).fill("2022")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("2022")
           await page.keyboard.press("Enter")
           await expect(page.getByText("2022 bereits vorhanden")).toBeVisible()
         })
 
         await test.step("Add invalid years of dispute not possible, former error replaced by new one", async () => {
-          await page.getByLabel("Streitjahr", { exact: true }).fill("999")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("0999")
           await page.keyboard.press("Enter")
           await expect(page.getByText("2022 bereits vorhanden")).toBeHidden()
           await expect(page.getByText("Kein valides Jahr")).toBeVisible()
         })
 
         await test.step("Add more then 4 numbers not possible", async () => {
-          await page.getByLabel("Streitjahr", { exact: true }).fill("20202")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("20202")
           await page.keyboard.press("Enter")
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_yearOfDispute")
-              .getByText("2020"),
+            page.getByTestId("year-of-dispute").getByText("2020"),
           ).toBeVisible()
         })
 
         await test.step("Add characters not possible", async () => {
-          await page.getByLabel("Streitjahr", { exact: true }).fill("abcd")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("abcd")
           await page.keyboard.press("Enter")
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_yearOfDispute")
-              .getByText("abcd"),
+            page.getByTestId("year-of-dispute").getByText("abcd"),
           ).toBeHidden()
         })
 
         await test.step("Add years of dispute in future not possible, former error replaced by new one", async () => {
-          await page.getByLabel("Streitjahr", { exact: true }).fill("2030")
+          await page.getByLabel("Streitjahr").getByRole("textbox").fill("2030")
           await page.keyboard.press("Enter")
           await expect(page.getByText("Kein valides Jahr")).toBeHidden()
           await expect(
@@ -305,22 +294,12 @@ test.describe(
           ).toBeVisible()
         })
 
-        await test.step("On blur validates input, input is not saved with error", async () => {
-          await page.getByLabel("Streitjahr", { exact: true }).fill("20")
-          await page.keyboard.press("Tab")
-          await expect(
-            page.getByText("Streitjahr darf nicht in der Zukunft liegen"),
-          ).toBeHidden()
-          await expect(page.getByText("Kein valides Jahr")).toBeVisible()
-        })
         await save(page)
 
-        await test.step("Check if onyl valids years of dispute are persisted in reload", async () => {
+        await test.step("Check if only valid years of dispute are persisted in reload", async () => {
           await page.reload()
           await expect(
-            page
-              .getByTestId("chips-input-wrapper_yearOfDispute")
-              .getByText("2022"),
+            page.getByTestId("year-of-dispute").getByText("2022"),
           ).toBeVisible()
         })
       },

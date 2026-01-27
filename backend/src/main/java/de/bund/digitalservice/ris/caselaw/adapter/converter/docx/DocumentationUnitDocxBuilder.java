@@ -145,14 +145,14 @@ public class DocumentationUnitDocxBuilder extends DocxBuilder {
     }
 
     if (ppr.getPStyle() != null
-        && ppr.getPStyle().getVal().equals("Listenabsatz")
+        && ("Listenabsatz".equals(ppr.getPStyle().getVal())
+            || "ListParagraph".equals(ppr.getPStyle().getVal()))
         && ppr.getFramePr() != null) {
       return true;
     }
 
     if (ppr.getPStyle() != null
-        && List.of("RandNummer", "ListParagraph", "Randziffern")
-            .contains(ppr.getPStyle().getVal())) {
+        && List.of("RandNummer", "Randziffern").contains(ppr.getPStyle().getVal())) {
       return true;
     }
 
@@ -202,7 +202,13 @@ public class DocumentationUnitDocxBuilder extends DocxBuilder {
       return false;
     }
 
-    return paragraph.getPPr().getNumPr() != null;
+    var numPr = paragraph.getPPr().getNumPr();
+    if (numPr == null) {
+      return false;
+    }
+
+    var numId = numPr.getNumId();
+    return numId != null && numId.getVal().longValue() != 0;
   }
 
   private DocumentationUnitDocx convertToNumberingListEntry(

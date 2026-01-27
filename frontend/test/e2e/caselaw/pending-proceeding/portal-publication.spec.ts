@@ -4,6 +4,7 @@ import {
   expectHistoryLogRow,
   navigateToManagementData,
   navigateToPublication,
+  requestHtmlFromPortalApi,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe(
@@ -42,12 +43,13 @@ test.describe(
         { scope: "test" },
       ],
     })
+
     test(
       "Anhängiges Verfahren kann veröffentlicht und zurückgezogen werden",
       {
         tag: ["@RISDEV-7896", "@RISDEV-8460"],
       },
-      async ({ page, prefilledPendingProceeding }) => {
+      async ({ page, prefilledPendingProceeding, baseURL, browser }) => {
         await navigateToPublication(
           page,
           prefilledPendingProceeding.documentNumber,
@@ -83,6 +85,22 @@ test.describe(
             page.getByRole("button", { name: "Zurückziehen" }),
           ).toBeVisible()
         })
+
+        // Portal is not available in local environment
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (baseURL !== "http://127.0.0.1") {
+          await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
+            const portalResponse = await requestHtmlFromPortalApi(
+              browser,
+              prefilledPendingProceeding.documentNumber,
+            )
+
+            // eslint-disable-next-line playwright/no-conditional-expect
+            expect(portalResponse.status).toBe(200)
+            // eslint-disable-next-line playwright/no-conditional-expect
+            expect(portalResponse.content).toContain("test headline")
+          })
+        }
 
         await test.step("Eine veröffentlichte Dokumentationseinheit kann nicht gelöscht werden", async () => {
           await navigateToManagementData(
@@ -122,6 +140,20 @@ test.describe(
           ).toBeHidden()
         })
 
+        // Portal is not available in local environment
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (baseURL !== "http://127.0.0.1") {
+          await test.step("Die Entscheidung ist nicht per Portal-API abrufbar", async () => {
+            const portalResponse = await requestHtmlFromPortalApi(
+              browser,
+              prefilledPendingProceeding.documentNumber,
+            )
+
+            // eslint-disable-next-line playwright/no-conditional-expect
+            expect(portalResponse.status).toBe(404)
+          })
+        }
+
         await test.step("Veröffentlichen und Zurückziehen wird in der Historie geloggt", async () => {
           await navigateToManagementData(
             page,
@@ -159,6 +191,58 @@ test.describe(
     )
 
     test(
+      "Plausibilitätsprüfung Anhängiges Verfahren",
+      {
+        tag: ["@RISDEV-9248"],
+      },
+      async ({ pageWithBfhUser, pendingProceedings }) => {
+        const { createdPendingProceedings } = pendingProceedings
+        const pendingProceeding = createdPendingProceedings[0]
+
+        await navigateToPublication(
+          pageWithBfhUser,
+          pendingProceeding.documentNumber,
+          {
+            type: "pending-proceeding",
+          },
+        )
+
+        await test.step("Plausibilitätsprüfung ist erfolgreich, wenn alle Pflichtfelder befüllt sind", async () => {
+          await expect(
+            pageWithBfhUser.getByText(
+              "Alle Pflichtfelder sind korrekt ausgefüllt",
+            ),
+          ).toBeVisible()
+
+          await expect(
+            pageWithBfhUser.getByRole("button", { name: "Veröffentlichen" }),
+          ).toBeEnabled()
+        })
+
+        await test.step("Plausibilitätsprüfung schlägt fehl, wenn ein Pflichtfeld nicht befüllt ist", async () => {
+          const pendingProceedingWithoutJudgmentBody =
+            createdPendingProceedings[1]
+          await navigateToPublication(
+            pageWithBfhUser,
+            pendingProceedingWithoutJudgmentBody.documentNumber,
+            {
+              type: "pending-proceeding",
+            },
+          )
+          await expect(
+            pageWithBfhUser.getByText(
+              "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt",
+            ),
+          ).toBeVisible()
+          await expect(pageWithBfhUser.getByText("LDML-Vorschau")).toBeHidden()
+          await expect(
+            pageWithBfhUser.getByRole("button", { name: "Veröffentlichen" }),
+          ).toBeDisabled()
+        })
+      },
+    )
+
+    test(
       "LDML Vorschau Anhängiges Verfahren",
       {
         tag: ["@RISDEV-7896", "@RISDEV-8843"],
@@ -189,29 +273,6 @@ test.describe(
           await expect(
             pageWithBfhUser.getByText("<akn:akomaNtoso"),
           ).toBeHidden()
-        })
-
-        await test.step("Fehler beim Laden der LDML Vorschau wenn kein valides LDML erzeugt werden kann", async () => {
-          const pendingProceedingWithoutJudgmentBody =
-            createdPendingProceedings[1]
-          await navigateToPublication(
-            pageWithBfhUser,
-            pendingProceedingWithoutJudgmentBody.documentNumber,
-            {
-              type: "pending-proceeding",
-            },
-          )
-          await expect(
-            pageWithBfhUser.getByText("Fehler beim Laden der LDML-Vorschau"),
-          ).toBeVisible()
-          await expect(
-            pageWithBfhUser.getByText(
-              "Die LDML-Vorschau konnte nicht geladen werden: Missing judgment body.",
-            ),
-          ).toBeVisible()
-          await expect(
-            pageWithBfhUser.getByRole("button", { name: "Veröffentlichen" }),
-          ).toBeDisabled()
         })
       },
     )

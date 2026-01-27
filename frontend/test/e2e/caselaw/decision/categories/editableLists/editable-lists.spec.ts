@@ -218,7 +218,7 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-    const normsContainer = page.getByLabel("Norm")
+    const normsContainer = page.getByLabel("Normen")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
@@ -231,10 +231,6 @@ test.describe("related documentation units", () => {
         "for category " + (await container.first().getAttribute("aria-label")),
         async () => {
           const fileNumber = generateString()
-          const containerLabel = (await container
-            .first()
-            .getAttribute("aria-label")) as string
-
           if (container === activeCitationContainer) {
             await fillActiveCitationInputs(page, { fileNumber: fileNumber })
           }
@@ -260,7 +256,7 @@ test.describe("related documentation units", () => {
             container.getByLabel("Löschen", { exact: true }),
           ).toBeHidden()
 
-          await container.getByLabel(`${containerLabel} speichern`).click()
+          await container.getByRole("button", { name: /speichern/ }).click()
 
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
@@ -311,7 +307,7 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-    const normsContainer = page.getByLabel("Norm")
+    const normsContainer = page.getByLabel("Normen")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
@@ -323,10 +319,6 @@ test.describe("related documentation units", () => {
       await test.step(
         "for category " + (await container.first().getAttribute("aria-label")),
         async () => {
-          const containerLabel = (await container
-            .first()
-            .getAttribute("aria-label")) as string
-
           await navigateToCategories(page, documentNumber)
 
           //list item 1
@@ -351,7 +343,7 @@ test.describe("related documentation units", () => {
               normAbbreviation: "PBefG",
             })
           }
-          await container.getByLabel(`${containerLabel} speichern`).click()
+          await container.getByRole("button", { name: /speichern/ }).click()
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
           //list item 2
@@ -376,7 +368,7 @@ test.describe("related documentation units", () => {
               normAbbreviation: "AusstgBeschWoEigGVV",
             })
           }
-          await container.getByLabel(`${containerLabel} speichern`).click()
+          await container.getByRole("button", { name: /speichern/ }).click()
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
 
           // leaving an empty list item, deletes it
@@ -415,7 +407,7 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-    const normsContainer = page.getByLabel("Norm")
+    const normsContainer = page.getByLabel("Normen")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
@@ -427,10 +419,6 @@ test.describe("related documentation units", () => {
       await test.step(
         "for category " + (await container.first().getAttribute("aria-label")),
         async () => {
-          const containerLabel = (await container
-            .first()
-            .getAttribute("aria-label")) as string
-
           const firstEntry = container === normsContainer ? "PBefG" : "1234"
           const secondEntry =
             container === normsContainer ? "KaffeeStG" : "4321"
@@ -456,7 +444,7 @@ test.describe("related documentation units", () => {
             await expect(container.getByLabel("Abbrechen")).toBeHidden()
           }
 
-          await container.getByLabel(`${containerLabel} speichern`).click()
+          await container.getByRole("button", { name: /speichern/ }).click()
 
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
@@ -502,7 +490,7 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-    const normsContainer = page.getByLabel("Norm")
+    const normsContainer = page.getByLabel("Normen")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
@@ -514,10 +502,6 @@ test.describe("related documentation units", () => {
       await test.step(
         "for category " + (await container.first().getAttribute("aria-label")),
         async () => {
-          const containerLabel = (await container
-            .first()
-            .getAttribute("aria-label")) as string
-
           const fileNumber = generateString()
           await navigateToCategories(page, documentNumber)
 
@@ -538,7 +522,7 @@ test.describe("related documentation units", () => {
             })
           }
 
-          await container.getByLabel(`${containerLabel} speichern`).click()
+          await container.getByRole("button", { name: /speichern/ }).click()
 
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 

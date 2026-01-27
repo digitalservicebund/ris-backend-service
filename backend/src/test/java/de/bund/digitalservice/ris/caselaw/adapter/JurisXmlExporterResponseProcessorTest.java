@@ -57,11 +57,16 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @Import({JurisXmlExporterResponseProcessor.class, JurisMessageWrapperFactory.class})
 class JurisXmlExporterResponseProcessorTest {
   private static final String DOCUMENT_NUMBER = "KORE123456789";
@@ -134,7 +139,7 @@ class JurisXmlExporterResponseProcessorTest {
     verify(storeFactory, times(1)).createStore();
     verify(xmlHandoverRepository, times(1)).getLastXmlHandoverMail(DOCUMENT_UUID);
     verify(mailSender, times(1))
-        .sendMail(any(), any(), any(), any(), any(), eq("report-" + DOCUMENT_NUMBER));
+        .sendMail(any(), any(), any(), any(), any(), any(), eq("report-" + DOCUMENT_NUMBER));
     verify(inbox, times(1)).copyMessages(new Message[] {importMessage}, processed);
     verify(importMessage, times(1)).setFlag(Flag.DELETED, true);
   }
@@ -205,6 +210,7 @@ class JurisXmlExporterResponseProcessorTest {
             any(),
             any(),
             argThat(list -> list.get(0).equals(new MailAttachment("test.txt", "ÄÜÖäüöß"))),
+            any(),
             eq("report-" + DOCUMENT_NUMBER));
   }
 

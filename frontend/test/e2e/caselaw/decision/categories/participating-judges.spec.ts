@@ -29,6 +29,7 @@ test.describe(
           page.getByRole("button", { name: "Mitwirkende Richter" }),
         ).toBeVisible()
       })
+
       await page.getByRole("button", { name: "Mitwirkende Richter" }).click()
 
       await test.step("Übernehmen is disabled if name is empty", async () => {
@@ -114,7 +115,10 @@ test.describe(
           .getByTestId("Mitwirkende Richter")
           .getByTestId("list-entry-0")
           .click()
-        await page.getByRole("button", { name: "Eintrag löschen" }).click()
+        await page
+          .getByTestId("Mitwirkende Richter")
+          .getByRole("button", { name: "Eintrag löschen" })
+          .click()
       })
 
       await test.step("Summary of list entry should be gone", async () => {

@@ -4,6 +4,7 @@ import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategor
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
 const ERROR_WORD = "Felelr"
+
 test.describe(
   "text check store",
   {
@@ -15,6 +16,7 @@ test.describe(
         shortTexts: { headnote: `<p>Text mit ${ERROR_WORD}</p>` },
       },
     })
+
     test(
       "text check, preserves matches after navigation",
       {
@@ -31,6 +33,7 @@ test.describe(
             },
           ],
         }
+
         await test.step("navigate to headnote (Orientierungssatz) in categories", async () => {
           await navigateToCategories(
             page,

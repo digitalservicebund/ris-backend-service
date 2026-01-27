@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,32 +25,43 @@ public class FieldOfLawController {
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public Slice<FieldOfLaw> getFieldsOfLawBySearchQuery(
+  public ResponseEntity<Slice<FieldOfLaw>> getFieldsOfLawBySearchQuery(
       @RequestParam("q") Optional<String> searchStr,
       @RequestParam("identifier") Optional<String> identifier,
       @RequestParam("norm") Optional<String> norm,
       @RequestParam("pg") int page,
       @RequestParam("sz") int size) {
-    return service.getFieldsOfLawBySearchQuery(
-        identifier, searchStr, norm, PageRequest.of(page, size));
+    return ResponseEntity.ok()
+        .cacheControl(CacheControlDefaults.staticValues())
+        .body(
+            service.getFieldsOfLawBySearchQuery(
+                identifier, searchStr, norm, PageRequest.of(page, size)));
   }
 
   @GetMapping(value = "/search-by-identifier", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public List<FieldOfLaw> getFieldsOfLawByIdentifierSearch(
-      @RequestParam("q") Optional<String> searchStr) {
-    return service.getFieldsOfLawByIdentifierSearch(searchStr);
+  public ResponseEntity<List<FieldOfLaw>> getFieldsOfLawByIdentifierSearch(
+      @RequestParam("q") Optional<String> searchStr,
+      @RequestParam("pg") int page,
+      @RequestParam("sz") int size) {
+    return ResponseEntity.ok()
+        .cacheControl(CacheControlDefaults.staticValues())
+        .body(service.getFieldsOfLawByIdentifierSearch(searchStr, PageRequest.of(page, size)));
   }
 
   @GetMapping(value = "{identifier}/children", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public List<FieldOfLaw> getChildrenOfFieldOfLaw(@PathVariable String identifier) {
-    return service.getChildrenOfFieldOfLaw(identifier);
+  public ResponseEntity<List<FieldOfLaw>> getChildrenOfFieldOfLaw(@PathVariable String identifier) {
+    return ResponseEntity.ok()
+        .cacheControl(CacheControlDefaults.staticValues())
+        .body(service.getChildrenOfFieldOfLaw(identifier));
   }
 
   @GetMapping(value = "{identifier}/tree", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public FieldOfLaw getTreeForFieldOfLaw(@PathVariable String identifier) {
-    return service.getTreeForFieldOfLaw(identifier);
+  public ResponseEntity<FieldOfLaw> getTreeForFieldOfLaw(@PathVariable String identifier) {
+    return ResponseEntity.ok()
+        .cacheControl(CacheControlDefaults.staticValues())
+        .body(service.getTreeForFieldOfLaw(identifier));
   }
 }

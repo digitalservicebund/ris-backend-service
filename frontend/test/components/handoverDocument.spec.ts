@@ -1,15 +1,19 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
+import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDecisionView from "@/components/HandoverDecisionView.vue"
 import { Decision } from "@/domain/decision"
 import { Env } from "@/domain/env"
 import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
+import IncomeType from "@/domain/incomeType"
 import LegalForce from "@/domain/legalForce"
 import { DuplicateRelationStatus } from "@/domain/managementData"
 import NormReference from "@/domain/normReference"
+import RelatedPendingProceeding from "@/domain/pendingProceedingReference"
+import { PublicationState } from "@/domain/publicationStatus"
 import SingleNorm from "@/domain/singleNorm"
 import featureToggleService from "@/services/featureToggleService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
@@ -68,7 +72,7 @@ describe("HandoverDocumentationUnitView:", () => {
     vi.spyOn(handoverDocumentationUnitService, "getPreview").mockResolvedValue({
       status: 200,
       data: new Preview({
-        xml: "<xml>all good</xml>",
+        xml: "<xml>all good <jurimg /></xml>",
         success: true,
       }),
     })
@@ -487,6 +491,7 @@ describe("HandoverDocumentationUnitView:", () => {
               location: "location",
               label: "label",
             },
+            courtBranchLocation: { value: "Augsburg", id: "1" },
             decisionDate: "2022-02-01",
             legalEffect: "legalEffect",
             documentType: {
@@ -503,6 +508,28 @@ describe("HandoverDocumentationUnitView:", () => {
             appeal: {
               appellants: [{ id: "1", value: "Kläger" }],
             },
+            incomeTypes: [new IncomeType()],
+            relatedPendingProceedings: [
+              new RelatedPendingProceeding({
+                documentNumber: "YYTestDoc0017",
+                court: {
+                  type: "BGH",
+                  label: "BGH",
+                },
+                decisionDate: "2022-02-01",
+                fileNumber: "IV R 99/99",
+              }),
+            ],
+            nonApplicationNorms: [
+              new NormReference({
+                normAbbreviation: { abbreviation: "ABC" },
+                singleNorms: [
+                  new SingleNorm({
+                    singleNorm: "§ 1",
+                  }),
+                ],
+              }),
+            ],
           },
           longTexts: { decisionReasons: "decisionReasons" },
           managementData: {
@@ -527,6 +554,12 @@ describe("HandoverDocumentationUnitView:", () => {
       ).toBeInTheDocument()
       expect(screen.getByText("Rechtsmittelzulassung")).toBeInTheDocument()
       expect(screen.getByText("Rechtsmittel")).toBeInTheDocument()
+      expect(screen.getByText("Einkunftsart")).toBeInTheDocument()
+      expect(screen.getByText("Sitz der Außenstelle")).toBeInTheDocument()
+      expect(
+        screen.getByText("Verknüpfung anhängiges Verfahren"),
+      ).toBeInTheDocument()
+      expect(screen.getByText("Nichtanwendungsgesetz")).toBeInTheDocument()
       const handoverButton = screen.getByRole("button", {
         name: "Dokumentationseinheit an jDV übergeben",
       })
@@ -722,7 +755,9 @@ describe("HandoverDocumentationUnitView:", () => {
 
     expect(codeSnippet).toBeInTheDocument()
     expect(codeSnippet).toHaveAttribute("XML")
-    expect(codeSnippet?.getAttribute("xml")).toBe("<xml>all good</xml>")
+    expect(codeSnippet?.getAttribute("xml")).toBe(
+      "<xml>all good <jurimg /></xml>",
+    )
   })
 
   it("should not allow to publish when publication is scheduled", async () => {
@@ -811,6 +846,122 @@ describe("HandoverDocumentationUnitView:", () => {
     expect(codeSnippet?.title).toBe("XML")
     expect(codeSnippet).toHaveAttribute("XML")
     expect(codeSnippet?.getAttribute("xml")).toBe("xml content")
+  })
+
+  it("shows image attachments", async () => {
+    const { container } = renderComponent({
+      props: {
+        eventLog: [
+          new HandoverMail({
+            type: EventRecordType.HANDOVER,
+            attachments: [{ fileContent: "xml content", fileName: "file.xml" }],
+            imageAttachments: [
+              { fileName: "foo.png" },
+              { fileName: "bar.jpg" },
+            ],
+            statusMessages: ["success"],
+            success: true,
+            receiverAddress: "receiver address",
+            mailSubject: "mail subject",
+            date: "01.02.2000",
+          }),
+        ],
+      },
+      documentUnit: new Decision("123", {
+        coreData: {
+          fileNumbers: ["foo"],
+          court: { type: "type", location: "location", label: "label" },
+          decisionDate: "2022-02-01",
+          legalEffect: "legalEffect",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
+          },
+        },
+      }),
+    })
+
+    // Wait for XML Vorschau
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    expect(container).toHaveTextContent(`Anhänge: foo.png, bar.jpg`)
+  })
+
+  it("prevent handover published with images", async () => {
+    renderComponent({
+      documentUnit: new Decision("123", {
+        status: { publicationStatus: PublicationState.PUBLISHED },
+        coreData: {
+          fileNumbers: ["foo"],
+          court: { type: "type", location: "location", label: "label" },
+          decisionDate: "2022-02-01",
+          legalEffect: "legalEffect",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
+          },
+        },
+      }),
+      stubs: {
+        CodeSnippet: {
+          template: '<div data-testid="code-snippet"/>',
+        },
+      },
+    })
+
+    // Wait for XML Vorschau
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await nextTick()
+
+    expect(
+      screen.getByText(
+        "Diese bereits veröffentlichte Entscheidung enthält Bilder und kann deshalb nicht erneut an die jDV übergeben werden.",
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it("prevent handover with images in uat", async () => {
+    renderComponent({
+      env: { environment: "uat" },
+      documentUnit: new Decision("123", {
+        status: { publicationStatus: PublicationState.UNPUBLISHED },
+        coreData: {
+          fileNumbers: ["foo"],
+          court: { type: "type", location: "location", label: "label" },
+          decisionDate: "2022-02-01",
+          legalEffect: "legalEffect",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
+          },
+        },
+      }),
+      stubs: {
+        CodeSnippet: {
+          template: '<div data-testid="code-snippet"/>',
+        },
+      },
+    })
+
+    // Wait for XML Vorschau
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await nextTick()
+
+    expect(
+      screen.getByText(
+        "Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV übergeben werden. Dieses Feature steht nur in der Prod-Umgebung zur Verfügung.",
+      ),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        "In UAT können keine Entscheidungen mit Bildern an die jDV übergeben werden",
+      ),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText(
+        "Diese bereits veröffentlichte Entscheidung enthält Bilder und kann deshalb nicht erneut an die jDV übergeben werden.",
+      ),
+    ).not.toBeInTheDocument()
   })
 })
 

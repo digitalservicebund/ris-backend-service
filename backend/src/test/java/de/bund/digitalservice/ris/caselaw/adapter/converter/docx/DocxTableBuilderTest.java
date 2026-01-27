@@ -21,6 +21,7 @@ import org.docx4j.wml.CTTblPrBase;
 import org.docx4j.wml.CTTblPrBase.TblStyle;
 import org.docx4j.wml.CTTblStylePr;
 import org.docx4j.wml.CTVerticalAlignRun;
+import org.docx4j.wml.CTVerticalJc;
 import org.docx4j.wml.Color;
 import org.docx4j.wml.HpsMeasure;
 import org.docx4j.wml.RPr;
@@ -28,10 +29,14 @@ import org.docx4j.wml.STBorder;
 import org.docx4j.wml.STShd;
 import org.docx4j.wml.STTblStyleOverrideType;
 import org.docx4j.wml.STVerticalAlignRun;
+import org.docx4j.wml.STVerticalJc;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.TblBorders;
+import org.docx4j.wml.TblGrid;
+import org.docx4j.wml.TblGridCol;
 import org.docx4j.wml.TblPr;
+import org.docx4j.wml.TblWidth;
 import org.docx4j.wml.Tc;
 import org.docx4j.wml.TcPr;
 import org.docx4j.wml.TcPrInner;
@@ -179,9 +184,9 @@ class DocxTableBuilderTest {
     // cell should take insideV from table
     assertThat(result)
         .contains(
-            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; min-width: 5px; padding: 5px;\">")
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; display: table-cell; min-width: 5px; padding: 5px;\">")
         .contains(
-            "<td colspan=\"2\" style=\"background-color: #111222; border-left: 6px solid #000; border-right: 3px solid #foo; border-top: 1.5px solid #mnopqr; min-width: 5px; padding: 5px;\"><p>foo</p></td>");
+            "<td colspan=\"2\" style=\"background-color: #111222; border-left: 6px solid #000; border-right: 3px solid #foo; border-top: 1.5px solid #mnopqr; display: table-cell; min-width: 5px; padding: 5px;\"><p>foo</p></td>");
   }
 
   @Test
@@ -334,9 +339,202 @@ class DocxTableBuilderTest {
         .isEqualTo(
             "<table style=\"border-collapse: collapse;\">"
                 + "<tr>"
-                + "<td style=\"border-left: 0.25px solid #000; min-width: 5px; padding: 5px;\"><p>table cell</p></td>"
+                + "<td style=\"border-left: 0.25px solid #000; display: table-cell; min-width: 5px; padding: 5px;\"><p>table cell</p></td>"
                 + "</tr>"
                 + "</table>");
+  }
+
+  @Test
+  void testBuild_withExternalTableStyleInReversedOrder() {
+    Tbl table = generateTable(List.of(List.of("table cell")));
+    TblPr tblPr = new TblPr();
+    TblStyle tblStyle = new TblStyle();
+    tblStyle.setVal("external-style");
+    tblPr.setTblStyle(tblStyle);
+    table.setTblPr(tblPr);
+
+    Map<String, Style> styles = new HashMap<>();
+    Style style = new Style();
+    putReverseTableStylePrToStyle(style);
+    styles.put("external-style", style);
+
+    var converter = new DocxConverter();
+    converter.setStyles(styles);
+    var result =
+        DocxTableBuilder.newInstance()
+            .setTable(table)
+            .setConverter(converter)
+            .build(new ArrayList<>());
+
+    assertThat(result).isInstanceOf(TableElement.class);
+    TableElement tableElement = (TableElement) result;
+    assertThat(tableElement.toHtmlString())
+        .isEqualTo(
+            "<table style=\"border-collapse: collapse;\">"
+                + "<tr>"
+                + "<td style=\"border-left: 0.25px solid #000; display: table-cell; min-width: 5px; padding: 5px;\"><p>table cell</p></td>"
+                + "</tr>"
+                + "</table>");
+  }
+
+  @Test
+  void givenTableWithCellWidths_whenBuildingTable_thenValidateWidthsArePresent_MsWord() {
+    // given
+    var firstColWidthInTwips = 500;
+    var secondColWidthInTwips = 1000;
+    var thirdColWidthInTwips = 750;
+    var fourthColWidthInTwips = 2000;
+
+    var row = new Tr();
+    var cellWithVerticalCenterAlignment =
+        generateTableCellWidthBorderAndWidth("ABCDEF", 12, firstColWidthInTwips);
+    var vAlignCenter = new CTVerticalJc();
+    vAlignCenter.setVal(STVerticalJc.CENTER);
+    cellWithVerticalCenterAlignment.getValue().getTcPr().setVAlign(vAlignCenter);
+    row.getContent().add(cellWithVerticalCenterAlignment);
+
+    var cellWithBottomVerticalAlignment =
+        generateTableCellWidthBorderAndWidth("GHIJKL", 12, secondColWidthInTwips);
+    var vAlignBottom = new CTVerticalJc();
+    vAlignBottom.setVal(STVerticalJc.BOTTOM);
+    cellWithBottomVerticalAlignment.getValue().getTcPr().setVAlign(vAlignBottom);
+
+    row.getContent().add(cellWithBottomVerticalAlignment);
+    row.getContent().add(generateTableCellWidthBorderAndWidth("GHIJKL", 12, thirdColWidthInTwips));
+    row.getContent().add(generateTableCellWidthBorderAndWidth("MNOPQR", 12, fourthColWidthInTwips));
+
+    var tableCtBorder = new CTBorder();
+    tableCtBorder.setVal(STBorder.SINGLE);
+    tableCtBorder.setSz(BigInteger.valueOf(48));
+    tableCtBorder.setColor("auto");
+
+    var tableBorders = new TblBorders();
+    tableBorders.setInsideV(tableCtBorder);
+    tableBorders.setInsideH(tableCtBorder);
+
+    var tblPr = new TblPr();
+    tblPr.setTblBorders(tableBorders);
+    var tbl = new Tbl();
+    tbl.setTblPr(tblPr);
+    tbl.getContent().add(row);
+
+    var builder = DocxTableBuilder.newInstance();
+    builder.setTable(tbl);
+
+    // when
+    var result = builder.build(new ArrayList<>()).toHtmlString();
+
+    // then
+    assertThat(result)
+        .contains(
+            "<td style=\"border-right: 6px solid #000; border-top: 1.5px solid #abcdef; display: table-cell; min-width: 5px; padding: 5px; vertical-align: middle; width: 33px;\">")
+        .contains(
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; display: table-cell; min-width: 5px; padding: 5px; vertical-align: bottom; width: 66px;\">")
+        .contains(
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; display: table-cell; min-width: 5px; padding: 5px; width: 50px;\">")
+        .contains(
+            "<td style=\"border-left: 6px solid #000; border-top: 1.5px solid #mnopqr; display: table-cell; min-width: 5px; padding: 5px; width: 133px;\">");
+  }
+
+  @Test
+  void givenTableWithGlobalCellWidths_whenBuildingTable_thenValidateWidthsArePresent_GoogleDocs() {
+    // given
+    var firstColWidthInTwips = 500;
+    var secondColWidthInTwips = 1000;
+    var thirdColWidthInTwips = 750;
+    var fourthColWidthInTwips = 2000;
+
+    var row = new Tr();
+    row.getContent().add(generateTableCellWidthBorder("ABCDEF", 12));
+    row.getContent().add(generateTableCellWidthBorder("GHIJKL", 12));
+    row.getContent().add(generateTableCellWidthBorder("GHIJKL", 12));
+    row.getContent().add(generateTableCellWidthBorder("MNOPQR", 12));
+
+    var tableCtBorder = new CTBorder();
+    tableCtBorder.setVal(STBorder.SINGLE);
+    tableCtBorder.setSz(BigInteger.valueOf(48));
+    tableCtBorder.setColor("auto");
+
+    var tableBorders = new TblBorders();
+    tableBorders.setInsideV(tableCtBorder);
+    tableBorders.setInsideH(tableCtBorder);
+
+    var tblPr = new TblPr();
+    tblPr.setTblBorders(tableBorders);
+    var tbl = new Tbl();
+    tbl.setTblPr(tblPr);
+    tbl.getContent().add(row);
+
+    var tableGrid = new TblGrid();
+    var colOne = new TblGridCol();
+    colOne.setW(BigInteger.valueOf(firstColWidthInTwips));
+    var colTwo = new TblGridCol();
+    colTwo.setW(BigInteger.valueOf(secondColWidthInTwips));
+    var colThree = new TblGridCol();
+    colThree.setW(BigInteger.valueOf(thirdColWidthInTwips));
+    var colFour = new TblGridCol();
+    colFour.setW(BigInteger.valueOf(fourthColWidthInTwips));
+    tableGrid.getGridCol().addAll(List.of(colOne, colTwo, colThree, colFour));
+    tbl.setTblGrid(tableGrid);
+
+    var builder = DocxTableBuilder.newInstance();
+    builder.setTable(tbl);
+
+    // when
+    var result = builder.build(new ArrayList<>()).toHtmlString();
+
+    // then
+    assertThat(result)
+        .contains(
+            "<td style=\"border-right: 6px solid #000; border-top: 1.5px solid #abcdef; display: table-cell; min-width: 5px; padding: 5px; width: 33px;\">")
+        .contains(
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; display: table-cell; min-width: 5px; padding: 5px; width: 66px;\">")
+        .contains(
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; display: table-cell; min-width: 5px; padding: 5px; width: 50px;\">")
+        .contains(
+            "<td style=\"border-left: 6px solid #000; border-top: 1.5px solid #mnopqr; display: table-cell; min-width: 5px; padding: 5px; width: 133px;\">");
+  }
+
+  @Test
+  void givenTableWithLineStyles_whenBuildingTable_thenStylesShouldBePresent() {
+    // given
+    var row = new Tr();
+    var cell = generateTableCellWidthBorder("ABCDEF", 12);
+    var leftCtBorder = new CTBorder();
+    var rightCtBorder = new CTBorder();
+    leftCtBorder.setVal(STBorder.DASHED);
+    rightCtBorder.setVal(STBorder.DOTTED);
+    leftCtBorder.setSz(BigInteger.valueOf(24));
+    rightCtBorder.setSz(BigInteger.valueOf(24));
+    cell.getValue().getTcPr().getTcBorders().setLeft(leftCtBorder);
+    cell.getValue().getTcPr().getTcBorders().setRight(rightCtBorder);
+    row.getContent().add(cell);
+
+    var tableCtBorder = new CTBorder();
+    tableCtBorder.setVal(STBorder.SINGLE);
+    tableCtBorder.setSz(BigInteger.valueOf(48));
+    tableCtBorder.setColor("auto");
+
+    var tableBorders = new TblBorders();
+    tableBorders.setInsideV(tableCtBorder);
+    tableBorders.setInsideH(tableCtBorder);
+
+    var tblPr = new TblPr();
+    tblPr.setTblBorders(tableBorders);
+    var tbl = new Tbl();
+    tbl.setTblPr(tblPr);
+    tbl.getContent().add(row);
+
+    var builder = DocxTableBuilder.newInstance();
+    builder.setTable(tbl);
+
+    // when
+    var result = builder.build(new ArrayList<>()).toHtmlString();
+
+    // then
+    assertThat(result)
+        .contains(
+            "<td style=\"border-left: 3px dashed #000; border-right: 3px dotted #000; border-top: 1.5px solid #abcdef; display: table-cell; min-width: 5px; padding: 5px;\">");
   }
 
   @SuppressWarnings("java:S5976") // Disable warning for tests that could be parametrized
@@ -346,7 +544,7 @@ class DocxTableBuilderTest {
       return String.format(
           "<table style=\"border-collapse: collapse;\">"
               + "<tr>"
-              + "<td style=\"border-left: %spx solid #000; min-width: 5px; padding: 5px;\"><p>table cell</p></td>"
+              + "<td style=\"border-left: %spx solid #000; display: table-cell; min-width: 5px; padding: 5px;\"><p>table cell</p></td>"
               + "</tr>"
               + "</table>",
           borderLeft);
@@ -450,6 +648,48 @@ class DocxTableBuilderTest {
         .add(generateTableStylePr(STTblStyleOverrideType.SW_CELL, "26", null, null, null));
   }
 
+  private void putReverseTableStylePrToStyle(Style style) {
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.SW_CELL, "26", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.SE_CELL, "24", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.NW_CELL, "22", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.NE_CELL, "20", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.LAST_ROW, "18", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.FIRST_ROW, "16", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.LAST_COL, "14", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.FIRST_COL, "12", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.BAND_2_HORZ, "10", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.BAND_1_HORZ, "8", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.BAND_2_VERT, "6", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.BAND_1_VERT, "4", null, null, null));
+    style
+        .getTblStylePr()
+        .add(generateTableStylePr(STTblStyleOverrideType.WHOLE_TABLE, "2", null, null, null));
+  }
+
   private CTTblStylePr generateTableStylePr(
       STTblStyleOverrideType type,
       String leftSize,
@@ -530,6 +770,33 @@ class DocxTableBuilderTest {
         .add(
             TestDocxBuilder.newParagraphBuilder()
                 .addRunElement(TestDocxBuilder.buildTextRunElement("foo"))
+                .build());
+    return new JAXBElement<>(new QName("tc"), Tc.class, tc);
+  }
+
+  private JAXBElement<Tc> generateTableCellWidthBorderAndWidth(
+      String color, Integer borderWidth, Integer cellWidth) {
+    var ctBorder = new CTBorder();
+    ctBorder.setVal(STBorder.SINGLE);
+    ctBorder.setSz(BigInteger.valueOf(borderWidth));
+    ctBorder.setColor(color);
+
+    var tcBorders = new TcPrInner.TcBorders();
+    tcBorders.setTop(ctBorder);
+
+    var tblWidth = new TblWidth();
+    tblWidth.setW(BigInteger.valueOf(cellWidth));
+
+    var tcPr = new TcPr();
+    tcPr.setTcBorders(tcBorders);
+    tcPr.setTcW(tblWidth);
+
+    var tc = new Tc();
+    tc.setTcPr(tcPr);
+    tc.getContent()
+        .add(
+            TestDocxBuilder.newParagraphBuilder()
+                .addRunElement(TestDocxBuilder.buildTextRunElement("foobar"))
                 .build());
     return new JAXBElement<>(new QName("tc"), Tc.class, tc);
   }

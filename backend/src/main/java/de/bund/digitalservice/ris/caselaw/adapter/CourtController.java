@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,9 +31,28 @@ public class CourtController {
    */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public List<Court> getCourts(
+  public ResponseEntity<List<Court>> getCourts(
       @RequestParam(value = "q", required = false) String searchStr,
       @RequestParam(value = "sz", required = false, defaultValue = "200") Integer size) {
-    return service.getCourts(searchStr, size);
+    return ResponseEntity.ok()
+        .cacheControl(CacheControlDefaults.staticValues())
+        .body(service.getCourts(searchStr, size));
+  }
+
+  /**
+   * Returns branch locations for a specific court
+   *
+   * @param type the type of the court
+   * @param location the location of the court
+   * @return a list of branch locations for the court
+   */
+  @GetMapping("branchlocations")
+  @PreAuthorize("isAuthenticated()")
+  public ResponseEntity<List<String>> getBranchLocationsForCourt(
+      @RequestParam(value = "type") String type,
+      @RequestParam(value = "location", required = false) String location) {
+    return ResponseEntity.ok()
+        .cacheControl(CacheControlDefaults.staticValues())
+        .body(service.getBranchLocationsForCourt(type, location));
   }
 }

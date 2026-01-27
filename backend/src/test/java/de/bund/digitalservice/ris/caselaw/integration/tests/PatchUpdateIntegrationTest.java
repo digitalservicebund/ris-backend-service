@@ -2119,6 +2119,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                   .id(court1Id)
                   .jurisdictionType("")
                   .regions(List.of("NW"))
+                  .courtBranchLocations(List.of())
                   .isSuperiorCourt(false)
                   .isForeignCourt(false)
                   .build(),
@@ -2259,6 +2260,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                   .label("LG Detmold")
                   .jurisdictionType("")
                   .regions(List.of("NW"))
+                  .courtBranchLocations(List.of())
                   .id(court1Id)
                   .isSuperiorCourt(false)
                   .isForeignCourt(false)
@@ -2474,6 +2476,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                   .label("LG Detmold")
                   .jurisdictionType("")
                   .regions(List.of("NW"))
+                  .courtBranchLocations(List.of())
                   .id(court1Id)
                   .isSuperiorCourt(false)
                   .isForeignCourt(false)
@@ -5042,7 +5045,6 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           "path": "/previousDecisions/0",
           "value": {
             "uuid": null,
-            "newEntry": false,
             "documentNumber": "%s",
             "status": {
               "publicationStatus": "UNPUBLISHED",
@@ -5109,6 +5111,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
             "revoked": null,
             "jurisdictionType": "",
             "regions": ["NW"],
+            "courtBranchLocations": [],
             "responsibleDocOffice": null,
             "isSuperiorCourt": false,
             "isForeignCourt": false

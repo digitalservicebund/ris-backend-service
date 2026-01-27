@@ -4,7 +4,7 @@ on:
       SLACK_WEBHOOK_URL:
         required: false
       SONAR_TOKEN:
-        required: true
+        required: false
       GH_PACKAGES_REPOSITORY_USER:
         required: true
       GH_PACKAGES_REPOSITORY_TOKEN:
@@ -15,7 +15,7 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -26,16 +26,16 @@ jobs:
   backend-unit-tests:
     needs: scan-backend-changes
     # Disabled as tests run in sonar job
-    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main' && false  }}
+    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main' && github.actor == 'dependabot[bot]'  }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Get Gradle version
         working-directory: ./backend
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@6ba5449b7dcda52941806a19f0cf626b6420191e
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -60,16 +60,16 @@ jobs:
   backend-integration-tests:
     needs: scan-backend-changes
     # Disabled as tests run in sonar job
-    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main' && false  }}
+    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main'  && github.actor == 'dependabot[bot]'  }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Get Gradle version
         working-directory: ./backend
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@6ba5449b7dcda52941806a19f0cf626b6420191e
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -94,19 +94,19 @@ jobs:
 
   backend-tests-and-code-quality:
     needs: scan-backend-changes
-    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' }}
+    if: ${{ needs.scan-backend-changes.outputs.backend == 'true'  && github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up JDK
-        uses: actions/setup-java@6ba5449b7dcda52941806a19f0cf626b6420191e
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654
         with:
           java-version: "21.0"
           distribution: "temurin"
       - name: Cache SonarQube packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
@@ -125,7 +125,7 @@ jobs:
       - name: Check SonarQube Quality Gate
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sonarsource/sonarqube-quality-gate-action@95b1cc6c02a15c8ecc00c07b1c2a75ed61a14055
+        uses: sonarsource/sonarqube-quality-gate-action@cb3ed20f9fec62b4c3b8ad9e77656c6adaade913
         with:
           scanMetadataReportFile: backend/build/sonar/report-task.txt
         timeout-minutes: 3 # Force to fail step after a specific time

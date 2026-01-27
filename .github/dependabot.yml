@@ -1,0 +1,60 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "daily"
+      time: "02:00"
+      timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 3
+    groups:
+      all-frontend-non-major-dependencies:
+        update-types:
+          - minor
+          - patch
+      tiptap:
+        patterns:
+          - "@tiptap/*"
+    ignore:
+      # later versions have a bug that reports false positives
+      - dependency-name: "eslint-plugin-testing-library"
+        versions: [ ">7.6.3" ]
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "02:00"
+      timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 3
+    ignore:
+      - dependency-name: "postgres"
+        update-types:
+          - version-update:semver-major
+
+  - package-ecosystem: "gradle"
+    directory: "/backend"
+    schedule:
+      interval: "daily"
+      time: "02:00"
+      timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 3
+    groups:
+      all-backend-non-major-dependencies:
+        update-types:
+          - minor
+          - patch
+        exclude-patterns:
+          - de.bund.digitalservice:*
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "02:00"
+      timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 3

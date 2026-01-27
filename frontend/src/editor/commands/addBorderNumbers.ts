@@ -21,7 +21,7 @@ function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
 
   const nodesWithoutBorderNumbers: { node: ProsemirrorNode; pos: number }[] = []
   state.doc.nodesBetween(initialFrom, initialTo, (node, pos, parent) => {
-    const isTopLevelNode = parent && parent.type === state.schema.topNodeType
+    const isTopLevelNode = parent?.type === state.schema.topNodeType
 
     const isBorderNumberNode = node.type === borderNumberNodeType
 

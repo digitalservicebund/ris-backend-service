@@ -53,6 +53,8 @@ import org.docx4j.openpackaging.parts.PartName;
 import org.docx4j.openpackaging.parts.Parts;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.openpackaging.parts.WordprocessingML.FooterPart;
+import org.docx4j.openpackaging.parts.WordprocessingML.ImageBmpPart;
+import org.docx4j.openpackaging.parts.WordprocessingML.ImageGifPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImageJpegPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImagePngPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
@@ -76,6 +78,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
@@ -89,6 +92,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 @ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 @Import({DocxConverterService.class, ConverterConfig.class})
 class DocxConverterServiceTest {
 
@@ -167,7 +171,7 @@ class DocxConverterServiceTest {
           "<p>test</p>"
               + "<border-number><number>1</number><content><p>border number 1</p></content></border-number>"
               + "<border-number><number>2</number><content><p>border number 2</p></content></border-number>"
-              + "<table style=\"border-collapse: collapse;\"><tr><td style=\"min-width: 5px; padding: 5px;\"><p>table content</p></td></tr></table>",
+              + "<table style=\"border-collapse: collapse;\"><tr><td style=\"display: table-cell; min-width: 5px; padding: 5px;\"><p>table content</p></td></tr></table>",
           docx2Html.html());
     }
   }
@@ -216,6 +220,7 @@ class DocxConverterServiceTest {
     MainDocumentPart mainDocumentPart = mock(MainDocumentPart.class);
     Parts parts = mock(Parts.class);
     HashMap<PartName, Part> partMap = new HashMap<>();
+
     PartName partName = new PartName("/emfPart");
     BinaryPartAbstractImage part = new MetafileEmfPart(partName);
     Relationship relationship = new Relationship();
@@ -225,6 +230,7 @@ class DocxConverterServiceTest {
         DocxConverterServiceTest.class.getClassLoader().getResourceAsStream("test.emf");
     part.setBinaryData(emfStream.readAllBytes());
     partMap.put(partName, part);
+
     partName = new PartName("/jpegPart");
     part = new ImageJpegPart(partName);
     relationship = new Relationship();
@@ -232,6 +238,7 @@ class DocxConverterServiceTest {
     part.getSourceRelationships().add(relationship);
     part.setBinaryData(new byte[] {});
     partMap.put(partName, part);
+
     partName = new PartName("/pngPart");
     part = new ImagePngPart(partName);
     relationship = new Relationship();
@@ -239,6 +246,23 @@ class DocxConverterServiceTest {
     part.getSourceRelationships().add(relationship);
     part.setBinaryData(new byte[] {});
     partMap.put(partName, part);
+
+    partName = new PartName("/gifPart");
+    part = new ImageGifPart(partName);
+    relationship = new Relationship();
+    relationship.setId("gifPart");
+    part.getSourceRelationships().add(relationship);
+    part.setBinaryData(new byte[] {});
+    partMap.put(partName, part);
+
+    partName = new PartName("/bmpPart");
+    part = new ImageBmpPart(partName);
+    relationship = new Relationship();
+    relationship.setId("bmpPart");
+    part.getSourceRelationships().add(relationship);
+    part.setBinaryData(new byte[] {});
+    partMap.put(partName, part);
+
     when(parts.getParts()).thenReturn(partMap);
     when(mlPackage.getParts()).thenReturn(parts);
     when(mlPackage.getMainDocumentPart()).thenReturn(mainDocumentPart);
@@ -255,13 +279,17 @@ class DocxConverterServiceTest {
 
       verify(converter).setImages(imageMapCaptor.capture());
       Map<String, DocxImagePart> imageMapValue = imageMapCaptor.getValue();
-      assertEquals(3, imageMapValue.values().size());
+      assertEquals(5, imageMapValue.values().size());
       assertTrue(imageMapValue.containsKey("emfPart"));
       assertEquals("image/x-emf", imageMapValue.get("emfPart").contentType());
       assertTrue(imageMapValue.containsKey("jpegPart"));
       assertEquals("image/jpeg", imageMapValue.get("jpegPart").contentType());
       assertTrue(imageMapValue.containsKey("pngPart"));
       assertEquals("image/png", imageMapValue.get("pngPart").contentType());
+      assertTrue(imageMapValue.containsKey("gifPart"));
+      assertEquals("image/gif", imageMapValue.get("gifPart").contentType());
+      assertTrue(imageMapValue.containsKey("bmpPart"));
+      assertEquals("image/bmp", imageMapValue.get("bmpPart").contentType());
     }
   }
 
@@ -618,10 +646,10 @@ class DocxConverterServiceTest {
         assertNotNull(docx2Html);
         assertEquals(
             "<ol style=\"list-style-type:decimal;\">"
-                + "<li><p>list entry 1</p></li>"
+                + "<li><p>list entry 1</p>"
                 + "<ol style=\"list-style-type:decimal;\">"
                 + "<li style=\"list-style-type:decimal\"><p>list entry 1.1</p></li>"
-                + "</ol>"
+                + "</ol></li>"
                 + "<li style=\"list-style-type:decimal\"><p>bullet list entry 2</p></li>"
                 + "</ol>",
             docx2Html.html());
@@ -658,6 +686,44 @@ class DocxConverterServiceTest {
                 + "<li><p>bullet list entry 1</p></li>"
                 + "</ol>",
             docx2Html.html());
+      }
+    }
+
+    @Test
+    void testGetHtml_customStartValue() {
+      numberFormat = DocumentationUnitNumberingListNumberFormat.DECIMAL;
+      lvlText = "%1.";
+      startVal = "5";
+      entries.add(
+          (NumberingListEntry) generateNumberingListEntry("Five", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry) generateNumberingListEntry("Six", createNumberingListEntryIndex()));
+
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocumentationUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
+
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
+
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+
+        String expected =
+            "<ol style=\"list-style-type:decimal;\" start=\"5\">"
+                + "<li><p>Five</p></li>"
+                + "<li><p>Six</p></li>"
+                + "</ol>";
+
+        assertEquals(expected, docx2Html.html());
       }
     }
 
@@ -714,15 +780,15 @@ class DocxConverterServiceTest {
         assertEquals(
             "<ul style=\"list-style-type:disc;\">"
                 + "<li><p>bullet list entry 1</p></li>"
-                + "<li><p>bullet list entry 2</p></li>"
+                + "<li><p>bullet list entry 2</p>"
                 + "<ul style=\"list-style-type:disc;\">"
                 + "<li><p>bullet list entry 2.1</p></li>"
-                + "<li><p>bullet list entry 2.2</p></li>"
+                + "<li><p>bullet list entry 2.2</p>"
                 + "<ul style=\"list-style-type:disc;\">"
                 + "<li><p>bullet list entry 2.2.1</p></li>"
                 + "<li><p>bullet list entry 2.2.2</p></li>"
-                + "</ul><li><p>bullet list entry 2.3</p></li>"
-                + "</ul>"
+                + "</ul></li><li><p>bullet list entry 2.3</p></li>"
+                + "</ul></li>"
                 + "<li><p>bullet list entry 3</p></li>"
                 + "</ul>",
             docx2Html.html());
@@ -794,16 +860,16 @@ class DocxConverterServiceTest {
         assertEquals(
             "<ol style=\"list-style-type:lower-roman;\">"
                 + "<li><p>lower roman list entry 1</p></li>"
-                + "<li><p>lower roman list entry 2</p></li>"
+                + "<li><p>lower roman list entry 2</p>"
                 + "<ol style=\"list-style-type:lower-roman;\">"
                 + "<li><p>lower roman list entry 2.1</p></li>"
-                + "<li><p>lower roman list entry 2.2</p></li>"
+                + "<li><p>lower roman list entry 2.2</p>"
                 + "<ol style=\"list-style-type:lower-roman;\">"
                 + "<li><p>lower roman list entry 2.2.1</p></li>"
                 + "<li><p>lower roman list entry 2.2.2</p></li>"
-                + "</ol>"
+                + "</ol></li>"
                 + "<li><p>lower roman list entry 2.3</p></li>"
-                + "</ol>"
+                + "</ol></li>"
                 + "<li><p>lower roman list entry 3</p></li>"
                 + "</ol>",
             docx2Html.html());
@@ -875,14 +941,14 @@ class DocxConverterServiceTest {
         assertEquals(
             "<ol style=\"list-style-type:upper-roman;\">"
                 + "<li><p>upper roman list entry 1</p></li>"
-                + "<li><p>upper roman list entry 2</p></li>"
+                + "<li><p>upper roman list entry 2</p>"
                 + "<ol style=\"list-style-type:upper-roman;\">"
                 + "<li><p>upper roman list entry 2.1</p></li>"
-                + "<li><p>upper roman list entry 2.2</p></li>"
+                + "<li><p>upper roman list entry 2.2</p>"
                 + "<ol style=\"list-style-type:upper-roman;\">"
                 + "<li><p>upper roman list entry 2.2.1</p></li>"
-                + "<li><p>upper roman list entry 2.2.2</p></li></ol>"
-                + "<li><p>upper roman list entry 2.3</p></li></ol>"
+                + "<li><p>upper roman list entry 2.2.2</p></li></ol></li>"
+                + "<li><p>upper roman list entry 2.3</p></li></ol></li>"
                 + "<li><p>upper roman list entry 3</p></li>"
                 + "</ol>",
             docx2Html.html());
@@ -954,16 +1020,16 @@ class DocxConverterServiceTest {
         assertEquals(
             "<ol style=\"list-style-type:lower-latin;\">"
                 + "<li><p>lower letter list entry 1</p></li>"
-                + "<li><p>lower letter list entry 2</p></li>"
+                + "<li><p>lower letter list entry 2</p>"
                 + "<ol style=\"list-style-type:lower-latin;\">"
                 + "<li><p>lower letter list entry 2.1</p></li>"
-                + "<li><p>lower letter list entry 2.2</p></li>"
+                + "<li><p>lower letter list entry 2.2</p>"
                 + "<ol style=\"list-style-type:lower-latin;\">"
                 + "<li><p>lower letter list entry 2.2.1</p></li>"
                 + "<li><p>lower letter list entry 2.2.2</p></li>"
-                + "</ol>"
+                + "</ol></li>"
                 + "<li><p>lower letter list entry 2.3</p></li>"
-                + "</ol>"
+                + "</ol></li>"
                 + "<li><p>lower letter list entry 3</p></li>"
                 + "</ol>",
             docx2Html.html());
@@ -1035,16 +1101,16 @@ class DocxConverterServiceTest {
         assertEquals(
             "<ol style=\"list-style-type:upper-latin;\">"
                 + "<li><p>upper letter list entry 1</p></li>"
-                + "<li><p>upper letter list entry 2</p></li>"
+                + "<li><p>upper letter list entry 2</p>"
                 + "<ol style=\"list-style-type:upper-latin;\">"
                 + "<li><p>upper letter list entry 2.1</p></li>"
-                + "<li><p>upper letter list entry 2.2</p></li>"
+                + "<li><p>upper letter list entry 2.2</p>"
                 + "<ol style=\"list-style-type:upper-latin;\">"
                 + "<li><p>upper letter list entry 2.2.1</p></li>"
                 + "<li><p>upper letter list entry 2.2.2</p></li>"
-                + "</ol>"
+                + "</ol></li>"
                 + "<li><p>upper letter list entry 2.3</p></li>"
-                + "</ol>"
+                + "</ol></li>"
                 + "<li><p>upper letter list entry 3</p></li>"
                 + "</ol>",
             docx2Html.html());
@@ -1113,16 +1179,16 @@ class DocxConverterServiceTest {
         assertEquals(
             "<ol style=\"list-style-type:decimal;\">"
                 + "<li><p>decimal list entry 1</p></li>"
-                + "<li><p>decimal list entry 2</p></li>"
+                + "<li><p>decimal list entry 2</p>"
                 + "<ol style=\"list-style-type:decimal;\">"
                 + "<li><p>decimal list entry 2.1</p></li>"
-                + "<li><p>decimal list entry 2.2</p></li>"
+                + "<li><p>decimal list entry 2.2</p>"
                 + "<ol style=\"list-style-type:decimal;\">"
                 + "<li><p>decimal list entry 2.2.1</p></li>"
                 + "<li><p>decimal list entry 2.2.2</p></li>"
-                + "</ol>"
+                + "</ol></li>"
                 + "<li><p>decimal list entry 2.3</p></li>"
-                + "</ol>"
+                + "</ol></li>"
                 + "<li><p>decimal list entry 3</p></li>"
                 + "</ol>",
             docx2Html.html());
@@ -1197,19 +1263,19 @@ class DocxConverterServiceTest {
         assertEquals(
             "<ol style=\"list-style-type:decimal;\">"
                 + "<li><p>list entry 1</p></li>"
-                + "<li><p>list entry 2</p></li>"
+                + "<li><p>list entry 2</p>"
                 + "<ul style=\"list-style-type:disc;\">"
                 + "<li><p>list entry 2.1</p></li>"
-                + "<li><p>list entry 2.2</p></li>"
+                + "<li><p>list entry 2.2</p>"
                 + "<ol style=\"list-style-type:decimal;\">"
                 + "<li><p>list entry 2.2.1</p></li>"
                 + "<li><p>list entry 2.2.2</p></li>"
-                + "</ol>"
-                + "<li><p>list entry 2.3</p></li>"
+                + "</ol></li>"
+                + "<li><p>list entry 2.3</p>"
                 + "<ul style=\"list-style-type:disc;\">"
                 + "<li><p>list entry 2.3.1</p></li>"
-                + "</ul>"
-                + "</ul>"
+                + "</ul></li>"
+                + "</ul></li>"
                 + "<li><p>list entry 3</p></li>"
                 + "</ol>",
             docx2Html.html());

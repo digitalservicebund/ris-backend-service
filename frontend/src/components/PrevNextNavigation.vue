@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Button from "primevue/button"
-import Tooltip from "./Tooltip.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import IcOutlineArrowBack from "~icons/ic/outline-arrow-back"
 import IcOutlineArrowForward from "~icons/ic/outline-arrow-forward"
@@ -34,25 +33,23 @@ const decreaseFileIndex = () => {
 
 <template>
   <FlexContainer v-if="list.length > 1" class="float-end items-center gap-4">
-    <Tooltip text="Zurück">
-      <Button
-        id="decrease"
-        aria-label="Vorheriges Dokument anzeigen"
-        size="small"
-        text
-        @click="decreaseFileIndex"
-        ><template #icon> <IcOutlineArrowBack /> </template
-      ></Button>
-    </Tooltip>
-    <Tooltip text="Weiter">
-      <Button
-        id="increase"
-        aria-label="Nächstes Dokument anzeigen"
-        size="small"
-        text
-        @click="incrementFileIndex"
-        ><template #icon> <IcOutlineArrowForward /> </template
-      ></Button>
-    </Tooltip>
+    <Button
+      id="decrease"
+      v-tooltip.bottom="'Zurück'"
+      aria-label="Vorheriges Dokument anzeigen"
+      size="small"
+      text
+      @click="decreaseFileIndex"
+      ><template #icon> <IcOutlineArrowBack /> </template
+    ></Button>
+    <Button
+      id="increase"
+      v-tooltip.bottom="'Weiter'"
+      aria-label="Nächstes Dokument anzeigen"
+      size="small"
+      text
+      @click="incrementFileIndex"
+      ><template #icon> <IcOutlineArrowForward /> </template
+    ></Button>
   </FlexContainer>
 </template>

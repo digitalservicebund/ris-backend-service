@@ -14,7 +14,6 @@ import { DocumentType } from "@/domain/documentType"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
@@ -47,9 +46,6 @@ function renderComponent(ensuingDecisions?: EnsuingDecision[]) {
     user,
     ...render(EnsuingDecisions, {
       global: {
-        directives: {
-          "ctrl-enter": onSearchShortcutDirective,
-        },
         plugins: [
           [
             createTestingPinia({
@@ -78,6 +74,7 @@ function renderComponent(ensuingDecisions?: EnsuingDecision[]) {
 
 function generateEnsuingDecision(options?: {
   uuid?: string
+  localId?: string
   documentNumber?: string
   court?: Court
   decisionDate?: string
@@ -87,7 +84,8 @@ function generateEnsuingDecision(options?: {
   note?: string
 }) {
   const ensuingDecision = new EnsuingDecision({
-    uuid: options?.uuid ?? crypto.randomUUID(),
+    uuid: options?.uuid,
+    localId: options?.localId ?? "0",
     documentNumber: options?.documentNumber ?? undefined,
     court: options?.court ?? {
       type: "type1",
@@ -306,8 +304,12 @@ describe("EnsuingDecisions", () => {
 
   it("correctly deletes ensuing decision", async () => {
     const { user } = renderComponent([
-      generateEnsuingDecision(),
-      generateEnsuingDecision(),
+      generateEnsuingDecision({
+        localId: "0",
+      }),
+      generateEnsuingDecision({
+        localId: "test1",
+      }),
     ])
     const ensuingDecisions = screen.getAllByLabelText("Listen Eintrag")
     expect(ensuingDecisions.length).toBe(2)
@@ -384,7 +386,10 @@ describe("EnsuingDecisions", () => {
   })
 
   it("displays error in list and edit component when fields missing", async () => {
-    const ensuingDecisions: EnsuingDecision[] = [generateEnsuingDecision()]
+    // errors only displayed, when entry was already saved to backend
+    const ensuingDecisions: EnsuingDecision[] = [
+      generateEnsuingDecision({ uuid: "id-from-backend" }),
+    ]
     const { user } = renderComponent(ensuingDecisions)
     await user.click(screen.getByTestId("list-entry-0"))
 

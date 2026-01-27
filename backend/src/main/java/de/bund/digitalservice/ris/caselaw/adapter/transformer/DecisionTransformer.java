@@ -1,6 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.NormReferenceType;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbstractNormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbuseFeeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CountryOfOriginDto;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO.DecisionDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
@@ -12,24 +16,35 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ForeignLanguageVersionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.IncomeTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NonApplicationNormDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ObjectValueDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
+import de.bund.digitalservice.ris.caselaw.domain.AbuseFee;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
+import de.bund.digitalservice.ris.caselaw.domain.CountryOfOrigin;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.Definition;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
+import de.bund.digitalservice.ris.caselaw.domain.IncomeType;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.ObjectValue;
+import de.bund.digitalservice.ris.caselaw.domain.OriginOfTranslation;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
@@ -106,7 +121,8 @@ public class DecisionTransformer extends DocumentableTransformer {
 
       addDeviatingDocumentNumbers(builder, coreData, currentDto);
       addFileNumbers(builder, coreData, currentDto);
-      addDeviationCourts(builder, coreData);
+      addDeviatingCourts(builder, coreData);
+      addCourtBranchLocation(builder, coreData);
       addDeviatingDecisionDates(builder, coreData);
       addDeviatingFileNumbers(builder, coreData, currentDto);
       addSources(currentDto, builder, updatedDomainObject);
@@ -138,7 +154,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       addCollectiveAgreements(builder, contentRelatedIndexing);
       builder.hasLegislativeMandate(contentRelatedIndexing.hasLegislativeMandate());
       builder.evsf(contentRelatedIndexing.evsf());
-      addForeignLanguageVersions(currentDto, builder, contentRelatedIndexing);
+      addForeignLanguageVersions(builder, contentRelatedIndexing);
       if (contentRelatedIndexing.appealAdmission() == null) {
         builder.appealAdmitted(null);
         builder.appealAdmittedBy(null);
@@ -147,6 +163,13 @@ public class DecisionTransformer extends DocumentableTransformer {
         builder.appealAdmittedBy(contentRelatedIndexing.appealAdmission().by());
       }
       builder.appeal(AppealTransformer.transformToDTO(currentDto, contentRelatedIndexing.appeal()));
+      addOriginOfTranslations(builder, contentRelatedIndexing);
+      addObjectValues(builder, contentRelatedIndexing);
+      addAbuseFees(builder, contentRelatedIndexing);
+      addCountriesOfOrigin(builder, contentRelatedIndexing);
+      addIncomeTypes(builder, contentRelatedIndexing);
+      addRelatedPendingProceedings(builder, contentRelatedIndexing);
+      addNonApplicationNorms(builder, contentRelatedIndexing);
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -253,7 +276,8 @@ public class DecisionTransformer extends DocumentableTransformer {
         .participatingJudges(
             ParticipatingJudgeTransformer.transformToDTO(longTexts.participatingJudges()))
         .otherLongText(longTexts.otherLongText())
-        .outline(longTexts.outline());
+        .outline(longTexts.outline())
+        .corrections(CorrectionTransformer.transformToDTOs(longTexts.corrections()));
   }
 
   private static void addShortTexts(
@@ -291,9 +315,9 @@ public class DecisionTransformer extends DocumentableTransformer {
             .map(ActiveCitationTransformer::transformToDTO)
             .filter(Objects::nonNull)
             .map(
-                previousDecisionDTO -> {
-                  previousDecisionDTO.setRank(i.getAndIncrement());
-                  return previousDecisionDTO;
+                dto -> {
+                  dto.setRank(i.getAndIncrement());
+                  return dto;
                 })
             .toList());
   }
@@ -327,7 +351,7 @@ public class DecisionTransformer extends DocumentableTransformer {
             .map(
                 def ->
                     DefinitionDTO.builder()
-                        .id(def.newEntry() ? null : def.id())
+                        .id(def.id())
                         .value(def.definedTerm())
                         .borderNumber(def.definingBorderNumber())
                         .rank(definitions.indexOf(def) + 1L)
@@ -380,12 +404,14 @@ public class DecisionTransformer extends DocumentableTransformer {
     }
 
     List<CollectiveAgreementDTO> collectiveAgreementDTOS = new ArrayList<>();
-    List<String> collectiveAgreements =
+    List<CollectiveAgreement> collectiveAgreements =
         contentRelatedIndexing.collectiveAgreements().stream().distinct().toList();
 
     for (int i = 0; i < collectiveAgreements.size(); i++) {
-      collectiveAgreementDTOS.add(
-          CollectiveAgreementDTO.builder().value(collectiveAgreements.get(i)).rank(i + 1L).build());
+      var collectiveAgreement = collectiveAgreements.get(i);
+      var dto = CollectiveAgreementTransformer.transformToDTO(collectiveAgreement);
+      dto.setRank(i + 1L);
+      collectiveAgreementDTOS.add(dto);
     }
 
     builder.collectiveAgreements(collectiveAgreementDTOS);
@@ -534,9 +560,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   }
 
   private static void addForeignLanguageVersions(
-      DecisionDTO currentDto,
-      DecisionDTOBuilder<?, ?> builder,
-      ContentRelatedIndexing contentRelatedIndexing) {
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
     if (contentRelatedIndexing.foreignLanguageVersions() == null) {
       return;
     }
@@ -547,17 +571,113 @@ public class DecisionTransformer extends DocumentableTransformer {
 
     for (int i = 0; i < foreignLanguageVersions.size(); i++) {
       foreignLanguageVersionDTOs.add(
-          ForeignLanguageVersionDTO.builder()
-              .documentationUnit(currentDto)
-              .url(foreignLanguageVersions.get(i).link())
-              .languageCode(
-                  LanguageCodeTransformer.transformToDTO(
-                      foreignLanguageVersions.get(i).languageCode()))
-              .rank(i + 1L)
-              .build());
+          ForeignLanguageTransformer.transformToDTO(foreignLanguageVersions.get(i), i));
     }
 
     builder.foreignLanguageVersions(foreignLanguageVersionDTOs);
+  }
+
+  private static void addOriginOfTranslations(
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.originOfTranslations() == null) {
+      return;
+    }
+
+    List<OriginOfTranslationDTO> originOfTranslationDTOS = new ArrayList<>();
+    List<OriginOfTranslation> originOfTranslations = contentRelatedIndexing.originOfTranslations();
+
+    for (int i = 0; i < originOfTranslations.size(); i++) {
+      originOfTranslationDTOS.add(
+          OriginOfTranslationTransformer.transformToDTO(originOfTranslations.get(i), i));
+    }
+
+    builder.originOfTranslations(originOfTranslationDTOS);
+  }
+
+  private static void addObjectValues(
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.objectValues() == null) {
+      return;
+    }
+
+    List<ObjectValueDTO> objectValueDTOS = new ArrayList<>();
+    List<ObjectValue> objectValues = contentRelatedIndexing.objectValues();
+
+    for (int i = 0; i < objectValues.size(); i++) {
+      objectValueDTOS.add(ObjectValueTransformer.transformToDTO(objectValues.get(i), i));
+    }
+
+    builder.objectValues(objectValueDTOS);
+  }
+
+  private static void addAbuseFees(
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.abuseFees() == null) {
+      return;
+    }
+
+    List<AbuseFeeDTO> abuseFeeDTOS = new ArrayList<>();
+    List<AbuseFee> abuseFees = contentRelatedIndexing.abuseFees();
+
+    for (int i = 0; i < abuseFees.size(); i++) {
+      abuseFeeDTOS.add(AbuseFeeTransformer.transformToDTO(abuseFees.get(i), i));
+    }
+
+    builder.abuseFees(abuseFeeDTOS);
+  }
+
+  private static void addCountriesOfOrigin(
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.countriesOfOrigin() == null) {
+      return;
+    }
+
+    List<CountryOfOriginDto> dtos = new ArrayList<>();
+    long nextRank = 1L;
+
+    for (CountryOfOrigin countryOfOrigin : contentRelatedIndexing.countriesOfOrigin()) {
+      dtos.add(CountryOfOriginTransformer.transformToDTO(countryOfOrigin, nextRank));
+      nextRank++;
+    }
+
+    builder.countriesOfOrigin(dtos);
+  }
+
+  private static void addIncomeTypes(
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.incomeTypes() == null) {
+      return;
+    }
+
+    List<IncomeTypeDTO> incomeTypeDTOS = new ArrayList<>();
+    List<IncomeType> incomeTypes = contentRelatedIndexing.incomeTypes();
+
+    for (int i = 0; i < incomeTypes.size(); i++) {
+      var incomeType = incomeTypes.get(i);
+      incomeTypeDTOS.add(
+          IncomeTypeDTO.builder()
+              .typeOfIncome(incomeType.typeOfIncome())
+              .terminology(incomeType.terminology())
+              .rank(i + 1L)
+              .id(incomeType.id())
+              .build());
+    }
+
+    builder.incomeTypes(incomeTypeDTOS);
+  }
+
+  private static void addNonApplicationNorms(
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.nonApplicationNorms() == null) {
+      return;
+    }
+
+    builder.nonApplicationNorms(
+        (List<NonApplicationNormDTO>)
+            (List<? extends AbstractNormReferenceDTO>)
+                NormReferenceTransformer.transformToDTO(
+                    contentRelatedIndexing.nonApplicationNorms(),
+                    NormReferenceType.NON_APPLICATION_NORM));
   }
 
   public static Decision transformToDomain(DecisionDTO decisionDTO) {
@@ -644,6 +764,12 @@ public class DecisionTransformer extends DocumentableTransformer {
             ParticipatingJudgeTransformer.transformToDomain(decisionDTO.getParticipatingJudges()))
         .otherLongText(decisionDTO.getOtherLongText())
         .outline(decisionDTO.getOutline())
+        .corrections(
+            decisionDTO.getCorrections() != null
+                ? decisionDTO.getCorrections().stream()
+                    .map(CorrectionTransformer::transformToDomain)
+                    .toList()
+                : null)
         .build();
   }
 
@@ -680,6 +806,7 @@ public class DecisionTransformer extends DocumentableTransformer {
     return coreDataBuilder.build();
   }
 
+  @SuppressWarnings("java:S3776")
   private static ContentRelatedIndexing buildContentRelatedIndexing(DecisionDTO decisionDTO) {
     ContentRelatedIndexing.ContentRelatedIndexingBuilder contentRelatedIndexingBuilder =
         DocumentableTransformer.buildContentRelatedIndexing(decisionDTO).toBuilder();
@@ -710,11 +837,10 @@ public class DecisionTransformer extends DocumentableTransformer {
     }
 
     if (decisionDTO.getCollectiveAgreements() != null) {
-      List<String> collectiveAgreements =
+      contentRelatedIndexingBuilder.collectiveAgreements(
           decisionDTO.getCollectiveAgreements().stream()
-              .map(CollectiveAgreementDTO::getValue)
-              .toList();
-      contentRelatedIndexingBuilder.collectiveAgreements(collectiveAgreements);
+              .map(CollectiveAgreementTransformer::transformToDomain)
+              .toList());
     }
 
     if (decisionDTO.getDefinitions() != null) {
@@ -754,6 +880,59 @@ public class DecisionTransformer extends DocumentableTransformer {
 
     contentRelatedIndexingBuilder.appeal(
         AppealTransformer.transformToDomain(decisionDTO.getAppeal()));
+
+    if (decisionDTO.getOriginOfTranslations() != null) {
+      List<OriginOfTranslation> originOfTranslations =
+          decisionDTO.getOriginOfTranslations().stream()
+              .map(OriginOfTranslationTransformer::transformToDomain)
+              .toList();
+      contentRelatedIndexingBuilder.originOfTranslations(originOfTranslations);
+    }
+
+    if (decisionDTO.getObjectValues() != null) {
+      List<ObjectValue> objectValues =
+          decisionDTO.getObjectValues().stream()
+              .map(ObjectValueTransformer::transformToDomain)
+              .toList();
+      contentRelatedIndexingBuilder.objectValues(objectValues);
+    }
+
+    if (decisionDTO.getAbuseFees() != null) {
+      List<AbuseFee> abuseFees =
+          decisionDTO.getAbuseFees().stream().map(AbuseFeeTransformer::transformToDomain).toList();
+      contentRelatedIndexingBuilder.abuseFees(abuseFees);
+    }
+
+    if (decisionDTO.getCountriesOfOrigin() != null) {
+      contentRelatedIndexingBuilder.countriesOfOrigin(
+          decisionDTO.getCountriesOfOrigin().stream()
+              .map(CountryOfOriginTransformer::transformToDomain)
+              .toList());
+    }
+
+    if (decisionDTO.getIncomeTypes() != null) {
+      List<IncomeType> incomeTypes =
+          decisionDTO.getIncomeTypes().stream()
+              .map(
+                  it ->
+                      IncomeType.builder()
+                          .typeOfIncome(it.getTypeOfIncome())
+                          .terminology(it.getTerminology())
+                          .id(it.getId())
+                          .build())
+              .toList();
+      contentRelatedIndexingBuilder.incomeTypes(incomeTypes);
+    }
+
+    if (decisionDTO.getRelatedPendingProceedings() != null) {
+      contentRelatedIndexingBuilder.relatedPendingProceedings(
+          getRelatedPendingProceedings(decisionDTO));
+    }
+
+    if (decisionDTO.getNonApplicationNorms() != null) {
+      contentRelatedIndexingBuilder.nonApplicationNorms(
+          NormReferenceTransformer.transformToDomain(decisionDTO.getNonApplicationNorms()));
+    }
 
     return contentRelatedIndexingBuilder.build();
   }
@@ -865,5 +1044,32 @@ public class DecisionTransformer extends DocumentableTransformer {
                   .build();
             })
         .toList();
+  }
+
+  static List<RelatedPendingProceeding> getRelatedPendingProceedings(DecisionDTO decisionDTO) {
+    if (decisionDTO.getRelatedPendingProceedings() == null) {
+      return List.of();
+    }
+
+    return decisionDTO.getRelatedPendingProceedings().stream()
+        .map(RelatedPendingProceedingTransformer::transformToDomain)
+        .toList();
+  }
+
+  static void addRelatedPendingProceedings(
+      DecisionDTO.DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing updatedDomainObject) {
+    if (updatedDomainObject.relatedPendingProceedings() != null) {
+      AtomicInteger i = new AtomicInteger(1);
+      builder.relatedPendingProceedings(
+          updatedDomainObject.relatedPendingProceedings().stream()
+              .map(RelatedPendingProceedingTransformer::transformToDTO)
+              .filter(Objects::nonNull)
+              .map(
+                  relatedPendingProceedingDTO -> {
+                    relatedPendingProceedingDTO.setRank(i.getAndIncrement());
+                    return relatedPendingProceedingDTO;
+                  })
+              .toList());
+    }
   }
 }

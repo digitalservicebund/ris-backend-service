@@ -30,7 +30,9 @@ async function verifyDocUnitOpensInEditMode(
   await expect(
     newTab.getByLabel("Entscheidungsdatum", { exact: true }),
   ).toHaveValue(formattedDate)
-  await expect(newTab.getByTestId("chip-value")).toHaveText(randomFileNumber)
+  await expect(
+    newTab.getByLabel("Aktenzeichen").getByRole("listitem"),
+  ).toHaveText(randomFileNumber)
   await expect(newTab.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
     "Anerkenntnisurteil",
   )
@@ -170,6 +172,7 @@ test.describe(
         })
       },
     )
+
     test(
       "Docoffice is empty and has to be set manually when new decision has empty court",
       {
@@ -242,9 +245,9 @@ test.describe(
           await expect(
             newTab.getByLabel("Entscheidungsdatum", { exact: true }),
           ).toHaveValue(formattedDate)
-          await expect(newTab.getByTestId("chip-value")).toHaveText(
-            "some new value",
-          )
+          await expect(
+            newTab.getByLabel("Aktenzeichen").getByRole("listitem"),
+          ).toHaveText("some new value")
           await expect(
             newTab.getByLabel("Dokumenttyp", { exact: true }),
           ).toHaveValue("Anerkenntnisurteil")
@@ -295,6 +298,7 @@ test.describe(
         await deleteDocumentUnit(page, documentNumber)
       },
     )
+    // eslint-disable-next-line playwright/consistent-spacing-between-blocks
     ;[
       {
         type: "Rechtsprechung",

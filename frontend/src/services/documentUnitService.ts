@@ -156,6 +156,14 @@ const service: DocumentUnitService = {
   },
 
   async update(documentUnitUuid: string, patch: RisJsonPatch) {
+    // Check size limit in advance to avoid an incomprehensible 400-status response due to the api limit
+    const MAX_BYTES = 12 * 1024 * 1024 // 12 MB
+    const patchJson = JSON.stringify(patch)
+    const totalBytes = new Blob([patchJson]).size
+    if (totalBytes > MAX_BYTES) {
+      throw new Error(errorMessages.PATCH_SIZE_TOO_BIG.title)
+    }
+
     const response = await httpClient.patch<
       RisJsonPatch,
       RisJsonPatch | FailedValidationServerResponse

@@ -137,9 +137,7 @@ describe("Texts", () => {
         outline: "outline",
       },
     )
-    expect(
-      screen.getByRole("textbox", { name: "Entscheidungsnamen" }),
-    ).toBeVisible()
+    expect(screen.getByTestId("Entscheidungsnamen")).toBeVisible()
     expect(screen.getByLabelText("Titelzeile Button Leiste")).toBeVisible()
     expect(screen.getByLabelText("Leitsatz Button Leiste")).toBeVisible()
     expect(
@@ -183,7 +181,11 @@ describe("Texts", () => {
       },
     )
 
-    const excludeLabels = ["decisionNames", "participatingJudges"]
+    const excludeLabels = [
+      "decisionNames",
+      "participatingJudges",
+      "corrections",
+    ]
 
     Object.keys({ ...shortTextLabels, ...longTextLabels })
       .filter((category) => !excludeLabels.includes(category))

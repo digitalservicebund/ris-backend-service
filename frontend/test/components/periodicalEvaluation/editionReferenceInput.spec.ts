@@ -1,13 +1,18 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { http, HttpResponse } from "msw"
+import { setupServer } from "msw/node"
 import { setActivePinia } from "pinia"
 import { createRouter, createWebHistory } from "vue-router"
+import { SourceValue } from "./../../../src/domain/source"
 import PeriodicalEditionReferenceInput from "@/components/periodical-evaluation/references/PeriodicalEditionReferenceInput.vue"
+import { Decision } from "@/domain/decision"
+import DocumentationOffice from "@/domain/documentationOffice"
+import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 // Mock the stores
@@ -27,6 +32,23 @@ vi.mock("@/stores/useEditionStore", () => ({
 const scrollIntoViewportByIdMock = vi.fn()
 const openSidePanelAndScrollToSectionMock = vi.fn()
 
+const dsDocOffice: DocumentationOffice = {
+  id: "456",
+  abbreviation: "DS",
+}
+
+const server = setupServer(
+  http.get("/api/v1/caselaw/documentationoffices", () =>
+    HttpResponse.json([dsDocOffice]),
+  ),
+  http.get("/api/v1/caselaw/courts", () => {
+    return HttpResponse.json([])
+  }),
+  http.get("/api/v1/caselaw/documenttypes", () => {
+    return HttpResponse.json([])
+  }),
+)
+
 vi.mock("@/composables/useScroll", () => ({
   useScroll: () => ({
     scrollIntoViewportById: scrollIntoViewportByIdMock,
@@ -34,7 +56,11 @@ vi.mock("@/composables/useScroll", () => ({
   }),
 }))
 
-function renderComponent() {
+function renderComponent(
+  options: {
+    modelValue?: Reference
+  } = {},
+) {
   const user = userEvent.setup()
 
   const router = createRouter({
@@ -45,10 +71,10 @@ function renderComponent() {
     user,
     ...render(PeriodicalEditionReferenceInput, {
       props: {
+        modelValue: options.modelValue ?? undefined,
         modelValueList: [],
       },
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           router,
           [
@@ -66,8 +92,11 @@ function renderComponent() {
 }
 
 describe("Legal periodical edition reference input", () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
   beforeEach(() => {
     // Activate Pinia
+    vi.restoreAllMocks()
     setActivePinia(createTestingPinia())
 
     // Mock the searchByRelatedDocumentation method
@@ -133,5 +162,75 @@ describe("Legal periodical edition reference input", () => {
 
     // onmounted, on search results and on validation error
     expect(scrollIntoViewportByIdMock).toHaveBeenCalledTimes(3)
+  })
+
+  test("adding a reference from a newly created documentation unit uses backend reference ID and builds citation", async () => {
+    const { user, emitted } = renderComponent({
+      modelValue: new Reference({
+        citation: "3",
+        referenceSupplement: "L",
+        legalPeriodical: { uuid: "123", title: "Test Zeitschrift" },
+      }),
+    })
+    await user.type(await screen.findByLabelText("Aktenzeichen"), "test")
+    await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
+    await user.click(screen.getByLabelText("Dokumentationsstelle auswählen"))
+    await user.click(screen.getByText("DS"))
+    expect(screen.getByLabelText("Dokumentationsstelle auswählen")).toHaveValue(
+      "DS",
+    )
+
+    const createNewButton = await screen.findByLabelText(
+      "Dokumentationseinheit erstellen",
+    )
+    expect(createNewButton).toBeInTheDocument()
+    vi.spyOn(documentUnitService, "createNew").mockResolvedValue({
+      status: 200,
+      data: new Decision("foo", {
+        documentNumber: "1234567891234",
+        coreData: {
+          fileNumbers: ["AZ 123"],
+          sources: [
+            {
+              value: SourceValue.Zeitschrift,
+              reference: new Reference({
+                id: "123",
+                citation: "3",
+                referenceSupplement: "L",
+                legalPeriodical: { uuid: "123", title: "Test Zeitschrift" },
+                legalPeriodicalRawValue: "A&G",
+                referenceType: "caselaw",
+                primaryReference: false,
+              }),
+            },
+          ],
+        },
+      }),
+    })
+    window.open = vi.fn()
+
+    await user.click(createNewButton)
+
+    expect(emitted()["update:modelValue"]).toEqual(
+      expect.arrayContaining([
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: "123",
+            citation: "3",
+            referenceSupplement: "L",
+            referenceType: "caselaw",
+            legalPeriodical: { uuid: "123", title: "Test Zeitschrift" },
+
+            documentationUnit: expect.objectContaining({
+              uuid: "foo",
+              documentNumber: "1234567891234",
+              fileNumber: "AZ 123",
+              createdByReference: "123",
+            }),
+          }),
+        ]),
+      ]),
+    )
+    expect(emitted()).toHaveProperty("addEntry")
   })
 })

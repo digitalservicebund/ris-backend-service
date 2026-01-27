@@ -4,11 +4,15 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import jsonPatch from "fast-json-patch"
 import { Page as Pagination } from "@/components/Pagination.vue"
+import { Addressee } from "@/domain/abuseFee"
 import { AppealAdmitter } from "@/domain/appealAdmitter"
 import { Decision } from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import { TypeOfIncome } from "@/domain/incomeType"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import { ProceedingType } from "@/domain/objectValue"
+import { TranslationType } from "@/domain/originOfTranslation"
 import PendingProceeding from "@/domain/pendingProceeding"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { SourceValue } from "@/domain/source"
@@ -34,6 +38,7 @@ type MyFixtures = {
   prefilledDocumentUnitWithReferences: Decision
   prefilledDocumentUnitWithTexts: Decision
   prefilledDocumentUnitWithManyReferences: Decision
+  prefilledDocumentUnitWithLegacyCountryOfOrigin: Decision
   pendingProceeding: PendingProceeding
   prefilledPendingProceeding: PendingProceeding
   /** Define fixture option "decisionsToBeCreated" to define the decisions to be generated */
@@ -151,7 +156,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     const citationType = await citationTypeResponse.json()
 
     const fieldsOfLawResponse = await request.get(
-      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01`,
+      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01&sz=200&pg=0`,
     )
     const fieldsOfLaw = await fieldsOfLawResponse.json()
     const documentTypeResponse = await request.get(
@@ -248,7 +253,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     const normAbbreviation = await normAbbreviationResponse.json()
 
     const fieldsOfLawResponse = await request.get(
-      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01`,
+      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01&sz=200&pg=0`,
     )
     const fieldsOfLaw = await fieldsOfLawResponse.json()
     const documentTypeResponse = await request.get(
@@ -381,7 +386,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           },
           caselawReferences: [
             {
-              id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -391,7 +395,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           ],
           literatureReferences: [
             {
-              id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical?.[0],
@@ -463,7 +466,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           },
           caselawReferences: [
             {
-              id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -471,7 +473,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "caselaw",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -479,7 +480,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "caselaw",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -487,7 +487,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "caselaw",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -495,7 +494,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "caselaw",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -503,7 +501,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "caselaw",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -513,7 +510,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           ],
           literatureReferences: [
             {
-              id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical?.[0],
@@ -522,7 +518,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "literature",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical?.[0],
@@ -531,7 +526,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "literature",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical?.[0],
@@ -540,7 +534,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "literature",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical?.[0],
@@ -549,7 +542,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "literature",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical?.[0],
@@ -558,7 +550,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               referenceType: "literature",
             },
             {
-              id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical?.[0],
@@ -593,10 +584,23 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
     const court = await courtResponse.json()
 
+    const courtBFHResponse = await request.get(`api/v1/caselaw/courts?q=BFH`)
+    const courtBFH = await courtBFHResponse.json()
+
     const documentTypeResponse = await request.get(
       `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
     )
     const documentType = await documentTypeResponse.json()
+
+    const fieldsOfLawResponse = await request.get(
+      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=RE-07-DEU&sz=200&pg=0`,
+    )
+    const country = await fieldsOfLawResponse.json()
+
+    const normAbbreviationResponse = await request.get(
+      `api/v1/caselaw/normabbreviation/search?q=BGB&sz=30&pg=0`,
+    )
+    const normAbbreviation = await normAbbreviationResponse.json()
 
     const updateResponse = await request.put(
       `/api/v1/caselaw/documentunits/${prefilledDocumentUnitWithLongTexts.uuid}`,
@@ -627,6 +631,12 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             participatingJudges: [{ name: "Test Richter" }],
             otherLongText: "Test Sonstiger Langtext",
             outline: "Test Gliederung",
+            corrections: [
+              {
+                type: "Berichtigungsbeschluss",
+                description: "Hauffen -> Haufen",
+              },
+            ],
           },
           contentRelatedIndexing: {
             evsf: "Test E-VSF",
@@ -634,9 +644,8 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               {
                 definedTerm: "Test Definition",
                 definingBorderNumber: 2,
-                newEntry: true,
               },
-              { definedTerm: "Test Definition2", newEntry: true },
+              { definedTerm: "Test Definition2" },
             ],
             foreignLanguageVersions: [
               {
@@ -646,7 +655,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                   label: "Akan",
                   isoCode: "ak",
                 },
-                newEntry: true,
               },
               {
                 link: "Test Fremdsprachige Fassung2",
@@ -655,7 +663,19 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
                   label: "Afar",
                   isoCode: "aa",
                 },
-                newEntry: true,
+              },
+            ],
+            originOfTranslations: [
+              {
+                languageCode: {
+                  id: "5a36047e-3b85-52a2-812b-02420b4a8499",
+                  label: "Französisch",
+                  isoCode: "fr",
+                },
+                translators: ["Maxi Muster"],
+                borderNumbers: [1],
+                urls: ["www.link-to-translation.fr"],
+                translationType: TranslationType.AMTLICH,
               },
             ],
             dismissalTypes: ["Test Kündigungsarten"],
@@ -668,9 +688,70 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             },
             appeal: {
               appellants: [
-                { id: "37213474-a727-4d85-8cc6-309d86944132", value: "Kläger" },
+                {
+                  id: "37213474-a727-4d85-8cc6-309d86944132",
+                  value: "Kläger",
+                },
               ],
             },
+            collectiveAgreements: [
+              {
+                name: "Stehende Bühnen",
+                norm: "§ 23",
+                date: "12.2002",
+                industry: {
+                  id: "290b39dc-9368-4d1c-9076-7f96e05cb575",
+                  label: "Bühne, Theater, Orchester",
+                },
+              },
+            ],
+            objectValues: [
+              {
+                amount: 123,
+                currencyCode: {
+                  id: "c7a92695-5171-459a-bd79-5cc741064a25",
+                  label: "Dollar (USD)",
+                  isoCode: "USD",
+                },
+                proceedingType: ProceedingType.VERFASSUNGSBESCHWERDE,
+              },
+            ],
+            abuseFees: [
+              {
+                amount: 223,
+                currencyCode: {
+                  id: "c7a92695-5171-459a-bd79-5cc741064a25",
+                  label: "Dollar (USD)",
+                  isoCode: "USD",
+                },
+                addressee: Addressee.BEVOLLMAECHTIGTER,
+              },
+            ],
+            countriesOfOrigin: [
+              {
+                country: country?.[0],
+              },
+            ],
+            incomeTypes: [
+              {
+                terminology: "Programmierer",
+                typeOfIncome: TypeOfIncome.GEWERBEBETRIEB,
+              },
+            ],
+            relatedPendingProceedings: [
+              {
+                documentNumber: "YYTestDoc0017",
+                court: courtBFH?.[0],
+                decisionDate: "2022-02-01",
+                fileNumber: "IV R 99/99",
+              },
+            ],
+            nonApplicationNorms: [
+              {
+                normAbbreviation: normAbbreviation?.[0],
+                singleNorms: [{ singleNorm: "§ 1" }],
+              },
+            ],
           },
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
@@ -684,6 +765,64 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
       prefilledDocumentUnitWithLongTexts.uuid,
       csrfToken,
       prefilledDocumentUnitWithLongTexts.documentNumber,
+    )
+  },
+
+  prefilledDocumentUnitWithLegacyCountryOfOrigin: async (
+    { request, context },
+    use,
+  ) => {
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+    const response = await context.request.put(
+      `/api/v1/caselaw/documentunits/new`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+    const documentUnit = await response.json()
+
+    const courtResponse = await context.request.get(
+      `api/v1/caselaw/courts?q=AG+Aachen`,
+    )
+    const court = await courtResponse.json()
+
+    const documentTypeResponse = await context.request.get(
+      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
+    )
+    const documentType = await documentTypeResponse.json()
+
+    const updateResponse = await context.request.put(
+      `/api/v1/caselaw/documentunits/${documentUnit.uuid}`,
+      {
+        data: {
+          ...documentUnit,
+          coreData: {
+            ...documentUnit.coreData,
+            court: court?.[0],
+            documentType: documentType?.[0],
+            fileNumbers: [generateString()],
+            decisionDate: "2020-01-01",
+          },
+          contentRelatedIndexing: {
+            countriesOfOrigin: [
+              {
+                legacyValue: "legacy value",
+              },
+            ],
+          },
+        } as Decision,
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    await use(await updateResponse.json())
+
+    await deleteWithRetry(
+      request,
+      documentUnit.uuid,
+      csrfToken,
+      documentUnit.documentNumber,
     )
   },
 
@@ -720,7 +859,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             fileNumbers: [generateString()],
             decisionDate: "2020-01-01",
           },
-        },
+        } as Decision,
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
       },
     )
@@ -999,7 +1138,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           name: "2024, " + generateString(),
           references: [
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 12-22, Heft 1",
               referenceSupplement: "L",
@@ -1011,7 +1149,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
@@ -1023,7 +1160,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "literature",
               citation: "2024, 23-25, Heft 1",
               author: "Picard, Jean-Luc",
@@ -1036,7 +1172,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "literature",
               citation: "2024, 26, Heft 1",
               author: "Janeway, Kathryn",
@@ -1157,7 +1292,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           name: "2024, " + generateString(),
           references: [
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 12-22, Heft 1",
               referenceSupplement: "L",
@@ -1169,7 +1303,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
@@ -1181,7 +1314,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
@@ -1193,7 +1325,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
@@ -1205,7 +1336,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               }),
             },
             {
-              id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",

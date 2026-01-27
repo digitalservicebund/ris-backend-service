@@ -1,10 +1,13 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.AttachmentInlineTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.AttachmentTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
@@ -45,10 +48,11 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @Service
 public class S3AttachmentService implements AttachmentService {
   private final AttachmentRepository repository;
+  private final DatabaseAttachmentInlineRepository attachmentInlineRepository;
   private final S3Client s3Client;
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
   private final DocumentationUnitHistoryLogService documentationUnitHistoryLogService;
-
+  private static final String UNKNOWN_YET = "unknown yet";
   private final MediaType wordMediaType =
       MediaType.parseMediaType(
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
@@ -63,10 +67,12 @@ public class S3AttachmentService implements AttachmentService {
 
   public S3AttachmentService(
       AttachmentRepository repository,
+      DatabaseAttachmentInlineRepository attachmentInlineRepository,
       @Qualifier("docxS3Client") S3Client s3Client,
       DatabaseDocumentationUnitRepository documentationUnitRepository,
       DocumentationUnitHistoryLogService documentationUnitHistoryLogService) {
     this.repository = repository;
+    this.attachmentInlineRepository = attachmentInlineRepository;
     this.s3Client = s3Client;
     this.documentationUnitRepository = documentationUnitRepository;
     this.documentationUnitHistoryLogService = documentationUnitHistoryLogService;
@@ -75,7 +81,7 @@ public class S3AttachmentService implements AttachmentService {
   public Attachment attachFileToDocumentationUnit(
       UUID documentationUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders, User user) {
     String fileName =
-        httpHeaders.containsKey("X-Filename")
+        httpHeaders.containsHeader("X-Filename")
             ? httpHeaders.getFirst("X-Filename")
             : "Kein Dateiname gefunden";
 
@@ -105,21 +111,22 @@ public class S3AttachmentService implements AttachmentService {
 
   private Attachment attachImage(
       ByteBuffer byteBuffer, MediaType contentType, DocumentationUnitDTO documentationUnit) {
-    AttachmentDTO attachmentDTO;
-    attachmentDTO =
-        AttachmentDTO.builder()
-            .s3ObjectPath(null)
+
+    AttachmentInlineDTO attachmentInlineDTO =
+        AttachmentInlineDTO.builder()
             .content(byteBuffer.array())
             .documentationUnit(documentationUnit)
             .format(contentType.getSubtype().toLowerCase())
-            .filename("unknown yet")
+            .filename(UNKNOWN_YET)
             .uploadTimestamp(Instant.now())
             .build();
 
-    attachmentDTO = repository.save(attachmentDTO);
-    attachmentDTO.setFilename(attachmentDTO.getId() + "." + attachmentDTO.getFormat());
+    attachmentInlineDTO = attachmentInlineRepository.save(attachmentInlineDTO);
+    var fileName = attachmentInlineDTO.getId() + "." + attachmentInlineDTO.getFormat();
+    attachmentInlineDTO.setFilename(fileName);
+    var persistedAttachmentLineDTO = attachmentInlineRepository.save(attachmentInlineDTO);
 
-    return AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
+    return AttachmentInlineTransformer.transformToDomain(persistedAttachmentLineDTO);
   }
 
   private Attachment attachDocx(
@@ -133,7 +140,7 @@ public class S3AttachmentService implements AttachmentService {
 
     AttachmentDTO attachmentDTO =
         AttachmentDTO.builder()
-            .s3ObjectPath("unknown yet")
+            .s3ObjectPath(UNKNOWN_YET)
             .documentationUnit(documentationUnit)
             .filename(fileName)
             .format("docx")
@@ -142,10 +149,10 @@ public class S3AttachmentService implements AttachmentService {
 
     attachmentDTO = repository.save(attachmentDTO);
 
-    UUID fileUuid = attachmentDTO.getId();
-    putObjectIntoBucket(fileUuid.toString(), byteBuffer, httpHeaders);
+    String s3ObjectPath = attachmentDTO.getId().toString();
+    putObjectIntoBucket(s3ObjectPath, byteBuffer, httpHeaders);
 
-    attachmentDTO.setS3ObjectPath(fileUuid.toString());
+    attachmentDTO.setS3ObjectPath(s3ObjectPath);
 
     Attachment attachment = AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
 
@@ -180,14 +187,14 @@ public class S3AttachmentService implements AttachmentService {
   @Override
   public Optional<Image> findByDocumentationUnitIdAndFileName(
       UUID documentationUnitId, String imageName) {
-    return repository
+    return attachmentInlineRepository
         .findByDocumentationUnitIdAndFilename(documentationUnitId, imageName)
         .map(
-            attachmentDTO ->
+            attachmentInlineDTO ->
                 Image.builder()
-                    .content(attachmentDTO.getContent())
-                    .contentType(attachmentDTO.getFormat())
-                    .name(attachmentDTO.getFilename())
+                    .content(attachmentInlineDTO.getContent())
+                    .contentType(attachmentInlineDTO.getFormat())
+                    .name(attachmentInlineDTO.getFilename())
                     .build());
   }
 

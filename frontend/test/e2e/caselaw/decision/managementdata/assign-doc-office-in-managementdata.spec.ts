@@ -21,6 +21,7 @@ test.describe(
       let documentNumber: string
       const fileNumber = generateString()
       await navigateToSearch(page)
+
       await test.step("Erstelle neue Dokumentationseinheit", async () => {
         await page
           .getByRole("button", {
@@ -40,7 +41,10 @@ test.describe(
 
       // We add a file number to be able to identify the document. If multiple tests run in parallel, the docnumber might be recycled for a new doc unit and makes it seems as it was not deleted.
       await navigateToCategories(page, documentNumber!)
-      await page.getByTestId("chips-input_fileNumber").fill(fileNumber)
+      await page
+        .getByLabel("Aktenzeichen")
+        .getByRole("textbox")
+        .fill(fileNumber)
       await save(page)
 
       await navigateToManagementData(page, documentNumber!)

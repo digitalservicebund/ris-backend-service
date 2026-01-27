@@ -4,6 +4,7 @@ import { API_PREFIX } from "./httpClient"
 import { ComboboxInputModelType, ComboboxItem } from "@/components/input/types"
 import { Page } from "@/components/Pagination.vue"
 import { CitationType } from "@/domain/citationType"
+import { CollectiveAgreementIndustry } from "@/domain/collectiveAgreementIndustry"
 import { Court } from "@/domain/court"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentType } from "@/domain/documentType"
@@ -13,6 +14,7 @@ import { LanguageCode } from "@/domain/foreignLanguageVersion"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
+import { CurrencyCode } from "@/domain/objectValue"
 import { Procedure } from "@/domain/procedure"
 import { User } from "@/domain/user"
 import errorMessages from "@/i18n/errors.json"
@@ -30,6 +32,8 @@ enum Endpoint {
   documentationOffices = `documentationoffices`,
   languageCodes = `languagecodes`,
   usersForDocOffice = "users",
+  collectiveAgreementIndustries = "collective-agreement-industries",
+  currencyCodes = `currencycodes`,
 }
 
 function formatDropdownItems(
@@ -120,6 +124,18 @@ function formatDropdownItems(
         value: item,
       }))
     }
+    case Endpoint.collectiveAgreementIndustries: {
+      return (responseData as CollectiveAgreementIndustry[]).map((item) => ({
+        label: item.label,
+        value: item,
+      }))
+    }
+    case Endpoint.currencyCodes: {
+      return (responseData as CurrencyCode[]).map((item) => ({
+        label: item.label,
+        value: item,
+      }))
+    }
   }
 }
 
@@ -177,9 +193,14 @@ type ComboboxItemService = {
   getDependentLiteratureDocumentTypes: (
     filter: Ref<string | undefined>,
   ) => UseFetchReturn<ComboboxItem[]>
+  getCountryFieldOfLawSearchByIdentifier: (
+    filter: Ref<string | undefined>,
+  ) => UseFetchReturn<ComboboxItem[]>
 }
 
 const service: ComboboxItemService = {
+  getCollectiveAgreementIndustries: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.collectiveAgreementIndustries, filter),
   getCourts: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.courts, filter, 200),
   getCaselawDocumentTypes: (filter: Ref<string | undefined>) =>
@@ -201,7 +222,13 @@ const service: ComboboxItemService = {
       DocumentTypeCategory.DEPENDENT_LITERATURE,
     ),
   getFieldOfLawSearchByIdentifier: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter),
+    fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter, 200),
+  getCountryFieldOfLawSearchByIdentifier: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(
+      Endpoint.fieldOfLawSearchByIdentifier,
+      computed(() => `RE-07-${filter.value?.replace("RE-07-", "") ?? ""}`),
+      1000,
+    ),
   getRisAbbreviations: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.risAbbreviations, filter, 30),
   getCitationTypes: (filter: Ref<string | undefined>) =>
@@ -220,6 +247,8 @@ const service: ComboboxItemService = {
     fetchFromEndpoint(Endpoint.languageCodes, filter),
   getUsersForDocOffice: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.usersForDocOffice, filter),
+  getCurrencyCodes: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.currencyCodes, filter),
 }
 
 export default service

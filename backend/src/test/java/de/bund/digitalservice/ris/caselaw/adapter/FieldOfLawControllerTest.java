@@ -11,7 +11,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -72,17 +72,19 @@ class FieldOfLawControllerTest {
 
   @Test
   void testFieldsOfLawByIdentifier() {
-    when(service.getFieldsOfLawByIdentifierSearch(Optional.of("AR"))).thenReturn(null);
+    when(service.getFieldsOfLawByIdentifierSearch(Optional.of("AR"), PageRequest.ofSize(200)))
+        .thenReturn(null);
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR")
+        .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR&sz=200&pg=0")
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).getFieldsOfLawByIdentifierSearch(Optional.of("AR"));
+    verify(service, times(1))
+        .getFieldsOfLawByIdentifierSearch(Optional.of("AR"), PageRequest.ofSize(200));
   }
 
   @Test

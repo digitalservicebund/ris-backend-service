@@ -82,13 +82,17 @@ test.describe(
       await test.step("Check and reset warning on other doc unit", async () => {
         const prefilledDocNumber = prefilledDocumentUnit.documentNumber
         await navigateToManagementData(page, prefilledDocNumber)
+
         await test.step("Duplicate warning should be ignored on other doc unit as well", async () => {
           await expect(page.getByLabel("Warnung ignorieren")).toBeChecked()
         })
+
         await expectNoDuplicateWarning(page)
+
         await test.step("Reset duplicate warning", async () => {
           await page.getByLabel("Warnung ignorieren").uncheck()
         })
+
         await expectDuplicateWarning(page)
       })
     })
@@ -342,8 +346,10 @@ test.describe(
 async function setFileNumberToMatchDocUnit(page: Page, docUnit: Decision) {
   await test.step("Set fileNumber to match existing doc", async () => {
     await page
-      .getByLabel("Aktenzeichen", { exact: true })
+      .getByLabel("Aktenzeichen")
+      .getByRole("textbox")
       .fill(docUnit.coreData.fileNumbers?.[0] ?? "")
+    await page.keyboard.press("Enter")
   })
 }
 
@@ -355,9 +361,9 @@ async function setDeviatingFileNumberToMatchDocUnit(
     await page.getByLabel("Abweichendes Aktenzeichen anzeigen").click()
 
     await page
-      // .getByTestId("chips-input_deviatingFileNumber")
-      .getByLabel("Abweichendes Aktenzeichen", { exact: true })
-      .pressSequentially(docUnit.coreData.fileNumbers?.[0] ?? "")
+      .getByLabel("Abweichendes Aktenzeichen")
+      .getByRole("textbox")
+      .fill(docUnit.coreData.fileNumbers?.[0] ?? "")
     await page.keyboard.press("Enter")
   })
 }
@@ -366,6 +372,7 @@ async function setDecisionDateToMatchDocUnit(page: Page, docUnit: Decision) {
   await test.step("Set decisionDate to match existing doc", async () => {
     const date = DateUtil.formatDate(docUnit.coreData.decisionDate)!
     await page.getByLabel("Entscheidungsdatum", { exact: true }).fill(date)
+    await page.keyboard.press("Enter")
   })
 }
 
@@ -377,8 +384,9 @@ async function setDeviatingDecisionDateToMatchDocUnit(
     await page.getByLabel("Abweichendes Entscheidungsdatum anzeigen").click()
     const date = DateUtil.formatDate(docUnit.coreData.decisionDate)!
     await page
-      .getByLabel("Abweichendes Entscheidungsdatum", { exact: true })
-      .pressSequentially(date)
+      .getByLabel("Abweichendes Entscheidungsdatum")
+      .getByRole("textbox")
+      .fill(date)
     await page.keyboard.press("Enter")
   })
 }

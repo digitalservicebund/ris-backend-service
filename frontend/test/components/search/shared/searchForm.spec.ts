@@ -13,7 +13,6 @@ import { Kind } from "@/domain/documentationUnitKind"
 import PendingProceeding from "@/domain/pendingProceeding"
 import ProcessStep from "@/domain/processStep"
 import authService from "@/services/authService"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
@@ -53,7 +52,6 @@ function renderComponent(
         kind,
       },
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           router,
           createTestingPinia({

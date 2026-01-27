@@ -1,25 +1,26 @@
 <script setup lang="ts">
 import Button from "primevue/button"
-import Tooltip from "@/components/Tooltip.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
+
+/**
+ * Helper to format tooltip with shortcut on a new line
+ */
+const getTooltip = (label: string, shortcut?: string) => {
+  return shortcut ? `${label}\n(${shortcut})` : label
+}
 </script>
 
 <template>
   <KitchensinkPage name="Tooltip">
     <div class="flex gap-20">
-      <Tooltip text="I'm a tooltip">
-        <Button label="Hover me"></Button>
-      </Tooltip>
+      <Button v-tooltip.bottom="'I\'m a tooltip'" label="Hover me"></Button>
 
-      <Tooltip shortcut="Key1 + Key2" text="I'm a tooltip with shortcut">
-        <Button label="Hover me, I have a shortcut"></Button>
-      </Tooltip>
-
-      <Tooltip
-        text="Tooltips shouldn’t really exceed one line, but sometimes it’s unavoidable"
-      >
-        <Button label="Hover me, I have a long tooltip"></Button>
-      </Tooltip>
+      <Button
+        v-tooltip.bottom="
+          getTooltip('I\'m a tooltip with shortcut', 'Key1 + Key2')
+        "
+        label="Hover me, I have a shortcut"
+      ></Button>
     </div>
   </KitchensinkPage>
 </template>

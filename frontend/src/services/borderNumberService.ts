@@ -4,7 +4,7 @@ import { Decision, LongTexts, ShortTexts } from "@/domain/decision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 type ShortTextKeys = keyof Omit<ShortTexts, "decisionNames">
-type LongTextKeys = keyof Omit<LongTexts, "participatingJudges">
+type LongTextKeys = keyof Omit<LongTexts, "participatingJudges" | "corrections">
 const orderedCategoriesWithBorderNumbers: LongTextKeys[] = [
   "reasons",
   "caseFacts",
@@ -125,7 +125,7 @@ function updateBorderNumberLinks(
   }
 
   const longTextNames = Object.keys(documentUnit.longTexts).filter(
-    (key) => key !== "participatingJudges",
+    (key) => key !== "participatingJudges" && key !== "corrections",
   ) as LongTextKeys[]
   for (const longTextName of longTextNames) {
     const longText = documentUnit.longTexts[longTextName]
@@ -185,7 +185,7 @@ type ParsedDocumentPerCategory =
 function getParsedDocumentPerCategory(
   texts:
     | Omit<ShortTexts, "decisionNames">
-    | Omit<LongTexts, "participatingJudges">,
+    | Omit<LongTexts, "participatingJudges" | "corrections">,
   group: "shortTexts" | "longTexts",
 ): ParsedDocumentPerCategory[] {
   return Object.entries(texts)
@@ -204,7 +204,8 @@ function invalidateBorderNumberLinks(
   documentUnit: Decision,
   numbersToBeInvalidated: string[],
 ): void {
-  const { participatingJudges, ...longTexts } = documentUnit.longTexts
+  const { participatingJudges, corrections, ...longTexts } =
+    documentUnit.longTexts
   const { decisionNames, ...shortTexts } = documentUnit.shortTexts
   const texts = [
     ...getParsedDocumentPerCategory(shortTexts, "shortTexts"),

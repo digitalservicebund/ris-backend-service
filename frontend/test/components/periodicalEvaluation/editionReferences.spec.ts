@@ -13,7 +13,6 @@ import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
 import service from "@/services/legalPeriodicalEditionService"
-import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import testRoutes from "~/test-helper/routes"
 
 const editionUUid = crypto.randomUUID()
@@ -57,7 +56,6 @@ async function renderComponent(options?: { references?: Reference[] }) {
     user,
     ...render(PeriodicalEditionReferences, {
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [router, pinia],
       },
     }),
@@ -233,6 +231,7 @@ describe("Legal periodical edition evaluation", () => {
       references: [
         {
           id: "id",
+          localId: "0",
           citation: "123",
           referenceSupplement: "supplement",
           legalPeriodicalRawValue: "BDZ",
@@ -264,6 +263,7 @@ describe("Legal periodical edition evaluation", () => {
       references: [
         {
           id: sameId,
+          localId: "id0",
           citation: "3",
           referenceSupplement: "3",
           legalPeriodical: {
