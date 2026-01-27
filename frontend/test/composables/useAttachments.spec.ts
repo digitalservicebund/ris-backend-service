@@ -107,10 +107,7 @@ describe("useAttachments", () => {
 
       await handleOnDelete(mockAttachment)
 
-      expect(deleteAttachmentMock).toHaveBeenCalledWith(
-        "test-uuid",
-        "./path.docx",
-      )
+      expect(deleteAttachmentMock).toHaveBeenCalledWith("test-uuid", "123")
       expect(mockEvents.attachmentIndexDeleted).toHaveBeenCalledWith(0)
       expect(store.loadDocumentUnit).toHaveBeenCalledWith(
         decision.documentNumber,

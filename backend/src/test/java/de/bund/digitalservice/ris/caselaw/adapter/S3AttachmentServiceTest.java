@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -196,30 +197,55 @@ class S3AttachmentServiceTest {
   }
 
   @Test
-  void testDeleteByS3Path() {
-    var testS3Path = UUID.randomUUID().toString();
-    service.deleteByS3Path(testS3Path, UUID.randomUUID(), User.builder().build());
+  void testDeleteByFileId() {
+    var testFileId = UUID.randomUUID();
+    when(repository.findById(testFileId))
+        .thenReturn(
+            Optional.ofNullable(
+                AttachmentDTO.builder().id(testFileId).s3ObjectPath("path").build()));
+    service.deleteByFileId(testFileId, UUID.randomUUID(), User.builder().build());
 
     // bucket interaction
     var deleteObjectRequestCaptor = ArgumentCaptor.forClass(DeleteObjectRequest.class);
     verify(s3Client).deleteObject(deleteObjectRequestCaptor.capture());
     assertEquals("testBucket", deleteObjectRequestCaptor.getValue().bucket());
-    assertEquals(testS3Path, deleteObjectRequestCaptor.getValue().key());
+    assertEquals("path", deleteObjectRequestCaptor.getValue().key());
 
     // repo interaction
-    verify(repository).deleteByS3ObjectPath(testS3Path);
+    verify(repository).deleteById(testFileId);
   }
 
   @ParameterizedTest()
   @ValueSource(strings = {"", " "})
   @NullSource
-  void testDeleteByS3Path_withoutS3Path(String s3Path) {
+  void testDeleteByFileId_withoutS3Path(String s3Path) {
     var user = User.builder().build();
     var docUnitId = UUID.randomUUID();
-    assertThrows(AttachmentException.class, () -> service.deleteByS3Path(s3Path, docUnitId, user));
+    var fileId = UUID.randomUUID();
+    when(repository.findById(fileId))
+        .thenReturn(
+            Optional.ofNullable(AttachmentDTO.builder().id(fileId).s3ObjectPath(s3Path).build()));
+
+    assertThrows(AttachmentException.class, () -> service.deleteByFileId(fileId, docUnitId, user));
 
     verifyNoInteractions(s3Client);
-    verifyNoInteractions(repository);
+    verify(repository, never()).deleteById(fileId);
+  }
+
+  @Test
+  void testDeleteByFileId_withoutAttachment_shouldThrow() {
+    var user = User.builder().build();
+    var docUnitId = UUID.randomUUID();
+    var fileId = UUID.randomUUID();
+    when(repository.findById(fileId)).thenReturn(Optional.empty());
+
+    Throwable throwable =
+        assertThrows(
+            ResponseStatusException.class, () -> service.deleteByFileId(fileId, docUnitId, user));
+
+    assertThat(throwable.getMessage()).contains("File not found");
+    verifyNoInteractions(s3Client);
+    verify(repository, never()).deleteById(fileId);
   }
 
   @Test

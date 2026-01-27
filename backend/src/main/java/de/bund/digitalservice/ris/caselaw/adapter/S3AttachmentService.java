@@ -309,17 +309,24 @@ public class S3AttachmentService implements AttachmentService {
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void deleteByS3Path(String s3Path, UUID documentationUnitId, User user) {
-    deleteObjectFromBucket(s3Path);
+  public void deleteByFileId(UUID fileId, UUID documentationUnitId, User user) {
+    var attachmentDTO = repository.findById(fileId);
+    if (attachmentDTO.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found");
+    }
+    deleteObjectFromBucket(attachmentDTO.get().getS3ObjectPath());
     documentationUnitRepository
         .findById(documentationUnitId)
         .ifPresent(
             documentationUnit -> {
               setLastUpdated(user, documentationUnit);
               documentationUnitHistoryLogService.saveHistoryLog(
-                  documentationUnitId, user, HistoryLogEventType.FILES, "Word-Dokument gelöscht");
+                  documentationUnitId,
+                  user,
+                  HistoryLogEventType.FILES,
+                  String.format("Anhang \"%s\" gelöscht", attachmentDTO.get().getFilename()));
             });
-    repository.deleteByS3ObjectPath(s3Path);
+    repository.deleteById(fileId);
   }
 
   public void deleteAllObjectsFromBucketForDocumentationUnit(UUID uuid) {

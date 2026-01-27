@@ -21,7 +21,7 @@ interface AttachmentService {
 
   delete(
     documentUnitUuid: string,
-    s3path: string,
+    fileToDeleteId: string,
   ): Promise<ServiceResponse<unknown>>
 
   getAttachmentAsHtml(
@@ -174,9 +174,9 @@ const service: AttachmentService = {
     return response
   },
 
-  async delete(documentUnitUuid: string, s3path: string) {
+  async delete(documentUnitUuid: string, fileToDeleteId: string) {
     const response = await httpClient.delete(
-      `caselaw/documentunits/${documentUnitUuid}/file/${s3path}`,
+      `caselaw/documentunits/${documentUnitUuid}/file/${fileToDeleteId}`,
     )
     response.error =
       response.status >= 300

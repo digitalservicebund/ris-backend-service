@@ -1,5 +1,6 @@
 import fs from "fs/promises"
 import { Download, expect } from "@playwright/test"
+import errorMessages from "@/i18n/errors.json" with { type: "json" }
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   navigateToCategories,
@@ -79,7 +80,8 @@ test.describe("Weitere Anhänge", { tag: ["@RISDEV-8920"] }, () => {
       await test.step("Lösche die Datei nach Dialog-Bestätigung und prüfe Entfernung", async () => {
         await page.getByLabel("Datei löschen").click()
         // Confirm the dialog
-        await page.getByLabel("Löschen", { exact: true }).click()
+        const dialog = page.getByRole("dialog")
+        await dialog.getByLabel("Anhang löschen", { exact: true }).click()
         await expect(page.getByText("Anhang löschen")).toBeHidden()
         await expect(page.getByText("sample.docx")).toBeHidden()
       })
@@ -109,7 +111,7 @@ test.describe("Weitere Anhänge", { tag: ["@RISDEV-8920"] }, () => {
   )
 
   test(
-    "Eine Datei über 100MB wird abgelehnt",
+    "Eine Datei über 100 MB wird abgelehnt",
     { tag: ["@RISDEV-9850"] },
     async ({ page, documentNumber, testFiles }) => {
       await navigateToCategories(page, documentNumber)
@@ -130,7 +132,10 @@ test.describe("Weitere Anhänge", { tag: ["@RISDEV-8920"] }, () => {
         await expect(
           page.getByRole("alert").getByRole("list").getByRole("listitem"),
         ).toHaveText(
-          "too_large.bin überschreitet das Limit von 100MB Größe. Laden Sie eine kleinere Datei hoch.",
+          "'too_large.bin' " +
+            errorMessages.OTHER_FILE_TOO_LARGE_CASELAW.title +
+            " " +
+            errorMessages.OTHER_FILE_TOO_LARGE_CASELAW.description,
         )
       })
 
@@ -145,7 +150,7 @@ test.describe("Weitere Anhänge", { tag: ["@RISDEV-8920"] }, () => {
   )
 
   test(
-    "Zwei Dateien mit 100MB und 10MB können hochgeladen werden",
+    "Zwei Dateien mit 100 MB und 10 MB können hochgeladen werden",
     { tag: ["@RISDEV-9850"] },
     async ({ page, documentNumber, testFiles }) => {
       await navigateToCategories(page, documentNumber)

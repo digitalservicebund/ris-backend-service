@@ -185,10 +185,10 @@ describe("attachmentService", () => {
         status: 200,
       } as ServiceResponse<unknown>)
 
-      const result = await service.delete("123", "path/to/file")
+      const result = await service.delete("123", "fileToDeleteId")
 
       expect(httpDeleteMock).toHaveBeenCalledWith(
-        "caselaw/documentunits/123/file/path/to/file",
+        "caselaw/documentunits/123/file/fileToDeleteId",
       )
       expect(result.error).toBeUndefined()
     })
@@ -197,7 +197,7 @@ describe("attachmentService", () => {
       httpDeleteMock.mockResolvedValue({
         status: 400,
       } as ServiceResponse<unknown>)
-      const result = await service.delete("123", "path/to/file")
+      const result = await service.delete("123", "fileToDeleteId")
 
       expect(result.error).toEqual(errorMessages.FILE_DELETE_FAILED)
     })

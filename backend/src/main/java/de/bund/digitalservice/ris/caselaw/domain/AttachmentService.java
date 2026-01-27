@@ -13,7 +13,7 @@ public interface AttachmentService {
   Attachment streamFileToDocumentationUnit(
       UUID documentationUnitId, InputStream file, String filename, User user, AttachmentType type);
 
-  void deleteByS3Path(String s3Path, UUID documentationUnitId, User user);
+  void deleteByFileId(UUID fileId, UUID documentationUnitId, User user);
 
   void deleteAllObjectsFromBucketForDocumentationUnit(UUID documentationUnitId);
 

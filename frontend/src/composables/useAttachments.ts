@@ -50,7 +50,7 @@ export function useAttachments(
     }
     const { status } = await attachmentService.delete(
       decision.value.uuid,
-      fileToDelete.s3path,
+      fileToDelete.id,
     )
     if (status < 300) {
       events.attachmentIndexDeleted?.(attachments.value.indexOf(fileToDelete))

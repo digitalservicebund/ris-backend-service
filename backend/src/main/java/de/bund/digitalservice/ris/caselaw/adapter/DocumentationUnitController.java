@@ -216,18 +216,16 @@ public class DocumentationUnitController {
       @RequestBody byte[] bytes,
       @RequestHeader HttpHeaders httpHeaders) {
 
-    var attachmentPath =
-        attachmentService
-            .attachFileToDocumentationUnit(
-                uuid, ByteBuffer.wrap(bytes), httpHeaders, userService.getUser(oidcUser))
-            .s3path();
+    var attachment =
+        attachmentService.attachFileToDocumentationUnit(
+            uuid, ByteBuffer.wrap(bytes), httpHeaders, userService.getUser(oidcUser));
     try {
-      var attachment2Html = converterService.getConvertedObject(attachmentPath);
+      var attachment2Html = converterService.getConvertedObject(attachment.s3path());
       initializeCoreDataAndCheckDuplicates(uuid, attachment2Html, userService.getUser(oidcUser));
       return ResponseEntity.status(HttpStatus.OK).body(attachment2Html);
 
     } catch (Exception e) {
-      attachmentService.deleteByS3Path(attachmentPath, uuid, userService.getUser(oidcUser));
+      attachmentService.deleteByFileId(attachment.id(), uuid, userService.getUser(oidcUser));
       return ResponseEntity.unprocessableContent().build();
     }
   }
@@ -292,7 +290,7 @@ public class DocumentationUnitController {
       initializeCoreDataAndCheckDuplicates(uuid, attachment2Html, userService.getUser(oidcUser));
       return ResponseEntity.status(HttpStatus.OK).body(attachment2Html);
     } catch (Exception e) {
-      attachmentService.deleteByS3Path(attachment.s3path(), uuid, userService.getUser(oidcUser));
+      attachmentService.deleteByFileId(attachment.id(), uuid, userService.getUser(oidcUser));
       return ResponseEntity.unprocessableContent().build();
     }
   }
@@ -362,18 +360,19 @@ public class DocumentationUnitController {
     }
   }
 
-  @DeleteMapping(value = "/{uuid}/file/{s3Path}")
+  @DeleteMapping(value = "/{uuid}/file/{fileId}")
   @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<Object> removeAttachmentFromDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser,
       @PathVariable UUID uuid,
-      @PathVariable String s3Path) {
+      @PathVariable UUID fileId) {
 
     try {
-      attachmentService.deleteByS3Path(s3Path, uuid, userService.getUser(oidcUser));
+      attachmentService.deleteByFileId(fileId, uuid, userService.getUser(oidcUser));
       return ResponseEntity.noContent().build();
     } catch (Exception e) {
-      log.error("Error by deleting attachment '{}' for documentation unit {}", s3Path, uuid, e);
+      log.error(
+          "Error by deleting attachment with '{}' for documentation unit {}", fileId, uuid, e);
       return ResponseEntity.internalServerError().build();
     }
   }

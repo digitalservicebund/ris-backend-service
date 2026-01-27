@@ -339,7 +339,7 @@ class DocumentationUnitControllerTest {
           .expectStatus()
           .is4xxClientError();
 
-      verify(attachmentService).deleteByS3Path(any(), any(), any());
+      verify(attachmentService).deleteByFileId(any(), any(), any());
     }
 
     @Test
