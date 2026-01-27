@@ -9,6 +9,9 @@ Proposed
 ## Context
 
 We want to handle our domain exceptions in a centralized way that is establishing rules for how our exceptions are defined and what data they carry. This should also make handling of our exceptions easier since they will follow a pattern where all exceptions relay data uniformly.
+Related to frontend code and if this benefits that too, ...
+Another benefit of this approach is that in the controller there are no more try-catch blocks that need to be covered by tests and that reduce readability.
+
 
 The idea is simply that since all HTTP exceptions fall into well known categories (400, 401, 403, 404, 500, etc.) one or more of our domain exceptions should be mapped to these categories.
 By defining a common interface for all of our domain exceptions we ensure:
@@ -27,6 +30,8 @@ RFC-9457 defines a standardized JSON structure to convey machine-readable and hu
 - `instance` — A URI reference that identifies the specific occurrence of the problem.
 
 RFC-9457 allows extension members: include domain-specific keys inside the same object (for example `error_code`, `invalid_fields`, `trace_id`) to provide more structured context.
+
+[RFC-9457](https://www.rfc-editor.org/rfc/rfc9457.html)
 
 ### Guidelines
 
