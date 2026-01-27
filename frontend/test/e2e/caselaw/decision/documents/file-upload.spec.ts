@@ -48,7 +48,8 @@ test.describe("upload an original document to a doc unit", () => {
 
       // delete file
       await page.getByLabel("Datei löschen").click()
-      await page.getByLabel("Löschen", { exact: true }).click() // confirm
+      const dialog = page.getByRole("dialog")
+      await dialog.getByLabel("Anhang löschen", { exact: true }).click() // confirm
       await expect(page.getByText("Anhang löschen")).toBeHidden()
       await expect(page.getByText("sample.docx")).toBeHidden()
 
@@ -106,7 +107,8 @@ test.describe("upload an original document to a doc unit", () => {
         .getByTestId("list-entry-0")
         .getByLabel("Datei löschen")
       await deleteFirstDocument.click()
-      await page.getByLabel("Löschen", { exact: true }).click() // confirm
+      const dialog = page.getByRole("dialog")
+      await dialog.getByLabel("Anhang löschen", { exact: true }).click() // confirm
       await expect(page.getByLabel("Datei löschen")).toHaveCount(1)
 
       const deleteSecondDocument = page
@@ -134,7 +136,7 @@ test.describe("upload an original document to a doc unit", () => {
     await uploadTestfile(page, "sample.png", { skipAssert: true })
     await expect(
       page.getByText(
-        "sample.png hat ein falsches Format. Laden Sie eine .docx-Version hoch.",
+        "'sample.png' hat ein falsches Format. Laden Sie eine .docx-Version hoch.",
         { exact: true },
       ),
     ).toBeVisible()
@@ -186,7 +188,7 @@ test.describe("upload an original document to a doc unit", () => {
     await page.dispatchEvent("#upload-drop-area", "drop", { dataTransfer })
     await expect(
       page.getByText(
-        "sample.png hat ein falsches Format. Laden Sie eine .docx-Version hoch.",
+        "'sample.png' hat ein falsches Format. Laden Sie eine .docx-Version hoch.",
         { exact: true },
       ),
     ).toBeVisible()
