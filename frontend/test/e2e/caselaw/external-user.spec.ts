@@ -231,6 +231,12 @@ test.describe(
           ).toBeHidden()
         })
 
+        await test.step("Assigned external user cannot access other attachments", async () => {
+          await expect(
+            pageWithExternalUser.getByLabel("Anhänge anzeigen"),
+          ).toBeHidden()
+        })
+
         // Assignment to previous procedure is overwritten -> user (group) is not assigned to doc unit anymore
         await assignProcedureToDocUnit(page, documentNumber, procedurePrefix)
 
