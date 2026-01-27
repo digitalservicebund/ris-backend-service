@@ -83,6 +83,8 @@ class DocumentationUnitControllerAuthTest {
   @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
+  private static final UUID TEST_FILE_UUID =
+      UUID.fromString("99999999-4444-4444-4444-121212121212");
   private final String docOffice1Group = "/CC-RIS";
   private final String docOffice2Group = "/BGH";
   private final DocumentationOffice docOffice1 = buildCCRisDocOffice();
@@ -156,7 +158,7 @@ class DocumentationUnitControllerAuthTest {
   @Test
   void testRemoveFileFromDocumentationUnit() throws DocumentationUnitNotExistsException {
     mockDocumentationUnit(docOffice2, null, null);
-    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/fooPath";
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/" + TEST_FILE_UUID;
 
     risWebTestClient
         .withLogin(docOffice1Group)
@@ -335,7 +337,9 @@ class DocumentationUnitControllerAuthTest {
         Decision.builder()
             .uuid(TEST_UUID)
             .status(status == null ? Status.builder().publicationStatus(PUBLISHED).build() : status)
-            .attachments(Collections.singletonList(Attachment.builder().s3path(s3path).build()))
+            .attachments(
+                Collections.singletonList(
+                    Attachment.builder().id(TEST_FILE_UUID).s3path(s3path).build()))
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();
     when(service.getByUuid(TEST_UUID)).thenReturn(docUnit);
