@@ -1,4 +1,4 @@
-import "@/styles/text-check.scss"
+import "@/styles/text-check.css"
 import { Mark } from "@tiptap/vue-3"
 import { TextCheckTagName } from "@/types/textCheck"
 
