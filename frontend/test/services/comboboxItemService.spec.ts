@@ -76,83 +76,135 @@ describe("comboboxItemService", () => {
   })
 
   it("should fetch caselaw document type from lookup table", async () => {
-    const { data, execute } = service.getCaselawDocumentTypes(ref())
+    const {
+      useFetch: { data, execute },
+    } = service.getCaselawDocumentTypes(ref())
 
     await execute()
     await waitFor(() => {
-      expect(data.value?.[0].label).toEqual("Anordnung")
-      expect(data.value?.[0].value).toEqual(doctype)
+      expect(data.value?.[0]).toEqual(doctype)
     })
+  })
+
+  it("should format caselaw document type", async () => {
+    const { format } = service.getCaselawDocumentTypes(ref())
+    expect(format(doctype).label).toEqual("Anordnung")
   })
 
   it("should fetch pending proceeding document type from lookup table", async () => {
-    const { data, execute } =
-      service.getCaselawAndPendingProceedingDocumentTypes(ref("Anh"))
+    const {
+      useFetch: { data, execute },
+    } = service.getCaselawAndPendingProceedingDocumentTypes(ref("Anh"))
 
     await execute()
     await waitFor(() => {
-      expect(data.value?.[0].label).toEqual("Anhängiges Verfahren")
-      expect(data.value?.[0].value).toEqual(pendingProceedingDoctype)
+      expect(data.value?.[0]).toEqual(pendingProceedingDoctype)
     })
+  })
+
+  it("should format pending proceeding document type", async () => {
+    const { format } =
+      service.getCaselawAndPendingProceedingDocumentTypes(ref())
+    expect(format(pendingProceedingDoctype).label).toEqual(
+      "Anhängiges Verfahren",
+    )
   })
 
   it("should fetch dependent literature document type from lookup table", async () => {
-    const { data, execute } = service.getDependentLiteratureDocumentTypes(ref())
+    const {
+      useFetch: { data, execute },
+    } = service.getDependentLiteratureDocumentTypes(ref())
 
     await execute()
     await waitFor(() => {
-      expect(data.value?.[0].label).toEqual("Aufsatz")
-      expect(data.value?.[0].value).toEqual(dependentLiteratureDoctype)
+      expect(data.value?.[0]).toEqual(dependentLiteratureDoctype)
     })
+  })
+
+  it("should format dependent literature document type", async () => {
+    const { format } = service.getDependentLiteratureDocumentTypes(ref())
+    expect(format(dependentLiteratureDoctype).label).toEqual("Aufsatz")
   })
 
   it("should fetch court from lookup table", async () => {
-    const { data, execute } = service.getCourts(ref())
+    const {
+      useFetch: { data, execute },
+    } = service.getCourts(ref())
 
     await execute()
     await waitFor(() => {
-      expect(data.value?.[0].label).toEqual("BGH Karlsruhe")
-      expect(data.value?.[0].value).toEqual(court)
+      expect(data.value?.[0]).toEqual(court)
     })
+  })
+
+  it("should format court", async () => {
+    const { format } = service.getCourts(ref())
+    expect(format(court).label).toEqual("BGH Karlsruhe")
   })
 
   it("should fetch risAbbreviations from lookup table", async () => {
-    const { data, execute } = service.getRisAbbreviations(ref())
+    const {
+      useFetch: { data, execute },
+    } = service.getRisAbbreviations(ref())
 
     await execute()
     await waitFor(() => {
-      expect(data.value?.[0].label).toEqual("BGB")
-      expect(data.value?.[0].value).toEqual(normAbbreviation)
+      expect(data.value?.[0]).toEqual(normAbbreviation)
     })
+  })
+
+  it("should format risAbbreviations", async () => {
+    const { format } = service.getRisAbbreviations(ref())
+    expect(format(normAbbreviation).label).toEqual("BGB")
   })
 
   it("should fetch language code from lookup table", async () => {
-    const { data, execute } = service.getLanguageCodes(ref())
+    const {
+      useFetch: { data, execute },
+    } = service.getLanguageCodes(ref())
 
     await execute()
     await waitFor(() => {
-      expect(data.value?.[0].label).toEqual("Englisch")
-      expect(data.value?.[0].value).toEqual(languageCode)
+      expect(data.value?.[0]).toEqual(languageCode)
     })
+  })
+
+  it("should format language code", async () => {
+    const { format } = service.getLanguageCodes(ref())
+    expect(format(languageCode).label).toEqual("Englisch")
   })
 
   it("should fetch currency code from lookup table", async () => {
-    const { data, execute } = service.getCurrencyCodes(ref())
+    const {
+      useFetch: { data, execute },
+    } = service.getCurrencyCodes(ref())
 
     await execute()
     await waitFor(() => {
-      expect(data.value?.[0].label).toEqual("Euro (EUR)")
-      expect(data.value?.[0].value).toEqual(currencyCode)
+      expect(data.value?.[0]).toEqual(currencyCode)
     })
   })
 
+  it("should format currency code", async () => {
+    const { format } = service.getCurrencyCodes(ref())
+    expect(format(currencyCode).label).toEqual("Euro (EUR)")
+  })
+
   it("should fetch collective agreement industries from lookup table", async () => {
-    const { data, execute } = service.getCollectiveAgreementIndustries(ref())
+    const {
+      useFetch: { data, execute },
+    } = service.getCollectiveAgreementIndustries(ref())
 
     await execute()
     await waitFor(() => {
-      expect(data.value?.[0].label).toEqual("Bühne, Theater, Orchester")
-      expect(data.value?.[0].value).toEqual(collectiveAgreementIndustry)
+      expect(data.value?.[0]).toEqual(collectiveAgreementIndustry)
     })
+  })
+
+  it("should format collective agreement industries", async () => {
+    const { format } = service.getCollectiveAgreementIndustries(ref())
+    expect(format(collectiveAgreementIndustry).label).toEqual(
+      "Bühne, Theater, Orchester",
+    )
   })
 })

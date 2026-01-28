@@ -14,7 +14,7 @@ import { useValidationStore } from "@/composables/useValidationStore"
 import ActiveCitation from "@/domain/activeCitation"
 import { CitationType } from "@/domain/citationType"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
-import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemServices from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 
 const props = defineProps<{
@@ -212,9 +212,8 @@ onMounted(() => {
         id="activeCitationPredicate"
         v-model="activeCitationType"
         aria-label="Art der Zitierung"
-        clear-on-choosing-item
         :has-error="slotProps.hasError"
-        :item-service="ComboboxItemService.getCitationTypes"
+        :item-service="ComboboxItemServices.getCitationTypes"
         @focus="validationStore.remove('citationType')"
       ></ComboboxInput>
     </InputField>
@@ -230,11 +229,10 @@ onMounted(() => {
             id="activeCitationCourt"
             v-model="activeCitation.court"
             aria-label="Gericht Aktivzitierung"
-            clear-on-choosing-item
             :has-error="slotProps.hasError"
-            :item-service="ComboboxItemService.getCourts"
+            :item-service="ComboboxItemServices.getCourts"
             :read-only="activeCitation.hasForeignSource"
-            @focus="validationStore.remove('court')"
+            @show="validationStore.remove('court')"
           >
           </ComboboxInput>
         </InputField>
@@ -281,7 +279,7 @@ onMounted(() => {
             id="activeCitationDecisionDocumentType"
             v-model="activeCitation.documentType"
             aria-label="Dokumenttyp Aktivzitierung"
-            :item-service="ComboboxItemService.getCaselawDocumentTypes"
+            :item-service="ComboboxItemServices.getCaselawDocumentTypes"
             :read-only="activeCitation.hasForeignSource"
           ></ComboboxInput>
         </InputField>

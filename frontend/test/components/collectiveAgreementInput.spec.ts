@@ -65,7 +65,9 @@ describe("Collective Agreement Input", () => {
     expect(
       screen.getByRole("textbox", { name: "Tarifnorm" }),
     ).toBeInTheDocument()
-    expect(screen.getByRole("textbox", { name: "Branche" })).toBeInTheDocument()
+    expect(
+      screen.getByRole("combobox", { name: "Branche" }),
+    ).toBeInTheDocument()
     expect(
       screen.getByRole("button", { name: "Tarifvertrag speichern" }),
     ).toBeDisabled()
@@ -172,7 +174,7 @@ describe("Collective Agreement Input", () => {
     expect(screen.getByRole("textbox", { name: "Tarifnorm" })).toHaveValue(
       "§ 23",
     )
-    expect(screen.getByRole("textbox", { name: "Branche" })).toHaveValue(
+    expect(screen.getByRole("combobox", { name: "Branche" })).toHaveValue(
       "Eisen-, Stahl-, Metall-, und Elektroindustrie, Metallverarbeitung",
     )
 
@@ -307,7 +309,7 @@ describe("Collective Agreement Input", () => {
     )
     await user.type(screen.getByRole("textbox", { name: "Datum" }), "12.2001")
     await user.type(screen.getByRole("textbox", { name: "Tarifnorm" }), "§ 23")
-    await user.type(screen.getByRole("textbox", { name: "Branche" }), "Ei")
+    await user.type(screen.getByRole("combobox", { name: "Branche" }), "Ei")
     await user.click(
       screen.getByText(
         "Eisen-, Stahl-, Metall-, und Elektroindustrie, Metallverarbeitung",

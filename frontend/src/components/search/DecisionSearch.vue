@@ -14,7 +14,7 @@ import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { SourceValue } from "@/domain/source"
 import errorMessages from "@/i18n/errors.json"
-import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemServices from "@/services/comboboxItemService"
 import service from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
 import { DocumentationUnitCreationParameters } from "@/types/documentationUnitCreationParameters"
@@ -66,8 +66,9 @@ const isSearchCompletedWithNoResults = computed(
 )
 
 const courtFilter = ref("")
-const { data: courts, execute: fetchCourts } =
-  ComboboxItemService.getCourts(courtFilter)
+const {
+  useFetch: { data: courts, execute: fetchCourts },
+} = ComboboxItemServices.getCourts(courtFilter)
 const courtFromQuery = ref<Court | undefined>()
 
 const hasRequiredCreateParams = computed(() => {
@@ -100,8 +101,7 @@ async function validateAndSetCourtFromQuery() {
     const matches = courts.value?.filter(
       (item) => item.label === courtFilter.value,
     )
-    courtFromQuery.value =
-      matches?.length === 1 ? (matches[0].value as Court) : undefined
+    courtFromQuery.value = matches?.length === 1 ? matches[0] : undefined
   } else {
     courtFromQuery.value = undefined
   }

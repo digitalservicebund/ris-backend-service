@@ -23,11 +23,9 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await page
       .locator("#coreData div")
       .filter({ hasText: "Gericht * Fehlerhaftes" })
-      .getByLabel("Dropdown öffnen")
+      .getByLabel("Vorschläge anzeigen")
       .click()
-    await expect(
-      page.locator("[aria-label='dropdown-option'] >> nth=9"),
-    ).toBeVisible()
+    await expect(page.getByRole("option").nth(9)).toBeVisible()
 
     await expect(page.getByText("AG Aachen")).toBeVisible()
     await expect(page.getByText("AG Aalen")).toBeVisible()
@@ -35,9 +33,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
       "bayern",
     )
-    await expect(
-      page.locator("[aria-label='dropdown-option'] >> nth=2"),
-    ).toBeVisible()
+    await expect(page.getByRole("option").nth(2)).toBeVisible()
     const accessibilityScanResults = await useAxeBuilder(page)
       .disableRules(["duplicate-id-aria"])
       .analyze()
@@ -76,21 +72,17 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await page
       .locator("#coreData div")
       .filter({ hasText: "Spruchkörper Dokumenttyp" })
-      .getByLabel("Dropdown öffnen")
+      .getByLabel("Vorschläge anzeigen")
       .click()
 
-    await expect(
-      page.getByLabel("dropdown-option", { exact: true }),
-    ).not.toHaveCount(0)
+    await expect(page.getByRole("option")).not.toHaveCount(0)
 
     // type search string: 3 results for "zwischen"
     await page.getByLabel("Dokumenttyp", { exact: true }).fill("zwischen")
     await expect(page.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
       "zwischen",
     )
-    await expect(
-      page.getByLabel("dropdown-option", { exact: true }),
-    ).toHaveCount(3)
+    await expect(page.getByRole("option")).toHaveCount(3)
 
     const accessibilityScanResults = await useAxeBuilder(page)
       .disableRules(["duplicate-id-aria"])

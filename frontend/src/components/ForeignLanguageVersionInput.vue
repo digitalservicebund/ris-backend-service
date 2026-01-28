@@ -5,7 +5,7 @@ import { onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
-import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemServices from "@/services/comboboxItemService"
 
 const props = defineProps<{
   modelValue?: ForeignLanguageVersion
@@ -60,7 +60,6 @@ onMounted(() => {
         <InputField
           id="foreignLanguageVersionLanguageInput"
           v-slot="slotProps"
-          data-testid="foreign-language-version-language"
           label="Sprache *"
         >
           <ComboboxInput
@@ -68,9 +67,8 @@ onMounted(() => {
             v-model="foreignLanguageVersion.languageCode"
             aria-label="Sprache"
             class="w-full"
-            data-testid="foreign-language-version-language-input"
             :invalid="slotProps.hasError"
-            :item-service="ComboboxItemService.getLanguageCodes"
+            :item-service="ComboboxItemServices.getLanguageCodes"
           ></ComboboxInput>
         </InputField>
       </div>

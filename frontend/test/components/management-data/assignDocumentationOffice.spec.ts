@@ -106,7 +106,7 @@ describe("Assigning a new documentation office", () => {
     // The Combobox requests are debounced
     await vi.advanceTimersByTimeAsync(300)
 
-    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    const dropdownItems = screen.getAllByRole("option")
     const optionLabels = dropdownItems.map((o) => o.textContent)
 
     expect(optionLabels).toContain("BFH")
@@ -163,7 +163,7 @@ describe("Assigning a new documentation office", () => {
     // The Combobox requests are debounced
     await vi.advanceTimersByTimeAsync(300)
 
-    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    const dropdownItems = screen.getAllByRole("option")
     await fireEvent.click(dropdownItems[0])
 
     const button = screen.getByLabelText("Zuweisen")
@@ -213,7 +213,7 @@ describe("Assigning a new documentation office", () => {
     // The Combobox requests are debounced
     await vi.advanceTimersByTimeAsync(300)
 
-    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    const dropdownItems = screen.getAllByRole("option")
     await fireEvent.click(dropdownItems[0])
 
     const button = screen.getByLabelText("Zuweisen")
