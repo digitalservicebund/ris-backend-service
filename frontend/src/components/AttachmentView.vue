@@ -69,12 +69,12 @@ watch(
   </FlexContainer>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .odoc-open {
   display: flex;
   height: 65px;
-  align-items: center; // align vertical
-  justify-content: center; // align horizontal
+  align-items: center; /* align vertical */
+  justify-content: center; /* align horizontal */
   border-radius: 10px;
   margin-right: 40px;
   transform: rotate(-90deg);
