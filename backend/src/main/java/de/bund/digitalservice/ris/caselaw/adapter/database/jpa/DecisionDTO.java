@@ -138,18 +138,19 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @JoinColumn(name = "creating_documentation_office_id", referencedColumnName = "id")
   private DocumentationOfficeDTO creatingDocumentationOffice;
 
-  /** Aktivzitierung */
+  /**
+   * Aktivzitierung
+   *
+   * @deprecated use {@link #activeLinkCaselawCitations} and {@link
+   *     #activeBlindlinkCaselawCitations} instead
+   */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
   @OrderBy("rank")
   private List<ActiveCitationDTO> activeCitations = new ArrayList<>();
 
-  /**
-   * Aktivzitierungen (echte Links) CURRENTLY NO GUARANTEE TO INCLUDE THE CORRECT DATA. ONLY USE FOR
-   * WRITING!
-   */
-  // TODO: (Malte Laukötter, 2026-01-09) remove comment once they can be read as well
+  /** Aktivzitierungen (echte Links) */
   @OneToMany(
       cascade = CascadeType.ALL,
       fetch = FetchType.LAZY,
@@ -159,11 +160,7 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   private List<LinkCaselawCitationDTO> activeLinkCaselawCitations = new ArrayList<>();
 
-  /**
-   * Aktivzitierungen (blind Links) CURRENTLY NO GUARANTEE TO INCLUDE THE CORRECT DATA. ONLY USE FOR
-   * WRITING!
-   */
-  // TODO: (Malte Laukötter, 2026-01-09) remove comment once they can be read as well
+  /** Aktivzitierungen (blind Links) */
   @OneToMany(
       cascade = CascadeType.ALL,
       fetch = FetchType.LAZY,
