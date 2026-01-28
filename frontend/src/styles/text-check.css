@@ -7,7 +7,7 @@ text-check {
   transition: background-color 0.25s ease-in-out;
 
   &:hover {
-    background: rgba($color: #f5dcd7, $alpha: 100%);
+    background: #f5dcd7;
   }
 
   &[ignored="true"] {
@@ -15,7 +15,7 @@ text-check {
     text-decoration: none;
 
     &:hover {
-      background: rgba($color: #cce4f0, $alpha: 100%) !important;
+      background: #cce4f0 !important;
     }
   }
 }

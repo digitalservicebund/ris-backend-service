@@ -51,7 +51,7 @@ function handleTokenClick(token: Token) {
   </span>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .linked-field {
   cursor: pointer;
   text-decoration: underline;
