@@ -63,7 +63,7 @@ export function useCaseLawMenuItems(
     ...(isInternalUser.value
       ? [
           {
-            label: "Dokumente",
+            label: "Originaldokument",
             route: {
               ...baseRoute,
               name: "caselaw-documentUnit-documentNumber-attachments",

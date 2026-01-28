@@ -332,7 +332,7 @@ describe("Document Number Route", () => {
       expect(screen.getByTestId("preview")).toBeInTheDocument()
     })
 
-    it('detects "d" keypress and opens documents', async () => {
+    it('detects "o" keypress and opens Originaldokument', async () => {
       const { user, router } = renderComponent()
       await router.push({
         path: "/caselaw/documentUnit/1234567891234/references?showAttachmentPanel=false",
@@ -343,7 +343,7 @@ describe("Document Number Route", () => {
           "Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.",
         ),
       ).not.toBeInTheDocument()
-      await user.keyboard("d")
+      await user.keyboard("o")
       expect(
         screen.getByText(
           "Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.",
@@ -360,6 +360,17 @@ describe("Document Number Route", () => {
       expect(screen.queryByTestId("category-import")).not.toBeInTheDocument()
       await user.keyboard("r")
       expect(screen.getByTestId("category-import")).toBeInTheDocument()
+    })
+
+    it('detects "a" keypress and opens other attachments', async () => {
+      const { user, router } = renderComponent()
+      await router.push({
+        path: "/caselaw/documentUnit/1234567891234/references?showAttachmentPanel=false",
+      })
+
+      expect(screen.queryByText("Weitere Anhänge")).not.toBeInTheDocument()
+      await user.keyboard("a")
+      expect(screen.getByText("Weitere Anhänge")).toBeInTheDocument()
     })
 
     it('detects ">" keypress and opens both panels', async () => {

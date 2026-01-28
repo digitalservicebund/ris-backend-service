@@ -6,7 +6,7 @@ describe("FileUpload", () => {
   // TODO: more test needed because of new props
   test("renders file upload with default props", async () => {
     render(FileUpload, {
-      props: {},
+      props: { id: "id", ariaLabel: "label" },
     })
 
     screen.getByText("Ziehen Sie Ihre Dateien in diesen Bereich.")
@@ -32,7 +32,9 @@ describe("FileUpload", () => {
       ],
     ],
   ])(`fires events on files selected`, async (files) => {
-    const { emitted } = render(FileUpload)
+    const { emitted } = render(FileUpload, {
+      props: { id: "id", ariaLabel: "label" },
+    })
     const inputEl = screen.getByLabelText("Oder hier auswählen", {
       selector: "input",
       exact: false,
@@ -51,6 +53,8 @@ describe("FileUpload", () => {
   test("shows spinner when set on loading", async () => {
     render(FileUpload, {
       props: {
+        id: "id",
+        ariaLabel: "label",
         isLoading: true,
       },
     })

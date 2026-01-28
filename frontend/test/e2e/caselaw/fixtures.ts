@@ -1,3 +1,5 @@
+import fs from "fs/promises"
+import path from "path"
 import { APIRequestContext, Cookie, Page, test } from "@playwright/test"
 import { mergeDeep } from "@tiptap/vue-3"
 import dayjs from "dayjs"
@@ -55,12 +57,14 @@ type MyFixtures = {
     createdPendingProceedings: PendingProceeding[]
     fileNumberPrefix: string
   }
+  testFiles: { path: string; sizeInMB: number }[]
 }
 
 type MyOptions = {
   pendingProceedingsToBeCreated: Partial<PendingProceeding>[]
   decisionsToBeCreated: Partial<Decision>[]
   decisionToBeCreated: Partial<Decision>
+  testFilesOptions: { fileName: string; sizeInMB: number }[]
 }
 
 /**
@@ -1696,5 +1700,27 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
         newPendingProceeding.documentNumber,
       )
     }
+  },
+
+  testFilesOptions: [[], { option: true }],
+
+  testFiles: async ({ testFilesOptions }, use, testInfo) => {
+    const temporaryTestPath = testInfo.outputPath("testfiles")
+
+    // Ensure temp directory exists
+    await fs.mkdir(temporaryTestPath, { recursive: true })
+
+    const testFiles: { path: string; sizeInMB: number }[] = []
+    for (const { fileName, sizeInMB } of testFilesOptions) {
+      // Create file with specified size
+      const filePath = path.join(temporaryTestPath, fileName)
+      await fs.writeFile(filePath, Buffer.alloc(sizeInMB * 1024 * 1024))
+      testFiles.push({ path: filePath, sizeInMB })
+    }
+
+    await use(testFiles)
+
+    // Although the output dir will be removed automatically, we do not want the test files to be included in the snapshots after failures
+    await fs.rm(temporaryTestPath, { recursive: true, force: true })
   },
 })

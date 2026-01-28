@@ -8,12 +8,16 @@ const fileIndex = ref(0)
 const files = computed(() => {
   return [
     {
+      id: "123",
       name: "first.docx",
       format: "docx",
+      uploadTimestamp: "2024-06-01T12:00:00Z",
     },
     {
+      id: "456",
       name: "second.docx",
       format: "docx",
+      uploadTimestamp: "2024-06-01T12:00:00Z",
     },
   ]
 })

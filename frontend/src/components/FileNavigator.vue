@@ -2,7 +2,7 @@
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import PrevNextNavigation from "@/components/PrevNextNavigation.vue"
-import Attachment from "@/domain/attachment"
+import { Attachment } from "@/domain/attachment"
 
 const props = defineProps<{
   attachments: Attachment[]

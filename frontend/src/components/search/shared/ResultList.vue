@@ -90,7 +90,9 @@ const stickyHeaderPT = computed(() => {
 // --- END: sticky header logic ---
 
 const attachmentText = (listEntry: DocumentUnitListEntry) =>
-  listEntry.hasAttachments ? "Anhang vorhanden" : "Kein Anhang vorhanden"
+  listEntry.hasAttachments
+    ? "Originaldokument vorhanden"
+    : "Kein Originaldokument vorhanden"
 
 const headNoteOrPrincipleText = (listEntry: DocumentUnitListEntry) =>
   listEntry.hasHeadnoteOrPrinciple

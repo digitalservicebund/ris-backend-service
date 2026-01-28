@@ -30,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AbuseFee;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -728,6 +729,7 @@ public class DecisionTransformer extends DocumentableTransformer {
                 : decisionDTO.getDocumentalists().stream().map(DocumentalistDTO::getValue).toList())
         .previousDecisions(getPreviousDecisions(decisionDTO))
         .attachments(buildAttachments(decisionDTO))
+        .otherAttachments(buildOtherAttachments(decisionDTO))
         .ensuingDecisions(buildEnsuingDecisions(decisionDTO))
         .status(getStatus(decisionDTO))
         .inboxStatus(decisionDTO.getInboxStatus())
@@ -940,8 +942,14 @@ public class DecisionTransformer extends DocumentableTransformer {
   private static List<Attachment> buildAttachments(DecisionDTO decisionDTO) {
     return decisionDTO.getAttachments().stream()
         .map(AttachmentTransformer::transformToDomain)
-        .filter(
-            attachment -> "docx".equals(attachment.format()) || "fmx".equals(attachment.format()))
+        .filter(attachment -> AttachmentType.ORIGINAL == attachment.type())
+        .toList();
+  }
+
+  private static List<Attachment> buildOtherAttachments(DecisionDTO decisionDTO) {
+    return decisionDTO.getAttachments().stream()
+        .map(AttachmentTransformer::transformToDomain)
+        .filter(attachment -> AttachmentType.OTHER == attachment.type())
         .toList();
   }
 

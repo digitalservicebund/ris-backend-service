@@ -190,11 +190,11 @@ export const navigateToAttachments = async (
     skipAssert?: boolean
   },
 ) => {
-  await test.step("Navigate to 'Dokumente'", async () => {
+  await test.step("Navigate to 'Originaldokument'", async () => {
     const queryParams = getAllQueryParamsFromUrl(page)
 
     if (options?.navigationBy === "click") {
-      await page.getByRole("link", { name: "Dokumente" }).click()
+      await page.getByRole("link", { name: "Originaldokument" }).click()
     } else {
       await page.goto(
         `/caselaw/documentunit/${documentNumber}/attachments${queryParams}`,
@@ -321,31 +321,33 @@ export const uploadTestfile = async (
   filename: string | string[],
   options?: {
     skipAssert?: boolean
+    basePath?: string
   },
 ) => {
-  const [fileChooser] = await Promise.all([
-    page.waitForEvent("filechooser"),
-    page.getByText("Oder hier auswählen").click(),
-  ])
   const fileNames = Array.isArray(filename) ? filename : [filename]
-  await fileChooser.setFiles(
-    fileNames.map((file) => "./test/e2e/caselaw/testfiles/" + file),
-  )
-  await fileChooser.setFiles(
-    fileNames.map((file) => "./test/e2e/caselaw/testfiles/" + file),
-  )
-  await expect(async () => {
-    await expect(page.getByLabel("Ladestatus")).not.toBeAttached()
-  }).toPass({ timeout: 15000 })
+  const stepName = fileNames.length > 1 ? "Dateien werden" : "Datei wird"
 
-  // Assert upload block
-  if (options?.skipAssert) return
-  await expect(page.getByText("Hochgeladen am")).toBeVisible()
+  await test.step(`${fileNames.length} ${stepName} hochgeladen`, async () => {
+    const basePath = options?.basePath ?? "./test/e2e/caselaw/testfiles/"
+    const [fileChooser] = await Promise.all([
+      page.waitForEvent("filechooser"),
+      page.getByText("Oder hier auswählen").click(),
+    ])
+    await fileChooser.setFiles(fileNames.map((file) => basePath + file))
+    await fileChooser.setFiles(fileNames.map((file) => basePath + file))
+    await expect(async () => {
+      await expect(page.getByLabel("Ladestatus")).not.toBeAttached()
+    }).toPass({ timeout: 15000 })
 
-  for (const file of fileNames) {
-    const lastFileName = page.getByRole("cell", { name: file }).last()
-    await expect(lastFileName).toBeVisible()
-  }
+    // Assert upload block
+    if (options?.skipAssert) return
+    await expect(page.getByText("Hochgeladen am")).toBeVisible()
+
+    for (const file of fileNames) {
+      const lastFileName = page.getByRole("cell", { name: file }).last()
+      await expect(lastFileName).toBeVisible()
+    }
+  })
 }
 
 export async function save(page: Page) {

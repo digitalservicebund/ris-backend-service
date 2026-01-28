@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxImporterException;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeCategory;
@@ -144,6 +145,7 @@ public class FmxImportService implements TransformationService {
             .filename("Originalentscheidung")
             .format("fmx")
             .uploadTimestamp(Instant.now())
+            .attachmentType(AttachmentType.ORIGINAL.name())
             .build();
 
     attachmentRepository.save(attachmentDTO);

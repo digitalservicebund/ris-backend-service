@@ -10,6 +10,7 @@ import { useRouter } from "vue-router"
 import SingleCategory from "@/components/category-import/SingleCategory.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import InputField from "@/components/input/InputField.vue"
+import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ActiveCitation from "@/domain/activeCitation"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
@@ -670,7 +671,7 @@ onMounted(() => {
     class="scrollable-container relative overflow-auto"
     data-testid="category-import"
   >
-    <span class="ris-label1-bold">Rubriken importieren</span>
+    <TitleElement class="mb-24">Rubriken importieren</TitleElement>
     <div class="mt-16 flex flex-row items-end gap-8">
       <InputField
         id="categoryImporterDocumentNumber"

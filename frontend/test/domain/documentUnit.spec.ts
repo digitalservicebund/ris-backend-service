@@ -1,3 +1,4 @@
+import { Attachment } from "@/domain/attachment"
 import { CoreData } from "@/domain/coreData"
 import { Decision, LongTexts, ShortTexts } from "@/domain/decision"
 
@@ -48,14 +49,14 @@ describe("DocumentUnit", () => {
 
   it("returns true if file is attached", () => {
     const documentUnit = new Decision("foo", {
-      attachments: [{ s3path: "foo-path" }],
+      attachments: [mockAttachment],
     })
     expect(documentUnit.hasAttachments).toBeTruthy()
   })
 
   it("returns all missing required fields", () => {
     const documentUnit = new Decision("foo", {
-      attachments: [{ s3path: "foo-path" }],
+      attachments: [mockAttachment],
     })
     expect(documentUnit.missingRequiredFields).toStrictEqual([
       "fileNumbers",
@@ -68,7 +69,7 @@ describe("DocumentUnit", () => {
 
   it("identify missing fields correctly if one field is set", () => {
     const documentUnit = new Decision("foo", {
-      attachments: [{ s3path: "foo-path" }],
+      attachments: [mockAttachment],
       coreData: { legalEffect: "foo" },
     })
     expect(documentUnit.missingRequiredFields).toStrictEqual([
@@ -81,7 +82,7 @@ describe("DocumentUnit", () => {
 
   it("indentify empty fileNumbers as missing", () => {
     const documentUnit = new Decision("foo", {
-      attachments: [{ s3path: "foo-path" }],
+      attachments: [mockAttachment],
       coreData: { fileNumbers: [] },
     })
     expect(documentUnit.missingRequiredFields).toStrictEqual([
@@ -95,7 +96,7 @@ describe("DocumentUnit", () => {
 
   it("indentify empty decisionDate as missing", () => {
     const documentUnit = new Decision("foo", {
-      attachments: [{ s3path: "foo-path" }],
+      attachments: [mockAttachment],
       coreData: { decisionDate: "" },
     })
     expect(documentUnit.missingRequiredFields).toStrictEqual([
@@ -109,7 +110,7 @@ describe("DocumentUnit", () => {
 
   it("indentify all missing required fields", () => {
     const documentUnit = new Decision("foo", {
-      attachments: [{ s3path: "foo-path" }],
+      attachments: [mockAttachment],
       coreData: { legalEffect: "foo" },
     })
     expect(documentUnit.missingRequiredFields).toStrictEqual([
@@ -120,3 +121,11 @@ describe("DocumentUnit", () => {
     ])
   })
 })
+
+const mockAttachment: Attachment = {
+  id: "123",
+  uploadTimestamp: "2024-06-01T12:00:00Z",
+  name: "name",
+  format: "docx",
+  s3path: "foo-path",
+}

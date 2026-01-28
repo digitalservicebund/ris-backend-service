@@ -29,12 +29,12 @@ test.describe.skip(
 
       await test.step("Navigate to categories", async () => {
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
-        await expect(page.getByLabel("Dokumente anzeigen")).toBeVisible()
+        await expect(page.getByLabel("Originaldokument anzeigen")).toBeVisible()
       })
 
       await test.step("Validate word image is rotated correctly", async () => {
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
-        await expect(page.getByLabel("Dokumente anzeigen")).toBeVisible()
+        await expect(page.getByLabel("Originaldokument anzeigen")).toBeVisible()
         const image = page
           .getByTestId("Dokumentenvorschau")
           .locator("img")

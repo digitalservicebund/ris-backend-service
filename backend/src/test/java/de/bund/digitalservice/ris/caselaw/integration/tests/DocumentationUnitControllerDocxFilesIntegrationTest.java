@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
@@ -399,14 +400,16 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
 
-    attachmentRepository.save(
-        AttachmentDTO.builder()
-            .s3ObjectPath("fooPath")
-            .documentationUnit(dto)
-            .uploadTimestamp(Instant.now())
-            .filename("fooFile")
-            .format("docx")
-            .build());
+    var attachment =
+        attachmentRepository.save(
+            AttachmentDTO.builder()
+                .s3ObjectPath("fooPath")
+                .documentationUnit(dto)
+                .uploadTimestamp(Instant.now())
+                .filename("fooFile")
+                .format("docx")
+                .attachmentType(AttachmentType.OTHER.name())
+                .build());
 
     assertThat(attachmentRepository.findAll()).hasSize(1);
 
@@ -414,7 +417,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     risWebTestClient
         .withDefaultLogin(oidcLoggedInUserId)
         .delete()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file/fooPath")
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file/" + attachment.getId())
         .exchange()
         .expectStatus()
         .isNoContent();
@@ -443,7 +446,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     assertThat(logs).hasSize(1);
     assertThat(logs.getFirst().eventType()).isEqualTo(HistoryLogEventType.FILES);
     assertThat(logs.getFirst().createdBy()).isEqualTo("testUser");
-    assertThat(logs.getFirst().description()).isEqualTo("Word-Dokument gelöscht");
+    assertThat(logs.getFirst().description()).isEqualTo("Anhang \"fooFile\" gelöscht");
   }
 
   @Test
@@ -455,14 +458,16 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
 
-    attachmentRepository.save(
-        AttachmentDTO.builder()
-            .s3ObjectPath("fooPath")
-            .documentationUnit(dto)
-            .uploadTimestamp(Instant.now())
-            .filename("fooFile")
-            .format("docx")
-            .build());
+    var attachment =
+        attachmentRepository.save(
+            AttachmentDTO.builder()
+                .s3ObjectPath("fooPath")
+                .documentationUnit(dto)
+                .uploadTimestamp(Instant.now())
+                .filename("fooFile")
+                .format("docx")
+                .attachmentType(AttachmentType.OTHER.name())
+                .build());
 
     assertThat(attachmentRepository.findAll()).hasSize(1);
 
@@ -470,7 +475,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     risWebTestClient
         .withDefaultLogin()
         .delete()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file/fooPath")
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file/" + attachment.getId())
         .exchange()
         .expectStatus()
         .isNoContent();
@@ -520,10 +525,11 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
 
   @Test
   void testRemoveFileFromDocumentationUnit_withInvalidUuid_shouldFail() {
+    var fileId = UUID.randomUUID();
     risWebTestClient
         .withDefaultLogin()
         .delete()
-        .uri("/api/v1/caselaw/documentunits/abc/file/fooPath")
+        .uri("/api/v1/caselaw/documentunits/abc/file/" + fileId)
         .exchange()
         .expectStatus()
         .is4xxClientError();
@@ -537,6 +543,32 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
 
+    var attachment =
+        attachmentRepository.save(
+            AttachmentDTO.builder()
+                .s3ObjectPath("fooPath")
+                .documentationUnit(dto)
+                .uploadTimestamp(Instant.now())
+                .filename("fooFile")
+                .format("docx")
+                .attachmentType(AttachmentType.OTHER.name())
+                .build());
+
+    assertThat(attachmentRepository.findAll()).hasSize(1);
+    risWebTestClient
+        .withExternalLogin()
+        .delete()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file/" + attachment.getId())
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+  }
+
+  @Test
+  void testRemoveDocumentationUnit_shouldRemoveAttachments() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
+
     attachmentRepository.save(
         AttachmentDTO.builder()
             .s3ObjectPath("fooPath")
@@ -544,16 +576,18 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
             .uploadTimestamp(Instant.now())
             .filename("fooFile")
             .format("docx")
+            .attachmentType(AttachmentType.OTHER.name())
             .build());
 
     assertThat(attachmentRepository.findAll()).hasSize(1);
     risWebTestClient
-        .withExternalLogin()
+        .withDefaultLogin()
         .delete()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file/fooPath")
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
         .exchange()
         .expectStatus()
-        .isForbidden();
+        .isOk();
+    assertThat(attachmentRepository.findAll()).isEmpty();
   }
 
   private void mockS3ClientToReturnFile(byte[] file) {

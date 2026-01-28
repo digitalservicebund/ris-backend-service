@@ -42,4 +42,7 @@ public class AttachmentDTO {
   private DocumentationUnitDTO documentationUnit;
 
   @Column private byte[] content;
+
+  @Column(name = "attachment_type")
+  private String attachmentType;
 }

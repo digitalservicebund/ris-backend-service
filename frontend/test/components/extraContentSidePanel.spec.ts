@@ -4,7 +4,7 @@ import { fireEvent, render, screen } from "@testing-library/vue"
 import { beforeAll, describe } from "vitest"
 import { createRouter, createWebHistory, Router } from "vue-router"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
-import Attachment from "@/domain/attachment"
+import { Attachment } from "@/domain/attachment"
 import { Decision } from "@/domain/decision"
 import Reference from "@/domain/reference"
 import featureToggleService from "@/services/featureToggleService"
@@ -67,6 +67,7 @@ function renderComponent(
 
 function mockAttachment(name: string = ""): Attachment {
   return {
+    id: "123",
     name: name,
     format: "",
     s3path: "123",
@@ -195,11 +196,13 @@ describe("ExtraContentSidePanel", () => {
 
           if (expectedIsOpen) {
             expect(screen.getByLabelText("Notiz anzeigen")).toBeVisible()
-            expect(screen.getByLabelText("Dokumente anzeigen")).toBeVisible()
+            expect(
+              screen.getByLabelText("Originaldokument anzeigen"),
+            ).toBeVisible()
           } else {
             expect(screen.getByLabelText("Notiz anzeigen")).not.toBeVisible()
             expect(
-              screen.getByLabelText("Dokumente anzeigen"),
+              screen.getByLabelText("Originaldokument anzeigen"),
             ).not.toBeVisible()
           }
         }),
@@ -276,7 +279,7 @@ describe("ExtraContentSidePanel", () => {
       })
 
       expect(await screen.findByDisplayValue("some note")).toBeVisible()
-      await fireEvent.click(screen.getByLabelText("Dokumente anzeigen"))
+      await fireEvent.click(screen.getByLabelText("Originaldokument anzeigen"))
       expect(
         await screen.findByText(
           "Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.",
@@ -297,19 +300,39 @@ describe("ExtraContentSidePanel", () => {
       const testCases = [
         {
           sidePanelMode: "attachments",
-          expectedHidden: ["note", "preview", "category-import"],
+          expectedHidden: ["note", "preview", "category-import", "other-files"],
         },
         {
           sidePanelMode: "note",
-          expectedHidden: ["attachments", "preview", "category-import"],
+          expectedHidden: [
+            "attachments",
+            "preview",
+            "category-import",
+            "other-files",
+          ],
         },
         {
           sidePanelMode: "preview",
-          expectedHidden: ["attachments", "note", "category-import"],
+          expectedHidden: [
+            "attachments",
+            "note",
+            "category-import",
+            "other-files",
+          ],
         },
         {
           enabledPanels: ["category-import"],
-          expectedHidden: ["attachments", "note", "preview"],
+          expectedHidden: ["attachments", "note", "preview", "other-files"],
+        },
+        {
+          enabledPanels: ["other-files"],
+          expectedHidden: [
+            "attachments",
+            "note",
+            "preview",
+            "other-files",
+            "category-import",
+          ],
         },
       ]
       testCases.forEach(({ sidePanelMode, expectedHidden }) =>
