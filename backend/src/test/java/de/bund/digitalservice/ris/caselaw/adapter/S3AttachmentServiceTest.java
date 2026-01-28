@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,6 +37,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -75,7 +75,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.UploadPartRequest;
 import software.amazon.awssdk.services.s3.model.UploadPartResponse;
 
-@TestPropertySource(properties = "otc.obs.bucket-name:testBucket")
+@TestPropertySource(properties = "otc.obs.bucket-name=testBucket")
 @ExtendWith(SpringExtension.class)
 @Import({S3AttachmentService.class})
 class S3AttachmentServiceTest {
@@ -266,8 +266,10 @@ class S3AttachmentServiceTest {
     var deleteObjectRequestCaptor = ArgumentCaptor.forClass(DeleteObjectRequest.class);
     verify(s3Client, times(2)).deleteObject(deleteObjectRequestCaptor.capture());
     List<DeleteObjectRequest> capturedRequests = deleteObjectRequestCaptor.getAllValues();
-    assertTrue(capturedRequests.stream().anyMatch(request -> request.key().equals("fooS3Path")));
-    assertTrue(capturedRequests.stream().anyMatch(request -> request.key().equals("barS3Path")));
+    Assertions.assertTrue(
+        capturedRequests.stream().anyMatch(request -> request.key().equals("fooS3Path")));
+    Assertions.assertTrue(
+        capturedRequests.stream().anyMatch(request -> request.key().equals("barS3Path")));
   }
 
   @Test
@@ -356,7 +358,7 @@ class S3AttachmentServiceTest {
   }
 
   @Test
-  void testStreamUploadToS3_multipartIsUsed_andDomainIsPersisted() throws Exception {
+  void testStreamUploadToS3_multipartIsUsed_andDomainIsPersisted() {
     // given
     byte[] data = new byte[6 * 1024 * 1024];
     var in = new java.io.ByteArrayInputStream(data);
@@ -406,7 +408,7 @@ class S3AttachmentServiceTest {
   }
 
   @Test
-  void testStreamUploadToS3_whenUploadPartFails_abortsAndDeletesDomain() throws Exception {
+  void testStreamUploadToS3_whenUploadPartFails_abortsAndDeletesDomain() {
     // given
     byte[] data = new byte[6 * 1024 * 1024];
     var in = new java.io.ByteArrayInputStream(data);
@@ -440,7 +442,8 @@ class S3AttachmentServiceTest {
                     docUnitId, in, "test.zip", user, AttachmentType.OTHER));
 
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
-    assertTrue(exception.getReason().contains("Failed to upload file"));
+    Assertions.assertNotNull(exception.getReason());
+    Assertions.assertTrue(exception.getReason().contains("Failed to upload file"));
     verify(repository).delete(any(AttachmentDTO.class));
   }
 
@@ -479,7 +482,8 @@ class S3AttachmentServiceTest {
                     docUnitId, in, "test.zip", user, AttachmentType.OTHER));
 
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exFromStream.getStatusCode());
-    assertTrue(exFromStream.getReason().contains("Failed to upload file"));
+    Assertions.assertNotNull(exFromStream.getReason());
+    Assertions.assertTrue(exFromStream.getReason().contains("Failed to upload file"));
     verify(repository).delete(any(AttachmentDTO.class));
   }
 
@@ -501,8 +505,7 @@ class S3AttachmentServiceTest {
             .build();
 
     var responseInputStream =
-        new ResponseInputStream<GetObjectResponse>(
-            getObjectResponse, new ByteArrayInputStream(data));
+        new ResponseInputStream<>(getObjectResponse, new ByteArrayInputStream(data));
 
     when(s3Client.getObject(any(GetObjectRequest.class), any(ResponseTransformer.class)))
         .thenReturn(responseInputStream);
