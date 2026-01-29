@@ -218,7 +218,7 @@ class S3AttachmentServiceTest {
   @ParameterizedTest()
   @ValueSource(strings = {"", " "})
   @NullSource
-  void testDeleteByFileId_withoutS3Path(String s3Path) {
+  void testDeleteByFileId_withoutS3Path_shouldThrowAttachmentException(String s3Path) {
     var user = User.builder().build();
     var docUnitId = UUID.randomUUID();
     var fileId = UUID.randomUUID();
@@ -233,7 +233,7 @@ class S3AttachmentServiceTest {
   }
 
   @Test
-  void testDeleteByFileId_withoutAttachment_shouldThrow() {
+  void testDeleteByFileId_withoutAttachment_shouldThrowNotFound() {
     var user = User.builder().build();
     var docUnitId = UUID.randomUUID();
     var fileId = UUID.randomUUID();
