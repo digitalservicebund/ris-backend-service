@@ -159,11 +159,23 @@ public class S3AttachmentService implements AttachmentService {
     try {
       streamFileToBucket(s3ObjectPath, inputStream);
     } catch (Exception e) {
-      log.error("Failed to upload file to S3", e);
+      log.atError()
+          .setCause(e)
+          .setMessage("Failed to upload file to S3")
+          .addKeyValue("id", attachmentDTO.getId())
+          .addKeyValue("filename", filename)
+          .addKeyValue("s3ObjectPath", s3ObjectPath)
+          .log();
       try {
         repository.delete(attachmentDTO);
       } catch (Exception deleteEx) {
-        log.error("Failed to delete attachment record after failed multipart upload", deleteEx);
+        log.atError()
+            .setCause(deleteEx)
+            .setMessage("Failed to delete attachment record after failed multipart upload")
+            .addKeyValue("id", attachmentDTO.getId())
+            .addKeyValue("filename", filename)
+            .addKeyValue("s3ObjectPath", s3ObjectPath)
+            .log();
       }
       throw new ResponseStatusException(
           HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload file", e);
@@ -262,7 +274,8 @@ public class S3AttachmentService implements AttachmentService {
 
   private void abortUploadSafely(String key, String uploadId, Exception e) {
     log.atWarn()
-        .addKeyValue("uploadId", uploadId)
+        .addKeyValue("key", key)
+        .addKeyValue("id", uploadId)
         .setCause(e)
         .log("Multipart upload failed, aborting uploadId={}", uploadId);
     try {
@@ -274,7 +287,8 @@ public class S3AttachmentService implements AttachmentService {
               .build());
     } catch (Exception abortEx) {
       log.atWarn()
-          .addKeyValue("uploadId", uploadId)
+          .addKeyValue("id", uploadId)
+          .addKeyValue("key", key)
           .setCause(abortEx)
           .log("Failed to abort multipart upload for id {}", uploadId);
     }
@@ -397,7 +411,11 @@ public class S3AttachmentService implements AttachmentService {
             stream.transferTo(outputStream);
             outputStream.flush();
           } catch (IOException e) {
-            log.error("Failed to stream file from S3", e);
+            log.atError()
+                .setCause(e)
+                .setMessage("Failed to stream file from S3")
+                .addKeyValue("id", attachmentDTO.getId())
+                .log();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
           }
         };

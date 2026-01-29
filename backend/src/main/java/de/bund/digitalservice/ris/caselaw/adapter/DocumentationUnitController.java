@@ -280,10 +280,18 @@ public class DocumentationUnitController {
           attachmentService.streamFileToDocumentationUnit(
               uuid, inputStream, filename, user, AttachmentType.ORIGINAL);
     } catch (IOException e) {
-      log.error("Error reading uploaded file for documentation unit {}", uuid, e);
+      log.atError()
+          .setCause(e)
+          .setMessage("Error reading uploaded file for documentation unit")
+          .addKeyValue("id", uuid)
+          .log();
       return ResponseEntity.internalServerError().build();
     } catch (Exception e) {
-      log.error("Error by attaching file to documentation unit {}", uuid, e);
+      log.atError()
+          .setCause(e)
+          .setMessage("Error by attaching file to documentation unit")
+          .addKeyValue("id", uuid)
+          .log();
       return ResponseEntity.internalServerError().build();
     }
 
@@ -328,10 +336,18 @@ public class DocumentationUnitController {
           uuid, inputStream, filename, user, AttachmentType.OTHER);
       return ResponseEntity.status(HttpStatus.CREATED).build();
     } catch (IOException e) {
-      log.error("Error reading uploaded file for documentation unit {}", uuid, e);
+      log.atError()
+          .setCause(e)
+          .setMessage("Error reading uploaded file for documentation unit")
+          .addKeyValue("id", uuid)
+          .log();
       return ResponseEntity.internalServerError().build();
     } catch (Exception e) {
-      log.error("Error by attaching file to documentation unit {}", uuid, e);
+      log.atError()
+          .setCause(e)
+          .setMessage("Error by attaching file to documentation unit")
+          .addKeyValue("id", uuid)
+          .log();
       return ResponseEntity.internalServerError().build();
     }
   }
