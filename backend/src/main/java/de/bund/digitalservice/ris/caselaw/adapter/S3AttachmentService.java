@@ -127,7 +127,11 @@ public class S3AttachmentService implements AttachmentService {
   }
 
   public Attachment streamFileToDocumentationUnit(
-      UUID documentationUnitId, InputStream file, String filename, User user, AttachmentType type) {
+      UUID documentationUnitId,
+      InputStream inputStream,
+      String filename,
+      User user,
+      AttachmentType type) {
 
     var documentationUnit = documentationUnitRepository.findById(documentationUnitId).orElseThrow();
     var documentationUnitNumber = documentationUnit.getDocumentNumber();
@@ -153,7 +157,7 @@ public class S3AttachmentService implements AttachmentService {
                 attachmentDTO.getFormat());
 
     try {
-      streamFileToBucket(s3ObjectPath, file);
+      streamFileToBucket(s3ObjectPath, inputStream);
     } catch (Exception e) {
       log.error("Failed to upload file to S3", e);
       try {
@@ -183,13 +187,13 @@ public class S3AttachmentService implements AttachmentService {
     int lastDotIndex = filename.lastIndexOf('.');
 
     if (lastDotIndex > 0 && lastDotIndex < filename.length() - 1) {
-      return filename.substring(lastDotIndex + 1);
+      return filename.substring(lastDotIndex + 1).toLowerCase();
     }
 
     return "";
   }
 
-  private void streamFileToBucket(String s3ObjectPath, InputStream file) {
+  private void streamFileToBucket(String s3ObjectPath, InputStream inputStream) {
     var createdMultipartUpload =
         s3Client.createMultipartUpload(
             c ->
@@ -201,9 +205,9 @@ public class S3AttachmentService implements AttachmentService {
     List<CompletedPart> completedParts = new ArrayList<>();
     int partNumber = 1;
 
-    try (file) {
+    try (inputStream) {
       byte[] buffer;
-      while ((buffer = file.readNBytes(PART_SIZE)).length > 0) {
+      while ((buffer = inputStream.readNBytes(PART_SIZE)).length > 0) {
         validatePartLimit(partNumber);
 
         CompletedPart part = uploadPart(s3ObjectPath, uploadId, partNumber, buffer);

@@ -274,11 +274,11 @@ public class DocumentationUnitController {
     }
 
     Attachment attachment;
-    try (InputStream is = file.getInputStream()) {
+    try (InputStream inputStream = file.getInputStream()) {
       User user = userService.getUser(oidcUser);
       attachment =
           attachmentService.streamFileToDocumentationUnit(
-              uuid, is, filename, user, AttachmentType.ORIGINAL);
+              uuid, inputStream, filename, user, AttachmentType.ORIGINAL);
     } catch (IOException e) {
       log.error("Error reading uploaded file for documentation unit {}", uuid, e);
       return ResponseEntity.internalServerError().build();
@@ -322,10 +322,10 @@ public class DocumentationUnitController {
       return ResponseEntity.badRequest().build();
     }
 
-    try (InputStream is = file.getInputStream()) {
+    try (InputStream inputStream = file.getInputStream()) {
       User user = userService.getUser(oidcUser);
       attachmentService.streamFileToDocumentationUnit(
-          uuid, is, filename, user, AttachmentType.OTHER);
+          uuid, inputStream, filename, user, AttachmentType.OTHER);
       return ResponseEntity.status(HttpStatus.CREATED).build();
     } catch (IOException e) {
       log.error("Error reading uploaded file for documentation unit {}", uuid, e);

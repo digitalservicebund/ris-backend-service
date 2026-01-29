@@ -11,7 +11,11 @@ public interface AttachmentService {
       UUID documentationUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders, User user);
 
   Attachment streamFileToDocumentationUnit(
-      UUID documentationUnitId, InputStream file, String filename, User user, AttachmentType type);
+      UUID documentationUnitId,
+      InputStream inputStream,
+      String filename,
+      User user,
+      AttachmentType type);
 
   void deleteByFileId(UUID fileId, UUID documentationUnitId, User user);
 
