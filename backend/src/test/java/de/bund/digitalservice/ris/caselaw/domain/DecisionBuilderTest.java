@@ -27,7 +27,7 @@ class DecisionBuilderTest {
     documentationUnitDTO.setDocumentationOffice(DocumentationOfficeDTO.builder().build());
     Decision decision = DecisionTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(decision.attachments().get(0).name()).isEqualTo("doc.docx");
+    assertThat(decision.originalDocumentAttachments().get(0).name()).isEqualTo("doc.docx");
     assertThat(decision.longTexts().reasons()).isEqualTo("reasons123");
   }
 }

@@ -112,7 +112,7 @@ export class Decision {
     PortalPublicationStatus.UNPUBLISHED
   readonly kind = Kind.DECISION
   public version: number = 0
-  public attachments: Attachment[] = []
+  public originalDocumentAttachments: Attachment[] = []
   public otherAttachments: Attachment[] = []
   public coreData: CoreData = {}
   public shortTexts: ShortTexts = {}
@@ -285,8 +285,11 @@ export class Decision {
     Object.assign(this, data)
   }
 
-  get hasAttachments(): boolean {
-    return this.attachments && this.attachments.length > 0
+  get hasOriginalDocumentAttachments(): boolean {
+    return (
+      this.originalDocumentAttachments &&
+      this.originalDocumentAttachments.length > 0
+    )
   }
 
   get renderSummary(): string {

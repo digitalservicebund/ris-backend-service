@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
@@ -51,14 +52,11 @@ public class DocumentationUnitListItemTransformer {
         .lastHandoverDateTime(documentationUnitListItemDTO.getLastHandoverDateTime())
         .appraisalBody(documentationUnitListItemDTO.getJudicialBody())
         .hasHeadnoteOrPrinciple(hasHeadnoteOrPrinciple(documentationUnitListItemDTO))
-        .hasAttachments(
-            !documentationUnitListItemDTO.getAttachments().stream()
-                .filter(
+        .hasOriginalDocument(
+            documentationUnitListItemDTO.getAttachments().stream()
+                .anyMatch(
                     attachmentDTO ->
-                        "fmx".equals(attachmentDTO.getFormat())
-                            || "docx".equals(attachmentDTO.getFormat()))
-                .toList()
-                .isEmpty())
+                        AttachmentType.ORIGINAL.name().equals(attachmentDTO.getAttachmentType())))
         .documentType(
             DocumentTypeTransformer.transformToDomain(
                 documentationUnitListItemDTO.getDocumentType()))

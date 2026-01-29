@@ -49,8 +49,8 @@ vi.mock("@/components/BulkAssignProcessStep.vue", () => {
     template: `
     <div data-testid="bulk-assign-mock">
         <span class="sr-only">Aktionen</span>
-        <button 
-            data-testid="trigger-no-selection-error" 
+        <button
+            data-testid="trigger-no-selection-error"
             @click="emitSelectionError"
         >
             Trigger Selection Error
@@ -68,7 +68,7 @@ const mockEntries = [
   new DocumentUnitListEntry({
     uuid: "1",
     documentNumber: "ABC123",
-    hasAttachments: true,
+    hasOriginalDocument: true,
     hasHeadnoteOrPrinciple: false,
     isDeletable: true,
     isEditable: true,
@@ -82,7 +82,7 @@ const mockEntries = [
   new DocumentUnitListEntry({
     uuid: "2",
     documentNumber: "DEF456",
-    hasAttachments: false,
+    hasOriginalDocument: false,
     hasHeadnoteOrPrinciple: true,
     note: "",
     isDeletable: false,

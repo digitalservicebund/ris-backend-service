@@ -32,8 +32,9 @@ const {
     attachmentIndexDeleted: (index) => emit("attachmentIndexDeleted", index),
   },
   {
-    getList: (decision) => decision.attachments,
-    setList: (decision, newValues) => (decision.attachments = newValues),
+    getList: (decision) => decision.originalDocumentAttachments,
+    setList: (decision, newValues) =>
+      (decision.originalDocumentAttachments = newValues),
     uploadFn: (uuid, file) =>
       attachmentService.uploadOriginalDocument(uuid, file),
   },

@@ -344,7 +344,7 @@ class DocumentationUnitControllerAuthTest {
         Decision.builder()
             .uuid(TEST_UUID)
             .status(status == null ? Status.builder().publicationStatus(PUBLISHED).build() : status)
-            .attachments(
+            .originalDocumentAttachments(
                 Collections.singletonList(
                     Attachment.builder().id(TEST_FILE_UUID).s3path(s3path).build()))
             .coreData(CoreData.builder().documentationOffice(docOffice).build())

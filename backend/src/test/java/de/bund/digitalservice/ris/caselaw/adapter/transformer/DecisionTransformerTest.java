@@ -1740,7 +1740,7 @@ class DecisionTransformerTest {
 
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
 
-    assertThat(decision.attachments())
+    assertThat(decision.originalDocumentAttachments())
         .hasSize(2)
         .satisfiesExactlyInAnyOrder(
             attachment -> assertThat(attachment.name()).isEqualTo("foo"),
@@ -2829,7 +2829,7 @@ class DecisionTransformerTest {
                 .borderNumbers(Collections.emptyList())
                 .duplicateRelations(List.of())
                 .build())
-        .attachments(Collections.emptyList())
+        .originalDocumentAttachments(Collections.emptyList())
         .otherAttachments(Collections.emptyList())
         .contentRelatedIndexing(
             ContentRelatedIndexing.builder()

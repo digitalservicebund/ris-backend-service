@@ -841,7 +841,8 @@ class DocumentationUnitControllerTest {
     when(service.getByUuid(TEST_UUID))
         .thenReturn(
             Decision.builder()
-                .attachments(Collections.singletonList(Attachment.builder().s3path("123").build()))
+                .originalDocumentAttachments(
+                    Collections.singletonList(Attachment.builder().s3path("123").build()))
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
                 .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
                 .build());

@@ -45,7 +45,7 @@ const popupModalText = computed(
 )
 const scrollLock = useScrollLock(document)
 const attachmentText = (listEntry: DocumentUnitListEntry) =>
-  listEntry.hasAttachments
+  listEntry.hasOriginalDocument
     ? "Originaldokument vorhanden"
     : "Kein Originaldokument vorhanden"
 
@@ -209,7 +209,9 @@ const emptyText = computed(() =>
                   <template #icon>
                     <IconAttachedFile
                       :class="
-                        item.hasAttachments ? 'text-blue-800' : 'text-gray-500'
+                        item.hasOriginalDocument
+                          ? 'text-blue-800'
+                          : 'text-gray-500'
                       "
                       data-testid="file-attached-icon"
                     />

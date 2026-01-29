@@ -21,7 +21,7 @@ import lombok.Builder;
  * @param appraisalBody (Spruchkörper) of the search result
  * @param documentType (Dokumenttyp) of the search result
  * @param status (Status) of the search result
- * @param hasAttachments Search result has attachments
+ * @param hasOriginalDocument Search result has originalDocumentAttachments
  * @param hasHeadnoteOrPrinciple Search result has headnote or principle
  * @param source the source the documentation unit was created from
  * @param previousProcessStep (Prozessschritte) the latest doc process step of the search result
@@ -36,7 +36,7 @@ public record DocumentationUnitListItem(
     String documentNumber,
     Court court,
     String fileNumber,
-    Boolean hasAttachments,
+    Boolean hasOriginalDocument,
     LocalDate decisionDate,
     LocalDate resolutionDate,
     Instant createdAt,

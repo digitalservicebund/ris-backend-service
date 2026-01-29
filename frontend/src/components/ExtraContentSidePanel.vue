@@ -36,11 +36,11 @@ const hasNote = computed(() => {
   )
 })
 
-const hasAttachments = computed(() => {
+const hasOriginalDocumentAttachments = computed(() => {
   return (
     isDecision(props.documentUnit) &&
-    !!props.documentUnit!.attachments &&
-    props.documentUnit!.attachments.length > 0
+    !!props.documentUnit!.originalDocumentAttachments &&
+    props.documentUnit!.originalDocumentAttachments.length > 0
   )
 })
 
@@ -81,7 +81,7 @@ function setDefaultState() {
   if (
     isDecision(props.documentUnit) &&
     !props.documentUnit?.note &&
-    props.documentUnit?.hasAttachments
+    props.documentUnit?.hasOriginalDocumentAttachments
   ) {
     setSidePanelMode("original-document")
     return
@@ -110,7 +110,7 @@ onMounted(() => {
   if (route.query.showAttachmentPanel) {
     store.isExpanded = route.query.showAttachmentPanel === "true"
   } else {
-    store.isExpanded = hasNote.value || hasAttachments.value
+    store.isExpanded = hasNote.value || hasOriginalDocumentAttachments.value
   }
 })
 </script>
@@ -163,11 +163,15 @@ onMounted(() => {
           <AttachmentView
             v-if="
               props.documentUnit.uuid &&
-              props.documentUnit.attachments &&
-              props.documentUnit.attachments[currentAttachmentIndex]?.id
+              props.documentUnit.originalDocumentAttachments &&
+              props.documentUnit.originalDocumentAttachments[
+                currentAttachmentIndex
+              ]?.id
             "
             :attachment-id="
-              props.documentUnit.attachments[currentAttachmentIndex].id
+              props.documentUnit.originalDocumentAttachments[
+                currentAttachmentIndex
+              ].id
             "
             :documentation-unit-id="props.documentUnit.uuid"
           />

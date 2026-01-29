@@ -149,7 +149,7 @@ const isInternalUser = useInternalUser()
 
     <FileNavigator
       v-if="panelMode === 'original-document' && isDecision(documentUnit)"
-      :attachments="documentUnit!.attachments"
+      :attachments="documentUnit!.originalDocumentAttachments"
       :current-index="currentAttachmentIndex"
       @select="emitAttachmentIndex"
     />

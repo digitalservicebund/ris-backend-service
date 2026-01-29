@@ -25,7 +25,7 @@ function renderComponent(attachments?: Attachment[]) {
               docunitStore: {
                 documentUnit: new Decision("foo", {
                   documentNumber: "1234567891234",
-                  attachments: attachments ?? [],
+                  originalDocumentAttachments: attachments ?? [],
                 }),
               },
             },

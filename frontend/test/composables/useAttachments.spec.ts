@@ -25,7 +25,7 @@ describe("useAttachments", () => {
     it("attachments returns correct list", () => {
       const events = {}
       const options = {
-        getList: (d: Decision) => d.attachments,
+        getList: (d: Decision) => d.originalDocumentAttachments,
         setList: vi.fn(),
         uploadFn: vi.fn(),
       }
@@ -38,7 +38,7 @@ describe("useAttachments", () => {
     it("hasAttachments with attachments returns true", () => {
       const events = {}
       const options = {
-        getList: (d: Decision) => d.attachments,
+        getList: (d: Decision) => d.originalDocumentAttachments,
         setList: vi.fn(),
         uploadFn: vi.fn(),
       }
@@ -50,12 +50,12 @@ describe("useAttachments", () => {
 
     it("hasAttachments without attachments returns false", () => {
       const decisionWithoutAttachment = new Decision("test-uuid", {
-        attachments: [],
+        originalDocumentAttachments: [],
       })
       createDocumentUnitStore(decisionWithoutAttachment)
       const events = {}
       const options = {
-        getList: (d: Decision) => d.attachments,
+        getList: (d: Decision) => d.originalDocumentAttachments,
         setList: vi.fn(),
         uploadFn: vi.fn(),
       }
@@ -83,7 +83,7 @@ describe("useAttachments", () => {
         attachmentIndexDeleted: vi.fn(),
       }
       const options = {
-        getList: (d: Decision) => d.attachments,
+        getList: (d: Decision) => d.originalDocumentAttachments,
         setList: vi.fn(),
         uploadFn: vi.fn(),
       }
@@ -255,7 +255,7 @@ const mockAttachment: Attachment = {
 }
 const decision = new Decision("test-uuid", {
   documentNumber: "documentNumber",
-  attachments: [mockAttachment],
+  originalDocumentAttachments: [mockAttachment],
   otherAttachments: [],
 })
 const deleteAttachmentMock = vi.spyOn(attachmentService, "delete")

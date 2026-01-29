@@ -33,7 +33,7 @@ function renderComponent(
   const documentUnit = new Decision("foo", {
     documentNumber: "1234567891234",
     note: options.note ?? "",
-    attachments: options.attachments ?? [],
+    originalDocumentAttachments: options.attachments ?? [],
     isEditable: options.isEditable || false,
   })
 

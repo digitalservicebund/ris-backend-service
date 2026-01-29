@@ -41,22 +41,24 @@ describe("DocumentUnit", () => {
 
   it("returns false if no file is attached", () => {
     const documentUnit = new Decision("foo")
-    expect(documentUnit.hasAttachments).toBeFalsy()
+    expect(documentUnit.hasOriginalDocumentAttachments).toBeFalsy()
 
-    const documentUnit2 = new Decision("foo", { attachments: [] })
-    expect(documentUnit2.hasAttachments).toBeFalsy()
+    const documentUnit2 = new Decision("foo", {
+      originalDocumentAttachments: [],
+    })
+    expect(documentUnit2.hasOriginalDocumentAttachments).toBeFalsy()
   })
 
   it("returns true if file is attached", () => {
     const documentUnit = new Decision("foo", {
-      attachments: [mockAttachment],
+      originalDocumentAttachments: [mockAttachment],
     })
-    expect(documentUnit.hasAttachments).toBeTruthy()
+    expect(documentUnit.hasOriginalDocumentAttachments).toBeTruthy()
   })
 
   it("returns all missing required fields", () => {
     const documentUnit = new Decision("foo", {
-      attachments: [mockAttachment],
+      originalDocumentAttachments: [mockAttachment],
     })
     expect(documentUnit.missingRequiredFields).toStrictEqual([
       "fileNumbers",
@@ -69,7 +71,7 @@ describe("DocumentUnit", () => {
 
   it("identify missing fields correctly if one field is set", () => {
     const documentUnit = new Decision("foo", {
-      attachments: [mockAttachment],
+      originalDocumentAttachments: [mockAttachment],
       coreData: { legalEffect: "foo" },
     })
     expect(documentUnit.missingRequiredFields).toStrictEqual([
@@ -82,7 +84,7 @@ describe("DocumentUnit", () => {
 
   it("indentify empty fileNumbers as missing", () => {
     const documentUnit = new Decision("foo", {
-      attachments: [mockAttachment],
+      originalDocumentAttachments: [mockAttachment],
       coreData: { fileNumbers: [] },
     })
     expect(documentUnit.missingRequiredFields).toStrictEqual([
@@ -96,7 +98,7 @@ describe("DocumentUnit", () => {
 
   it("indentify empty decisionDate as missing", () => {
     const documentUnit = new Decision("foo", {
-      attachments: [mockAttachment],
+      originalDocumentAttachments: [mockAttachment],
       coreData: { decisionDate: "" },
     })
     expect(documentUnit.missingRequiredFields).toStrictEqual([
@@ -110,7 +112,7 @@ describe("DocumentUnit", () => {
 
   it("indentify all missing required fields", () => {
     const documentUnit = new Decision("foo", {
-      attachments: [mockAttachment],
+      originalDocumentAttachments: [mockAttachment],
       coreData: { legalEffect: "foo" },
     })
     expect(documentUnit.missingRequiredFields).toStrictEqual([

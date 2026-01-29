@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -125,7 +124,6 @@ class XmlMailServiceProdTest {
                 CoreData.builder()
                     .court(Court.builder().location("testLocation").label("testLabel").build())
                     .build())
-            .attachments(Collections.singletonList(Attachment.builder().name("file_name").build()))
             .build();
     when(xmlExporter.transformToXml(any(Decision.class), anyBoolean())).thenReturn(FORMATTED_XML);
 

@@ -728,7 +728,7 @@ public class DecisionTransformer extends DocumentableTransformer {
                 ? new ArrayList<>()
                 : decisionDTO.getDocumentalists().stream().map(DocumentalistDTO::getValue).toList())
         .previousDecisions(getPreviousDecisions(decisionDTO))
-        .attachments(buildAttachments(decisionDTO))
+        .originalDocumentAttachments(buildAttachments(decisionDTO))
         .otherAttachments(buildOtherAttachments(decisionDTO))
         .ensuingDecisions(buildEnsuingDecisions(decisionDTO))
         .status(getStatus(decisionDTO))
@@ -941,15 +941,18 @@ public class DecisionTransformer extends DocumentableTransformer {
 
   private static List<Attachment> buildAttachments(DecisionDTO decisionDTO) {
     return decisionDTO.getAttachments().stream()
+        .filter(
+            attachmentDTO ->
+                AttachmentType.ORIGINAL.name().equals(attachmentDTO.getAttachmentType()))
         .map(AttachmentTransformer::transformToDomain)
-        .filter(attachment -> AttachmentType.ORIGINAL == attachment.type())
         .toList();
   }
 
   private static List<Attachment> buildOtherAttachments(DecisionDTO decisionDTO) {
     return decisionDTO.getAttachments().stream()
+        .filter(
+            attachmentDTO -> AttachmentType.OTHER.name().equals(attachmentDTO.getAttachmentType()))
         .map(AttachmentTransformer::transformToDomain)
-        .filter(attachment -> AttachmentType.OTHER == attachment.type())
         .toList();
   }
 
