@@ -490,10 +490,10 @@ class S3AttachmentServiceTest {
   @Test
   void testGetFileStream_returnsStreamedFileResponse() throws Exception {
     // given
-    UUID fileUuid = UUID.randomUUID();
+    UUID fileId = UUID.randomUUID();
     String s3Path = UUID.randomUUID().toString();
 
-    when(repository.findById(fileUuid))
+    when(repository.findById(fileId))
         .thenReturn(Optional.of(AttachmentDTO.builder().s3ObjectPath(s3Path).build()));
 
     byte[] data = "hello world".getBytes();
@@ -511,7 +511,7 @@ class S3AttachmentServiceTest {
         .thenReturn(responseInputStream);
 
     // when
-    var streamed = service.getFileStream(documentationUnitDTO.getId(), fileUuid);
+    var streamed = service.getFileStream(documentationUnitDTO.getId(), fileId);
 
     // then
     assertEquals(getObjectResponse.contentType(), streamed.response().contentType());

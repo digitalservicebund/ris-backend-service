@@ -67,6 +67,9 @@ public class S3AttachmentService implements AttachmentService {
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
   private final DocumentationUnitHistoryLogService documentationUnitHistoryLogService;
   private static final String UNKNOWN_YET = "unknown yet";
+  private static final int PART_SIZE = 5 * 1024 * 1024;
+  private static final int MAX_PARTS = 10_000;
+
   private final MediaType wordMediaType =
       MediaType.parseMediaType(
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
@@ -187,7 +190,6 @@ public class S3AttachmentService implements AttachmentService {
   }
 
   private void streamFileToBucket(String s3ObjectPath, InputStream file) {
-
     var createdMultipartUpload =
         s3Client.createMultipartUpload(
             c ->
@@ -196,60 +198,81 @@ public class S3AttachmentService implements AttachmentService {
                     .contentType(MediaType.APPLICATION_OCTET_STREAM_VALUE));
     String uploadId = createdMultipartUpload.uploadId();
 
-    final var PART_SIZE = 5 * 1024 * 1024;
     List<CompletedPart> completedParts = new ArrayList<>();
-    var partNumber = 1;
+    int partNumber = 1;
 
     try (file) {
-      while (true) {
-        byte[] buffer = file.readNBytes(PART_SIZE);
+      byte[] buffer;
+      while ((buffer = file.readNBytes(PART_SIZE)).length > 0) {
+        validatePartLimit(partNumber);
 
-        if (buffer.length == 0) {
-          break;
-        }
-
-        var uploadPartRequest =
-            UploadPartRequest.builder()
-                .bucket(bucketName)
-                .key(s3ObjectPath)
-                .uploadId(uploadId)
-                .partNumber(partNumber)
-                .contentLength((long) buffer.length)
-                .build();
-
-        var uploadPartResponse =
-            s3Client.uploadPart(uploadPartRequest, RequestBody.fromBytes(buffer));
-        completedParts.add(
-            CompletedPart.builder().partNumber(partNumber).eTag(uploadPartResponse.eTag()).build());
+        CompletedPart part = uploadPart(s3ObjectPath, uploadId, partNumber, buffer);
+        completedParts.add(part);
         partNumber++;
       }
 
-      var completeRequest =
-          CompleteMultipartUploadRequest.builder()
-              .bucket(bucketName)
-              .key(s3ObjectPath)
-              .uploadId(uploadId)
-              .multipartUpload(mpu -> mpu.parts(completedParts))
-              .build();
-
-      s3Client.completeMultipartUpload(completeRequest);
-    } catch (Exception e) {
-      log.atWarn()
-          .addKeyValue("uploadId", uploadId)
-          .setCause(e)
-          .log("Multipart upload failed, aborting uploadId={}", uploadId, e);
-      try {
-        s3Client.abortMultipartUpload(
-            AbortMultipartUploadRequest.builder()
-                .bucket(bucketName)
-                .key(s3ObjectPath)
-                .uploadId(uploadId)
-                .build());
-      } catch (Exception abortEx) {
-        log.warn("Failed to abort multipart upload for id {}", uploadId, abortEx);
+      if (completedParts.isEmpty()) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot upload empty file");
       }
+
+      s3Client.completeMultipartUpload(completeRequest(s3ObjectPath, uploadId, completedParts));
+
+    } catch (Exception e) {
+      abortUploadSafely(s3ObjectPath, uploadId, e);
       throw new ResponseStatusException(
           HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload file", e);
+    }
+  }
+
+  private void validatePartLimit(int partNumber) {
+    if (partNumber > MAX_PARTS) {
+      throw new ResponseStatusException(
+          HttpStatus.CONTENT_TOO_LARGE,
+          String.format("File too large: %d parts exceeds %d limit", partNumber, MAX_PARTS));
+    }
+  }
+
+  private CompletedPart uploadPart(String key, String uploadId, int partNumber, byte[] buffer) {
+    var request =
+        UploadPartRequest.builder()
+            .bucket(bucketName)
+            .key(key)
+            .uploadId(uploadId)
+            .partNumber(partNumber)
+            .contentLength((long) buffer.length)
+            .build();
+
+    var response = s3Client.uploadPart(request, RequestBody.fromBytes(buffer));
+    return CompletedPart.builder().partNumber(partNumber).eTag(response.eTag()).build();
+  }
+
+  private CompleteMultipartUploadRequest completeRequest(
+      String key, String uploadId, List<CompletedPart> completedParts) {
+    return CompleteMultipartUploadRequest.builder()
+        .bucket(bucketName)
+        .key(key)
+        .uploadId(uploadId)
+        .multipartUpload(mpu -> mpu.parts(completedParts))
+        .build();
+  }
+
+  private void abortUploadSafely(String key, String uploadId, Exception e) {
+    log.atWarn()
+        .addKeyValue("uploadId", uploadId)
+        .setCause(e)
+        .log("Multipart upload failed, aborting uploadId={}", uploadId);
+    try {
+      s3Client.abortMultipartUpload(
+          AbortMultipartUploadRequest.builder()
+              .bucket(bucketName)
+              .key(key)
+              .uploadId(uploadId)
+              .build());
+    } catch (Exception abortEx) {
+      log.atWarn()
+          .addKeyValue("uploadId", uploadId)
+          .setCause(abortEx)
+          .log("Failed to abort multipart upload for id {}", uploadId);
     }
   }
 
@@ -351,9 +374,9 @@ public class S3AttachmentService implements AttachmentService {
   }
 
   @Override
-  public StreamedFileResponse getFileStream(UUID documentationUnitId, UUID fileUuid) {
+  public StreamedFileResponse getFileStream(UUID documentationUnitId, UUID fileId) {
     var attachmentDTO =
-        repository.findById(fileUuid).orElseThrow(() -> new AttachmentException("File not found"));
+        repository.findById(fileId).orElseThrow(() -> new AttachmentException("File not found"));
 
     var getObjectRequest =
         GetObjectRequest.builder().bucket(bucketName).key(attachmentDTO.getS3ObjectPath()).build();
@@ -401,8 +424,7 @@ public class S3AttachmentService implements AttachmentService {
     return byteBufferArray;
   }
 
-  private void putObjectIntoBucket(
-      String fileUuid, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
+  private void putObjectIntoBucket(String fileId, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
 
     var contentLength = httpHeaders.getContentLength();
 
@@ -418,7 +440,7 @@ public class S3AttachmentService implements AttachmentService {
     var putObjectRequestBuilder =
         PutObjectRequest.builder()
             .bucket(bucketName)
-            .key(fileUuid)
+            .key(fileId)
             .contentType(mediaType.toString())
             .metadata(metadata);
 

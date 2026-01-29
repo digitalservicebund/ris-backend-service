@@ -1294,7 +1294,7 @@ class DocumentationUnitControllerTest {
     @Test
     void testDownloadFile_shouldReturnStreamedFileResponse() {
       when(userHasWriteAccess.apply(any())).thenReturn(true);
-      UUID fileUuid = UUID.randomUUID();
+      UUID fileId = UUID.randomUUID();
       byte[] data = "test file content".getBytes();
       var filename = "testfile.docx";
 
@@ -1309,12 +1309,12 @@ class DocumentationUnitControllerTest {
           new StreamedFileResponse(
               getObjectResponse, outputStream -> outputStream.write(data), filename);
 
-      when(attachmentService.getFileStream(TEST_UUID, fileUuid)).thenReturn(streamedFileResponse);
+      when(attachmentService.getFileStream(TEST_UUID, fileId)).thenReturn(streamedFileResponse);
 
       risWebClient
           .withDefaultLogin()
           .get()
-          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/" + fileUuid)
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/" + fileId)
           .exchange()
           .expectStatus()
           .isOk()
@@ -1327,7 +1327,7 @@ class DocumentationUnitControllerTest {
           .expectHeader()
           .valueEquals(HttpHeaders.CONTENT_LENGTH, String.valueOf(data.length));
 
-      verify(attachmentService).getFileStream(TEST_UUID, fileUuid);
+      verify(attachmentService).getFileStream(TEST_UUID, fileId);
     }
   }
 

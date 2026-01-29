@@ -230,13 +230,13 @@ public class DocumentationUnitController {
     }
   }
 
-  @GetMapping(value = "/{uuid}/file/{fileUuid}")
+  @GetMapping(value = "/{uuid}/file/{fileId}")
   @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<StreamingResponseBody> downloadFile(
       @AuthenticationPrincipal OidcUser oidcUser,
       @PathVariable UUID uuid,
-      @PathVariable UUID fileUuid) {
-    var fileResponse = attachmentService.getFileStream(uuid, fileUuid);
+      @PathVariable UUID fileId) {
+    var fileResponse = attachmentService.getFileStream(uuid, fileId);
 
     return ResponseEntity.ok()
         .header(
@@ -263,7 +263,7 @@ public class DocumentationUnitController {
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
-  public ResponseEntity<Attachment2Html> attachOriginatingFileToDocumentationUnit(
+  public ResponseEntity<Attachment2Html> attachOriginalFileToDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser,
       @PathVariable UUID uuid,
       @RequestPart("file") MultipartFile file,
@@ -273,7 +273,7 @@ public class DocumentationUnitController {
       return ResponseEntity.badRequest().build();
     }
 
-    Attachment attachment = null;
+    Attachment attachment;
     try (InputStream is = file.getInputStream()) {
       User user = userService.getUser(oidcUser);
       attachment =
