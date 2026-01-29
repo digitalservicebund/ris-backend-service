@@ -129,10 +129,8 @@ test.describe("Weitere Anhänge", { tag: ["@RISDEV-8920"] }, () => {
       })
 
       await test.step("Ein Fehler wird angezeigt", async () => {
-        await expect(
-          page.getByRole("alert").getByRole("list").getByRole("listitem"),
-        ).toHaveText(
-          "'too_large.bin' " +
+        await expect(page.getByRole("alert")).toHaveText(
+          "Es ist ein Fehler aufgetreten'too_large.bin' " +
             errorMessages.OTHER_FILE_TOO_LARGE_CASELAW.title +
             " " +
             errorMessages.OTHER_FILE_TOO_LARGE_CASELAW.description,
