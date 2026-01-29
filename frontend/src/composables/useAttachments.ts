@@ -1,5 +1,5 @@
 import { storeToRefs } from "pinia"
-import { ref, computed, Ref } from "vue"
+import { computed, ref, Ref } from "vue"
 import { Attachment } from "@/domain/attachment"
 import { Decision } from "@/domain/decision"
 import errorMessages from "@/i18n/errors.json"
@@ -44,10 +44,6 @@ export function useAttachments(
   async function handleOnDelete(fileToDelete: Attachment) {
     errors.value = []
     if (!decision.value) return
-    if (!fileToDelete.s3path) {
-      console.error("file path is undefined", fileToDelete)
-      return
-    }
     const { status } = await attachmentService.delete(
       decision.value.uuid,
       fileToDelete.id,

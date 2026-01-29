@@ -70,7 +70,6 @@ function mockAttachment(name: string = ""): Attachment {
     id: "123",
     name: name,
     format: "",
-    s3path: "123",
     uploadTimestamp: "",
   }
 }

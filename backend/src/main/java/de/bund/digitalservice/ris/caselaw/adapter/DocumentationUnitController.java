@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.ManualPortalPublicationResult;
@@ -102,6 +103,7 @@ public class DocumentationUnitController {
       documentationUnitDocxMetadataInitializationService;
   private final DuplicateCheckService duplicateCheckService;
   private final EurLexSOAPSearchService eurLexSOAPSearchService;
+  private final AttachmentRepository attachmentRepository;
 
   public DocumentationUnitController(
       DocumentationUnitService service,
@@ -114,7 +116,8 @@ public class DocumentationUnitController {
       DocumentationUnitDocxMetadataInitializationService
           documentationUnitDocxMetadataInitializationService,
       DuplicateCheckService duplicateCheckService,
-      EurLexSOAPSearchService eurLexSOAPSearchService) {
+      EurLexSOAPSearchService eurLexSOAPSearchService,
+      AttachmentRepository attachmentRepository) {
     this.service = service;
     this.userService = userService;
     this.attachmentService = attachmentService;
@@ -126,6 +129,7 @@ public class DocumentationUnitController {
     this.duplicateCheckService = duplicateCheckService;
     this.eurLexSOAPSearchService = eurLexSOAPSearchService;
     this.abstractService = abstractService;
+    this.attachmentRepository = attachmentRepository;
   }
 
   /**
@@ -640,24 +644,33 @@ public class DocumentationUnitController {
         PageRequest.of(page, size));
   }
 
-  @GetMapping(value = "/{uuid}/file", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#uuid)")
+  @GetMapping(
+      value = "/{documentationUnitId}/file/{attachmentId}/html",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#documentationUnitId)")
   public ResponseEntity<Attachment2Html> getDocxHtml(
-      @PathVariable UUID uuid, @RequestParam String s3Path, @RequestParam String format) {
+      @PathVariable UUID documentationUnitId, @PathVariable UUID attachmentId) {
 
     try {
-      service.getByUuid(uuid);
+      service.getByUuid(documentationUnitId);
     } catch (DocumentationUnitNotExistsException ex) {
       return ResponseEntity.notFound().build();
     }
 
     try {
-      var attachment2Html = converterService.getConvertedObject(format, s3Path, uuid);
+      var attachment = attachmentRepository.findById(attachmentId);
+      if (attachment.isEmpty()) {
+        return ResponseEntity.notFound().build();
+      }
+      var attach = attachment.get();
+      var attachment2Html =
+          converterService.getConvertedObject(
+              attach.getFormat(), attach.getS3ObjectPath(), documentationUnitId);
       return ResponseEntity.ok()
           .cacheControl(CacheControl.maxAge(Duration.ofDays(1))) // Set cache duration
           .body(attachment2Html);
     } catch (Exception ex) {
-      log.error("Error by getting docx for documentation unit {}", uuid, ex);
+      log.error("Error by getting docx for documentation unit {}", documentationUnitId, ex);
       return ResponseEntity.internalServerError().build();
     }
   }

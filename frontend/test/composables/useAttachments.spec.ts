@@ -1,6 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia, storeToRefs } from "pinia"
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import { useAttachments } from "@/composables/useAttachments"
 import { Attachment } from "@/domain/attachment"
 import { Decision } from "@/domain/decision"
@@ -73,24 +73,9 @@ describe("useAttachments", () => {
       const options = { getList: vi.fn(), setList: vi.fn(), uploadFn: vi.fn() }
       const { handleOnDelete } = useAttachments(events, options)
 
-      await handleOnDelete({ id: "1", s3path: "path" } as Attachment)
-
-      expect(deleteAttachmentMock).not.toHaveBeenCalled()
-    })
-
-    it("logs error without s3path", async () => {
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
-      const events = {}
-      const options = { getList: vi.fn(), setList: vi.fn(), uploadFn: vi.fn() }
-      const { handleOnDelete } = useAttachments(events, options)
-
       await handleOnDelete({ id: "1" } as Attachment)
 
-      expect(consoleSpy).toHaveBeenCalledWith("file path is undefined", {
-        id: "1",
-      })
       expect(deleteAttachmentMock).not.toHaveBeenCalled()
-      consoleSpy.mockRestore()
     })
 
     it("emits event and reloads store on success", async () => {
@@ -266,7 +251,6 @@ const mockAttachment: Attachment = {
   id: "123",
   name: "test-file.docx",
   format: "docx",
-  s3path: "./path.docx",
   uploadTimestamp: "11.04.2024",
 }
 const decision = new Decision("test-uuid", {

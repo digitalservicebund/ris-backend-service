@@ -9,9 +9,8 @@ import { Docx2HTML } from "@/domain/docx2html"
 import fileService from "@/services/attachmentService"
 
 const props = defineProps<{
-  documentUnitUuid?: string
-  s3Path?: string
-  format?: string
+  documentationUnitId?: string
+  attachmentId?: string
 }>()
 
 const isLoading = ref(false)
@@ -20,11 +19,10 @@ const fileAsHTML = ref<Docx2HTML>()
 
 const getAttachmentHTML = async () => {
   isLoading.value = true
-  if (props.documentUnitUuid && props.format) {
+  if (props.documentationUnitId && props.attachmentId) {
     const htmlResponse = await fileService.getAttachmentAsHtml(
-      props.documentUnitUuid,
-      props.s3Path,
-      props.format,
+      props.documentationUnitId,
+      props.attachmentId,
     )
     isLoading.value = false
     if (htmlResponse.error === undefined) fileAsHTML.value = htmlResponse.data
@@ -36,7 +34,7 @@ onBeforeMount(async () => {
 })
 
 watch(
-  () => props.s3Path,
+  () => props.attachmentId,
   async () => {
     await getAttachmentHTML()
   },

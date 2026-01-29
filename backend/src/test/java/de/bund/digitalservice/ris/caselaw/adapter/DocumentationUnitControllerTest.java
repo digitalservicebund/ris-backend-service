@@ -22,6 +22,8 @@ import com.gravity9.jsonpatch.JsonPatchOperation;
 import com.gravity9.jsonpatch.ReplaceOperation;
 import de.bund.digitalservice.ris.caselaw.DocumentationUnitControllerTestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverterException;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
@@ -138,6 +140,7 @@ class DocumentationUnitControllerTest {
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;
+  @MockitoBean private AttachmentRepository attachmentRepository;
 
   @MockitoBean(name = "userHasWriteAccess")
   private Function<UUID, Boolean> userHasWriteAccess;
@@ -834,6 +837,7 @@ class DocumentationUnitControllerTest {
 
   @Test
   void testGetHtml() throws DocumentationUnitNotExistsException {
+    var attachmentId = UUID.randomUUID();
     when(service.getByUuid(TEST_UUID))
         .thenReturn(
             Decision.builder()
@@ -842,11 +846,13 @@ class DocumentationUnitControllerTest {
                 .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
                 .build());
     when(converterService.getConvertedObject("123")).thenReturn(null);
+    when(attachmentRepository.findById(attachmentId))
+        .thenReturn(Optional.of(AttachmentDTO.builder().s3ObjectPath("123").format("").build()));
 
     risWebClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file?s3Path=123&format=")
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/" + attachmentId + "/html")
         .exchange()
         .expectStatus()
         .isOk();

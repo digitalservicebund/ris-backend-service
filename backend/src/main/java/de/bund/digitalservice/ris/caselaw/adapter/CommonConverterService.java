@@ -23,15 +23,15 @@ public class CommonConverterService implements ConverterService {
    * Convert attached file to an object with the html content of the file and potentially extracted
    * metadata.
    *
-   * @param fileName name of the file in the bucket
-   * @return the generated object with html content and metadata, or null if the filename is null or
+   * @param s3Path path of the file in the bucket
+   * @return the generated object with html content and metadata, or null if the s3 path is null or
    *     blank
    */
-  public Attachment2Html getConvertedObject(String fileName) {
-    if (fileName == null || fileName.isBlank()) {
+  public Attachment2Html getConvertedObject(String s3Path) {
+    if (s3Path == null || s3Path.isBlank()) {
       return null;
     }
-    return docxConverterService.getConvertedObject(fileName);
+    return docxConverterService.getConvertedObject(s3Path);
   }
 
   /**
@@ -39,18 +39,18 @@ public class CommonConverterService implements ConverterService {
    * metadata.
    *
    * @param format file format of the attached file
-   * @param fileName (optional) name of the file in the bucket in case of a bucket attachment
+   * @param s3Path (optional) name of the file in the bucket in case of a bucket attachment
    * @param documentationUnitId (optional) id of the documentation unit that the file is attached to
    *     in case of a database attachment
    * @return the generated object with html content and metadata, or null if format and filename are
    *     null or blank
    */
   public Attachment2Html getConvertedObject(
-      String format, String fileName, UUID documentationUnitId) {
+      String format, String s3Path, UUID documentationUnitId) {
     if ("fmx".equals(format)) {
       return fmxConverterService.getFmx(documentationUnitId);
     } else {
-      return docxConverterService.getConvertedObject(fileName);
+      return docxConverterService.getConvertedObject(s3Path);
     }
   }
 }

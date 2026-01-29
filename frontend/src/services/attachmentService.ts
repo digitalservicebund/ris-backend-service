@@ -5,29 +5,28 @@ import errorMessages from "@/i18n/errors.json"
 
 interface AttachmentService {
   uploadOriginalDocument(
-    documentUnitUuid: string,
+    documentationUnitId: string,
     file: File,
   ): Promise<ServiceResponse<Docx2HTML>>
 
   uploadOtherAttachment(
-    documentUnitUuid: string,
+    documentationUnitId: string,
     file: File,
   ): Promise<ServiceResponse<unknown>>
 
   download(
-    documentUnitUuid: string,
+    documentationUnitId: string,
     attachment: Attachment,
   ): Promise<ServiceResponse<unknown>>
 
   delete(
-    documentUnitUuid: string,
+    documentationUnitId: string,
     fileToDeleteId: string,
   ): Promise<ServiceResponse<unknown>>
 
   getAttachmentAsHtml(
-    uuid: string,
-    s3path: string | undefined,
-    format: string,
+    documentationUnitId: string,
+    attachmentId: string,
   ): Promise<ServiceResponse<Docx2HTML>>
 }
 
@@ -189,14 +188,10 @@ const service: AttachmentService = {
     return response
   },
 
-  async getAttachmentAsHtml(uuid: string, s3path: string, format: string) {
+  async getAttachmentAsHtml(documentationUnitId: string, attachmentId: string) {
     const response = await httpClient.get<Docx2HTML>(
-      `caselaw/documentunits/${uuid}/file`,
+      `caselaw/documentunits/${documentationUnitId}/file/${attachmentId}/html`,
       {
-        params: {
-          s3Path: s3path ?? "",
-          format: format ?? "",
-        },
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",

@@ -55,7 +55,6 @@ describe("Document Unit Categories", () => {
       id: "123",
       name: name,
       format: format,
-      s3path: "./path.docx",
       uploadTimestamp: "11.04.2024",
     }
     renderComponent([attachment])
@@ -74,7 +73,6 @@ describe("Document Unit Categories", () => {
       id: "123",
       name: name,
       format: format,
-      s3path: "./path.docx",
       uploadTimestamp: "11.04.2024",
     }
     renderComponent([attachment])

@@ -164,15 +164,12 @@ onMounted(() => {
             v-if="
               props.documentUnit.uuid &&
               props.documentUnit.attachments &&
-              props.documentUnit.attachments[currentAttachmentIndex]?.format
+              props.documentUnit.attachments[currentAttachmentIndex]?.id
             "
-            :document-unit-uuid="props.documentUnit.uuid"
-            :format="
-              props.documentUnit.attachments[currentAttachmentIndex].format
+            :attachment-id="
+              props.documentUnit.attachments[currentAttachmentIndex].id
             "
-            :s3-path="
-              props.documentUnit.attachments[currentAttachmentIndex].s3path
-            "
+            :documentation-unit-id="props.documentUnit.uuid"
           />
           <div v-else class="ris-label1-regular">
             Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.

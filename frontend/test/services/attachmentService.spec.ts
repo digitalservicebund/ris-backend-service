@@ -140,7 +140,6 @@ describe("attachmentService", () => {
       const mockAttachment: Attachment = {
         id: "123",
         name: "test.pdf",
-        s3path: "path/to/file",
       } as Attachment
 
       const mockBlobData = new Uint8Array([1, 2, 3])
@@ -207,12 +206,15 @@ describe("attachmentService", () => {
     it("should call GET with correct params", async () => {
       httpGetMock.mockResolvedValue({ status: 200 } as ServiceResponse<unknown>)
 
-      await service.getAttachmentAsHtml("123", "path", "html")
+      await service.getAttachmentAsHtml("123", "456")
 
       expect(httpGetMock).toHaveBeenCalledWith(
-        "caselaw/documentunits/123/file",
+        "caselaw/documentunits/123/file/456/html",
         expect.objectContaining({
-          params: { s3Path: "path", format: "html" },
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
         }),
       )
     })
@@ -221,7 +223,7 @@ describe("attachmentService", () => {
       httpGetMock.mockResolvedValue({
         status: 400,
       } as ServiceResponse<unknown>)
-      const result = await service.getAttachmentAsHtml("123", "path", "html")
+      const result = await service.getAttachmentAsHtml("123", "456")
 
       expect(result.error).toEqual(errorMessages.DOCX_COULD_NOT_BE_LOADED)
     })
