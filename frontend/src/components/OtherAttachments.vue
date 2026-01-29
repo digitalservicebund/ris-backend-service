@@ -28,11 +28,19 @@ const {
 
 <template>
   <TitleElement class="mb-24">Weitere Anhänge</TitleElement>
-  <Message v-if="errors.length > 0 && !isLoading" class="mt-8" severity="error">
+  <Message v-if="errors.length > 1 && !isLoading" class="mt-8" severity="error">
     <p class="ris-body1-bold">Es sind Fehler aufgetreten</p>
     <ul class="m-0 list-disc ps-20">
       <li v-for="(error, index) in errors" :key="index">{{ error }}</li>
     </ul>
+  </Message>
+  <Message
+    v-if="errors.length == 1 && !isLoading"
+    class="mt-8"
+    severity="error"
+  >
+    <p class="ris-body1-bold">Es ist ein Fehler aufgetreten</p>
+    <p>{{ errors[0] }}</p>
   </Message>
   <FileUpload
     id="other-attachments-upload"
