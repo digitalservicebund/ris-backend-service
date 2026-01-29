@@ -39,7 +39,7 @@ public class CommonConverterService implements ConverterService {
    * metadata.
    *
    * @param format file format of the attached file
-   * @param s3Path (optional) name of the file in the bucket in case of a bucket attachment
+   * @param s3Path (optional) path of the file in the bucket in case of a bucket attachment
    * @param documentationUnitId (optional) id of the documentation unit that the file is attached to
    *     in case of a database attachment
    * @return the generated object with html content and metadata, or null if format and filename are
