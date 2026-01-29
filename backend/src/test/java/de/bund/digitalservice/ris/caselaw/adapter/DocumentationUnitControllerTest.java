@@ -859,7 +859,7 @@ class DocumentationUnitControllerTest {
   @Nested
   class AttachOtherFileToDocumentationUnit {
     @Test
-    void givenMissingMultipart_whenUploadingOtherFile_thenFail() {
+    void testAttachOtherFile_withMissingMultipart_shouldFail() {
       // given
       // when
       when(userHasWriteAccess.apply(any())).thenReturn(true);
@@ -878,7 +878,7 @@ class DocumentationUnitControllerTest {
     }
 
     @Test
-    void givenMissingHeaderParam_whenUploadingOtherFile_thenFail() {
+    void testAttachOtherFile_withMissingHeaderParam_shouldFail() {
       // given
       byte[] fileContent = "test content".getBytes();
 
@@ -906,7 +906,7 @@ class DocumentationUnitControllerTest {
     }
 
     @Test
-    void givenEmptyFile_whenUploadingOtherFile_thenReturnBadRequest() {
+    void testAttachOtherFile_withEmptyFile_shouldFail() {
       // given
       byte[] emptyContent = new byte[0];
 
@@ -937,7 +937,7 @@ class DocumentationUnitControllerTest {
     }
 
     @Test
-    void givenValidFile_whenUploadingOtherFile_thenVerifyCreated() {
+    void testAttachOtherFile_withValidFile_shouldSucceed() {
       // given
       byte[] fileContent = "test content".getBytes();
 
@@ -974,7 +974,7 @@ class DocumentationUnitControllerTest {
     }
 
     @Test
-    void givenInvalidFile_whenUploadingOtherFile_thenVerifyIOException() throws IOException {
+    void testAttachOther_withInvalidFile_shouldFail() throws IOException {
       // given
       byte[] fileContent = "test content".getBytes();
       MockMultipartFile mockFile =
@@ -1014,7 +1014,7 @@ class DocumentationUnitControllerTest {
     }
 
     @Test
-    void givenAttachmentServiceThrows_whenUploadingOtherFile_thenVerifyServerError() {
+    void testAttachOtherFile_withRuntimeExceptionInAttachmentService_shouldFail() {
       // given
       byte[] fileContent = "test content".getBytes();
       MockMultipartFile mockFile =
@@ -1058,9 +1058,9 @@ class DocumentationUnitControllerTest {
   }
 
   @Nested
-  class testOriginalFileEndpoint {
+  class AttachOriginalFileToDocumentationUnit {
     @Test
-    void givenMissingMultipart_whenUploadingOriginalFile_thenFail() {
+    void testAttachOriginalFile_withMissingMultipart_shouldFail() {
       // given
       // when
       when(userHasWriteAccess.apply(any())).thenReturn(true);
@@ -1079,7 +1079,7 @@ class DocumentationUnitControllerTest {
     }
 
     @Test
-    void givenMissingHeaderParam_whenUploadingOtherFile_thenFail() {
+    void testAttachOriginalFile_withMissingHeaderParam_shouldFail() {
       // given
       byte[] fileContent = "test content".getBytes();
 
@@ -1107,7 +1107,7 @@ class DocumentationUnitControllerTest {
     }
 
     @Test
-    void givenEmptyFile_whenUploadingOriginalFile_thenReturnBadRequest() {
+    void testAttachOriginalFile_withEmptyFile_shouldFail() {
       // given
       byte[] emptyContent = new byte[0];
 
@@ -1139,7 +1139,7 @@ class DocumentationUnitControllerTest {
     }
 
     @Test
-    void givenValidFile_whenUploadingOtherFile_thenVerifyCreated()
+    void testAttachOriginalFile_withValidFile_shouldSucceed()
         throws DocumentationUnitNotExistsException {
       // given
       byte[] fileContent = "test content".getBytes();
@@ -1210,7 +1210,7 @@ class DocumentationUnitControllerTest {
     }
 
     @Test
-    void givenInvalidFile_whenUploadingOriginalFile_thenVerifyIOException() throws IOException {
+    void testAttachOriginalFile_withInvalidFile_shouldFail() throws IOException {
       // given
       byte[] fileContent = "test content".getBytes();
       MockMultipartFile mockFile =
@@ -1250,7 +1250,7 @@ class DocumentationUnitControllerTest {
     }
 
     @Test
-    void givenAttachmentServiceThrows_whenUploadingOriginalFile_thenVerifyServerError() {
+    void testAttachOriginalFile_withRuntimeExceptionInAttachmentService_shouldFail() {
       // given
       byte[] fileContent = "test content".getBytes();
       MockMultipartFile mockFile =
