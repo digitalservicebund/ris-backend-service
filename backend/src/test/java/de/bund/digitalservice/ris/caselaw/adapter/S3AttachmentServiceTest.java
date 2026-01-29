@@ -260,7 +260,7 @@ class S3AttachmentServiceTest {
 
     // repo interaction
     verify(repository).findAllByDocumentationUnitId(documentationUnitDTO.getId());
-    verify(repository, never()).deleteByS3ObjectPath(any(String.class));
+    verify(repository, never()).deleteById(any(UUID.class));
 
     // bucket interaction
     var deleteObjectRequestCaptor = ArgumentCaptor.forClass(DeleteObjectRequest.class);
