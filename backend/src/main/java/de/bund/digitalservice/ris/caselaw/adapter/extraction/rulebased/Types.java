@@ -107,6 +107,10 @@ class Token {
         && text.substring(1).equals(text.substring(1).toLowerCase());
   }
 
+  public boolean isUpper() {
+    return !text.equals(text.toLowerCase()) && text.equals(text.toUpperCase());
+  }
+
   public String shape() {
     StringBuilder result = new StringBuilder();
     for (char c : text.toCharArray()) {
@@ -144,10 +148,26 @@ record TokenConstraint(
     Boolean isTitle,
     Boolean isSentStart,
     String shape,
-    String op) {
+    String op,
+    Boolean isUpper) {
+
+  public TokenConstraint(
+      Object text,
+      Object lower,
+      String regex,
+      List<String> in,
+      List<String> notIn,
+      Boolean isDigit,
+      Boolean isAlpha,
+      Boolean isTitle,
+      Boolean isSentStart,
+      String shape,
+      String op) {
+    this(text, lower, regex, in, notIn, isDigit, isAlpha, isTitle, isSentStart, shape, op, null);
+  }
 
   public TokenConstraint(String text) {
-    this(text, null, null, null, null, null, null, null, null, null, null);
+    this(text, null, null, null, null, null, null, null, null, null, null, null);
   }
 }
 
@@ -163,25 +183,22 @@ record Pattern(List<TokenConstraint> constraints, String regex, boolean isRegex)
 
 // TODO: use enum for type, greedy, conditions, normalizers
 
+record ExtractionDef(String label, String value, Integer priority, boolean markTag) {}
+
+record SectionMarkerDef(String label, int lineOffset, Integer maxLines) {}
+
 record ExtractionRule(
-    String label,
-    String type,
+    String name,
+    List<ExtractionDef> extractions,
+    List<SectionMarkerDef> sectionMarkers,
     List<Pattern> patterns,
     String greedy,
     List<String> conditions,
-    List<String> normalizers,
-    Integer priority,
-    boolean markTag,
-    String followedBySection,
-    boolean inclusive,
-    boolean singleLine) {
+    List<String> skipSections,
+    List<String> normalizers) {
 
-  public ExtractionRule(String label, String type, List<Pattern> patterns) {
-    this(label, type, patterns, null, null, null, null, false, null, false, false);
-  }
-
-  public int getPriority() {
-    return priority != null ? priority : 0;
+  public ExtractionRule(String name, List<Pattern> patterns) {
+    this(name, null, null, patterns, null, null, null, null);
   }
 }
 
@@ -202,6 +219,8 @@ interface HtmlElement {
 
   String outerHtml();
 
+  boolean isCentered();
+
   HtmlElement find(String selector, boolean recursive);
 
   List<HtmlElement> findAll(String selector, boolean recursive);
@@ -211,9 +230,28 @@ interface HtmlElement {
 // Extraction Context
 // ============================================================================
 
-record SectionMarker(int lineIdx, String sectionName, boolean inclusive, boolean singleLine) {
+record SectionMarker(
+    int lineIdx,
+    String sectionName,
+    boolean inclusive,
+    boolean singleLine,
+    Integer lineOffset,
+    Integer maxLines) {
+
+  public int startIdx() {
+    return lineIdx + (lineOffset != null ? lineOffset : 0);
+  }
+
   public SectionMarker(int lineIdx, String sectionName) {
-    this(lineIdx, sectionName, false, false);
+    this(lineIdx, sectionName, false, false, null, null);
+  }
+
+  public SectionMarker(int lineIdx, String sectionName, Integer lineOffset, Integer maxLines) {
+    this(lineIdx, sectionName, false, false, lineOffset, maxLines);
+  }
+
+  public SectionMarker(int lineIdx, String sectionName, boolean inclusive, boolean singleLine) {
+    this(lineIdx, sectionName, inclusive, singleLine, null, null);
   }
 }
 
@@ -321,7 +359,7 @@ interface ExtractionModule {
 
 @FunctionalInterface
 interface ValidatorFunction {
-  boolean validate(HtmlElement tag, String text);
+  boolean validate(HtmlElement tag, String text, Integer lineIndex);
 }
 
 @FunctionalInterface

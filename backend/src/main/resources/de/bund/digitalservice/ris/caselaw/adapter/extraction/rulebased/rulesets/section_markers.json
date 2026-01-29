@@ -3,27 +3,101 @@
   "name": "sections",
   "rules": [
     {
-      "label": "tenor",
-      "type": "section_marker",
+      "name": "leitsatz",
+      "section_markers": [{ "label": "guiding_principle", "line_offset": 1 }],
+      "patterns": ["(?i)\\s*((leitsatz|leitsätze)(\\s+des\\s+senats)?:?)\\s*$"]
+    },
+    {
+      "name": "leitsatz_inline",
+      "extractions": [{ "label": "guiding_principle" }],
+      "patterns": ["(?i)leitsatz:\\n(.+)$"]
+    },
+    {
+      "name": "angewandte_vorschriften",
+      "section_markers": [{ "label": "norms" }],
+      "patterns": ["(?i)(angewandte\\s+vorschriften:?)"]
+    },
+    {
+      "name": "im_namen_des_volkes",
+      "section_markers": [{ "label": "header", "max_lines": 1 }],
+      "patterns": ["(?i)(im namen des volkes)"],
+      "conditions": ["is_table"]
+    },
+    {
+      "name": "tenor",
+      "section_markers": [{ "label": "tenor", "line_offset": 1 }],
       "patterns": [[{ "LOWER": "tenor" }]],
       "conditions": ["is_short_line"]
     },
     {
-      "label": "tenor2",
-      "type": "section_marker",
+      "name": "tenor_beschlossen",
+      "section_markers": [{ "label": "tenor", "line_offset": 1 }],
+      "extractions": [{ "label": "document_type", "value": "Beschluss" }],
       "patterns": [
-        [{ "LOWER": "beschlossen" }, { "TEXT": ":" }],
+        "(beschlos-?sen)\\s*:\\s*$",
+        "(b e s c h l o s s e n)\\s*:\\s*$",
+        [{ "LOWER": "beschlossen" }, { "TEXT": ":" }]
+      ]
+    },
+    {
+      "name": "tenor_fuer_recht_erkannt",
+      "section_markers": [{ "label": "tenor", "line_offset": 1 }],
+      "extractions": [{ "label": "document_type", "value": "Urteil" }],
+      "patterns": [
         [
           { "LOWER": "für" },
           { "LOWER": "recht" },
+          { "LOWER": "erkannt" },
+          { "TEXT": ":" }
+        ],
+        [
+          { "LOWER": "für" },
+          { "LOWER": "r" },
+          { "LOWER": "e" },
+          { "LOWER": "c" },
+          { "LOWER": "h" },
+          { "LOWER": "t" },
           { "LOWER": "erkannt" },
           { "TEXT": ":" }
         ]
       ]
     },
     {
-      "label": "reasons",
-      "type": "section_marker",
+      "label": "tenor_geaendert",
+      "section_markers": [{ "label": "tenor" }],
+      "extractions": [{ "label": "document_type", "value": "Beschluss" }],
+      "patterns": [
+        [
+          { "LOWER": "wie" },
+          { "LOWER": "folgt" },
+          { "LOWER": "neu", "OP": "?" },
+          { "TEXT": { "REGEX": "^((ab)?geändert|gefasst)$" } },
+          { "TEXT": ":" }
+        ]
+      ]
+    },
+    {
+      "name": "tenor_klage_abgewiesen",
+      "section_markers": [{ "label": "tenor" }],
+      "extractions": [{ "label": "document_type", "value": "Urteil" }],
+      "patterns": [
+        "(?i)^(?:\\s*1.\\s*)?((auf)?\\s*die(\\s+\\w+)?\\s+(berufung|klage|beschwerde|revision|beklagte))",
+        [
+          { "LOWER": "wird" },
+          {
+            "TEXT": {
+              "REGEX": "^(abgewiesen|zurückgewiesen|verurteilt|aufgehoben)$"
+            }
+          },
+          { "TEXT": { "IN": [".", ","] } }
+        ],
+        "wird\\s+für\\s+\\w+\\s+erklärt\\."
+      ],
+      "skip_sections": ["case_facts", "reasons", "decision_reasons"]
+    },
+    {
+      "name": "gruende",
+      "section_markers": [{ "label": "reasons", "line_offset": 1 }],
       "patterns": [
         [{ "LOWER": "gründe" }],
         [
@@ -38,20 +112,77 @@
       "conditions": ["is_short_line"]
     },
     {
-      "label": "case_facts",
-      "type": "section_marker",
+      "name": "tatbestand",
+      "section_markers": [{ "label": "case_facts", "line_offset": 1 }],
       "patterns": [[{ "LOWER": "tatbestand" }]],
       "conditions": ["is_short_line"]
     },
     {
-      "label": "decision_reasons",
-      "type": "section_marker",
+      "name": "tatbestand_sperr",
+      "section_markers": [{ "label": "case_facts", "line_offset": 1 }],
+      "patterns": [
+        [
+          { "LOWER": "t" },
+          { "LOWER": "a" },
+          { "LOWER": "t" },
+          { "LOWER": "b" },
+          { "LOWER": "e" },
+          { "LOWER": "s" },
+          { "LOWER": "t" },
+          { "LOWER": "a" },
+          { "LOWER": "n" },
+          { "LOWER": "d" }
+        ]
+      ]
+    },
+    {
+      "name": "entscheidungsgruende",
+      "section_markers": [{ "label": "decision_reasons", "line_offset": 1 }],
       "patterns": [[{ "LOWER": "entscheidungsgründe" }]],
       "conditions": ["is_short_line"]
     },
     {
-      "label": "previous_decisions",
-      "type": "section_marker",
+      "name": "entscheidungsgruende_sperr",
+      "section_markers": [{ "label": "decision_reasons", "line_offset": 1 }],
+      "patterns": [
+        [
+          { "LOWER": "e" },
+          { "LOWER": "n" },
+          { "LOWER": "t" },
+          { "LOWER": "s" },
+          { "LOWER": "c" },
+          { "LOWER": "h" },
+          { "LOWER": "e" },
+          { "LOWER": "i" },
+          { "LOWER": "d" },
+          { "LOWER": "u" },
+          { "LOWER": "n" },
+          { "LOWER": "g" },
+          { "LOWER": "s" },
+          { "LOWER": "g" },
+          { "LOWER": "r" },
+          { "LOWER": "ü" },
+          { "LOWER": "n" },
+          { "LOWER": "d" },
+          { "LOWER": "e" }
+        ]
+      ]
+    },
+    {
+      "name": "gruende_implizit",
+      "section_markers": [{ "label": "reasons", "line_offset": 1 }],
+      "patterns": ["^\\s*I\\.?\\s*$"],
+      "conditions": ["is_centered"],
+      "skip_sections": [
+        "guiding_principle",
+        "reasons",
+        "case_facts",
+        "decision_reasons"
+      ]
+    },
+    {
+      "name": "vorinstanzen",
+      "section_markers": [{ "label": "previous_decisions", "line_offset": 1 }],
       "patterns": [
         [{ "LOWER": "vorinstanzen" }, { "TEXT": ":" }],
         [{ "LOWER": "vorinstanz" }, { "TEXT": ":" }]
@@ -59,12 +190,24 @@
       "conditions": ["is_short_line"]
     },
     {
-      "label": "other",
-      "type": "section_marker",
+      "name": "vorinstanz_einzeilig",
+      "section_markers": [{ "label": "previous_decisions", "max_lines": 1 }],
+      "patterns": ["^Vorinstanz:.*"]
+    },
+    {
+      "name": "verkuendet",
+      "section_markers": [{ "label": "other", "line_offset": 1 }],
       "patterns": [
         [{ "LOWER": "verkündet" }, { "LOWER": "am" }, { "TEXT": ":" }]
       ],
       "conditions": ["is_short_line"]
+    },
+    {
+      "name": "rechtsmittelbelehrung",
+      "section_markers": [{ "label": "other", "line_offset": 1 }],
+      "patterns": [
+        "(?i)^\\s*(rechtsmittelbelehrung|rechtsbehelfsbelehrung):?\\s*$"
+      ]
     }
   ]
 }

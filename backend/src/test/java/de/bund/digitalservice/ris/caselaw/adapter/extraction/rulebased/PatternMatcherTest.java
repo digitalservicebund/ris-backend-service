@@ -294,4 +294,39 @@ class PatternMatcherTest {
     matches = matcher.match(List.of(pattern), text2);
     assertThat(matches).hasSize(1);
   }
+
+  @Test
+  void testTokenizerWithNewlines() {
+    // Test tokenizer handles newlines correctly
+    Tokenizer tokenizer = new Tokenizer();
+    String text = "This is a test.\nNew line here.";
+    List<Token> tokens = tokenizer.tokenize(text);
+
+    List<String> expectedTexts =
+        List.of("This", "is", "a", "test", ".", "\n", "New", "line", "here", ".");
+    assertThat(tokens).hasSize(expectedTexts.size());
+    for (int i = 0; i < tokens.size(); i++) {
+      assertThat(tokens.get(i).getText()).isEqualTo(expectedTexts.get(i));
+    }
+  }
+
+  @Test
+  void testMatcherWithNewlines() {
+    // Test that line breaks in text are handled correctly
+    PatternMatcher matcher = new PatternMatcher();
+    TokenConstraint constraint1 =
+        new TokenConstraint(
+            "OBERLANDESGERICHT", null, null, null, null, null, null, null, null, null, null, null);
+    TokenConstraint constraint2 =
+        new TokenConstraint("\n", null, null, null, null, null, null, null, null, null, null, null);
+    TokenConstraint constraint3 =
+        new TokenConstraint(null, null, null, null, null, null, null, null, null, null, null, true);
+
+    Pattern pattern = Pattern.ofConstraints(List.of(constraint1, constraint2, constraint3));
+
+    String text = "OBERLANDESGERICHT\nKARLSRUHE";
+    List<Match> matches = matcher.match(List.of(pattern), text);
+    assertThat(matches).hasSize(1);
+    assertThat(matches.get(0).text()).contains("KARLSRUHE");
+  }
 }

@@ -7,8 +7,8 @@
   "skip_sections": ["reasons", "case_facts", "decision_reasons"],
   "rules": [
     {
-      "label": "norm",
-      "type": "extraction",
+      "name": "norm",
+      "extractions": [{ "label": "norm" }],
       "patterns": [
         [
           { "TEXT": "§" },

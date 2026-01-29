@@ -3,21 +3,29 @@
   "name": "bverfg",
   "rules": [
     {
-      "label": "date",
-      "type": "extraction",
+      "name": "entscheidungsdatum",
+      "extractions": [{ "label": "date", "priority": 3 }],
       "patterns": [
         "am\\s+(\\d{1,2}\\.\\s+(?:Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\\s+\\d{4})(.*\\s+beschlossen:\\s?)$"
       ],
-      "normalizers": ["date_to_iso"],
-      "priority": 3
+      "normalizers": ["date_to_iso"]
     },
     {
-      "label": "file_number",
-      "type": "extraction",
+      "name": "aktenzeichen_in_tabelle",
+      "extractions": [
+        { "label": "file_number", "priority": 1, "mark_tag": true }
+      ],
       "patterns": ["-\\s+(\\d+\\s+[A-Za-z]{3}?\\s?\\d+/\\d+)\\s+-"],
-      "conditions": ["is_table"],
-      "mark_tag": true,
-      "priority": 1
+      "conditions": ["is_table"]
+    },
+    {
+      "name": "vorinstanzen_in_tabelle",
+      "section_markers": [{ "label": "previous_decisions" }],
+      "patterns": [
+        [{ "TEXT": { "REGEX": "(?i)^bevollmächtigter?" } }, { "TEXT": ":" }],
+        [{ "TEXT": "gegen" }]
+      ],
+      "conditions": ["is_table"]
     }
   ]
 }

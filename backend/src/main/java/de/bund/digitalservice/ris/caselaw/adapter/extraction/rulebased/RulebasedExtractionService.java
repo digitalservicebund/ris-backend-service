@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.jsoup.Jsoup;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,7 +19,8 @@ public class RulebasedExtractionService {
           "norms", RulesetModule.fromFile("norms.json"),
           "bgh", RulesetModule.fromFile("bgh.json"),
           "bfh", RulesetModule.fromFile("bfh.json"),
-          "bverfg", RulesetModule.fromFile("bverfg.json"));
+          "bverfg", RulesetModule.fromFile("bverfg.json"),
+          "olg_karlsruhe", RulesetModule.fromFile("olg_karlsruhe.json"));
 
   private final Tokenizer tokenizer = new Tokenizer();
 
@@ -27,10 +29,12 @@ public class RulebasedExtractionService {
     String court = providedCourt != null ? providedCourt : getCourtFromPreflightCheck(html);
     List<String> config =
         new ArrayList<>(
-            List.of("section_markers", "section_builder", "ner", "target_path", "norms"));
+            List.of("section_markers", "section_builder", "ner", "norms", "target_path"));
     if ("BFH".equals(court)) config.add("bfh");
     else if ("BGH".equals(court)) config.add("bgh");
     else if ("BVerfG".equals(court)) config.add("bverfg");
+    else if ("OLG Karlsruhe".equals(court) || "LG Karlsruhe".equals(court))
+      config.add("olg_karlsruhe");
 
     // System.out.println("Using court configuration: " + court + " -> " + config);
 
@@ -68,10 +72,18 @@ public class RulebasedExtractionService {
   }
 
   private String getCourtFromPreflightCheck(String html) {
-    String truncatedHtml = html.length() > 500 ? html.substring(0, 500) : html;
+    String cleanedHtml = getHtmlWithoutImgs(html);
+    String truncatedHtml =
+        cleanedHtml.length() > 1000 ? cleanedHtml.substring(0, 1000) : cleanedHtml;
     List<Extraction> preflightExtractions = process(truncatedHtml, resolveModules(List.of("ner")));
     String courtRaw = Utils.getExtractionText(preflightExtractions, "court");
     return Utils.getNormalizedCourt(courtRaw);
+  }
+
+  private String getHtmlWithoutImgs(String html) {
+    org.jsoup.nodes.Document doc = Jsoup.parse(html);
+    doc.select("img").remove();
+    return doc.outerHtml();
   }
 
   private List<ExtractionModule> resolveModules(List<String> keys) {

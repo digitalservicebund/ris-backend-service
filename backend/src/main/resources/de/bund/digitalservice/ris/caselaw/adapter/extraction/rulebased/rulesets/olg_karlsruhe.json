@@ -1,0 +1,28 @@
+{
+  "$schema": "_schema.json",
+  "name": "olg_karlsruhe",
+  "rules": [
+    {
+      "name": "vorinstanz_nach_aktenzeichen",
+      "extractions": [{ "label": "previous_decisions" }],
+      "patterns": [
+        "\\d+ \\w+ \\d+\\/\\d+\\n+(\\d+ .* (LG|AG) .*)\\n*$",
+        "Vorinstanz:.*$"
+      ]
+    },
+    {
+      "name": "schluss_tabelle",
+      "section_markers": [{ "label": "final_table " }],
+      "patterns": ["(?i)erlass\\s+des\\s+beschlusses"],
+      "conditions": ["is_table", "is_centered"]
+    },
+    {
+      "name": "datum_in_schluss_tabelle",
+      "extractions": [{ "label": "date", "priority": 2 }],
+      "patterns": ["am\\s+(\\d{2}\\.\\d{2}\\.\\d{4})"],
+      "conditions": ["is_table", "is_centered"],
+      "skip_sections": ["tenor", "case_facts", "reasons", "decision_reasons"],
+      "normalizers": ["date_to_iso"]
+    }
+  ]
+}

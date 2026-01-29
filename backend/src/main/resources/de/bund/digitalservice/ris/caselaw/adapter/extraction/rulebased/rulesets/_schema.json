@@ -1,19 +1,96 @@
 {
   "$defs": {
-    "ExtractionRule": {
-      "description": "A rule for extracting information with a label and one or more patterns.",
+    "ExtractionConfig": {
       "properties": {
         "label": {
           "description": "Label for extracted entities (e.g., 'date', 'court')",
           "title": "Label",
           "type": "string"
         },
-        "type": {
-          "default": "extraction",
-          "description": "Rule type: 'extraction' for general extraction, 'section_marker' for section boundaries",
-          "enum": ["extraction", "section_marker"],
-          "title": "Type",
-          "type": "string"
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional fixed value",
+          "title": "Value"
+        },
+        "priority": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Priority for this extraction (higher = more important)",
+          "title": "Priority"
+        },
+        "mark_tag": {
+          "default": false,
+          "description": "Mark the entire tag as extracted when this rule matches",
+          "title": "Mark Tag",
+          "type": "boolean"
+        }
+      },
+      "required": ["label"],
+      "title": "ExtractionConfig",
+      "type": "object"
+    },
+    "ExtractionRule": {
+      "description": "A rule for extracting information with a label and one or more patterns.",
+      "properties": {
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Name of the rule (for logging and debugging purposes)",
+          "title": "Name"
+        },
+        "extractions": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/ExtractionConfig"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Extractions to create when this rule matches",
+          "title": "Extractions"
+        },
+        "section_markers": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/SectionMarkerConfig"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Section markers to add when this rule matches",
+          "title": "Section Markers"
         },
         "patterns": {
           "description": "List of alternative patterns, each is a sequence of token constraints",
@@ -51,7 +128,13 @@
           "anyOf": [
             {
               "items": {
-                "enum": ["is_short_line", "is_not_short_line", "is_table"],
+                "enum": [
+                  "is_short_line",
+                  "is_not_short_line",
+                  "is_table",
+                  "is_first_line",
+                  "is_centered"
+                ],
                 "type": "string"
               },
               "type": "array"
@@ -63,6 +146,22 @@
           "default": null,
           "description": "List of condition validator names to apply (e.g., ['is_short_line'])",
           "title": "Conditions"
+        },
+        "skip_sections": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Disable rule in these sections",
+          "title": "Skip Sections"
         },
         "normalizers": {
           "anyOf": [
@@ -80,8 +179,26 @@
           "default": null,
           "description": "List of normalizers to apply to matched text (e.g., ['date_to_iso'])",
           "title": "Normalizers"
+        }
+      },
+      "required": ["patterns"],
+      "title": "ExtractionRule",
+      "type": "object"
+    },
+    "SectionMarkerConfig": {
+      "properties": {
+        "label": {
+          "description": "Label for section marker (e.g., 'tenor')",
+          "title": "Label",
+          "type": "string"
         },
-        "priority": {
+        "line_offset": {
+          "default": 0,
+          "description": "Where to start the section (0 = current line, 1 = next line, etc.)",
+          "title": "Line Offset",
+          "type": "integer"
+        },
+        "max_lines": {
           "anyOf": [
             {
               "type": "integer"
@@ -91,43 +208,12 @@
             }
           ],
           "default": null,
-          "description": "Priority for this extraction (higher = more important)",
-          "title": "Priority"
-        },
-        "mark_tag": {
-          "default": false,
-          "description": "Mark the entire tag as extracted when this rule matches",
-          "title": "Mark Tag",
-          "type": "boolean"
-        },
-        "followed_by_section": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Label of section that should follow this extraction",
-          "title": "Followed By Section"
-        },
-        "inclusive": {
-          "default": false,
-          "description": "Whether section marker is part of the section",
-          "title": "Inclusive",
-          "type": "boolean"
-        },
-        "single_line": {
-          "default": false,
-          "description": "Whether section consists of a single line only",
-          "title": "Single Line",
-          "type": "boolean"
+          "description": "Maximum number of lines",
+          "title": "Max Lines"
         }
       },
-      "required": ["label", "patterns"],
-      "title": "ExtractionRule",
+      "required": ["label"],
+      "title": "SectionMarkerConfig",
       "type": "object"
     },
     "TokenConstraint": {
@@ -244,6 +330,18 @@
           "default": null,
           "title": "Is Title"
         },
+        "IS_UPPER": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Is Upper"
+        },
         "IS_SENT_START": {
           "anyOf": [
             {
@@ -286,7 +384,6 @@
       "type": "object"
     }
   },
-  "additionalProperties": true,
   "description": "Configuration for a single extraction ruleset.",
   "properties": {
     "name": {

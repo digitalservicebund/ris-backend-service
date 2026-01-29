@@ -3,45 +3,40 @@
   "name": "bfh",
   "rules": [
     {
-      "label": "headline",
-      "type": "section_marker",
+      "name": "titelzeile_dann_leitsatz",
+      "section_markers": [
+        { "label": "headline" },
+        { "label": "guiding_principle", "line_offset": 1 }
+      ],
       "patterns": [[{ "IS_TITLE": true }, { "IS_ALPHA": true }]],
-      "conditions": ["is_not_short_line"],
-      "inclusive": true,
-      "followed_by_section": "guiding_principle"
+      "conditions": ["is_not_short_line"]
     },
     {
-      "label": "table",
-      "type": "section_marker",
+      "name": "tabelle",
+      "section_markers": [{ "label": "table", "max_lines": 1 }],
       "patterns": [[{ "IS_ALPHA": true }]],
-      "conditions": ["is_table"],
-      "inclusive": true,
-      "single_line": true
+      "conditions": ["is_table"]
     },
-
     {
-      "label": "document_type",
-      "type": "extraction",
+      "name": "dokumenttyp",
+      "extractions": [{ "label": "document_type", "priority": 1 }],
       "patterns": ["(?i)(urteil|beschluss|versäumnisurteil|entscheidung)"],
-      "conditions": ["is_table"],
-      "priority": 1
+      "conditions": ["is_table"]
     },
     {
-      "label": "previous_decisions",
-      "type": "extraction",
+      "name": "vorinstanz",
+      "extractions": [{ "label": "previous_decisions" }],
       "patterns": ["Vorinstanz:.*"]
     },
     {
-      "label": "case_facts",
-      "type": "section_marker",
-      "patterns": ["^\\s*(I|A)\\.\\s*$"],
-      "inclusive": true
+      "name": "tatbestand_roemisch",
+      "section_markers": [{ "label": "case_facts" }],
+      "patterns": ["^\\s*(I|A)\\.\\s*$"]
     },
     {
-      "label": "decision_reasons",
-      "type": "section_marker",
-      "patterns": ["^\\s*(II|B)\\.\\s*$"],
-      "inclusive": true
+      "name": "entscheidungsgruende_roemisch",
+      "section_markers": [{ "label": "decision_reasons" }],
+      "patterns": ["^\\s*(II|B)\\.\\s*$"]
     }
   ]
 }

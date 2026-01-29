@@ -15,7 +15,7 @@ class Tokenizer {
     String patternStr =
         "(\\d+\\.\\d+\\.\\d+|[a-zA-ZäöüßÄÖÜ]+(?:-[a-zA-ZäöüßÄÖÜ]+)+|"
             + "[a-zA-ZäöüßÄÖÜ]+(?:-\\d+)+|\\d+(?:-[a-zA-ZäöüßÄÖÜ]+)+|"
-            + "\\d+\\.|\\w+|[^\\w\\s])";
+            + "\\d+\\.|\\w+|\\n|[^\\w\\s\\n])";
 
     java.util.regex.Pattern pattern =
         java.util.regex.Pattern.compile(
@@ -176,6 +176,7 @@ class PatternMatcher {
     if (c.isDigit() != null && token.isDigit() != c.isDigit()) return false;
     if (c.isAlpha() != null && token.isAlpha() != c.isAlpha()) return false;
     if (c.isTitle() != null && token.isTitle() != c.isTitle()) return false;
+    if (c.isUpper() != null && token.isUpper() != c.isUpper()) return false;
     if (c.shape() != null && !token.shape().equals(c.shape())) return false;
     if (c.isSentStart() != null && token.isSentStart() != c.isSentStart()) return false;
 

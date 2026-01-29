@@ -3,30 +3,41 @@
   "name": "ner",
   "skip_sections": ["reasons", "case_facts", "decision_reasons"],
   "vars": {
-    "DOC_TYPE": "(?i)^(urteil|beschluss|versäumnisurteil|entscheidung)$",
-    "FED_COURT": "(?i)^(bundesgerichtshof|bgh|bundesfinanzhof|bfh|bundesarbeitsgericht|bag|bundessozialgericht|bsg|bundesverwaltungsgericht|bverwg|bundesverfassungsgericht|bverfg|bundespatentgericht|bpatg)?$",
-    "LOWER_COURT": "^(Amtsgericht|AG|Landgericht|LG|Oberlandesgericht|OLG|Kammergericht|KG|Arbeitsgericht|ArbG|Landesarbeitsgericht|LAG|Sozialgericht|SG|Landessozialgericht|LSG|Verwaltungsgericht|VG|Oberverwaltungsgericht|OVG|Finanzgericht|FG|Anwaltsgerichtshof|AGH)$",
+    "DOC_TYPE": "(?i)^(urteil|beschluss|entscheidung|versäumnisurteil|verzichtsurteil|zwischenurteil|gerichtsbescheid)$",
+    "FED_COURT": "(?i)^(bundesgerichtshof|bgh|bundesfinanzhof|bfh|bundesarbeitsgericht|bag|bundessozialgericht|bsg|bundesverwaltungsgericht|bverwg|bundesverfassungsgericht|bverfg|bundespatentgericht|bpatg)s?$",
+    "LOWER_COURT": "(?i)^(Amtsgericht|AG|Landgericht|LG|Oberlandesgericht|OLG|Kammergericht|KG|Arbeitsgericht|ArbG|Landesarbeitsgericht|LAG|Sozialgericht|SG|Landessozialgericht|LSG|Verwaltungsgericht|VG|Verwaltungsgerichtshof|VGH|Verfassungsgerichtshof|VerfGH|Oberverwaltungsgericht|OVG|Finanzgericht|FG|Anwaltsgerichtshof|AGH|Rheins?schiffahrtsobergericht)s?$",
     "LANDES": "^(Sächsisches|Bayerisches|Hessisches|Brandenburgisches|Thüringisches|Thüringer|Berliner|Hamburgisches|Bremisches|Schleswig-Holsteinisches|Niedersächsisches)$",
-    "FN_SUFFIX": "^(WEG|B|E|F|jur|jug|U|G|Z|K|AO|GrE|Erb|WS)$"
+    "FN_SUFFIX": "^(WEG|B|E|F|jur|jug|U|G|Z|K|AO|GrE|Erb|WS|KfH|BET|BerH|VA|Rae|ER|RHSch|RhSch|BSch)$",
+    "TITLE_OR_UPPER": "^([A-ZÄÖÜ][A-Za-zÄÖÜäöüß\\-]+)$"
   },
   "rules": [
     {
-      "label": "date",
-      "type": "extraction",
+      "name": "datum",
+      "extractions": [{ "label": "date" }],
       "patterns": [
-        "\\d+.?\\s+(?:Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\\s+\\d{4}",
-        "\\d{2}\\.\\d{2}\\.\\d{4}"
+        "\\d+\\.?\\s+(?:Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\\s+\\d{4}",
+        "(?i)^verkündet\\s+am\\s+(\\d{1,2}\\.\\d{1,2}\\.\\d{4})",
+        "(\\d{1,2}\\.\\d{1,2}\\.\\d{4})"
       ],
       "normalizers": ["date_to_iso"]
     },
     {
-      "label": "document_type",
-      "type": "extraction",
+      "name": "datum_verhandlung",
+      "extractions": [{ "label": "date", "priority": 1 }],
+      "patterns": [
+        "(?i)verhandlung\\s+vom\\s+(\\d+.?\\s+(?:Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\\s+\\d{4})"
+      ],
+      "normalizers": ["date_to_iso"],
+      "skip_sections": ["tenor"]
+    },
+    {
+      "name": "dokumenttyp",
+      "extractions": [{ "label": "document_type" }],
       "patterns": [[{ "TEXT": { "REGEX": "$DOC_TYPE" } }]]
     },
     {
-      "label": "court",
-      "type": "extraction",
+      "name": "gericht",
+      "extractions": [{ "label": "court" }],
       "patterns": [
         [{ "TEXT": { "REGEX": "$FED_COURT" } }],
         [
@@ -42,6 +53,13 @@
         ],
         [
           { "TEXT": { "REGEX": "$LOWER_COURT" } },
+          { "TEXT": "für" },
+          { "TEXT": "das" },
+          { "TEXT": "Land" },
+          { "IS_TITLE": true }
+        ],
+        [
+          { "TEXT": { "REGEX": "$LOWER_COURT" } },
           { "IS_TITLE": true },
           { "LOWER": { "IN": ["am", "an", "der", "vor", "dem"] }, "OP": "+" },
           { "IS_TITLE": true }
@@ -49,19 +67,39 @@
         [
           { "TEXT": { "REGEX": "$LANDES" } },
           { "TEXT": { "REGEX": "$LOWER_COURT" } }
-        ]
+        ],
+        [{ "TEXT": { "REGEX": "$LOWER_COURT" } }, { "IS_UPPER": true }],
+        [{ "TEXT": { "REGEX": "(?i)(finanzgericht)$" } }, { "IS_UPPER": true }]
       ],
       "greedy": "LONGEST"
     },
     {
-      "label": "file_number",
-      "type": "extraction",
+      "name": "gericht_in_tabelle",
+      "extractions": [{ "label": "court", "priority": 1 }],
+      "patterns": [
+        [{ "TEXT": { "REGEX": "$LOWER_COURT" } }, { "IS_TITLE": true }],
+        [{ "TEXT": { "REGEX": "$LOWER_COURT" } }, { "IS_UPPER": true }]
+      ],
+      "conditions": ["is_table"],
+      "skip_sections": ["tenor"]
+    },
+    {
+      "name": "gericht_header",
+      "extractions": [{ "label": "court", "priority": 3 }],
+      "patterns": [[{ "TEXT": { "REGEX": "$FED_COURT" } }]],
+      "conditions": ["is_first_line"]
+    },
+    {
+      "name": "aktenzeichen",
+      "extractions": [{ "label": "file_number" }],
       "_comments": [
         "a) [Senate] [Register] [Number] [/] [Year]: 'III ZR 407/23', '1 StR 299/25', 'VIa ZR 135/22', 'WpSt (R) 1/24', 'AnwZ (Brfg) 20/252'",
-        "b) Longer patterns: '2 KLs 500 Js 22402/22', 'VIII KLs 104 Js 27144/23', '2 KLs 500 Js 22402/22 (3)', '12 KLs 119/24 jug (3)'",
+        "aa) ... same + ()",
+        "b) Longer patterns: '2 KLs 500 Js 22402/22', 'VIII KLs 104 Js 27144/23', '2 KLs 500 Js 22402/22 (3)', '12 KLs 119/24 jug (3)', '(544 KLs) 254 Js 243/20 (22/20)', '68 KLs-609 Js 1029/21-18/21'",
         "c) [number(letter)?] [letter] [number] [/] [year]: '16a U 172/19'",
         "d) [number] [-] [number] [letter] [number] [/] [year]: '2-23 O 177/20', 'I-34 U 141/19'",
-        "e) [IVX-number] [letter] [number] [/] [year]: 'I-34 U 141/19'"
+        "e) [IVX-number] [letter] [number] [/] [year]: 'I-34 U 141/19'",
+        "f) [number] [IVX] [letter] [number]: '27 XVII S 3644'"
       ],
       "patterns": [
         [
@@ -73,15 +111,28 @@
           { "IS_DIGIT": true },
           { "TEXT": "/" },
           { "IS_DIGIT": true },
-          { "TEXT": { "REGEX": "$FN_SUFFIX" }, "OP": "?" },
-          { "TEXT": "(", "OP": "?" },
-          { "TEXT": { "REGEX": "^\\w{1,4}$" }, "OP": "?" },
-          { "TEXT": ")", "OP": "?" }
+          { "TEXT": { "REGEX": "$FN_SUFFIX" }, "OP": "?" }
         ],
         [
           { "IS_DIGIT": true, "OP": "?" },
-          { "TEXT": { "REGEX": "^[IVX0-9]+$" }, "OP": "?" },
-          { "TEXT": { "REGEX": "^[A-Za-z]+s$" }, "OP": "?" },
+          { "TEXT": { "REGEX": "^[A-Za-z0-9]+$" } },
+          { "TEXT": "(", "OP": "?" },
+          { "IS_ALPHA": true, "OP": "?" },
+          { "TEXT": ")", "OP": "?" },
+          { "IS_DIGIT": true },
+          { "TEXT": "/" },
+          { "IS_DIGIT": true },
+          { "TEXT": { "REGEX": "$FN_SUFFIX" }, "OP": "?" },
+          { "TEXT": "(" },
+          { "TEXT": { "REGEX": "^\\w{1,4}$" }, "OP": "?" },
+          { "TEXT": ")" }
+        ],
+        "(\\d+ KLs( |-)\\d+ Js \\d+/\\d+( |-)\\d+/\\d+)",
+        [
+          { "TEXT": "(", "OP": "?" },
+          { "TEXT": { "REGEX": "^[IVX0-9]+[abcd]?$" }, "OP": "?" },
+          { "TEXT": { "REGEX": "^[A-Za-z]{1,4}$" }, "OP": "?" },
+          { "TEXT": ")", "OP": "?" },
           { "IS_DIGIT": true },
           { "IS_ALPHA": true },
           { "IS_DIGIT": true },
@@ -89,7 +140,7 @@
           { "IS_DIGIT": true },
           { "TEXT": { "REGEX": "$FN_SUFFIX" }, "OP": "?" },
           { "TEXT": "(", "OP": "?" },
-          { "TEXT": { "REGEX": "^\\w{1,4}$" }, "OP": "?" },
+          { "TEXT": { "REGEX": "^\\d{1,4}$" }, "OP": "?" },
           { "TEXT": "/", "OP": "?" },
           { "IS_DIGIT": true, "OP": "?" },
           { "TEXT": ")", "OP": "?" }
@@ -115,6 +166,12 @@
           { "IS_ALPHA": true },
           { "IS_DIGIT": true },
           { "TEXT": "/" },
+          { "IS_DIGIT": true }
+        ],
+        [
+          { "IS_DIGIT": true },
+          { "TEXT": { "REGEX": "^[IVX]+$" } },
+          { "IS_ALPHA": true },
           { "IS_DIGIT": true }
         ]
       ],

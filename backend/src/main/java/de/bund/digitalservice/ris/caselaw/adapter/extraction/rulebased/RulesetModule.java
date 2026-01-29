@@ -14,9 +14,11 @@ class RulesetModule implements ExtractionModule {
   private static final PatternMatcher matcher = new PatternMatcher();
   private static final Map<String, ValidatorFunction> VALIDATORS =
       Map.of(
-          "is_short_line", (tag, text) -> text.length() <= 24,
-          "is_not_short_line", (tag, text) -> text.length() > 15,
-          "is_table", (tag, text) -> "table".equals(tag.name()));
+          "is_short_line", (tag, text, i) -> text.length() <= 24,
+          "is_not_short_line", (tag, text, i) -> text.length() > 15,
+          "is_table", (tag, text, i) -> "table".equals(tag.name()),
+          "is_first_line", (tag, text, i) -> i == 0,
+          "is_centered", (tag, text, i) -> tag.isCentered());
   private static final Map<String, NormalizerFunction> NORMALIZERS =
       Map.of("date_to_iso", Utils::dateToIso);
 
@@ -36,6 +38,7 @@ class RulesetModule implements ExtractionModule {
     if (ruleset.skipSections() != null
         && currentSection != null
         && ruleset.skipSections().contains(currentSection)) return;
+
     Pos pos = tagData.tag().pos();
     if (pos == null) throw new IllegalStateException("Tag position is null");
 
@@ -43,68 +46,84 @@ class RulesetModule implements ExtractionModule {
     String tagStr = tagData.tag().outerHtml();
 
     for (ExtractionRule rule : ruleset.rules()) {
-      if (rule.conditions() != null && !validate(tagData.tag(), tagData.text(), rule.conditions()))
+      currentSection =
+          ctx.getMarkers().isEmpty()
+              ? null
+              : ctx.getMarkers().get(ctx.getMarkers().size() - 1).sectionName();
+
+      if (rule.conditions() != null
+          && !validate(tagData.tag(), tagData.text(), tagData.index(), rule.conditions())) {
         continue;
+      }
+
+      if (rule.skipSections() != null
+          && currentSection != null
+          && rule.skipSections().contains(currentSection)) {
+        continue;
+      }
 
       List<Match> matches =
           matcher.match(rule.patterns(), tagData.text(), rule.greedy(), tagData.tokens());
 
+      int matchStartIdx = 0;
       for (Match match : matches) {
+        if (rule.sectionMarkers() != null) {
+          for (SectionMarkerDef sm : rule.sectionMarkers()) {
+            boolean exists =
+                ctx.getMarkers().stream().anyMatch(m -> m.sectionName().equals(sm.label()));
+            if (exists) continue;
 
-        // System.out.println("Matched rule " + rule.label() + ": " + match.text());
+            ctx.addMarker(
+                new SectionMarker(tagData.index(), sm.label(), sm.lineOffset(), sm.maxLines()));
 
-        String label = rule.label();
-
-        if ("section_marker".equals(rule.type())) {
-          String secLabel = rule.label().replaceAll("[0-9]+$", "");
-          label = secLabel + "_marker";
-
-          boolean exists =
-              ctx.getMarkers().stream().anyMatch(m -> m.sectionName().equals(secLabel));
-          if (exists) continue;
-
-          ctx.addMarker(
-              new SectionMarker(tagData.index(), secLabel, rule.inclusive(), rule.singleLine()));
-        }
-
-        int actualStart, actualEnd;
-        if (rule.markTag()) {
-          actualStart = tagStartPos;
-          actualEnd = tagStartPos + tagStr.length();
-        } else {
-          int offset = tagStr.indexOf(match.text());
-          if (offset == -1) {
-            System.out.println(
-                "Warning: matched text not found in tag outer HTML: '"
-                    + match.text()
-                    + "' in '"
-                    + tagStr
-                    + "'");
-            continue;
+            int offset = tagStr.indexOf(match.text(), 0);
+            if (offset != -1) {
+              ctx.addExtraction(
+                  sm.label() + "_marker",
+                  match.text(),
+                  tagStartPos + offset,
+                  tagStartPos + offset + match.text().length());
+            }
           }
-          actualStart = tagStartPos + offset;
-          actualEnd = actualStart + match.text().length();
         }
 
-        // normalized_text = self._normalize(match.text, rule.normalizers) if rule.normalizers else
-        // None
+        if (rule.extractions() != null) {
+          for (ExtractionDef extConfig : rule.extractions()) {
+            String matchStr = match.text();
+            int actualStart, actualEnd;
 
-        String normalizedText =
-            rule.normalizers() != null ? normalize(match.text(), rule.normalizers()) : null;
+            if (extConfig.markTag()) {
+              actualStart = tagStartPos;
+              actualEnd = tagStartPos + tagStr.length();
+            } else {
+              int offset = tagStr.indexOf(matchStr, matchStartIdx);
+              if (offset == -1) {
+                System.out.println(
+                    "Warning: matched text not found in tag outer HTML: '"
+                        + matchStr
+                        + "' in '"
+                        + tagStr
+                        + "'");
+                continue;
+              }
+              matchStartIdx = offset + matchStr.length();
+              actualStart = tagStartPos + offset;
+              actualEnd = actualStart + matchStr.length();
+            }
 
-        ctx.addExtraction(
-            label,
-            match.text(),
-            actualStart,
-            actualEnd,
-            false,
-            null,
-            rule.getPriority(),
-            normalizedText);
+            String normalizedText =
+                rule.normalizers() != null ? normalize(match.text(), rule.normalizers()) : null;
 
-        if (rule.followedBySection() != null) {
-          ctx.addMarker(
-              new SectionMarker(tagData.index() + 1, rule.followedBySection(), true, false));
+            ctx.addExtraction(
+                extConfig.label(),
+                match.text(),
+                actualStart,
+                actualEnd,
+                false,
+                null,
+                extConfig.priority() != null ? extConfig.priority() : 0,
+                extConfig.value() != null ? extConfig.value() : normalizedText);
+          }
         }
       }
     }
@@ -117,14 +136,15 @@ class RulesetModule implements ExtractionModule {
   // Helpers
   // ============================================================================
 
-  private static boolean validate(HtmlElement tag, String text, List<String> conditions) {
-    if (conditions == null) return true;
+  private static boolean validate(
+      HtmlElement tag, String text, int index, List<String> conditions) {
+    if (conditions == null || conditions.isEmpty()) return true;
     for (String name : conditions) {
       ValidatorFunction v = VALIDATORS.get(name);
       if (v == null) throw new IllegalArgumentException("Unknown validator: " + name);
-      if (!v.validate(tag, text)) return false;
+      if (v.validate(tag, text, index)) return true; // OR logic
     }
-    return true;
+    return false;
   }
 
   private static String normalize(String text, List<String> normalizers) {
@@ -203,8 +223,7 @@ class RulesetModule implements ExtractionModule {
 
   @SuppressWarnings("unchecked")
   private static ExtractionRule parseRule(JsonObject obj) {
-    String label = obj.get("label").getAsString();
-    String type = obj.has("type") ? obj.get("type").getAsString() : "extraction";
+    String name = obj.has("name") ? obj.get("name").getAsString() : null;
 
     List<Pattern> patterns = new ArrayList<>();
     for (JsonElement elem : obj.getAsJsonArray("patterns")) {
@@ -231,30 +250,48 @@ class RulesetModule implements ExtractionModule {
         obj.has("normalizers") && !obj.get("normalizers").isJsonNull()
             ? new Gson().fromJson(obj.get("normalizers"), List.class)
             : null;
-    Integer priority =
-        obj.has("priority") && !obj.get("priority").isJsonNull()
-            ? obj.get("priority").getAsInt()
+    List<String> skipSections =
+        obj.has("skip_sections") && !obj.get("skip_sections").isJsonNull()
+            ? new Gson().fromJson(obj.get("skip_sections"), List.class)
             : null;
-    boolean markTag = obj.has("mark_tag") && obj.get("mark_tag").getAsBoolean();
-    String followedBy =
-        obj.has("followed_by_section") && !obj.get("followed_by_section").isJsonNull()
-            ? obj.get("followed_by_section").getAsString()
-            : null;
-    boolean inclusive = obj.has("inclusive") && obj.get("inclusive").getAsBoolean();
-    boolean singleLine = obj.has("single_line") && obj.get("single_line").getAsBoolean();
+
+    List<ExtractionDef> extractions = null;
+    if (obj.has("extractions") && !obj.get("extractions").isJsonNull()) {
+      extractions = new ArrayList<>();
+      for (JsonElement elem : obj.getAsJsonArray("extractions")) {
+        JsonObject eObj = elem.getAsJsonObject();
+        extractions.add(
+            new ExtractionDef(
+                eObj.get("label").getAsString(),
+                eObj.has("value") && !eObj.get("value").isJsonNull()
+                    ? eObj.get("value").getAsString()
+                    : null,
+                eObj.has("priority") && !eObj.get("priority").isJsonNull()
+                    ? eObj.get("priority").getAsInt()
+                    : null,
+                eObj.has("mark_tag") && eObj.get("mark_tag").getAsBoolean()));
+      }
+    }
+
+    List<SectionMarkerDef> sectionMarkers = null;
+    if (obj.has("section_markers") && !obj.get("section_markers").isJsonNull()) {
+      sectionMarkers = new ArrayList<>();
+      for (JsonElement elem : obj.getAsJsonArray("section_markers")) {
+        JsonObject sObj = elem.getAsJsonObject();
+        sectionMarkers.add(
+            new SectionMarkerDef(
+                sObj.get("label").getAsString(),
+                sObj.has("line_offset") && !sObj.get("line_offset").isJsonNull()
+                    ? sObj.get("line_offset").getAsInt()
+                    : 0,
+                sObj.has("max_lines") && !sObj.get("max_lines").isJsonNull()
+                    ? sObj.get("max_lines").getAsInt()
+                    : null));
+      }
+    }
 
     return new ExtractionRule(
-        label,
-        type,
-        patterns,
-        greedy,
-        conditions,
-        normalizers,
-        priority,
-        markTag,
-        followedBy,
-        inclusive,
-        singleLine);
+        name, extractions, sectionMarkers, patterns, greedy, conditions, skipSections, normalizers);
   }
 
   @SuppressWarnings("unchecked")
@@ -275,13 +312,14 @@ class RulesetModule implements ExtractionModule {
     Boolean isDigit = parseBoolean(obj, "IS_DIGIT");
     Boolean isAlpha = parseBoolean(obj, "IS_ALPHA");
     Boolean isTitle = parseBoolean(obj, "IS_TITLE");
+    Boolean isUpper = parseBoolean(obj, "IS_UPPER");
     Boolean isSentStart = parseBoolean(obj, "IS_SENT_START");
     String shape =
         obj.has("SHAPE") && !obj.get("SHAPE").isJsonNull() ? obj.get("SHAPE").getAsString() : null;
     String op = obj.has("OP") && !obj.get("OP").isJsonNull() ? obj.get("OP").getAsString() : null;
 
     return new TokenConstraint(
-        text, lower, regex, in, notIn, isDigit, isAlpha, isTitle, isSentStart, shape, op);
+        text, lower, regex, in, notIn, isDigit, isAlpha, isTitle, isSentStart, shape, op, isUpper);
   }
 
   private static Object parseField(JsonObject obj, String field, Gson gson) {

@@ -42,6 +42,10 @@ class Utils {
   }
 
   public static String dateToIso(String dateStr) {
-    return LocalDate.parse(dateStr, ISO_DATE_FORMATTER).toString();
+    try {
+      return LocalDate.parse(dateStr, ISO_DATE_FORMATTER).toString();
+    } catch (Exception e) {
+      return dateStr;
+    }
   }
 }

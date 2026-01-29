@@ -30,7 +30,13 @@ class JsoupElement implements HtmlElement {
 
   @Override
   public String innerText() {
-    return element.text();
+    return element.text(); // TODO: newline separator "\n" between elements
+  }
+
+  @Override
+  public boolean isCentered() {
+    String style = element.attr("style");
+    return style != null && style.toLowerCase().contains("text-align: center");
   }
 
   @Override
