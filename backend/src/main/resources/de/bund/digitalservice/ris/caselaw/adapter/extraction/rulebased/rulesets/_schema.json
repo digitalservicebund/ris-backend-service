@@ -167,7 +167,7 @@
           "anyOf": [
             {
               "items": {
-                "const": "date_to_iso",
+                "enum": ["date_to_iso", "normalize_court"],
                 "type": "string"
               },
               "type": "array"

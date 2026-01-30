@@ -20,7 +20,7 @@ class RulesetModule implements ExtractionModule {
           "is_first_line", (tag, text, i) -> i == 0,
           "is_centered", (tag, text, i) -> tag.isCentered());
   private static final Map<String, NormalizerFunction> NORMALIZERS =
-      Map.of("date_to_iso", Utils::dateToIso);
+      Map.of("date_to_iso", Utils::dateToIso, "normalize_court", Utils::getNormalizedCourt);
 
   private final RulesetDef ruleset;
 

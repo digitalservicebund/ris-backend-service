@@ -71,7 +71,8 @@
         [{ "TEXT": { "REGEX": "$LOWER_COURT" } }, { "IS_UPPER": true }],
         [{ "TEXT": { "REGEX": "(?i)(finanzgericht)$" } }, { "IS_UPPER": true }]
       ],
-      "greedy": "LONGEST"
+      "greedy": "LONGEST",
+      "normalizers": ["normalize_court"]
     },
     {
       "name": "gericht_in_tabelle",
@@ -81,13 +82,15 @@
         [{ "TEXT": { "REGEX": "$LOWER_COURT" } }, { "IS_UPPER": true }]
       ],
       "conditions": ["is_table"],
-      "skip_sections": ["tenor"]
+      "skip_sections": ["tenor"],
+      "normalizers": ["normalize_court"]
     },
     {
       "name": "gericht_header",
       "extractions": [{ "label": "court", "priority": 3 }],
       "patterns": [[{ "TEXT": { "REGEX": "$FED_COURT" } }]],
-      "conditions": ["is_first_line"]
+      "conditions": ["is_first_line"],
+      "normalizers": ["normalize_court"]
     },
     {
       "name": "aktenzeichen",
