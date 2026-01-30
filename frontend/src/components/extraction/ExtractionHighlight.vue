@@ -162,7 +162,7 @@ const labelPrefix = props.node.attrs.targetPath?.startsWith("previousDecisions")
     :data-extraction-class="$props.node.attrs.extractionClass"
     :data-extraction-id="$props.node.attrs.extractionId"
     tabindex="-1"
-    @click="handleClick"
+    @click.stop="handleClick"
   >
     <NodeViewContent />
     <button
@@ -317,7 +317,7 @@ mark.extraction {
   background-color: var(--color-blue-500);
 }
 
-.extraction.has-path.active .cta-button {
+.extraction.has-path.active > .cta-button {
   width: auto;
   height: auto;
   opacity: 1;

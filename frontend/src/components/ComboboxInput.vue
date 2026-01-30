@@ -248,15 +248,15 @@ async function handleRemoteSearch(event: Event) {
     inputText.value = query
     filter.value = query
     await updateCurrentItems()
-    // a) auto-set if only one result or exact match
+    // a) auto-set if only one result AND exact match
     if (
-      existingItems.value?.length === 1 ||
-      (existingItems.value?.length &&
-        existingItems.value[0].label.toLowerCase() === query.toLowerCase())
+      existingItems.value?.length === 1 &&
+      existingItems.value?.length &&
+      existingItems.value[0].label.toLowerCase() === query.toLowerCase()
     ) {
       setChosenItem(existingItems.value[0])
     }
-    // b) ambiguous result: open dropdown for user selection
+    // b) ambiguous or no result: open dropdown for user selection
     else {
       inputText.value = query // without, it would disappear again
       showDropdown.value = true
