@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 
@@ -32,6 +33,8 @@ public class HandoverService {
   private final MailService mailService;
   private final DeltaMigrationRepository deltaMigrationRepository;
   private final DocumentationUnitHistoryLogService historyLogService;
+  private final AttachmentInlineRepository attachmentInlineRepository;
+  private final Environment env;
 
   @Value("${mail.exporter.recipientAddress:neuris@example.com}")
   private String recipientAddress;
@@ -42,7 +45,9 @@ public class HandoverService {
       DeltaMigrationRepository migrationService,
       HandoverReportRepository handoverReportRepository,
       LegalPeriodicalEditionRepository editionRepository,
-      DocumentationUnitHistoryLogService historyLogService) {
+      DocumentationUnitHistoryLogService historyLogService,
+      AttachmentInlineRepository attachmentInlineRepository,
+      Environment env) {
 
     this.repository = repository;
     this.mailService = mailService;
@@ -50,6 +55,8 @@ public class HandoverService {
     this.handoverReportRepository = handoverReportRepository;
     this.editionRepository = editionRepository;
     this.historyLogService = historyLogService;
+    this.attachmentInlineRepository = attachmentInlineRepository;
+    this.env = env;
   }
 
   /**
@@ -59,6 +66,7 @@ public class HandoverService {
    * @param issuerAddress the email address of the issuer
    * @return the handover result
    * @throws DocumentationUnitNotExistsException if the documentation unit does not exist
+   * @throws HandoverNotAllowedException if the documentation unit cannot be handed over
    */
   public HandoverMail handoverDocumentationUnitAsMail(
       UUID documentationUnitId, String issuerAddress, @Nullable User user)
@@ -67,6 +75,7 @@ public class HandoverService {
     DocumentationUnit documentationUnit = repository.findByUuid(documentationUnitId);
 
     if (documentationUnit instanceof Decision decision) {
+      checkHandoverAllowed(decision);
       String description = "Dokeinheit an jDV übergeben";
       historyLogService.saveHistoryLog(
           decision.uuid(), user, HistoryLogEventType.HANDOVER, description);
@@ -186,6 +195,43 @@ public class HandoverService {
       return writer.toString();
     } catch (Exception e) {
       throw new HandoverException("Failed to prettify XML", e);
+    }
+  }
+
+  /**
+   * Checks if handover is allowed for decisions with images and throws a {@link
+   * HandoverNotAllowedException} if decision has images and is already published in jDV or any of
+   * the images are not in the correct format (.png, .jpg, .gif).
+   */
+  private void checkHandoverAllowed(Decision decision) {
+    List<Attachment> inlineAttachments =
+        attachmentInlineRepository.findAllByDocumentationUnitId(decision.uuid());
+    if (!inlineAttachments.isEmpty()) {
+      boolean isUnpublished =
+          PublicationStatus.UNPUBLISHED.equals(decision.status().publicationStatus());
+      boolean isMigrated = "Migration".equals(decision.managementData().createdByName());
+      if (env.matchesProfiles("uat")) {
+        throw new HandoverNotAllowedException(
+            "Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV übergeben werden.");
+      }
+      if (!isUnpublished || isMigrated) {
+        throw new HandoverNotAllowedException(
+            "Die Übergabe einer Entscheidung mit Bildern an die jDV ist nur bei Neuanlagen gestattet.");
+      }
+      var hasOnlyAllowedImageFormats =
+          inlineAttachments.stream()
+              .map(Attachment::format)
+              .map(String::toLowerCase)
+              .allMatch(
+                  format ->
+                      "jpg".equals(format)
+                          || "jpeg".equals(format)
+                          || "png".equals(format)
+                          || "gif".equals(format));
+      if (!hasOnlyAllowedImageFormats) {
+        throw new HandoverNotAllowedException(
+            "Diese Entscheidung enthält Bilder, die nicht den Formaten entsprechen, die an die jDV übergeben werden können (jpg, png, gif).");
+      }
     }
   }
 }

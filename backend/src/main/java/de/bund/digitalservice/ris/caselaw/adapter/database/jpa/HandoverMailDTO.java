@@ -50,6 +50,9 @@ public class HandoverMailDTO {
   @Column(name = "issuer_address")
   private String issuerAddress;
 
+  @Column(name = "attached_images")
+  private String attachedImages;
+
   // One-to-many relationship for attachments
   @Builder.Default
   @OneToMany(mappedBy = "handoverMail", cascade = CascadeType.ALL, orphanRemoval = true)

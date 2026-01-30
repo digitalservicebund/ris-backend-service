@@ -1,9 +1,7 @@
 {
-  "plugins": ["stylelint-scss", "@namics/stylelint-bem"],
+  "plugins": ["@namics/stylelint-bem"],
   "extends": [
     "stylelint-config-standard",
-    "stylelint-config-standard-scss",
-    "stylelint-config-prettier-scss",
     "stylelint-config-recommended-vue",
     "stylelint-config-idiomatic-order"
   ],
@@ -11,14 +9,8 @@
     "plugin/stylelint-bem-namics": {
       "patternPrefixes": [],
       "helperPrefixes": []
-    },
-    "scss/at-rule-no-unknown": [
-      true,
-      {
-        "ignoreAtRules": ["tailwind", "apply"]
-      }
-    ]
+    }
   },
   "reportNeedlessDisables": true,
-  "ignoreFiles": ["!**/*.vue", "!**/*.scss"]
+  "ignoreFiles": ["!**/*.vue"]
 }

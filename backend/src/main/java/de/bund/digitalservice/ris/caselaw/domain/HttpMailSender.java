@@ -9,5 +9,6 @@ public interface HttpMailSender {
       String subject,
       String content,
       List<MailAttachment> mailAttachments,
+      List<MailAttachmentImage> imageAttachments,
       String tag);
 }

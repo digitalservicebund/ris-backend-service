@@ -604,8 +604,8 @@ public class DocumentationUnitService {
     }
 
     if (docUnit instanceof Decision decision
-        && decision.attachments() != null
-        && !decision.attachments().isEmpty()) {
+        && decision.originalDocumentAttachments() != null
+        && !decision.originalDocumentAttachments().isEmpty()) {
       attachmentService.deleteAllObjectsFromBucketForDocumentationUnit(documentationUnitId);
     }
 

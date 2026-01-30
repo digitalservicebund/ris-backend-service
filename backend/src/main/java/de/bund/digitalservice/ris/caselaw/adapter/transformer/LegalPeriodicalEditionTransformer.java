@@ -32,7 +32,7 @@ public class LegalPeriodicalEditionTransformer {
                 ? new ArrayList<>()
                 : legalPeriodicalEditionDTO.getReferences().stream()
                     .map(ReferenceTransformer::transformToDomain)
-                    .collect(Collectors.toList()))
+                    .collect(Collectors.toList())) // NOSONAR
         .build();
   }
 

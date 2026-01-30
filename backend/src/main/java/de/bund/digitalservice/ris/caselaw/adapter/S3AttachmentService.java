@@ -2,27 +2,33 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.AttachmentInlineTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.AttachmentTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
+import de.bund.digitalservice.ris.caselaw.domain.StreamedFileResponse;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.image.ImageUtil;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -38,20 +44,32 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.AbortMultipartUploadRequest;
+import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadRequest;
+import software.amazon.awssdk.services.s3.model.CompletedPart;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.UploadPartRequest;
 
 @Slf4j
 @Service
 public class S3AttachmentService implements AttachmentService {
   private final AttachmentRepository repository;
-  private final AttachmentInlineRepository attachmentInlineRepository;
+  private final DatabaseAttachmentInlineRepository attachmentInlineRepository;
   private final S3Client s3Client;
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
   private final DocumentationUnitHistoryLogService documentationUnitHistoryLogService;
   private static final String UNKNOWN_YET = "unknown yet";
+  private static final int PART_SIZE = 5 * 1024 * 1024;
+  private static final int MAX_PARTS = 10_000;
+
   private final MediaType wordMediaType =
       MediaType.parseMediaType(
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
@@ -66,7 +84,7 @@ public class S3AttachmentService implements AttachmentService {
 
   public S3AttachmentService(
       AttachmentRepository repository,
-      AttachmentInlineRepository attachmentInlineRepository,
+      DatabaseAttachmentInlineRepository attachmentInlineRepository,
       @Qualifier("docxS3Client") S3Client s3Client,
       DatabaseDocumentationUnitRepository documentationUnitRepository,
       DocumentationUnitHistoryLogService documentationUnitHistoryLogService) {
@@ -108,17 +126,179 @@ public class S3AttachmentService implements AttachmentService {
     }
   }
 
+  public Attachment streamFileToDocumentationUnit(
+      UUID documentationUnitId,
+      InputStream inputStream,
+      String filename,
+      User user,
+      AttachmentType type) {
+
+    var documentationUnit = documentationUnitRepository.findById(documentationUnitId).orElseThrow();
+    var documentationUnitNumber = documentationUnit.getDocumentNumber();
+
+    var extension = getExtension(filename);
+
+    var attachmentDTO =
+        AttachmentDTO.builder()
+            .s3ObjectPath(UNKNOWN_YET)
+            .documentationUnit(documentationUnit)
+            .filename(filename)
+            .format(extension)
+            .uploadTimestamp(Instant.now())
+            .attachmentType(type.name())
+            .build();
+
+    attachmentDTO = repository.save(attachmentDTO);
+    var s3ObjectPath =
+        "%s/%s.%s"
+            .formatted(
+                documentationUnitNumber,
+                attachmentDTO.getId().toString(),
+                attachmentDTO.getFormat());
+
+    try {
+      streamFileToBucket(s3ObjectPath, inputStream);
+    } catch (Exception e) {
+      log.atError()
+          .setCause(e)
+          .setMessage("Failed to upload file to S3")
+          .addKeyValue("id", attachmentDTO.getId())
+          .addKeyValue("filename", filename)
+          .addKeyValue("s3ObjectPath", s3ObjectPath)
+          .log();
+      try {
+        repository.delete(attachmentDTO);
+      } catch (Exception deleteEx) {
+        log.atError()
+            .setCause(deleteEx)
+            .setMessage("Failed to delete attachment record after failed multipart upload")
+            .addKeyValue("id", attachmentDTO.getId())
+            .addKeyValue("filename", filename)
+            .addKeyValue("s3ObjectPath", s3ObjectPath)
+            .log();
+      }
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload file", e);
+    }
+
+    attachmentDTO.setS3ObjectPath(s3ObjectPath);
+    var attachment = AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
+
+    setLastUpdated(user, documentationUnit);
+    documentationUnitHistoryLogService.saveHistoryLog(
+        documentationUnitId,
+        user,
+        HistoryLogEventType.FILES,
+        "Anhang \"" + filename + "\" hinzugefügt");
+
+    return attachment;
+  }
+
+  public String getExtension(String filename) {
+    if (filename == null || !filename.contains(".")) {
+      return "";
+    }
+
+    int lastDotIndex = filename.lastIndexOf('.');
+
+    if (lastDotIndex > 0 && lastDotIndex < filename.length() - 1) {
+      return filename.substring(lastDotIndex + 1).toLowerCase();
+    }
+
+    return "";
+  }
+
+  private void streamFileToBucket(String s3ObjectPath, InputStream inputStream) {
+    var createdMultipartUpload =
+        s3Client.createMultipartUpload(
+            c ->
+                c.bucket(bucketName)
+                    .key(s3ObjectPath)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM_VALUE));
+    String uploadId = createdMultipartUpload.uploadId();
+
+    List<CompletedPart> completedParts = new ArrayList<>();
+    int partNumber = 1;
+
+    try (inputStream) {
+      byte[] buffer;
+      while ((buffer = inputStream.readNBytes(PART_SIZE)).length > 0) {
+        validatePartLimit(partNumber);
+
+        CompletedPart part = uploadPart(s3ObjectPath, uploadId, partNumber, buffer);
+        completedParts.add(part);
+        partNumber++;
+      }
+
+      if (completedParts.isEmpty()) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot upload empty file");
+      }
+
+      s3Client.completeMultipartUpload(completeRequest(s3ObjectPath, uploadId, completedParts));
+
+    } catch (Exception e) {
+      abortUploadSafely(s3ObjectPath, uploadId, e);
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload file", e);
+    }
+  }
+
+  private void validatePartLimit(int partNumber) {
+    if (partNumber > MAX_PARTS) {
+      throw new ResponseStatusException(
+          HttpStatus.CONTENT_TOO_LARGE,
+          String.format("File too large: %d parts exceeds %d limit", partNumber, MAX_PARTS));
+    }
+  }
+
+  private CompletedPart uploadPart(String key, String uploadId, int partNumber, byte[] buffer) {
+    var request =
+        UploadPartRequest.builder()
+            .bucket(bucketName)
+            .key(key)
+            .uploadId(uploadId)
+            .partNumber(partNumber)
+            .contentLength((long) buffer.length)
+            .build();
+
+    var response = s3Client.uploadPart(request, RequestBody.fromBytes(buffer));
+    return CompletedPart.builder().partNumber(partNumber).eTag(response.eTag()).build();
+  }
+
+  private CompleteMultipartUploadRequest completeRequest(
+      String key, String uploadId, List<CompletedPart> completedParts) {
+    return CompleteMultipartUploadRequest.builder()
+        .bucket(bucketName)
+        .key(key)
+        .uploadId(uploadId)
+        .multipartUpload(mpu -> mpu.parts(completedParts))
+        .build();
+  }
+
+  private void abortUploadSafely(String key, String uploadId, Exception e) {
+    log.atWarn()
+        .addKeyValue("key", key)
+        .addKeyValue("id", uploadId)
+        .setCause(e)
+        .log("Multipart upload failed, aborting uploadId={}", uploadId);
+    try {
+      s3Client.abortMultipartUpload(
+          AbortMultipartUploadRequest.builder()
+              .bucket(bucketName)
+              .key(key)
+              .uploadId(uploadId)
+              .build());
+    } catch (Exception abortEx) {
+      log.atWarn()
+          .addKeyValue("id", uploadId)
+          .addKeyValue("key", key)
+          .setCause(abortEx)
+          .log("Failed to abort multipart upload for id {}", uploadId);
+    }
+  }
+
   private Attachment attachImage(
       ByteBuffer byteBuffer, MediaType contentType, DocumentationUnitDTO documentationUnit) {
-    AttachmentDTO attachmentDTO =
-        AttachmentDTO.builder()
-            .s3ObjectPath(null)
-            .content(byteBuffer.array())
-            .documentationUnit(documentationUnit)
-            .format(contentType.getSubtype().toLowerCase())
-            .filename(UNKNOWN_YET)
-            .uploadTimestamp(Instant.now())
-            .build();
 
     AttachmentInlineDTO attachmentInlineDTO =
         AttachmentInlineDTO.builder()
@@ -129,16 +309,12 @@ public class S3AttachmentService implements AttachmentService {
             .uploadTimestamp(Instant.now())
             .build();
 
-    attachmentDTO = repository.save(attachmentDTO);
-
-    String fileName = attachmentDTO.getId() + "." + attachmentDTO.getFormat();
-
-    attachmentDTO.setFilename(fileName);
-    attachmentInlineDTO.setFilename(fileName);
     attachmentInlineDTO = attachmentInlineRepository.save(attachmentInlineDTO);
-    attachmentInlineRepository.save(attachmentInlineDTO);
+    var fileName = attachmentInlineDTO.getId() + "." + attachmentInlineDTO.getFormat();
+    attachmentInlineDTO.setFilename(fileName);
+    var persistedAttachmentLineDTO = attachmentInlineRepository.save(attachmentInlineDTO);
 
-    return AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
+    return AttachmentInlineTransformer.transformToDomain(persistedAttachmentLineDTO);
   }
 
   private Attachment attachDocx(
@@ -157,6 +333,7 @@ public class S3AttachmentService implements AttachmentService {
             .filename(fileName)
             .format("docx")
             .uploadTimestamp(Instant.now())
+            .attachmentType(AttachmentType.ORIGINAL.name())
             .build();
 
     attachmentDTO = repository.save(attachmentDTO);
@@ -176,17 +353,24 @@ public class S3AttachmentService implements AttachmentService {
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void deleteByS3Path(String s3Path, UUID documentationUnitId, User user) {
-    deleteObjectFromBucket(s3Path);
+  public void deleteByFileId(UUID fileId, UUID documentationUnitId, User user) {
+    var attachmentDTO = repository.findById(fileId);
+    if (attachmentDTO.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found");
+    }
+    deleteObjectFromBucket(attachmentDTO.get().getS3ObjectPath());
     documentationUnitRepository
         .findById(documentationUnitId)
         .ifPresent(
             documentationUnit -> {
               setLastUpdated(user, documentationUnit);
               documentationUnitHistoryLogService.saveHistoryLog(
-                  documentationUnitId, user, HistoryLogEventType.FILES, "Word-Dokument gelöscht");
+                  documentationUnitId,
+                  user,
+                  HistoryLogEventType.FILES,
+                  String.format("Anhang \"%s\" gelöscht", attachmentDTO.get().getFilename()));
             });
-    repository.deleteByS3ObjectPath(s3Path);
+    repository.deleteById(fileId);
   }
 
   public void deleteAllObjectsFromBucketForDocumentationUnit(UUID uuid) {
@@ -199,15 +383,47 @@ public class S3AttachmentService implements AttachmentService {
   @Override
   public Optional<Image> findByDocumentationUnitIdAndFileName(
       UUID documentationUnitId, String imageName) {
-    return repository
+    return attachmentInlineRepository
         .findByDocumentationUnitIdAndFilename(documentationUnitId, imageName)
         .map(
-            attachmentDTO ->
+            attachmentInlineDTO ->
                 Image.builder()
-                    .content(attachmentDTO.getContent())
-                    .contentType(attachmentDTO.getFormat())
-                    .name(attachmentDTO.getFilename())
+                    .content(attachmentInlineDTO.getContent())
+                    .contentType(attachmentInlineDTO.getFormat())
+                    .name(attachmentInlineDTO.getFilename())
                     .build());
+  }
+
+  @Override
+  public StreamedFileResponse getFileStream(UUID documentationUnitId, UUID fileId) {
+    var attachmentDTO =
+        repository.findById(fileId).orElseThrow(() -> new AttachmentException("File not found"));
+
+    var getObjectRequest =
+        GetObjectRequest.builder().bucket(bucketName).key(attachmentDTO.getS3ObjectPath()).build();
+
+    ResponseTransformer<GetObjectResponse, ResponseInputStream<GetObjectResponse>> transformer =
+        ResponseTransformer.toInputStream();
+
+    ResponseInputStream<GetObjectResponse> stream =
+        s3Client.getObject(getObjectRequest, transformer);
+
+    StreamingResponseBody responseBody =
+        outputStream -> {
+          try (stream) {
+            stream.transferTo(outputStream);
+            outputStream.flush();
+          } catch (IOException e) {
+            log.atError()
+                .setCause(e)
+                .setMessage("Failed to stream file from S3")
+                .addKeyValue("id", attachmentDTO.getId())
+                .log();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+          }
+        };
+
+    return new StreamedFileResponse(stream.response(), responseBody, attachmentDTO.getFilename());
   }
 
   void checkDocx(ByteBuffer byteBuffer) {
@@ -233,8 +449,7 @@ public class S3AttachmentService implements AttachmentService {
     return byteBufferArray;
   }
 
-  private void putObjectIntoBucket(
-      String fileUuid, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
+  private void putObjectIntoBucket(String fileId, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
 
     var contentLength = httpHeaders.getContentLength();
 
@@ -250,7 +465,7 @@ public class S3AttachmentService implements AttachmentService {
     var putObjectRequestBuilder =
         PutObjectRequest.builder()
             .bucket(bucketName)
-            .key(fileUuid)
+            .key(fileId)
             .contentType(mediaType.toString())
             .metadata(metadata);
 

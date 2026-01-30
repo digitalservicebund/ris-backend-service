@@ -13,6 +13,8 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.DocumentationUnitControllerTestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
@@ -39,6 +41,7 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,8 +84,11 @@ class DocumentationUnitControllerAuthTest {
   @MockitoBean private ProcedureService procedureService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
+  @MockitoBean private AttachmentRepository attachmentRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
+  private static final UUID TEST_FILE_UUID =
+      UUID.fromString("99999999-4444-4444-4444-121212121212");
   private final String docOffice1Group = "/CC-RIS";
   private final String docOffice2Group = "/BGH";
   private final DocumentationOffice docOffice1 = buildCCRisDocOffice();
@@ -156,7 +162,7 @@ class DocumentationUnitControllerAuthTest {
   @Test
   void testRemoveFileFromDocumentationUnit() throws DocumentationUnitNotExistsException {
     mockDocumentationUnit(docOffice2, null, null);
-    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/fooPath";
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/" + TEST_FILE_UUID;
 
     risWebTestClient
         .withLogin(docOffice1Group)
@@ -248,10 +254,13 @@ class DocumentationUnitControllerAuthTest {
 
   @Test
   void testGetHtml() throws DocumentationUnitNotExistsException {
+    var attachmentId = UUID.randomUUID();
     mockDocumentationUnit(docOffice1, "123", Status.builder().publicationStatus(PUBLISHED).build());
     when(converterService.getConvertedObject("123")).thenReturn(null);
+    when(attachmentRepository.findById(attachmentId))
+        .thenReturn(Optional.of(AttachmentDTO.builder().s3ObjectPath("123").build()));
 
-    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file?s3Path=123&format=";
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/" + attachmentId + "/html";
 
     risWebTestClient.withLogin(docOffice1Group).get().uri(uri).exchange().expectStatus().isOk();
 
@@ -335,7 +344,9 @@ class DocumentationUnitControllerAuthTest {
         Decision.builder()
             .uuid(TEST_UUID)
             .status(status == null ? Status.builder().publicationStatus(PUBLISHED).build() : status)
-            .attachments(Collections.singletonList(Attachment.builder().s3path(s3path).build()))
+            .originalDocumentAttachments(
+                Collections.singletonList(
+                    Attachment.builder().id(TEST_FILE_UUID).s3path(s3path).build()))
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();
     when(service.getByUuid(TEST_UUID)).thenReturn(docUnit);

@@ -1,5 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import com.nimbusds.oauth2.sdk.util.CollectionUtils;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
@@ -9,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.MailAttachmentImage;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
@@ -21,8 +25,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
@@ -43,6 +50,8 @@ public class HandoverMailService implements MailService {
 
   private final HandoverRepository repository;
 
+  private final DatabaseAttachmentInlineRepository attachmentInlineRepository;
+
   private final Environment env;
 
   @Value("${mail.exporter.senderAddress:export.test@neuris}")
@@ -55,10 +64,12 @@ public class HandoverMailService implements MailService {
       XmlExporter xmlExporter,
       HttpMailSender mailSender,
       HandoverRepository repository,
+      DatabaseAttachmentInlineRepository attachmentInlineRepository,
       Environment env) {
     this.xmlExporter = xmlExporter;
     this.mailSender = mailSender;
     this.repository = repository;
+    this.attachmentInlineRepository = attachmentInlineRepository;
     this.env = env;
   }
 
@@ -80,6 +91,8 @@ public class HandoverMailService implements MailService {
       throw new HandoverException("Couldn't generate xml for documentationUnit.", ex);
     }
 
+    List<MailAttachmentImage> mailAttachmentImages = getImageAttachments(decision, xml.xml());
+
     String mailSubject = generateMailSubject(decision);
 
     HandoverMail handoverMail =
@@ -88,6 +101,7 @@ public class HandoverMailService implements MailService {
             receiverAddress,
             mailSubject,
             List.of(xml),
+            mailAttachmentImages,
             issuerAddress,
             HandoverEntityType.DOCUMENTATION_UNIT);
     if (!handoverMail.success()) {
@@ -124,6 +138,7 @@ public class HandoverMailService implements MailService {
             receiverAddress,
             mailSubject,
             xml,
+            Collections.emptyList(),
             issuerAddress,
             HandoverEntityType.EDITION);
     generateAndSendMail(handoverMail);
@@ -223,6 +238,7 @@ public class HandoverMailService implements MailService {
         handoverMail.mailSubject(),
         "neuris",
         handoverMail.attachments(),
+        handoverMail.imageAttachments(),
         handoverMail.entityId().toString());
   }
 
@@ -231,6 +247,7 @@ public class HandoverMailService implements MailService {
       String receiverAddress,
       String mailSubject,
       List<XmlTransformationResult> xml,
+      List<MailAttachmentImage> attachedImages,
       String issuerAddress,
       HandoverEntityType entityType) {
     var xmlHandoverMailBuilder =
@@ -253,6 +270,7 @@ public class HandoverMailService implements MailService {
         .handoverDate(xml.get(0).creationDate())
         .issuerAddress(issuerAddress)
         .attachments(renameAndCreateMailAttachments(xml))
+        .imageAttachments(attachedImages)
         .entityType(entityType)
         .build();
   }
@@ -296,6 +314,7 @@ public class HandoverMailService implements MailService {
               Optional.ofNullable(decision.coreData()).orElseGet(() -> CoreData.builder().build()))
           .build();
     }
+
     return decision.toBuilder()
         .documentNumber("TEST" + decision.documentNumber())
         .coreData(
@@ -327,5 +346,69 @@ public class HandoverMailService implements MailService {
                             .fileNumbers(Collections.singletonList("TEST"))
                             .build()))
         .build();
+  }
+
+  private List<MailAttachmentImage> getImageAttachments(Decision decision, String xml) {
+    List<String> jurimgFilenames = getJurimgFilenames(xml);
+
+    if (jurimgFilenames.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    List<AttachmentInlineDTO> inlineAttachments =
+        attachmentInlineRepository.findAllByDocumentationUnitId(decision.uuid());
+
+    if (inlineAttachments.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    return inlineAttachments.stream()
+        .map(
+            attachmentImage -> {
+              var filename =
+                  transformFileName(
+                      decision.documentNumber(),
+                      decision.coreData().documentationOffice().abbreviation(),
+                      attachmentImage);
+              var imgName = filename.split("_", 3)[2];
+              if (!CollectionUtils.contains(jurimgFilenames, imgName)) {
+                return null;
+              }
+              return MailAttachmentImage.builder()
+                  .fileName(filename)
+                  .fileContent(attachmentImage.getContent())
+                  .build();
+            })
+        .filter(Objects::nonNull)
+        .toList();
+  }
+
+  /**
+   * Transforms the filename to the convention specified by juris as the following pattern: {doknr
+   * in Kleinschreibung}_{dokst in Kleinschreibung}_{dateiname}. Transforms jpeg to jpg because
+   * juris can only handle 3-letter file extensions.
+   */
+  private String transformFileName(
+      String documentNumber, String docOffice, AttachmentInlineDTO attachmentImage) {
+    var filename = documentNumber + "_" + docOffice + "_" + attachmentImage.getFilename().trim();
+    filename = filename.toLowerCase();
+    if (filename.endsWith(".jpeg")) {
+      filename = filename.replace(".jpeg", ".jpg");
+    }
+    return filename;
+  }
+
+  private List<String> getJurimgFilenames(String xml) {
+    List<String> jurimgFilenames = new ArrayList<>();
+    Matcher matcher = Pattern.compile("<jurimg[^>]*>").matcher(xml);
+    while (matcher.find()) {
+      var imgTag = matcher.group(0);
+      Pattern namePattern = Pattern.compile("name=\"(.+?)\"");
+      Matcher nameMatcher = namePattern.matcher(imgTag);
+      if (nameMatcher.find()) {
+        jurimgFilenames.add(nameMatcher.group(1));
+      }
+    }
+    return jurimgFilenames;
   }
 }

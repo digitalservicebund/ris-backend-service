@@ -21,6 +21,7 @@ test.describe(
       let documentNumber: string
       const fileNumber = generateString()
       await navigateToSearch(page)
+
       await test.step("Erstelle neue Dokumentationseinheit", async () => {
         await page
           .getByRole("button", {

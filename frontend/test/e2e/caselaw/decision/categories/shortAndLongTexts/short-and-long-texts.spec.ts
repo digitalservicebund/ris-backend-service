@@ -308,6 +308,7 @@ test.describe("short and long texts", () => {
     },
     async ({ page, documentNumber }) => {
       const editable = 'contenteditable="true"'
+
       await test.step("Navigiere zu Rubriken als external Nutzer", async () => {
         await navigateToCategories(page, documentNumber)
       })

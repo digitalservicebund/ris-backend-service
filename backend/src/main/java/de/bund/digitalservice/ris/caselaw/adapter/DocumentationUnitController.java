@@ -1,12 +1,15 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.ManualPortalPublicationResult;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
+import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment2Html;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcessStepRequest;
 import de.bund.digitalservice.ris.caselaw.domain.BulkDocumentationUnitService;
@@ -24,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverNotAllowedException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
@@ -44,6 +48,8 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepNotFoundEx
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -76,12 +82,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 @RestController
 @RequestMapping("api/v1/caselaw/documentunits")
 @Slf4j
 public class DocumentationUnitController {
+  public static final String X_FILENAME = "X-Filename";
   private final DocumentationUnitService service;
   private final BulkDocumentationUnitService abstractService;
   private final UserService userService;
@@ -93,6 +103,7 @@ public class DocumentationUnitController {
       documentationUnitDocxMetadataInitializationService;
   private final DuplicateCheckService duplicateCheckService;
   private final EurLexSOAPSearchService eurLexSOAPSearchService;
+  private final AttachmentRepository attachmentRepository;
 
   public DocumentationUnitController(
       DocumentationUnitService service,
@@ -105,7 +116,8 @@ public class DocumentationUnitController {
       DocumentationUnitDocxMetadataInitializationService
           documentationUnitDocxMetadataInitializationService,
       DuplicateCheckService duplicateCheckService,
-      EurLexSOAPSearchService eurLexSOAPSearchService) {
+      EurLexSOAPSearchService eurLexSOAPSearchService,
+      AttachmentRepository attachmentRepository) {
     this.service = service;
     this.userService = userService;
     this.attachmentService = attachmentService;
@@ -117,6 +129,7 @@ public class DocumentationUnitController {
     this.duplicateCheckService = duplicateCheckService;
     this.eurLexSOAPSearchService = eurLexSOAPSearchService;
     this.abstractService = abstractService;
+    this.attachmentRepository = attachmentRepository;
   }
 
   /**
@@ -207,19 +220,139 @@ public class DocumentationUnitController {
       @RequestBody byte[] bytes,
       @RequestHeader HttpHeaders httpHeaders) {
 
-    var attachmentPath =
-        attachmentService
-            .attachFileToDocumentationUnit(
-                uuid, ByteBuffer.wrap(bytes), httpHeaders, userService.getUser(oidcUser))
-            .s3path();
+    var attachment =
+        attachmentService.attachFileToDocumentationUnit(
+            uuid, ByteBuffer.wrap(bytes), httpHeaders, userService.getUser(oidcUser));
     try {
-      var attachment2Html = converterService.getConvertedObject(attachmentPath);
+      var attachment2Html = converterService.getConvertedObject(attachment.s3path());
       initializeCoreDataAndCheckDuplicates(uuid, attachment2Html, userService.getUser(oidcUser));
       return ResponseEntity.status(HttpStatus.OK).body(attachment2Html);
 
     } catch (Exception e) {
-      attachmentService.deleteByS3Path(attachmentPath, uuid, userService.getUser(oidcUser));
+      attachmentService.deleteByFileId(attachment.id(), uuid, userService.getUser(oidcUser));
       return ResponseEntity.unprocessableContent().build();
+    }
+  }
+
+  @GetMapping(value = "/{uuid}/file/{fileId}")
+  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
+  public ResponseEntity<StreamingResponseBody> downloadFile(
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @PathVariable UUID uuid,
+      @PathVariable UUID fileId) {
+    var fileResponse = attachmentService.getFileStream(uuid, fileId);
+
+    return ResponseEntity.ok()
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION,
+            "attachment; filename=\"" + fileResponse.filename() + "\"")
+        .contentType(MediaType.parseMediaType(fileResponse.response().contentType()))
+        .contentLength(fileResponse.response().contentLength())
+        .body(fileResponse.body());
+  }
+
+  /**
+   * Attach a content file (docx) to the documentation unit. This file is used to fill the
+   * categories of the documentation unit.
+   *
+   * <p>Do a conversion into html and parse the footer for ECLI information.
+   *
+   * @param uuid UUID of the documentation unit
+   * @param file the file to be uploaded
+   * @param filename http headers with the X-Filename information
+   * @return the into html converted content of the file with some additional metadata (ECLI)
+   */
+  @PutMapping(
+      value = {"/{uuid}/original-file"},
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
+  public ResponseEntity<Attachment2Html> attachOriginalFileToDocumentationUnit(
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @PathVariable UUID uuid,
+      @RequestPart("file") MultipartFile file,
+      @RequestHeader(X_FILENAME) String filename) {
+
+    if (file == null || file.isEmpty()) {
+      return ResponseEntity.badRequest().build();
+    }
+
+    Attachment attachment;
+    try (InputStream inputStream = file.getInputStream()) {
+      User user = userService.getUser(oidcUser);
+      attachment =
+          attachmentService.streamFileToDocumentationUnit(
+              uuid, inputStream, filename, user, AttachmentType.ORIGINAL);
+    } catch (IOException e) {
+      log.atError()
+          .setCause(e)
+          .setMessage("Error reading uploaded file for documentation unit")
+          .addKeyValue("id", uuid)
+          .log();
+      return ResponseEntity.internalServerError().build();
+    } catch (Exception e) {
+      log.atError()
+          .setCause(e)
+          .setMessage("Error by attaching file to documentation unit")
+          .addKeyValue("id", uuid)
+          .log();
+      return ResponseEntity.internalServerError().build();
+    }
+
+    try {
+      var attachment2Html = converterService.getConvertedObject(attachment.s3path());
+      initializeCoreDataAndCheckDuplicates(uuid, attachment2Html, userService.getUser(oidcUser));
+      return ResponseEntity.status(HttpStatus.OK).body(attachment2Html);
+    } catch (Exception e) {
+      attachmentService.deleteByFileId(attachment.id(), uuid, userService.getUser(oidcUser));
+      return ResponseEntity.unprocessableContent().build();
+    }
+  }
+
+  /**
+   * Attaches an additional file to an existing documentation unit identified by the provided UUID.
+   * The file is uploaded as part of a multipart form request.
+   *
+   * @param oidcUser the authenticated user making the request, obtained automatically from the
+   *     security context
+   * @param uuid the unique identifier of the documentation unit to which the file will be attached
+   * @param file the file to be attached to the documentation unit; must be a non-empty multipart
+   *     file
+   * @return a {@link org.springframework.http.ResponseEntity} representing the result of the
+   *     operation; returns 201 (Created) on success, 400 (Bad Request) if the file is invalid or
+   *     missing, and 500 (Internal Server Error) for any unexpected errors
+   */
+  @PutMapping(value = "/{uuid}/other-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
+  public ResponseEntity<Void> attachOtherFileToDocumentationUnit(
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @PathVariable UUID uuid,
+      @RequestPart("file") MultipartFile file,
+      @RequestHeader(X_FILENAME) String filename) {
+
+    if (file == null || file.isEmpty()) {
+      return ResponseEntity.badRequest().build();
+    }
+
+    try (InputStream inputStream = file.getInputStream()) {
+      User user = userService.getUser(oidcUser);
+      attachmentService.streamFileToDocumentationUnit(
+          uuid, inputStream, filename, user, AttachmentType.OTHER);
+      return ResponseEntity.status(HttpStatus.CREATED).build();
+    } catch (IOException e) {
+      log.atError()
+          .setCause(e)
+          .setMessage("Error reading uploaded file for documentation unit")
+          .addKeyValue("id", uuid)
+          .log();
+      return ResponseEntity.internalServerError().build();
+    } catch (Exception e) {
+      log.atError()
+          .setCause(e)
+          .setMessage("Error by attaching file to documentation unit")
+          .addKeyValue("id", uuid)
+          .log();
+      return ResponseEntity.internalServerError().build();
     }
   }
 
@@ -249,18 +382,19 @@ public class DocumentationUnitController {
     }
   }
 
-  @DeleteMapping(value = "/{uuid}/file/{s3Path}")
+  @DeleteMapping(value = "/{uuid}/file/{fileId}")
   @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<Object> removeAttachmentFromDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser,
       @PathVariable UUID uuid,
-      @PathVariable String s3Path) {
+      @PathVariable UUID fileId) {
 
     try {
-      attachmentService.deleteByS3Path(s3Path, uuid, userService.getUser(oidcUser));
+      attachmentService.deleteByFileId(fileId, uuid, userService.getUser(oidcUser));
       return ResponseEntity.noContent().build();
     } catch (Exception e) {
-      log.error("Error by deleting attachment '{}' for documentation unit {}", s3Path, uuid, e);
+      log.error(
+          "Error by deleting attachment with '{}' for documentation unit {}", fileId, uuid, e);
       return ResponseEntity.internalServerError().build();
     }
   }
@@ -446,6 +580,13 @@ public class DocumentationUnitController {
     } catch (DocumentationUnitNotExistsException | HandoverException e) {
       log.error("Error handing over documentation unit '{}' as email", uuid, e);
       return ResponseEntity.internalServerError().build();
+    } catch (HandoverNotAllowedException e) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN)
+          .body(
+              HandoverMail.builder()
+                  .success(false)
+                  .statusMessages(List.of(e.getMessage()))
+                  .build());
     }
   }
 
@@ -503,24 +644,33 @@ public class DocumentationUnitController {
         PageRequest.of(page, size));
   }
 
-  @GetMapping(value = "/{uuid}/file", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#uuid)")
+  @GetMapping(
+      value = "/{documentationUnitId}/file/{attachmentId}/html",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#documentationUnitId)")
   public ResponseEntity<Attachment2Html> getDocxHtml(
-      @PathVariable UUID uuid, @RequestParam String s3Path, @RequestParam String format) {
+      @PathVariable UUID documentationUnitId, @PathVariable UUID attachmentId) {
 
     try {
-      service.getByUuid(uuid);
+      service.getByUuid(documentationUnitId);
     } catch (DocumentationUnitNotExistsException ex) {
       return ResponseEntity.notFound().build();
     }
 
     try {
-      var attachment2Html = converterService.getConvertedObject(format, s3Path, uuid);
+      var attachment = attachmentRepository.findById(attachmentId);
+      if (attachment.isEmpty()) {
+        return ResponseEntity.notFound().build();
+      }
+      var attach = attachment.get();
+      var attachment2Html =
+          converterService.getConvertedObject(
+              attach.getFormat(), attach.getS3ObjectPath(), documentationUnitId);
       return ResponseEntity.ok()
           .cacheControl(CacheControl.maxAge(Duration.ofDays(1))) // Set cache duration
           .body(attachment2Html);
     } catch (Exception ex) {
-      log.error("Error by getting docx for documentation unit {}", uuid, ex);
+      log.error("Error by getting docx for documentation unit {}", documentationUnitId, ex);
       return ResponseEntity.internalServerError().build();
     }
   }

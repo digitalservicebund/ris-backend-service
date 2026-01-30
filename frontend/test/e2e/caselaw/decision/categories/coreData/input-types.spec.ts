@@ -120,6 +120,7 @@ test.describe(
         }
 
         await save(page)
+
         await test.step("Alle Eingangsarten sind in der Vorschau sichtbar", async () => {
           await navigateToPreview(page, documentNumber)
           await expect(

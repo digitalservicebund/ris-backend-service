@@ -2,7 +2,7 @@ import dayjs from "dayjs"
 import DocumentationUnitProcessStep from "./documentationUnitProcessStep"
 import AbuseFee from "@/domain/abuseFee"
 import ActiveCitation from "@/domain/activeCitation"
-import Attachment from "@/domain/attachment"
+import { Attachment } from "@/domain/attachment"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { CoreData } from "@/domain/coreData"
 import Correction from "@/domain/correction"
@@ -112,7 +112,8 @@ export class Decision {
     PortalPublicationStatus.UNPUBLISHED
   readonly kind = Kind.DECISION
   public version: number = 0
-  public attachments: Attachment[] = []
+  public originalDocumentAttachments: Attachment[] = []
+  public otherAttachments: Attachment[] = []
   public coreData: CoreData = {}
   public shortTexts: ShortTexts = {}
   public longTexts: LongTexts = {}
@@ -235,12 +236,6 @@ export class Decision {
     if (data.contentRelatedIndexing?.definitions)
       data.contentRelatedIndexing.definitions = data.contentRelatedIndexing?.definitions.map(def => new Definition({ ...def }))
 
-    if (data.attachments != undefined && data.attachments.length > 0) {
-      data.attachments = data.attachments.map(
-        (attachment: Attachment) => new Attachment({ ...attachment }),
-      )
-    }
-
     if (data.caselawReferences)
       data.caselawReferences = data.caselawReferences.map(
         (reference) => new Reference({ ...reference }),
@@ -290,8 +285,11 @@ export class Decision {
     Object.assign(this, data)
   }
 
-  get hasAttachments(): boolean {
-    return this.attachments && this.attachments.length > 0
+  get hasOriginalDocumentAttachments(): boolean {
+    return (
+      this.originalDocumentAttachments &&
+      this.originalDocumentAttachments.length > 0
+    )
   }
 
   get renderSummary(): string {

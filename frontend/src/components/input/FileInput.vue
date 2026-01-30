@@ -50,7 +50,7 @@ function onEnter() {
   </a>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .button {
   margin-top: 1rem;
 }

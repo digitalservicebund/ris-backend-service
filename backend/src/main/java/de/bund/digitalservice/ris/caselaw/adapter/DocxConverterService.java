@@ -44,6 +44,8 @@ import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.DocPropsCustomPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
+import org.docx4j.openpackaging.parts.WordprocessingML.ImageBmpPart;
+import org.docx4j.openpackaging.parts.WordprocessingML.ImageGifPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImageJpegPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImagePngPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MetafileEmfPart;
@@ -127,23 +129,23 @@ public class DocxConverterService {
   }
 
   /**
-   * Convert docx file to a object with the html content of the word file and some metadata
-   * extracted of the docx file.
+   * Convert docx file to an object with the html content of the word file and some metadata
+   * extracted from the docx file.
    *
-   * @param fileName name of the file in the bucket
-   * @return the generated object with html content and metadata, if the file name is null a empty
-   *     mono is returned
+   * @param s3Path path of the file in the bucket
+   * @return the generated object with html content and metadata, if the s3Path is null, we return
+   *     null
    */
-  public Docx2Html getConvertedObject(String fileName) {
-    if (fileName == null) {
+  public Docx2Html getConvertedObject(String s3Path) {
+    if (s3Path == null) {
       return null;
     }
-    return getDocx(fileName);
+    return getDocx(s3Path);
   }
 
-  private Docx2Html getDocx(String fileName) {
+  private Docx2Html getDocx(String s3Path) {
 
-    GetObjectRequest request = GetObjectRequest.builder().bucket(bucketName).key(fileName).build();
+    GetObjectRequest request = GetObjectRequest.builder().bucket(bucketName).key(s3Path).build();
 
     ResponseBytes<GetObjectResponse> response =
         client.getObject(request, ResponseTransformer.toBytes());
@@ -447,6 +449,22 @@ public class DocxConverterService {
                             images.put(
                                 relationship.getId(),
                                 new DocxImagePart(emfPart.getContentType(), emfPart.getBytes())));
+              } else if (part instanceof ImageGifPart imageGifPart) {
+                part.getSourceRelationships()
+                    .forEach(
+                        relationship ->
+                            images.put(
+                                relationship.getId(),
+                                new DocxImagePart(
+                                    imageGifPart.getContentType(), imageGifPart.getBytes())));
+              } else if (part instanceof ImageBmpPart imageBmpPart) {
+                part.getSourceRelationships()
+                    .forEach(
+                        relationship ->
+                            images.put(
+                                relationship.getId(),
+                                new DocxImagePart(
+                                    imageBmpPart.getContentType(), imageBmpPart.getBytes())));
               } else if (part instanceof ImagePngPart pngPart) {
                 part.getSourceRelationships()
                     .forEach(

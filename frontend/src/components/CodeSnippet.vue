@@ -42,7 +42,7 @@ watch(
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .xml-container {
   .code-line {
     display: flex;

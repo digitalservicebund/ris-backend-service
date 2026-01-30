@@ -25,7 +25,7 @@ describe("publishDocumentationUnitService", () => {
       })
       const result = await service.publishDocument("123")
       expect(result.error?.title).toEqual(
-        "Fehler beim Veröffentlichen der Dokumentationseinheit",
+        "Fehler beim Veröffentlichen der Dokumentationseinheit.",
       )
       expect(result.error?.description).toContain(
         "Die Dokumentationseinheit konnte nicht veröffentlicht werden",
@@ -50,7 +50,7 @@ describe("publishDocumentationUnitService", () => {
       })
       const result = await service.withdrawDocument("123")
       expect(result.error?.title).toEqual(
-        "Fehler beim Zurückziehen der Dokumentationseinheit",
+        "Fehler beim Zurückziehen der Dokumentationseinheit.",
       )
       expect(result.error?.description).toContain(
         "Die Dokumentationseinheit konnte nicht zurückgezogen werden",

@@ -7,6 +7,10 @@ class MailAttachment {
   ) {}
 }
 
+class MailAttachmentImage {
+  constructor(public fileName?: string) {}
+}
+
 enum HandoverEntityType {
   DOCUMENTATION_UNIT,
   EDITION,
@@ -31,6 +35,7 @@ export class HandoverMail implements EventRecord {
   receiverAddress?: string
   mailSubject?: string
   attachments: MailAttachment[] = []
+  imageAttachments: MailAttachmentImage[] = []
   success?: boolean
   statusMessages?: string[]
   date?: string

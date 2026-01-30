@@ -1,9 +1,10 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories } from "../utils/e2e-utils"
+import { navigateToAttachments, navigateToCategories } from "../utils/e2e-utils"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
 const ERROR_WORD = "Felelr"
+
 test.describe(
   "text check store",
   {
@@ -15,6 +16,7 @@ test.describe(
         shortTexts: { headnote: `<p>Text mit ${ERROR_WORD}</p>` },
       },
     })
+
     test(
       "text check, preserves matches after navigation",
       {
@@ -31,6 +33,7 @@ test.describe(
             },
           ],
         }
+
         await test.step("navigate to headnote (Orientierungssatz) in categories", async () => {
           await navigateToCategories(
             page,
@@ -81,11 +84,11 @@ test.describe(
         })
 
         await test.step("match should still appear after navigation", async () => {
-          await page.getByRole("link", { name: "Dokumente" }).click()
-
-          await expect(
-            page.getByRole("heading", { name: "Dokumente" }),
-          ).toBeVisible()
+          await navigateToAttachments(
+            page,
+            decision.createdDecision.documentNumber,
+            { navigationBy: "click" },
+          )
 
           await page
             .getByRole("link", { name: "Rubriken", exact: true })

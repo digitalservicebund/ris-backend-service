@@ -23,12 +23,16 @@
     "title": "Umgebung konnte nicht geladen werden.",
     "description": ""
   },
+  "OTHER_FILE_TOO_LARGE_CASELAW": {
+    "title": "überschreitet die zulässige Dateigröße von 100 MB.",
+    "description": "Laden Sie eine kleinere Datei hoch."
+  },
   "WRONG_MEDIA_TYPE_DOCX_REQUIRED": {
     "title": "hat ein falsches Format.",
     "description": "Laden Sie eine .docx-Version hoch."
   },
-  "FILE_TOO_LARGE_CASELAW": {
-    "title": "überschreitet das Limit von 20MB Größe.",
+  "ORIGINAL_DOCUMENT_TOO_LARGE_CASELAW": {
+    "title": "überschreitet die zulässige Dateigröße von 20 MB.",
     "description": "Laden Sie eine kleinere Datei hoch."
   },
   "DOCX_PARSING_ERROR": {
@@ -103,6 +107,10 @@
     "title": "Datei konnte nicht gelöscht werden.",
     "description": ""
   },
+  "FILE_DOWNLOAD_FAILED": {
+    "title": "Datei konnte nicht heruntergeladen werden.",
+    "description": ""
+  },
   "DOCX_COULD_NOT_BE_LOADED": {
     "title": "Docx konnte nicht als html geladen werden.",
     "description": ""
@@ -157,6 +165,10 @@
   },
   "FILE_TOO_BIG": {
     "title": "Die Datei überschreitet die maximale Dateigröße von 20 MB.",
+    "description": ""
+  },
+  "FILE_UPLOAD_FAILED": {
+    "title": "Der Upload ist fehlgeschlagen. Bitte versuchen Sie es erneut oder wenden sich an den Support.",
     "description": ""
   },
   "NO_INTERNET_CONNECTION": {
@@ -277,5 +289,9 @@
   "NEXT_PROCESS_STEP_FOR_DOCUMENATION_UNIT_COULD_NOT_BE_LOADED": {
     "title": "Der nächste Schritt konnte nicht geladen werden.",
     "description": "Wählen Sie einen Schritt aus der Liste aus oder öffnen Sie den Dialog erneut."
+  },
+  "PATCH_SIZE_TOO_BIG": {
+    "title": "Letzte Änderung überschreitet Speicherlimit",
+    "description": "Machen Sie die Änderung rückgängig und reduzieren Sie die Datengröße [z.B. Bild(er) komprimieren]."
   }
 }

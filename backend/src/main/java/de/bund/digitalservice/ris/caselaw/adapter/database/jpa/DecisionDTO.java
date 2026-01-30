@@ -145,6 +145,43 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   private List<ActiveCitationDTO> activeCitations = new ArrayList<>();
 
+  /**
+   * Aktivzitierungen (echte Links) CURRENTLY NO GUARANTEE TO INCLUDE THE CORRECT DATA. ONLY USE FOR
+   * WRITING!
+   */
+  // TODO: (Malte Laukötter, 2026-01-09) remove comment once they can be read as well
+  @OneToMany(
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true,
+      mappedBy = "sourceDocument")
+  @Builder.Default
+  @OrderBy("rank")
+  private List<LinkCaselawCitationDTO> activeLinkCaselawCitations = new ArrayList<>();
+
+  /**
+   * Aktivzitierungen (blind Links) CURRENTLY NO GUARANTEE TO INCLUDE THE CORRECT DATA. ONLY USE FOR
+   * WRITING!
+   */
+  // TODO: (Malte Laukötter, 2026-01-09) remove comment once they can be read as well
+  @OneToMany(
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true,
+      mappedBy = "sourceDocument")
+  @Builder.Default
+  @OrderBy("rank")
+  private List<ActiveBlindlinkCaselawCitationDTO> activeBlindlinkCaselawCitations =
+      new ArrayList<>();
+
+  /** Passivezitierungen (echte Links) CURRENTLY NO GUARANTEE TO INCLUDE THE CORRECT DATA. */
+  // TODO: (Malte Laukötter, 2026-01-09) remove comment once they can be read
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "targetDocument")
+  @Builder.Default
+  @OrderBy(
+      "id") // do not sort the passive links by rank as the rank has the sorting for the active side
+  private List<LinkCaselawCitationDTO> passiveLinkCaselawCitations = new ArrayList<>();
+
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default

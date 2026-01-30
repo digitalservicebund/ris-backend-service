@@ -3,7 +3,6 @@ import Checkbox from "primevue/checkbox"
 import { computed, ref, watch } from "vue"
 import { NodeHelperInterface } from "@/components/field-of-law/fieldOfLawNode"
 import FlexContainer from "@/components/FlexContainer.vue"
-import Tooltip from "@/components/Tooltip.vue"
 import { type FieldOfLaw } from "@/domain/fieldOfLaw"
 import IconArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
 import IconArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
@@ -113,28 +112,26 @@ watch(
     <FlexContainer class="min-h-36" flex-direction="flex-row">
       <div v-if="node.hasChildren">
         <div v-if="isExpanded">
-          <Tooltip text="Zuklappen">
-            <button
-              id="collapse-button"
-              :aria-label="node.text + ' einklappen'"
-              class="w-icon rounded-full bg-blue-200 text-blue-800"
-              @click="toggleExpanded"
-            >
-              <IconArrowUp />
-            </button>
-          </Tooltip>
+          <button
+            id="collapse-button"
+            v-tooltip.bottom="'Zuklappen'"
+            :aria-label="node.text + ' einklappen'"
+            class="w-icon cursor-pointer rounded-full bg-blue-200 text-blue-800"
+            @click="toggleExpanded"
+          >
+            <IconArrowUp />
+          </button>
         </div>
         <div v-else>
-          <Tooltip text="Aufklappen">
-            <button
-              id="expand-button"
-              :aria-label="node.text + ' aufklappen'"
-              class="w-icon cursor-pointer rounded-full bg-blue-200 text-blue-800"
-              @click="toggleExpanded"
-            >
-              <IconArrowDown />
-            </button>
-          </Tooltip>
+          <button
+            id="expand-button"
+            v-tooltip.bottom="'Aufklappen'"
+            :aria-label="node.text + ' aufklappen'"
+            class="w-icon cursor-pointer rounded-full bg-blue-200 text-blue-800"
+            @click="toggleExpanded"
+          >
+            <IconArrowDown />
+          </button>
         </div>
       </div>
       <span v-else class="pl-[1.3333em]" />

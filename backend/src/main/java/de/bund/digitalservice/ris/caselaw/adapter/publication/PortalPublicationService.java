@@ -5,8 +5,8 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import de.bund.digitalservice.ris.caselaw.adapter.S3Bucket;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
@@ -45,7 +45,6 @@ import tools.jackson.databind.ObjectMapper;
 public class PortalPublicationService {
 
   private final DocumentationUnitRepository documentationUnitRepository;
-  private final AttachmentRepository attachmentRepository;
   private final S3Bucket portalBucket;
   private final ObjectMapper objectMapper;
   private final XmlUtilService xmlUtilService;
@@ -55,25 +54,26 @@ public class PortalPublicationService {
 
   private static final String PUBLICATION_FEATURE_FLAG = "neuris.portal-publication";
   private static final String CHANGELOG_FEATURE_FLAG = "neuris.regular-changelogs";
+  private final DatabaseAttachmentInlineRepository attachmentInlineRepository;
 
   public PortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
-      AttachmentRepository attachmentRepository,
       XmlUtilService xmlUtilService,
       S3Bucket portalBucket,
       ObjectMapper objectMapper,
       PortalTransformer portalTransformer,
       FeatureToggleService featureToggleService,
-      DocumentationUnitHistoryLogService historyLogService) {
+      DocumentationUnitHistoryLogService historyLogService,
+      DatabaseAttachmentInlineRepository attachmentInlineRepository) {
 
     this.documentationUnitRepository = documentationUnitRepository;
-    this.attachmentRepository = attachmentRepository;
     this.portalBucket = portalBucket;
     this.objectMapper = objectMapper;
     this.xmlUtilService = xmlUtilService;
     this.ldmlTransformer = portalTransformer;
     this.featureToggleService = featureToggleService;
     this.historyLogService = historyLogService;
+    this.attachmentInlineRepository = attachmentInlineRepository;
   }
 
   /**
@@ -269,8 +269,8 @@ public class PortalPublicationService {
   }
 
   private PortalPublicationResult publishToBucket(DocumentationUnit documentationUnit) {
-    List<AttachmentDTO> attachments =
-        attachmentRepository.findAllByDocumentationUnitId(documentationUnit.uuid());
+    List<AttachmentInlineDTO> inlineImages =
+        attachmentInlineRepository.findAllByDocumentationUnitId(documentationUnit.uuid());
     CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     if (fileContent.isEmpty()) {
@@ -278,7 +278,7 @@ public class PortalPublicationService {
     }
 
     var result =
-        saveToBucket(ldml.getUniqueId() + "/", ldml.getFileName(), fileContent.get(), attachments);
+        saveToBucket(ldml.getUniqueId() + "/", ldml.getFileName(), fileContent.get(), inlineImages);
 
     log.atInfo()
         .setMessage("Doc unit published to portal bucket.")
@@ -289,31 +289,27 @@ public class PortalPublicationService {
   }
 
   private PortalPublicationResult saveToBucket(
-      String path, String fileName, String fileContent, List<AttachmentDTO> attachments) {
+      String path, String fileName, String fileContent, List<AttachmentInlineDTO> inlineImages) {
     try {
       List<String> existingFiles = portalBucket.getAllFilenamesByPath(path);
-      List<String> addedFiles = new ArrayList<>();
+      List<String> addedInlineImages = new ArrayList<>();
 
       portalBucket.save(path + fileName, fileContent);
-      addedFiles.add(path + fileName);
+      addedInlineImages.add(path + fileName);
 
-      if (!attachments.isEmpty()) {
-        attachments.stream()
-            .filter(
-                attachment ->
-                    !attachment.getFormat().equals("docx") && !attachment.getFormat().equals("fmx"))
-            .forEach(
-                attachment -> {
-                  portalBucket.saveBytes(path + attachment.getFilename(), attachment.getContent());
-                  addedFiles.add(path + attachment.getFilename());
-                });
+      if (!inlineImages.isEmpty()) {
+        inlineImages.forEach(
+            inlineImage -> {
+              portalBucket.saveBytes(path + inlineImage.getFilename(), inlineImage.getContent());
+              addedInlineImages.add(path + inlineImage.getFilename());
+            });
       }
 
       // Check for files that are not part of this update and remove them (e.g. removed images)
-      existingFiles.removeAll(addedFiles);
+      existingFiles.removeAll(addedInlineImages);
       existingFiles.forEach(portalBucket::delete);
 
-      return new PortalPublicationResult(addedFiles, existingFiles);
+      return new PortalPublicationResult(addedInlineImages, existingFiles);
     } catch (BucketException e) {
       throw new PublishException("Could not save LDML to bucket.", e);
     }

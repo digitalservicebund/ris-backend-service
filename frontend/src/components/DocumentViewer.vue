@@ -122,11 +122,11 @@ const handleKeyDown = (event: KeyboardEvent) => {
         extraContentSidePanelStore.setSidePanelMode("note")
       }
       break
-    case "d":
+    case "o":
       if (props.kind === Kind.DECISION) {
         event.preventDefault()
         extraContentSidePanelStore.togglePanel(true)
-        extraContentSidePanelStore.setSidePanelMode("attachments")
+        extraContentSidePanelStore.setSidePanelMode("original-document")
       }
       break
     case "v":
@@ -136,6 +136,10 @@ const handleKeyDown = (event: KeyboardEvent) => {
     case "r":
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("category-import")
+      break
+    case "a":
+      extraContentSidePanelStore.togglePanel(true)
+      extraContentSidePanelStore.setSidePanelMode("other-attachments")
       break
     default:
       break
@@ -176,6 +180,7 @@ onMounted(async () => {
         data-testid="side-toggle-navigation"
         :is-expanded="showNavigationPanelRef"
         label="Navigation"
+        shortcut="<"
         tabindex="0"
         @update:is-expanded="toggleNavigationPanel"
       >

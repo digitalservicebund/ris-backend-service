@@ -31,6 +31,7 @@ test.describe("preview pending proceeding", () => {
       { scope: "test" },
     ],
   })
+
   test(
     "display preview, check that fields are filled with values from categories",
     {

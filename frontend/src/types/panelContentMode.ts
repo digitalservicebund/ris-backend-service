@@ -1,5 +1,6 @@
 export type SelectablePanelContent =
   | "note"
-  | "attachments"
+  | "original-document"
   | "preview"
   | "category-import"
+  | "other-attachments"

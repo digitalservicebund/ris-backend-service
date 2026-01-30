@@ -239,7 +239,7 @@ describe("CategoryImport", () => {
     await fireEvent.click(screen.getByLabelText("Rechtsmittel übernehmen"))
 
     expect(store.documentUnit?.contentRelatedIndexing.appeal).toEqual({
-      id: undefined,
+      id: "uuid",
       appellants: [{ id: "1", value: "Kläger" }],
       revisionDefendantStatuses: [],
       revisionPlaintiffStatuses: [],

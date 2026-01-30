@@ -40,6 +40,7 @@ test.describe(
           .getByLabel("Entscheidungsdatum", { exact: true })
           .fill("03.02.2000")
       })
+
       await checkHasDeliveryDate(page)
       await save(page)
 

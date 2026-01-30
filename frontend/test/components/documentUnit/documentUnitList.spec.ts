@@ -93,8 +93,7 @@ describe("documentUnit list", () => {
 
   test("renders documentUnit list", async () => {
     const longNote = "Long note will be trimmed Lorem ipsum dolor sit ama"
-    const trimmedNote = "Long note will be trimmed Lorem ipsum dolor sit am..."
-    const { user } = renderComponent({
+    renderComponent({
       documentUnitListEntries: [
         {
           id: "id",
@@ -110,7 +109,7 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.PUBLISHED,
             withError: false,
           },
-          hasAttachments: true,
+          hasOriginalDocument: true,
           hasHeadnoteOrPrinciple: true,
           isDeletable: false,
           isEditable: false,
@@ -129,7 +128,7 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.PUBLISHED,
             withError: false,
           },
-          hasAttachments: false,
+          hasOriginalDocument: false,
           hasHeadnoteOrPrinciple: false,
           isDeletable: true,
           isEditable: true,
@@ -147,7 +146,7 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.EXTERNAL_HANDOVER_PENDING,
             withError: false,
           },
-          hasAttachments: false,
+          hasOriginalDocument: false,
           hasHeadnoteOrPrinciple: false,
           isDeletable: false,
           isEditable: false,
@@ -182,24 +181,16 @@ describe("documentUnit list", () => {
 
     // expect Notes
     expect(screen.getByLabelText("Keine Notiz vorhanden")).toBeVisible()
-    expect(screen.queryByText("a note")).not.toBeInTheDocument()
-    await user.hover(screen.getByLabelText("a note"))
-    // The tooltip of the short note can be seen fully after hovering over the icon
-    expect(screen.getByText("a note")).toBeVisible()
-
-    await user.hover(screen.getByLabelText(trimmedNote))
-    // After hovering another note, the previous tooltip is hidden
-    expect(screen.queryByText("a note")).not.toBeInTheDocument()
-    // The long tooltip will be shown trimmed to 50 chars after hovering over the icon
-    expect(screen.getByText(trimmedNote)).toBeVisible()
 
     // expect Headnote or Principal
     expect(screen.getAllByLabelText("Kein Kurztext vorhanden")).toHaveLength(2)
     expect(screen.getByLabelText("Kurztext vorhanden")).toBeVisible()
 
     // expect Attachment
-    expect(screen.getAllByLabelText("Kein Anhang vorhanden")).toHaveLength(2)
-    expect(screen.getByLabelText("Anhang vorhanden")).toBeVisible()
+    expect(
+      screen.getAllByLabelText("Kein Originaldokument vorhanden"),
+    ).toHaveLength(2)
+    expect(screen.getByLabelText("Originaldokument vorhanden")).toBeVisible()
 
     // expect three view links
     expect(

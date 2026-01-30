@@ -4,13 +4,13 @@ import LoadingSpinner from "./LoadingSpinner.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
+import TitleElement from "@/components/TitleElement.vue"
 import { Docx2HTML } from "@/domain/docx2html"
 import fileService from "@/services/attachmentService"
 
 const props = defineProps<{
-  documentUnitUuid?: string
-  s3Path?: string
-  format?: string
+  documentationUnitId?: string
+  attachmentId?: string
 }>()
 
 const isLoading = ref(false)
@@ -19,11 +19,10 @@ const fileAsHTML = ref<Docx2HTML>()
 
 const getAttachmentHTML = async () => {
   isLoading.value = true
-  if (props.documentUnitUuid && props.format) {
+  if (props.documentationUnitId && props.attachmentId) {
     const htmlResponse = await fileService.getAttachmentAsHtml(
-      props.documentUnitUuid,
-      props.s3Path,
-      props.format,
+      props.documentationUnitId,
+      props.attachmentId,
     )
     isLoading.value = false
     if (htmlResponse.error === undefined) fileAsHTML.value = htmlResponse.data
@@ -35,7 +34,7 @@ onBeforeMount(async () => {
 })
 
 watch(
-  () => props.s3Path,
+  () => props.attachmentId,
   async () => {
     await getAttachmentHTML()
   },
@@ -43,6 +42,7 @@ watch(
 </script>
 
 <template>
+  <TitleElement>Originaldokument</TitleElement>
   <FlexContainer
     v-if="fileAsHTML?.html"
     v-bind="$attrs"
@@ -69,12 +69,12 @@ watch(
   </FlexContainer>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .odoc-open {
   display: flex;
   height: 65px;
-  align-items: center; // align vertical
-  justify-content: center; // align horizontal
+  align-items: center; /* align vertical */
+  justify-content: center; /* align horizontal */
   border-radius: 10px;
   margin-right: 40px;
   transform: rotate(-90deg);

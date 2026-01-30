@@ -32,7 +32,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -160,7 +160,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Set up JDK
-        uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -339,7 +339,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@6862ffc5ab2cdb4405cf318a62a6f4c066e2298b
+        uses: docker/login-action@0567fa5ae8c9a197cb207537dc5cbb43ca3d803f
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -349,7 +349,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@4d14d7f17e7112af04ea6108fbb4bfc714c00390
+        uses: sigstore/cosign-installer@430b6a704fe0c92f1b1261d84376a900f38d90ff
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - id: set-version
@@ -387,7 +387,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@6862ffc5ab2cdb4405cf318a62a6f4c066e2298b
+        uses: docker/login-action@0567fa5ae8c9a197cb207537dc5cbb43ca3d803f
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -397,7 +397,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@4d14d7f17e7112af04ea6108fbb4bfc714c00390
+        uses: sigstore/cosign-installer@430b6a704fe0c92f1b1261d84376a900f38d90ff
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - id: set-version
@@ -423,7 +423,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d
+      - uses: chainguard-dev/actions/setup-gitsign@18e5e3427cf9d6bcfbefe60dca48e40292f000c5
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4e758f584953506c571951ffcba33d6a6246e856 # v1.0.0
         with:
@@ -539,7 +539,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d
+      - uses: chainguard-dev/actions/setup-gitsign@18e5e3427cf9d6bcfbefe60dca48e40292f000c5
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4e758f584953506c571951ffcba33d6a6246e856 # v1.0.0
         with:
@@ -582,7 +582,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d
+      - uses: chainguard-dev/actions/setup-gitsign@18e5e3427cf9d6bcfbefe60dca48e40292f000c5
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4e758f584953506c571951ffcba33d6a6246e856 # v1.0.0
         with:
@@ -637,7 +637,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -674,7 +674,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Set up JDK
-        uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654
         with:
           java-version: "21.0"
           distribution: "temurin"

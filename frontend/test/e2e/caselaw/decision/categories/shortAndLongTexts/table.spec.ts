@@ -28,7 +28,7 @@ test.describe("Editor: table tests", () => {
         const tableExpectedParagraphText =
           "<p>some text so the table is exportable</p>"
         const tableClosingHTML = "</tbody></table>"
-        const tableXMLPreview = `<table class="invisible-table-cell" style="min-width: 25px;">`
+        const tableXMLPreview = `<table style="min-width: 25px;">`
         const inputField = page.getByTestId("Gründe")
         const menu = page.getByLabel("Gründe Button Leiste")
 
@@ -95,12 +95,24 @@ test.describe("Editor: table tests", () => {
   test.describe(
     "Click on every table menu button for cursor inside a cell",
     {
-      annotation: {
-        type: "story",
-        description:
-          "https://digitalservicebund.atlassian.net/browse/RISDEV-6646",
-      },
-      tag: ["@RISDEV-6646"],
+      annotation: [
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-6646",
+        },
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-9331",
+        },
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-10447",
+        },
+      ],
+      tag: ["@RISDEV-6646", "@RISDEV-9331", "@RISDEV-10447"],
     },
     () => {
       test("'Tabellenrahmen' => 'Alle Rahmen' and reset to 'Keine Rahmen'", async ({
@@ -339,12 +351,24 @@ test.describe("Editor: table tests", () => {
   test.describe(
     "Click on every table menu button for (vertical) three selected cell",
     {
-      annotation: {
-        type: "story",
-        description:
-          "https://digitalservicebund.atlassian.net/browse/RISDEV-6646",
-      },
-      tag: ["@RISDEV-6646"],
+      annotation: [
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-6646",
+        },
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-9331",
+        },
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-10447",
+        },
+      ],
+      tag: ["@RISDEV-6646", "@RISDEV-9331", "@RISDEV-10447"],
     },
     () => {
       test("'Tabellenrahmen' => 'Alle Rahmen' and reset to 'Keine Rahmen'", async ({
@@ -669,12 +693,24 @@ test.describe("Editor: table tests", () => {
   test.describe(
     "Leave the table by arrow key press",
     {
-      annotation: {
-        type: "story",
-        description:
-          "https://digitalservicebund.atlassian.net/browse/RISDEV-6646",
-      },
-      tag: ["@RISDEV-6646"],
+      annotation: [
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-6646",
+        },
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-9331",
+        },
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-10447",
+        },
+      ],
+      tag: ["@RISDEV-6646", "@RISDEV-9331", "@RISDEV-10447"],
     },
     () => {
       test("Select last cell in the first column, press 'arrow down' key, cell should lose focus", async ({
@@ -717,12 +753,24 @@ test.describe("Editor: table tests", () => {
   test.describe(
     "Don't lose style information (especially border information) by paste from clipboard",
     {
-      annotation: {
-        type: "story",
-        description:
-          "https://digitalservicebund.atlassian.net/browse/RISDEV-6646",
-      },
-      tag: ["@RISDEV-6646"],
+      annotation: [
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-6646",
+        },
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-9333",
+        },
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-10447",
+        },
+      ],
+      tag: ["@RISDEV-6646", "@RISDEV-9333", "@RISDEV-10447"],
     },
     () => {
       // eslint-disable-next-line playwright/no-skipped-test

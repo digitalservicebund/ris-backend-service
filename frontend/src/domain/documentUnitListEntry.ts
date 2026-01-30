@@ -20,7 +20,7 @@ export default class DocumentUnitListEntry {
   court?: Court
   appraisalBody?: string
   hasHeadnoteOrPrinciple?: boolean
-  hasAttachments?: boolean
+  hasOriginalDocument?: boolean
   note?: string
   isDeletable?: boolean
   isEditable?: boolean
