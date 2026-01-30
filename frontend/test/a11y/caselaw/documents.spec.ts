@@ -7,7 +7,7 @@ import {
   uploadTestfile,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
-test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/files)", () => {
+test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/attachments)", () => {
   test("upload document", async ({ page, documentNumber }) => {
     await navigateToAttachments(page, documentNumber)
 
@@ -30,7 +30,9 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
     })
     await uploadTestfile(page, "sample.docx")
     await page.getByLabel("Datei löschen").click()
-    await page.getByRole("button", { name: "Löschen", exact: true }).click()
+    await page
+      .getByRole("button", { name: "Anhang löschen", exact: true })
+      .click()
     await expect(tableView).toBeHidden()
 
     const accessibilityScanResults = await useAxeBuilder(page).analyze()
@@ -41,7 +43,8 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
     await navigateToAttachments(page, documentNumber)
     await uploadTestfile(page, "sample.docx")
     await page.getByLabel("Datei löschen").click()
-    await page.getByLabel("Anhang löschen", { exact: true }).click()
+    const dialog = page.getByRole("dialog")
+    await dialog.getByLabel("Anhang löschen", { exact: true }).click()
 
     const accessibilityScanResults = await useAxeBuilder(page).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
@@ -55,7 +58,7 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
     await uploadTestfile(page, "sample.png", { skipAssert: true })
     await expect(
       page.locator(
-        "text=sample.png hat ein falsches Format. Laden Sie eine .docx-Version hoch.",
+        "text='sample.png' hat ein falsches Format. Laden Sie eine .docx-Version hoch.",
       ),
     ).toBeVisible()
 
