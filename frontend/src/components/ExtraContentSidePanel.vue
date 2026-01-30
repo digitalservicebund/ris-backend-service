@@ -2,13 +2,13 @@
 import { storeToRefs } from "pinia"
 import { computed, onMounted } from "vue"
 import { useRoute } from "vue-router"
-import AttachmentView from "@/components/AttachmentView.vue"
 import CategoryImport from "@/components/category-import/CategoryImport.vue"
 import ExtraContentExtraContentSidePanelMenu from "@/components/ExtraContentSidePanelMenu.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import { ExtraContentSidePanelProps } from "@/components/input/types"
+import OriginalDocumentAttachmentView from "@/components/OriginalDocumentAttachmentView.vue"
 import OtherAttachments from "@/components/OtherAttachments.vue"
 import DecisionPreview from "@/components/preview/DecisionPreview.vue"
 import PendingProceedingPreview from "@/components/preview/PendingProceedingPreview.vue"
@@ -160,7 +160,7 @@ onMounted(() => {
             panelMode === 'original-document' && isDecision(props.documentUnit)
           "
         >
-          <AttachmentView
+          <OriginalDocumentAttachmentView
             v-if="
               props.documentUnit.uuid &&
               props.documentUnit.originalDocumentAttachments &&

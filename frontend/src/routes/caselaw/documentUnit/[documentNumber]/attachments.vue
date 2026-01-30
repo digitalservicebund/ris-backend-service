@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import DecisionAttachments from "@/components/DecisionAttachments.vue"
+import DecisionOriginalDocumentAttachments from "@/components/DecisionOriginalDocumentAttachments.vue"
 
 const emit = defineEmits<{
   attachmentsUploaded: [boolean]
@@ -21,7 +21,7 @@ async function attachmentIndexDeleted(index: number) {
 </script>
 
 <template>
-  <DecisionAttachments
+  <DecisionOriginalDocumentAttachments
     @attachment-index-deleted="attachmentIndexDeleted"
     @attachment-index-selected="attachmentIndexSelected"
     @attachments-uploaded="attachmentsUploaded"

@@ -1,6 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
-import AttachmentView from "@/components/AttachmentView.vue"
+import OriginalDocumentAttachmentView from "@/components/OriginalDocumentAttachmentView.vue"
 import attachmentService from "@/services/attachmentService"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
@@ -15,7 +15,7 @@ describe("attachments are shown in side panel", () => {
 
     useFeatureToggleServiceMock()
 
-    render(AttachmentView, {
+    render(OriginalDocumentAttachmentView, {
       props: {
         documentationUnitId: "123",
         attachmentId: "456",
