@@ -169,6 +169,18 @@ class PatternMatcherTest {
   }
 
   @Test
+  void testPatternMatcherIsTitleWithHyphen() {
+    // "Sachsen-Anhalt" is title case with hyphen
+    PatternMatcher matcher = new PatternMatcher();
+    TokenConstraint isTitleContraint =
+        new TokenConstraint(null, null, null, null, null, null, null, true, null, null, null);
+    Pattern pattern = Pattern.ofConstraints(List.of(isTitleContraint));
+    List<Match> matches = matcher.match(List.of(pattern), "Sachsen-Anhalt");
+    assertThat(matches).hasSize(1);
+    assertThat(matches.get(0).text()).isEqualTo("Sachsen-Anhalt");
+  }
+
+  @Test
   void testPatternMatcherShape() {
     // Test SHAPE constraint
     PatternMatcher matcher = new PatternMatcher();

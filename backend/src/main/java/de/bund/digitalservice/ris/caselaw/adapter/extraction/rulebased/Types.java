@@ -102,9 +102,8 @@ class Token {
   }
 
   public boolean isTitle() {
-    return !text.isEmpty()
-        && Character.isUpperCase(text.charAt(0))
-        && text.substring(1).equals(text.substring(1).toLowerCase());
+    // A bit simpler than Python's str.istitle()
+    return !text.isEmpty() && Character.isUpperCase(text.charAt(0));
   }
 
   public boolean isUpper() {
