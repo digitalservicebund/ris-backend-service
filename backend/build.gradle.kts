@@ -21,7 +21,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.2.0"
     id("org.flywaydb.flyway") version "11.20.2"
-    id("io.sentry.jvm.gradle") version "5.12.2"
+    id("io.sentry.jvm.gradle") version "6.0.0"
 }
 
 group = "de.bund.digitalservice"
