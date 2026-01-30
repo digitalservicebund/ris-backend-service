@@ -528,7 +528,7 @@ jobs:
 
   deploy-production:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && false
+    if: github.ref == 'refs/heads/main'
     concurrency: deploy-production
     environment: production
     needs:
@@ -572,7 +572,7 @@ jobs:
   deploy-uat:
     runs-on: ubuntu-latest
     if: |
-      github.ref == 'refs/heads/main' && false
+      github.ref == 'refs/heads/main'
     concurrency: deploy-uat
     environment: uat
     needs:
