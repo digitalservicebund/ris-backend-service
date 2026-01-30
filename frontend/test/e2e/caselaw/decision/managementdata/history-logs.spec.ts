@@ -237,7 +237,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
         page,
         0,
         "DS (e2e_tests DigitalService)",
-        `Anhang "sample.docx' gelöscht`,
+        `Anhang "sample.docx" gelöscht`,
       )
     })
   })
