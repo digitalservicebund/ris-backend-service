@@ -18,9 +18,9 @@ const service: PublishDocumentationUnitService = {
 
     if (response.status >= 400) {
       response.error = {
-        title: "Fehler beim Veröffentlichen der Dokumentationseinheit",
+        title: "Fehler beim Veröffentlichen der Dokumentationseinheit.",
         description:
-          "Die Dokumentationseinheit konnte nicht veröffentlicht werden. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support.",
+          "Die Dokumentationseinheit konnte nicht veröffentlicht werden.",
       }
     }
 
@@ -33,9 +33,9 @@ const service: PublishDocumentationUnitService = {
 
     if (response.status >= 400) {
       response.error = {
-        title: "Fehler beim Zurückziehen der Dokumentationseinheit",
+        title: "Fehler beim Zurückziehen der Dokumentationseinheit.",
         description:
-          "Die Dokumentationseinheit konnte nicht zurückgezogen werden. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support.",
+          "Die Dokumentationseinheit konnte nicht zurückgezogen werden",
       }
     }
 

@@ -17,9 +17,8 @@ describe("attachments are shown in side panel", () => {
 
     render(AttachmentView, {
       props: {
-        documentUnitUuid: "123",
-        s3Path: "foo-path",
-        format: "docx",
+        documentationUnitId: "123",
+        attachmentId: "456",
       },
       global: {
         plugins: [createTestingPinia()],

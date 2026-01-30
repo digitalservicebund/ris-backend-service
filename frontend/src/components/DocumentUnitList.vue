@@ -61,7 +61,9 @@ const popupModalText = computed(
 )
 
 const attachmentText = (listEntry: DocumentUnitListEntry) =>
-  listEntry.hasAttachments ? "Anhang vorhanden" : "Kein Anhang vorhanden"
+  listEntry.hasOriginalDocument
+    ? "Originaldokument vorhanden"
+    : "Kein Originaldokument vorhanden"
 
 const headNoteOrPrincipleText = (listEntry: DocumentUnitListEntry) =>
   listEntry.hasHeadnoteOrPrinciple
@@ -184,7 +186,9 @@ function onDelete() {
               :aria-label="attachmentText(listEntry)"
               class="flex-end h-20 w-20"
               :class="
-                listEntry.hasAttachments ? 'text-blue-800' : 'text-gray-500'
+                listEntry.hasOriginalDocument
+                  ? 'text-blue-800'
+                  : 'text-gray-500'
               "
               data-testid="file-attached-icon"
             />

@@ -49,7 +49,7 @@ export const useExtraContentSidePanelStore = defineStore(
       if (selectedIndex !== undefined) {
         currentAttachmentIndex.value = selectedIndex
       }
-      setSidePanelMode("attachments")
+      setSidePanelMode("original-document")
     }
 
     /**

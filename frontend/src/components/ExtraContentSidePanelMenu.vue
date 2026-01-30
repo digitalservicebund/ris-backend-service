@@ -3,6 +3,7 @@ import Button from "primevue/button"
 import { computed } from "vue"
 import { RouteLocationRaw } from "vue-router"
 import FileNavigator from "@/components/FileNavigator.vue"
+import { useInternalUser } from "@/composables/useInternalUser"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import { isDecision } from "@/utils/typeGuards"
@@ -11,6 +12,8 @@ import IconEdit from "~icons/ic/outline-edit"
 import IconOpenInNewTab from "~icons/ic/outline-open-in-new"
 import IconPreview from "~icons/ic/outline-remove-red-eye"
 import IconStickyNote from "~icons/ic/outline-sticky-note-2"
+import IconOtherAttachmentsWithFiles from "~icons/material-symbols/folder"
+import IconOtherAttachmentsWithoutFiles from "~icons/material-symbols/folder-outline"
 import IconImportCategories from "~icons/material-symbols/text-select-move-back-word"
 
 const props = defineProps<{
@@ -55,6 +58,8 @@ function emitSidePanelMode(value: SelectablePanelContent) {
 function emitAttachmentIndex(value: number) {
   emit("attachmentIndex:update", value)
 }
+
+const isInternalUser = useInternalUser()
 </script>
 
 <template>
@@ -67,7 +72,7 @@ function emitAttachmentIndex(value: number) {
         aria-label="Notiz anzeigen"
         class="focus-visible:z-20"
         data-testid="note-button"
-        severity="secondary"
+        :severity="panelMode === 'note' ? 'primary' : 'secondary'"
         size="small"
         @click="() => emitSidePanelMode('note')"
       >
@@ -79,13 +84,13 @@ function emitAttachmentIndex(value: number) {
       <Button
         v-if="isDecision(documentUnit)"
         id="attachments"
-        v-tooltip.bottom="tooltipValue('Datei', 'd')"
-        aria-label="Dokumente anzeigen"
+        v-tooltip.bottom="tooltipValue('Originaldokument', 'o')"
+        aria-label="Originaldokument anzeigen"
         class="focus-visible:z-20"
         data-testid="attachments-button"
-        severity="secondary"
+        :severity="panelMode === 'original-document' ? 'primary' : 'secondary'"
         size="small"
-        @click="() => emitSidePanelMode('attachments')"
+        @click="() => emitSidePanelMode('original-document')"
       >
         <template #icon>
           <IconAttachFile />
@@ -98,7 +103,7 @@ function emitAttachmentIndex(value: number) {
         aria-label="Vorschau anzeigen"
         class="focus-visible:z-20"
         data-testid="preview-button"
-        severity="secondary"
+        :severity="panelMode === 'preview' ? 'primary' : 'secondary'"
         size="small"
         @click="() => emitSidePanelMode('preview')"
       >
@@ -113,7 +118,7 @@ function emitAttachmentIndex(value: number) {
         aria-label="Rubriken-Import anzeigen"
         class="focus-visible:z-20"
         data-testid="category-import-button"
-        severity="secondary"
+        :severity="panelMode === 'category-import' ? 'primary' : 'secondary'"
         size="small"
         @click="() => emitSidePanelMode('category-import')"
       >
@@ -121,11 +126,30 @@ function emitAttachmentIndex(value: number) {
           <IconImportCategories />
         </template>
       </Button>
+
+      <Button
+        v-if="isDecision(documentUnit) && isInternalUser"
+        id="other-attachments"
+        v-tooltip.bottom="tooltipValue('Anhänge', 'a')"
+        aria-label="Anhänge anzeigen"
+        class="focus-visible:z-20"
+        data-testid="other-attachments-button"
+        :severity="panelMode === 'other-attachments' ? 'primary' : 'secondary'"
+        size="small"
+        @click="() => emitSidePanelMode('other-attachments')"
+      >
+        <template #icon>
+          <IconOtherAttachmentsWithoutFiles
+            v-if="documentUnit?.otherAttachments?.length === 0"
+          />
+          <IconOtherAttachmentsWithFiles v-else />
+        </template>
+      </Button>
     </div>
 
     <FileNavigator
-      v-if="panelMode === 'attachments' && isDecision(documentUnit)"
-      :attachments="documentUnit!.attachments"
+      v-if="panelMode === 'original-document' && isDecision(documentUnit)"
+      :attachments="documentUnit!.originalDocumentAttachments"
       :current-index="currentAttachmentIndex"
       @select="emitAttachmentIndex"
     />

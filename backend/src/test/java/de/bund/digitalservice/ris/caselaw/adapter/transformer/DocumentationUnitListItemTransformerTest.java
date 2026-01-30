@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceeding
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
@@ -207,7 +208,7 @@ class DocumentationUnitListItemTransformerTest {
   }
 
   @Test
-  void testTransformToDomain_withOnlyImages_hasAttachmentsShouldBeFalse() {
+  void testTransformToDomain_withOnlyImages_hasOriginalDocumentShouldBeFalse() {
     UUID id = UUID.randomUUID();
     DocumentationUnitListItemDTO currentDto =
         DecisionDTO.builder()
@@ -221,24 +222,24 @@ class DocumentationUnitListItemTransformerTest {
     DocumentationUnitListItem documentationUnitListItem =
         DocumentationUnitListItemTransformer.transformToDomain(currentDto);
 
-    assertThat(documentationUnitListItem.hasAttachments()).isFalse();
+    assertThat(documentationUnitListItem.hasOriginalDocument()).isFalse();
   }
 
   @Test
-  void testTransformToDomain_withMixedAttachments_hasAttachmentsShouldBeTrue() {
+  void testTransformToDomain_withMixedAttachmentTypes_hasOriginalDocumentShouldBeTrue() {
     UUID id = UUID.randomUUID();
     DocumentationUnitListItemDTO currentDto =
         DecisionDTO.builder()
             .id(id)
             .attachments(
                 List.of(
-                    AttachmentDTO.builder().format("png").build(),
-                    AttachmentDTO.builder().format("fmx").build()))
+                    AttachmentDTO.builder().attachmentType(AttachmentType.OTHER.name()).build(),
+                    AttachmentDTO.builder().attachmentType(AttachmentType.ORIGINAL.name()).build()))
             .build();
 
     DocumentationUnitListItem documentationUnitListItem =
         DocumentationUnitListItemTransformer.transformToDomain(currentDto);
 
-    assertThat(documentationUnitListItem.hasAttachments()).isTrue();
+    assertThat(documentationUnitListItem.hasOriginalDocument()).isTrue();
   }
 }

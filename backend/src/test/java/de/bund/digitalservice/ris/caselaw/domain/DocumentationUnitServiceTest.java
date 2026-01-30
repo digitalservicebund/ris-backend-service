@@ -595,7 +595,7 @@ class DocumentationUnitServiceTest {
     Decision decision =
         Decision.builder()
             .uuid(TEST_UUID)
-            .attachments(
+            .originalDocumentAttachments(
                 Collections.singletonList(
                     Attachment.builder().s3path(TEST_UUID.toString()).build()))
             .build();
@@ -698,7 +698,7 @@ class DocumentationUnitServiceTest {
         Decision.builder()
             .uuid(UUID.randomUUID())
             .documentNumber("ABCDE20220001")
-            .attachments(
+            .originalDocumentAttachments(
                 Collections.singletonList(
                     Attachment.builder().uploadTimestamp(Instant.now()).build()))
             .build();
@@ -768,7 +768,7 @@ class DocumentationUnitServiceTest {
         Decision.builder()
             .uuid(UUID.randomUUID())
             .documentNumber("ABCDE20220001")
-            .attachments(
+            .originalDocumentAttachments(
                 Collections.singletonList(
                     Attachment.builder().uploadTimestamp(Instant.now()).build()))
             .version(0L)
@@ -804,7 +804,7 @@ class DocumentationUnitServiceTest {
         Decision.builder()
             .uuid(UUID.randomUUID())
             .documentNumber("ABCDE20220001")
-            .attachments(
+            .originalDocumentAttachments(
                 Collections.singletonList(
                     Attachment.builder().uploadTimestamp(Instant.now()).build()))
             .version(0L)
@@ -849,7 +849,7 @@ class DocumentationUnitServiceTest {
         Decision.builder()
             .uuid(UUID.randomUUID())
             .documentNumber("ABCDE20220001")
-            .attachments(
+            .originalDocumentAttachments(
                 Collections.singletonList(
                     Attachment.builder().uploadTimestamp(Instant.now()).build()))
             .version(0L)

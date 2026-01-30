@@ -30,7 +30,9 @@ async function attachmentIndexDeleted(
   await requestDocumentUnitFromServer()
   extraContentSidePanelStore.onAttachmentDeleted(
     index,
-    documentUnit.value ? documentUnit.value.attachments.length - 1 : 0,
+    documentUnit.value
+      ? documentUnit.value.originalDocumentAttachments.length
+      : 0,
   )
 }
 
@@ -42,7 +44,9 @@ async function attachmentsUploaded(
     await requestDocumentUnitFromServer()
     extraContentSidePanelStore.togglePanel(true)
     extraContentSidePanelStore.selectAttachments(
-      documentUnit.value ? documentUnit.value.attachments.length - 1 : 0,
+      documentUnit.value
+        ? documentUnit.value.originalDocumentAttachments.length - 1
+        : 0,
     )
   }
 }

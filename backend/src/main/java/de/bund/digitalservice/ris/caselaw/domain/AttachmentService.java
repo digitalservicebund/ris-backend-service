@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Optional;
 import java.util.UUID;
@@ -9,9 +10,18 @@ public interface AttachmentService {
   Attachment attachFileToDocumentationUnit(
       UUID documentationUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders, User user);
 
-  void deleteByS3Path(String s3Path, UUID documentationUnitId, User user);
+  Attachment streamFileToDocumentationUnit(
+      UUID documentationUnitId,
+      InputStream inputStream,
+      String filename,
+      User user,
+      AttachmentType type);
+
+  void deleteByFileId(UUID fileId, UUID documentationUnitId, User user);
 
   void deleteAllObjectsFromBucketForDocumentationUnit(UUID documentationUnitId);
 
   Optional<Image> findByDocumentationUnitIdAndFileName(UUID documentationUnitId, String imageName);
+
+  StreamedFileResponse getFileStream(UUID documentationUnitId, UUID fileId);
 }

@@ -13,7 +13,7 @@ import lombok.Builder;
  * @param version the version
  * @param documentNumber the document number, pattern depending on the documentation office, e.g.
  *     KORE00012024
- * @param attachments a list of attachments (e.g. .docx files)
+ * @param originalDocumentAttachments a list of originalDocumentAttachments (e.g. .docx files)
  * @param coreData the core data (e.g. file number, decision date)
  * @param previousDecisions a list of previous decisions (Vorinstanz)
  * @param ensuingDecisions a list of ensuing decisions
@@ -33,7 +33,8 @@ public record Decision(
     Long version,
     @Size(min = 13, max = 14, message = "documentNumber has to be 13 or 14 characters long")
         String documentNumber,
-    List<Attachment> attachments,
+    List<Attachment> originalDocumentAttachments,
+    List<Attachment> otherAttachments,
     @Valid CoreData coreData,
     List<PreviousDecision> previousDecisions,
     List<EnsuingDecision> ensuingDecisions,

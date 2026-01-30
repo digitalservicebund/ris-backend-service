@@ -9,9 +9,12 @@ import FlexItem from "@/components/FlexItem.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import { ExtraContentSidePanelProps } from "@/components/input/types"
+import OtherAttachments from "@/components/OtherAttachments.vue"
 import DecisionPreview from "@/components/preview/DecisionPreview.vue"
 import PendingProceedingPreview from "@/components/preview/PendingProceedingPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
+import TitleElement from "@/components/TitleElement.vue"
+import { useInternalUser } from "@/composables/useInternalUser"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
@@ -33,11 +36,11 @@ const hasNote = computed(() => {
   )
 })
 
-const hasAttachments = computed(() => {
+const hasOriginalDocumentAttachments = computed(() => {
   return (
     isDecision(props.documentUnit) &&
-    !!props.documentUnit!.attachments &&
-    props.documentUnit!.attachments.length > 0
+    !!props.documentUnit!.originalDocumentAttachments &&
+    props.documentUnit!.originalDocumentAttachments.length > 0
   )
 })
 
@@ -78,9 +81,9 @@ function setDefaultState() {
   if (
     isDecision(props.documentUnit) &&
     !props.documentUnit?.note &&
-    props.documentUnit?.hasAttachments
+    props.documentUnit?.hasOriginalDocumentAttachments
   ) {
-    setSidePanelMode("attachments")
+    setSidePanelMode("original-document")
     return
   }
 
@@ -91,6 +94,8 @@ function setDefaultState() {
 
   setSidePanelMode("note")
 }
+
+const isInternalUser = useInternalUser()
 
 /**
  * Checks whether the panel should be expanded when it is mounted.
@@ -105,7 +110,7 @@ onMounted(() => {
   if (route.query.showAttachmentPanel) {
     store.isExpanded = route.query.showAttachmentPanel === "true"
   } else {
-    store.isExpanded = hasNote.value || hasAttachments.value
+    store.isExpanded = hasNote.value || hasOriginalDocumentAttachments.value
   }
 })
 </script>
@@ -138,7 +143,8 @@ onMounted(() => {
       />
       <div class="m-24">
         <div v-if="panelMode === 'note' && isDecision(props.documentUnit)">
-          <InputField id="notesInput" v-slot="{ id }" label="Notiz">
+          <TitleElement class="mb-24">Notiz</TitleElement>
+          <InputField id="notesInput" v-slot="{ id }" label="">
             <TextAreaInput
               :id="id"
               v-model="props.documentUnit!.note"
@@ -151,22 +157,23 @@ onMounted(() => {
         </div>
         <div
           v-else-if="
-            panelMode === 'attachments' && isDecision(props.documentUnit)
+            panelMode === 'original-document' && isDecision(props.documentUnit)
           "
         >
           <AttachmentView
             v-if="
               props.documentUnit.uuid &&
-              props.documentUnit.attachments &&
-              props.documentUnit.attachments[currentAttachmentIndex]?.format
+              props.documentUnit.originalDocumentAttachments &&
+              props.documentUnit.originalDocumentAttachments[
+                currentAttachmentIndex
+              ]?.id
             "
-            :document-unit-uuid="props.documentUnit.uuid"
-            :format="
-              props.documentUnit.attachments[currentAttachmentIndex].format
+            :attachment-id="
+              props.documentUnit.originalDocumentAttachments[
+                currentAttachmentIndex
+              ].id
             "
-            :s3-path="
-              props.documentUnit.attachments[currentAttachmentIndex].s3path
-            "
+            :documentation-unit-id="props.documentUnit.uuid"
           />
           <div v-else class="ris-label1-regular">
             Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.
@@ -175,8 +182,9 @@ onMounted(() => {
         <div
           v-else-if="panelMode === 'preview'"
           id="preview-container"
-          class="flex max-h-[70vh] overflow-auto"
+          class="flex max-h-[70vh] flex-col overflow-auto"
         >
+          <TitleElement>Vorschau</TitleElement>
           <DecisionPreview
             v-if="isDecision(props.documentUnit)"
             layout="narrow"
@@ -191,6 +199,9 @@ onMounted(() => {
         <CategoryImport
           v-else-if="panelMode === 'category-import'"
           :document-number="importDocumentNumber"
+        />
+        <OtherAttachments
+          v-else-if="panelMode === 'other-attachments' && isInternalUser"
         />
       </div>
     </SideToggle>

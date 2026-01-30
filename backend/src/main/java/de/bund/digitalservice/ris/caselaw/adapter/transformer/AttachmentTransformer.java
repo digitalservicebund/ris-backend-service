@@ -9,6 +9,7 @@ public class AttachmentTransformer {
 
   public static Attachment transformToDomain(AttachmentDTO dto) {
     return Attachment.builder()
+        .id(dto.getId())
         .name(dto.getFilename())
         .format(dto.getFormat())
         .s3path(dto.getS3ObjectPath())

@@ -1,27 +1,37 @@
 import httpClient, { ServiceResponse } from "./httpClient"
+import { Attachment } from "@/domain/attachment"
 import { Docx2HTML } from "@/domain/docx2html"
 import errorMessages from "@/i18n/errors.json"
 
 interface AttachmentService {
-  upload(
-    documentUnitUuid: string,
+  uploadOriginalDocument(
+    documentationUnitId: string,
     file: File,
   ): Promise<ServiceResponse<Docx2HTML>>
 
+  uploadOtherAttachment(
+    documentationUnitId: string,
+    file: File,
+  ): Promise<ServiceResponse<unknown>>
+
+  download(
+    documentationUnitId: string,
+    attachment: Attachment,
+  ): Promise<ServiceResponse<unknown>>
+
   delete(
-    documentUnitUuid: string,
-    s3path: string,
+    documentationUnitId: string,
+    fileToDeleteId: string,
   ): Promise<ServiceResponse<unknown>>
 
   getAttachmentAsHtml(
-    uuid: string,
-    s3path: string | undefined,
-    format: string,
+    documentationUnitId: string,
+    attachmentId: string,
   ): Promise<ServiceResponse<Docx2HTML>>
 }
 
 const service: AttachmentService = {
-  async upload(documentUnitUuid: string, file: File) {
+  async uploadOriginalDocument(documentUnitUuid: string, file: File) {
     const extension = file.name?.split(".").pop()
     if (extension?.toLowerCase() !== "docx") {
       return {
@@ -32,22 +42,36 @@ const service: AttachmentService = {
         },
       }
     }
+    if (file.size > 20 * 1024 * 1024)
+      return {
+        status: 413,
+        error: {
+          title: errorMessages.ORIGINAL_DOCUMENT_TOO_LARGE_CASELAW.title,
+          description:
+            errorMessages.ORIGINAL_DOCUMENT_TOO_LARGE_CASELAW.description,
+        },
+      }
 
-    const response = await httpClient.put<File, Docx2HTML>(
-      `caselaw/documentunits/${documentUnitUuid}/file`,
+    const form = new FormData()
+    form.append("file", file)
+
+    const response = await httpClient.put<FormData, Docx2HTML>(
+      `caselaw/documentunits/${documentUnitUuid}/original-file`,
       {
         headers: {
           "Content-Type":
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           "X-Filename": file.name,
+          "X-Filesize": `${file.size}`,
         },
       },
-      file,
+      form,
     )
     if (response.status === 413) {
       response.error = {
-        title: errorMessages.FILE_TOO_LARGE_CASELAW.title,
-        description: errorMessages.FILE_TOO_LARGE_CASELAW.description,
+        title: errorMessages.ORIGINAL_DOCUMENT_TOO_LARGE_CASELAW.title,
+        description:
+          errorMessages.ORIGINAL_DOCUMENT_TOO_LARGE_CASELAW.description,
       }
     } else if (response.status === 415) {
       response.error = {
@@ -76,26 +100,98 @@ const service: AttachmentService = {
     return response
   },
 
-  async delete(documentUnitUuid: string, s3path: string) {
+  async uploadOtherAttachment(documentUnitUuid: string, file: File) {
+    if (file.size > 100 * 1024 * 1024)
+      return {
+        status: 413,
+        error: {
+          title: errorMessages.OTHER_FILE_TOO_LARGE_CASELAW.title,
+          description: errorMessages.OTHER_FILE_TOO_LARGE_CASELAW.description,
+        },
+      } as ServiceResponse<unknown>
+
+    const form = new FormData()
+    form.append("file", file)
+
+    const response = await httpClient.put<FormData, unknown>(
+      `caselaw/documentunits/${documentUnitUuid}/other-file`,
+      {
+        headers: {
+          "X-Filename": file.name,
+          "X-Filesize": `${file.size}`,
+        },
+      },
+      form,
+    )
+    if (response.status === 413) {
+      response.error = {
+        title: errorMessages.OTHER_FILE_TOO_LARGE_CASELAW.title,
+        description: errorMessages.OTHER_FILE_TOO_LARGE_CASELAW.description,
+      }
+    } else if (response.status === 403) {
+      response.error = {
+        title: errorMessages.NOT_ALLOWED.title,
+        description: errorMessages.NOT_ALLOWED.description,
+      }
+    } else if (response.status >= 300) {
+      response.error = {
+        title: errorMessages.SERVER_ERROR.title,
+        description: errorMessages.SERVER_ERROR.description,
+      }
+    } else {
+      response.error = undefined
+    }
+
+    return response
+  },
+
+  async download(documentUnitUuid: string, attachment: Attachment) {
+    const response = await httpClient.get<BlobPart>(
+      `caselaw/documentunits/${documentUnitUuid}/file/${attachment.id}`,
+      { responseType: "blob" },
+    )
+    if (response.error || response.status > 300)
+      return {
+        status: 500,
+        error: {
+          title: errorMessages.FILE_DOWNLOAD_FAILED.title,
+          description: errorMessages.FILE_DOWNLOAD_FAILED.description,
+        },
+      }
+
+    const blob = new Blob([response.data], {
+      type: response?.headers?.["content-type"],
+    })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = attachment.name
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+    return response
+  },
+
+  async delete(documentUnitUuid: string, fileToDeleteId: string) {
     const response = await httpClient.delete(
-      `caselaw/documentunits/${documentUnitUuid}/file/${s3path}`,
+      `caselaw/documentunits/${documentUnitUuid}/file/${fileToDeleteId}`,
     )
     response.error =
       response.status >= 300
-        ? { title: errorMessages.FILE_DELETE_FAILED.title }
+        ? {
+            title: errorMessages.FILE_DELETE_FAILED.title,
+            description: errorMessages.FILE_DELETE_FAILED.description,
+          }
         : undefined
 
     return response
   },
 
-  async getAttachmentAsHtml(uuid: string, s3path: string, format: string) {
+  async getAttachmentAsHtml(documentationUnitId: string, attachmentId: string) {
     const response = await httpClient.get<Docx2HTML>(
-      `caselaw/documentunits/${uuid}/file`,
+      `caselaw/documentunits/${documentationUnitId}/file/${attachmentId}/html`,
       {
-        params: {
-          s3Path: s3path ?? "",
-          format: format ?? "",
-        },
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
@@ -104,7 +200,10 @@ const service: AttachmentService = {
     )
     response.error =
       response.status >= 300
-        ? { title: errorMessages.DOCX_COULD_NOT_BE_LOADED.title }
+        ? {
+            title: errorMessages.DOCX_COULD_NOT_BE_LOADED.title,
+            description: errorMessages.DOCX_COULD_NOT_BE_LOADED.description,
+          }
         : undefined
 
     return response

@@ -1,13 +1,12 @@
 <script lang="ts" setup>
-import { useScrollLock } from "@vueuse/core"
 import { storeToRefs } from "pinia"
 import Message from "primevue/message"
-import { computed, Ref, ref, watch } from "vue"
+import { computed, Ref } from "vue"
 import AttachmentList from "@/components/AttachmentList.vue"
 import FileUpload from "@/components/FileUpload.vue"
 import FlexItem from "@/components/FlexItem.vue"
-import PopupModal from "@/components/PopupModal.vue"
 import TitleElement from "@/components/TitleElement.vue"
+import { useAttachments } from "@/composables/useAttachments"
 import { Decision } from "@/domain/decision"
 import attachmentService from "@/services/attachmentService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -18,17 +17,34 @@ const emit = defineEmits<{
   attachmentIndexDeleted: [number]
 }>()
 
+const {
+  errors,
+  isLoading,
+  attachments,
+  hasAttachments,
+  attachmentIdsWithActiveDownload,
+  handleOnDelete,
+  handleOnDownload,
+  upload,
+} = useAttachments(
+  {
+    attachmentsUploaded: (success) => emit("attachmentsUploaded", success),
+    attachmentIndexDeleted: (index) => emit("attachmentIndexDeleted", index),
+  },
+  {
+    getList: (decision) => decision.originalDocumentAttachments,
+    setList: (decision, newValues) =>
+      (decision.originalDocumentAttachments = newValues),
+    uploadFn: (uuid, file) =>
+      attachmentService.uploadOriginalDocument(uuid, file),
+  },
+)
+
 const store = useDocumentUnitStore()
 const { documentUnit: decision } = storeToRefs(store) as {
   documentUnit: Ref<Decision | undefined>
 }
-const errors = ref<string[]>([])
-const isLoading = ref(false)
 const acceptedFileFormats = [".docx"]
-const deletingAttachmentIndex: Ref<number> = ref(0)
-
-const showDeleteModal = ref(false)
-const deleteModalHeaderText = "Anhang löschen"
 
 const errorTitle = computed(() => {
   if (errors.value.length === 1) {
@@ -38,93 +54,11 @@ const errorTitle = computed(() => {
   } else return ""
 })
 
-const handleDeleteAttachment = async (index: number) => {
-  const fileToDelete = attachments.value[index]
-  if (fileToDelete.s3path == undefined) {
-    console.error("file path is undefined", index)
-    return
-  }
-
-  if (
-    (await attachmentService.delete(decision.value!.uuid, fileToDelete.s3path))
-      .status < 300
-  ) {
-    emit("attachmentIndexDeleted", index)
-    await store.loadDocumentUnit(store.documentUnit!.documentNumber!)
-  }
-}
-
 const handleOnSelect = (index: number) => {
   if (index >= 0 && index < attachments.value.length) {
     emit("attachmentIndexSelected", index)
   }
 }
-
-const handleOnDelete = (index: number) => {
-  errors.value = []
-  deletingAttachmentIndex.value = index
-  openDeleteModal()
-}
-
-const deleteFile = async (index: number) => {
-  await handleDeleteAttachment(index)
-  closeDeleteModal()
-}
-
-async function upload(files: FileList) {
-  errors.value = []
-  let anySuccessful = false
-  try {
-    for (const file of Array.from(files)) {
-      isLoading.value = true
-      const response = await attachmentService.upload(
-        decision.value!.uuid,
-        file,
-      )
-      if (response.status === 200 && response.data) {
-        anySuccessful = true
-      } else if (response.error?.title) {
-        errors.value.push(
-          file.name +
-            " " +
-            response.error?.title +
-            " " +
-            response.error?.description,
-        )
-      }
-    }
-  } finally {
-    isLoading.value = false
-    emit("attachmentsUploaded", anySuccessful)
-    await store.loadDocumentUnit(store.documentUnit!.documentNumber!)
-  }
-}
-
-const scrollLock = useScrollLock(document)
-watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
-
-function openDeleteModal() {
-  const attachmentToBeDeleted =
-    attachments.value?.[deletingAttachmentIndex.value]?.name
-  if (attachmentToBeDeleted != null) {
-    showDeleteModal.value = true
-  }
-}
-
-function closeDeleteModal() {
-  showDeleteModal.value = false
-}
-
-const hasAttachments = computed<boolean>(() => {
-  return decision.value!.attachments.length > 0
-})
-
-const attachments = computed({
-  get: () => decision.value!.attachments,
-  set: (newValues) => {
-    decision.value!.attachments = newValues
-  },
-})
 </script>
 
 <template>
@@ -134,22 +68,14 @@ const attachments = computed({
     data-testid="document-unit-attachments"
   >
     <div class="flex w-full flex-1 grow flex-col gap-24">
-      <PopupModal
-        v-if="showDeleteModal"
-        :aria-label="deleteModalHeaderText"
-        :content-text="`Möchten Sie den Anhang ${attachments?.[deletingAttachmentIndex]?.name} wirklich dauerhaft löschen?`"
-        :header-text="deleteModalHeaderText"
-        primary-button-text="Löschen"
-        primary-button-type="destructive"
-        @close-modal="closeDeleteModal"
-        @primary-action="deleteFile(deletingAttachmentIndex)"
-      />
-      <TitleElement>Dokumente</TitleElement>
+      <TitleElement>Originaldokument</TitleElement>
       <AttachmentList
         v-if="hasAttachments"
-        id="file-table"
+        :attachment-ids-with-active-download="attachmentIdsWithActiveDownload"
+        enable-select
         :files="attachments"
         @delete="handleOnDelete"
+        @download="handleOnDownload"
         @select="handleOnSelect"
       />
       <Message
@@ -165,7 +91,9 @@ const attachments = computed({
       <div class="flex-grow">
         <div class="flex h-full flex-col items-start">
           <FileUpload
+            id="file-upload"
             :accept="acceptedFileFormats.toString()"
+            aria-label="Originaldokument hochladen"
             :is-loading="isLoading"
             @files-selected="(files) => upload(files)"
           />

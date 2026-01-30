@@ -90,7 +90,9 @@ const stickyHeaderPT = computed(() => {
 // --- END: sticky header logic ---
 
 const attachmentText = (listEntry: DocumentUnitListEntry) =>
-  listEntry.hasAttachments ? "Anhang vorhanden" : "Kein Anhang vorhanden"
+  listEntry.hasOriginalDocument
+    ? "Originaldokument vorhanden"
+    : "Kein Originaldokument vorhanden"
 
 const headNoteOrPrincipleText = (listEntry: DocumentUnitListEntry) =>
   listEntry.hasHeadnoteOrPrinciple
@@ -243,7 +245,9 @@ onUnmounted(() => {
                     :aria-label="attachmentText(item)"
                     class="flex-end h-20 w-20"
                     :class="
-                      item.hasAttachments ? 'text-blue-800' : 'text-gray-500'
+                      item.hasOriginalDocument
+                        ? 'text-blue-800'
+                        : 'text-gray-500'
                     "
                     data-testid="file-attached-icon"
                   />

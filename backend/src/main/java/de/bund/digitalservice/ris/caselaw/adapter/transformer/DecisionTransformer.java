@@ -30,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AbuseFee;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -727,7 +728,8 @@ public class DecisionTransformer extends DocumentableTransformer {
                 ? new ArrayList<>()
                 : decisionDTO.getDocumentalists().stream().map(DocumentalistDTO::getValue).toList())
         .previousDecisions(getPreviousDecisions(decisionDTO))
-        .attachments(buildAttachments(decisionDTO))
+        .originalDocumentAttachments(buildAttachments(decisionDTO))
+        .otherAttachments(buildOtherAttachments(decisionDTO))
         .ensuingDecisions(buildEnsuingDecisions(decisionDTO))
         .status(getStatus(decisionDTO))
         .inboxStatus(decisionDTO.getInboxStatus())
@@ -939,9 +941,18 @@ public class DecisionTransformer extends DocumentableTransformer {
 
   private static List<Attachment> buildAttachments(DecisionDTO decisionDTO) {
     return decisionDTO.getAttachments().stream()
-        .map(AttachmentTransformer::transformToDomain)
         .filter(
-            attachment -> "docx".equals(attachment.format()) || "fmx".equals(attachment.format()))
+            attachmentDTO ->
+                AttachmentType.ORIGINAL.name().equals(attachmentDTO.getAttachmentType()))
+        .map(AttachmentTransformer::transformToDomain)
+        .toList();
+  }
+
+  private static List<Attachment> buildOtherAttachments(DecisionDTO decisionDTO) {
+    return decisionDTO.getAttachments().stream()
+        .filter(
+            attachmentDTO -> AttachmentType.OTHER.name().equals(attachmentDTO.getAttachmentType()))
+        .map(AttachmentTransformer::transformToDomain)
         .toList();
   }
 

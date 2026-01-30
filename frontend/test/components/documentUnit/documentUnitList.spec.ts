@@ -109,7 +109,7 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.PUBLISHED,
             withError: false,
           },
-          hasAttachments: true,
+          hasOriginalDocument: true,
           hasHeadnoteOrPrinciple: true,
           isDeletable: false,
           isEditable: false,
@@ -128,7 +128,7 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.PUBLISHED,
             withError: false,
           },
-          hasAttachments: false,
+          hasOriginalDocument: false,
           hasHeadnoteOrPrinciple: false,
           isDeletable: true,
           isEditable: true,
@@ -146,7 +146,7 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.EXTERNAL_HANDOVER_PENDING,
             withError: false,
           },
-          hasAttachments: false,
+          hasOriginalDocument: false,
           hasHeadnoteOrPrinciple: false,
           isDeletable: false,
           isEditable: false,
@@ -187,8 +187,10 @@ describe("documentUnit list", () => {
     expect(screen.getByLabelText("Kurztext vorhanden")).toBeVisible()
 
     // expect Attachment
-    expect(screen.getAllByLabelText("Kein Anhang vorhanden")).toHaveLength(2)
-    expect(screen.getByLabelText("Anhang vorhanden")).toBeVisible()
+    expect(
+      screen.getAllByLabelText("Kein Originaldokument vorhanden"),
+    ).toHaveLength(2)
+    expect(screen.getByLabelText("Originaldokument vorhanden")).toBeVisible()
 
     // expect three view links
     expect(
