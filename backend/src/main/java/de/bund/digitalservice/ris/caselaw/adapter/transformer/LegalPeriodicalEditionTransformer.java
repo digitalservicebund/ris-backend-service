@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -31,7 +32,7 @@ public class LegalPeriodicalEditionTransformer {
                 ? new ArrayList<>()
                 : legalPeriodicalEditionDTO.getReferences().stream()
                     .map(ReferenceTransformer::transformToDomain)
-                    .toList())
+                    .collect(Collectors.toList())) // NOSONAR
         .build();
   }
 
