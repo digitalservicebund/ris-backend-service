@@ -387,7 +387,7 @@ class S3AttachmentServiceTest {
             eq(documentationUnitDTO.getId()),
             any(User.class),
             eq(HistoryLogEventType.FILES),
-            eq("File uploaded"));
+            eq("Anhang \"test.zip\" hinzugefügt"));
 
     var uploadPartRequestCaptor = ArgumentCaptor.forClass(UploadPartRequest.class);
     var requestBodyCaptor = ArgumentCaptor.forClass(RequestBody.class);

@@ -225,9 +225,9 @@ export const navigateToManagementData = async (
     } else {
       await getRequest(baseUrl, page)
     }
-    await expect(page.getByTestId("title").first()).toHaveText(
-      "Verwaltungsdaten",
-    )
+    await expect(
+      page.getByRole("heading", { name: "Verwaltungsdaten" }),
+    ).toBeVisible()
   })
 }
 
