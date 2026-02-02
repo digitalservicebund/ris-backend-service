@@ -87,6 +87,7 @@ class ScheduledPublicationIntegrationTest extends BaseIntegrationTest {
     LocalDateTime now = LocalDateTime.now();
 
     await()
+        .atLeast(Duration.ofSeconds(1))
         .atMost(Duration.ofSeconds(62))
         .untilAsserted(
             () -> {
