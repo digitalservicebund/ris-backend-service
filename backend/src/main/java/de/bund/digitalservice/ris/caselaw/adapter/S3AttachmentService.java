@@ -183,7 +183,7 @@ public class S3AttachmentService implements AttachmentService {
 
     attachmentDTO.setS3ObjectPath(s3ObjectPath);
     var attachment = AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
-    var description = getAttachmentAddedDescription(filename);
+    var description = getAttachmentAddedDescription(filename, type);
     setLastUpdated(user, documentationUnit);
     documentationUnitHistoryLogService.saveHistoryLog(
         documentationUnitId, user, HistoryLogEventType.FILES, description);
@@ -191,20 +191,18 @@ public class S3AttachmentService implements AttachmentService {
     return attachment;
   }
 
-  private String getAttachmentAddedDescription(String filename) {
-    if (filename.endsWith(".docx")) {
-      return "Originaldokument hinzugefügt";
-    } else {
-      return "Anhang \"" + filename + "\" hinzugefügt";
-    }
+  private String getAttachmentAddedDescription(String filename, AttachmentType attachmentType) {
+    return switch (attachmentType) {
+      case AttachmentType.ORIGINAL -> "Originaldokument hinzugefügt";
+      case AttachmentType.OTHER -> "Anhang \"" + filename + "\" hinzugefügt";
+    };
   }
 
-  private String getAttachmentRemovedDescription(String filename) {
-    if (filename.endsWith(".docx")) {
-      return "Originaldokument gelöscht";
-    } else {
-      return "Anhang \"" + filename + "\" gelöscht";
-    }
+  private String getAttachmentDeletedDescription(String filename, AttachmentType attachmentType) {
+    return switch (attachmentType) {
+      case AttachmentType.ORIGINAL -> "Originaldokument gelöscht";
+      case AttachmentType.OTHER -> "Anhang \"" + filename + "\" gelöscht";
+    };
   }
 
   private String getExtension(String filename) {
@@ -363,7 +361,7 @@ public class S3AttachmentService implements AttachmentService {
         documentationUnitId,
         user,
         HistoryLogEventType.FILES,
-        getAttachmentAddedDescription(fileName));
+        getAttachmentAddedDescription(fileName, AttachmentType.ORIGINAL));
 
     return attachment;
   }
@@ -384,7 +382,9 @@ public class S3AttachmentService implements AttachmentService {
                   documentationUnitId,
                   user,
                   HistoryLogEventType.FILES,
-                  getAttachmentRemovedDescription(attachmentDTO.get().getFilename()));
+                  getAttachmentDeletedDescription(
+                      attachmentDTO.get().getFilename(),
+                      AttachmentType.valueOf(attachmentDTO.get().getAttachmentType())));
             });
     repository.deleteById(fileId);
   }
