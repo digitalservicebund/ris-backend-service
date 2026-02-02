@@ -1017,7 +1017,7 @@ class DocumentationUnitControllerTest {
           .addHeader("X-Filename", "some-file.docx")
           .exchange()
           .expectStatus()
-          .is5xxServerError();
+          .is4xxClientError();
     }
 
     @Test
@@ -1253,7 +1253,7 @@ class DocumentationUnitControllerTest {
           .addHeader("X-Filename", "some-file.docx")
           .exchange()
           .expectStatus()
-          .is5xxServerError();
+          .is4xxClientError();
     }
 
     @Test
