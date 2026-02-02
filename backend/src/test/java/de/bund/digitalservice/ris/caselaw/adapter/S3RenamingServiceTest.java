@@ -84,7 +84,7 @@ class S3RenamingServiceTest {
     assertThat(attachmentCaptor.getValue().getS3ObjectPath())
         .isEqualTo("XXRE123456789/" + attachmentId + ".docx");
 
-    assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(0);
+    assertThat(memoryAppender.count(Level.ERROR)).isZero();
     assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1);
     assertThat(memoryAppender.getMessage(Level.INFO, 0))
         .isEqualTo(
@@ -98,7 +98,7 @@ class S3RenamingServiceTest {
     assertThat(infoKVPairs)
         .containsExactlyInAnyOrder(
             new KeyValuePair("id", attachmentId),
-            new KeyValuePair("documentNumber", "XXRE123456789"),
+            new KeyValuePair("document number", "XXRE123456789"),
             new KeyValuePair("old object path", attachmentId.toString()),
             new KeyValuePair("new object path", "XXRE123456789/" + attachmentId + ".docx"));
   }
@@ -141,7 +141,7 @@ class S3RenamingServiceTest {
     assertThat(infoKVPairs)
         .containsExactlyInAnyOrder(
             new KeyValuePair("id", attachmentId1),
-            new KeyValuePair("documentNumber", "XXRE111111111"),
+            new KeyValuePair("document number", "XXRE111111111"),
             new KeyValuePair("old object path", attachmentId1.toString()),
             new KeyValuePair("new object path", "XXRE111111111/" + attachmentId1 + ".docx"));
 
@@ -199,7 +199,7 @@ class S3RenamingServiceTest {
     assertThat(infoKVPairs)
         .containsExactlyInAnyOrder(
             new KeyValuePair("id", attachmentId1),
-            new KeyValuePair("documentNumber", "XXRE111111111"),
+            new KeyValuePair("document number", "XXRE111111111"),
             new KeyValuePair("old object path", attachmentId1.toString()),
             new KeyValuePair("new object path", "XXRE111111111/" + attachmentId1 + ".docx"));
 
@@ -256,7 +256,7 @@ class S3RenamingServiceTest {
     assertThat(infoKVPairs)
         .containsExactlyInAnyOrder(
             new KeyValuePair("id", attachmentId1),
-            new KeyValuePair("documentNumber", "XXRE111111111"),
+            new KeyValuePair("document number", "XXRE111111111"),
             new KeyValuePair("old object path", attachmentId1.toString()),
             new KeyValuePair("new object path", "XXRE111111111/" + attachmentId1 + ".docx"));
 

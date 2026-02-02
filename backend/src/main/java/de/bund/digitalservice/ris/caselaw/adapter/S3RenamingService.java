@@ -23,10 +23,10 @@ public class S3RenamingService {
   private final AttachmentRepository attachmentRepository;
   private final S3Client s3Client;
 
-  private final String ID = "id";
-  private final String DOC_NUMBER = "documentnumber";
-  private final String OLD_PATH = "old object path";
-  private final String NEW_PATH = "new object path";
+  private static final String ID = "id";
+  private static final String DOC_NUMBER = "document number";
+  private static final String OLD_PATH = "old object path";
+  private static final String NEW_PATH = "new object path";
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
