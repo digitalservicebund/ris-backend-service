@@ -183,8 +183,8 @@ public class S3RenamingService {
                       String.format(
                           "Moved unreferenced attachment from '%s' to '%s'",
                           oldObjectPath, newObjectPath))
-                  .addKeyValue("old object path", oldObjectPath)
-                  .addKeyValue("new object path", newObjectPath)
+                  .addKeyValue(OLD_PATH, oldObjectPath)
+                  .addKeyValue(NEW_PATH, newObjectPath)
                   .log();
             });
   }
