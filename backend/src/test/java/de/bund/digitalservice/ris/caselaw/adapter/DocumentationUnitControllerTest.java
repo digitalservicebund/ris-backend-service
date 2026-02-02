@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -1293,6 +1294,43 @@ class DocumentationUnitControllerTest {
           .exchange()
           .expectStatus()
           .is5xxServerError();
+    }
+
+    @Test
+    void testAttachOriginalFile_whenConversionFailing_shouldDeleteFile() {
+      // given
+      byte[] fileContent = "test content".getBytes();
+      MockMultipartFile mockFile =
+          new MockMultipartFile(
+              "file",
+              "some-file.docx",
+              String.valueOf(MediaType.APPLICATION_OCTET_STREAM),
+              fileContent);
+
+      doThrow(new RuntimeException("error"))
+          .when(converterService)
+          .getConvertedObject(any(String.class));
+
+      // when
+      when(attachmentService.streamFileToDocumentationUnit(
+              any(UUID.class), any(InputStream.class), any(), any(), any()))
+          .thenReturn(Attachment.builder().s3path("somePath").build());
+      when(userHasWriteAccess.apply(any())).thenReturn(true);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+
+      // then
+      risWebClient
+          .withLogin("DS", "Internal")
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/original-file")
+          .contentType(MediaType.MULTIPART_FORM_DATA)
+          .addFile(mockFile)
+          .addHeader("X-Filename", "some-file.docx")
+          .exchange()
+          .expectStatus()
+          .is4xxClientError();
+
+      verify(attachmentService, atLeastOnce()).deleteByFileId(any(), any(), any());
     }
   }
 
