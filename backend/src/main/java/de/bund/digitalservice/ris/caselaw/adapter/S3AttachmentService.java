@@ -183,18 +183,31 @@ public class S3AttachmentService implements AttachmentService {
 
     attachmentDTO.setS3ObjectPath(s3ObjectPath);
     var attachment = AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
-
+    var description = getAttachmentAddedDescription(filename);
     setLastUpdated(user, documentationUnit);
     documentationUnitHistoryLogService.saveHistoryLog(
-        documentationUnitId,
-        user,
-        HistoryLogEventType.FILES,
-        "Anhang \"" + filename + "\" hinzugefügt");
+        documentationUnitId, user, HistoryLogEventType.FILES, description);
 
     return attachment;
   }
 
-  public String getExtension(String filename) {
+  private String getAttachmentAddedDescription(String filename) {
+    if (filename.endsWith(".docx")) {
+      return "Originaldokument hinzugefügt";
+    } else {
+      return "Anhang \"" + filename + "\" hinzugefügt";
+    }
+  }
+
+  private String getAttachmentRemovedDescription(String filename) {
+    if (filename.endsWith(".docx")) {
+      return "Originaldokument gelöscht";
+    } else {
+      return "Anhang \"" + filename + "\" gelöscht";
+    }
+  }
+
+  private String getExtension(String filename) {
     if (filename == null || !filename.contains(".")) {
       return "";
     }
@@ -347,7 +360,10 @@ public class S3AttachmentService implements AttachmentService {
 
     setLastUpdated(user, documentationUnit);
     documentationUnitHistoryLogService.saveHistoryLog(
-        documentationUnitId, user, HistoryLogEventType.FILES, "Anhang " + fileName + "hinzugefügt");
+        documentationUnitId,
+        user,
+        HistoryLogEventType.FILES,
+        getAttachmentAddedDescription(fileName));
 
     return attachment;
   }
@@ -368,7 +384,7 @@ public class S3AttachmentService implements AttachmentService {
                   documentationUnitId,
                   user,
                   HistoryLogEventType.FILES,
-                  String.format("Anhang \"%s\" gelöscht", attachmentDTO.get().getFilename()));
+                  getAttachmentRemovedDescription(attachmentDTO.get().getFilename()));
             });
     repository.deleteById(fileId);
   }

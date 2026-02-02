@@ -129,7 +129,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
           .map(HistoryLog::eventType)
           .containsExactly(HistoryLogEventType.UPDATE, HistoryLogEventType.FILES);
       assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser");
-      assertThat(logs.get(1).description()).isEqualTo("Anhang \"attachment.docx\" hinzugefügt");
+      assertThat(logs.get(1).description()).isEqualTo("Originaldokument hinzugefügt");
     }
 
     @Test
@@ -516,7 +516,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
       assertThat(logs).hasSize(1);
       assertThat(logs.getFirst().eventType()).isEqualTo(HistoryLogEventType.FILES);
       assertThat(logs.getFirst().createdBy()).isEqualTo("testUser");
-      assertThat(logs.getFirst().description()).isEqualTo("Anhang \"fooFile.docx\" gelöscht");
+      assertThat(logs.getFirst().description()).isEqualTo("Originaldokument gelöscht");
     }
 
     @Test
