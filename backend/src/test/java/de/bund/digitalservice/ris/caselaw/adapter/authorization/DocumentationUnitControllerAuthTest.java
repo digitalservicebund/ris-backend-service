@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService
 import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.BulkDocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -38,7 +39,7 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
-import java.nio.ByteBuffer;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -49,15 +50,28 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadRequest;
+import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadResponse;
+import software.amazon.awssdk.services.s3.model.CreateMultipartUploadRequest;
+import software.amazon.awssdk.services.s3.model.CreateMultipartUploadResponse;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.UploadPartRequest;
+import software.amazon.awssdk.services.s3.model.UploadPartResponse;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = DocumentationUnitController.class)
@@ -85,6 +99,10 @@ class DocumentationUnitControllerAuthTest {
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
   @MockitoBean private AttachmentRepository attachmentRepository;
+
+  @MockitoBean
+  @Qualifier("docxS3Client")
+  private S3Client s3Client;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final UUID TEST_FILE_UUID =
@@ -125,23 +143,33 @@ class DocumentationUnitControllerAuthTest {
   }
 
   @Test
-  void testAttachFileToDocumentationUnit() throws DocumentationUnitNotExistsException {
-    when(attachmentService.attachFileToDocumentationUnit(
-            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
+  void testAttachOriginalFileToDocumentationUnit() throws DocumentationUnitNotExistsException {
+    when(attachmentService.streamFileToDocumentationUnit(
+            eq(TEST_UUID),
+            any(InputStream.class),
+            eq("attachment.docx"),
+            eq(null),
+            eq(AttachmentType.ORIGINAL)))
         .thenReturn(Attachment.builder().s3path("fooPath").build());
     when(converterService.getConvertedObject(anyString())).thenReturn(Docx2Html.EMPTY);
     mockDocumentationUnit(docOffice1, null, null);
+    var file = "hello world".getBytes();
+    mockS3Client(file);
 
-    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file";
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/original-file";
 
     risWebTestClient
         .withLogin(docOffice1Group)
         .put()
-        .uri(uri)
-        .contentType(
-            MediaType.parseMediaType(
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-        .bodyValue(new byte[] {})
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/original-file")
+        .contentType(MediaType.MULTIPART_FORM_DATA)
+        .addFile(
+            new MockMultipartFile(
+                "file",
+                "attachment.docx",
+                String.valueOf(MediaType.APPLICATION_OCTET_STREAM),
+                file))
+        .addHeader("X-Filename", "attachment.docx")
         .exchange()
         .expectStatus()
         .isOk();
@@ -150,10 +178,15 @@ class DocumentationUnitControllerAuthTest {
         .withLogin(docOffice2Group)
         .put()
         .uri(uri)
-        .contentType(
-            MediaType.parseMediaType(
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-        .bodyValue(new byte[] {})
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/original-file")
+        .contentType(MediaType.MULTIPART_FORM_DATA)
+        .addFile(
+            new MockMultipartFile(
+                "file",
+                "attachment.docx",
+                String.valueOf(MediaType.APPLICATION_OCTET_STREAM),
+                file))
+        .addHeader("X-Filename", "attachment.docx")
         .exchange()
         .expectStatus()
         .isForbidden();
@@ -351,5 +384,33 @@ class DocumentationUnitControllerAuthTest {
             .build();
     when(service.getByUuid(TEST_UUID)).thenReturn(docUnit);
     return docUnit;
+  }
+
+  private void mockS3Client(byte[] file) {
+    when(s3Client.createMultipartUpload(any(CreateMultipartUploadRequest.class)))
+        .thenReturn(CreateMultipartUploadResponse.builder().uploadId("upload-123").build());
+    when(s3Client.createMultipartUpload(any(CreateMultipartUploadRequest.class)))
+        .thenReturn(CreateMultipartUploadResponse.builder().uploadId("upload-123").build());
+    when(s3Client.uploadPart(any(UploadPartRequest.class), any(RequestBody.class)))
+        .thenReturn(UploadPartResponse.builder().eTag("etag").build());
+    when(s3Client.completeMultipartUpload(any(CompleteMultipartUploadRequest.class)))
+        .thenReturn(CompleteMultipartUploadResponse.builder().build());
+    when(s3Client.uploadPart(any(UploadPartRequest.class), any(RequestBody.class)))
+        .thenReturn(UploadPartResponse.builder().eTag("etag").build());
+    when(s3Client.completeMultipartUpload(any(CompleteMultipartUploadRequest.class)))
+        .thenReturn(CompleteMultipartUploadResponse.builder().build());
+
+    var getObjectResponse =
+        GetObjectResponse.builder()
+            .contentType("application/octet-stream")
+            .contentLength((long) file.length)
+            .build();
+
+    ResponseBytes<GetObjectResponse> responseBytes =
+        ResponseBytes.fromByteArray(getObjectResponse, file);
+
+    when(s3Client.getObject(
+            (GetObjectRequest) any(), (ResponseTransformer<GetObjectResponse, Object>) any()))
+        .thenReturn(responseBytes);
   }
 }

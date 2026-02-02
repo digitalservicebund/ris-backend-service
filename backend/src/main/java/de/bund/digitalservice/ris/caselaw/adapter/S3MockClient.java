@@ -161,8 +161,6 @@ public class S3MockClient implements S3Client {
     return DeleteObjectResponse.builder().build();
   }
 
-  // --- Multipart support added below ---
-
   @Override
   public CreateMultipartUploadResponse createMultipartUpload(CreateMultipartUploadRequest request) {
     String uploadId = UUID.randomUUID().toString();

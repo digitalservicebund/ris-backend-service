@@ -50,7 +50,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -195,42 +194,6 @@ public class DocumentationUnitController {
       return ResponseEntity.ok(updatedDocumentationUnit);
     } catch (Exception e) {
       throw new StatusImporterException("Could not update publicationStatus", e);
-    }
-  }
-
-  /**
-   * Attach a content file (docx) to the documentation unit. This file is used to fill the
-   * categories of the documentation unit.
-   *
-   * <p>Do a conversion into html and parse the footer for ECLI information.
-   *
-   * @param uuid UUID of the documentation unit
-   * @param bytes bytes of the content file
-   * @param httpHeaders http headers with the X-Filename information
-   * @return the into html converted content of the file with some additional metadata (ECLI)
-   */
-  @PutMapping(
-      value = "/{uuid}/file",
-      produces = MediaType.APPLICATION_JSON_VALUE,
-      consumes = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
-  public ResponseEntity<Attachment2Html> attachFileToDocumentationUnit(
-      @AuthenticationPrincipal OidcUser oidcUser,
-      @PathVariable UUID uuid,
-      @RequestBody byte[] bytes,
-      @RequestHeader HttpHeaders httpHeaders) {
-
-    var attachment =
-        attachmentService.attachFileToDocumentationUnit(
-            uuid, ByteBuffer.wrap(bytes), httpHeaders, userService.getUser(oidcUser));
-    try {
-      var attachment2Html = converterService.getConvertedObject(attachment.s3path());
-      initializeCoreDataAndCheckDuplicates(uuid, attachment2Html, userService.getUser(oidcUser));
-      return ResponseEntity.status(HttpStatus.OK).body(attachment2Html);
-
-    } catch (Exception e) {
-      attachmentService.deleteByFileId(attachment.id(), uuid, userService.getUser(oidcUser));
-      return ResponseEntity.unprocessableContent().build();
     }
   }
 

@@ -347,7 +347,7 @@ public class S3AttachmentService implements AttachmentService {
 
     setLastUpdated(user, documentationUnit);
     documentationUnitHistoryLogService.saveHistoryLog(
-        documentationUnitId, user, HistoryLogEventType.FILES, "Word-Dokument hinzugefügt");
+        documentationUnitId, user, HistoryLogEventType.FILES, "Anhang " + fileName + "hinzugefügt");
 
     return attachment;
   }
