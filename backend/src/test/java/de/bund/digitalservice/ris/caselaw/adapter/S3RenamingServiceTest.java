@@ -73,12 +73,12 @@ class S3RenamingServiceTest {
     ArgumentCaptor<AttachmentDTO> attachmentCaptor = ArgumentCaptor.forClass(AttachmentDTO.class);
 
     verify(s3Client).copyObject(copyCaptor.capture());
-    assertThat(copyCaptor.getAllValues().size()).isEqualTo(1);
+    assertThat(copyCaptor.getAllValues()).hasSize(1);
     assertThat(copyCaptor.getValue().sourceKey()).isEqualTo(attachmentId.toString());
     assertThat(copyCaptor.getValue().destinationKey())
         .isEqualTo("XXRE123456789/" + attachmentId + ".docx");
     verify(s3Client).deleteObject(deleteCaptor.capture());
-    assertThat(deleteCaptor.getAllValues().size()).isEqualTo(1);
+    assertThat(deleteCaptor.getAllValues()).hasSize(1);
     assertThat(deleteCaptor.getValue().key()).isEqualTo(attachmentId.toString());
     verify(attachmentRepository).save(attachmentCaptor.capture());
     assertThat(attachmentCaptor.getValue().getS3ObjectPath())
@@ -293,14 +293,14 @@ class S3RenamingServiceTest {
         ArgumentCaptor.forClass(DeleteObjectRequest.class);
 
     verify(s3Client).copyObject(copyCaptor.capture());
-    assertThat(copyCaptor.getAllValues().size()).isEqualTo(1);
+    assertThat(copyCaptor.getAllValues()).hasSize(1);
     assertThat(copyCaptor.getValue().sourceKey()).isEqualTo("some-id");
     assertThat(copyCaptor.getValue().destinationKey()).isEqualTo("unreferenced/some-id.docx");
     verify(s3Client).deleteObject(deleteCaptor.capture());
-    assertThat(deleteCaptor.getAllValues().size()).isEqualTo(1);
+    assertThat(deleteCaptor.getAllValues()).hasSize(1);
     assertThat(deleteCaptor.getValue().key()).isEqualTo("some-id");
 
-    assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(0);
+    assertThat(memoryAppender.count(Level.ERROR)).isZero();
     assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1);
     assertThat(memoryAppender.getMessage(Level.INFO, 0))
         .isEqualTo("Moved unreferenced attachment from 'some-id' to 'unreferenced/some-id.docx'");
@@ -340,7 +340,7 @@ class S3RenamingServiceTest {
             new KeyValuePair("new object path", "unreferenced/some-other-id.docx"));
 
     verify(s3Client, times(2)).copyObject(copyCaptor.capture());
-    ;
+
     assertThat(copyCaptor.getAllValues().get(1).sourceKey()).isEqualTo("some-id");
     assertThat(copyCaptor.getAllValues().get(1).destinationKey())
         .isEqualTo("unreferenced/some-id.docx");
@@ -378,7 +378,7 @@ class S3RenamingServiceTest {
             new KeyValuePair("new object path", "unreferenced/some-other-id.docx"));
 
     verify(s3Client, times(2)).copyObject(copyCaptor.capture());
-    ;
+
     assertThat(copyCaptor.getAllValues().get(1).sourceKey()).isEqualTo("some-id");
     assertThat(copyCaptor.getAllValues().get(1).destinationKey())
         .isEqualTo("unreferenced/some-id.docx");

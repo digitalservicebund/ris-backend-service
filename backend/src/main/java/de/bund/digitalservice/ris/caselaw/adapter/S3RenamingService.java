@@ -23,6 +23,11 @@ public class S3RenamingService {
   private final AttachmentRepository attachmentRepository;
   private final S3Client s3Client;
 
+  private final String ID = "id";
+  private final String DOC_NUMBER = "documentnumber";
+  private final String OLD_PATH = "old object path";
+  private final String NEW_PATH = "new object path";
+
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
 
@@ -72,10 +77,10 @@ public class S3RenamingService {
             log.atError()
                 .setMessage("Error while copying attachment to new name")
                 .setCause(e)
-                .addKeyValue("id", attachment.getId())
-                .addKeyValue("documentNumber", documentNumber)
-                .addKeyValue("old object path", oldObjectPath)
-                .addKeyValue("new object path", newObjectPath)
+                .addKeyValue(ID, attachment.getId())
+                .addKeyValue(DOC_NUMBER, documentNumber)
+                .addKeyValue(OLD_PATH, oldObjectPath)
+                .addKeyValue(NEW_PATH, newObjectPath)
                 .log();
             return;
           }
@@ -89,10 +94,10 @@ public class S3RenamingService {
                 .setMessage(
                     "Error while deleting attachment at old location (it was already copied successfully)")
                 .setCause(e)
-                .addKeyValue("id", attachment.getId())
-                .addKeyValue("documentNumber", documentNumber)
-                .addKeyValue("old object path", oldObjectPath)
-                .addKeyValue("new object path", newObjectPath)
+                .addKeyValue(ID, attachment.getId())
+                .addKeyValue(DOC_NUMBER, documentNumber)
+                .addKeyValue(OLD_PATH, oldObjectPath)
+                .addKeyValue(NEW_PATH, newObjectPath)
                 .log();
             return;
           }
@@ -105,10 +110,10 @@ public class S3RenamingService {
             log.atError()
                 .setMessage("Error while while updating s3ObjectPath for moved attachment")
                 .setCause(e)
-                .addKeyValue("id", attachment.getId())
-                .addKeyValue("documentNumber", documentNumber)
-                .addKeyValue("old object path", oldObjectPath)
-                .addKeyValue("new object path", newObjectPath)
+                .addKeyValue(ID, attachment.getId())
+                .addKeyValue(DOC_NUMBER, documentNumber)
+                .addKeyValue(OLD_PATH, oldObjectPath)
+                .addKeyValue(NEW_PATH, newObjectPath)
                 .log();
             return;
           }
@@ -118,10 +123,10 @@ public class S3RenamingService {
                   String.format(
                       "Moved attachment for '%s' from '%s' to '%s'",
                       documentNumber, oldObjectPath, newObjectPath))
-              .addKeyValue("id", attachment.getId())
-              .addKeyValue("documentNumber", documentNumber)
-              .addKeyValue("old object path", oldObjectPath)
-              .addKeyValue("new object path", newObjectPath)
+              .addKeyValue(ID, attachment.getId())
+              .addKeyValue(DOC_NUMBER, documentNumber)
+              .addKeyValue(OLD_PATH, oldObjectPath)
+              .addKeyValue(NEW_PATH, newObjectPath)
               .log();
         });
   }
@@ -153,8 +158,8 @@ public class S3RenamingService {
                 log.atError()
                     .setMessage("Error while copying attachment to unreferenced prefix")
                     .setCause(e)
-                    .addKeyValue("old object path", oldObjectPath)
-                    .addKeyValue("new object path", newObjectPath)
+                    .addKeyValue(OLD_PATH, oldObjectPath)
+                    .addKeyValue(NEW_PATH, newObjectPath)
                     .log();
                 return;
               }
@@ -167,8 +172,8 @@ public class S3RenamingService {
                     .setMessage(
                         "Error deleting attachment from old location (it was already moved to unreferenced)")
                     .setCause(e)
-                    .addKeyValue("old object path", oldObjectPath)
-                    .addKeyValue("new object path", newObjectPath)
+                    .addKeyValue(OLD_PATH, oldObjectPath)
+                    .addKeyValue(NEW_PATH, newObjectPath)
                     .log();
                 return;
               }
