@@ -340,7 +340,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@0567fa5ae8c9a197cb207537dc5cbb43ca3d803f
+        uses: docker/login-action@3227f5311cb93ffd14d13e65d8cc400d30f4dd8a
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -388,7 +388,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@0567fa5ae8c9a197cb207537dc5cbb43ca3d803f
+        uses: docker/login-action@3227f5311cb93ffd14d13e65d8cc400d30f4dd8a
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
