@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
@@ -312,7 +313,7 @@ class PendingProceedingTransformerTest {
     PendingProceedingDTO currentDto =
         PendingProceedingDTO.builder()
             .caselawReferences(
-                List.of(CaselawReferenceDTO.builder().id(uuid).documentationUnitRank(3).build()))
+                List.of(ReferenceDTO.builder().id(uuid).documentationUnitRank(3).build()))
             .build();
 
     var updatedReferences =
@@ -331,28 +332,6 @@ class PendingProceedingTransformerTest {
     assertThat(resultDto.getCaselawReferences()).hasSize(1);
     assertThat(resultDto.getCaselawReferences().getFirst().getDocumentationUnitRank()).isOne();
     assertThat(resultDto.getCaselawReferences().getFirst().getId()).isEqualTo(uuid);
-  }
-
-  @Test
-  void testTransformToDTO_withLiteratureReferences() {
-    var uuid = UUID.randomUUID();
-    PendingProceedingDTO currentDto =
-        PendingProceedingDTO.builder()
-            .literatureReferences(
-                List.of(LiteratureReferenceDTO.builder().id(uuid).documentationUnitRank(3).build()))
-            .build();
-
-    var updatedReferences =
-        List.of(Reference.builder().id(uuid).referenceType(ReferenceType.LITERATURE).build());
-    PendingProceeding pendingProceeding =
-        PendingProceeding.builder().literatureReferences(updatedReferences).build();
-
-    PendingProceedingDTO resultDto =
-        PendingProceedingTransformer.transformToDTO(currentDto, pendingProceeding);
-
-    assertThat(resultDto.getLiteratureReferences()).hasSize(1);
-    assertThat(resultDto.getLiteratureReferences().getFirst().getDocumentationUnitRank()).isOne();
-    assertThat(resultDto.getLiteratureReferences().getFirst().getId()).isEqualTo(uuid);
   }
 
   @Test

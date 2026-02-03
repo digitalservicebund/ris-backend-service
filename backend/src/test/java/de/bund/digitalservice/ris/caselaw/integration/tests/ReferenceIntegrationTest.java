@@ -9,12 +9,15 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabasePassiveCitationUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseReferenceRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationUliDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -43,6 +46,7 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseDocumentTypeRepository documentTypeRepository;
   @Autowired private LegalPeriodicalEditionRepository editionRepository;
   @Autowired private DatabaseReferenceRepository referenceRepository;
+  @Autowired private DatabasePassiveCitationUliRepository passiveCitationUliRepository;
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;
@@ -196,7 +200,7 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
             dto.toBuilder()
                 .caselawReferences(
                     List.of(
-                        CaselawReferenceDTO.builder()
+                        ReferenceDTO.builder()
                             .documentationUnitRank(1)
                             .documentationUnit(dto)
                             .citation("2024, S.3")
@@ -206,18 +210,18 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
                                     .id(bverwgeLegalPeriodical.uuid())
                                     .build())
                             .build()))
-                .literatureReferences(
+                .passiveUliCitations(
                     List.of(
-                        LiteratureReferenceDTO.builder()
-                            .documentationUnitRank(1)
-                            .documentationUnit(dto)
-                            .citation("2024, S.3")
-                            .author("Curie, Marie")
-                            .legalPeriodicalRawValue("BVerwGE")
-                            .documentTypeRawValue("Ean")
-                            .documentType(
+                        PassiveCitationUliDTO.builder()
+                            .rank(1)
+                            .target(dto)
+                            .sourceCitation("2024, S.3")
+                            .sourceAuthor("Curie, Marie")
+                            .sourceLegalPeriodicalRawValue("BVerwGE")
+                            .sourceDocumentTypeRawValue("Ean")
+                            .sourceDocumentType(
                                 DocumentTypeDTO.builder().id(eanDocumentType.uuid()).build())
-                            .legalPeriodical(
+                            .sourceLegalPeriodical(
                                 LegalPeriodicalDTO.builder()
                                     .id(bverwgeLegalPeriodical.uuid())
                                     .build())
@@ -225,7 +229,7 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
                 .build());
 
     UUID caselawReferenceId = savedDocUnitDto.getCaselawReferences().getFirst().getId();
-    UUID literatureReferenceId = savedDocUnitDto.getLiteratureReferences().getFirst().getId();
+    UUID literatureReferenceId = savedDocUnitDto.getPassiveUliCitations().getFirst().getId();
 
     Decision decisionFromFrontend =
         Decision.builder()
@@ -251,7 +255,7 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
             });
 
     assertThat(referenceRepository.findById(caselawReferenceId)).isEmpty();
-    // Todo: check passive uli citations for literatureReferences to be empty
+    assertThat(passiveCitationUliRepository.findById(literatureReferenceId)).isEmpty();
   }
 
   @Test

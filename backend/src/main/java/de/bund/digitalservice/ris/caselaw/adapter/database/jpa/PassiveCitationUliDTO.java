@@ -19,6 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.UuidGenerator;
 import org.jspecify.annotations.Nullable;
 
 @Getter
@@ -32,7 +33,7 @@ import org.jspecify.annotations.Nullable;
 @Table(name = "passive_citation_uli", schema = "incremental_migration")
 public class PassiveCitationUliDTO {
 
-  @Id @GeneratedValue @EqualsAndHashCode.Exclude private UUID id;
+  @Id @GeneratedValue @UuidGenerator @EqualsAndHashCode.Exclude private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "target_id", nullable = false)

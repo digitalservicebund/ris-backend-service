@@ -87,12 +87,6 @@ public class LegalPeriodicalEditionTransformer {
         .name(legalPeriodicalEdition.name())
         .prefix(legalPeriodicalEdition.prefix())
         .suffix(legalPeriodicalEdition.suffix())
-        .references(
-            legalPeriodicalEdition.references() == null
-                ? new ArrayList<>()
-                : legalPeriodicalEdition.references().stream()
-                    .map(ReferenceTransformer::transformToDTO)
-                    .toList())
         .build();
   }
 }
