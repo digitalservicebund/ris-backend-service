@@ -2,8 +2,9 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
-import jakarta.transaction.Transactional;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,6 +23,7 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 public class S3RenamingService {
   private final AttachmentRepository attachmentRepository;
   private final S3Client s3Client;
+  private final AttachmentService attachmentService;
 
   private static final String ID = "id";
   private static final String DOC_NUMBER = "document number";
@@ -32,9 +34,12 @@ public class S3RenamingService {
   private String bucketName;
 
   public S3RenamingService(
-      AttachmentRepository attachmentRepository, @Qualifier("docxS3Client") S3Client s3Client) {
+      AttachmentRepository attachmentRepository,
+      @Qualifier("docxS3Client") S3Client s3Client,
+      AttachmentService attachmentService) {
     this.attachmentRepository = attachmentRepository;
     this.s3Client = s3Client;
+    this.attachmentService = attachmentService;
   }
 
   /**
@@ -43,7 +48,6 @@ public class S3RenamingService {
    */
   @Scheduled(cron = "-", zone = "Europe/Berlin")
   @SchedulerLock(name = "adjust-s3-paths", lockAtMostFor = "PT12H")
-  @Transactional
   public void moveExistingFilesToNewPaths() {
     List<AttachmentDTO> attachmentsToMove =
         attachmentRepository.findAll().stream()
@@ -86,14 +90,23 @@ public class S3RenamingService {
           }
 
           try {
-            // delete file at the old location
-            s3Client.deleteObject(
-                DeleteObjectRequest.builder().bucket(bucketName).key(oldObjectPath).build());
+            attachment.setS3ObjectPath(newObjectPath);
+            attachmentService.saveAttachment(attachment);
           } catch (Exception e) {
             log.atError()
                 .setMessage(
-                    "Error while deleting attachment at old location (it was already copied successfully)")
+                    "Error while updating s3ObjectPath for moved attachment, trying to delete new file")
                 .setCause(e)
+                .addKeyValue(ID, attachment.getId())
+                .addKeyValue(DOC_NUMBER, documentNumber)
+                .addKeyValue(OLD_PATH, oldObjectPath)
+                .addKeyValue(NEW_PATH, newObjectPath)
+                .log();
+            // roll back s3 change
+            s3Client.deleteObject(
+                DeleteObjectRequest.builder().bucket(bucketName).key(newObjectPath).build());
+            log.atInfo()
+                .setMessage("Deleted new file after failed update of s3ObjectPath")
                 .addKeyValue(ID, attachment.getId())
                 .addKeyValue(DOC_NUMBER, documentNumber)
                 .addKeyValue(OLD_PATH, oldObjectPath)
@@ -103,12 +116,13 @@ public class S3RenamingService {
           }
 
           try {
-            // update dto object path
-            attachment.setS3ObjectPath(newObjectPath);
-            attachmentRepository.save(attachment);
+            // delete file at the old location
+            s3Client.deleteObject(
+                DeleteObjectRequest.builder().bucket(bucketName).key(oldObjectPath).build());
           } catch (Exception e) {
             log.atError()
-                .setMessage("Error while updating s3ObjectPath for moved attachment")
+                .setMessage(
+                    "Error while deleting attachment at old location (it was already copied successfully)")
                 .setCause(e)
                 .addKeyValue(ID, attachment.getId())
                 .addKeyValue(DOC_NUMBER, documentNumber)
@@ -145,6 +159,15 @@ public class S3RenamingService {
         .filter(it -> !it.contains("/"))
         .forEach(
             oldObjectPath -> {
+              Optional<AttachmentDTO> existing =
+                  attachmentRepository.findByS3ObjectPath(oldObjectPath);
+              if (existing.isPresent()) {
+                log.atInfo()
+                    .setMessage("Attachment with matching object path exists in database, skipping")
+                    .addKeyValue(OLD_PATH, oldObjectPath)
+                    .log();
+                return;
+              }
               String newObjectPath = String.format("unreferenced/%s.docx", oldObjectPath);
               try {
                 s3Client.copyObject(

@@ -509,4 +509,10 @@ public class S3AttachmentService implements AttachmentService {
           DocumentationOfficeTransformer.transformToDTO(user.documentationOffice()));
     }
   }
+
+  @Override
+  @Transactional
+  public void saveAttachment(AttachmentDTO attachmentDTO) {
+    repository.save(attachmentDTO);
+  }
 }

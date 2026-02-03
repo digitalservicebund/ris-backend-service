@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,12 +37,13 @@ class S3RenamingServiceTest {
 
   @MockitoBean private AttachmentRepository attachmentRepository;
   @MockitoBean private S3Client s3Client;
+  @MockitoBean private AttachmentService attachmentService;
 
   private S3RenamingService subject;
 
   @BeforeEach
   void setUp() {
-    subject = new S3RenamingService(attachmentRepository, s3Client);
+    subject = new S3RenamingService(attachmentRepository, s3Client, attachmentService);
   }
 
   @Test
@@ -80,7 +83,7 @@ class S3RenamingServiceTest {
     verify(s3Client).deleteObject(deleteCaptor.capture());
     assertThat(deleteCaptor.getAllValues()).hasSize(1);
     assertThat(deleteCaptor.getValue().key()).isEqualTo(attachmentId.toString());
-    verify(attachmentRepository).save(attachmentCaptor.capture());
+    verify(attachmentService).saveAttachment(attachmentCaptor.capture());
     assertThat(attachmentCaptor.getValue().getS3ObjectPath())
         .isEqualTo("XXRE123456789/" + attachmentId + ".docx");
 
@@ -137,8 +140,8 @@ class S3RenamingServiceTest {
     assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1);
     assertThat(memoryAppender.getMessage(Level.ERROR, 0))
         .isEqualTo("Error while copying attachment to new name");
-    List<KeyValuePair> infoKVPairs = memoryAppender.getKeyValuePairs(Level.ERROR, 0);
-    assertThat(infoKVPairs)
+    List<KeyValuePair> errorKVPairs = memoryAppender.getKeyValuePairs(Level.ERROR, 0);
+    assertThat(errorKVPairs)
         .containsExactlyInAnyOrder(
             new KeyValuePair("id", attachmentId1),
             new KeyValuePair("document number", "XXRE111111111"),
@@ -156,7 +159,7 @@ class S3RenamingServiceTest {
         .isEqualTo("XXRE123456789/" + attachmentId2 + ".docx");
     verify(s3Client).deleteObject(deleteCaptor.capture());
     assertThat(deleteCaptor.getValue().key()).isEqualTo(attachmentId2.toString());
-    verify(attachmentRepository).save(attachmentCaptor.capture());
+    verify(attachmentService).saveAttachment(attachmentCaptor.capture());
     assertThat(attachmentCaptor.getValue().getS3ObjectPath())
         .isEqualTo("XXRE123456789/" + attachmentId2 + ".docx");
   }
@@ -195,8 +198,8 @@ class S3RenamingServiceTest {
     assertThat(memoryAppender.getMessage(Level.ERROR, 0))
         .isEqualTo(
             "Error while deleting attachment at old location (it was already copied successfully)");
-    List<KeyValuePair> infoKVPairs = memoryAppender.getKeyValuePairs(Level.ERROR, 0);
-    assertThat(infoKVPairs)
+    List<KeyValuePair> errorKVPairs = memoryAppender.getKeyValuePairs(Level.ERROR, 0);
+    assertThat(errorKVPairs)
         .containsExactlyInAnyOrder(
             new KeyValuePair("id", attachmentId1),
             new KeyValuePair("document number", "XXRE111111111"),
@@ -214,8 +217,8 @@ class S3RenamingServiceTest {
         .isEqualTo("XXRE123456789/" + attachmentId2 + ".docx");
     verify(s3Client, times(2)).deleteObject(deleteCaptor.capture());
     assertThat(deleteCaptor.getAllValues().get(1).key()).isEqualTo(attachmentId2.toString());
-    verify(attachmentRepository).save(attachmentCaptor.capture());
-    assertThat(attachmentCaptor.getValue().getS3ObjectPath())
+    verify(attachmentService, times(2)).saveAttachment(attachmentCaptor.capture());
+    assertThat(attachmentCaptor.getAllValues().get(1).getS3ObjectPath())
         .isEqualTo("XXRE123456789/" + attachmentId2 + ".docx");
   }
 
@@ -241,19 +244,24 @@ class S3RenamingServiceTest {
                         DecisionDTO.builder().documentNumber("XXRE123456789").build())
                     .build()));
 
-    when(attachmentRepository.save(any(AttachmentDTO.class)))
-        .thenThrow(RuntimeException.class)
-        .thenReturn(AttachmentDTO.builder().build());
+    doThrow(RuntimeException.class)
+        .doNothing()
+        .when(attachmentService)
+        .saveAttachment(any(AttachmentDTO.class));
+
     TestMemoryAppender memoryAppender = new TestMemoryAppender(S3RenamingService.class);
 
     subject.moveExistingFilesToNewPaths();
 
     assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(1);
-    assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1);
+    assertThat(memoryAppender.count(Level.INFO)).isEqualTo(2);
     assertThat(memoryAppender.getMessage(Level.ERROR, 0))
-        .isEqualTo("Error while while updating s3ObjectPath for moved attachment");
-    List<KeyValuePair> infoKVPairs = memoryAppender.getKeyValuePairs(Level.ERROR, 0);
-    assertThat(infoKVPairs)
+        .isEqualTo(
+            "Error while updating s3ObjectPath for moved attachment, trying to delete new file");
+    assertThat(memoryAppender.getMessage(Level.INFO, 0))
+        .isEqualTo("Deleted new file after failed update of s3ObjectPath");
+    List<KeyValuePair> errorKVPairs = memoryAppender.getKeyValuePairs(Level.ERROR, 0);
+    assertThat(errorKVPairs)
         .containsExactlyInAnyOrder(
             new KeyValuePair("id", attachmentId1),
             new KeyValuePair("document number", "XXRE111111111"),
@@ -271,7 +279,7 @@ class S3RenamingServiceTest {
         .isEqualTo("XXRE123456789/" + attachmentId2 + ".docx");
     verify(s3Client, times(2)).deleteObject(deleteCaptor.capture());
     assertThat(deleteCaptor.getAllValues().get(1).key()).isEqualTo(attachmentId2.toString());
-    verify(attachmentRepository, times(2)).save(attachmentCaptor.capture());
+    verify(attachmentService, times(2)).saveAttachment(attachmentCaptor.capture());
     assertThat(attachmentCaptor.getAllValues().get(1).getS3ObjectPath())
         .isEqualTo("XXRE123456789/" + attachmentId2 + ".docx");
   }
@@ -333,8 +341,8 @@ class S3RenamingServiceTest {
     assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1);
     assertThat(memoryAppender.getMessage(Level.ERROR, 0))
         .isEqualTo("Error while copying attachment to unreferenced prefix");
-    List<KeyValuePair> infoKVPairs = memoryAppender.getKeyValuePairs(Level.ERROR, 0);
-    assertThat(infoKVPairs)
+    List<KeyValuePair> errorKVPairs = memoryAppender.getKeyValuePairs(Level.ERROR, 0);
+    assertThat(errorKVPairs)
         .containsExactlyInAnyOrder(
             new KeyValuePair("old object path", "some-other-id"),
             new KeyValuePair("new object path", "unreferenced/some-other-id.docx"));
@@ -371,8 +379,8 @@ class S3RenamingServiceTest {
     assertThat(memoryAppender.getMessage(Level.ERROR, 0))
         .isEqualTo(
             "Error deleting attachment from old location (it was already moved to unreferenced)");
-    List<KeyValuePair> infoKVPairs = memoryAppender.getKeyValuePairs(Level.ERROR, 0);
-    assertThat(infoKVPairs)
+    List<KeyValuePair> errorKVPairs = memoryAppender.getKeyValuePairs(Level.ERROR, 0);
+    assertThat(errorKVPairs)
         .containsExactlyInAnyOrder(
             new KeyValuePair("old object path", "some-other-id"),
             new KeyValuePair("new object path", "unreferenced/some-other-id.docx"));

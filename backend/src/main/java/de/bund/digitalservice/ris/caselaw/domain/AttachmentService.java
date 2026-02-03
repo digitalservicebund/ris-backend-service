@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Optional;
@@ -24,4 +25,6 @@ public interface AttachmentService {
   Optional<Image> findByDocumentationUnitIdAndFileName(UUID documentationUnitId, String imageName);
 
   StreamedFileResponse getFileStream(UUID documentationUnitId, UUID fileId);
+
+  void saveAttachment(AttachmentDTO attachmentDTO);
 }
