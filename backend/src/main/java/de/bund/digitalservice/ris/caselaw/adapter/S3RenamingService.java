@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
-import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +22,7 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 public class S3RenamingService {
   private final AttachmentRepository attachmentRepository;
   private final S3Client s3Client;
-  private final AttachmentService attachmentService;
+  private final TempAttachmentService attachmentService;
 
   private static final String ID = "id";
   private static final String DOC_NUMBER = "document number";
@@ -36,7 +35,7 @@ public class S3RenamingService {
   public S3RenamingService(
       AttachmentRepository attachmentRepository,
       @Qualifier("docxS3Client") S3Client s3Client,
-      AttachmentService attachmentService) {
+      TempAttachmentService attachmentService) {
     this.attachmentRepository = attachmentRepository;
     this.s3Client = s3Client;
     this.attachmentService = attachmentService;

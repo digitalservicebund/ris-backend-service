@@ -12,7 +12,6 @@ import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
-import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +36,7 @@ class S3RenamingServiceTest {
 
   @MockitoBean private AttachmentRepository attachmentRepository;
   @MockitoBean private S3Client s3Client;
-  @MockitoBean private AttachmentService attachmentService;
+  @MockitoBean private TempAttachmentService attachmentService;
 
   private S3RenamingService subject;
 
