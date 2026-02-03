@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.AttachmentTransfor
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentInline;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
@@ -94,13 +95,8 @@ public class S3AttachmentService implements AttachmentService {
     this.documentationUnitHistoryLogService = documentationUnitHistoryLogService;
   }
 
-  public Attachment attachFileToDocumentationUnit(
+  public AttachmentInline attachImageFileToDocumentationUnit(
       UUID documentationUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders, User user) {
-    String fileName =
-        httpHeaders.containsHeader("X-Filename")
-            ? httpHeaders.getFirst("X-Filename")
-            : "Kein Dateiname gefunden";
-
     DocumentationUnitDTO documentationUnit =
         documentationUnitRepository.findById(documentationUnitId).orElseThrow();
 
@@ -111,10 +107,7 @@ public class S3AttachmentService implements AttachmentService {
           HttpStatus.BAD_REQUEST, "Missing / invalid Content-Type header");
     }
 
-    if (equalsMediaType(wordMediaType, contentType)) {
-      return attachDocx(
-          documentationUnitId, byteBuffer, httpHeaders, user, documentationUnit, fileName);
-    } else if (ImageUtil.getSupportedMediaTypes().stream()
+    if (ImageUtil.getSupportedMediaTypes().stream()
         .anyMatch(type -> equalsMediaType(type, contentType))) {
 
       return attachImage(byteBuffer, contentType, documentationUnit);
@@ -297,7 +290,7 @@ public class S3AttachmentService implements AttachmentService {
     }
   }
 
-  private Attachment attachImage(
+  private AttachmentInline attachImage(
       ByteBuffer byteBuffer, MediaType contentType, DocumentationUnitDTO documentationUnit) {
 
     AttachmentInlineDTO attachmentInlineDTO =

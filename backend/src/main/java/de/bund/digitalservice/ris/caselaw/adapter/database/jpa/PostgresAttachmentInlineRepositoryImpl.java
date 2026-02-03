@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.AttachmentInlineTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentInline;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentInlineRepository;
 import java.util.List;
 import java.util.Optional;
@@ -17,14 +17,14 @@ public class PostgresAttachmentInlineRepositoryImpl implements AttachmentInlineR
   }
 
   @Override
-  public List<Attachment> findAllByDocumentationUnitId(UUID documentationUnitId) {
+  public List<AttachmentInline> findAllByDocumentationUnitId(UUID documentationUnitId) {
     return repository.findAllByDocumentationUnitId(documentationUnitId).stream()
         .map(AttachmentInlineTransformer::transformToDomain)
         .toList();
   }
 
   @Override
-  public Optional<Attachment> findByDocumentationUnitIdAndFilename(
+  public Optional<AttachmentInline> findByDocumentationUnitIdAndFilename(
       UUID documentationUnitId, String fileName) {
     return repository
         .findByDocumentationUnitIdAndFilename(documentationUnitId, fileName)

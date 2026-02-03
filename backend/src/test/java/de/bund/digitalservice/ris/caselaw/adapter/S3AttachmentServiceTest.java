@@ -55,7 +55,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.server.ResponseStatusException;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.exception.SdkException;
@@ -71,7 +70,6 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
-import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.UploadPartRequest;
 import software.amazon.awssdk.services.s3.model.UploadPartResponse;
 
@@ -124,37 +122,6 @@ class S3AttachmentServiceTest {
   @Nested
   class DocxTest {
     @Test
-    void testAttachFileToDocumentationUnit() {
-      var byteBuffer = ByteBuffer.wrap(new byte[] {});
-      var headerMap = new LinkedMultiValueMap<String, String>();
-      headerMap.put("Content-Type", List.of(DOCX_MEDIA_TYPE));
-      headerMap.put("X-Filename", List.of("testfile.docx"));
-      var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
-      doNothing().when(service).checkDocx(any(ByteBuffer.class));
-
-      service.attachFileToDocumentationUnit(
-          documentationUnitDTO.getId(), byteBuffer, httpHeaders, User.builder().build());
-
-      // s3 interaction
-      var putObjectRequestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
-      var requestBodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
-      verify(s3Client).putObject(putObjectRequestCaptor.capture(), requestBodyCaptor.capture());
-      assertEquals("testBucket", putObjectRequestCaptor.getValue().bucket());
-      assertEquals(DOCX_MEDIA_TYPE, putObjectRequestCaptor.getValue().contentType());
-      var value = requestBodyCaptor.getValue();
-      var expected = RequestBody.fromByteBuffer(ByteBuffer.wrap(new byte[] {}));
-      assertEquals(
-          expected.optionalContentLength().orElse(0L), value.optionalContentLength().orElse(0L));
-      assertEquals(expected.contentType(), value.contentType());
-
-      // repo interaction
-      var attachmentDtoCaptor = ArgumentCaptor.forClass(AttachmentDTO.class);
-      verify(repository, times(2)).save(attachmentDtoCaptor.capture());
-      assertEquals("testfile.docx", attachmentDtoCaptor.getValue().getFilename());
-      assertEquals("docx", attachmentDtoCaptor.getValue().getFormat());
-    }
-
-    @Test
     void testCheckDocx_withValidDocument() {
       ByteBuffer byteBuffer = buildBuffer("word/document.xml");
       assertDoesNotThrow(() -> service.checkDocx(byteBuffer));
@@ -176,22 +143,6 @@ class S3AttachmentServiceTest {
 
       assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
     }
-  }
-
-  @Test
-  void testAttachFileToDocumentationUnit_withoutFileName() {
-    var byteBuffer = ByteBuffer.wrap(new byte[] {});
-    var headerMap = new LinkedMultiValueMap<String, String>();
-    headerMap.put("Content-Type", List.of(DOCX_MEDIA_TYPE));
-    var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
-    doNothing().when(service).checkDocx(any(ByteBuffer.class));
-
-    service.attachFileToDocumentationUnit(
-        documentationUnitDTO.getId(), byteBuffer, httpHeaders, User.builder().build());
-
-    var attachmentDtoCaptor = ArgumentCaptor.forClass(AttachmentDTO.class);
-    verify(repository, times(2)).save(attachmentDtoCaptor.capture());
-    assertEquals("Kein Dateiname gefunden", attachmentDtoCaptor.getValue().getFilename());
   }
 
   @Test
@@ -276,29 +227,6 @@ class S3AttachmentServiceTest {
     assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
   }
 
-  @Test
-  void testGenerateNewDocumentationUnitAndAttachFile_withExceptionFromBucket() throws S3Exception {
-    var byteBuffer = ByteBuffer.wrap(new byte[] {});
-    var headerMap = new LinkedMultiValueMap<String, String>();
-    headerMap.put("Content-Type", List.of(DOCX_MEDIA_TYPE));
-
-    var headers = HttpHeaders.readOnlyHttpHeaders(headerMap);
-    var user = User.builder().build();
-    var documentationUnitDTOId = documentationUnitDTO.getId();
-
-    doNothing().when(service).checkDocx(any(ByteBuffer.class));
-    when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
-        .thenThrow(SdkException.create("exception", null));
-
-    assertThrows(
-        SdkException.class,
-        () ->
-            service.attachFileToDocumentationUnit(
-                documentationUnitDTOId, byteBuffer, headers, user));
-
-    verify(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
-  }
-
   @Nested
   class ImageTest {
 
@@ -314,7 +242,7 @@ class S3AttachmentServiceTest {
           assertThrows(
               ResponseStatusException.class,
               () ->
-                  service.attachFileToDocumentationUnit(
+                  service.attachImageFileToDocumentationUnit(
                       documentationUnitDTOId, byteBuffer, headers, user));
 
       assertEquals("Only images and docx are supported", exception.getReason());
@@ -345,7 +273,7 @@ class S3AttachmentServiceTest {
 
       // Run
       var result =
-          service.attachFileToDocumentationUnit(
+          service.attachImageFileToDocumentationUnit(
               documentationUnitDTO.getId(), byteBuffer, headers, User.builder().build());
 
       verify(attachmentInlineRepository, times(2)).save(any()); // initial + filename update

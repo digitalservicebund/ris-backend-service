@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.springframework.http.HttpHeaders;
 
 public interface AttachmentService {
-  Attachment attachFileToDocumentationUnit(
+  AttachmentInline attachImageFileToDocumentationUnit(
       UUID documentationUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders, User user);
 
   Attachment streamFileToDocumentationUnit(

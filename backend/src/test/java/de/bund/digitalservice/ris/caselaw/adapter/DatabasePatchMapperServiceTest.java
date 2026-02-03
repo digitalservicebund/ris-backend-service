@@ -18,7 +18,7 @@ import com.gravity9.jsonpatch.PathValueOperation;
 import com.gravity9.jsonpatch.RemoveOperation;
 import com.gravity9.jsonpatch.ReplaceOperation;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitPatchRepository;
-import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentInline;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -74,10 +74,10 @@ class DatabasePatchMapperServiceTest {
     DocumentationUnit docUnit =
         Decision.builder().uuid(UUID.randomUUID()).documentNumber("YYTestDoc0001").build();
 
-    Attachment attachment =
-        Attachment.builder().name("2e7e7908-faa3-4aca-a0ff-4bfa4dcf316a.png").build();
+    AttachmentInline attachment =
+        AttachmentInline.builder().name("2e7e7908-faa3-4aca-a0ff-4bfa4dcf316a.png").build();
 
-    when(attachmentService.attachFileToDocumentationUnit(
+    when(attachmentService.attachImageFileToDocumentationUnit(
             any(), any(ByteBuffer.class), any(HttpHeaders.class), any()))
         .thenReturn(attachment);
 
@@ -107,10 +107,10 @@ class DatabasePatchMapperServiceTest {
     DocumentationUnit docUnit =
         Decision.builder().uuid(UUID.randomUUID()).documentNumber("YYTestDoc0001").build();
 
-    Attachment attachment =
-        Attachment.builder().name("2e7e7908-faa3-4aca-a0ff-4bfa4dcf316a.png").build();
+    AttachmentInline attachment =
+        AttachmentInline.builder().name("2e7e7908-faa3-4aca-a0ff-4bfa4dcf316a.png").build();
 
-    when(attachmentService.attachFileToDocumentationUnit(
+    when(attachmentService.attachImageFileToDocumentationUnit(
             any(), any(ByteBuffer.class), any(HttpHeaders.class), any()))
         .thenReturn(attachment);
 
@@ -195,8 +195,8 @@ class DatabasePatchMapperServiceTest {
     DocumentationUnit docUnit =
         Decision.builder().uuid(UUID.randomUUID()).documentNumber("YYMultipleImagesDoc").build();
 
-    Attachment attachment = Attachment.builder().name("testfile.png").build();
-    when(attachmentService.attachFileToDocumentationUnit(
+    AttachmentInline attachment = AttachmentInline.builder().name("testfile.png").build();
+    when(attachmentService.attachImageFileToDocumentationUnit(
             any(), any(ByteBuffer.class), any(HttpHeaders.class), any()))
         .thenReturn(attachment);
 
@@ -222,9 +222,9 @@ class DatabasePatchMapperServiceTest {
     DocumentationUnit docUnit =
         Decision.builder().uuid(UUID.randomUUID()).documentNumber("YYAddOpDoc").build();
 
-    Attachment attachment = Attachment.builder().name("testaddop.png").build();
+    AttachmentInline attachment = AttachmentInline.builder().name("testaddop.png").build();
 
-    when(attachmentService.attachFileToDocumentationUnit(
+    when(attachmentService.attachImageFileToDocumentationUnit(
             any(), any(ByteBuffer.class), any(HttpHeaders.class), any()))
         .thenReturn(attachment);
 
@@ -258,7 +258,8 @@ class DatabasePatchMapperServiceTest {
     JsonPatchOperation op = result.getOperations().get(0);
     assertThat(op).isInstanceOf(RemoveOperation.class);
     verify(attachmentService, never())
-        .attachFileToDocumentationUnit(any(), any(ByteBuffer.class), any(HttpHeaders.class), any());
+        .attachImageFileToDocumentationUnit(
+            any(), any(ByteBuffer.class), any(HttpHeaders.class), any());
   }
 
   @Test
