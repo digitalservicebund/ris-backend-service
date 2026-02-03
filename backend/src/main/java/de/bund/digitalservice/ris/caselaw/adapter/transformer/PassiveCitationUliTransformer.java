@@ -25,6 +25,7 @@ public class PassiveCitationUliTransformer {
         .id(dto.getId())
         .author(dto.getSourceAuthor())
         .citation(dto.getSourceCitation())
+        .documentationUnit(RelatedDocumentationUnitTransformer.transformToDomain(dto.getTarget()))
         .legalPeriodical(legalPeriodical)
         .legalPeriodicalRawValue(
             legalPeriodical != null

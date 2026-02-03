@@ -50,6 +50,8 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
   @Transactional(transactionManager = "jpaTransactionManager")
   public LegalPeriodicalEdition save(LegalPeriodicalEdition legalPeriodicalEdition) {
     var editionDTO = LegalPeriodicalEditionTransformer.transformToDTO(legalPeriodicalEdition);
+    List<ReferenceDTO> caselawRefs = new ArrayList<>();
+    List<PassiveCitationUliDTO> uliRefs = new ArrayList<>();
     AtomicInteger editionRank = new AtomicInteger(0);
 
     for (Reference reference :
@@ -57,28 +59,30 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
       var documentationUnitOptional =
           documentationUnitRepository.findByDocumentNumber(
               reference.documentationUnit().getDocumentNumber());
-
       if (documentationUnitOptional.isEmpty()) continue;
       var docUnitDTO = documentationUnitOptional.get();
 
       if (reference.referenceType().equals(ReferenceType.CASELAW)) {
         ReferenceDTO dto = ReferenceTransformer.transformToDTO(reference);
-        dto.setDocumentationUnitRank(calculateCaselawRank(reference, docUnitDTO));
         dto.setDocumentationUnit(docUnitDTO);
-        dto.setEditionRank(editionRank.getAndIncrement());
         dto.setEdition(editionDTO);
-        referenceRepository.save(dto);
+        dto.setEditionRank(editionRank.getAndIncrement());
+        dto.setDocumentationUnitRank(calculateCaselawRank(reference, docUnitDTO));
+        caselawRefs.add(dto);
       } else if (reference.referenceType().equals(ReferenceType.LITERATURE)) {
         if (docUnitDTO instanceof DecisionDTO decisionDTO) {
           PassiveCitationUliDTO dto = PassiveCitationUliTransformer.transformToDTO(reference);
-          dto.setRank(calculateLiteratureRank(reference, decisionDTO));
           dto.setTarget(decisionDTO);
-          dto.setEditionRank(editionRank.getAndIncrement());
           dto.setEdition(editionDTO);
-          passiveCitationRepository.save(dto);
+          dto.setEditionRank(editionRank.getAndIncrement());
+          dto.setRank(calculateLiteratureRank(reference, decisionDTO));
+          uliRefs.add(dto);
         }
       }
     }
+
+    editionDTO.setReferences(caselawRefs);
+    editionDTO.setPassiveUliCitations(uliRefs);
 
     removeDeletedReferences(legalPeriodicalEdition);
     return LegalPeriodicalEditionTransformer.transformToDomain(repository.save(editionDTO));
