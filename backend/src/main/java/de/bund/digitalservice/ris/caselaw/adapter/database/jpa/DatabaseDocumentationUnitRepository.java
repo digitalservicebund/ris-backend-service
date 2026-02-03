@@ -62,4 +62,6 @@ SELECT d.documentNumber FROM DocumentationUnitDTO d
   WHERE d.portalPublicationStatus = 'PUBLISHED'
             """)
   Set<String> findAllPublishedDocumentNumbers();
+
+  List<DocumentationUnitDTO> findAllByStatus(StatusDTO status);
 }

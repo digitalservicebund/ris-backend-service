@@ -293,6 +293,19 @@ public class OAuthService implements AuthService {
             .allMatch(allowedPaths::contains);
   }
 
+  @Bean
+  public Function<OidcUser, Boolean> isDSMember() {
+    return user -> {
+      DocumentationOffice documentationOffice = userService.getDocumentationOffice(user);
+
+      if (documentationOffice != null) {
+        return documentationOffice.abbreviation().equals("DS");
+      }
+
+      return false;
+    };
+  }
+
   private boolean isProcedureAssignedToUser(Procedure procedure, OidcUser oidcUser) {
     var userGroupIdOfUser = userService.getUserGroup(oidcUser).map(UserGroup::id).orElse(null);
     return procedure.userGroupId() != null && procedure.userGroupId().equals(userGroupIdOfUser);

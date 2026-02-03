@@ -187,4 +187,6 @@ public interface DocumentationUnitRepository {
   void updatePortalPublicationStatus(UUID documentationUnitId, PortalPublicationStatus newStatus);
 
   void savePublicationDateTime(UUID documentationUnitId);
+
+  List<UUID> findAllByCurrentStatus(PublicationStatus publicationStatus, int page, int size);
 }
