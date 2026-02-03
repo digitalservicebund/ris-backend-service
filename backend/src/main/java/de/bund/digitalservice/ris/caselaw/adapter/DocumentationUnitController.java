@@ -351,7 +351,7 @@ public class DocumentationUnitController {
           .addKeyValue("id", uuid)
           .log();
 
-      return ResponseEntity.unprocessableContent().build();
+      return ResponseEntity.badRequest().build();
     } catch (Exception e) {
       log.atError()
           .setCause(e)
