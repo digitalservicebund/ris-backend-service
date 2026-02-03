@@ -6,7 +6,6 @@ import {
   searchForDocUnitWithFileNumberAndDecisionDate,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
-/* eslint-disable playwright/no-conditional-in-test */
 test.describe(
   "Add new reference for same docunit in periodical evaluation",
   {
