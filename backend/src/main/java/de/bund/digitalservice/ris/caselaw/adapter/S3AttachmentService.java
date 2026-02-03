@@ -70,10 +70,6 @@ public class S3AttachmentService implements AttachmentService {
   private static final String UNKNOWN_YET = "unknown yet";
   private static final int PART_SIZE = 5 * 1024 * 1024; // minimum of 5 MB for S3 multipart upload
 
-  private final MediaType wordMediaType =
-      MediaType.parseMediaType(
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
 
@@ -308,44 +304,6 @@ public class S3AttachmentService implements AttachmentService {
     var persistedAttachmentLineDTO = attachmentInlineRepository.save(attachmentInlineDTO);
 
     return AttachmentInlineTransformer.transformToDomain(persistedAttachmentLineDTO);
-  }
-
-  private Attachment attachDocx(
-      UUID documentationUnitId,
-      ByteBuffer byteBuffer,
-      HttpHeaders httpHeaders,
-      User user,
-      DocumentationUnitDTO documentationUnit,
-      String fileName) {
-    checkDocx(byteBuffer);
-
-    AttachmentDTO attachmentDTO =
-        AttachmentDTO.builder()
-            .s3ObjectPath(UNKNOWN_YET)
-            .documentationUnit(documentationUnit)
-            .filename(fileName)
-            .format("docx")
-            .uploadTimestamp(Instant.now())
-            .attachmentType(AttachmentType.ORIGINAL.name())
-            .build();
-
-    attachmentDTO = repository.save(attachmentDTO);
-
-    String s3ObjectPath = attachmentDTO.getId().toString();
-    putObjectIntoBucket(s3ObjectPath, byteBuffer, httpHeaders);
-
-    attachmentDTO.setS3ObjectPath(s3ObjectPath);
-
-    Attachment attachment = AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
-
-    setLastUpdated(user, documentationUnit);
-    documentationUnitHistoryLogService.saveHistoryLog(
-        documentationUnitId,
-        user,
-        HistoryLogEventType.FILES,
-        getAttachmentAddedDescription(fileName, AttachmentType.ORIGINAL));
-
-    return attachment;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")

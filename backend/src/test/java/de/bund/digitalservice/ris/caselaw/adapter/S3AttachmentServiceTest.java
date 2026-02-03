@@ -91,9 +91,6 @@ class S3AttachmentServiceTest {
 
   private DocumentationUnitDTO documentationUnitDTO;
 
-  private static final String DOCX_MEDIA_TYPE =
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-
   @BeforeEach
   void setup() {
     documentationUnitDTO = DecisionDTO.builder().id(UUID.randomUUID()).build();
