@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -23,6 +24,7 @@ public class S3RenamingService {
   private final AttachmentRepository attachmentRepository;
   private final S3Client s3Client;
   private final TempAttachmentService attachmentService;
+  private final Environment env;
 
   private static final String ID = "id";
   private static final String DOC_NUMBER = "document number";
@@ -35,10 +37,12 @@ public class S3RenamingService {
   public S3RenamingService(
       AttachmentRepository attachmentRepository,
       @Qualifier("docxS3Client") S3Client s3Client,
-      TempAttachmentService attachmentService) {
+      TempAttachmentService attachmentService,
+      Environment env) {
     this.attachmentRepository = attachmentRepository;
     this.s3Client = s3Client;
     this.attachmentService = attachmentService;
+    this.env = env;
   }
 
   /**
@@ -48,6 +52,9 @@ public class S3RenamingService {
   @Scheduled(cron = "-", zone = "Europe/Berlin")
   @SchedulerLock(name = "adjust-s3-paths", lockAtMostFor = "PT12H")
   public void moveExistingFilesToNewPaths() {
+    if (!env.matchesProfiles("staging")) {
+      return;
+    }
     List<AttachmentDTO> attachmentsToMove =
         attachmentRepository.findAll().stream()
             .filter(it -> it.getS3ObjectPath() != null)
@@ -151,6 +158,9 @@ public class S3RenamingService {
   @Scheduled(cron = "-", zone = "Europe/Berlin")
   @SchedulerLock(name = "move-unreferenced", lockAtMostFor = "PT12H")
   public void moveRemainingFilesToUnreferenced() {
+    if (!env.matchesProfiles("staging")) {
+      return;
+    }
     ListObjectsV2Response response =
         s3Client.listObjectsV2(ListObjectsV2Request.builder().bucket(bucketName).build());
     response.contents().stream()

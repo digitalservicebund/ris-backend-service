@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.slf4j.event.KeyValuePair;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -37,12 +38,13 @@ class S3RenamingServiceTest {
   @MockitoBean private AttachmentRepository attachmentRepository;
   @MockitoBean private S3Client s3Client;
   @MockitoBean private TempAttachmentService attachmentService;
+  @MockitoBean private Environment env;
 
   private S3RenamingService subject;
 
   @BeforeEach
   void setUp() {
-    subject = new S3RenamingService(attachmentRepository, s3Client, attachmentService);
+    subject = new S3RenamingService(attachmentRepository, s3Client, attachmentService, env);
   }
 
   @Test
