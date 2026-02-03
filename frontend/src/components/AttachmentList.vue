@@ -128,16 +128,16 @@ function closeDeleteModal() {
     class="max-h-[768px] max-w-[640px]"
     :closable="false"
     dismissable-mask
-    header="Anhang löschen"
+    header="Datei löschen"
     modal
   >
     <p>
-      Möchten Sie den Anhang <b>{{ attachmentToBeDeleted?.name }}</b> wirklich
+      Möchten Sie die Datei <b>{{ attachmentToBeDeleted?.name }}</b> wirklich
       dauerhaft löschen?
     </p>
     <div class="modal-buttons-container flex w-full flex-row gap-[1rem] pt-32">
       <Button
-        aria-label="Anhang löschen"
+        aria-label="Datei löschen"
         label="Löschen"
         severity="primary"
         size="small"

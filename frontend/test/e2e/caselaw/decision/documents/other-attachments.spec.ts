@@ -84,8 +84,8 @@ test.describe("Weitere Anhänge", { tag: ["@RISDEV-8920"] }, () => {
         await page.getByLabel("Datei löschen").click()
         // Confirm the dialog
         const dialog = page.getByRole("dialog")
-        await dialog.getByLabel("Anhang löschen", { exact: true }).click()
-        await expect(page.getByText("Anhang löschen")).toBeHidden()
+        await dialog.getByLabel("Datei löschen", { exact: true }).click()
+        await expect(page.getByText("Datei löschen")).toBeHidden()
         await expect(page.getByText("sample.docx")).toBeHidden()
       })
 
