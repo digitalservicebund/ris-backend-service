@@ -85,7 +85,6 @@
     "@iconify-json/ic": "^1.2.4",
     "@iconify-json/material-symbols": "^1.2.53",
     "@iconify-json/mdi": "^1.2.3",
-    "@namics/stylelint-bem": "^10.1.0",
     "@pinia/testing": "^1.0.3",
     "@playwright/test": "^1.58.1",
     "@sentry/vite-plugin": "^4.8.0",
@@ -126,10 +125,10 @@
     "postcss-scrollbar": "^0.5.1",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.1",
-    "stylelint": "^16.26.0",
+    "stylelint": "^17.1.0",
     "stylelint-config-idiomatic-order": "^10.0.0",
     "stylelint-config-recommended-vue": "^1.6.1",
-    "stylelint-config-standard": "^39.0.1",
+    "stylelint-config-standard": "^40.0.0",
     "tailwindcss": "^4.1.17",
     "typescript": "5.9.3",
     "typescript-eslint": "^8.54.0",
@@ -140,5 +139,8 @@
     "vite-plugin-vue-devtools": "^8.0.5",
     "vitest": "^4.0.13",
     "vitest-fail-on-console": "^0.10.1"
+  },
+  "overrides": {
+    "stylelint-order": "^7.0.1"
   }
 }
