@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalEditionRepository;
@@ -13,7 +12,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseReference
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;

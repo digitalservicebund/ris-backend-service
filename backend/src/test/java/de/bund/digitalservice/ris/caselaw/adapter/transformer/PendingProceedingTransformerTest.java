@@ -5,7 +5,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtBranchLocationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
@@ -13,7 +12,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDocument
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;

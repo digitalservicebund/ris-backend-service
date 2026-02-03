@@ -7,7 +7,6 @@ import static de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil.createTes
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;

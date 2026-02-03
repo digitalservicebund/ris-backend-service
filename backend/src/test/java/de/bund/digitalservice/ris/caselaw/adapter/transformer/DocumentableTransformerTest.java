@@ -5,9 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;

@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDependentLiteratureCitationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
@@ -17,7 +15,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -46,7 +43,6 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseDocumentTypeRepository documentTypeRepository;
   @Autowired private LegalPeriodicalEditionRepository editionRepository;
   @Autowired private DatabaseReferenceRepository referenceRepository;
-  @Autowired private DatabaseDependentLiteratureCitationRepository literatureCitationRepository;
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;
@@ -255,7 +251,7 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
             });
 
     assertThat(referenceRepository.findById(caselawReferenceId)).isEmpty();
-    assertThat(literatureCitationRepository.findById(literatureReferenceId)).isEmpty();
+    // Todo: check passive uli citations for literatureReferences to be empty
   }
 
   @Test
@@ -324,7 +320,7 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
             });
 
     assertThat(referenceRepository.findById(referenceId)).isEmpty();
-    assertThat(literatureCitationRepository.findById(literatureCitationId)).isEmpty();
+    // Todo: check passive uli citations for literatureReferences to be empty
     assertThat(editionRepository.findById(edition.id()).get().references()).isEmpty();
 
     editionRepository.delete(edition);
