@@ -289,7 +289,7 @@ public class DocumentationUnitController {
           .setMessage("Error reading uploaded file for documentation unit")
           .addKeyValue("id", uuid)
           .log();
-      return ResponseEntity.internalServerError().build();
+      return ResponseEntity.unprocessableContent().build();
     } catch (Exception e) {
       log.atError()
           .setCause(e)
@@ -305,6 +305,11 @@ public class DocumentationUnitController {
       return ResponseEntity.status(HttpStatus.OK).body(attachment2Html);
     } catch (Exception e) {
       attachmentService.deleteByFileId(attachment.id(), uuid, userService.getUser(oidcUser));
+      log.atError()
+          .setCause(e)
+          .setMessage("Error by converting uploaded file to html")
+          .addKeyValue("id", uuid)
+          .log();
       return ResponseEntity.unprocessableContent().build();
     }
   }
@@ -342,10 +347,11 @@ public class DocumentationUnitController {
     } catch (IOException e) {
       log.atError()
           .setCause(e)
-          .setMessage("Error reading uploaded file for documentation unit")
+          .setMessage("IO Error reading file stream")
           .addKeyValue("id", uuid)
           .log();
-      return ResponseEntity.internalServerError().build();
+
+      return ResponseEntity.badRequest().build();
     } catch (Exception e) {
       log.atError()
           .setCause(e)

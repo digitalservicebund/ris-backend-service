@@ -67,8 +67,7 @@ public class S3AttachmentService implements AttachmentService {
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
   private final DocumentationUnitHistoryLogService documentationUnitHistoryLogService;
   private static final String UNKNOWN_YET = "unknown yet";
-  private static final int PART_SIZE = 5 * 1024 * 1024;
-  private static final int MAX_PARTS = 10_000;
+  private static final int PART_SIZE = 5 * 1024 * 1024; // minimum of 5 MB for S3 multipart upload
 
   private final MediaType wordMediaType =
       MediaType.parseMediaType(
@@ -223,8 +222,6 @@ public class S3AttachmentService implements AttachmentService {
     try (inputStream) {
       byte[] buffer;
       while ((buffer = inputStream.readNBytes(PART_SIZE)).length > 0) {
-        validatePartLimit(partNumber);
-
         CompletedPart part = uploadPart(s3ObjectPath, uploadId, partNumber, buffer);
         completedParts.add(part);
         partNumber++;
@@ -240,14 +237,6 @@ public class S3AttachmentService implements AttachmentService {
       abortUploadSafely(s3ObjectPath, uploadId, e);
       throw new ResponseStatusException(
           HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload file", e);
-    }
-  }
-
-  private void validatePartLimit(int partNumber) {
-    if (partNumber > MAX_PARTS) {
-      throw new ResponseStatusException(
-          HttpStatus.CONTENT_TOO_LARGE,
-          String.format("File too large: %d parts exceeds %d limit", partNumber, MAX_PARTS));
     }
   }
 
