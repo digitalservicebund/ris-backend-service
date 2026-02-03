@@ -126,7 +126,7 @@
     "postcss-scrollbar": "^0.5.1",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.1",
-    "stylelint": "^16.26.0",
+    "stylelint": "^17.1.0",
     "stylelint-config-idiomatic-order": "^10.0.0",
     "stylelint-config-recommended-vue": "^1.6.1",
     "stylelint-config-standard": "^39.0.1",
