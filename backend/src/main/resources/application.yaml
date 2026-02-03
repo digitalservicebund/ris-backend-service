@@ -65,6 +65,9 @@ logging:
 spring:
   servlet:
     multipart:
+      # if changing the value below, be aware that this influences
+      # S3AtachmentService code where we chunk the file into parts.
+      # There is a limit of 10,000 parts per multipart upload.
       max-file-size: 100MB
       max-request-size: 100MB
   cloud:
