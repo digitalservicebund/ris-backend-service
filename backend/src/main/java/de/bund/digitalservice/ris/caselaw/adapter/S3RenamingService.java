@@ -108,7 +108,7 @@ public class S3RenamingService {
             attachmentRepository.save(attachment);
           } catch (Exception e) {
             log.atError()
-                .setMessage("Error while while updating s3ObjectPath for moved attachment")
+                .setMessage("Error while updating s3ObjectPath for moved attachment")
                 .setCause(e)
                 .addKeyValue(ID, attachment.getId())
                 .addKeyValue(DOC_NUMBER, documentNumber)
