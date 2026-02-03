@@ -118,7 +118,8 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
           .expectStatus()
           .isOk();
 
-      var savedAttachment = attachmentRepository.findAllByDocumentationUnitId(dto.getId()).get(0);
+      var savedAttachment =
+          attachmentRepository.findAllByDocumentationUnitId(dto.getId()).getFirst();
       assertThat(savedAttachment.getUploadTimestamp()).isInstanceOf(Instant.class);
       assertThat(savedAttachment.getId()).isInstanceOf(UUID.class);
 
@@ -133,7 +134,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     }
 
     @Test
-    void testOriginalFileToDocumentationUnit_shouldSetManagementData() throws IOException {
+    void testAttachOriginalFileToDocumentationUnit_shouldSetManagementData() throws IOException {
       var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
       MockMultipartFile mockFile =
           new MockMultipartFile(
@@ -176,7 +177,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     }
 
     @Test
-    void testOriginalFileToDocumentationUnit_shouldSetManagementDataForOtherDocOffice()
+    void testAttachOriginalFileToDocumentationUnit_shouldSetManagementDataForOtherDocOffice()
         throws IOException {
       var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
       MockMultipartFile mockFile =
@@ -462,7 +463,8 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
   @Nested
   class RemoveAttachmentFromDocumentationUnit {
     @Test
-    void testRemoveFileFromDocumentationUnit_shouldReturnLastUpdatedByWithName() {
+    void
+        testRemoveFileFromDocumentationUnit_withOtherAttachmentType_shouldReturnLastUpdatedByWithName() {
       // Arrange
       when(s3Client.deleteObject(any(DeleteObjectRequest.class)))
           .thenReturn(DeleteObjectResponse.builder().build());
@@ -516,7 +518,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
       assertThat(logs).hasSize(1);
       assertThat(logs.getFirst().eventType()).isEqualTo(HistoryLogEventType.FILES);
       assertThat(logs.getFirst().createdBy()).isEqualTo("testUser");
-      assertThat(logs.getFirst().description()).isEqualTo("Originaldokument gelöscht");
+      assertThat(logs.getFirst().description()).isEqualTo("Anhang \"fooFile.docx\" gelöscht");
     }
 
     @Test
