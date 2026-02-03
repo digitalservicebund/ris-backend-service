@@ -25,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedDocumentationSnapshotRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
@@ -82,6 +83,7 @@ class PortalPublicationServiceTest {
   @MockitoBean private PortalTransformer portalTransformer;
   @MockitoBean private FeatureToggleService featureToggleService;
   @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
+  @MockitoBean private PublishedDocumentationSnapshotRepository snapshotRepository;
 
   private static Decision testDocumentUnit;
   private static String testDocumentNumber;
@@ -214,7 +216,8 @@ class PortalPublicationServiceTest {
             portalTransformer,
             featureToggleService,
             historyLogService,
-            attachmentInlineRepository);
+            attachmentInlineRepository,
+            snapshotRepository);
     when(objectMapper.writeValueAsString(any())).thenReturn("");
     when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(true);
     when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(true);
