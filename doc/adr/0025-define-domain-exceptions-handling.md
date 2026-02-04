@@ -108,15 +108,6 @@ public ResponseEntity<ErrorDTO> handleAsBadRequest(CaselawException ex) {
 
 This way every system interacting with ours can know that we always deliver errors in the same standardized format, and they don't need to introduce more complexity than necessary.
 
-### Frontend
-
-This ADR focuses on readability and maintainability of backend code, but with regards to Frontend I found that Vue also has a possibility for global error handling.
-```typescript
-app.config.errorHandler = (err, vm, info) => {
-  // handle error
-}
-```
-
 This approach would allow a global error handler to be defined in `main.ts` and then all errors, potentially, could be handled in one place because we know the error payload is always the same.
 
 ### Suggestions for refactoring
