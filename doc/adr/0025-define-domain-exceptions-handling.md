@@ -9,7 +9,6 @@ Proposed
 ## Context
 
 We want to handle our domain exceptions in a centralized way that is establishing rules for how our exceptions are defined and what data they carry. This should also make handling of our exceptions easier since they will follow a pattern where all exceptions relay data uniformly.
-Related to frontend code and if this benefits that too, ...
 Another benefit of this approach is that in the controller there are no more try-catch blocks that need to be covered by tests and that reduce readability.
 
 
