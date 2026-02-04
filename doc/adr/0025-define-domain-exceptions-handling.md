@@ -1,6 +1,6 @@
 # 25. define domain exceptions handling
 
-Date: 2025-11-14
+Date: 2026-02-04
 
 ## Status
 
