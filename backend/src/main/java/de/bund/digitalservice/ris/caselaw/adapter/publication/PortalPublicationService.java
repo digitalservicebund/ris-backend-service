@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mapping.MappingException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
@@ -125,6 +126,7 @@ public class PortalPublicationService {
     }
   }
 
+  @Async
   public void publishSnapshots(int page, int size) {
     List<UUID> documentationUnitIds =
         documentationUnitRepository.findAllByCurrentStatus(PublicationStatus.PUBLISHED, page, size);
