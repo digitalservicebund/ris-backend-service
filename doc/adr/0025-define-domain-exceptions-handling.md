@@ -123,7 +123,7 @@ This way refactoring can really be done in small incremental steps.
 
 ## Decision
 
-<The change that we're proposing or have agreed to implement.>
+Decided to be accepted and the first PR inpmlementing this new way should cover one of the more complex refactoring cases.
 
 ## Consequences
 
