@@ -43,7 +43,7 @@ public class ReferenceTransformer {
         .primaryReference(isPrimary)
         .referenceSupplement(dto.getReferenceSupplement())
         .footnote(dto.getFootnote())
-        .referenceType(ReferenceType.CASELAW) // Todo: remove this
+        .referenceType(ReferenceType.CASELAW)
         .build();
   }
 

@@ -23,7 +23,7 @@ public class LegalPeriodicalEditionTransformer {
       return null;
     }
 
-    // 1. Alle DTOs in eine temporäre Liste sammeln
+    // Collect all DTOS in temporary list
     List<Object> allDtos = new ArrayList<>();
     if (legalPeriodicalEditionDTO.getReferences() != null) {
       allDtos.addAll(legalPeriodicalEditionDTO.getReferences());
@@ -32,8 +32,7 @@ public class LegalPeriodicalEditionTransformer {
       allDtos.addAll(legalPeriodicalEditionDTO.getPassiveUliCitations());
     }
 
-    // 2. Die DTOs nach ihrem editionRank sortieren
-    // Da wir zwei verschiedene Klassen haben, müssen wir den Rank "manuell" abgreifen
+    // Because the DTOS are in two seperated lists, we need to sort them manually by edition rank
     allDtos.sort(
         Comparator.comparing(
             dto -> {
@@ -43,7 +42,7 @@ public class LegalPeriodicalEditionTransformer {
             },
             Comparator.nullsLast(Comparator.naturalOrder())));
 
-    // 3. Jetzt in der richtigen Reihenfolge transformieren
+    // Transform in correct order
     List<Reference> sortedReferences =
         allDtos.stream()
             .map(

@@ -324,7 +324,7 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
             });
 
     assertThat(referenceRepository.findById(referenceId)).isEmpty();
-    // Todo: check passive uli citations for literatureReferences to be empty
+    assertThat(passiveCitationUliRepository.findById(literatureCitationId)).isEmpty();
     assertThat(editionRepository.findById(edition.id()).get().references()).isEmpty();
 
     editionRepository.delete(edition);
