@@ -24,9 +24,9 @@ const isInternalUser = useInternalUser()
 
 const otherLongText = computed({
   get: () =>
-    decision.value?.longTexts.otherLongText
+    decision.value?.longTexts?.otherLongText
       ? useValidBorderNumberLinks(
-          decision.value?.longTexts.otherLongText,
+          decision.value.longTexts.otherLongText,
           decision.value.managementData.borderNumbers,
         )
       : undefined,
