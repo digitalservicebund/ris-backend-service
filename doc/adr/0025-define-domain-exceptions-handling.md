@@ -66,21 +66,26 @@ public ResponseEntity<Object> handleLdmlTransformationException(LdmlTransformati
 Common interface that every domain exception implements:
 ```java
 interface CaselawException() {
-   /**
-   * Message identifier string.
-   */
-  String getMessage();
-
   /**
    * The type of exception starting with `/error/`
    */
   URI getType();
 
   /**
+   * Short, human-readable summary of the problem type.
+   */
+  String getTitle();
+
+  /**
+   * Human-readable explanation specific to this occurrence of the problem.
+   */
+  String getDetail();
+
+  /**
    * Additional details about the exception that could be sent to the user.
    * See "Extension Members" in RFC-9457
    */
-  Map<String, Object> getProperties();
+  Map<String, String> getProperties();
 }
 ```
 - getMessage(): should return a message identifier that can then be mapped to a human readable message in English or German.
