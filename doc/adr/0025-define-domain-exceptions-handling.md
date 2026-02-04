@@ -88,10 +88,6 @@ interface CaselawException() {
   Map<String, String> getProperties();
 }
 ```
-- getMessage(): should return a message identifier that can then be mapped to a human readable message in English or German.
-- getYpe(): ?
-- getProperties(): should contain any details relevant for this error, usually unique identifiers of entities.
-
 
 ***NOTE** - `getProperties` could also be a `Map<String, String>` because then we do not need to worry about serializing objects into JSON. Also Frontend would not need additional logic to handle different `Objects`. If there would be a specific need where we could not provide whole information `Object` could be introduced.
 
