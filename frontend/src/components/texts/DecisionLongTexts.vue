@@ -18,9 +18,9 @@ const { documentUnit: decision } = storeToRefs(store) as {
 
 const tenor = computed({
   get: () =>
-    decision.value?.longTexts.tenor
+    decision.value?.longTexts?.tenor
       ? useValidBorderNumberLinks(
-          decision.value?.longTexts.tenor,
+          decision.value.longTexts.tenor,
           decision.value.managementData.borderNumbers,
         )
       : undefined,
@@ -32,9 +32,9 @@ const tenor = computed({
 
 const reasons = computed({
   get: () =>
-    decision.value?.longTexts.reasons
+    decision.value?.longTexts?.reasons
       ? useValidBorderNumberLinks(
-          decision.value?.longTexts.reasons,
+          decision.value.longTexts.reasons,
           decision.value.managementData.borderNumbers,
         )
       : undefined,
@@ -46,9 +46,9 @@ const reasons = computed({
 
 const caseFacts = computed({
   get: () =>
-    decision.value?.longTexts.caseFacts
+    decision.value?.longTexts?.caseFacts
       ? useValidBorderNumberLinks(
-          decision.value?.longTexts.caseFacts,
+          decision.value.longTexts.caseFacts,
           decision.value.managementData.borderNumbers,
         )
       : undefined,
@@ -60,9 +60,9 @@ const caseFacts = computed({
 
 const decisionReasons = computed({
   get: () =>
-    decision.value?.longTexts.decisionReasons
+    decision.value?.longTexts?.decisionReasons
       ? useValidBorderNumberLinks(
-          decision.value?.longTexts.decisionReasons,
+          decision.value.longTexts.decisionReasons,
           decision.value.managementData.borderNumbers,
         )
       : undefined,
