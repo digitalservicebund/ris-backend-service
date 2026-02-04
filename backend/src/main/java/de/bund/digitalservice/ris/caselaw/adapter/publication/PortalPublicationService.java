@@ -126,14 +126,14 @@ public class PortalPublicationService {
   }
 
   public void publishSnapshots(int page, int size) {
-    List<UUID> documentationUnits =
+    List<UUID> documentationUnitIds =
         documentationUnitRepository.findAllByCurrentStatus(PublicationStatus.PUBLISHED, page, size);
 
-    documentationUnits.forEach(
+    documentationUnitIds.forEach(
         uuid -> {
           try {
-            DocumentationUnit byUuid = documentationUnitRepository.findByUuid(uuid);
-            if (byUuid instanceof Decision decision) {
+            DocumentationUnit documentationUnit = documentationUnitRepository.findByUuid(uuid);
+            if (documentationUnit instanceof Decision decision) {
               saveSnapshot(decision);
             }
           } catch (DocumentationUnitNotExistsException e) {
