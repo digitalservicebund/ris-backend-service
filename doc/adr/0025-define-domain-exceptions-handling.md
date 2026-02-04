@@ -85,7 +85,7 @@ interface CaselawException() {
    * Additional details about the exception that could be sent to the user.
    * See "Extension Members" in RFC-9457
    */
-  Map<String, String> getProperties();
+  Map<String, Object> getProperties();
 }
 ```
 
