@@ -7,6 +7,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedDocumentationSnapshotEntity;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedDocumentationSnapshotRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
@@ -23,11 +25,13 @@ import de.bund.digitalservice.ris.caselaw.domain.LdmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.LoggingKeys;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -51,6 +55,7 @@ public class PortalPublicationService {
   private final PortalTransformer ldmlTransformer;
   private final FeatureToggleService featureToggleService;
   private final DocumentationUnitHistoryLogService historyLogService;
+  private final PublishedDocumentationSnapshotRepository snapshotRepository;
 
   private static final String PUBLICATION_FEATURE_FLAG = "neuris.portal-publication";
   private static final String CHANGELOG_FEATURE_FLAG = "neuris.regular-changelogs";
@@ -64,7 +69,8 @@ public class PortalPublicationService {
       PortalTransformer portalTransformer,
       FeatureToggleService featureToggleService,
       DocumentationUnitHistoryLogService historyLogService,
-      DatabaseAttachmentInlineRepository attachmentInlineRepository) {
+      DatabaseAttachmentInlineRepository attachmentInlineRepository,
+      PublishedDocumentationSnapshotRepository snapshotRepository) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.portalBucket = portalBucket;
@@ -74,6 +80,7 @@ public class PortalPublicationService {
     this.featureToggleService = featureToggleService;
     this.historyLogService = historyLogService;
     this.attachmentInlineRepository = attachmentInlineRepository;
+    this.snapshotRepository = snapshotRepository;
   }
 
   /**
@@ -116,6 +123,45 @@ public class PortalPublicationService {
           "Dokeinheit konnte nicht im Portal veröffentlicht werden");
       throw exception;
     }
+  }
+
+  public void publishSnapshots(int page, int size) {
+    List<UUID> documentationUnitIds =
+        documentationUnitRepository.findAllByCurrentStatus(PublicationStatus.PUBLISHED, page, size);
+
+    documentationUnitIds.forEach(
+        uuid -> {
+          try {
+            DocumentationUnit documentationUnit = documentationUnitRepository.findByUuid(uuid);
+            if (documentationUnit instanceof Decision decision) {
+              saveSnapshot(decision);
+            }
+          } catch (DocumentationUnitNotExistsException e) {
+            log.warn("documentation unit for published snapshot couldn't be found", e);
+          }
+        });
+  }
+
+  private void saveSnapshot(DocumentationUnit documentationUnit) {
+    Optional<PublishedDocumentationSnapshotEntity> snapshot =
+        snapshotRepository.findByDocumentationUnitId(documentationUnit.uuid());
+    PublishedDocumentationSnapshotEntity entity;
+    if (snapshot.isPresent()) {
+      entity =
+          snapshot.get().toBuilder()
+              .json(documentationUnit)
+              .publishedAt(LocalDateTime.now())
+              .build();
+    } else {
+      entity =
+          PublishedDocumentationSnapshotEntity.builder()
+              .documentationUnitId(documentationUnit.uuid())
+              .json(documentationUnit)
+              .publishedAt(LocalDateTime.now())
+              .build();
+    }
+
+    snapshotRepository.save(entity);
   }
 
   /**
