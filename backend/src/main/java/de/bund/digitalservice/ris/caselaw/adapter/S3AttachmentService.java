@@ -28,9 +28,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,7 +54,6 @@ import software.amazon.awssdk.services.s3.model.CompletedPart;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.UploadPartRequest;
 
 @Slf4j
@@ -403,35 +400,6 @@ public class S3AttachmentService implements AttachmentService {
     byteBuffer.get(byteBufferArray);
     byteBuffer.rewind();
     return byteBufferArray;
-  }
-
-  private void putObjectIntoBucket(String fileId, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
-
-    var contentLength = httpHeaders.getContentLength();
-
-    Map<String, String> metadata = new HashMap<>();
-    MediaType mediaType = httpHeaders.getContentType();
-    if (mediaType == null) {
-      mediaType = MediaType.APPLICATION_OCTET_STREAM;
-    }
-
-    log.debug("upload header information: mediaType{}, contentLength={}", mediaType, contentLength);
-
-    var requestBody = RequestBody.fromByteBuffer(byteBuffer);
-    var putObjectRequestBuilder =
-        PutObjectRequest.builder()
-            .bucket(bucketName)
-            .key(fileId)
-            .contentType(mediaType.toString())
-            .metadata(metadata);
-
-    if (contentLength >= 0) {
-      putObjectRequestBuilder.contentLength(contentLength);
-    }
-
-    var putObjectRequest = putObjectRequestBuilder.build();
-
-    s3Client.putObject(putObjectRequest, requestBody);
   }
 
   private void deleteObjectFromBucket(String s3Path) {
