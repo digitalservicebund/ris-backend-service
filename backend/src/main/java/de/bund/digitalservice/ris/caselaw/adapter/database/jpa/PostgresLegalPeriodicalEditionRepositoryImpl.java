@@ -69,15 +69,14 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
         dto.setEditionRank(editionRank.getAndIncrement());
         dto.setDocumentationUnitRank(calculateCaselawRank(reference, docUnitDTO));
         caselawRefs.add(dto);
-      } else if (reference.referenceType().equals(ReferenceType.LITERATURE)) {
-        if (docUnitDTO instanceof DecisionDTO decisionDTO) {
-          PassiveCitationUliDTO dto = PassiveCitationUliTransformer.transformToDTO(reference);
-          dto.setTarget(decisionDTO);
-          dto.setEdition(editionDTO);
-          dto.setEditionRank(editionRank.getAndIncrement());
-          dto.setRank(calculateLiteratureRank(reference, decisionDTO));
-          uliRefs.add(dto);
-        }
+      } else if (reference.referenceType().equals(ReferenceType.LITERATURE)
+          && docUnitDTO instanceof DecisionDTO decisionDTO) {
+        PassiveCitationUliDTO dto = PassiveCitationUliTransformer.transformToDTO(reference);
+        dto.setTarget(decisionDTO);
+        dto.setEdition(editionDTO);
+        dto.setEditionRank(editionRank.getAndIncrement());
+        dto.setRank(calculateLiteratureRank(reference, decisionDTO));
+        uliRefs.add(dto);
       }
     }
 
