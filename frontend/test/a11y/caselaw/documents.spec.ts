@@ -30,7 +30,8 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/att
     })
     await uploadTestfile(page, "sample.docx")
     await page.getByLabel("Datei löschen").click()
-    await page
+    const dialog = page.getByRole("dialog")
+    await dialog
       .getByRole("button", { name: "Datei löschen", exact: true })
       .click()
     await expect(tableView).toBeHidden()
