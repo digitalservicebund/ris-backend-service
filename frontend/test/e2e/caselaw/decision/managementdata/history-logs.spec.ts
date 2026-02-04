@@ -215,7 +215,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
         page,
         1,
         "DS (e2e_tests DigitalService)",
-        'Anhang "sample.docx" hinzugefügt',
+        "Originaldokument hinzugefügt",
       )
     })
 
@@ -225,7 +225,8 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       })
       await page.getByTestId("list-entry-0").getByLabel("Datei löschen").click()
       // Dialog bestätigen
-      await page.getByRole("button", { name: "Anhang löschen" }).click()
+      const dialog = page.getByRole("dialog")
+      await dialog.getByRole("button", { name: "Datei löschen" }).click()
     })
 
     await test.step("In der Historie gibt es zusätzlich ein Dokument gelöscht Historien-Event", async () => {
@@ -237,7 +238,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
         page,
         0,
         "DS (e2e_tests DigitalService)",
-        `Anhang "sample.docx" gelöscht`,
+        `Originaldokument gelöscht`,
       )
     })
   })

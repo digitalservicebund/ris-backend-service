@@ -182,18 +182,29 @@ public class S3AttachmentService implements AttachmentService {
 
     attachmentDTO.setS3ObjectPath(s3ObjectPath);
     var attachment = AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
-
+    var description = getAttachmentAddedDescription(filename, type);
     setLastUpdated(user, documentationUnit);
     documentationUnitHistoryLogService.saveHistoryLog(
-        documentationUnitId,
-        user,
-        HistoryLogEventType.FILES,
-        "Anhang \"" + filename + "\" hinzugefügt");
+        documentationUnitId, user, HistoryLogEventType.FILES, description);
 
     return attachment;
   }
 
-  public String getExtension(String filename) {
+  private String getAttachmentAddedDescription(String filename, AttachmentType attachmentType) {
+    return switch (attachmentType) {
+      case AttachmentType.ORIGINAL -> "Originaldokument hinzugefügt";
+      case AttachmentType.OTHER -> "Anhang \"" + filename + "\" hinzugefügt";
+    };
+  }
+
+  private String getAttachmentDeletedDescription(String filename, AttachmentType attachmentType) {
+    return switch (attachmentType) {
+      case AttachmentType.ORIGINAL -> "Originaldokument gelöscht";
+      case AttachmentType.OTHER -> "Anhang \"" + filename + "\" gelöscht";
+    };
+  }
+
+  private String getExtension(String filename) {
     if (filename == null || !filename.contains(".")) {
       return "";
     }
@@ -336,7 +347,10 @@ public class S3AttachmentService implements AttachmentService {
 
     setLastUpdated(user, documentationUnit);
     documentationUnitHistoryLogService.saveHistoryLog(
-        documentationUnitId, user, HistoryLogEventType.FILES, "Word-Dokument hinzugefügt");
+        documentationUnitId,
+        user,
+        HistoryLogEventType.FILES,
+        getAttachmentAddedDescription(fileName, AttachmentType.ORIGINAL));
 
     return attachment;
   }
@@ -357,7 +371,9 @@ public class S3AttachmentService implements AttachmentService {
                   documentationUnitId,
                   user,
                   HistoryLogEventType.FILES,
-                  String.format("Anhang \"%s\" gelöscht", attachmentDTO.get().getFilename()));
+                  getAttachmentDeletedDescription(
+                      attachmentDTO.get().getFilename(),
+                      AttachmentType.valueOf(attachmentDTO.get().getAttachmentType())));
             });
     repository.deleteById(fileId);
   }

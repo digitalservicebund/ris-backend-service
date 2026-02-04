@@ -25,6 +25,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedDocumentationSnapshotEntity;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedDocumentationSnapshotRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
@@ -46,6 +48,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.User;
@@ -64,6 +67,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -82,6 +86,10 @@ class PortalPublicationServiceTest {
   @MockitoBean private PortalTransformer portalTransformer;
   @MockitoBean private FeatureToggleService featureToggleService;
   @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
+  @MockitoBean private PublishedDocumentationSnapshotRepository snapshotRepository;
+
+  private ArgumentCaptor<PublishedDocumentationSnapshotEntity> snapshotCaptor =
+      ArgumentCaptor.forClass(PublishedDocumentationSnapshotEntity.class);
 
   private static Decision testDocumentUnit;
   private static String testDocumentNumber;
@@ -214,7 +222,8 @@ class PortalPublicationServiceTest {
             portalTransformer,
             featureToggleService,
             historyLogService,
-            attachmentInlineRepository);
+            attachmentInlineRepository,
+            snapshotRepository);
     when(objectMapper.writeValueAsString(any())).thenReturn("");
     when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(true);
     when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(true);
@@ -1134,6 +1143,84 @@ class PortalPublicationServiceTest {
             .isEqualTo(LdmlTransformationResult.builder().ldml(transformed).success(true).build());
       }
     }
+  }
+
+  @Test
+  void testPublishSnapshots_withoutSnapshotInDatabase_saveNewSnapshot()
+      throws DocumentationUnitNotExistsException {
+    List<UUID> documentationUnitIds = List.of(testDocumentUnit.uuid());
+
+    when(documentationUnitRepository.findAllByCurrentStatus(PublicationStatus.PUBLISHED, 0, 10))
+        .thenReturn(documentationUnitIds);
+    when(documentationUnitRepository.findByUuid(testDocumentUnit.uuid()))
+        .thenReturn(testDocumentUnit);
+    when(snapshotRepository.findByDocumentationUnitId(testDocumentUnit.uuid()))
+        .thenReturn(Optional.empty());
+
+    subject.publishSnapshots(0, 10);
+
+    verify(snapshotRepository, times(1)).save(snapshotCaptor.capture());
+    assertThat(snapshotCaptor.getValue())
+        .extracting("documentationUnitId", "json")
+        .containsExactly(testDocumentUnit.uuid(), testDocumentUnit);
+  }
+
+  @Test
+  void testPublishSnapshots_withPendingProceeding_shouldNotSave()
+      throws DocumentationUnitNotExistsException {
+    UUID pendingProceedingUuid = testDocumentUnit.uuid();
+    List<UUID> documentationUnitIds = List.of(pendingProceedingUuid);
+
+    when(documentationUnitRepository.findAllByCurrentStatus(PublicationStatus.PUBLISHED, 0, 10))
+        .thenReturn(documentationUnitIds);
+    when(documentationUnitRepository.findByUuid(pendingProceedingUuid))
+        .thenReturn(PendingProceeding.builder().build());
+
+    subject.publishSnapshots(0, 10);
+
+    verify(snapshotRepository, never()).save(any(PublishedDocumentationSnapshotEntity.class));
+  }
+
+  @Test
+  void testPublishSnapshots_withDocumentationUnitNotException_shouldNotSaveASnapshot()
+      throws DocumentationUnitNotExistsException {
+    UUID notExisitingUuid = testDocumentUnit.uuid();
+    List<UUID> documentationUnitIds = List.of(notExisitingUuid);
+
+    when(documentationUnitRepository.findAllByCurrentStatus(PublicationStatus.PUBLISHED, 0, 10))
+        .thenReturn(documentationUnitIds);
+
+    doThrow(DocumentationUnitNotExistsException.class)
+        .when(documentationUnitRepository)
+        .findByUuid(notExisitingUuid);
+
+    subject.publishSnapshots(0, 10);
+
+    verify(snapshotRepository, never()).save(any(PublishedDocumentationSnapshotEntity.class));
+  }
+
+  @Test
+  void testPublishSnapshots_withExistingSnapshot_overwriteTheOldSnapshot()
+      throws DocumentationUnitNotExistsException {
+    List<UUID> documentationUnitIds = List.of(testDocumentUnit.uuid());
+    PublishedDocumentationSnapshotEntity existingSnapshot =
+        PublishedDocumentationSnapshotEntity.builder()
+            .documentationUnitId(testDocumentUnit.uuid())
+            .build();
+
+    when(documentationUnitRepository.findAllByCurrentStatus(PublicationStatus.PUBLISHED, 0, 10))
+        .thenReturn(documentationUnitIds);
+    when(documentationUnitRepository.findByUuid(testDocumentUnit.uuid()))
+        .thenReturn(testDocumentUnit);
+    when(snapshotRepository.findByDocumentationUnitId(testDocumentUnit.uuid()))
+        .thenReturn(Optional.of(existingSnapshot));
+
+    subject.publishSnapshots(0, 10);
+
+    verify(snapshotRepository, times(1)).save(snapshotCaptor.capture());
+    assertThat(snapshotCaptor.getValue())
+        .extracting("documentationUnitId", "json")
+        .containsExactly(testDocumentUnit.uuid(), testDocumentUnit);
   }
 
   private String withPrefix(String documentNumber) {

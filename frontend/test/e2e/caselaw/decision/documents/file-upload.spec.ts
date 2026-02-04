@@ -49,8 +49,8 @@ test.describe("upload an original document to a doc unit", () => {
       // delete file
       await page.getByLabel("Datei löschen").click()
       const dialog = page.getByRole("dialog")
-      await dialog.getByLabel("Anhang löschen", { exact: true }).click() // confirm
-      await expect(page.getByText("Anhang löschen")).toBeHidden()
+      await dialog.getByLabel("Datei löschen", { exact: true }).click() // confirm
+      await expect(page.getByText("Datei löschen")).toBeHidden()
       await expect(page.getByText("sample.docx")).toBeHidden()
 
       await page.reload()
@@ -108,7 +108,7 @@ test.describe("upload an original document to a doc unit", () => {
         .getByLabel("Datei löschen")
       await deleteFirstDocument.click()
       const dialog = page.getByRole("dialog")
-      await dialog.getByLabel("Anhang löschen", { exact: true }).click() // confirm
+      await dialog.getByLabel("Datei löschen", { exact: true }).click() // confirm
       await expect(page.getByLabel("Datei löschen")).toHaveCount(1)
 
       const deleteSecondDocument = page
@@ -116,8 +116,8 @@ test.describe("upload an original document to a doc unit", () => {
         .getByLabel("Datei löschen")
       await expect(deleteSecondDocument).toBeVisible()
       await deleteSecondDocument.click()
-      await dialog.getByLabel("Anhang löschen", { exact: true }).click() // confirm
-      await expect(page.getByLabel("Datei löschen")).toBeHidden()
+      await dialog.getByLabel("Datei löschen", { exact: true }).click() // confirm
+      await expect(dialog.getByLabel("Datei löschen")).toBeHidden()
 
       await page.reload()
       await expect(

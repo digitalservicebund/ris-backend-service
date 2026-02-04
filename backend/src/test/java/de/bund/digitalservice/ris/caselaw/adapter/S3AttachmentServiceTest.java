@@ -89,8 +89,6 @@ class S3AttachmentServiceTest {
   @Qualifier("docxS3Client")
   S3Client s3Client;
 
-  @MockitoBean S3Client streamS3Client;
-
   @MockitoBean DatabaseDocumentationUnitRepository documentationUnitRepository;
 
   private DocumentationUnitDTO documentationUnitDTO;

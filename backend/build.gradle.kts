@@ -205,7 +205,7 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.130")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.132")
     // for local development:
     // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.121.jar"))
 
@@ -273,7 +273,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.2.2.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.2.3.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
