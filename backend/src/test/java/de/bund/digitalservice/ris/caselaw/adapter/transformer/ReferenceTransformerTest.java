@@ -7,9 +7,8 @@ import static de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil.createTes
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
@@ -26,7 +25,7 @@ class ReferenceTransformerTest {
     return Stream.of(
         Arguments.of(
             // all fields set
-            CaselawReferenceDTO.builder()
+            ReferenceDTO.builder()
                 .documentationUnitRank(1)
                 .citation("2024, 123")
                 .footnote("footnote")
@@ -46,7 +45,7 @@ class ReferenceTransformerTest {
                 .build()),
         // without legal periodical, with editionRank
         Arguments.of(
-            CaselawReferenceDTO.builder()
+            ReferenceDTO.builder()
                 .editionRank(3)
                 .documentationUnitRank(1)
                 .citation("2024, 123")
@@ -70,7 +69,7 @@ class ReferenceTransformerTest {
   @ParameterizedTest
   @MethodSource("provideReferencesTestData_toDomain")
   void testTransformToDomain_shouldTransformReferences(
-      CaselawReferenceDTO caselawReferenceDTO, Reference expectedReference) {
+      ReferenceDTO caselawReferenceDTO, Reference expectedReference) {
     assertThat(ReferenceTransformer.transformToDomain(caselawReferenceDTO))
         .isEqualTo(expectedReference);
   }
@@ -81,7 +80,7 @@ class ReferenceTransformerTest {
         IllegalArgumentException.class,
         () ->
             ReferenceTransformer.transformToDomain(
-                CaselawReferenceDTO.builder()
+                ReferenceDTO.builder()
                     .documentationUnitRank(1)
                     .citation("2024, 123")
                     .referenceSupplement("Klammerzusatz")
@@ -111,15 +110,11 @@ class ReferenceTransformerTest {
                 .referenceSupplement("Klammerzusatz")
                 .referenceType(ReferenceType.CASELAW)
                 .build(),
-            CaselawReferenceDTO.builder()
+            ReferenceDTO.builder()
                 .id(referenceId)
                 .citation("2024, S.5")
                 .footnote("a footnote")
                 .referenceSupplement("Klammerzusatz")
-                .documentationUnit(
-                    DecisionDTO.builder()
-                        .id(UUID.fromString("e8c6f756-d6b2-4fa4-b751-e88c7c53bde4"))
-                        .build())
                 .legalPeriodical(
                     LegalPeriodicalDTO.builder()
                         .id(legalPeriodicalId)
@@ -143,7 +138,7 @@ class ReferenceTransformerTest {
                 .citation("2024, S.5")
                 .referenceType(ReferenceType.CASELAW)
                 .build(),
-            CaselawReferenceDTO.builder()
+            ReferenceDTO.builder()
                 .citation("2024, S.5")
                 .legalPeriodical(
                     LegalPeriodicalDTO.builder()
@@ -166,7 +161,7 @@ class ReferenceTransformerTest {
                 .citation("2024, S.5")
                 .referenceType(ReferenceType.CASELAW)
                 .build(),
-            CaselawReferenceDTO.builder()
+            ReferenceDTO.builder()
                 .citation("2024, S.5")
                 .legalPeriodical(
                     LegalPeriodicalDTO.builder()
@@ -185,7 +180,7 @@ class ReferenceTransformerTest {
                 .primaryReference(true)
                 .referenceType(ReferenceType.CASELAW)
                 .build(),
-            CaselawReferenceDTO.builder()
+            ReferenceDTO.builder()
                 .citation("2024, S.5")
                 .legalPeriodicalRawValue("ABC")
                 .type("amtlich")
@@ -194,7 +189,7 @@ class ReferenceTransformerTest {
 
   @ParameterizedTest
   @MethodSource("provideReferencesTestData_toDTO")
-  void testTransformToDTO_shouldAddReferences(Reference reference, CaselawReferenceDTO expected) {
+  void testTransformToDTO_shouldAddReferences(Reference reference, ReferenceDTO expected) {
 
     var referenceDTO = ReferenceTransformer.transformToDTO(reference);
     assertThat(referenceDTO).usingRecursiveComparison().isEqualTo(expected);

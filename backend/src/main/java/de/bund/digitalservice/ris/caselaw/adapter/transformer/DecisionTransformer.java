@@ -24,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NonApplicationNor
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ObjectValueDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationUliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
@@ -209,7 +210,63 @@ public class DecisionTransformer extends DocumentableTransformer {
       result.getAppeal().setDecision(result);
     }
 
-    return DocumentableTransformer.postProcessRelationships(result, currentDto);
+    return postProcessRelationships(result, currentDto);
+  }
+
+  static DecisionDTO postProcessRelationships(DecisionDTO result, DecisionDTO currentDto) {
+    DocumentableTransformer.postProcessRelationships(result, currentDto);
+
+    if (result.getPassiveUliCitations() != null) {
+      result.getPassiveUliCitations().forEach(citation -> citation.setTarget(result));
+    }
+
+    if (result.getActiveUliCitations() != null) {
+      result.getActiveUliCitations().forEach(citation -> citation.setSource(result));
+    }
+
+    return result;
+  }
+
+  private static void addLiteratureReferences(
+      Decision updatedDomainObject,
+      DecisionDTO.DecisionDTOBuilder<?, ?> builder,
+      DecisionDTO currentDTO) {
+
+    if (updatedDomainObject.literatureReferences() == null) {
+      builder.passiveUliCitations(Collections.emptyList());
+      return;
+    }
+
+    AtomicInteger rank = new AtomicInteger(0);
+
+    builder.passiveUliCitations(
+        updatedDomainObject.literatureReferences().stream()
+            .map(PassiveCitationUliTransformer::transformToDTO)
+            .map(
+                citationDTO -> {
+                  citationDTO.setRank(rank.incrementAndGet());
+
+                  // Matching gegen den aktuellen Stand im DTO (currentDTO),
+                  // um Edition-Daten zu erhalten
+                  Optional<PassiveCitationUliDTO> existingCitation = Optional.empty();
+                  UUID citationId = citationDTO.getId();
+
+                  if (citationId != null && currentDTO.getPassiveUliCitations() != null) {
+                    existingCitation =
+                        currentDTO.getPassiveUliCitations().stream()
+                            .filter(existing -> citationId.equals(existing.getId()))
+                            .findFirst();
+                  }
+
+                  existingCitation.ifPresent(
+                      old -> {
+                        citationDTO.setEditionRank(old.getEditionRank());
+                        citationDTO.setEdition(old.getEdition());
+                      });
+
+                  return citationDTO;
+                })
+            .toList());
   }
 
   private static void addSources(
@@ -718,10 +775,10 @@ public class DecisionTransformer extends DocumentableTransformer {
                     .map(ReferenceTransformer::transformToDomain)
                     .toList())
         .literatureReferences(
-            decisionDTO.getLiteratureReferences() == null
+            decisionDTO.getPassiveUliCitations() == null
                 ? new ArrayList<>()
-                : decisionDTO.getLiteratureReferences().stream()
-                    .map(ReferenceTransformer::transformToDomain)
+                : decisionDTO.getPassiveUliCitations().stream()
+                    .map(PassiveCitationUliTransformer::transformToDomain)
                     .toList())
         .documentalists(
             decisionDTO.getDocumentalists() == null

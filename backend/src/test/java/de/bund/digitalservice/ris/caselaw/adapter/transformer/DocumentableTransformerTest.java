@@ -5,11 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
@@ -216,8 +215,7 @@ class DocumentableTransformerTest {
       // Arrange
       var result =
           DecisionDTO.builder()
-              .caselawReferences(
-                  List.of(CaselawReferenceDTO.builder().id(UUID.randomUUID()).build()))
+              .caselawReferences(List.of(ReferenceDTO.builder().id(UUID.randomUUID()).build()))
               .build();
       var currentDTO = DecisionDTO.builder().build();
 
@@ -233,8 +231,7 @@ class DocumentableTransformerTest {
       // Arrange
       var result =
           PendingProceedingDTO.builder()
-              .caselawReferences(
-                  List.of(CaselawReferenceDTO.builder().id(UUID.randomUUID()).build()))
+              .caselawReferences(List.of(ReferenceDTO.builder().id(UUID.randomUUID()).build()))
               .build();
       var currentDTO = PendingProceedingDTO.builder().build();
 
@@ -255,54 +252,7 @@ class DocumentableTransformerTest {
       var actual = DocumentableTransformer.postProcessRelationships(result, currentDTO);
 
       // Assert
-      assertThat(actual.getLiteratureReferences()).isEmpty();
-    }
-
-    @Test
-    void testPendingProceeding_withoutLiteratureReferences_shouldNotAddLink() {
-      // Arrange
-      var result = PendingProceedingDTO.builder().build();
-      var currentDTO = PendingProceedingDTO.builder().build();
-
-      // Act
-      var actual = DocumentableTransformer.postProcessRelationships(result, currentDTO);
-
-      // Assert
-      assertThat(actual.getLiteratureReferences()).isEmpty();
-    }
-
-    @Test
-    void testDecision_withLiteratureReferences_shouldAddLink() {
-      // Arrange
-      var result =
-          DecisionDTO.builder()
-              .literatureReferences(
-                  List.of(LiteratureReferenceDTO.builder().id(UUID.randomUUID()).build()))
-              .build();
-      var currentDTO = DecisionDTO.builder().build();
-
-      // Act
-      var actual = DocumentableTransformer.postProcessRelationships(result, currentDTO);
-
-      // Assert
-      assertThat(actual.getLiteratureReferences().get(0).getDocumentationUnit()).isEqualTo(result);
-    }
-
-    @Test
-    void testPendingProceeding_withLiteratureReferences_shouldAddLink() {
-      // Arrange
-      var result =
-          PendingProceedingDTO.builder()
-              .literatureReferences(
-                  List.of(LiteratureReferenceDTO.builder().id(UUID.randomUUID()).build()))
-              .build();
-      var currentDTO = PendingProceedingDTO.builder().build();
-
-      // Act
-      var actual = DocumentableTransformer.postProcessRelationships(result, currentDTO);
-
-      // Assert
-      assertThat(actual.getLiteratureReferences().get(0).getDocumentationUnit()).isEqualTo(result);
+      assertThat(actual.getPassiveUliCitations()).isEmpty();
     }
 
     @Test
