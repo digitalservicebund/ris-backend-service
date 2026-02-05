@@ -1813,10 +1813,11 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testGenerateNewDocumentationUnit_withLiteratureReferenceInParameters_shouldSetSource() {
+    int randomJurisId = new Random().nextInt(100000, 999999);
     LegalPeriodicalDTO legalPeriodical =
         legalPeriodicalRepository.save(
             LegalPeriodicalDTO.builder()
-                .jurisId(1)
+                .jurisId(randomJurisId)
                 .abbreviation("ABC")
                 .primaryReference(true)
                 .title("Longer title")
