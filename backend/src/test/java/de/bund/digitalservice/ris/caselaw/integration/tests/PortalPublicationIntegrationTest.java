@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -589,7 +590,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  void testFillPublishedDocumentationUnit() {
+  void testFillPublishedDocumentationUnit_firstPublication() {
     DecisionDTO decision =
         DecisionDTO.builder()
             .documentNumber("XXRE000000000")
@@ -604,6 +605,47 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
             .build();
     decision.setStatus(status);
     repository.save(decision);
+
+    var result =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/admin/fillPublishedDocumentationUnit")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<PublishedDocumentationSnapshotEntity> snapshots = snapshotRepository.findAll();
+
+    assertThat(result.getResponseBody()).isEqualTo("ok");
+    assertThat(snapshots).hasSize(1);
+  }
+
+  @Test
+  void testFillPublishedDocumentationUnit_withExistingPublishedDocumentationUnit() {
+    DecisionDTO decision =
+        DecisionDTO.builder()
+            .documentNumber("XXRE000000000")
+            .documentationOffice(documentationOffice)
+            .build();
+    repository.save(decision);
+
+    StatusDTO status =
+        StatusDTO.builder()
+            .publicationStatus(PublicationStatus.PUBLISHED)
+            .documentationUnit(decision)
+            .build();
+    decision.setStatus(status);
+    DecisionDTO savedDecision = repository.save(decision);
+
+    PublishedDocumentationSnapshotEntity snapshot =
+        PublishedDocumentationSnapshotEntity.builder()
+            .documentationUnitId(savedDecision.getId())
+            .publishedAt(LocalDateTime.now().minusDays(1))
+            .build();
+    snapshotRepository.save(snapshot);
 
     var result =
         risWebTestClient

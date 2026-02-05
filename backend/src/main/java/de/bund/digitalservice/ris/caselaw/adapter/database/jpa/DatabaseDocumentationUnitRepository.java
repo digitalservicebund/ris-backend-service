@@ -1,10 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -63,5 +65,8 @@ SELECT d.documentNumber FROM DocumentationUnitDTO d
             """)
   Set<String> findAllPublishedDocumentNumbers();
 
-  List<DocumentationUnitDTO> findAllByStatus(StatusDTO status);
+  @Query(
+      value =
+          "SELECT d FROM DocumentationUnitDTO d WHERE d.status.publicationStatus = :publicationStatus ORDER BY d.status.createdAt DESC")
+  List<DocumentationUnitDTO> findAllByStatus(PublicationStatus publicationStatus, Pageable page);
 }

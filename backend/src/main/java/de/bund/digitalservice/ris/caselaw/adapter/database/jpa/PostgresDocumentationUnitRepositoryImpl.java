@@ -65,7 +65,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -1187,13 +1186,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   @Override
-  public List<UUID> findAllByCurrentStatus(
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public List<DocumentationUnit> findAllByCurrentStatus(
       PublicationStatus publicationStatus, int page, int size) {
-    return statusRepository
-        .findAllByPublicationStatus(
-            publicationStatus, PageRequest.of(page, size, Direction.DESC, "createdAt"))
-        .stream()
-        .map(dto -> dto.getDocumentationUnit().getId())
+    return repository.findAllByStatus(publicationStatus, PageRequest.of(page, size)).stream()
+        .map(dto -> getDocumentationUnit(dto, null))
         .toList();
   }
 }
