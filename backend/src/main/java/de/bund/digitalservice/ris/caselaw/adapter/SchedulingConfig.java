@@ -22,6 +22,7 @@ public class SchedulingConfig {
   public LockProvider lockProvider(DataSource dataSource) {
     return new JdbcTemplateLockProvider(
         JdbcTemplateLockProvider.Configuration.builder()
+            .withTableName("incremental_migration.shedlock")
             .withJdbcTemplate(new JdbcTemplate(dataSource))
             .usingDbTime()
             .build());
