@@ -38,8 +38,17 @@ public class RelatedDocumentationUnitTransformer {
             documentationUnitDTO.getSource().stream()
                 .findFirst()
                 .map(
-                    sourceDTO ->
-                        sourceDTO.getReference() == null ? null : sourceDTO.getReference().getId())
+                    sourceDTO -> {
+                      // check caselaw reference case first
+                      if (sourceDTO.getReference() != null) {
+                        return sourceDTO.getReference().getId();
+                      }
+                      // then literature reference
+                      if (sourceDTO.getLiteratureReference() != null) {
+                        return sourceDTO.getLiteratureReference().getId();
+                      }
+                      return null;
+                    })
                 .orElse(null))
         .documentationOffice(
             DocumentationOfficeTransformer.transformToDomain(

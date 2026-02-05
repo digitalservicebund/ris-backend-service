@@ -46,4 +46,10 @@ public class SourceDTO {
       orphanRemoval = true)
   @JoinColumn(name = "reference_id")
   private ReferenceDTO reference;
+
+  @OneToOne(
+      cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+      orphanRemoval = true)
+  @JoinColumn(name = "literature_reference_id")
+  private PassiveCitationUliDTO literatureReference;
 }

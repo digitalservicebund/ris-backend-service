@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransf
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitProcessStepTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.PassiveCitationUliTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PendingProceedingTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ReferenceTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.StatusTransformer;
@@ -24,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
@@ -90,6 +92,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       databaseDocumentationUnitProcessStepRepository;
   private final EntityManager entityManager;
   private final DatabaseReferenceRepository referenceRepository;
+  private final DatabasePassiveCitationUliRepository passiveCitationUliRepository;
   private final DocumentationUnitHistoryLogService historyLogService;
 
   public PostgresDocumentationUnitRepositoryImpl(
@@ -104,6 +107,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DatabaseDocumentationUnitProcessStepRepository databaseDocumentationUnitProcessStepRepository,
       EntityManager entityManager,
       DatabaseReferenceRepository referenceRepository,
+      DatabasePassiveCitationUliRepository passiveCitationUliRepository,
       DocumentationUnitHistoryLogService historyLogService) {
 
     this.repository = repository;
@@ -114,6 +118,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.fieldOfLawRepository = fieldOfLawRepository;
     this.procedureRepository = procedureRepository;
     this.referenceRepository = referenceRepository;
+    this.passiveCitationUliRepository = passiveCitationUliRepository;
     this.entityManager = entityManager;
     this.historyLogService = historyLogService;
     this.processStepRepository = processStepRepository;
@@ -210,17 +215,29 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     List<SourceDTO> sources = new ArrayList<>();
     if (createdFromReference != null) {
-      ReferenceDTO referenceDTO = ReferenceTransformer.transformToDTO(createdFromReference);
-      referenceDTO.setDocumentationUnitRank(0);
-      referenceDTO.setDocumentationUnit(documentationUnitDTO);
+      if (createdFromReference.referenceType() == ReferenceType.CASELAW) {
+        ReferenceDTO referenceDTO = ReferenceTransformer.transformToDTO(createdFromReference);
+        referenceDTO.setDocumentationUnitRank(0);
+        referenceDTO.setDocumentationUnit(documentationUnitDTO);
+        // There is no cascading from Source->References as the doc unit also has the references
+        // relationship directly that has cascading. Otherwise, when saving the doc unit, it would
+        // try to save the same reference twice -> JPA save error
+        referenceRepository.save(referenceDTO);
 
-      // There is no cascading from Source->References as the doc unit also has the references
-      // relationship directly that has cascading. Otherwise, when saving the doc unit, it would try
-      // to save the same reference twice -> JPA save error
-      referenceRepository.save(referenceDTO);
+        // if created from reference, the source is always 'Z' (Zeitschrift)
+        sources.add(
+            SourceDTO.builder().rank(1).value(SourceValue.Z).reference(referenceDTO).build());
+      } else if (createdFromReference.referenceType() == ReferenceType.LITERATURE) {
+        PassiveCitationUliDTO uliDTO =
+            PassiveCitationUliTransformer.transformToDTO(createdFromReference);
+        uliDTO.setRank(0);
+        uliDTO.setTarget(documentationUnitDTO instanceof DecisionDTO d ? d : null);
 
-      // if created from reference, the source is always 'Z' (Zeitschrift)
-      sources.add(SourceDTO.builder().rank(1).value(SourceValue.Z).reference(referenceDTO).build());
+        passiveCitationUliRepository.save(uliDTO);
+
+        sources.add(
+            SourceDTO.builder().rank(1).value(SourceValue.Z).literatureReference(uliDTO).build());
+      }
     }
 
     if (fileNumber != null) {

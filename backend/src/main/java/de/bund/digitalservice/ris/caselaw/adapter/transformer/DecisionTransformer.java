@@ -1101,10 +1101,18 @@ public class DecisionTransformer extends DocumentableTransformer {
               if (sourceDTO.getValue() != null) {
                 sourceValue = sourceDTO.getValue();
               }
+
               var reference =
                   Optional.ofNullable(sourceDTO.getReference())
                       .map(ReferenceTransformer::transformToDomain)
                       .orElse(null);
+
+              if (reference == null && sourceDTO.getLiteratureReference() != null) {
+                reference =
+                    PassiveCitationUliTransformer.transformToDomain(
+                        sourceDTO.getLiteratureReference());
+              }
+
               return Source.builder()
                   .value(sourceValue)
                   .sourceRawValue(sourceDTO.getSourceRawValue())

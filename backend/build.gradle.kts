@@ -201,13 +201,13 @@ dependencies {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
-//     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.49.jar"))
+    // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.49.jar"))
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.133")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.134")
     // for local development:
-    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.121.jar"))
+    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.134.jar"))
 
     implementation("tools.jackson.core:jackson-core:3.0.4")
     implementation("tools.jackson.core:jackson-databind:3.0.4")
