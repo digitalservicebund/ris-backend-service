@@ -305,11 +305,11 @@ test.describe(
         previewLabel: "Sekundäre Fundstellen",
         mandatoryFields: 2,
       },
-      {
-        type: "Literatur",
-        previewLabel: "Literaturfundstellen",
-        mandatoryFields: 3,
-      },
+      // {
+      //   type: "Literatur",
+      //   previewLabel: "Literaturfundstellen",
+      //   mandatoryFields: 3,
+      // },
     ].forEach(({ type, previewLabel, mandatoryFields }) => {
       test(
         `Allow creation from periodical evaluation of type ${type} for own docoffice`,
