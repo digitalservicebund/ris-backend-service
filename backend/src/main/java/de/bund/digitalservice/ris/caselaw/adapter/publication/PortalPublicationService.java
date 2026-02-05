@@ -128,18 +128,13 @@ public class PortalPublicationService {
 
   @Async
   public void publishSnapshots(int page, int size) {
-    List<UUID> documentationUnitIds =
+    List<DocumentationUnit> documentationUnits =
         documentationUnitRepository.findAllByCurrentStatus(PublicationStatus.PUBLISHED, page, size);
 
-    documentationUnitIds.forEach(
-        uuid -> {
-          try {
-            DocumentationUnit documentationUnit = documentationUnitRepository.findByUuid(uuid);
-            if (documentationUnit instanceof Decision decision) {
-              saveSnapshot(decision);
-            }
-          } catch (DocumentationUnitNotExistsException e) {
-            log.warn("documentation unit for published snapshot couldn't be found", e);
+    documentationUnits.forEach(
+        documentationUnit -> {
+          if (documentationUnit instanceof Decision decision) {
+            saveSnapshot(decision);
           }
         });
   }
