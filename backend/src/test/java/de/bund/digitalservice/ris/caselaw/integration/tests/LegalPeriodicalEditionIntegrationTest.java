@@ -682,6 +682,101 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  void testGetEdition_withDocUnitCreatedByLiteratureReference_shouldSucceed()
+      throws DocumentationUnitNotExistsException {
+
+    var docUnit =
+        EntityBuilderTestUtil.createAndSaveDecision(
+            documentationUnitRepository,
+            documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()),
+            "DOC_NUMBER");
+
+    var literatureReference =
+        PassiveCitationUliDTO.builder()
+            .rank(1)
+            .sourceLegalPeriodicalRawValue("ABC")
+            .sourceCitation("ABC 2024, 3")
+            .sourceAuthor("author")
+            .target(docUnit)
+            .sourceLegalPeriodical(LegalPeriodicalTransformer.transformToDTO(legalPeriodical))
+            .build();
+
+    // Reference needs to be saved manually as the source has no full cascading.
+    var saveReference = passiveCitationUliRepository.save(literatureReference);
+
+    // add status and source
+    documentationUnitRepository.save(
+        docUnit.toBuilder()
+            .source(
+                new ArrayList<>(
+                    List.of(
+                        SourceDTO.builder()
+                            .rank(1)
+                            .literatureReference(literatureReference)
+                            .value(SourceValue.Z)
+                            .build())))
+            .build());
+
+    // add reference via edition
+    var edition =
+        repository.save(
+            LegalPeriodicalEdition.builder()
+                .id(UUID.randomUUID())
+                .legalPeriodical(legalPeriodical)
+                .name("2024 Sonderheft 1")
+                .prefix("2024,")
+                .suffix("- Sonderheft 1")
+                .references(
+                    List.of(
+                        Reference.builder()
+                            .id(saveReference.getId())
+                            .referenceType(ReferenceType.LITERATURE)
+                            .citation("ABC 2024, 3")
+                            .legalPeriodicalRawValue("ABC")
+                            .documentationUnit(
+                                RelatedDocumentationUnit.builder()
+                                    .uuid(docUnit.getId())
+                                    .documentNumber("DOC_NUMBER")
+                                    .createdByReference(saveReference.getId())
+                                    .build())
+                            .build()))
+                .build());
+
+    var editionList =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri(EDITION_ENDPOINT + "/" + edition.id())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(LegalPeriodicalEdition.class)
+            .returnResult()
+            .getResponseBody();
+
+    Assertions.assertNotNull(editionList, "Edition should not be null");
+    var firstEditionReferences = editionList.references();
+    Assertions.assertEquals(1, firstEditionReferences.size());
+    Assertions.assertEquals("ABC 2024, 3", firstEditionReferences.get(0).citation());
+    Assertions.assertEquals(
+        saveReference.getId(),
+        firstEditionReferences.get(0).documentationUnit().getCreatedByReference());
+
+    assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").literatureReferences())
+        .hasSize(1)
+        .satisfies(
+            list -> {
+              assertThat(list.get(0).id()).isEqualTo(saveReference.getId());
+              assertThat(list.get(0).citation()).isEqualTo("ABC 2024, 3");
+              assertThat(list.get(0).documentationUnit().getCreatedByReference())
+                  .isEqualTo(saveReference.getId());
+            });
+
+    // clean up
+    repository.save(edition.toBuilder().references(List.of()).build());
+  }
+
+  @Test
   void testDeleteReference_shouldCleanupDocUnitSource() throws DocumentationUnitNotExistsException {
     // create skeleton doc unit to retrieve ID
     var docUnit =
