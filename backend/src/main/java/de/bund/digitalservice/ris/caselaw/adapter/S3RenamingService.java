@@ -155,8 +155,8 @@ public class S3RenamingService {
    * Moves files in the old s3 path pattern that were not moved in the previous step into the
    * 'unreferenced' prefix
    */
-  @Scheduled(cron = "-", zone = "Europe/Berlin")
-  @SchedulerLock(name = "move-unreferenced", lockAtMostFor = "PT12H")
+  @Scheduled(cron = "0 0 15 5 2 *", zone = "Europe/Berlin")
+  @SchedulerLock(name = "move-unreferenced", lockAtMostFor = "PT1H")
   public void moveRemainingFilesToUnreferenced() {
     if (!env.matchesProfiles("staging")) {
       return;
