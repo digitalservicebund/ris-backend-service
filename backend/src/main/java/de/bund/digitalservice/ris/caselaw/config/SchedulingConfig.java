@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter;
+package de.bund.digitalservice.ris.caselaw.config;
 
 import javax.sql.DataSource;
 import net.javacrumbs.shedlock.core.LockProvider;
