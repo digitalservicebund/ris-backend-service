@@ -94,6 +94,7 @@ spring:
           #          fail_on_pagination_over_collection_fetch: true
           default_batch_fetch_size: 20
           batch_fetch_style: dynamic
+        default_schema: incremental_migration
   security:
     oauth2:
       client:
