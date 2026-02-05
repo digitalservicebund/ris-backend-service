@@ -3,7 +3,7 @@ import dayjs from "dayjs"
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import { useToast } from "primevue/usetoast"
-import { computed, Ref, ref, toRaw, watchEffect } from "vue"
+import { computed, Ref, ref, toRaw } from "vue"
 import { useRoute } from "vue-router"
 import AssignProcessStep from "@/components/AssignProcessStep.vue"
 import CurrentAndPreviousProcessStepBadge from "@/components/CurrentAndPreviousProcessStepBadge.vue"
@@ -61,7 +61,12 @@ const formattedInfo = computed(() => {
   return parts.join(", ")
 })
 
-const statusBadge = ref(useStatusBadge(documentUnit.value.status).value)
+const statusBadge = computed(() => {
+  if (!documentUnit.value) {
+    return null
+  }
+  return useStatusBadge(documentUnit.value.status).value
+})
 
 const isRouteWithSaveButton = computed(
   () =>
@@ -100,10 +105,6 @@ async function handleAssignProcessStep(
   showProcessStepDialog.value = false
   return undefined
 }
-
-watchEffect(() => {
-  statusBadge.value = useStatusBadge(documentUnit.value.status).value
-})
 </script>
 
 <template>
