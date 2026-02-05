@@ -91,7 +91,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final EntityManager entityManager;
   private final DatabaseReferenceRepository referenceRepository;
   private final DocumentationUnitHistoryLogService historyLogService;
-  private final DatabaseStatusRepository statusRepository;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -105,8 +104,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DatabaseDocumentationUnitProcessStepRepository databaseDocumentationUnitProcessStepRepository,
       EntityManager entityManager,
       DatabaseReferenceRepository referenceRepository,
-      DocumentationUnitHistoryLogService historyLogService,
-      DatabaseStatusRepository statusRepository) {
+      DocumentationUnitHistoryLogService historyLogService) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -121,7 +119,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.processStepRepository = processStepRepository;
     this.databaseDocumentationUnitProcessStepRepository =
         databaseDocumentationUnitProcessStepRepository;
-    this.statusRepository = statusRepository;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
