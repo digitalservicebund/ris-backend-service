@@ -11,6 +11,7 @@ public record FieldOfLaw(
     boolean hasChildren,
     String identifier,
     String text,
+    String notation,
     List<String> linkedFields,
     List<Norm> norms,
     List<FieldOfLaw> children,

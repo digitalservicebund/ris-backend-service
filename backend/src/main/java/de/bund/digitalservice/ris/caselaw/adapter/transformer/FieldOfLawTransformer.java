@@ -1,11 +1,13 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.Notation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw.FieldOfLawBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class FieldOfLawTransformer {
   private FieldOfLawTransformer() {}
@@ -20,6 +22,10 @@ public class FieldOfLawTransformer {
         FieldOfLaw.builder()
             .id(fieldOfLawDTO.getId())
             .identifier(fieldOfLawDTO.getIdentifier())
+            .notation(
+                Optional.ofNullable(fieldOfLawDTO.getNotation())
+                    .map(Notation::toString)
+                    .orElse(null))
             .text(fieldOfLawDTO.getText());
 
     if (fieldOfLawDTO.getParent() != null) {
