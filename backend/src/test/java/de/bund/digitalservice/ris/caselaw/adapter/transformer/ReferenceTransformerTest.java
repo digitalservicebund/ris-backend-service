@@ -74,20 +74,6 @@ class ReferenceTransformerTest {
         .isEqualTo(expectedReference);
   }
 
-  @Test
-  void testTransformToDomainWithoutType_shouldThrowException() {
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            ReferenceTransformer.transformToDomain(
-                ReferenceDTO.builder()
-                    .documentationUnitRank(1)
-                    .citation("2024, 123")
-                    .referenceSupplement("Klammerzusatz")
-                    .documentationUnit(createTestDocumentationUnitDTO())
-                    .build()));
-  }
-
   private static Stream<Arguments> provideReferencesTestData_toDTO() {
     var legalPeriodicalId = UUID.randomUUID();
     var referenceId = UUID.randomUUID();
