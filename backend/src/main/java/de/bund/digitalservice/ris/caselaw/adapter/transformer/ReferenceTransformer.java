@@ -6,8 +6,10 @@ import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 @UtilityClass
+@Slf4j
 public class ReferenceTransformer {
   public static Reference transformToDomain(ReferenceDTO dto) {
     if (dto == null) return null;
@@ -28,8 +30,7 @@ public class ReferenceTransformer {
     Boolean isPrimary = (periodicalReferenceType != null) ? periodicalReferenceType : referenceType;
 
     if (isPrimary == null) {
-      throw new IllegalArgumentException(
-          "Type must be set in either legalPeriodical or referenceDTO itself");
+      log.warn("Either the referenceDTO's legalPeriodical or type field must be set");
     }
 
     return Reference.builder()
