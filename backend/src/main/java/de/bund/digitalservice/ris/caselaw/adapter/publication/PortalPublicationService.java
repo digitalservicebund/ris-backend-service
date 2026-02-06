@@ -129,15 +129,23 @@ public class PortalPublicationService {
 
   @Async
   public void publishSnapshots(int page, int size) {
-    List<DocumentationUnit> documentationUnits =
+    List<UUID> documentationUnitIds =
         documentationUnitRepository.findAllByCurrentStatus(PublicationStatus.PUBLISHED, page, size);
 
-    log.info("save {} documentation units as snapshots", documentationUnits.size());
+    log.info("save {} documentation units as snapshots", documentationUnitIds.size());
 
     AtomicInteger counter = new AtomicInteger(0);
     AtomicInteger decisionCounter = new AtomicInteger(0);
-    documentationUnits.forEach(
-        documentationUnit -> {
+    AtomicInteger batchCounter = new AtomicInteger(0);
+    documentationUnitIds.forEach(
+        documentationUnitId -> {
+          DocumentationUnit documentationUnit = null;
+          try {
+            documentationUnit = documentationUnitRepository.findByUuid(documentationUnitId);
+          } catch (DocumentationUnitNotExistsException e) {
+            return;
+          }
+
           counter.incrementAndGet();
           if (documentationUnit instanceof Decision decision) {
             decisionCounter.incrementAndGet();
@@ -146,18 +154,24 @@ public class PortalPublicationService {
 
           if (counter.get() > 1000) {
             log.info(
-                "save {} decisions of {} documentation units",
+                "save {} decisions of {} documentation units in batch {}",
                 decisionCounter.get(),
-                counter.get());
+                counter.get(),
+                batchCounter.get());
             counter.set(0);
             decisionCounter.set(0);
+            batchCounter.incrementAndGet();
           }
         });
 
     if (counter.get() > 0) {
-      log.info("save {} decisions of {} documentation units", decisionCounter.get(), counter.get());
-      if (!documentationUnits.isEmpty()) {
-        log.info("last documentation units: {}", documentationUnits.getLast().documentNumber());
+      log.info(
+          "save {} decisions of {} documentation units in batch {}",
+          decisionCounter.get(),
+          counter.get(),
+          batchCounter.get());
+      if (!documentationUnitIds.isEmpty()) {
+        log.info("last documentation units: {}", documentationUnitIds.getLast());
       }
     }
   }

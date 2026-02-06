@@ -38,7 +38,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransfo
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
@@ -1147,11 +1146,14 @@ class PortalPublicationServiceTest {
   }
 
   @Test
-  void testPublishSnapshots_withoutSnapshotInDatabase_saveNewSnapshot() {
-    List<DocumentationUnit> documentationUnits = List.of(testDocumentUnit);
+  void testPublishSnapshots_withoutSnapshotInDatabase_saveNewSnapshot()
+      throws DocumentationUnitNotExistsException {
+    List<UUID> documentationUnitIds = List.of(testDocumentUnit.uuid());
 
     when(documentationUnitRepository.findAllByCurrentStatus(PublicationStatus.PUBLISHED, 0, 10))
-        .thenReturn(documentationUnits);
+        .thenReturn(documentationUnitIds);
+    when(documentationUnitRepository.findByUuid(testDocumentUnit.uuid()))
+        .thenReturn(testDocumentUnit);
     when(snapshotRepository.findByDocumentationUnitId(testDocumentUnit.uuid()))
         .thenReturn(Optional.empty());
 
@@ -1164,11 +1166,15 @@ class PortalPublicationServiceTest {
   }
 
   @Test
-  void testPublishSnapshots_withPendingProceeding_shouldNotSave() {
-    List<DocumentationUnit> documentationUnits = List.of(PendingProceeding.builder().build());
+  void testPublishSnapshots_withPendingProceeding_shouldNotSave()
+      throws DocumentationUnitNotExistsException {
+    UUID pendingProceedingUuid = UUID.randomUUID();
+    List<UUID> documentationUnits = List.of(pendingProceedingUuid);
 
     when(documentationUnitRepository.findAllByCurrentStatus(PublicationStatus.PUBLISHED, 0, 10))
         .thenReturn(documentationUnits);
+    when(documentationUnitRepository.findByUuid(pendingProceedingUuid))
+        .thenReturn(PendingProceeding.builder().uuid(pendingProceedingUuid).build());
 
     subject.publishSnapshots(0, 10);
 
@@ -1176,8 +1182,9 @@ class PortalPublicationServiceTest {
   }
 
   @Test
-  void testPublishSnapshots_withExistingSnapshot_overwriteTheOldSnapshot() {
-    List<DocumentationUnit> documentationUnits = List.of(testDocumentUnit);
+  void testPublishSnapshots_withExistingSnapshot_overwriteTheOldSnapshot()
+      throws DocumentationUnitNotExistsException {
+    List<UUID> documentationUnits = List.of(testDocumentUnit.uuid());
     PublishedDocumentationSnapshotEntity existingSnapshot =
         PublishedDocumentationSnapshotEntity.builder()
             .documentationUnitId(testDocumentUnit.uuid())
@@ -1185,6 +1192,8 @@ class PortalPublicationServiceTest {
 
     when(documentationUnitRepository.findAllByCurrentStatus(PublicationStatus.PUBLISHED, 0, 10))
         .thenReturn(documentationUnits);
+    when(documentationUnitRepository.findByUuid(testDocumentUnit.uuid()))
+        .thenReturn(testDocumentUnit);
     when(snapshotRepository.findByDocumentationUnitId(testDocumentUnit.uuid()))
         .thenReturn(Optional.of(existingSnapshot));
 
