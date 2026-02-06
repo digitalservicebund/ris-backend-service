@@ -2,8 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -157,14 +155,16 @@ public class S3RenamingService {
    * Moves files in the old s3 path pattern that were not moved in the previous step into the
    * 'unreferenced' prefix
    */
-  @Scheduled(cron = "0 45 10 * * *", zone = "Europe/Berlin")
+  @Scheduled(cron = "0 45 9 * * *", zone = "Europe/Berlin")
   @SchedulerLock(name = "move-unreferenced", lockAtMostFor = "PT1H")
   public void moveRemainingFilesToUnreferenced() {
     if (!env.matchesProfiles("staging")) {
       return;
     }
-    log.atInfo().setMessage("Starting to move unreferenced files").log();
-    getAllFilenames().stream()
+    ListObjectsV2Response response =
+        s3Client.listObjectsV2(ListObjectsV2Request.builder().bucket(bucketName).build());
+    response.contents().stream()
+        .map(S3Object::key)
         .filter(it -> !it.contains("/"))
         .forEach(
             oldObjectPath -> {
@@ -219,23 +219,5 @@ public class S3RenamingService {
                   .addKeyValue(NEW_PATH, newObjectPath)
                   .log();
             });
-    log.atInfo().setMessage("Finished moving unreferenced files").log();
-  }
-
-  public List<String> getAllFilenames() {
-    List<String> keys = new ArrayList<>();
-    ListObjectsV2Response response;
-    ListObjectsV2Request request = ListObjectsV2Request.builder().bucket(bucketName).build();
-    do {
-      response = s3Client.listObjectsV2(request);
-      if (response == null) {
-        return Collections.emptyList();
-      }
-      keys.addAll(response.contents().stream().map(S3Object::key).toList());
-      String token = response.nextContinuationToken();
-      request = ListObjectsV2Request.builder().bucket(bucketName).continuationToken(token).build();
-    } while (Boolean.TRUE.equals(response.isTruncated()));
-
-    return keys;
   }
 }
