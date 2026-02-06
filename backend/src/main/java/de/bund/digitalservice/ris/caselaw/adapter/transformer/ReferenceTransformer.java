@@ -60,11 +60,10 @@ public class ReferenceTransformer {
     Boolean isPrimaryReference =
         legalPeriodicalDTO != null
             ? legalPeriodicalDTO.getPrimaryReference()
-            : reference.primaryReference(); // fallback to nichtamtlich
+            : reference.primaryReference();
 
     if (isPrimaryReference == null) {
-      throw new IllegalArgumentException(
-          "Either the reference's legalPeriodical or primaryReference field must be set");
+      log.warn("Either the reference's legalPeriodical or primaryReference field must be set");
     }
     return ReferenceDTO.builder()
         .id(reference.id())
@@ -76,7 +75,10 @@ public class ReferenceTransformer {
                 : reference.legalPeriodicalRawValue()) // fallback to raw value
         .referenceSupplement(reference.referenceSupplement())
         .footnote(reference.footnote())
-        .type(isPrimaryReference ? "amtlich" : "nichtamtlich")
+        .type(
+            Boolean.TRUE.equals(isPrimaryReference)
+                ? "amtlich"
+                : "nichtamtlich") // fallback to nichtamtlich
         .build();
   }
 }
