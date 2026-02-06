@@ -142,7 +142,7 @@ public class PortalPublicationService {
           DocumentationUnit documentationUnit = null;
           try {
             documentationUnit = documentationUnitRepository.findByUuid(documentationUnitId);
-          } catch (DocumentationUnitNotExistsException e) {
+          } catch (Exception e) {
             return;
           }
 
