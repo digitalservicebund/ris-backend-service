@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.scheduling.annotation.Async;
@@ -131,12 +132,34 @@ public class PortalPublicationService {
     List<DocumentationUnit> documentationUnits =
         documentationUnitRepository.findAllByCurrentStatus(PublicationStatus.PUBLISHED, page, size);
 
+    log.info("save {} documentation units as snapshots", documentationUnits.size());
+
+    AtomicInteger counter = new AtomicInteger(0);
+    AtomicInteger decisionCounter = new AtomicInteger(0);
     documentationUnits.forEach(
         documentationUnit -> {
+          counter.incrementAndGet();
           if (documentationUnit instanceof Decision decision) {
+            decisionCounter.incrementAndGet();
             saveSnapshot(decision);
           }
+
+          if (counter.get() > 1000) {
+            log.info(
+                "save {} decisions of {} documentation units",
+                decisionCounter.get(),
+                counter.get());
+            counter.set(0);
+            decisionCounter.set(0);
+          }
         });
+
+    if (counter.get() > 0) {
+      log.info("save {} decisions of {} documentation units", decisionCounter.get(), counter.get());
+      if (!documentationUnits.isEmpty()) {
+        log.info("last documentation units: {}", documentationUnits.getLast().documentNumber());
+      }
+    }
   }
 
   private void saveSnapshot(DocumentationUnit documentationUnit) {
