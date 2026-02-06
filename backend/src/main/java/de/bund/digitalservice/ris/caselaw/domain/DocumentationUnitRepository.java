@@ -188,6 +188,5 @@ public interface DocumentationUnitRepository {
 
   void savePublicationDateTime(UUID documentationUnitId);
 
-  List<DocumentationUnit> findAllByCurrentStatus(
-      PublicationStatus publicationStatus, int page, int size);
+  List<UUID> findAllByCurrentStatus(PublicationStatus publicationStatus, int page, int size);
 }

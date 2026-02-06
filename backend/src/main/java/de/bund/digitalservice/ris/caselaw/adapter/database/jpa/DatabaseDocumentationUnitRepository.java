@@ -67,6 +67,6 @@ SELECT d.documentNumber FROM DocumentationUnitDTO d
 
   @Query(
       value =
-          "SELECT d FROM DocumentationUnitDTO d WHERE d.status.publicationStatus = :publicationStatus ORDER BY d.status.createdAt DESC")
-  List<DocumentationUnitDTO> findAllByStatus(PublicationStatus publicationStatus, Pageable page);
+          "SELECT d.id FROM DocumentationUnitDTO d WHERE d.status.publicationStatus = :publicationStatus ORDER BY d.status.createdAt DESC")
+  List<UUID> findAllByStatus(PublicationStatus publicationStatus, Pageable page);
 }

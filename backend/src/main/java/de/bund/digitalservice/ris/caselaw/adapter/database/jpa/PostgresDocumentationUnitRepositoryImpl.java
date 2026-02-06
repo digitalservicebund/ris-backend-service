@@ -1201,10 +1201,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public List<DocumentationUnit> findAllByCurrentStatus(
+  public List<UUID> findAllByCurrentStatus(
       PublicationStatus publicationStatus, int page, int size) {
-    return repository.findAllByStatus(publicationStatus, PageRequest.of(page, size)).stream()
-        .map(dto -> getDocumentationUnit(dto, null))
-        .toList();
+    return repository.findAllByStatus(publicationStatus, PageRequest.of(page, size));
   }
 }
