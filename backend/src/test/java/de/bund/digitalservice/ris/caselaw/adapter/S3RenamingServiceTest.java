@@ -311,10 +311,10 @@ class S3RenamingServiceTest {
     assertThat(deleteCaptor.getValue().key()).isEqualTo("some-id");
 
     assertThat(memoryAppender.count(Level.ERROR)).isZero();
-    assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1);
-    assertThat(memoryAppender.getMessage(Level.INFO, 0))
+    assertThat(memoryAppender.count(Level.INFO)).isEqualTo(3);
+    assertThat(memoryAppender.getMessage(Level.INFO, 1))
         .isEqualTo("Moved unreferenced attachment from 'some-id' to 'unreferenced/some-id.docx'");
-    List<KeyValuePair> infoKVPairs = memoryAppender.getKeyValuePairs(Level.INFO, 0);
+    List<KeyValuePair> infoKVPairs = memoryAppender.getKeyValuePairs(Level.INFO, 1);
     assertThat(infoKVPairs)
         .containsExactlyInAnyOrder(
             new KeyValuePair("old object path", "some-id"),
@@ -340,7 +340,7 @@ class S3RenamingServiceTest {
         ArgumentCaptor.forClass(DeleteObjectRequest.class);
 
     assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(1);
-    assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1);
+    assertThat(memoryAppender.count(Level.INFO)).isEqualTo(3);
     assertThat(memoryAppender.getMessage(Level.ERROR, 0))
         .isEqualTo("Error while copying attachment to unreferenced prefix");
     List<KeyValuePair> errorKVPairs = memoryAppender.getKeyValuePairs(Level.ERROR, 0);
@@ -377,7 +377,7 @@ class S3RenamingServiceTest {
         ArgumentCaptor.forClass(DeleteObjectRequest.class);
 
     assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(1);
-    assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1);
+    assertThat(memoryAppender.count(Level.INFO)).isEqualTo(3);
     assertThat(memoryAppender.getMessage(Level.ERROR, 0))
         .isEqualTo(
             "Error deleting attachment from old location (it was already moved to unreferenced)");
