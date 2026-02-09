@@ -181,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.41.20"))
+    implementation(platform("software.amazon.awssdk:bom:2.41.23"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -242,7 +242,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.20.0")
 
     // CVE-2025-67735
-    implementation("io.netty:netty-codec-http:4.2.9.Final")
+    implementation("io.netty:netty-codec-http:4.2.10.Final")
 
     val flywayCore = "org.flywaydb:flyway-core:12.0.0"
     implementation(flywayCore)
