@@ -16,11 +16,6 @@ jobs:
           app-id: ${{ secrets.GITOPS_NEURIS_APP_ID }}
           private-key: ${{ secrets.GITOPS_NEURIS_APP_PRIVATE_KEY }}
 
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ steps.app_token.outputs.token }}
-
       - name: bump nginx image
         uses: digitalservicebund/bump-chainguard-digest@5c65d776ae05712c732d853ea4fcc07e74d3c398 # v1.1.1
         with:
@@ -45,14 +40,8 @@ jobs:
           github_token: ${{ steps.app_token.outputs.token }}
           branch: bump-chainguard-images
 
-      - name: Create PR and Enable Auto-merge
+      - name: Enable Auto-merge
         run: |
-          gh pr create \
-            --title "deps: bump chainguard images" \
-            --body "Automated update of nginx, redis and jre digests to latest versions." \
-            --head bump-chainguard-images \
-            --base main || echo "PR already exists, checking for updates..."
-
-          gh pr merge --auto --squash --delete-branch
+          gh pr merge --auto --squash --delete-branch "bump-chainguard-images"
         env:
           GH_TOKEN: ${{ steps.app_token.outputs.token }}
