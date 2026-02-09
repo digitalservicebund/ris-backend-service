@@ -3,47 +3,56 @@ name: Bump images
 on:
   schedule:
     - cron: "0 6 * * *"
-  # Allow to run this workflow manually
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
   bump-chainguard-images:
     runs-on: ubuntu-latest
     steps:
+      - name: Generate token
+        id: app_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.GITOPS_NEURIS_APP_ID }}
+          private-key: ${{ secrets.GITOPS_NEURIS_APP_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app_token.outputs.token }}
+
       - name: bump nginx image
         uses: digitalservicebund/bump-chainguard-digest@5c65d776ae05712c732d853ea4fcc07e74d3c398 # v1.1.1
         with:
           image_name: nginx
           file_path: frontend/Dockerfile.prod
-          github_token: ${{ github.token }}
-          branch: bump-nginx-image
+          github_token: ${{ steps.app_token.outputs.token }}
+          branch: bump-chainguard-images
+
       - name: bump redis image
         uses: digitalservicebund/bump-chainguard-digest@5c65d776ae05712c732d853ea4fcc07e74d3c398 # v1.1.1
         with:
           image_name: redis
           file_path: compose.yaml
-          github_token: ${{ github.token }}
-          branch: bump-redis-image
+          github_token: ${{ steps.app_token.outputs.token }}
+          branch: bump-chainguard-images
+
       - name: bump jre image
         uses: digitalservicebund/bump-chainguard-digest@5c65d776ae05712c732d853ea4fcc07e74d3c398 # v1.1.1
         with:
           image_name: jre
           file_path: backend/Dockerfile.prod
-          github_token: ${{ github.token }}
-          branch: bump-jre-image
+          github_token: ${{ steps.app_token.outputs.token }}
+          branch: bump-chainguard-images
 
-  trigger-pipeline:
-    needs: bump-chainguard-images
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-      - run: gh workflow run pipeline.yml
+      - name: Create PR and Enable Auto-merge
+        run: |
+          gh pr create \
+            --title "deps: bump chainguard images" \
+            --body "Automated update of nginx, redis and jre digests to latest versions." \
+            --head bump-chainguard-images \
+            --base main || echo "PR already exists, checking for updates..."
+
+          gh pr merge --auto --squash --delete-branch
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
