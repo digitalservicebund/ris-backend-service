@@ -3,7 +3,11 @@ name: Bump images
 on:
   schedule:
     - cron: "0 6 * * *"
+  # Allow to run this workflow manually
   workflow_dispatch:
+
+  permissions:
+    contents: write
 
 jobs:
   bump-chainguard-images:
