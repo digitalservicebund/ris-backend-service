@@ -22,7 +22,7 @@ jobs:
           image_name: nginx
           file_path: frontend/Dockerfile.prod
           github_token: ${{ steps.app_token.outputs.token }}
-          branch: bump-chainguard-images
+          branch: bump-nginx-image
 
       - name: bump redis image
         uses: digitalservicebund/bump-chainguard-digest@5c65d776ae05712c732d853ea4fcc07e74d3c398 # v1.1.1
@@ -30,7 +30,7 @@ jobs:
           image_name: redis
           file_path: compose.yaml
           github_token: ${{ steps.app_token.outputs.token }}
-          branch: bump-chainguard-images
+          branch: bump-redis-image
 
       - name: bump jre image
         uses: digitalservicebund/bump-chainguard-digest@5c65d776ae05712c732d853ea4fcc07e74d3c398 # v1.1.1
@@ -38,10 +38,14 @@ jobs:
           image_name: jre
           file_path: backend/Dockerfile.prod
           github_token: ${{ steps.app_token.outputs.token }}
-          branch: bump-chainguard-images
+          branch: bump-jre-image
 
       - name: Enable Auto-merge
+        # The '|| true' ensures the workflow doesn't fail if there was no new image (and thus no PR to merge).
         run: |
-          gh pr merge --auto --squash --delete-branch "bump-chainguard-images"
+          for branch in bump-nginx-image bump-redis-image bump-jre-image; do
+            echo "Enabling auto-merge for $branch..."
+            gh pr merge --auto --squash --delete-branch "$branch" || echo "No active PR found for $branch, skipping."
+            done
         env:
           GH_TOKEN: ${{ steps.app_token.outputs.token }}
