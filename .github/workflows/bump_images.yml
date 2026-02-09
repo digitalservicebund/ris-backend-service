@@ -6,8 +6,8 @@ on:
   # Allow to run this workflow manually
   workflow_dispatch:
 
-  permissions:
-    contents: write
+permissions:
+  contents: write
 
 jobs:
   bump-chainguard-images:
