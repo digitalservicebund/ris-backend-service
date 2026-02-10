@@ -14,15 +14,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class JudgmentBody {
-  @XmlElement(name = "motivation", namespace = CaseLawLdml.AKN_NS)
-  private List<Motivation> motivations;
 
   @XmlElement(name = "introduction", namespace = CaseLawLdml.AKN_NS)
   private List<Introduction> introductions;
 
-  @XmlElement(name = "background", namespace = CaseLawLdml.AKN_NS)
-  private JaxbHtml background;
-
   @XmlElement(name = "decision", namespace = CaseLawLdml.AKN_NS)
   private JaxbHtml decision;
+
+  @XmlElement(name = "motivation", namespace = CaseLawLdml.AKN_NS)
+  private List<Motivation> motivations;
 }

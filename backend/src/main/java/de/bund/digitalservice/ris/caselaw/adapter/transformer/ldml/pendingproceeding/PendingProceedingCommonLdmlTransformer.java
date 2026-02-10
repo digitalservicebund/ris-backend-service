@@ -172,15 +172,13 @@ public abstract class PendingProceedingCommonLdmlTransformer
     JudgmentBody.JudgmentBodyBuilder builder = JudgmentBody.builder();
 
     builder
-        .motivations(buildMotivations(pendingProceeding))
         .introductions(buildIntroductions(pendingProceeding))
-        .background(null)
-        .decision(buildDecision(pendingProceeding));
+        .decision(buildDecision(pendingProceeding))
+        .motivations(buildMotivations(pendingProceeding));
 
     var judgmentBody = builder.build();
 
     if (judgmentBody.getIntroductions().isEmpty()
-        && judgmentBody.getBackground() == null
         && judgmentBody.getDecision() == null
         && judgmentBody.getMotivations() == null) {
       throw new ValidationException("Empty judgment body");
