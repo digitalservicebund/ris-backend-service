@@ -28,7 +28,7 @@ import org.hibernate.type.SqlTypes;
 @Getter
 @Setter
 @Entity
-@Table(name = "correction", schema = "incremental_migration")
+@Table(name = "correction")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

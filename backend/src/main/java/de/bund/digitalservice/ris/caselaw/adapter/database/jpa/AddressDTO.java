@@ -18,7 +18,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(name = "address", schema = "incremental_migration")
+@Table(name = "address")
 public class AddressDTO {
   @Id @GeneratedValue private UUID id;
 

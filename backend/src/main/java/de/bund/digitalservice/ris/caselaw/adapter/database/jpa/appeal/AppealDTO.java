@@ -33,7 +33,7 @@ import org.hibernate.proxy.HibernateProxy;
 @AllArgsConstructor
 @Entity
 @Builder(toBuilder = true)
-@Table(schema = "incremental_migration", name = "appeal")
+@Table(name = "appeal")
 public class AppealDTO {
 
   @Id

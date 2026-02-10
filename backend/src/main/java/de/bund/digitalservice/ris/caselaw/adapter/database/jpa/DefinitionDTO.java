@@ -23,7 +23,7 @@ import lombok.ToString;
 @ToString
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "definition")
+@Table(name = "definition")
 public class DefinitionDTO {
 
   @Id @GeneratedValue private UUID id;

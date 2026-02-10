@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(schema = "incremental_migration", name = "eurlex")
+@Table(name = "eurlex")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

@@ -23,7 +23,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "deviating_document_number")
+@Table(name = "deviating_document_number")
 public class DeviatingDocumentNumberDTO {
   @Id @GeneratedValue private UUID id;
 

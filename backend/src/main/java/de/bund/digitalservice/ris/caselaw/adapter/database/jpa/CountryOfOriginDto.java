@@ -25,7 +25,7 @@ import org.hibernate.annotations.UuidGenerator;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "country_of_origin")
+@Table(name = "country_of_origin")
 public class CountryOfOriginDto {
 
   @Id

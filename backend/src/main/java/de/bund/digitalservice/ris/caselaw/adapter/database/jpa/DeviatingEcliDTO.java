@@ -19,7 +19,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "deviating_ecli")
+@Table(name = "deviating_ecli")
 public class DeviatingEcliDTO {
   @Id @GeneratedValue private UUID id;
 

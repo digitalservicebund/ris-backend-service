@@ -22,7 +22,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "documentation_unit_keyword")
+@Table(name = "documentation_unit_keyword")
 public class DocumentationUnitKeywordDTO {
 
   @EmbeddedId @Builder.Default

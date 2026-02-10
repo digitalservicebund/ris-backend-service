@@ -19,7 +19,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(name = "court_branch_location", schema = "incremental_migration")
+@Table(name = "court_branch_location")
 public class CourtBranchLocationDTO {
   @Id @GeneratedValue private UUID id;
 

@@ -30,7 +30,7 @@ import org.hibernate.type.SqlTypes;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(schema = "incremental_migration", name = "duplicate_relation")
+@Table(name = "duplicate_relation")
 public class DuplicateRelationDTO {
 
   @EmbeddedId private DuplicateRelationId id;

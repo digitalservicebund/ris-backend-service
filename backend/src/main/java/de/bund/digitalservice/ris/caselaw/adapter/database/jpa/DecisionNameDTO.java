@@ -20,7 +20,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "decision_name", schema = "incremental_migration")
+@Table(name = "decision_name")
 public class DecisionNameDTO {
 
   @Id @GeneratedValue private UUID id;

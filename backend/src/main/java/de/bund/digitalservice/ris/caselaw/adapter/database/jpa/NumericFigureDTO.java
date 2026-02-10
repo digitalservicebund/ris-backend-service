@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(name = "numeric_figure", schema = "incremental_migration")
+@Table(name = "numeric_figure")
 public class NumericFigureDTO {
 
   @Id private UUID judicialBodyId;

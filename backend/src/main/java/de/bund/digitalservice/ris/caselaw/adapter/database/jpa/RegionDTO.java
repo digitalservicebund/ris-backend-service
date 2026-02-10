@@ -19,7 +19,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "region", schema = "incremental_migration")
+@Table(name = "region")
 public class RegionDTO {
 
   @Id @GeneratedValue private UUID id;

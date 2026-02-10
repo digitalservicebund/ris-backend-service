@@ -18,7 +18,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "origin_of_translation_border_number")
+@Table(name = "origin_of_translation_border_number")
 public class OriginOfTranslationBorderNumberDTO {
   @Id @GeneratedValue private UUID id;
 

@@ -30,7 +30,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity()
-@Table(name = "norm_abbreviation", schema = "incremental_migration")
+@Table(name = "norm_abbreviation")
 public class NormAbbreviationDTO {
 
   @Id @GeneratedValue private UUID id;

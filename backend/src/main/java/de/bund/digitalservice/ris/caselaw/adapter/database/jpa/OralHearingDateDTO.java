@@ -20,7 +20,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "hearing_date")
+@Table(name = "hearing_date")
 public class OralHearingDateDTO {
   @Id @GeneratedValue private UUID id;
 

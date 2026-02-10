@@ -22,7 +22,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "year_of_dispute")
+@Table(name = "year_of_dispute")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class YearOfDisputeDTO {
 

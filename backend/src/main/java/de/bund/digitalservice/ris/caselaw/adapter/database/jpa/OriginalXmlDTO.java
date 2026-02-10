@@ -22,7 +22,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(name = "original_xml", schema = "incremental_migration")
+@Table(name = "original_xml")
 public class OriginalXmlDTO {
 
   @Id

@@ -29,7 +29,7 @@ import org.jspecify.annotations.Nullable;
 @Builder
 @EqualsAndHashCode
 @ToString
-@Table(name = "active_citation_uli", schema = "incremental_migration")
+@Table(name = "active_citation_uli")
 public class ActiveCitationUliDTO {
 
   @Id @GeneratedValue @EqualsAndHashCode.Exclude private UUID id;

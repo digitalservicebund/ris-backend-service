@@ -19,7 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "leading_decision_norm_reference", schema = "incremental_migration")
+@Table(name = "leading_decision_norm_reference")
 public class LeadingDecisionNormReferenceDTO {
 
   @Id @GeneratedValue private UUID id;

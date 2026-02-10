@@ -23,7 +23,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(schema = "incremental_migration", name = "handover_mail")
+@Table(name = "handover_mail")
 @Entity
 public class HandoverMailDTO {
 

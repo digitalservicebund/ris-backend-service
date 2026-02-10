@@ -23,7 +23,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(schema = "incremental_migration", name = "ignored_text_check_word")
+@Table(name = "ignored_text_check_word")
 @Entity
 public class IgnoredTextCheckWordDTO {
 

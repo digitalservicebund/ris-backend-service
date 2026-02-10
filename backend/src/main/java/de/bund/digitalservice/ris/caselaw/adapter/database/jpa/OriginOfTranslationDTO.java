@@ -31,7 +31,7 @@ import org.hibernate.type.SqlTypes;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "origin_of_translation")
+@Table(name = "origin_of_translation")
 public class OriginOfTranslationDTO {
   @Id @GeneratedValue private UUID id;
 

@@ -23,7 +23,7 @@ import org.hibernate.annotations.Immutable;
 @Builder
 @Entity
 @Immutable
-@Table(schema = "incremental_migration", name = "collective_agreement_industry")
+@Table(name = "collective_agreement_industry")
 public class CollectiveAgreementIndustryDTO {
 
   @Id @GeneratedValue private UUID id;

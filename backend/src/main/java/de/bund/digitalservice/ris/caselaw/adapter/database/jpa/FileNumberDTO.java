@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "file_number", schema = "incremental_migration")
+@Table(name = "file_number")
 public class FileNumberDTO {
 
   @Id @GeneratedValue private UUID id;

@@ -21,7 +21,7 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(schema = "incremental_migration", name = "citation_type")
+@Table(name = "citation_type")
 @Entity
 public class CitationTypeDTO {
   @Id @GeneratedValue private UUID id;

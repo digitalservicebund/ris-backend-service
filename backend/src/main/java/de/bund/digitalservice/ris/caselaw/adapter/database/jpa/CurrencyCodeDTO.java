@@ -18,7 +18,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "currency_code")
+@Table(name = "currency_code")
 public class CurrencyCodeDTO {
 
   @Id private UUID id;

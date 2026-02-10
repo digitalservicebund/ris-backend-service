@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "documentation_office_user_group", schema = "incremental_migration")
+@Table(name = "documentation_office_user_group")
 public class UserGroupDTO {
   @Id @GeneratedValue private UUID id;
 

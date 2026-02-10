@@ -22,7 +22,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(name = "attachment", schema = "incremental_migration")
+@Table(name = "attachment")
 public class AttachmentDTO {
 
   @Id @GeneratedValue @NotNull private UUID id;

@@ -21,7 +21,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "management_data", schema = "incremental_migration")
+@Table(name = "management_data")
 public class ManagementDataDTO {
 
   @Id

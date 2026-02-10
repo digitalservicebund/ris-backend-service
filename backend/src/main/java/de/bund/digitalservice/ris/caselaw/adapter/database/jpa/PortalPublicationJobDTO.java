@@ -26,7 +26,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @Entity
-@Table(name = "portal_publication_job", schema = "incremental_migration")
+@Table(name = "portal_publication_job")
 public class PortalPublicationJobDTO {
 
   @Id @GeneratedValue @Include private UUID id;

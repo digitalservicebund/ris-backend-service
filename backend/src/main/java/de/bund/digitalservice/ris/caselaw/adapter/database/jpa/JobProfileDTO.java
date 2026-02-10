@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "job_profile")
+@Table(name = "job_profile")
 public class JobProfileDTO {
 
   @Id @GeneratedValue private UUID id;

@@ -43,7 +43,7 @@ import org.hibernate.type.SqlTypes;
 @SuperBuilder(toBuilder = true)
 @ToString(onlyExplicitlyIncluded = true)
 @Entity
-@Table(name = "decision", schema = "incremental_migration")
+@Table(name = "decision")
 @SuppressWarnings(
     "java:S6539") // This class depends on many classes, because it's the key part and merging
 // everything.
@@ -105,7 +105,6 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OneToMany
   @JoinTable(
       name = "documentation_unit_procedure",
-      schema = "incremental_migration",
       joinColumns = @JoinColumn(name = "documentation_unit_id"),
       inverseJoinColumns = @JoinColumn(name = "procedure_id"))
   @OrderColumn(name = "rank")

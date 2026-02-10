@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "dismissal_grounds")
+@Table(name = "dismissal_grounds")
 public class DismissalGroundsDTO {
 
   @Id @GeneratedValue private UUID id;

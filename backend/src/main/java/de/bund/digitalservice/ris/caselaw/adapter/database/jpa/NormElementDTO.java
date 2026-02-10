@@ -17,7 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "norm_element", schema = "incremental_migration")
+@Table(name = "norm_element")
 public class NormElementDTO {
   @Id UUID id;
 

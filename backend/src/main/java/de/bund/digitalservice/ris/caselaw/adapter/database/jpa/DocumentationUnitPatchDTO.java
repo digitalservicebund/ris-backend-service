@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(schema = "incremental_migration", name = "documentation_unit_patch")
+@Table(name = "documentation_unit_patch")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

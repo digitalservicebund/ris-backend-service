@@ -26,7 +26,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 @Entity
-@Table(schema = "incremental_migration", name = "related_documentation")
+@Table(name = "related_documentation")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class RelatedDocumentationDTO {
 

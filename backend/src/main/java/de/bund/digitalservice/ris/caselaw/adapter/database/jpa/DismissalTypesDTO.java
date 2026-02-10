@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "dismissal_type")
+@Table(name = "dismissal_type")
 public class DismissalTypesDTO {
 
   @Id @GeneratedValue private UUID id;

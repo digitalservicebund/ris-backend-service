@@ -24,7 +24,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "documentation_unit_history_log", schema = "incremental_migration")
+@Table(name = "documentation_unit_history_log")
 public class HistoryLogDTO {
   @Id
   @GeneratedValue

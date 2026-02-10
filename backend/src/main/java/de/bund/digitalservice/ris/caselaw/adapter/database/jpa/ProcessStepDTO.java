@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Builder(toBuilder = true)
-@Table(name = "process_step", schema = "incremental_migration")
+@Table(name = "process_step")
 public class ProcessStepDTO {
   @Id private UUID id;
 

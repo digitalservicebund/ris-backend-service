@@ -22,7 +22,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "court_region")
+@Table(name = "court_region")
 public class CourtRegionDTO {
 
   @EmbeddedId @Builder.Default private CourtRegionId primaryKey = new CourtRegionId();

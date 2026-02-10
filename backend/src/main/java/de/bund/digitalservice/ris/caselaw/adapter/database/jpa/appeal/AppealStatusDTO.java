@@ -20,7 +20,7 @@ import org.springframework.data.annotation.Immutable;
 @Builder(toBuilder = true)
 @Entity
 @Immutable
-@Table(schema = "incremental_migration", name = "appeal_status")
+@Table(name = "appeal_status")
 public class AppealStatusDTO {
 
   @Id @GeneratedValue private UUID id;

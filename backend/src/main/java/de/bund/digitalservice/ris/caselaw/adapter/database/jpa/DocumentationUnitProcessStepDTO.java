@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "documentation_unit_process_step", schema = "incremental_migration")
+@Table(name = "documentation_unit_process_step")
 public class DocumentationUnitProcessStepDTO {
   @Id @GeneratedValue private UUID id;
 

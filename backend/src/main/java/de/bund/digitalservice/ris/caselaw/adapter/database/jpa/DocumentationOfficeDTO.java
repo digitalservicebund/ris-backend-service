@@ -28,7 +28,7 @@ import org.hibernate.proxy.HibernateProxy;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "documentation_office", schema = "incremental_migration")
+@Table(name = "documentation_office")
 public class DocumentationOfficeDTO {
   @Id private UUID id;
 
