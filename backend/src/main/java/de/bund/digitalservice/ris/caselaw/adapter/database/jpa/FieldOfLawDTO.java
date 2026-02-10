@@ -38,7 +38,6 @@ import lombok.ToString;
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(
-    schema = "incremental_migration",
     uniqueConstraints = {@UniqueConstraint(columnNames = {"juris_id", "notation"})},
     name = "field_of_law")
 public class FieldOfLawDTO {
@@ -55,7 +54,6 @@ public class FieldOfLawDTO {
   // Not used yet
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinTable(
-      schema = "incremental_migration",
       name = "field_of_law_field_of_law_navigation_term",
       joinColumns = @JoinColumn(name = "field_of_law_id"),
       inverseJoinColumns = @JoinColumn(name = "field_of_law_navigation_term_id"))
@@ -65,7 +63,6 @@ public class FieldOfLawDTO {
   // Not used yet
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
-      schema = "incremental_migration",
       name = "field_of_law_field_of_law_keyword",
       joinColumns = @JoinColumn(name = "field_of_law_id"),
       inverseJoinColumns = @JoinColumn(name = "field_of_law_keyword_id"))
@@ -84,7 +81,6 @@ public class FieldOfLawDTO {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinTable(
-      schema = "incremental_migration",
       name = "field_of_law_field_of_law_parent",
       joinColumns = @JoinColumn(name = "field_of_law_id"),
       inverseJoinColumns = @JoinColumn(name = "field_of_law_parent_id"))
@@ -97,7 +93,6 @@ public class FieldOfLawDTO {
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
-      schema = "incremental_migration",
       name = "field_of_law_field_of_law_text_reference",
       joinColumns = @JoinColumn(name = "field_of_law_id"),
       inverseJoinColumns = @JoinColumn(name = "field_of_law_text_reference_id"))

@@ -53,7 +53,6 @@ public class NormAbbreviationDTO {
   @OneToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "norm_abbreviation_document_type",
-      schema = "incremental_migration",
       joinColumns = @JoinColumn(name = "norm_abbreviation_id"),
       inverseJoinColumns = @JoinColumn(name = "document_type_id"))
   @Builder.Default
@@ -71,7 +70,6 @@ public class NormAbbreviationDTO {
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinTable(
       name = "norm_abbreviation_region",
-      schema = "incremental_migration",
       joinColumns = @JoinColumn(name = "norm_abbreviation_id"),
       inverseJoinColumns = @JoinColumn(name = "region_id"))
   private RegionDTO region;

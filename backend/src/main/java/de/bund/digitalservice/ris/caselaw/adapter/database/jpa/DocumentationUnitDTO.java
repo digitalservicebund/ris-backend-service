@@ -118,7 +118,6 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
       fetch = FetchType.LAZY)
   @JoinTable(
       name = "documentation_unit_region",
-      schema = "incremental_migration",
       joinColumns = @JoinColumn(name = "documentation_unit_id"),
       inverseJoinColumns = @JoinColumn(name = "region_id"))
   @Builder.Default

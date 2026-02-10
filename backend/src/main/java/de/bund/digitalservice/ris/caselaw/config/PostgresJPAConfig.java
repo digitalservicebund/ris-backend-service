@@ -31,11 +31,14 @@ public class PostgresJPAConfig {
   @Value("${database.database:neuris}")
   private String database;
 
+  @Value("${database.schema:incremental_migration}")
+  private String schema;
+
   @Bean
   public DataSource dataSource() {
     return DataSourceBuilder.create()
         .driverClassName("org.postgresql.Driver")
-        .url("jdbc:postgresql://" + host + ":" + port + "/" + database)
+        .url("jdbc:postgresql://" + host + ":" + port + "/" + database + "?currentSchema=" + schema)
         .username(user)
         .password(password)
         .build();
