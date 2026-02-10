@@ -85,7 +85,7 @@ spring:
     #    show-sql: true
     properties:
       hibernate:
-        default_schema: incremental_migration
+        default_schema: ${DATABASE_SCHEMA:incremental_migration}
         #        format_sql: true
         #        highlight_sql: true
         #        use_sql_comments: true
