@@ -34,7 +34,7 @@ public class ActiveCitationCaselawDTO {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "source_id", nullable = false)
   @Nullable
-  private DocumentationUnitDTO source;
+  private DecisionDTO source;
 
   @Column(name = "target_document_number")
   @Nullable

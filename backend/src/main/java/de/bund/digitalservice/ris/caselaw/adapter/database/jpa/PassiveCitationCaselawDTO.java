@@ -39,7 +39,7 @@ public class PassiveCitationCaselawDTO {
   @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumn(name = "target_id", nullable = false)
   @Nullable
-  private DocumentationUnitDTO target;
+  private DecisionDTO target;
 
   @Column(name = "source_document_number")
   @Nullable
