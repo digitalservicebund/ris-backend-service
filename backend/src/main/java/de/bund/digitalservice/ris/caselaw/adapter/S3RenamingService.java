@@ -51,7 +51,7 @@ public class S3RenamingService {
    * Adds a document number path prefix and .docx file extension to existing files in the old s3
    * path pattern
    */
-  @Scheduled(cron = "0 30 16 * * *", zone = "Europe/Berlin")
+  @Scheduled(cron = "0 45 17 * * *", zone = "Europe/Berlin")
   @SchedulerLock(name = "adjust-s3-paths", lockAtMostFor = "PT12H")
   public void moveExistingFilesToNewPaths() {
     if (!env.matchesProfiles("uat")) {
