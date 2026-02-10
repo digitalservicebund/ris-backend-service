@@ -66,7 +66,7 @@
     "@unhead/vue": "^2.1.2",
     "@vueuse/core": "^14.2.0",
     "@vueuse/router": "^14.2.0",
-    "axios": "^1.13.4",
+    "axios": "^1.13.5",
     "dayjs": "^1.11.19",
     "fast-json-patch": "^3.1.1",
     "maska": "^3.2.0",
