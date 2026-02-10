@@ -1,7 +1,4 @@
 delete from
-    incremental_migration.active_citation_caselaw;
-
-delete from
   incremental_migration.related_documentation;
 
 delete from

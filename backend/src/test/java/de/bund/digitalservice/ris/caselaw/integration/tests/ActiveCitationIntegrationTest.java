@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -16,13 +14,10 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationTy
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
 import java.util.UUID;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.transaction.TestTransaction;
-import org.springframework.transaction.annotation.Transactional;
 
 @Sql(scripts = {"classpath:doc_office_init.sql", "classpath:active_citations_init.sql"})
 @Sql(
@@ -32,18 +27,12 @@ class ActiveCitationIntegrationTest extends BaseIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-  @Autowired private DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
 
   DocumentationOfficeDTO docOfficeDTO;
 
   @BeforeEach
   void setUp() {
     docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
-  }
-
-  @AfterEach
-  void cleanUp() {
-    databaseDocumentationUnitRepository.deleteAll();
   }
 
   @Test
@@ -1122,97 +1111,5 @@ class ActiveCitationIntegrationTest extends BaseIntegrationTest {
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
                     .hasSize(1));
-  }
-
-  // TODO: (Malte Laukötter, 2026-02-10) remove once the refactoring of the citation tables is done
-  @Transactional
-  @Test
-  void testUpdateDocumentationUnit_alsoUpdatesNewTables() {
-    TestTransaction.end();
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documentunits/documentnr001")
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(Decision.class)
-        .consumeWith(
-            response ->
-                assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
-                    .hasSize(2));
-
-    Decision decisionFromFrontend =
-        Decision.builder()
-            .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
-            .documentNumber("documentnr001")
-            .coreData(CoreData.builder().build())
-            .contentRelatedIndexing(
-                ContentRelatedIndexing.builder()
-                    .activeCitations(
-                        List.of(
-                            ActiveCitation.builder()
-                                .uuid(UUID.fromString("f0232240-7416-11ee-b962-0242ac120002"))
-                                .documentNumber("documentnr002")
-                                .citationType(
-                                    CitationType.builder()
-                                        .uuid(
-                                            UUID.fromString("4e768071-1a19-43a1-8ab9-c185adec94bf"))
-                                        .jurisShortcut("Anwendung")
-                                        .label("Anwendung")
-                                        .build())
-                                .build(),
-                            ActiveCitation.builder()
-                                .uuid(UUID.fromString("f0232240-7416-11ee-b962-0242ac120003"))
-                                .documentNumber("documentnr512") // does not exist
-                                .citationType(
-                                    CitationType.builder()
-                                        .uuid(
-                                            UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
-                                        .build())
-                                .build(),
-                            ActiveCitation.builder()
-                                .citationType(
-                                    CitationType.builder()
-                                        .uuid(
-                                            UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
-                                        .build())
-                                .build(),
-                            ActiveCitation.builder()
-                                .citationType(
-                                    CitationType.builder()
-                                        .uuid(
-                                            UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
-                                        .build())
-                                .build()))
-                    .build())
-            .build();
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(decisionFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    TestTransaction.start();
-    var documentationUnitDTO =
-        databaseDocumentationUnitRepository.findById(
-            UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"));
-    assertThat(documentationUnitDTO).isNotEmpty();
-    var decisionDTO = (DecisionDTO) documentationUnitDTO.get();
-    assertThat(decisionDTO.getDocumentNumber()).isEqualTo("documentnr001");
-    assertThat(decisionDTO.getActiveCaselawCitations()).hasSize(4);
-    assertThat(decisionDTO.getActiveCaselawCitations().getFirst().getSource().getDocumentNumber())
-        .isEqualTo("documentnr001");
-    assertThat(decisionDTO.getActiveCaselawCitations().getFirst().getTargetDocumentNumber())
-        .isEqualTo("documentnr002");
-    assertThat(decisionDTO.getActiveCaselawCitations().getFirst().getRank()).isEqualTo(1);
-    assertThat(decisionDTO.getActiveCaselawCitations().get(1).getRank()).isEqualTo(2);
-    assertThat(decisionDTO.getActiveCaselawCitations().get(2).getRank()).isEqualTo(3);
-    assertThat(decisionDTO.getActiveCaselawCitations().get(3).getRank()).isEqualTo(4);
-    TestTransaction.end();
   }
 }

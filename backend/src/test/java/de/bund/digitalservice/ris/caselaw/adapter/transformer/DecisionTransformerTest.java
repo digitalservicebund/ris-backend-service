@@ -2831,7 +2831,6 @@ class DecisionTransformerTest {
                 .fieldsOfLaw(Collections.emptyList())
                 .norms(Collections.emptyList())
                 .activeCitations(Collections.emptyList())
-                .passiveCaselawCitations(Collections.emptyList())
                 .jobProfiles(Collections.emptyList())
                 .dismissalGrounds(Collections.emptyList())
                 .dismissalTypes(Collections.emptyList())

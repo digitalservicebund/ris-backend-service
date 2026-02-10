@@ -20,7 +20,6 @@ public record ContentRelatedIndexing(
     List<FieldOfLaw> fieldsOfLaw,
     List<NormReference> norms,
     List<ActiveCitation> activeCitations,
-    List<PassiveCaselawCitation> passiveCaselawCitations,
     List<String> dismissalGrounds,
     List<String> dismissalTypes,
     List<CollectiveAgreement> collectiveAgreements,
