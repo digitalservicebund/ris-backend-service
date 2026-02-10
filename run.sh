@@ -99,6 +99,13 @@ IMPORTER_URL=$( op read "op://Team NeuRIS/Importer - Staging/website")
 BAREID_INSTANCE=$(op read "op://Team NeuRIS/API keycloak bare.id user api client staging/instanceUuid")
 PORTAL_STAGING_BASIC_AUTH_USER=$(op read "op://Team NeuRIS/Basic auth public portal staging/username")
 PORTAL_STAGING_BASIC_AUTH_PASSWORD=$(op read "op://Team NeuRIS/Basic auth public portal staging/password")
+SPRING_PROFILES_ACTIVE=local
+DATABASE_DATABASE=neuris
+DATABASE_USER=test
+DATABASE_PASSWORD=test
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_SCHEMA=incremental_migration
 
 EOF
 

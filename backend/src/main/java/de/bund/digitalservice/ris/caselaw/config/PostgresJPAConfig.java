@@ -31,7 +31,7 @@ public class PostgresJPAConfig {
   @Value("${database.database:neuris}")
   private String database;
 
-  @Value("${database.schema:incremental_migration}")
+  @Value("${database.schema:caselaw}")
   private String schema;
 
   @Bean

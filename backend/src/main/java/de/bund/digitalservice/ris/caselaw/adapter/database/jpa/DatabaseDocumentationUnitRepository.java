@@ -25,8 +25,8 @@ public interface DatabaseDocumentationUnitRepository
   @Query(
       value =
           """
-          SELECT DISTINCT d.id FROM incremental_migration.documentation_unit d
-          JOIN incremental_migration.status s ON d.id = s.documentation_unit_id
+          SELECT DISTINCT d.id FROM documentation_unit d
+          JOIN status s ON d.id = s.documentation_unit_id
           where s.publication_status = 'PUBLISHED'
           LIMIT 100
           """,
