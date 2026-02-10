@@ -22,7 +22,7 @@ import lombok.ToString;
 @ToString
 @Builder(toBuilder = true)
 @Entity
-@Table(name = "user")
+@Table(name = "\"user\"")
 public class UserDTO {
 
   @Id @GeneratedValue private UUID id;
