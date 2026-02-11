@@ -34,7 +34,7 @@ public interface DatabaseDuplicateCheckRepository
     SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive, status.publication_status AS status
     FROM documentation_unit documentationUnit
       LEFT JOIN status status ON status.id = documentationUnit.current_status_id
-      JOIN \file_number fileNumber
+      JOIN file_number fileNumber
         ON documentationUnit.id = fileNumber.documentation_unit_id
       JOIN document_type documentType
         ON documentationUnit.document_type_id = documentType.id
