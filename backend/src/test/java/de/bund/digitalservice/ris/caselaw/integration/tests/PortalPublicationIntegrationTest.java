@@ -24,16 +24,21 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedDocumentationSnapshotEntity;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedDocumentationSnapshotRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -61,6 +66,8 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 @Import({PortalPublicationIntegrationTest.PortalPublicationConfig.class})
 class PortalPublicationIntegrationTest extends BaseIntegrationTest {
 
+  @Autowired private DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
+
   @TestConfiguration
   static class PortalPublicationConfig {
 
@@ -79,6 +86,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseDocumentationUnitHistoryLogRepository historyLogRepository;
   @Autowired private DatabaseUserRepository databaseUserRepository;
   @Autowired private DatabaseAttachmentInlineRepository attachmentInlineRepository;
+  @Autowired private PublishedDocumentationSnapshotRepository snapshotRepository;
 
   @MockitoBean(name = "portalS3Client")
   private S3Client s3Client;
@@ -579,5 +587,80 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
         .fileNumbers(List.of(FileNumberDTO.builder().value("123").rank(0L).build()))
         .attachmentsInline(inlineAttachments)
         .grounds("lorem ipsum dolor sit amet");
+  }
+
+  @Test
+  void testFillPublishedDocumentationUnit_firstPublication() {
+    DecisionDTO decision =
+        DecisionDTO.builder()
+            .documentNumber("XXRE000000000")
+            .documentationOffice(documentationOffice)
+            .build();
+    repository.save(decision);
+
+    StatusDTO status =
+        StatusDTO.builder()
+            .publicationStatus(PublicationStatus.PUBLISHED)
+            .documentationUnit(decision)
+            .build();
+    decision.setStatus(status);
+    repository.save(decision);
+
+    var result =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/admin/fillPublishedDocumentationUnit")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<PublishedDocumentationSnapshotEntity> snapshots = snapshotRepository.findAll();
+
+    assertThat(result.getResponseBody()).isEqualTo("ok");
+    assertThat(snapshots).hasSize(1);
+  }
+
+  @Test
+  void testFillPublishedDocumentationUnit_withExistingPublishedDocumentationUnit() {
+    DecisionDTO decision =
+        DecisionDTO.builder()
+            .documentNumber("XXRE000000000")
+            .documentationOffice(documentationOffice)
+            .build();
+    repository.save(decision);
+
+    StatusDTO status =
+        StatusDTO.builder()
+            .publicationStatus(PublicationStatus.PUBLISHED)
+            .documentationUnit(decision)
+            .build();
+    decision.setStatus(status);
+    DecisionDTO savedDecision = repository.save(decision);
+
+    PublishedDocumentationSnapshotEntity snapshot =
+        PublishedDocumentationSnapshotEntity.builder()
+            .documentationUnitId(savedDecision.getId())
+            .publishedAt(LocalDateTime.now().minusDays(1))
+            .build();
+    snapshotRepository.save(snapshot);
+
+    var result =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/admin/fillPublishedDocumentationUnit")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<PublishedDocumentationSnapshotEntity> snapshots = snapshotRepository.findAll();
+
+    assertThat(result.getResponseBody()).isEqualTo("ok");
+    assertThat(snapshots).hasSize(1);
   }
 }

@@ -1,17 +1,16 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
-import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentInline;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class AttachmentInlineTransformer {
 
-  public static Attachment transformToDomain(AttachmentInlineDTO dto) {
-    return Attachment.builder()
+  public static AttachmentInline transformToDomain(AttachmentInlineDTO dto) {
+    return AttachmentInline.builder()
         .name(dto.getFilename())
         .format(dto.getFormat())
-        .s3path(null)
         .uploadTimestamp(dto.getUploadTimestamp())
         .build();
   }

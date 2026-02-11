@@ -204,7 +204,7 @@ public class HandoverService {
    * the images are not in the correct format (.png, .jpg, .gif).
    */
   private void checkHandoverAllowed(Decision decision) {
-    List<Attachment> inlineAttachments =
+    List<AttachmentInline> inlineAttachments =
         attachmentInlineRepository.findAllByDocumentationUnitId(decision.uuid());
     if (!inlineAttachments.isEmpty()) {
       boolean isUnpublished =
@@ -220,7 +220,7 @@ public class HandoverService {
       }
       var hasOnlyAllowedImageFormats =
           inlineAttachments.stream()
-              .map(Attachment::format)
+              .map(AttachmentInline::format)
               .map(String::toLowerCase)
               .allMatch(
                   format ->

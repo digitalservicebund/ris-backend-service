@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.EnvironmentResponse;
 import de.bund.digitalservice.ris.caselaw.domain.MailStatus;
@@ -34,6 +35,7 @@ class AdminControllerTest {
   @MockitoBean private EnvironmentService environmentService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
+  @MockitoBean private PortalPublicationService publicationService;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
 

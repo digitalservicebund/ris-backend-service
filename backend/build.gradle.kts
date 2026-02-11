@@ -13,15 +13,15 @@ plugins {
     jacoco
     id("org.springframework.boot") version "4.0.2"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.diffplug.spotless") version "8.2.0"
+    id("com.diffplug.spotless") version "8.2.1"
     id("org.sonarqube") version "7.2.2.6593"
     id("com.github.jk1.dependency-license-report") version "3.0.1"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.2.0"
-    id("org.flywaydb.flyway") version "11.20.2"
-    id("io.sentry.jvm.gradle") version "5.12.2"
+    id("org.flywaydb.flyway") version "12.0.0"
+    id("io.sentry.jvm.gradle") version "6.0.0"
 }
 
 group = "de.bund.digitalservice"
@@ -167,10 +167,10 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server:7.0.2")
     implementation("org.springframework.boot:spring-boot-starter-flyway")
 
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:5.0.0")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:5.0.1")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.33.4")
+    implementation("com.google.protobuf:protobuf-java:4.33.5")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.6.0")
@@ -182,7 +182,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.41.14"))
+    implementation(platform("software.amazon.awssdk:bom:2.41.24"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -202,13 +202,13 @@ dependencies {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
-//     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.49.jar"))
+    // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.49.jar"))
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.125")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.135")
     // for local development:
-//     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.121.jar"))
+    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.135.jar"))
 
     implementation("tools.jackson.core:jackson-core:3.0.4")
     implementation("tools.jackson.core:jackson-databind:3.0.4")
@@ -223,12 +223,12 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260102.1")
 
-    implementation("io.getunleash:unleash-client-java:12.1.0")
+    implementation("io.getunleash:unleash-client-java:12.1.1")
     implementation("org.apache.commons:commons-text:1.15.0")
     implementation("org.jsoup:jsoup:1.22.1")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:7.5.0")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.5.0")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:7.6.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.6.0")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.4")
@@ -243,12 +243,12 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.20.0")
 
     // CVE-2025-67735
-    implementation("io.netty:netty-codec-http:4.2.9.Final")
+    implementation("io.netty:netty-codec-http:4.2.10.Final")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.20.2"
+    val flywayCore = "org.flywaydb:flyway-core:12.0.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.20.2")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:12.0.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -274,14 +274,14 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.2.1.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.2.4.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
 buildscript {
     dependencies {
-        classpath("org.flywaydb:flyway-database-postgresql:11.20.2")
+        classpath("org.flywaydb:flyway-database-postgresql:12.0.0")
     }
 }
 

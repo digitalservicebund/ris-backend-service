@@ -7,8 +7,8 @@ import java.util.UUID;
 /** Repository for inline attachments (images). */
 public interface AttachmentInlineRepository {
 
-  List<Attachment> findAllByDocumentationUnitId(UUID documentationUnitId);
+  List<AttachmentInline> findAllByDocumentationUnitId(UUID documentationUnitId);
 
-  Optional<Attachment> findByDocumentationUnitIdAndFilename(
+  Optional<AttachmentInline> findByDocumentationUnitIdAndFilename(
       UUID documentationUnitId, String fileName);
 }

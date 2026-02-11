@@ -7,8 +7,10 @@ import EditableList from "@/components/EditableList.vue"
 import ReferenceSummary from "@/components/ReferenceSummary.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useScroll } from "@/composables/useScroll"
+import { DocumentationUnit } from "@/domain/documentationUnit"
 import Reference from "@/domain/reference"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import { isDecision } from "@/utils/typeGuards"
 import IconAdd from "~icons/material-symbols/add"
 
 const store = useDocumentUnitStore()
@@ -17,16 +19,20 @@ const literatureReferenceListRef = ref()
 const { scrollIntoViewportById } = useScroll()
 
 const caselawReferences = computed({
-  get: () => store.documentUnit!.caselawReferences as Reference[],
+  get: () => (store.documentUnit?.caselawReferences ?? []) as Reference[],
   set: (newValues) => {
-    store.documentUnit!.caselawReferences = newValues
+    if (store.documentUnit) {
+      store.documentUnit.caselawReferences = newValues
+    }
   },
 })
 
 const literatureReferences = computed({
-  get: () => store.documentUnit!.literatureReferences as Reference[],
+  get: () => (store.documentUnit?.literatureReferences ?? []) as Reference[],
   set: (newValues) => {
-    store.documentUnit!.literatureReferences = newValues
+    if (store.documentUnit) {
+      store.documentUnit.literatureReferences = newValues
+    }
   },
 })
 
@@ -89,16 +95,18 @@ async function addNewEntry(entryType: "caselaw" | "literature") {
         />
       </div>
 
-      <TitleElement>Literaturfundstellen</TitleElement>
+      <div v-if="isDecision(store.documentUnit as DocumentationUnit)">
+        <TitleElement>Literaturfundstellen</TitleElement>
 
-      <div class="flex flex-row" data-testid="literature-reference-list">
-        <EditableList
-          ref="literatureReferenceListRef"
-          v-model="literatureReferences"
-          :create-entry="() => new Reference()"
-          :edit-component="DocumentUnitLiteratureReferenceInput"
-          :summary-component="ReferenceSummary"
-        />
+        <div class="flex flex-row" data-testid="literature-reference-list">
+          <EditableList
+            ref="literatureReferenceListRef"
+            v-model="literatureReferences"
+            :create-entry="() => new Reference()"
+            :edit-component="DocumentUnitLiteratureReferenceInput"
+            :summary-component="ReferenceSummary"
+          />
+        </div>
       </div>
     </div>
   </div>

@@ -80,7 +80,7 @@ describe("Document Unit Categories", () => {
     screen.getByLabelText("Datei löschen").click()
     await nextTick()
     expect(screen.getByRole("dialog")).toHaveTextContent(
-      "Möchten Sie den Anhang this-is-a-file-name.docx wirklich dauerhaft löschen?",
+      "Möchten Sie die Datei this-is-a-file-name.docx wirklich dauerhaft löschen?",
     )
     screen.getByLabelText("Abbrechen").click()
     await nextTick()

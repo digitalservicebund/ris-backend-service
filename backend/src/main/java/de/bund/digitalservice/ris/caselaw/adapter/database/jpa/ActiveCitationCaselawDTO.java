@@ -19,48 +19,51 @@ import org.jspecify.annotations.Nullable;
 
 @Getter
 @Setter
-@Entity
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-@Table(name = "citation_caselaw_blindlink_active", schema = "incremental_migration")
-public class ActiveBlindlinkCaselawCitationDTO {
+@Entity
+@Table(name = "active_citation_caselaw", schema = "incremental_migration")
+public class ActiveCitationCaselawDTO {
   @Id
-  // @GeneratedValue -- we currently manage the id manually to keep it in sync with
-  // related_documentation
+  @Column(name = "id", nullable = false)
+  @Nullable
+  @AssignedIdOrUuid
   private UUID id;
 
-  @NonNull
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "source_id", nullable = false)
-  private DecisionDTO sourceDocument;
-
   @Nullable
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "target_court_id")
-  private CourtDTO targetCourt;
+  private DecisionDTO source;
 
-  @Nullable
-  @Column(name = "target_date")
-  private LocalDate targetDate;
-
-  @Nullable
   @Column(name = "target_document_number")
+  @Nullable
   private String targetDocumentNumber;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "target_court_id")
   @Nullable
+  private CourtDTO targetCourt;
+
+  @Column(name = "target_date")
+  @Nullable
+  private LocalDate targetDate;
+
   @Column(name = "target_file_number")
+  @Nullable
   private String targetFileNumber;
 
-  @Nullable
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "target_document_type_id")
+  @Nullable
   private DocumentTypeDTO targetDocumentType;
 
-  @Nullable
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "citation_type_id")
+  @Nullable
   private CitationTypeDTO citationType;
 
-  @Column @NonNull private Integer rank;
+  @Column(name = "rank", nullable = false)
+  @NonNull
+  private Integer rank;
 }

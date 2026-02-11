@@ -1812,6 +1812,49 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  void testGenerateNewDocumentationUnit_withLiteratureReferenceInParameters_shouldSetSource() {
+    int randomJurisId = new Random().nextInt(100000, 999999);
+    LegalPeriodicalDTO legalPeriodical =
+        legalPeriodicalRepository.save(
+            LegalPeriodicalDTO.builder()
+                .jurisId(randomJurisId)
+                .abbreviation("ABC")
+                .primaryReference(true)
+                .title("Longer title")
+                .build());
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("DS", "ZZREYYYY*****"));
+
+    DocumentationUnitCreationParameters parameters =
+        DocumentationUnitCreationParameters.builder()
+            .reference(
+                Reference.builder()
+                    .referenceType(ReferenceType.LITERATURE)
+                    .legalPeriodical(LegalPeriodicalTransformer.transformToDomain(legalPeriodical))
+                    .legalPeriodicalRawValue(legalPeriodical.getAbbreviation())
+                    .author("Test")
+                    .citation("test")
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/new")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(parameters)
+        .exchange()
+        .expectStatus()
+        .isCreated()
+        .expectBody(Decision.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().coreData().sources())
+                    .extracting(Source::value)
+                    .containsExactly(SourceValue.Z));
+  }
+
+  @Test
   void testGenerateNewDocumentationUnit_shouldWriteHistoryLogs_forProcessSteps() {
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "XXREYYYY*****"));

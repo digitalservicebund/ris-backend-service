@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter;
+package de.bund.digitalservice.ris.caselaw.config;
 
 import javax.sql.DataSource;
 import net.javacrumbs.shedlock.core.LockProvider;
@@ -22,6 +22,7 @@ public class SchedulingConfig {
   public LockProvider lockProvider(DataSource dataSource) {
     return new JdbcTemplateLockProvider(
         JdbcTemplateLockProvider.Configuration.builder()
+            .withTableName("incremental_migration.shedlock")
             .withJdbcTemplate(new JdbcTemplate(dataSource))
             .usingDbTime()
             .build());

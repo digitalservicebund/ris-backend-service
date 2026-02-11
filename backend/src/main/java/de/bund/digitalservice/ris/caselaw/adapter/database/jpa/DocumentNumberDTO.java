@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "document_number", schema = "public")
+@Table(name = "document_number", schema = "incremental_migration")
 public class DocumentNumberDTO {
 
   @Id @GeneratedValue private UUID id;

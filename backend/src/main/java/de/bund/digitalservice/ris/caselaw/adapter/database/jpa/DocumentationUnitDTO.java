@@ -214,17 +214,7 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
       fetch = FetchType.LAZY)
   @Builder.Default
   @OrderBy("documentationUnitRank")
-  private List<CaselawReferenceDTO> caselawReferences = new ArrayList<>();
-
-  // Literaturfundstellen
-  @OneToMany(
-      mappedBy = "documentationUnit",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true,
-      fetch = FetchType.LAZY)
-  @Builder.Default
-  @OrderBy("documentationUnitRank")
-  private List<LiteratureReferenceDTO> literatureReferences = new ArrayList<>();
+  private List<ReferenceDTO> caselawReferences = new ArrayList<>();
 
   /** Stores the last time the document has been handed over to jDV * */
   @Column(name = "last_publication_date_time")

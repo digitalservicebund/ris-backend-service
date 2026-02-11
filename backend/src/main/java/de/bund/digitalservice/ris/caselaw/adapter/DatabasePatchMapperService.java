@@ -15,7 +15,7 @@ import com.gravity9.jsonpatch.ReplaceOperation;
 import com.gravity9.jsonpatch.diff.JsonDiff;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitPatchRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitPatchDTO;
-import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentInline;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -346,8 +346,8 @@ public class DatabasePatchMapperService implements PatchMapperService {
                     HttpHeaders attachmentHeaders = createHttpHeadersForImage(base64ImageElement);
 
                     ByteBuffer imageBytes = ImageUtil.encodeToBytes(base64ImageElement);
-                    Attachment savedAttachment =
-                        attachmentService.attachFileToDocumentationUnit(
+                    AttachmentInline savedAttachment =
+                        attachmentService.attachImageFileToDocumentationUnit(
                             documentationUnit.uuid(), imageBytes, attachmentHeaders, null);
 
                     Element newImageElement =

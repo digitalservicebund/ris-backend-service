@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.AttachmentTransfor
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentInline;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
@@ -27,9 +28,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,7 +54,6 @@ import software.amazon.awssdk.services.s3.model.CompletedPart;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.UploadPartRequest;
 
 @Slf4j
@@ -67,12 +65,7 @@ public class S3AttachmentService implements AttachmentService {
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
   private final DocumentationUnitHistoryLogService documentationUnitHistoryLogService;
   private static final String UNKNOWN_YET = "unknown yet";
-  private static final int PART_SIZE = 5 * 1024 * 1024;
-  private static final int MAX_PARTS = 10_000;
-
-  private final MediaType wordMediaType =
-      MediaType.parseMediaType(
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+  private static final int PART_SIZE = 5 * 1024 * 1024; // minimum of 5 MB for S3 multipart upload
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
@@ -95,13 +88,8 @@ public class S3AttachmentService implements AttachmentService {
     this.documentationUnitHistoryLogService = documentationUnitHistoryLogService;
   }
 
-  public Attachment attachFileToDocumentationUnit(
+  public AttachmentInline attachImageFileToDocumentationUnit(
       UUID documentationUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders, User user) {
-    String fileName =
-        httpHeaders.containsHeader("X-Filename")
-            ? httpHeaders.getFirst("X-Filename")
-            : "Kein Dateiname gefunden";
-
     DocumentationUnitDTO documentationUnit =
         documentationUnitRepository.findById(documentationUnitId).orElseThrow();
 
@@ -112,10 +100,7 @@ public class S3AttachmentService implements AttachmentService {
           HttpStatus.BAD_REQUEST, "Missing / invalid Content-Type header");
     }
 
-    if (equalsMediaType(wordMediaType, contentType)) {
-      return attachDocx(
-          documentationUnitId, byteBuffer, httpHeaders, user, documentationUnit, fileName);
-    } else if (ImageUtil.getSupportedMediaTypes().stream()
+    if (ImageUtil.getSupportedMediaTypes().stream()
         .anyMatch(type -> equalsMediaType(type, contentType))) {
 
       return attachImage(byteBuffer, contentType, documentationUnit);
@@ -183,18 +168,29 @@ public class S3AttachmentService implements AttachmentService {
 
     attachmentDTO.setS3ObjectPath(s3ObjectPath);
     var attachment = AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
-
+    var description = getAttachmentAddedDescription(filename, type);
     setLastUpdated(user, documentationUnit);
     documentationUnitHistoryLogService.saveHistoryLog(
-        documentationUnitId,
-        user,
-        HistoryLogEventType.FILES,
-        "Anhang \"" + filename + "\" hinzugefügt");
+        documentationUnitId, user, HistoryLogEventType.FILES, description);
 
     return attachment;
   }
 
-  public String getExtension(String filename) {
+  private String getAttachmentAddedDescription(String filename, AttachmentType attachmentType) {
+    return switch (attachmentType) {
+      case AttachmentType.ORIGINAL -> "Originaldokument hinzugefügt";
+      case AttachmentType.OTHER -> "Anhang \"" + filename + "\" hinzugefügt";
+    };
+  }
+
+  private String getAttachmentDeletedDescription(String filename, AttachmentType attachmentType) {
+    return switch (attachmentType) {
+      case AttachmentType.ORIGINAL -> "Originaldokument gelöscht";
+      case AttachmentType.OTHER -> "Anhang \"" + filename + "\" gelöscht";
+    };
+  }
+
+  private String getExtension(String filename) {
     if (filename == null || !filename.contains(".")) {
       return "";
     }
@@ -223,8 +219,6 @@ public class S3AttachmentService implements AttachmentService {
     try (inputStream) {
       byte[] buffer;
       while ((buffer = inputStream.readNBytes(PART_SIZE)).length > 0) {
-        validatePartLimit(partNumber);
-
         CompletedPart part = uploadPart(s3ObjectPath, uploadId, partNumber, buffer);
         completedParts.add(part);
         partNumber++;
@@ -240,14 +234,6 @@ public class S3AttachmentService implements AttachmentService {
       abortUploadSafely(s3ObjectPath, uploadId, e);
       throw new ResponseStatusException(
           HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload file", e);
-    }
-  }
-
-  private void validatePartLimit(int partNumber) {
-    if (partNumber > MAX_PARTS) {
-      throw new ResponseStatusException(
-          HttpStatus.CONTENT_TOO_LARGE,
-          String.format("File too large: %d parts exceeds %d limit", partNumber, MAX_PARTS));
     }
   }
 
@@ -297,7 +283,7 @@ public class S3AttachmentService implements AttachmentService {
     }
   }
 
-  private Attachment attachImage(
+  private AttachmentInline attachImage(
       ByteBuffer byteBuffer, MediaType contentType, DocumentationUnitDTO documentationUnit) {
 
     AttachmentInlineDTO attachmentInlineDTO =
@@ -317,41 +303,6 @@ public class S3AttachmentService implements AttachmentService {
     return AttachmentInlineTransformer.transformToDomain(persistedAttachmentLineDTO);
   }
 
-  private Attachment attachDocx(
-      UUID documentationUnitId,
-      ByteBuffer byteBuffer,
-      HttpHeaders httpHeaders,
-      User user,
-      DocumentationUnitDTO documentationUnit,
-      String fileName) {
-    checkDocx(byteBuffer);
-
-    AttachmentDTO attachmentDTO =
-        AttachmentDTO.builder()
-            .s3ObjectPath(UNKNOWN_YET)
-            .documentationUnit(documentationUnit)
-            .filename(fileName)
-            .format("docx")
-            .uploadTimestamp(Instant.now())
-            .attachmentType(AttachmentType.ORIGINAL.name())
-            .build();
-
-    attachmentDTO = repository.save(attachmentDTO);
-
-    String s3ObjectPath = attachmentDTO.getId().toString();
-    putObjectIntoBucket(s3ObjectPath, byteBuffer, httpHeaders);
-
-    attachmentDTO.setS3ObjectPath(s3ObjectPath);
-
-    Attachment attachment = AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
-
-    setLastUpdated(user, documentationUnit);
-    documentationUnitHistoryLogService.saveHistoryLog(
-        documentationUnitId, user, HistoryLogEventType.FILES, "Word-Dokument hinzugefügt");
-
-    return attachment;
-  }
-
   @Transactional(transactionManager = "jpaTransactionManager")
   public void deleteByFileId(UUID fileId, UUID documentationUnitId, User user) {
     var attachmentDTO = repository.findById(fileId);
@@ -368,7 +319,9 @@ public class S3AttachmentService implements AttachmentService {
                   documentationUnitId,
                   user,
                   HistoryLogEventType.FILES,
-                  String.format("Anhang \"%s\" gelöscht", attachmentDTO.get().getFilename()));
+                  getAttachmentDeletedDescription(
+                      attachmentDTO.get().getFilename(),
+                      AttachmentType.valueOf(attachmentDTO.get().getAttachmentType())));
             });
     repository.deleteById(fileId);
   }
@@ -447,35 +400,6 @@ public class S3AttachmentService implements AttachmentService {
     byteBuffer.get(byteBufferArray);
     byteBuffer.rewind();
     return byteBufferArray;
-  }
-
-  private void putObjectIntoBucket(String fileId, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
-
-    var contentLength = httpHeaders.getContentLength();
-
-    Map<String, String> metadata = new HashMap<>();
-    MediaType mediaType = httpHeaders.getContentType();
-    if (mediaType == null) {
-      mediaType = MediaType.APPLICATION_OCTET_STREAM;
-    }
-
-    log.debug("upload header information: mediaType{}, contentLength={}", mediaType, contentLength);
-
-    var requestBody = RequestBody.fromByteBuffer(byteBuffer);
-    var putObjectRequestBuilder =
-        PutObjectRequest.builder()
-            .bucket(bucketName)
-            .key(fileId)
-            .contentType(mediaType.toString())
-            .metadata(metadata);
-
-    if (contentLength >= 0) {
-      putObjectRequestBuilder.contentLength(contentLength);
-    }
-
-    var putObjectRequest = putObjectRequestBuilder.build();
-
-    s3Client.putObject(putObjectRequest, requestBody);
   }
 
   private void deleteObjectFromBucket(String s3Path) {

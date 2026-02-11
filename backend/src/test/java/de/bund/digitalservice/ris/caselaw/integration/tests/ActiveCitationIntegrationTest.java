@@ -1124,7 +1124,7 @@ class ActiveCitationIntegrationTest extends BaseIntegrationTest {
                     .hasSize(1));
   }
 
-  // TODO: (Malte Laukötter, 2026-01-13) remove once the refactoring of the citation tables is done
+  // TODO: (Malte Laukötter, 2026-02-10) remove once the refactoring of the citation tables is done
   @Transactional
   @Test
   void testUpdateDocumentationUnit_alsoUpdatesNewTables() {
@@ -1204,36 +1204,15 @@ class ActiveCitationIntegrationTest extends BaseIntegrationTest {
     assertThat(documentationUnitDTO).isNotEmpty();
     var decisionDTO = (DecisionDTO) documentationUnitDTO.get();
     assertThat(decisionDTO.getDocumentNumber()).isEqualTo("documentnr001");
-    assertThat(decisionDTO.getActiveBlindlinkCaselawCitations()).hasSize(3);
-    assertThat(
-            decisionDTO
-                .getActiveBlindlinkCaselawCitations()
-                .getFirst()
-                .getSourceDocument()
-                .getDocumentNumber())
+    assertThat(decisionDTO.getActiveCaselawCitations()).hasSize(4);
+    assertThat(decisionDTO.getActiveCaselawCitations().getFirst().getSource().getDocumentNumber())
         .isEqualTo("documentnr001");
-    assertThat(
-            decisionDTO.getActiveBlindlinkCaselawCitations().getFirst().getTargetDocumentNumber())
-        .isEqualTo("documentnr512");
-    assertThat(decisionDTO.getActiveBlindlinkCaselawCitations().getFirst().getRank()).isEqualTo(2);
-    assertThat(decisionDTO.getActiveBlindlinkCaselawCitations().get(1).getRank()).isEqualTo(3);
-    assertThat(decisionDTO.getActiveBlindlinkCaselawCitations().get(2).getRank()).isEqualTo(4);
-    assertThat(decisionDTO.getActiveLinkCaselawCitations()).hasSize(1);
-    assertThat(
-            decisionDTO
-                .getActiveLinkCaselawCitations()
-                .getFirst()
-                .getSourceDocument()
-                .getDocumentNumber())
-        .isEqualTo("documentnr001");
-    assertThat(
-            decisionDTO
-                .getActiveLinkCaselawCitations()
-                .getFirst()
-                .getTargetDocument()
-                .getDocumentNumber())
+    assertThat(decisionDTO.getActiveCaselawCitations().getFirst().getTargetDocumentNumber())
         .isEqualTo("documentnr002");
-    assertThat(decisionDTO.getActiveLinkCaselawCitations().getFirst().getRank()).isEqualTo(1);
+    assertThat(decisionDTO.getActiveCaselawCitations().getFirst().getRank()).isEqualTo(1);
+    assertThat(decisionDTO.getActiveCaselawCitations().get(1).getRank()).isEqualTo(2);
+    assertThat(decisionDTO.getActiveCaselawCitations().get(2).getRank()).isEqualTo(3);
+    assertThat(decisionDTO.getActiveCaselawCitations().get(3).getRank()).isEqualTo(4);
     TestTransaction.end();
   }
 }

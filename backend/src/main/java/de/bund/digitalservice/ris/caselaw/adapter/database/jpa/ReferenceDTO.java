@@ -4,8 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -25,9 +23,8 @@ import org.hibernate.annotations.UuidGenerator;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(schema = "incremental_migration", name = "reference")
-public abstract class ReferenceDTO {
+public class ReferenceDTO {
 
   @Id
   @GeneratedValue
@@ -44,13 +41,6 @@ public abstract class ReferenceDTO {
   @NotNull
   private Integer documentationUnitRank;
 
-  @Column(name = "edition_rank")
-  private Integer editionRank;
-
-  @ManyToOne
-  @JoinColumn(name = "edition_id")
-  private LegalPeriodicalEditionDTO edition;
-
   @Column @NotBlank private String citation;
 
   @JoinColumn(name = "legal_periodical_id")
@@ -60,4 +50,18 @@ public abstract class ReferenceDTO {
   @Column(name = "legal_periodical_raw_value")
   @NotNull
   private String legalPeriodicalRawValue;
+
+  @Column private String type;
+
+  @Column(name = "reference_supplement")
+  private String referenceSupplement;
+
+  @Column private String footnote;
+
+  @Column(name = "edition_rank")
+  private Integer editionRank;
+
+  @ManyToOne
+  @JoinColumn(name = "edition_id")
+  private LegalPeriodicalEditionDTO edition;
 }

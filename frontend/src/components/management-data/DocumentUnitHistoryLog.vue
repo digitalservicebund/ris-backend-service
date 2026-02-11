@@ -23,7 +23,7 @@ const getColumnWidth = (field: string) => {
   if (field === "createdAt") {
     return { width: "250px" }
   } else if (field === "createdBy" || field === "description") {
-    return { width: "fit-content" }
+    return { width: "fit-content", wordBreak: "break-all" }
   }
   return {} // default style
 }
