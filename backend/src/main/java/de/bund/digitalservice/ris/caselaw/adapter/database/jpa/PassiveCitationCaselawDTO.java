@@ -27,7 +27,7 @@ import org.jspecify.annotations.Nullable;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "passive_citation_caselaw", schema = "incremental_migration")
+@Table(name = "passive_citation_caselaw")
 public class PassiveCitationCaselawDTO {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)

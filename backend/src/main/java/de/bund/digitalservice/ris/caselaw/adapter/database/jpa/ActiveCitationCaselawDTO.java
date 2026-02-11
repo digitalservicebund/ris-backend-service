@@ -23,7 +23,7 @@ import org.jspecify.annotations.Nullable;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "active_citation_caselaw", schema = "incremental_migration")
+@Table(name = "active_citation_caselaw")
 public class ActiveCitationCaselawDTO {
   @Id
   @Column(name = "id", nullable = false)
