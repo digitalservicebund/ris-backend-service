@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.NormReferenceType;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbstractNormReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDocumentNumberDTO;
@@ -11,9 +10,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
@@ -69,7 +68,7 @@ public class DocumentableTransformer {
                     referenceDTO -> {
                       referenceDTO.setDocumentationUnitRank(rank.incrementAndGet());
 
-                      Optional<CaselawReferenceDTO> existingReference = Optional.empty();
+                      Optional<ReferenceDTO> existingReference = Optional.empty();
 
                       UUID referenceId = referenceDTO.getId();
                       if (referenceId != null) {
@@ -84,41 +83,7 @@ public class DocumentableTransformer {
                             referenceDTO.setEdition(caselawReferenceDTO.getEdition());
                           });
 
-                      return (CaselawReferenceDTO) referenceDTO;
-                    })
-                .toList());
-  }
-
-  static void addLiteratureReferences(
-      DocumentationUnit updatedDomainObject,
-      DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder,
-      DocumentationUnitDTO currentDTO) {
-    AtomicInteger rank = new AtomicInteger(0);
-    builder.literatureReferences(
-        updatedDomainObject.literatureReferences() == null
-            ? Collections.emptyList()
-            : updatedDomainObject.literatureReferences().stream()
-                .map(ReferenceTransformer::transformToDTO)
-                .map(
-                    referenceDTO -> {
-                      referenceDTO.setDocumentationUnitRank(rank.incrementAndGet());
-
-                      Optional<LiteratureReferenceDTO> existingReference = Optional.empty();
-
-                      UUID referenceId = referenceDTO.getId();
-                      if (referenceId != null) {
-                        existingReference =
-                            currentDTO.getLiteratureReferences().stream()
-                                .filter(existing -> referenceId.equals(existing.getId()))
-                                .findFirst();
-                      }
-                      existingReference.ifPresent(
-                          literatureReferenceDTO -> {
-                            referenceDTO.setEditionRank(literatureReferenceDTO.getEditionRank());
-                            referenceDTO.setEdition(literatureReferenceDTO.getEdition());
-                          });
-
-                      return (LiteratureReferenceDTO) referenceDTO;
+                      return referenceDTO;
                     })
                 .toList());
   }
@@ -151,11 +116,6 @@ public class DocumentableTransformer {
     // --- CaselawReferences linking ---
     if (result.getCaselawReferences() != null) {
       result.getCaselawReferences().forEach(reference -> reference.setDocumentationUnit(result));
-    }
-
-    // --- LiteratureReferences linking ---
-    if (result.getLiteratureReferences() != null) {
-      result.getLiteratureReferences().forEach(reference -> reference.setDocumentationUnit(result));
     }
 
     // --- ManagementData linking ---

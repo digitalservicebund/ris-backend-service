@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -55,11 +54,6 @@ public class S3Bucket {
     } while (Boolean.TRUE.equals(response.isTruncated()));
 
     return keys;
-  }
-
-  public Optional<String> getFileAsString(String filename) {
-    Optional<byte[]> s3Response = get(filename);
-    return s3Response.map(bytes -> new String(bytes, StandardCharsets.UTF_8));
   }
 
   public Optional<byte[]> get(String filename) {

@@ -7,8 +7,6 @@ import {
   searchForDocUnitWithFileNumberAndDecisionDate,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
-/* eslint-disable playwright/no-conditional-in-test */
-
 test.describe("Literature references", () => {
   test(
     "Switching between caselaw and literature reference type renders different inputs",

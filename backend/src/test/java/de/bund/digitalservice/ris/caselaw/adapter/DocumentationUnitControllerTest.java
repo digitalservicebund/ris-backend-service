@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -81,9 +82,6 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
@@ -307,78 +305,6 @@ class DocumentationUnitControllerTest {
       // Assert
       verify(service, times(1))
           .generateNewDocumentationUnit(user, Optional.empty(), Kind.UNSUPPORTED);
-    }
-  }
-
-  @Nested
-  class AttachFileToDocumentationUnit {
-    @Test
-    void testAttachUnsupportedFile_shouldDeleteOnFail()
-        throws IOException, DocumentationUnitNotExistsException {
-      when(userHasWriteAccess.apply(any())).thenReturn(true);
-      var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
-      when(converterService.getConvertedObject(any())).thenThrow(DocxConverterException.class);
-
-      when(attachmentService.attachFileToDocumentationUnit(
-              eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
-          .thenReturn(Attachment.builder().s3path("fooPath").build());
-
-      when(service.getByUuid(TEST_UUID))
-          .thenReturn(
-              Decision.builder()
-                  .coreData(CoreData.builder().documentationOffice(docOffice).build())
-                  .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
-                  .build());
-
-      risWebClient
-          .withDefaultLogin()
-          .put()
-          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
-          .contentType(
-              MediaType.parseMediaType(
-                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-          .bodyAsByteArray(attachment)
-          .exchange()
-          .expectStatus()
-          .is4xxClientError();
-
-      verify(attachmentService).deleteByFileId(any(), any(), any());
-    }
-
-    @Test
-    void testAttachFile_shouldInitializeCoreDataAndCheckDuplicates()
-        throws IOException, DocumentationUnitNotExistsException {
-      when(userHasWriteAccess.apply(any())).thenReturn(true);
-      var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
-
-      when(attachmentService.attachFileToDocumentationUnit(
-              eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
-          .thenReturn(Attachment.builder().s3path("fooPath").build());
-
-      Decision docUnit =
-          Decision.builder()
-              .documentNumber("myDocNumber1")
-              .coreData(CoreData.builder().documentationOffice(docOffice).build())
-              .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
-              .build();
-      when(service.getByUuid(TEST_UUID)).thenReturn(docUnit);
-
-      risWebClient
-          .withDefaultLogin()
-          .put()
-          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
-          .contentType(
-              MediaType.parseMediaType(
-                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-          .bodyAsByteArray(attachment)
-          .exchange()
-          .expectStatus()
-          .isOk();
-
-      verify(duplicateCheckService, times(1)).checkDuplicates(docUnit.documentNumber());
-      verify(docUnitAttachmentService, times(1)).initializeCoreData(eq(docUnit), any(), any());
-
-      verify(attachmentService).attachFileToDocumentationUnit(eq(TEST_UUID), any(), any(), any());
     }
   }
 
@@ -940,7 +866,8 @@ class DocumentationUnitControllerTest {
           .expectStatus()
           .isBadRequest();
 
-      verify(attachmentService, never()).attachFileToDocumentationUnit(any(), any(), any(), any());
+      verify(attachmentService, never())
+          .streamFileToDocumentationUnit(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -996,8 +923,8 @@ class DocumentationUnitControllerTest {
       var expectedHtml =
           new Docx2Html("<html></html>", Collections.emptyList(), Collections.emptyMap());
 
-      when(attachmentService.attachFileToDocumentationUnit(
-              eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
+      when(attachmentService.streamFileToDocumentationUnit(
+              eq(TEST_UUID), any(InputStream.class), eq("some-file.docx"), any(), any()))
           .thenReturn(Attachment.builder().s3path("fooPath").build());
 
       // when
@@ -1017,7 +944,7 @@ class DocumentationUnitControllerTest {
           .addHeader("X-Filename", "some-file.docx")
           .exchange()
           .expectStatus()
-          .is5xxServerError();
+          .is4xxClientError();
     }
 
     @Test
@@ -1146,7 +1073,7 @@ class DocumentationUnitControllerTest {
     }
 
     @Test
-    void testAttachOriginalFile_withValidFile_shouldSucceed()
+    void testAttachOriginalFile_withValidFile_shouldSucceedAndInitializeCoreDataAndCheckDuplicates()
         throws DocumentationUnitNotExistsException {
       // given
       byte[] fileContent = "test content".getBytes();
@@ -1168,8 +1095,8 @@ class DocumentationUnitControllerTest {
               .format("docx")
               .build();
 
-      when(attachmentService.attachFileToDocumentationUnit(
-              eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
+      when(attachmentService.streamFileToDocumentationUnit(
+              eq(TEST_UUID), any(InputStream.class), eq("some-file.docx"), any(), any()))
           .thenReturn(Attachment.builder().s3path("fooPath").build());
 
       Decision docUnit =
@@ -1214,6 +1141,8 @@ class DocumentationUnitControllerTest {
               eq("some-file.docx"),
               eq(user),
               eq(AttachmentType.ORIGINAL));
+      verify(duplicateCheckService, times(1)).checkDuplicates(docUnit.documentNumber());
+      verify(docUnitAttachmentService, times(1)).initializeCoreData(eq(docUnit), any(), any());
     }
 
     @Test
@@ -1232,8 +1161,8 @@ class DocumentationUnitControllerTest {
       var expectedHtml =
           new Docx2Html("<html></html>", Collections.emptyList(), Collections.emptyMap());
 
-      when(attachmentService.attachFileToDocumentationUnit(
-              eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
+      when(attachmentService.streamFileToDocumentationUnit(
+              eq(TEST_UUID), any(InputStream.class), eq("some-file.docx"), any(), any()))
           .thenReturn(Attachment.builder().s3path("fooPath").build());
 
       // when
@@ -1253,7 +1182,7 @@ class DocumentationUnitControllerTest {
           .addHeader("X-Filename", "some-file.docx")
           .exchange()
           .expectStatus()
-          .is5xxServerError();
+          .is4xxClientError();
     }
 
     @Test
@@ -1293,6 +1222,84 @@ class DocumentationUnitControllerTest {
           .exchange()
           .expectStatus()
           .is5xxServerError();
+    }
+
+    @Test
+    void testAttachOriginalFile_whenConversionFailing_shouldDeleteFile() {
+      // given
+      byte[] fileContent = "test content".getBytes();
+      MockMultipartFile mockFile =
+          new MockMultipartFile(
+              "file",
+              "some-file.docx",
+              String.valueOf(MediaType.APPLICATION_OCTET_STREAM),
+              fileContent);
+
+      doThrow(new RuntimeException("error"))
+          .when(converterService)
+          .getConvertedObject(any(String.class));
+
+      // when
+      when(attachmentService.streamFileToDocumentationUnit(
+              any(UUID.class), any(InputStream.class), any(), any(), any()))
+          .thenReturn(Attachment.builder().s3path("somePath").build());
+      when(userHasWriteAccess.apply(any())).thenReturn(true);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+
+      // then
+      risWebClient
+          .withLogin("DS", "Internal")
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/original-file")
+          .contentType(MediaType.MULTIPART_FORM_DATA)
+          .addFile(mockFile)
+          .addHeader("X-Filename", "some-file.docx")
+          .exchange()
+          .expectStatus()
+          .is4xxClientError();
+
+      verify(attachmentService, atLeastOnce()).deleteByFileId(any(), any(), any());
+    }
+
+    @Test
+    void testAttachOriginalFile_withUnsupportedFile_shouldDeleteOnFail()
+        throws DocumentationUnitNotExistsException {
+      var fileId = UUID.randomUUID();
+      when(userHasWriteAccess.apply(any())).thenReturn(true);
+      byte[] fileContent = "test content".getBytes();
+      MockMultipartFile mockFile =
+          new MockMultipartFile(
+              "file",
+              "some-file.docx",
+              String.valueOf(MediaType.APPLICATION_OCTET_STREAM),
+              fileContent);
+      when(converterService.getConvertedObject(any())).thenThrow(DocxConverterException.class);
+      when(attachmentService.streamFileToDocumentationUnit(
+              eq(TEST_UUID),
+              any(InputStream.class),
+              eq("some-file.docx"),
+              eq(null),
+              eq(AttachmentType.ORIGINAL)))
+          .thenReturn(Attachment.builder().id(fileId).build());
+      when(service.getByUuid(TEST_UUID))
+          .thenReturn(
+              Decision.builder()
+                  .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                  .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+                  .build());
+
+      risWebClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/original-file")
+          .contentType(MediaType.MULTIPART_FORM_DATA)
+          .addFile(mockFile)
+          .addHeader("X-Filename", "some-file.docx")
+          .exchange()
+          .expectStatus()
+          .is4xxClientError();
+
+      verify(attachmentService).deleteByFileId(fileId, TEST_UUID, null);
     }
   }
 

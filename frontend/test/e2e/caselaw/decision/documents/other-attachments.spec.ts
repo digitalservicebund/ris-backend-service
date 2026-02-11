@@ -3,7 +3,10 @@ import { Download, expect } from "@playwright/test"
 import errorMessages from "@/i18n/errors.json" with { type: "json" }
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
+  expectHistoryCount,
+  expectHistoryLogRow,
   navigateToCategories,
+  navigateToManagementData,
   uploadTestfile,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
@@ -81,8 +84,8 @@ test.describe("Weitere Anhänge", { tag: ["@RISDEV-8920"] }, () => {
         await page.getByLabel("Datei löschen").click()
         // Confirm the dialog
         const dialog = page.getByRole("dialog")
-        await dialog.getByLabel("Anhang löschen", { exact: true }).click()
-        await expect(page.getByText("Anhang löschen")).toBeHidden()
+        await dialog.getByLabel("Datei löschen", { exact: true }).click()
+        await expect(page.getByText("Datei löschen")).toBeHidden()
         await expect(page.getByText("sample.docx")).toBeHidden()
       })
 
@@ -106,6 +109,25 @@ test.describe("Weitere Anhänge", { tag: ["@RISDEV-8920"] }, () => {
           .locator("svg")
           .innerHTML()
         expect(newIcon).toEqual(sidePanelTabButtonIcon)
+      })
+
+      await test.step("In der Historie gibt es ein Hochladen und ein Löschen Historien-Event", async () => {
+        await navigateToManagementData(page, documentNumber, {
+          navigationBy: "click",
+        })
+        await expectHistoryCount(page, 5)
+        await expectHistoryLogRow(
+          page,
+          0,
+          "DS (e2e_tests DigitalService)",
+          'Anhang "sample.docx" gelöscht',
+        )
+        await expectHistoryLogRow(
+          page,
+          1,
+          "DS (e2e_tests DigitalService)",
+          'Anhang "sample.docx" hinzugefügt',
+        )
       })
     },
   )

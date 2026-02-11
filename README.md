@@ -9,7 +9,7 @@
 You need (or may want) the following CLI tools. For UNIX users, there is a prepared `Brewfile`, see
 below.
 
-### Necessary tools:**
+### Necessary tools:
 
 - [lefthook](https://github.com/evilmartians/lefthook#install) - manages our git hooks
 - [GitHub CLI](https://cli.github.com/) - used by lefthook to check for pipeline status before push
@@ -19,7 +19,7 @@ below.
 - [Node.js](https://nodejs.org/en/) - JavaScript runtime & dependency management
 - [nodenv](https://github.com/nodenv/nodenv#installation) - manages the node.js environment
 
-### Backend only:**
+### Backend only:
 
 - [java](https://developers.redhat.com/products/openjdk/install) - we use Java 21 in the backend
 

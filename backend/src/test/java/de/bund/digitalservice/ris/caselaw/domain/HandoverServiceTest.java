@@ -132,7 +132,7 @@ class HandoverServiceTest {
     when(repository.findByUuid(TEST_UUID)).thenReturn(decision);
     when(environment.matchesProfiles("uat")).thenReturn(true);
     when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
-        .thenReturn(List.of(Attachment.builder().format("jpg").build()));
+        .thenReturn(List.of(AttachmentInline.builder().format("jpg").build()));
 
     assertThatThrownBy(
             () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
@@ -154,7 +154,7 @@ class HandoverServiceTest {
             .build();
     when(repository.findByUuid(TEST_UUID)).thenReturn(decision);
     when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
-        .thenReturn(List.of(Attachment.builder().format("jpg").build()));
+        .thenReturn(List.of(AttachmentInline.builder().format("jpg").build()));
 
     assertThatThrownBy(
             () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
@@ -176,7 +176,7 @@ class HandoverServiceTest {
             .build();
     when(repository.findByUuid(TEST_UUID)).thenReturn(decision);
     when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
-        .thenReturn(List.of(Attachment.builder().format("jpg").build()));
+        .thenReturn(List.of(AttachmentInline.builder().format("jpg").build()));
 
     assertThatThrownBy(
             () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
@@ -200,8 +200,8 @@ class HandoverServiceTest {
     when(attachmentInlineRepository.findAllByDocumentationUnitId(TEST_UUID))
         .thenReturn(
             List.of(
-                Attachment.builder().format("jpg").build(),
-                Attachment.builder().format("wmf").build()));
+                AttachmentInline.builder().format("jpg").build(),
+                AttachmentInline.builder().format("wmf").build()));
 
     assertThatThrownBy(
             () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))

@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "public", name = "deleted_documents")
+@Table(schema = "incremental_migration", name = "deleted_documents")
 public class DeletedDocumentationUnitDTO {
 
   @Id

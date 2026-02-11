@@ -91,7 +91,6 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
 
     // Calls to pre-build helper methods that populate the builder
     addCaselawReferences(pendingProceeding, builder, currentDto);
-    addLiteratureReferences(pendingProceeding, builder, currentDto);
     addManagementData(pendingProceeding, builder);
 
     PendingProceedingDTO result = builder.build();
@@ -140,12 +139,6 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
             pendingProceedingDTO.getCaselawReferences() == null
                 ? new ArrayList<>()
                 : pendingProceedingDTO.getCaselawReferences().stream()
-                    .map(ReferenceTransformer::transformToDomain)
-                    .toList())
-        .literatureReferences(
-            pendingProceedingDTO.getLiteratureReferences() == null
-                ? new ArrayList<>()
-                : pendingProceedingDTO.getLiteratureReferences().stream()
                     .map(ReferenceTransformer::transformToDomain)
                     .toList())
         .documentalists(

@@ -52,4 +52,9 @@ public class LegalPeriodicalEditionDTO {
   @OrderBy("editionRank")
   @Builder.Default
   private List<ReferenceDTO> references = new ArrayList<>();
+
+  @OneToMany(mappedBy = "edition", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OrderBy("editionRank")
+  @Builder.Default
+  private List<PassiveCitationUliDTO> passiveUliCitations = new ArrayList<>();
 }

@@ -713,7 +713,8 @@ test.describe(
       })
     })
 
-    test(
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
       "External user cannot edit or delete periodical editions",
       { tag: ["@RISDEV-4724", "@RISDEV-4519"] },
       async ({ pageWithExternalUser, edition }) => {

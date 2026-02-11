@@ -1,5 +1,4 @@
 schema:
-  - "public"
   - "incremental_migration"
 useAllTables: True
 debug: true

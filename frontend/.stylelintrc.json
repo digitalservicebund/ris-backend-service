@@ -1,16 +1,9 @@
 {
-  "plugins": ["@namics/stylelint-bem"],
   "extends": [
     "stylelint-config-standard",
     "stylelint-config-recommended-vue",
     "stylelint-config-idiomatic-order"
   ],
-  "rules": {
-    "plugin/stylelint-bem-namics": {
-      "patternPrefixes": [],
-      "helperPrefixes": []
-    }
-  },
   "reportNeedlessDisables": true,
   "ignoreFiles": ["!**/*.vue"]
 }

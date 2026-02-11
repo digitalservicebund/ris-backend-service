@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbuseFeeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementIndustryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CorrectionBorderNumberDTO;
@@ -41,7 +40,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LanguageCodeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ObjectValueDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OralHearingDateDTO;
@@ -50,9 +48,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslati
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationTranslatorDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginOfTranslationUrlDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ParticipatingJudgeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationUliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RelatedPendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
@@ -118,7 +118,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class DecisionTransformerTest {
@@ -730,7 +729,7 @@ class DecisionTransformerTest {
         DecisionDTO.builder()
             .caselawReferences(
                 List.of(
-                    CaselawReferenceDTO.builder()
+                    ReferenceDTO.builder()
                         .id(uuid)
                         .edition(LegalPeriodicalEditionDTO.builder().name("Foo").build())
                         .editionRank(3)
@@ -760,13 +759,13 @@ class DecisionTransformerTest {
     var uuid = UUID.randomUUID();
     DecisionDTO currentDto =
         DecisionDTO.builder()
-            .literatureReferences(
+            .passiveUliCitations(
                 List.of(
-                    LiteratureReferenceDTO.builder()
+                    PassiveCitationUliDTO.builder()
                         .id(uuid)
                         .edition(LegalPeriodicalEditionDTO.builder().name("Foo").build())
                         .editionRank(3)
-                        .documentationUnitRank(3)
+                        .rank(3)
                         .build()))
             .build();
 
@@ -777,9 +776,9 @@ class DecisionTransformerTest {
 
     DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
-    assertThat(decisionDTO.getLiteratureReferences().getFirst().getDocumentationUnitRank()).isOne();
-    assertThat(decisionDTO.getLiteratureReferences().getFirst().getEditionRank()).isEqualTo(3);
-    assertThat(decisionDTO.getLiteratureReferences().getFirst().getEdition().getName())
+    assertThat(decisionDTO.getPassiveUliCitations().getFirst().getRank()).isOne();
+    assertThat(decisionDTO.getPassiveUliCitations().getFirst().getEditionRank()).isEqualTo(3);
+    assertThat(decisionDTO.getPassiveUliCitations().getFirst().getEdition().getName())
         .isEqualTo("Foo");
   }
 
@@ -803,7 +802,7 @@ class DecisionTransformerTest {
 
   @Test
   void testTransformToDTO_withSource_withUpdatedExistingSource() {
-    var reference = CaselawReferenceDTO.builder().build();
+    var reference = ReferenceDTO.builder().build();
     List<SourceDTO> existingSources =
         List.of(
             SourceDTO.builder()
@@ -1114,72 +1113,68 @@ class DecisionTransformerTest {
     assertThat(decisionDTO.getDefinitions()).isEmpty();
   }
 
-  @ParameterizedTest
-  @EnumSource(
-      value = ReferenceType.class,
-      names = {"CASELAW", "LITERATURE"})
-  void testTransformToDTO_withSourceReferenceIsNotIncludedInReferences_shouldRemoveLinkToReference(
-      ReferenceType referenceType) {
+  @Test
+  void
+      testTransformToDTO_withSourceReferenceIsNotIncludedInReferences_shouldRemoveLinkToReference() {
     var referenceId = UUID.randomUUID();
+
+    // Wir setzen eine bestehende Source, die auf eine Caselaw-Referenz zeigt
     List<SourceDTO> existingSourcesWithReference =
         List.of(
             SourceDTO.builder()
                 .value(SourceValue.A)
                 .rank(1)
-                .reference(
-                    referenceType.equals(ReferenceType.CASELAW)
-                        ? CaselawReferenceDTO.builder().id(referenceId).build()
-                        : LiteratureReferenceDTO.builder().id(referenceId).build())
+                .reference(ReferenceDTO.builder().id(referenceId).build())
                 .build());
 
     DecisionDTO currentDto = DecisionDTO.builder().source(existingSourcesWithReference).build();
 
+    // Das neue Domain-Objekt enthält zwar noch die Source,
+    // aber keine Referenzen mehr (weder Caselaw noch Literatur)
     Decision updatedDomainObject =
         Decision.builder()
             .coreData(
                 CoreData.builder()
                     .sources(List.of(Source.builder().value(SourceValue.A).build()))
                     .build())
+            .caselawReferences(new ArrayList<>())
+            .literatureReferences(new ArrayList<>())
             .build();
 
     DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    // Die Source sollte noch da sein, aber der Link zur Referenz muss entfernt (null) sein
     assertThat(decisionDTO.getSource().getFirst().getReference()).isNull();
     assertThat(decisionDTO.getCaselawReferences()).isEmpty();
-    assertThat(decisionDTO.getLiteratureReferences()).isEmpty();
+    assertThat(decisionDTO.getPassiveUliCitations()).isEmpty();
   }
 
-  @ParameterizedTest
-  @EnumSource(
-      value = ReferenceType.class,
-      names = {"CASELAW", "LITERATURE"})
-  void testTransformToDTO_withSourceReferenceIsIncludedInReferences_shouldKeepLinkToReference(
-      ReferenceType referenceType) {
+  @Test
+  void testTransformToDTO_withSourceReferenceIsIncludedInReferences_shouldKeepLinkToReference() {
     var referenceId = UUID.randomUUID();
+
+    // Da nur Caselaw-Referenzen Quellen sein können, nutzen wir hier das entsprechende DTO
     List<SourceDTO> existingSourcesWithReference =
         List.of(
             SourceDTO.builder()
                 .value(SourceValue.A)
                 .rank(1)
                 .reference(
-                    referenceType.equals(ReferenceType.CASELAW)
-                        ? CaselawReferenceDTO.builder()
-                            .id(referenceId)
-                            .type("amtlich")
-                            .documentationUnitRank(1)
-                            .build()
-                        : LiteratureReferenceDTO.builder()
-                            .id(referenceId)
-                            .documentationUnitRank(1)
-                            .build())
+                    ReferenceDTO.builder()
+                        .id(referenceId)
+                        .type("amtlich")
+                        .documentationUnitRank(1)
+                        .build())
                 .build());
 
     DecisionDTO currentDto = DecisionDTO.builder().source(existingSourcesWithReference).build();
 
+    // Die Referenz im Domain-Objekt (muss CASELAW sein)
     var references =
         List.of(
             Reference.builder()
                 .id(referenceId)
-                .referenceType(referenceType)
+                .referenceType(ReferenceType.CASELAW)
                 .primaryReference(true)
                 .build());
 
@@ -1189,17 +1184,16 @@ class DecisionTransformerTest {
                 CoreData.builder()
                     .sources(List.of(Source.builder().value(SourceValue.A).build()))
                     .build())
-            .caselawReferences(referenceType.equals(ReferenceType.CASELAW) ? references : null)
-            .literatureReferences(
-                referenceType.equals(ReferenceType.LITERATURE) ? references : null)
+            .caselawReferences(references)
+            .literatureReferences(null)
             .build();
 
     DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    // Verifizierung
     assertThat(decisionDTO.getSource().getFirst().getReference().getId()).isEqualTo(referenceId);
-    if (referenceType.equals(ReferenceType.CASELAW))
-      assertThat(decisionDTO.getCaselawReferences()).isNotEmpty();
-    else if (referenceType.equals(ReferenceType.LITERATURE))
-      assertThat(decisionDTO.getLiteratureReferences()).isNotEmpty();
+    assertThat(decisionDTO.getCaselawReferences()).hasSize(1);
+    assertThat(decisionDTO.getPassiveUliCitations()).isEmpty();
   }
 
   @Test
@@ -2837,6 +2831,7 @@ class DecisionTransformerTest {
                 .fieldsOfLaw(Collections.emptyList())
                 .norms(Collections.emptyList())
                 .activeCitations(Collections.emptyList())
+                .passiveCaselawCitations(Collections.emptyList())
                 .jobProfiles(Collections.emptyList())
                 .dismissalGrounds(Collections.emptyList())
                 .dismissalTypes(Collections.emptyList())

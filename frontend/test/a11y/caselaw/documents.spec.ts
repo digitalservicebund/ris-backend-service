@@ -30,8 +30,9 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/att
     })
     await uploadTestfile(page, "sample.docx")
     await page.getByLabel("Datei löschen").click()
-    await page
-      .getByRole("button", { name: "Anhang löschen", exact: true })
+    const dialog = page.getByRole("dialog")
+    await dialog
+      .getByRole("button", { name: "Datei löschen", exact: true })
       .click()
     await expect(tableView).toBeHidden()
 
@@ -44,7 +45,7 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/att
     await uploadTestfile(page, "sample.docx")
     await page.getByLabel("Datei löschen").click()
     const dialog = page.getByRole("dialog")
-    await dialog.getByLabel("Anhang löschen", { exact: true }).click()
+    await dialog.getByLabel("Datei löschen", { exact: true }).click()
 
     const accessibilityScanResults = await useAxeBuilder(page).analyze()
     expect(accessibilityScanResults.violations).toEqual([])

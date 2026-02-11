@@ -1,11 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ActiveCitationTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitProcessStepTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.PassiveCitationUliTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PendingProceedingTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ReferenceTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.StatusTransformer;
@@ -25,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
@@ -57,13 +58,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -92,6 +92,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       databaseDocumentationUnitProcessStepRepository;
   private final EntityManager entityManager;
   private final DatabaseReferenceRepository referenceRepository;
+  private final DatabasePassiveCitationUliRepository passiveCitationUliRepository;
   private final DocumentationUnitHistoryLogService historyLogService;
 
   public PostgresDocumentationUnitRepositoryImpl(
@@ -106,6 +107,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DatabaseDocumentationUnitProcessStepRepository databaseDocumentationUnitProcessStepRepository,
       EntityManager entityManager,
       DatabaseReferenceRepository referenceRepository,
+      DatabasePassiveCitationUliRepository passiveCitationUliRepository,
       DocumentationUnitHistoryLogService historyLogService) {
 
     this.repository = repository;
@@ -116,6 +118,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.fieldOfLawRepository = fieldOfLawRepository;
     this.procedureRepository = procedureRepository;
     this.referenceRepository = referenceRepository;
+    this.passiveCitationUliRepository = passiveCitationUliRepository;
     this.entityManager = entityManager;
     this.historyLogService = historyLogService;
     this.processStepRepository = processStepRepository;
@@ -208,62 +211,33 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       User user,
       DocumentationUnitProcessStep initialProcessStep) {
 
-    DocumentationUnitDTO documentationUnitDTO;
-    if (docUnit instanceof Decision decision) {
-      // We need to create uuids for new active citations before transforming them to dtos as we
-      // want to use the same id in both the related_documenation table and the new
-      // caselaw_citation_x tables.
-      // TODO: (Malte Laukötter, 2026-01-09) remove this step once we only write the
-      // caselaw_citation_x tables and annotated the id in the DTOs with @GeneratedValue.
-      if (decision.contentRelatedIndexing() != null
-          && decision.contentRelatedIndexing().activeCitations() != null) {
-        decision.contentRelatedIndexing().activeCitations().stream()
-            .filter(activeCitation -> activeCitation.getUuid() == null)
-            .forEach(activeCitation -> activeCitation.setUuid(UUID.randomUUID()));
-      }
-
-      var decisionDTO =
-          DecisionTransformer.transformToDTO(
-              DecisionDTO.builder()
-                  .documentationOffice(
-                      DocumentationOfficeTransformer.transformToDTO(
-                          docUnit.coreData().documentationOffice()))
-                  .creatingDocumentationOffice(
-                      DocumentationOfficeTransformer.transformToDTO(
-                          docUnit.coreData().creatingDocOffice()))
-                  .build(),
-              decision);
-      addCitationsToDecisionDTO(decisionDTO, decision);
-      documentationUnitDTO = decisionDTO;
-    } else if (docUnit instanceof PendingProceeding pendingProceeding) {
-      documentationUnitDTO =
-          PendingProceedingTransformer.transformToDTO(
-              PendingProceedingDTO.builder()
-                  .documentationOffice(
-                      DocumentationOfficeTransformer.transformToDTO(
-                          docUnit.coreData().documentationOffice()))
-                  .build(),
-              pendingProceeding);
-    } else {
-      throw new DocumentationUnitException(
-          "DocumentationUnit couldn't be transformed to DTO as"
-              + " it is neither Decision nor PendingProceeding.");
-    }
-    documentationUnitDTO = repository.save(documentationUnitDTO);
+    var documentationUnitDTO = repository.save(getTransformedEntity(docUnit));
 
     List<SourceDTO> sources = new ArrayList<>();
     if (createdFromReference != null) {
-      ReferenceDTO referenceDTO = ReferenceTransformer.transformToDTO(createdFromReference);
-      referenceDTO.setDocumentationUnitRank(0);
-      referenceDTO.setDocumentationUnit(documentationUnitDTO);
+      if (createdFromReference.referenceType() == ReferenceType.CASELAW) {
+        ReferenceDTO referenceDTO = ReferenceTransformer.transformToDTO(createdFromReference);
+        referenceDTO.setDocumentationUnitRank(0);
+        referenceDTO.setDocumentationUnit(documentationUnitDTO);
+        // There is no cascading from Source->References as the doc unit also has the references
+        // relationship directly that has cascading. Otherwise, when saving the doc unit, it would
+        // try to save the same reference twice -> JPA save error
+        referenceRepository.save(referenceDTO);
 
-      // There is no cascading from Source->References as the doc unit also has the references
-      // relationship directly that has cascading. Otherwise, when saving the doc unit, it would try
-      // to save the same reference twice -> JPA save error
-      referenceRepository.save(referenceDTO);
+        // if created from reference, the source is always 'Z' (Zeitschrift)
+        sources.add(
+            SourceDTO.builder().rank(1).value(SourceValue.Z).reference(referenceDTO).build());
+      } else if (createdFromReference.referenceType() == ReferenceType.LITERATURE) {
+        PassiveCitationUliDTO uliDTO =
+            PassiveCitationUliTransformer.transformToDTO(createdFromReference);
+        uliDTO.setRank(0);
+        uliDTO.setTarget(documentationUnitDTO instanceof DecisionDTO d ? d : null);
 
-      // if created from reference, the source is always 'Z' (Zeitschrift)
-      sources.add(SourceDTO.builder().rank(1).value(SourceValue.Z).reference(referenceDTO).build());
+        passiveCitationUliRepository.save(uliDTO);
+
+        sources.add(
+            SourceDTO.builder().rank(1).value(SourceValue.Z).literatureReference(uliDTO).build());
+      }
     }
 
     if (fileNumber != null) {
@@ -349,6 +323,32 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     };
   }
 
+  private static DocumentationUnitDTO getTransformedEntity(DocumentationUnit docUnit) {
+    if (docUnit instanceof Decision decision) {
+      return DecisionTransformer.transformToDTO(
+          DecisionDTO.builder()
+              .documentationOffice(
+                  DocumentationOfficeTransformer.transformToDTO(
+                      docUnit.coreData().documentationOffice()))
+              .creatingDocumentationOffice(
+                  DocumentationOfficeTransformer.transformToDTO(
+                      docUnit.coreData().creatingDocOffice()))
+              .build(),
+          decision);
+    } else if (docUnit instanceof PendingProceeding pendingProceeding) {
+      return PendingProceedingTransformer.transformToDTO(
+          PendingProceedingDTO.builder()
+              .documentationOffice(
+                  DocumentationOfficeTransformer.transformToDTO(
+                      docUnit.coreData().documentationOffice()))
+              .build(),
+          pendingProceeding);
+    }
+    throw new DocumentationUnitException(
+        "DocumentationUnit couldn't be transformed to DTO as"
+            + " it is neither Decision nor PendingProceeding.");
+  }
+
   private ManagementDataDTO getCreatedBy(User user, DocumentationUnitDTO documentationUnitDTO) {
     ManagementDataDTO.ManagementDataDTOBuilder managementDataBuilder =
         ManagementDataDTO.builder()
@@ -418,23 +418,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
-      Decision decision = (Decision) documentationUnit;
-
-      // We need to create uuids for new active citations before transforming them to dtos as we
-      // want to use the same id in both the related_documenation table and the new
-      // caselaw_citation_x tables.
-      // TODO: (Malte Laukötter, 2026-01-09) remove this step once we only write the
-      // caselaw_citation_x tables and annotated the id in the DTOs with @GeneratedValue.
-      if (decision.contentRelatedIndexing() != null
-          && decision.contentRelatedIndexing().activeCitations() != null) {
-        decision.contentRelatedIndexing().activeCitations().stream()
-            .filter(activeCitation -> activeCitation.getUuid() == null)
-            .forEach(activeCitation -> activeCitation.setUuid(UUID.randomUUID()));
-      }
-
-      var updatedDecisionDTO = DecisionTransformer.transformToDTO(decisionDTO, decision);
-      addCitationsToDecisionDTO(updatedDecisionDTO, decision);
-      repository.save(updatedDecisionDTO);
+      documentationUnitDTO =
+          DecisionTransformer.transformToDTO(decisionDTO, (Decision) documentationUnit);
+      repository.save(documentationUnitDTO);
     }
     if (documentationUnitDTO instanceof PendingProceedingDTO pendingProceedingDTO) {
       if (!pendingProceedingDTO.isResolved
@@ -1213,46 +1199,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     }
   }
 
-  private void addCitationsToDecisionDTO(@NonNull DecisionDTO dto, @NonNull Decision decision) {
-    if (decision.contentRelatedIndexing() == null) {
-      return;
-    }
-
-    if (decision.contentRelatedIndexing().activeCitations() == null) {
-      return;
-    }
-
-    List<LinkCaselawCitationDTO> links = new ArrayList<>();
-    List<ActiveBlindlinkCaselawCitationDTO> blindlinks = new ArrayList<>();
-    AtomicInteger nextRank = new AtomicInteger(1);
-
-    decision.contentRelatedIndexing().activeCitations().stream()
-        .filter(activeCitation -> !activeCitation.hasNoValues())
-        .forEach(
-            activeCitation -> {
-              var optionalTargetDocument =
-                  Optional.ofNullable(activeCitation.getDocumentNumber())
-                      .flatMap(repository::findByDocumentNumber);
-
-              if (optionalTargetDocument.isEmpty()) {
-                blindlinks.add(
-                    ActiveCitationTransformer.transformToCaselawCitationBlindlinkDTO(
-                        activeCitation, dto, nextRank.getAndIncrement()));
-                return;
-              }
-
-              if (optionalTargetDocument.get() instanceof DecisionDTO targetDecisionDTO) {
-                links.add(
-                    ActiveCitationTransformer.transformToCaselawCitationLinkDTO(
-                        activeCitation, dto, targetDecisionDTO, nextRank.getAndIncrement()));
-                return;
-              }
-
-              throw new IllegalArgumentException(
-                  "Trying to add an active citation with a non decision documentation unit as the target."); // TODO: (Malte Laukötter, 2026-01-09) or should we just handle this as the blind link case as well?
-            });
-
-    dto.setActiveLinkCaselawCitations(links);
-    dto.setActiveBlindlinkCaselawCitations(blindlinks);
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public List<UUID> findAllByCurrentStatus(
+      PublicationStatus publicationStatus, int page, int size) {
+    return repository.findAllByStatus(publicationStatus, PageRequest.of(page, size));
   }
 }

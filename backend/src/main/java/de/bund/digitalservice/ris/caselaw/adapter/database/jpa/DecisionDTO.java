@@ -145,42 +145,45 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   private List<ActiveCitationDTO> activeCitations = new ArrayList<>();
 
-  /**
-   * Aktivzitierungen (echte Links) CURRENTLY NO GUARANTEE TO INCLUDE THE CORRECT DATA. ONLY USE FOR
-   * WRITING!
-   */
-  // TODO: (Malte Laukötter, 2026-01-09) remove comment once they can be read as well
+  /** Passivzitierung Caselaw */
   @OneToMany(
       cascade = CascadeType.ALL,
       fetch = FetchType.LAZY,
       orphanRemoval = true,
-      mappedBy = "sourceDocument")
+      mappedBy = "target")
   @Builder.Default
   @OrderBy("rank")
-  private List<LinkCaselawCitationDTO> activeLinkCaselawCitations = new ArrayList<>();
+  private List<PassiveCitationCaselawDTO> passiveCaselawCitations = new ArrayList<>();
 
-  /**
-   * Aktivzitierungen (blind Links) CURRENTLY NO GUARANTEE TO INCLUDE THE CORRECT DATA. ONLY USE FOR
-   * WRITING!
-   */
-  // TODO: (Malte Laukötter, 2026-01-09) remove comment once they can be read as well
+  /** Aktivzitierung Caselaw */
   @OneToMany(
       cascade = CascadeType.ALL,
       fetch = FetchType.LAZY,
       orphanRemoval = true,
-      mappedBy = "sourceDocument")
+      mappedBy = "source")
   @Builder.Default
   @OrderBy("rank")
-  private List<ActiveBlindlinkCaselawCitationDTO> activeBlindlinkCaselawCitations =
-      new ArrayList<>();
+  private List<ActiveCitationCaselawDTO> activeCaselawCitations = new ArrayList<>();
 
-  /** Passivezitierungen (echte Links) CURRENTLY NO GUARANTEE TO INCLUDE THE CORRECT DATA. */
-  // TODO: (Malte Laukötter, 2026-01-09) remove comment once they can be read
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "targetDocument")
+  // Passivzitierung ULI (Literaturfundstellen)
+  @OneToMany(
+      mappedBy = "target",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
   @Builder.Default
-  @OrderBy(
-      "id") // do not sort the passive links by rank as the rank has the sorting for the active side
-  private List<LinkCaselawCitationDTO> passiveLinkCaselawCitations = new ArrayList<>();
+  @OrderBy("rank")
+  private List<PassiveCitationUliDTO> passiveUliCitations = new ArrayList<>();
+
+  // Aktivzitierung ULI
+  @OneToMany(
+      mappedBy = "source",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @Builder.Default
+  @OrderBy("rank")
+  private List<ActiveCitationUliDTO> activeUliCitations = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
