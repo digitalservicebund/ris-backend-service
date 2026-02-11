@@ -62,12 +62,12 @@ import org.testcontainers.utility.DockerImageName;
 public abstract class BaseIntegrationTest {
 
   static PostgreSQLContainer postgreSQLContainer =
-      new PostgreSQLContainer("postgres:14").withInitScript("init_db.sql").withReuse(true);
+      new PostgreSQLContainer("postgres:14").withInitScript("init_db.sql").withReuse(false);
 
   static GenericContainer<?> redis =
       new GenericContainer<>(DockerImageName.parse("redis:7.0"))
           .withExposedPorts(6379)
-          .withReuse(true);
+          .withReuse(false);
 
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {

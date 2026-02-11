@@ -23,7 +23,7 @@ public interface DatabaseDocumentTypeRepository extends JpaRepository<DocumentTy
       value =
           "WITH label_added AS (SELECT *, "
               + " UPPER(CONCAT(abbreviation, ' ', label)) AS concat"
-              + " from incremental_migration.document_type) "
+              + " from document_type) "
               + "SELECT *,"
               + "       concat, "
               + "       CASE "
@@ -42,7 +42,7 @@ public interface DatabaseDocumentTypeRepository extends JpaRepository<DocumentTy
       nativeQuery = true,
       value =
           "SELECT * "
-              + "FROM incremental_migration.document_type "
+              + "FROM document_type "
               + "WHERE (abbreviation = :searchStr OR label = :searchStr) "
               + "AND document_category_id = :category ")
   Optional<DocumentTypeDTO> findUniqueCaselawBySearchStrAndCategory(

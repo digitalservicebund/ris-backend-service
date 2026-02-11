@@ -1,1 +1,1 @@
-TRUNCATE incremental_migration.documentation_unit CASCADE;
+TRUNCATE documentation_unit CASCADE;

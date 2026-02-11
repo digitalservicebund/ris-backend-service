@@ -16,9 +16,9 @@ public interface DatabaseDocUnitConsistencyRepository
       value =
 """
 SELECT documentation_unit.id, documentation_unit.document_number
-FROM incremental_migration.documentation_unit documentation_unit
-         LEFT JOIN incremental_migration.decision decision ON documentation_unit.id = decision.id
-         LEFT JOIN incremental_migration.pending_proceeding pending_proceeding ON documentation_unit.id = pending_proceeding.id
+FROM documentation_unit documentation_unit
+         LEFT JOIN decision decision ON documentation_unit.id = decision.id
+         LEFT JOIN pending_proceeding pending_proceeding ON documentation_unit.id = pending_proceeding.id
 WHERE decision.id IS NULL AND pending_proceeding.id IS NULL
 """)
   List<DatabaseDocumentUnitConsistencyService.DocumentationUnitIdentifier>

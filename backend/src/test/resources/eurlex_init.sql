@@ -1,5 +1,5 @@
 INSERT INTO
-  incremental_migration.court (id, location, type, juris_id)
+  court (id, location, type, juris_id)
 VALUES
     (
         'cccccccc-cccc-cccc-cccc-cccccccccccc',
@@ -15,7 +15,7 @@ VALUES
     );
 
 INSERT INTO
-  incremental_migration.eurlex (id, celex, file_number, court_id, status, decision_date, html_link, uri, created_at, updated_at)
+  eurlex (id, celex, file_number, court_id, status, decision_date, html_link, uri, created_at, updated_at)
 VALUES
   (
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',

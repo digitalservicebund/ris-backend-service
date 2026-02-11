@@ -1,5 +1,5 @@
 insert into
-  incremental_migration.court (
+  court (
     id,
     juris_id,
     location,
@@ -20,7 +20,7 @@ values
   );
 
 insert into
-  incremental_migration.document_type (id, abbreviation, label, document_category_id)
+  document_type (id, abbreviation, label, document_category_id)
 values
   (
     'b57e016e-665d-486c-902e-c191f5a7acf6',
@@ -36,7 +36,7 @@ values
   );
 
 insert into
-  incremental_migration.documentation_unit (id, document_number, documentation_office_id)
+  documentation_unit (id, document_number, documentation_office_id)
 values
   (
     '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
@@ -50,7 +50,7 @@ values
   );
 
 insert into
-    incremental_migration.decision (id)
+    decision (id)
 values
     (
         '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3'
@@ -60,7 +60,7 @@ values
     );
 
 insert into
-  incremental_migration.related_documentation (
+  related_documentation (
     id,
     court_id,
     date,

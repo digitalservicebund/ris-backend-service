@@ -12,7 +12,7 @@ services:
       - RIS_MIGRATION_DB_NAME=neuris
       - RIS_MIGRATION_DB_USER=test
       - RIS_MIGRATION_DB_PASSWORD=test
-      - RIS_MIGRATION_DB_SCHEMA=incremental_migration
+      - RIS_MIGRATION_DB_SCHEMA=caselaw
       - RIS_MIGRATION_S3_ENDPOINT=https://obs.eu-de.otc.t-systems.com
       - RIS_MIGRATION_S3_ACCESS_KEY=${AWS_ACCESS_KEY_ID} # Use the OTC S3 access key from 1Password. See run_migration_locally.md for details.
       - RIS_MIGRATION_S3_SECRET=${AWS_SECRET_ACCESS_KEY}  # Use the OTC S3 access key from 1Password. See run_migration_locally.md for details.

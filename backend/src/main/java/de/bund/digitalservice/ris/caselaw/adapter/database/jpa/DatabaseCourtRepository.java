@@ -42,7 +42,7 @@ public interface DatabaseCourtRepository extends JpaRepository<CourtDTO, UUID> {
                           *,
                           UPPER(CONCAT(type,' ',location)) AS label
                         FROM
-                          incremental_migration.court
+                          court
                       )
                       SELECT
                         *,

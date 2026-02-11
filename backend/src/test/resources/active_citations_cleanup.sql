@@ -1,18 +1,18 @@
 delete from
-  incremental_migration.related_documentation;
+  related_documentation;
 
 delete from
-  incremental_migration.documentation_unit;
+  documentation_unit;
 
 delete from
-    incremental_migration.decision;
+  decision;
 
 delete from
-  incremental_migration.document_type;
+  document_type;
 
 delete from
-  incremental_migration.court;
+  court;
 
 delete from
-  incremental_migration.citation_type;
+  citation_type;
 

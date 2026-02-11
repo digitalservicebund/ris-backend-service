@@ -1,6 +1,6 @@
 
 INSERT INTO
-  incremental_migration.documentation_unit (id, document_number, documentation_office_id)
+  documentation_unit (id, document_number, documentation_office_id)
 VALUES
   (
     '16f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
@@ -24,7 +24,7 @@ VALUES
   );
 
 INSERT INTO
-    incremental_migration.decision (id)
+    decision (id)
 VALUES
     (
         '16f9ae5c-ea72-46d8-864c-ce9dd7cee4a3'
@@ -40,7 +40,7 @@ VALUES
     );
 
 insert into
-    incremental_migration.status (id, documentation_unit_id, publication_status, created_at, with_error)
+    status (id, documentation_unit_id, publication_status, created_at, with_error)
 values
     (
         '75988131-f355-414d-9da5-dcbcdbf4b98f',
@@ -71,13 +71,13 @@ values
         false
     );
 
-update incremental_migration.documentation_unit set current_status_id = '75988131-f355-414d-9da5-dcbcdbf4b98f' where id = '16f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
-update incremental_migration.documentation_unit set current_status_id = '65988131-f355-414d-9da5-dcbcdbf4b98f' where id = '26f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
-update incremental_migration.documentation_unit set current_status_id = '55988131-f355-414d-9da5-dcbcdbf4b98f' where id = '36f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
-update incremental_migration.documentation_unit set current_status_id = '45988131-f355-414d-9da5-dcbcdbf4b98f' where id = '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
+update documentation_unit set current_status_id = '75988131-f355-414d-9da5-dcbcdbf4b98f' where id = '16f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
+update documentation_unit set current_status_id = '65988131-f355-414d-9da5-dcbcdbf4b98f' where id = '26f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
+update documentation_unit set current_status_id = '55988131-f355-414d-9da5-dcbcdbf4b98f' where id = '36f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
+update documentation_unit set current_status_id = '45988131-f355-414d-9da5-dcbcdbf4b98f' where id = '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
 
 INSERT INTO
-  incremental_migration.procedure (id, documentation_office_id, name, created_at, documentation_office_user_group_id)
+  procedure (id, documentation_office_id, name, created_at, documentation_office_user_group_id)
 VALUES
   (
     '1e768071-1a19-43a1-8ab9-c185adec94bf',

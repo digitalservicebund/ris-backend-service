@@ -2,7 +2,7 @@
 -- ${flyway:timestamp}
 
 INSERT INTO
-  incremental_migration.documentation_unit (
+  documentation_unit (
     id,
     court_id,
     date,
@@ -21,7 +21,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.court
+        court
       WHERE
       type
         = 'BAG'
@@ -32,7 +32,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.document_type
+        document_type
       WHERE
         abbreviation = 'ÄN'
     ),
@@ -40,7 +40,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_office
+        documentation_office
       WHERE
         abbreviation = 'BAG'
     ),
@@ -59,7 +59,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_office
+        documentation_office
       WHERE
         abbreviation = 'DS'
     ),
@@ -74,7 +74,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.court
+        court
       WHERE
       type
         = 'BGH'
@@ -85,7 +85,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.document_type
+        document_type
       WHERE
         abbreviation = 'Entscheidung'
     ),
@@ -93,7 +93,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_office
+        documentation_office
       WHERE
         abbreviation = 'DS'
     ),
@@ -108,7 +108,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.court
+        court
       WHERE
       type
         = 'AG'
@@ -120,7 +120,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.document_type
+        document_type
       WHERE
         abbreviation = 'Entscheidung'
     ),
@@ -128,7 +128,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_office
+        documentation_office
       WHERE
         abbreviation = 'DS'
     ),
@@ -143,7 +143,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.court
+        court
       WHERE
       type
         = 'BGH'
@@ -154,7 +154,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.document_type
+        document_type
       WHERE
         abbreviation = 'Entscheidung'
     ),
@@ -162,7 +162,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_office
+        documentation_office
       WHERE
         abbreviation = 'DS'
     ),
@@ -181,7 +181,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_office
+        documentation_office
       WHERE
         abbreviation = 'DS'
     ),
@@ -200,7 +200,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_office
+        documentation_office
       WHERE
         abbreviation = 'DS'
     ),
@@ -218,7 +218,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.document_type
+        document_type
       WHERE
         abbreviation = 'Entscheidung'
     ),
@@ -226,7 +226,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_office
+        documentation_office
       WHERE
         abbreviation = 'DS'
     ),
@@ -244,7 +244,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.document_type
+        document_type
       WHERE
         abbreviation = 'BE'
     ),
@@ -252,7 +252,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_office
+        documentation_office
       WHERE
         abbreviation = 'DS'
     ),
@@ -267,7 +267,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.court
+        court
       WHERE
       type
         = 'BSG'
@@ -278,7 +278,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.document_type
+        document_type
       WHERE
         abbreviation = 'BE'
     ),
@@ -286,7 +286,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_office
+        documentation_office
       WHERE
         abbreviation = 'DS'
     ),
@@ -301,7 +301,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.court
+        court
       WHERE
       type
         = 'BVerfG'
@@ -312,7 +312,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.document_type
+        document_type
       WHERE
         abbreviation = 'BR'
     ),
@@ -320,7 +320,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_office
+        documentation_office
       WHERE
         abbreviation = 'DS'
     ),
@@ -335,7 +335,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.court
+        court
       WHERE
       type
         = 'BVerwG'
@@ -346,7 +346,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.document_type
+        document_type
       WHERE
         abbreviation = 'EU'
     ),
@@ -354,7 +354,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_office
+        documentation_office
       WHERE
         abbreviation = 'DS'
     ),
@@ -369,7 +369,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.court
+        court
       WHERE
       type
         = 'BVerfG'
@@ -380,7 +380,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.document_type
+        document_type
       WHERE
         abbreviation = 'GB'
     ),
@@ -388,7 +388,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_office
+        documentation_office
       WHERE
         abbreviation = 'DS'
     ),
@@ -403,7 +403,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.court
+        court
       WHERE
       type
         = 'AG'
@@ -415,7 +415,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.document_type
+        document_type
       WHERE
         abbreviation = 'BE'
     ),
@@ -423,7 +423,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_office
+        documentation_office
       WHERE
         abbreviation = 'DS'
     ),
@@ -441,7 +441,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.document_type
+        document_type
       WHERE
         abbreviation = 'BE'
     ),
@@ -449,7 +449,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_office
+        documentation_office
       WHERE
         abbreviation = 'DS'
     ),
@@ -467,7 +467,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.document_type
+              document_type
           WHERE
               abbreviation = 'BE'
       ),
@@ -475,7 +475,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.documentation_office
+              documentation_office
           WHERE
               abbreviation = 'BGH'
       ),
@@ -491,7 +491,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.court
+              court
           WHERE
               type
                   = 'BFH'
@@ -502,7 +502,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.document_type
+              document_type
           WHERE
               abbreviation = 'Anh'
       ),
@@ -510,7 +510,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.documentation_office
+              documentation_office
           WHERE
               abbreviation = 'BFH'
       ),
@@ -525,7 +525,7 @@ VALUES
             SELECT
                 id
             FROM
-                incremental_migration.court
+                court
             WHERE
                 type
                     = 'BFH'
@@ -536,7 +536,7 @@ VALUES
       SELECT
       id
       FROM
-      incremental_migration.document_type
+      document_type
       WHERE
       abbreviation = 'Anh'
   ),
@@ -544,7 +544,7 @@ VALUES
       SELECT
       id
       FROM
-      incremental_migration.documentation_office
+      documentation_office
       WHERE
       abbreviation = 'DS'
   ),
@@ -559,7 +559,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.court
+              court
           WHERE
               type
                   = 'EuGH'
@@ -570,7 +570,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.document_type
+              document_type
           WHERE
               abbreviation = 'EU'
       ),
@@ -578,7 +578,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.documentation_office
+              documentation_office
           WHERE
               abbreviation = 'DS'
       ),
@@ -593,7 +593,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.court
+              court
           WHERE
               type
                   = 'BVerfG'
@@ -604,7 +604,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.document_type
+              document_type
           WHERE
               abbreviation = 'Urt'
       ),
@@ -612,7 +612,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.documentation_office
+              documentation_office
           WHERE
               abbreviation = 'DS'
       ),
@@ -623,7 +623,7 @@ VALUES
   );
 
 INSERT INTO
-    incremental_migration.decision (
+    decision (
     id,
     creating_documentation_office_id,
     guiding_principle,
@@ -635,7 +635,7 @@ VALUES
         (SELECT
         id
         FROM
-        incremental_migration.documentation_unit
+        documentation_unit
         WHERE
         document_number
         = 'YYTestDoc0001'),
@@ -648,7 +648,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0002'),
@@ -661,7 +661,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0003'),
@@ -674,7 +674,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0004'),
@@ -687,7 +687,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0005'),
@@ -700,7 +700,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0006'),
@@ -713,7 +713,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0007'),
@@ -726,7 +726,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0008'),
@@ -739,7 +739,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0009'),
@@ -752,7 +752,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0010'),
@@ -765,7 +765,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0011'),
@@ -778,7 +778,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0012'),
@@ -791,7 +791,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0013'),
@@ -804,7 +804,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0014'),
@@ -817,7 +817,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0015'),
@@ -830,7 +830,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0016'),
@@ -838,7 +838,7 @@ VALUES
             SELECT
                 id
             FROM
-                incremental_migration.documentation_office
+                documentation_office
             WHERE
                 abbreviation = 'DS'
         ),
@@ -850,7 +850,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0019'),
@@ -863,7 +863,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0020'),
@@ -875,7 +875,7 @@ VALUES
 
 
 INSERT INTO
-    incremental_migration.pending_proceeding (
+    pending_proceeding (
     id,
     resolution_note,
     is_resolved,
@@ -889,7 +889,7 @@ VALUES
         (SELECT
         id
         FROM
-        incremental_migration.documentation_unit
+        documentation_unit
         WHERE
         document_number
         = 'YYTestDoc0017'),
@@ -904,7 +904,7 @@ VALUES
         (SELECT
              id
          FROM
-             incremental_migration.documentation_unit
+             documentation_unit
          WHERE
              document_number
                  = 'YYTestDoc0018'),
@@ -917,7 +917,7 @@ VALUES
     );
 
 INSERT INTO
-    incremental_migration.source (
+    source (
     id,
     value,
     documentation_unit_id,
@@ -932,7 +932,7 @@ VALUES
             SELECT
                 id
             FROM
-                incremental_migration.documentation_unit
+                documentation_unit
             WHERE
                 document_number = 'YYTestDoc0001'
         ),
@@ -941,7 +941,7 @@ VALUES
     );
 
 INSERT INTO
-  incremental_migration.status (
+  status (
     id,
     created_at,
     publication_status,
@@ -958,7 +958,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0001'
     )
@@ -972,7 +972,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0002'
     )
@@ -986,7 +986,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0003'
     )
@@ -1000,7 +1000,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0004'
     )
@@ -1014,7 +1014,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0005'
     )
@@ -1028,7 +1028,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0006'
     )
@@ -1042,7 +1042,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0007'
     )
@@ -1056,7 +1056,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0008'
     )
@@ -1070,7 +1070,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0009'
     )
@@ -1084,7 +1084,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0010'
     )
@@ -1098,7 +1098,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0011'
     )
@@ -1112,7 +1112,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0012'
     )
@@ -1126,7 +1126,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0013'
     )
@@ -1140,7 +1140,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0014'
     )
@@ -1154,7 +1154,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0015'
     )
@@ -1168,7 +1168,7 @@ VALUES
       SELECT
           id
       FROM
-          incremental_migration.documentation_unit
+          documentation_unit
       WHERE
           document_number = 'YYTestDoc0015'
     )
@@ -1182,7 +1182,7 @@ VALUES
       SELECT
           id
       FROM
-          incremental_migration.documentation_unit
+          documentation_unit
       WHERE
           document_number = 'YYTestDoc0015'
     )
@@ -1195,7 +1195,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.documentation_unit
+              documentation_unit
           WHERE
               document_number = 'YYTestDoc0016'
       )
@@ -1209,7 +1209,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.documentation_unit
+              documentation_unit
           WHERE
               document_number = 'YYTestDoc0017'
       )
@@ -1223,7 +1223,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.documentation_unit
+              documentation_unit
           WHERE
               document_number = 'YYTestDoc0018'
       )
@@ -1237,7 +1237,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.documentation_unit
+              documentation_unit
           WHERE
               document_number = 'YYTestDoc0019'
       )
@@ -1251,117 +1251,117 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.documentation_unit
+              documentation_unit
           WHERE
               document_number = 'YYTestDoc0020'
       )
   )
     ;
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-(SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0001'))
+UPDATE documentation_unit SET current_status_id =
+(SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0001'))
 WHERE document_number = 'YYTestDoc0001';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0002'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0002'))
 WHERE document_number = 'YYTestDoc0002';
 
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0003'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0003'))
 WHERE document_number = 'YYTestDoc0003';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0004'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0004'))
 WHERE document_number = 'YYTestDoc0004';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0005'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0005'))
 WHERE document_number = 'YYTestDoc0005';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0006'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0006'))
 WHERE document_number = 'YYTestDoc0006';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0007'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0007'))
 WHERE document_number = 'YYTestDoc0007';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0008'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0008'))
 WHERE document_number = 'YYTestDoc0008';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0009'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0009'))
 WHERE document_number = 'YYTestDoc0009';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0010'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0010'))
 WHERE document_number = 'YYTestDoc0010';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0011'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0011'))
 WHERE document_number = 'YYTestDoc0011';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0012'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0012'))
 WHERE document_number = 'YYTestDoc0012';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0013'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0013'))
 WHERE document_number = 'YYTestDoc0013';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0014'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0014'))
 WHERE document_number = 'YYTestDoc0014';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0015') ORDER BY created_at DESC LIMIT 1)
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0015') ORDER BY created_at DESC LIMIT 1)
 WHERE document_number = 'YYTestDoc0015';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0016'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0016'))
 WHERE document_number = 'YYTestDoc0016';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0017'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0017'))
 WHERE document_number = 'YYTestDoc0017';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0018'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0018'))
 WHERE document_number = 'YYTestDoc0018';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0019'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0019'))
 WHERE document_number = 'YYTestDoc0019';
 
-UPDATE incremental_migration.documentation_unit SET current_status_id =
-    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0020'))
+UPDATE documentation_unit SET current_status_id =
+    (SELECT id FROM status WHERE documentation_unit_id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0020'))
 WHERE document_number = 'YYTestDoc0020';
 
 UPDATE
-  incremental_migration.decision
+  decision
 SET
   note = 'dies ist eine test notiz'
 WHERE
-  incremental_migration.decision.id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0015');
+  decision.id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0015');
 
 UPDATE
-    incremental_migration.decision
+    decision
 SET
     legal_effect = 'JA'
 WHERE
-    incremental_migration.decision.id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0013');
+    decision.id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0013');
 
 UPDATE
-    incremental_migration.decision
+    decision
 SET
     legal_effect = 'JA'
 WHERE
-    incremental_migration.decision.id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0020');
+    decision.id = (SELECT id FROM documentation_unit WHERE document_number = 'YYTestDoc0020');
 
 INSERT INTO
-  incremental_migration.file_number (id, value, documentation_unit_id, rank)
+  file_number (id, value, documentation_unit_id, rank)
 VALUES
   (
     gen_random_uuid (),
@@ -1370,7 +1370,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0001'
     ),
@@ -1383,7 +1383,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0001'
     ),
@@ -1396,7 +1396,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0004'
     ),
@@ -1409,7 +1409,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0012'
     ),
@@ -1422,7 +1422,7 @@ VALUES
       SELECT
         id
       FROM
-        incremental_migration.documentation_unit
+        documentation_unit
       WHERE
         document_number = 'YYTestDoc0013'
     ),
@@ -1435,7 +1435,7 @@ VALUES
             SELECT
                 id
             FROM
-                incremental_migration.documentation_unit
+                documentation_unit
             WHERE
                 document_number = 'YYTestDoc0017'
         ),
@@ -1448,7 +1448,7 @@ VALUES
           SELECT
               id
           FROM
-              incremental_migration.documentation_unit
+              documentation_unit
           WHERE
               document_number = 'YYTestDoc0020'
       ),
@@ -1456,7 +1456,7 @@ VALUES
   );
 
 INSERT INTO
-    incremental_migration.attachment_inline (id, upload_timestamp, format, filename, documentation_unit_id, content)
+    attachment_inline (id, upload_timestamp, format, filename, documentation_unit_id, content)
 VALUES
     (
         gen_random_uuid (),
@@ -1467,7 +1467,7 @@ VALUES
             SELECT
                 id
             FROM
-                incremental_migration.documentation_unit
+                documentation_unit
             WHERE
                 document_number = 'YYTestDoc0013'
         ),
@@ -1482,7 +1482,7 @@ VALUES
             SELECT
                 id
             FROM
-                incremental_migration.documentation_unit
+                documentation_unit
             WHERE
                 document_number = 'YYTestDoc0020'
         ),
@@ -1491,7 +1491,7 @@ VALUES
 ;
 
 INSERT INTO
-    incremental_migration.keyword (id, value)
+    keyword (id, value)
 VALUES
     (
         gen_random_uuid (),
@@ -1509,7 +1509,7 @@ ON CONFLICT DO NOTHING;
 
 
 -- TEXT CHECK IGNORED WORDS
-INSERT INTO incremental_migration.ignored_text_check_word (id,
+INSERT INTO ignored_text_check_word (id,
                                                            documentation_unit_id,
                                                            word,
                                                            juris_id,

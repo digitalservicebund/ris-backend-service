@@ -12,11 +12,7 @@ public class MultiSchemaFlywayMigrationStrategy implements FlywayMigrationStrate
     var dataSource = flyway.getConfiguration().getDataSource();
 
     Flyway incrementalMigrationModule =
-        Flyway.configure()
-            .schemas("incremental_migration")
-            .locations("db")
-            .dataSource(dataSource)
-            .load();
+        Flyway.configure().schemas("caselaw").locations("db").dataSource(dataSource).load();
 
     incrementalMigrationModule.repair();
     incrementalMigrationModule.migrate();

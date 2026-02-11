@@ -1,11 +1,11 @@
 delete from
-  incremental_migration.documentation_unit_keyword;
+  documentation_unit_keyword;
 
 delete from
-  incremental_migration.documentation_unit;
+  documentation_unit;
 
 delete from
-    incremental_migration.decision;
+  decision;
 
 delete from
-  incremental_migration.keyword;
+  keyword;

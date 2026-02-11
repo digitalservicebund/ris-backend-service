@@ -1,5 +1,5 @@
 INSERT INTO
-  incremental_migration.documentation_office_user_group (id, user_group_path_name, documentation_office_id, is_internal)
+  documentation_office_user_group (id, user_group_path_name, documentation_office_id, is_internal)
 VALUES
   (
     '2b733549-d2cc-40f0-b7f3-9bfa9f3c1b89',

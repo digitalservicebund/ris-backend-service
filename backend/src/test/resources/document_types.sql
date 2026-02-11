@@ -1,5 +1,5 @@
 insert into
-    incremental_migration.document_type (id, abbreviation, label, document_category_id)
+    document_type (id, abbreviation, label, document_category_id)
 values
     (
         '0f382996-497f-4c2f-9a30-1c73d8ac0a87',
