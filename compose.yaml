@@ -140,7 +140,7 @@ services:
         [ "$$(psql -U test postgres -Atc "select 1 from pg_roles where rolname = '$${MIGRATION_USER_NAME}';")" = "1" ] || psql -e -U test postgres -c "CREATE ROLE $${MIGRATION_USER_NAME} LOGIN PASSWORD '$${MIGRATION_USER_PASSWORD}';"
 
         # access for migration user
-        psql -e -U test "$${POSTGRES_DB}" -c "CREATE SCHEMA IF NOT EXISTS incremental_migration;"
+        psql -e -U test "$${POSTGRES_DB}" -c "CREATE SCHEMA IF NOT EXISTS $${DATABASE_SCHEMA:-incremental_migration};"
         psql -e -U test "$${POSTGRES_DB}" -c "GRANT ALL ON schema incremental_migration TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
         psql -e -U test "$${POSTGRES_DB}" -c "GRANT ALL ON ALL TABLES IN schema incremental_migration TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
         psql -e -U test "$${POSTGRES_DB}" -c "GRANT ALL ON ALL SEQUENCES IN schema incremental_migration TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
