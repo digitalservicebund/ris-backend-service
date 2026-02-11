@@ -51,10 +51,10 @@ public class S3RenamingService {
    * Adds a document number path prefix and .docx file extension to existing files in the old s3
    * path pattern
    */
-  @Scheduled(cron = "0 30 16 4 2 *", zone = "Europe/Berlin")
+  @Scheduled(cron = "-", zone = "Europe/Berlin")
   @SchedulerLock(name = "adjust-s3-paths", lockAtMostFor = "PT12H")
   public void moveExistingFilesToNewPaths() {
-    if (!env.matchesProfiles("staging")) {
+    if (!env.matchesProfiles("uat")) {
       return;
     }
     List<AttachmentDTO> attachmentsToMove =
@@ -157,10 +157,10 @@ public class S3RenamingService {
    * Moves files in the old s3 path pattern that were not moved in the previous step into the
    * 'unreferenced' prefix
    */
-  @Scheduled(cron = "0 30 17 * * *", zone = "Europe/Berlin")
+  @Scheduled(cron = "0 0 15 * * *", zone = "Europe/Berlin")
   @SchedulerLock(name = "move-unreferenced", lockAtMostFor = "PT1H")
   public void moveRemainingFilesToUnreferenced() {
-    if (!env.matchesProfiles("staging")) {
+    if (!env.matchesProfiles("uat")) {
       return;
     }
     log.atInfo().setMessage("Starting to move unreferenced files").log();

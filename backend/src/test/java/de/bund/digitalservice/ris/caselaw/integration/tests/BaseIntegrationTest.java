@@ -65,7 +65,7 @@ public abstract class BaseIntegrationTest {
       new PostgreSQLContainer("postgres:14").withInitScript("init_db.sql").withReuse(false);
 
   static GenericContainer<?> redis =
-      new GenericContainer<>(DockerImageName.parse("redis:7.0"))
+      new GenericContainer<>(DockerImageName.parse("redis:8"))
           .withExposedPorts(6379)
           .withReuse(false);
 

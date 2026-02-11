@@ -29,6 +29,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AbuseFee;
+import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentType;
@@ -46,6 +47,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ObjectValue;
 import de.bund.digitalservice.ris.caselaw.domain.OriginOfTranslation;
+import de.bund.digitalservice.ris.caselaw.domain.PassiveCaselawCitation;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
@@ -63,6 +65,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
@@ -149,6 +152,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       addNormReferences(builder, contentRelatedIndexing);
 
       addActiveCitations(builder, contentRelatedIndexing);
+      addPassiveCaselawCitations(builder, contentRelatedIndexing);
       addJobProfiles(builder, contentRelatedIndexing);
       addDefinitions(builder, contentRelatedIndexing);
       addDismissalGrounds(builder, contentRelatedIndexing);
@@ -215,6 +219,14 @@ public class DecisionTransformer extends DocumentableTransformer {
 
   static DecisionDTO postProcessRelationships(DecisionDTO result, DecisionDTO currentDto) {
     DocumentableTransformer.postProcessRelationships(result, currentDto);
+
+    if (result.getPassiveCaselawCitations() != null) {
+      result.getPassiveCaselawCitations().forEach(citation -> citation.setTarget(result));
+    }
+
+    if (result.getActiveCaselawCitations() != null) {
+      result.getActiveCaselawCitations().forEach(citation -> citation.setSource(result));
+    }
 
     if (result.getPassiveUliCitations() != null) {
       result.getPassiveUliCitations().forEach(citation -> citation.setTarget(result));
@@ -377,6 +389,33 @@ public class DecisionTransformer extends DocumentableTransformer {
                   previousDecisionDTO.setRank(i.getAndIncrement());
                   return previousDecisionDTO;
                 })
+            .toList());
+
+    AtomicInteger nextRank = new AtomicInteger(1);
+    builder.activeCaselawCitations(
+        contentRelatedIndexing.activeCitations().stream()
+            .filter(Predicate.not(ActiveCitation::hasNoValues))
+            .map(
+                citation ->
+                    ActiveCitationCaselawTransformer.transformToDTO(
+                        citation, nextRank.getAndIncrement()))
+            .toList());
+  }
+
+  private static void addPassiveCaselawCitations(
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.passiveCaselawCitations() == null) {
+      return;
+    }
+
+    AtomicInteger nextRank = new AtomicInteger(1);
+    builder.passiveCaselawCitations(
+        contentRelatedIndexing.passiveCaselawCitations().stream()
+            .filter(Predicate.not(PassiveCaselawCitation::hasNoValues))
+            .map(
+                citation ->
+                    PassiveCitationCaselawTransformer.transformToDTO(
+                        citation, nextRank.getAndIncrement()))
             .toList());
   }
 
@@ -870,10 +909,17 @@ public class DecisionTransformer extends DocumentableTransformer {
     ContentRelatedIndexing.ContentRelatedIndexingBuilder contentRelatedIndexingBuilder =
         DocumentableTransformer.buildContentRelatedIndexing(decisionDTO).toBuilder();
 
-    if (decisionDTO.getActiveCitations() != null) {
+    if (decisionDTO.getActiveCaselawCitations() != null) {
       contentRelatedIndexingBuilder.activeCitations(
-          decisionDTO.getActiveCitations().stream()
-              .map(ActiveCitationTransformer::transformToDomain)
+          decisionDTO.getActiveCaselawCitations().stream()
+              .map(ActiveCitationCaselawTransformer::transformToDomain)
+              .toList());
+    }
+
+    if (decisionDTO.getPassiveCaselawCitations() != null) {
+      contentRelatedIndexingBuilder.passiveCaselawCitations(
+          decisionDTO.getPassiveCaselawCitations().stream()
+              .map(PassiveCitationCaselawTransformer::transformToDomain)
               .toList());
     }
 

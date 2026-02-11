@@ -144,6 +144,26 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   private List<ActiveCitationDTO> activeCitations = new ArrayList<>();
 
+  /** Passivzitierung Caselaw */
+  @OneToMany(
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true,
+      mappedBy = "target")
+  @Builder.Default
+  @OrderBy("rank")
+  private List<PassiveCitationCaselawDTO> passiveCaselawCitations = new ArrayList<>();
+
+  /** Aktivzitierung Caselaw */
+  @OneToMany(
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true,
+      mappedBy = "source")
+  @Builder.Default
+  @OrderBy("rank")
+  private List<ActiveCitationCaselawDTO> activeCaselawCitations = new ArrayList<>();
+
   // Passivzitierung ULI (Literaturfundstellen)
   @OneToMany(
       mappedBy = "target",

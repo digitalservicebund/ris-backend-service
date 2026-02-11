@@ -45,7 +45,7 @@ class S3RenamingServiceTest {
   @BeforeEach
   void setUp() {
     subject = new S3RenamingService(attachmentRepository, s3Client, attachmentService, env);
-    when(env.matchesProfiles("staging")).thenReturn(true);
+    when(env.matchesProfiles("uat")).thenReturn(true);
   }
 
   @Test
