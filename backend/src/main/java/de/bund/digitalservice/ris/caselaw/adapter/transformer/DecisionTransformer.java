@@ -909,10 +909,10 @@ public class DecisionTransformer extends DocumentableTransformer {
     ContentRelatedIndexing.ContentRelatedIndexingBuilder contentRelatedIndexingBuilder =
         DocumentableTransformer.buildContentRelatedIndexing(decisionDTO).toBuilder();
 
-    if (decisionDTO.getActiveCitations() != null) {
+    if (decisionDTO.getActiveCaselawCitations() != null) {
       contentRelatedIndexingBuilder.activeCitations(
-          decisionDTO.getActiveCitations().stream()
-              .map(ActiveCitationTransformer::transformToDomain)
+          decisionDTO.getActiveCaselawCitations().stream()
+              .map(ActiveCitationCaselawTransformer::transformToDomain)
               .toList());
     }
 
