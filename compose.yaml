@@ -137,21 +137,21 @@ services:
         docker-entrypoint.sh postgres &
         sleep 5
         # Create migration role (unless it exists)
-        [ "$$(psql -U test postgres -Atc "select 1 from pg_roles where rolname = '$${MIGRATION_USER_NAME}';")" = "1" ] || psql -e -U test postgres -c "CREATE ROLE $${MIGRATION_USER_NAME} LOGIN PASSWORD '$${MIGRATION_USER_PASSWORD}';"
+        [ "$$(psql -U $${POSTGRES_USER} postgres -Atc "select 1 from pg_roles where rolname = '$${MIGRATION_USER_NAME}';")" = "1" ] || psql -e -U $${POSTGRES_USER} postgres -c "CREATE ROLE $${MIGRATION_USER_NAME} LOGIN PASSWORD '$${MIGRATION_USER_PASSWORD}';"
 
         # access for migration user
-        psql -e -U test "$${POSTGRES_DB}" -c "CREATE SCHEMA IF NOT EXISTS $${DATABASE_SCHEMA:-incremental_migration};"
-        psql -e -U test "$${POSTGRES_DB}" -c "GRANT ALL ON schema incremental_migration TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
-        psql -e -U test "$${POSTGRES_DB}" -c "GRANT ALL ON ALL TABLES IN schema incremental_migration TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
-        psql -e -U test "$${POSTGRES_DB}" -c "GRANT ALL ON ALL SEQUENCES IN schema incremental_migration TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
-        psql -e -U test "$${POSTGRES_DB}" -c "GRANT ALL ON ALL FUNCTIONS IN schema incremental_migration TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
-        psql -e -U test "$${POSTGRES_DB}" -c "ALTER DEFAULT PRIVILEGES IN SCHEMA incremental_migration GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
+        psql -e -U $${POSTGRES_USER} "$${POSTGRES_DB}" -c "CREATE SCHEMA IF NOT EXISTS $${DATABASE_SCHEMA:-incremental_migration};"
+        psql -e -U $${POSTGRES_USER} "$${POSTGRES_DB}" -c "GRANT ALL ON schema $${DATABASE_SCHEMA:-incremental_migration} TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
+        psql -e -U $${POSTGRES_USER} "$${POSTGRES_DB}" -c "GRANT ALL ON ALL TABLES IN schema $${DATABASE_SCHEMA:-incremental_migration} TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
+        psql -e -U $${POSTGRES_USER} "$${POSTGRES_DB}" -c "GRANT ALL ON ALL SEQUENCES IN schema $${DATABASE_SCHEMA:-incremental_migration} TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
+        psql -e -U $${POSTGRES_USER} "$${POSTGRES_DB}" -c "GRANT ALL ON ALL FUNCTIONS IN schema $${DATABASE_SCHEMA:-incremental_migration} TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
+        psql -e -U $${POSTGRES_USER} "$${POSTGRES_DB}" -c "ALTER DEFAULT PRIVILEGES IN SCHEMA $${DATABASE_SCHEMA:-incremental_migration} GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
 
         psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
         psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'CREATE EXTENSION IF NOT EXISTS pg_trgm;'
         wait
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U test -d neuris" ]
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
       interval: 5s
       retries: 3
       start_period: 5s
