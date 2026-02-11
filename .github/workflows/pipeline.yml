@@ -412,7 +412,7 @@ jobs:
         with:
           name: "vuln-frontend.json"
       - name: Attest vulnerability scan
-        run: cosign attest --yes --replace --predicate vuln-frontend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+        run: cosign attest --yes --replace --predicate vuln-frontend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - id: set-version
         run: echo "version=$CONTAINER_IMAGE_VERSION" >> "$GITHUB_OUTPUT"
       - name: Send status to Slack
