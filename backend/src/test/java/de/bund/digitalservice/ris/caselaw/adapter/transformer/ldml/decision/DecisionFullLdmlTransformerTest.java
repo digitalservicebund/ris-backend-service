@@ -249,9 +249,9 @@ class DecisionFullLdmlTransformerTest {
       String expected =
           """
               <akn:judgmentBody>
-                <akn:motivation ris:domainTerm="Tatbestand">
+                <akn:background ris:domainTerm="Tatbestand">
                    <akn:p>Example content 1</akn:p>
-                </akn:motivation>
+                </akn:background>
              </akn:judgmentBody>
          """;
       Decision dissentingCaseLaw =

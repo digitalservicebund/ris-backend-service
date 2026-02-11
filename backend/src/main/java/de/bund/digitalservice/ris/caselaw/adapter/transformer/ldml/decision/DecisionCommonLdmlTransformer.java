@@ -265,11 +265,13 @@ public abstract class DecisionCommonLdmlTransformer
     builder
         .introductions(buildIntroductions(decision))
         .decision(buildDecision(decision))
+        .background(buildBackground(decision))
         .motivations(buildMotivations(decision));
 
     var judgmentBody = builder.build();
 
     if (judgmentBody.getIntroductions().isEmpty()
+        && judgmentBody.getBackground() == null
         && judgmentBody.getDecision() == null
         && judgmentBody.getMotivations().isEmpty()) {
       throw new ValidationException("Empty judgment body");
@@ -311,7 +313,6 @@ public abstract class DecisionCommonLdmlTransformer
 
     var longTexts = decision.longTexts();
     var reasons = nullSafeGet(longTexts, LongTexts::reasons);
-    var caseFacts = nullSafeGet(longTexts, LongTexts::caseFacts);
     var decisionReasons = nullSafeGet(longTexts, LongTexts::decisionReasons);
     var otherLongTexts = nullSafeGet(longTexts, LongTexts::otherLongText);
     var dissentingOpinion = nullSafeGet(longTexts, LongTexts::dissentingOpinion);
@@ -321,14 +322,6 @@ public abstract class DecisionCommonLdmlTransformer
       var motivation =
           Motivation.builder().content(htmlTransformer.htmlStringToObjectList(reasons)).build();
       motivation.setDomainTerm("Gründe");
-      motivations.add(motivation);
-    }
-
-    // Tatbestand
-    if (isNotBlank(caseFacts)) {
-      var motivation =
-          Motivation.builder().content(htmlTransformer.htmlStringToObjectList(caseFacts)).build();
-      motivation.setDomainTerm("Tatbestand");
       motivations.add(motivation);
     }
 
@@ -404,6 +397,18 @@ public abstract class DecisionCommonLdmlTransformer
     motivation.setContent(content);
 
     return motivation;
+  }
+
+  private JaxbHtml buildBackground(Decision decision) {
+    var longTexts = decision.longTexts();
+    var caseFacts = nullSafeGet(longTexts, LongTexts::caseFacts);
+
+    if (isNotBlank(caseFacts)) {
+      JaxbHtml html = JaxbHtml.build(htmlTransformer.htmlStringToObjectList(caseFacts));
+      html.setDomainTerm("Tatbestand");
+      return html;
+    }
+    return null;
   }
 
   private JaxbHtml buildDecision(Decision decision) {
