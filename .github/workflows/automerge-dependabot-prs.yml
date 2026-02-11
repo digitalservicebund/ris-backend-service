@@ -4,7 +4,11 @@
 # documentation.
 # Source: https://docs.github.com/en/code-security/tutorials/secure-your-dependencies/automating-dependabot-with-github-actions#enabling-automerge-on-a-pull-request
 name: Dependabot auto-merge
-on: pull_request
+on:
+  # pull_request_target runs in the context of the base branch,
+  # allowing it to access repository secrets.
+  pull_request_target:
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
@@ -19,16 +23,16 @@ jobs:
         id: generate-token
         uses: actions/create-github-app-token@v2
         with:
-          app-id: ${{ vars.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.GITOPS_NEURIS_APP_ID }}
+          private-key: ${{ secrets.GITOPS_NEURIS_APP_PRIVATE_KEY }}
       - name: Dependabot metadata
         id: metadata
         uses: dependabot/fetch-metadata@21025c705c08248db411dc16f3619e6b5f9ea21a
         with:
-          github-token: "${{ steps.generate_token.outputs.token }}"
+          github-token: "${{ steps.generate-token.outputs.token }}"
       - name: Enable auto-merge for Dependabot PRs
         if: steps.metadata.outputs.update-type != 'version-update:semver-major'
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
-          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
