@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -29,7 +30,7 @@ import lombok.experimental.SuperBuilder;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class RelatedDocumentationDTO {
 
-  @Id @AssignedIdOrUuid private UUID id;
+  @Id @GeneratedValue private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   private CourtDTO court;
