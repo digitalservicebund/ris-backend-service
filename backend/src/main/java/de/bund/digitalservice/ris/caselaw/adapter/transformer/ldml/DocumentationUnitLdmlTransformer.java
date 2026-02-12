@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Impl
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Norm;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Periodikum;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Rechtszug;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Rechtszug.Vorgehend;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrAlias;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrAuthor;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.identification.FrbrCountry;
@@ -378,7 +379,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
       for (PreviousDecision previousDecision : previousDecisions) {
         if (previousDecision == null) continue;
 
-        var vorgehendBuilder = Rechtszug.Vorgehend.builder();
+        var vorgehendBuilder = Vorgehend.builder();
         buildCaselawReference(previousDecision, vorgehendBuilder);
         vorhergehendeEntscheidungen.add(
             ImplicitReference.builder()
