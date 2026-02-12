@@ -1,0 +1,95 @@
+package de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary;
+
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlValue;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Builder(toBuilder = true)
+public class Gericht {
+  @XmlAttribute(name = "domainTerm")
+  private static final String DOMAIN_TERM = "Gericht";
+
+  @XmlAttribute(namespace = CaseLawLdml.AKN_NS, name = "refersTo")
+  private String refersTo;
+
+  @XmlElement(name = "gerichtstyp", namespace = CaseLawLdml.RIS_NS)
+  private Gerichtstyp gerichtstyp;
+
+  @XmlElement(name = "gerichtsort", namespace = CaseLawLdml.RIS_NS)
+  private Gerichtsort gerichtsort;
+
+  @XmlElement(name = "gerichtsbarkeit", namespace = CaseLawLdml.RIS_NS)
+  private Gerichtsbarkeit gerichtsbarkeit;
+
+  @XmlElement(name = "spruchkoerper", namespace = CaseLawLdml.RIS_NS)
+  private Spruchkoerper spruchkoerper;
+
+  @XmlElement(name = "sitzDerAussenstelle", namespace = CaseLawLdml.RIS_NS)
+  private SitzDerAussenstelle sitzDerAussenstelle;
+
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Getter
+  @Builder
+  public static class Gerichtstyp {
+    @XmlAttribute(name = "domainTerm")
+    private static final String DOMAIN_TERM = "Gerichtstyp";
+
+    @XmlValue private String value;
+  }
+
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Getter
+  @Builder
+  public static class Gerichtsort {
+    @XmlAttribute(name = "domainTerm")
+    private static final String DOMAIN_TERM = "Gerichtsort";
+
+    @XmlValue private String value;
+  }
+
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Getter
+  @Builder
+  public static class Gerichtsbarkeit {
+    @XmlAttribute(name = "domainTerm")
+    private static final String DOMAIN_TERM = "Gerichtsbarkeit";
+
+    @XmlValue private String value;
+  }
+
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Getter
+  @Builder
+  public static class Spruchkoerper {
+    @XmlAttribute(name = "domainTerm")
+    private static final String DOMAIN_TERM = "Spruchkörper";
+
+    @XmlAttribute(namespace = CaseLawLdml.AKN_NS, name = "refersTo")
+    private static final String REFERS_TO = "#spruchkoerper";
+
+    @XmlValue private String value;
+  }
+
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Getter
+  @Builder
+  public static class SitzDerAussenstelle {
+    @XmlAttribute(name = "domainTerm")
+    private static final String DOMAIN_TERM = "Sitz der Außenstelle";
+
+    @XmlValue private String value;
+  }
+}
