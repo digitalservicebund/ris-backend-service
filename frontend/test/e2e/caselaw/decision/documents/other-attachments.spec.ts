@@ -24,7 +24,7 @@ test.describe("Weitere Anhänge", { tag: ["@RISDEV-8920"] }, () => {
 
   test(
     "Im Seitenpanel kann eine Datei hochgeladen, heruntergeladen und gelöscht werden.",
-    { tag: ["@RISDEV-9850"] },
+    { tag: ["@RISDEV-9850", "@RISDEV-9852"] },
     async ({ page, documentNumber }) => {
       await navigateToCategories(page, documentNumber)
 

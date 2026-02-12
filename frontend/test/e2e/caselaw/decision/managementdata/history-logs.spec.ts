@@ -186,62 +186,65 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
     })
   })
 
-  test("Es wird das Hochladen/Löschen eines Word-Dokuments geloggt", async ({
-    page,
-    documentNumber,
-    browserName,
-  }) => {
-    await test.step("Lade Word-Dokument hoch", async () => {
-      await navigateToAttachments(page, documentNumber)
-      await uploadTestfile(page, "sample.docx")
-    })
-
-    await test.step("In der Historie gibt es ein Hochladen und ein Bearbeitet Historien-Event", async () => {
-      // Known error in firefox (NS_BINDING_ABORTED),
-      // when navigating with a concurrent navigation triggered
-      // eslint-disable-next-line playwright/no-wait-for-timeout,playwright/no-conditional-in-test
-      if (browserName === "firefox") await page.waitForTimeout(500)
-      await navigateToManagementData(page, documentNumber, {
-        navigationBy: "click",
+  test(
+    "Es wird das Hochladen/Löschen eines Word-Dokuments geloggt",
+    { tag: ["@RISDEV-9852"] },
+    async ({ page, documentNumber, browserName }) => {
+      await test.step("Lade Word-Dokument hoch", async () => {
+        await navigateToAttachments(page, documentNumber)
+        await uploadTestfile(page, "sample.docx")
       })
-      await expectHistoryCount(page, 5)
-      await expectHistoryLogRow(
-        page,
-        0,
-        "DS (e2e_tests DigitalService)",
-        `Dokeinheit bearbeitet`,
-      )
-      await expectHistoryLogRow(
-        page,
-        1,
-        "DS (e2e_tests DigitalService)",
-        "Originaldokument hinzugefügt",
-      )
-    })
 
-    await test.step("Lösche Word-Dokument", async () => {
-      await navigateToAttachments(page, documentNumber, {
-        navigationBy: "click",
+      await test.step("In der Historie gibt es ein Hochladen und ein Bearbeitet Historien-Event", async () => {
+        // Known error in firefox (NS_BINDING_ABORTED),
+        // when navigating with a concurrent navigation triggered
+        // eslint-disable-next-line playwright/no-wait-for-timeout,playwright/no-conditional-in-test
+        if (browserName === "firefox") await page.waitForTimeout(500)
+        await navigateToManagementData(page, documentNumber, {
+          navigationBy: "click",
+        })
+        await expectHistoryCount(page, 5)
+        await expectHistoryLogRow(
+          page,
+          0,
+          "DS (e2e_tests DigitalService)",
+          `Dokeinheit bearbeitet`,
+        )
+        await expectHistoryLogRow(
+          page,
+          1,
+          "DS (e2e_tests DigitalService)",
+          "Originaldokument hinzugefügt",
+        )
       })
-      await page.getByTestId("list-entry-0").getByLabel("Datei löschen").click()
-      // Dialog bestätigen
-      const dialog = page.getByRole("dialog")
-      await dialog.getByRole("button", { name: "Datei löschen" }).click()
-    })
 
-    await test.step("In der Historie gibt es zusätzlich ein Dokument gelöscht Historien-Event", async () => {
-      await navigateToManagementData(page, documentNumber, {
-        navigationBy: "click",
+      await test.step("Lösche Word-Dokument", async () => {
+        await navigateToAttachments(page, documentNumber, {
+          navigationBy: "click",
+        })
+        await page
+          .getByTestId("list-entry-0")
+          .getByLabel("Datei löschen")
+          .click()
+        // Dialog bestätigen
+        const dialog = page.getByRole("dialog")
+        await dialog.getByRole("button", { name: "Datei löschen" }).click()
       })
-      await expectHistoryCount(page, 6)
-      await expectHistoryLogRow(
-        page,
-        0,
-        "DS (e2e_tests DigitalService)",
-        `Originaldokument gelöscht`,
-      )
-    })
-  })
+
+      await test.step("In der Historie gibt es zusätzlich ein Dokument gelöscht Historien-Event", async () => {
+        await navigateToManagementData(page, documentNumber, {
+          navigationBy: "click",
+        })
+        await expectHistoryCount(page, 6)
+        await expectHistoryLogRow(
+          page,
+          0,
+          "DS (e2e_tests DigitalService)",
+          `Originaldokument gelöscht`,
+        )
+      })
+    },
+  )
 
   test("Angaben zum Bearbeiter sind nur innerhalb einer Dokstelle sichtbar", async ({
     page,
