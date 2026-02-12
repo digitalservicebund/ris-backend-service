@@ -418,6 +418,18 @@
             </akn:p>
         </akn:header>
         <akn:judgmentBody>
+            <akn:introduction ris:domainTerm="Leitsatz">
+                <akn:p>guidingPrinciple test</akn:p>
+            </akn:introduction>
+            <akn:introduction ris:domainTerm="Gliederung">
+                <akn:p>outline test</akn:p>
+            </akn:introduction>
+            <akn:decision ris:domainTerm="Tenor">
+                <akn:p>tenor test</akn:p>
+            </akn:decision>
+            <akn:background ris:domainTerm="Tatbestand">
+                <akn:p>caseFacts test</akn:p>
+            </akn:background>
             <akn:motivation ris:domainTerm="Gründe">
                 <akn:p>grounds test</akn:p>
             </akn:motivation>
@@ -438,18 +450,6 @@
                                  by="#richterin-maxima-mustermann">referenced opinions test 2</akn:opinion>
                 </akn:block>
             </akn:motivation>
-            <akn:introduction ris:domainTerm="Leitsatz">
-                <akn:p>guidingPrinciple test</akn:p>
-            </akn:introduction>
-            <akn:introduction ris:domainTerm="Gliederung">
-                <akn:p>outline test</akn:p>
-            </akn:introduction>
-            <akn:background ris:domainTerm="Tatbestand">
-                <akn:p>caseFacts test</akn:p>
-            </akn:background>
-            <akn:decision ris:domainTerm="Tenor">
-                <akn:p>tenor test</akn:p>
-            </akn:decision>
         </akn:judgmentBody>
     </akn:judgment>
 </akn:akomaNtoso>

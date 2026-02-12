@@ -162,9 +162,6 @@
             </akn:p>
         </akn:header>
         <akn:judgmentBody>
-            <akn:motivation ris:domainTerm="Rechtsfrage">
-                <akn:p alternativeTo="textWrapper">Rechtsfrage</akn:p>
-            </akn:motivation>
             <akn:introduction ris:domainTerm="Rechtsmittelführer">
                 <akn:p alternativeTo="textWrapper">Rechtsmittelführer</akn:p>
             </akn:introduction>
@@ -174,6 +171,9 @@
             <akn:decision ris:domainTerm="Erledigungsvermerk">
                 <akn:p>Erledigungsvermerk</akn:p>
             </akn:decision>
+            <akn:motivation ris:domainTerm="Rechtsfrage">
+                <akn:p alternativeTo="textWrapper">Rechtsfrage</akn:p>
+            </akn:motivation>
         </akn:judgmentBody>
     </akn:judgment>
 </akn:akomaNtoso>
