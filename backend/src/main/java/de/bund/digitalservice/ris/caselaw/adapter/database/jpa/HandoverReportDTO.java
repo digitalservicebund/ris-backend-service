@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "incremental_migration", name = "handover_report")
+@Table(name = "handover_report")
 public class HandoverReportDTO {
   @Id @GeneratedValue private UUID id;
 

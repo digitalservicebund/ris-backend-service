@@ -24,7 +24,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "collective_agreement")
+@Table(name = "collective_agreement")
 public class CollectiveAgreementDTO {
 
   @Id @GeneratedValue private UUID id;

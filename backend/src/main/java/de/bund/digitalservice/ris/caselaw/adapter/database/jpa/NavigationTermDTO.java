@@ -19,7 +19,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "field_of_law_navigation_term")
+@Table(name = "field_of_law_navigation_term")
 public class NavigationTermDTO {
   @Id @GeneratedValue private UUID id;
 

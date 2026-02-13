@@ -29,14 +29,14 @@ WITH
     -- 1) Collect for each relevant criterion a full list of pairs of doc-unit-id and value, e.g. ("38e..34f", 2020-01-11)
     all_dates as(
         SELECT documentation_unit_id as id, value
-        FROM incremental_migration.deviating_date
+        FROM deviating_date
         UNION ALL
         SELECT id, date as value
-        FROM incremental_migration.documentation_unit),
+        FROM documentation_unit),
      all_courts as(
         SELECT documentation_unit_id as id, court.id as value
-        FROM incremental_migration.deviating_court
-        INNER JOIN incremental_migration.court
+        FROM deviating_court
+        INNER JOIN court
             ON UPPER(value) = (
                 CASE
                     WHEN court.is_superior_court = true THEN UPPER( type )
@@ -45,19 +45,19 @@ WITH
             )
         UNION ALL
         SELECT id, court_id as value
-        FROM incremental_migration.documentation_unit
+        FROM documentation_unit
         WHERE court_id IS NOT NULL),
      all_file_numbers as (
         SELECT documentation_unit_id as id, UPPER(value) as value
-        FROM incremental_migration.file_number
+        FROM file_number
         -- File numbers as "XX" lead to explosion of duplicate relationships
         WHERE value NOT IN (SELECT value
-                            FROM incremental_migration.file_number
+                            FROM file_number
                             GROUP BY value
                             HAVING count(*) > 50)
         UNION ALL
         SELECT documentation_unit_id as id, UPPER(value) as value
-        FROM incremental_migration.deviating_file_number),
+        FROM deviating_file_number),
 
     -- 2) Find all pairs of doc-unit-ids that have an identical value per criterion,
     -- e.g. ("38e..34f", 2020-01-11) + ("785..eb9", 2020-01-11) -> ("38e..34f", "785..eb9")
@@ -80,8 +80,8 @@ WITH
      date_file_number_doc_type_matches as (
         SELECT matches.id_a, matches.id_b
         FROM date_file_number_matches matches
-        JOIN incremental_migration.documentation_unit d1 ON d1.id = matches.id_a
-        JOIN incremental_migration.documentation_unit d2 ON d2.id = matches.id_b
+        JOIN documentation_unit d1 ON d1.id = matches.id_a
+        JOIN documentation_unit d2 ON d2.id = matches.id_b
         WHERE d1.document_type_id = d2.document_type_id),
      court_file_number_matches as (
         SELECT fnm.id_a, fnm.id_b
@@ -92,17 +92,17 @@ WITH
      court_file_number_doc_type_matches as (
         SELECT matches.id_a, matches.id_b
         FROM court_file_number_matches matches
-        JOIN incremental_migration.documentation_unit d1 ON d1.id = matches.id_a
-        JOIN incremental_migration.documentation_unit d2 ON d2.id = matches.id_b
+        JOIN documentation_unit d1 ON d1.id = matches.id_a
+        JOIN documentation_unit d2 ON d2.id = matches.id_b
         WHERE d1.document_type_id = d2.document_type_id),
 
     -- 2B) ECLI matches
      all_eclis as (
         SELECT documentation_unit_id as id, UPPER(value) as value
-        FROM incremental_migration.deviating_ecli
+        FROM deviating_ecli
         UNION ALL
         SELECT id, UPPER(ecli) as value
-        FROM incremental_migration.decision),
+        FROM decision),
      ecli_matches as (
         SELECT t1.id AS id_a, t2.id AS id_b
         FROM all_eclis t1
@@ -124,7 +124,7 @@ WITH
         ) as all_matches
       GROUP BY id_a, id_b)
 DELETE
-FROM incremental_migration.duplicate_relation
+FROM duplicate_relation
 WHERE (documentation_unit_id1, documentation_unit_id2) NOT IN
       (SELECT id_a as documentation_unit_id1, id_b as documentation_unit_id2
        FROM duplicate_relations_view);
@@ -139,14 +139,14 @@ WHERE (documentation_unit_id1, documentation_unit_id2) NOT IN
 WITH
     all_dates as(
         SELECT documentation_unit_id as id, value
-        FROM incremental_migration.deviating_date
+        FROM deviating_date
         UNION ALL
         SELECT id, date as value
-        FROM incremental_migration.documentation_unit),
+        FROM documentation_unit),
      all_courts as(
         SELECT documentation_unit_id as id, court.id as value
-        FROM incremental_migration.deviating_court
-        INNER JOIN incremental_migration.court
+        FROM deviating_court
+        INNER JOIN court
             ON UPPER(value) = (
                 CASE
                     WHEN court.is_superior_court = true THEN UPPER( type )
@@ -155,19 +155,19 @@ WITH
             )
         UNION ALL
         SELECT id, court_id as value
-        FROM incremental_migration.documentation_unit
+        FROM documentation_unit
         WHERE court_id IS NOT NULL),
      all_file_numbers as (
         SELECT documentation_unit_id as id, UPPER(value) as value
-        FROM incremental_migration.file_number
+        FROM file_number
         -- File numbers as "XX" lead to explosion of duplicate relationships
         WHERE value NOT IN (SELECT value
-                            FROM incremental_migration.file_number
+                            FROM file_number
                             GROUP BY value
                             HAVING count(*) > 50)
         UNION ALL
         SELECT documentation_unit_id as id, UPPER(value) as value
-        FROM incremental_migration.deviating_file_number),
+        FROM deviating_file_number),
      file_number_matches as (
         SELECT DISTINCT t1.id AS id_a, t2.id AS id_b
         FROM all_file_numbers t1
@@ -182,8 +182,8 @@ WITH
      date_file_number_doc_type_matches as (
         SELECT matches.id_a, matches.id_b
         FROM date_file_number_matches matches
-        JOIN incremental_migration.documentation_unit d1 ON d1.id = matches.id_a
-        JOIN incremental_migration.documentation_unit d2 ON d2.id = matches.id_b
+        JOIN documentation_unit d1 ON d1.id = matches.id_a
+        JOIN documentation_unit d2 ON d2.id = matches.id_b
         WHERE d1.document_type_id = d2.document_type_id),
      court_file_number_matches as (
         SELECT fnm.id_a, fnm.id_b
@@ -194,16 +194,16 @@ WITH
      court_file_number_doc_type_matches as (
         SELECT matches.id_a, matches.id_b
         FROM court_file_number_matches matches
-        JOIN incremental_migration.documentation_unit d1 ON d1.id = matches.id_a
-        JOIN incremental_migration.documentation_unit d2 ON d2.id = matches.id_b
+        JOIN documentation_unit d1 ON d1.id = matches.id_a
+        JOIN documentation_unit d2 ON d2.id = matches.id_b
         WHERE d1.document_type_id = d2.document_type_id),
 
      all_eclis as (
         SELECT documentation_unit_id as id, UPPER(value) as value
-        FROM incremental_migration.deviating_ecli
+        FROM deviating_ecli
         UNION ALL
         SELECT id, UPPER(ecli) as value
-        FROM incremental_migration.decision),
+        FROM decision),
      ecli_matches as (
         SELECT t1.id AS id_a, t2.id AS id_b
         FROM all_eclis t1
@@ -222,14 +222,14 @@ WITH
             FROM ecli_matches
         ) as all_matches
       GROUP BY id_a, id_b)
-INSERT INTO incremental_migration.duplicate_relation (documentation_unit_id1, documentation_unit_id2, status)
+INSERT INTO duplicate_relation (documentation_unit_id1, documentation_unit_id2, status)
 SELECT drel.id_a, drel.id_b, 'PENDING'
 FROM duplicate_relations_view drel
-         LEFT JOIN incremental_migration.duplicate_relation ON drel.id_a = duplicate_relation.documentation_unit_id1 AND
+         LEFT JOIN duplicate_relation ON drel.id_a = duplicate_relation.documentation_unit_id1 AND
                                                                drel.id_b = duplicate_relation.documentation_unit_id2
          -- proceeding decisions need to be filtered out -> only consider decisions
-         INNER JOIN incremental_migration.decision dec1 ON dec1.id = drel.id_a
-         INNER JOIN incremental_migration.decision dec2 ON dec2.id = drel.id_b
+         INNER JOIN decision dec1 ON dec1.id = drel.id_a
+         INNER JOIN decision dec2 ON dec2.id = drel.id_b
 WHERE duplicate_relation.documentation_unit_id1 IS NULL;
 """,
       nativeQuery = true)
@@ -239,12 +239,12 @@ WHERE duplicate_relation.documentation_unit_id1 IS NULL;
   @Query(
       value =
 """
-UPDATE incremental_migration.duplicate_relation drel
+UPDATE duplicate_relation drel
 SET status = 'IGNORED'
-FROM incremental_migration.documentation_unit d1
-        LEFT JOIN incremental_migration.status status1 ON d1.current_status_id = status1.id,
-    incremental_migration.documentation_unit d2
-        LEFT JOIN incremental_migration.status status2 ON d2.current_status_id = status2.id
+FROM documentation_unit d1
+        LEFT JOIN status status1 ON d1.current_status_id = status1.id,
+    documentation_unit d2
+        LEFT JOIN status status2 ON d2.current_status_id = status2.id
 WHERE drel.status = 'PENDING'
   AND drel.documentation_unit_id1 = d1.id AND drel.documentation_unit_id2 = d2.id
   AND (d1.duplicate_check = FALSE OR d2.duplicate_check = FALSE

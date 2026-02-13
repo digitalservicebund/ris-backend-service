@@ -23,7 +23,7 @@ import lombok.ToString;
 @Builder
 @Entity
 @ToString(onlyExplicitlyIncluded = true)
-@Table(name = "document_type", schema = "incremental_migration")
+@Table(name = "document_type")
 public class DocumentTypeDTO {
   @Id @GeneratedValue private UUID id;
 

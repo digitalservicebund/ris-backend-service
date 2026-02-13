@@ -1,5 +1,5 @@
 insert into
-  incremental_migration.field_of_law (id, identifier, text, juris_id, notation)
+  field_of_law (id, identifier, text, juris_id, notation)
 values
   (
     'ef382996-497f-4c2f-9a30-1c73d8ac0a87',
@@ -87,7 +87,7 @@ values
   );
 
 insert into
-  incremental_migration.field_of_law_norm (
+  field_of_law_norm (
     id,
     abbreviation,
     single_norm_description,
@@ -138,7 +138,7 @@ values
   );
 
 insert into
-  incremental_migration.field_of_law_field_of_law_parent (field_of_law_id, field_of_law_parent_id)
+  field_of_law_field_of_law_parent (field_of_law_id, field_of_law_parent_id)
 values
   (
     '71defe05-cd4d-43e5-a07e-06c611b81a26',

@@ -23,7 +23,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "legal_force_type", schema = "incremental_migration")
+@Table(name = "legal_force_type")
 public class LegalForceTypeDTO {
   @Id @GeneratedValue private UUID id;
 

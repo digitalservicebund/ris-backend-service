@@ -17,7 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "legal_periodical", schema = "incremental_migration")
+@Table(name = "legal_periodical")
 @Getter
 @Setter
 public class LegalPeriodicalDTO {

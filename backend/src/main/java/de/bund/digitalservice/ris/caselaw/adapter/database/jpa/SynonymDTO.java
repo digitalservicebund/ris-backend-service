@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "court_synonym", schema = "incremental_migration")
+@Table(name = "court_synonym")
 public class SynonymDTO {
   @Id @GeneratedValue private UUID id;
 

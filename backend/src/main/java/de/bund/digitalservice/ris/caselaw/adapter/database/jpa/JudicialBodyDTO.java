@@ -25,7 +25,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "judicial_body", schema = "incremental_migration")
+@Table(name = "judicial_body")
 public class JudicialBodyDTO {
 
   @Id @GeneratedValue private UUID id;

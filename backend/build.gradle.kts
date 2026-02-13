@@ -294,14 +294,11 @@ tasks {
         user = System.getenv("DB_USER")
         password = System.getenv("DB_PASSWORD")
         locations = arrayOf("classpath:db/migration")
-        defaultSchema = "incremental_migration"
+        defaultSchema = System.getenv("DB_SCHEMA")
         dependsOn("compileMigrationJava")
     }
 
     register<FlywayMigrateTask>("migrateDatabaseForERD") {
-        url = System.getenv("DB_URL")
-        user = System.getenv("DB_USER")
-        password = System.getenv("DB_PASSWORD")
         locations = arrayOf(
             "filesystem:src/main/resources/db/migration/", "classpath:db/migration"
         )

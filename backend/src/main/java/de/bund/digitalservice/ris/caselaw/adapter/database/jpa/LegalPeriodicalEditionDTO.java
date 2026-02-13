@@ -26,7 +26,7 @@ import org.springframework.data.annotation.CreatedDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "edition", schema = "incremental_migration")
+@Table(name = "edition")
 @Getter
 @Setter
 public class LegalPeriodicalEditionDTO {

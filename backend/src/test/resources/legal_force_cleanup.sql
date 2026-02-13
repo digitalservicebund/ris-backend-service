@@ -1,20 +1,20 @@
 delete from
-  incremental_migration.legal_force;
+  legal_force;
 
 delete from
-  incremental_migration.norm_reference;
+  norm_reference;
 
 delete from
-  incremental_migration.documentation_unit;
+  documentation_unit;
 
 delete from
-    incremental_migration.decision;
+  decision;
 
 delete from
-  incremental_migration.legal_force_type;
+  legal_force_type;
 
 delete from
-  incremental_migration.norm_abbreviation;
+  norm_abbreviation;
 
 delete from
-  incremental_migration.region;
+  region;

@@ -18,7 +18,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(name = "jurisdiction_type", schema = "incremental_migration")
+@Table(name = "jurisdiction_type")
 public class JurisdictionTypeDTO {
   @Id private UUID id;
 

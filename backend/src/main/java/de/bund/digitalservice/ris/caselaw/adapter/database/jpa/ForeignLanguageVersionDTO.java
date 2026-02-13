@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "foreign_language_version")
+@Table(name = "foreign_language_version")
 public class ForeignLanguageVersionDTO {
 
   @Id @GeneratedValue private UUID id;

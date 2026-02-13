@@ -27,7 +27,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-@Table(name = "procedure", schema = "incremental_migration")
+@Table(name = "procedure")
 public class ProcedureDTO {
   @Id @GeneratedValue private UUID id;
 

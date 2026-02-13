@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(schema = "incremental_migration", name = "status")
+@Table(name = "status")
 public class StatusDTO {
   @Id @GeneratedValue UUID id;
 

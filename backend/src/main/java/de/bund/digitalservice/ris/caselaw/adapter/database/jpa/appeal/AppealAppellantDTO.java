@@ -18,7 +18,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(schema = "incremental_migration", name = "appeal_appellant")
+@Table(name = "appeal_appellant")
 public class AppealAppellantDTO {
 
   @EmbeddedId @Builder.Default private AppealAppellantId primaryKey = new AppealAppellantId();

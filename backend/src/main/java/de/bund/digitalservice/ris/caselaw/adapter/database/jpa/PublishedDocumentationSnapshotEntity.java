@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 @Entity
-@Table(name = "published_documentation_snapshot", schema = "incremental_migration")
+@Table(name = "published_documentation_snapshot")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)

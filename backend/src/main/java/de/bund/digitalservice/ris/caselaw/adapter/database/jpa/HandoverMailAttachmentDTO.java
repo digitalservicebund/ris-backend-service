@@ -21,7 +21,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(schema = "incremental_migration", name = "handover_mail_attachments")
+@Table(name = "handover_mail_attachments")
 @Entity
 public class HandoverMailAttachmentDTO {
 

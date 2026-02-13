@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "input_type")
+@Table(name = "input_type")
 public class InputTypeDTO {
   @Id @GeneratedValue private UUID id;
 

@@ -26,7 +26,7 @@ import org.hibernate.type.SqlTypes;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "abuse_fee")
+@Table(name = "abuse_fee")
 public class AbuseFeeDTO {
   @Id @GeneratedValue private UUID id;
 

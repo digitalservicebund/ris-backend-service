@@ -26,7 +26,7 @@ import org.hibernate.type.SqlTypes;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "object_value")
+@Table(name = "object_value")
 public class ObjectValueDTO {
   @Id @GeneratedValue private UUID id;
 

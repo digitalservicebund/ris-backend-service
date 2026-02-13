@@ -29,7 +29,7 @@ import org.springframework.data.annotation.Immutable;
 @Builder(toBuilder = true)
 @Entity
 @Immutable
-@Table(name = "court", schema = "incremental_migration")
+@Table(name = "court")
 public class CourtDTO {
   @Id @GeneratedValue private UUID id;
 

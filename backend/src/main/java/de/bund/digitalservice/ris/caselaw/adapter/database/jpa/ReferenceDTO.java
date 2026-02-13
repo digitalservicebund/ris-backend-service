@@ -23,7 +23,7 @@ import org.hibernate.annotations.UuidGenerator;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @Entity
-@Table(schema = "incremental_migration", name = "reference")
+@Table(name = "reference")
 public class ReferenceDTO {
 
   @Id

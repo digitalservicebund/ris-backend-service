@@ -22,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @ToString(onlyExplicitlyIncluded = true)
 @Entity
-@Table(name = "pending_proceeding", schema = "incremental_migration")
+@Table(name = "pending_proceeding")
 @SuppressWarnings(
     "java:S6539") // This class depends on many classes, because it's the key part and merging
 // everything.

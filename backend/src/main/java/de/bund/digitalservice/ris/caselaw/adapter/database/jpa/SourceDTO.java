@@ -26,7 +26,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "source")
+@Table(name = "source")
 public class SourceDTO {
   @Id @GeneratedValue private UUID id;
 

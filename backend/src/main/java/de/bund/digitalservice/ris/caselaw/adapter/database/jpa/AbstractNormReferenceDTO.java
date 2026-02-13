@@ -33,7 +33,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @Entity
-@Table(name = "norm_reference", schema = "incremental_migration")
+@Table(name = "norm_reference")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class AbstractNormReferenceDTO {
 

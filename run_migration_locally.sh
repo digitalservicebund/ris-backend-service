@@ -11,7 +11,7 @@ export RIS_MIGRATION_DB_PORT=5432
 export RIS_MIGRATION_DB_NAME=neuris
 export RIS_MIGRATION_DB_USER=migration
 export RIS_MIGRATION_DB_PASSWORD=migration
-export RIS_MIGRATION_DB_SCHEMA=incremental_migration
+export RIS_MIGRATION_DB_SCHEMA=caselaw
 
 DATA_MIGRATION_SERVICE_PATH="../ris-data-migration"
 DATA_MIGRATION_IMPORT_PATH="./juris-xml-data"

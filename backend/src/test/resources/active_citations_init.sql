@@ -1,73 +1,73 @@
 INSERT INTO
-  incremental_migration.citation_type (
+    citation_type (
     id,
     abbreviation,
     label,
     documentation_unit_document_category_id,
     citation_document_category_id,
     juris_id
-  )
+)
 VALUES
-  (
-    '4e768071-1a19-43a1-8ab9-c185adec94bf',
-    'Anwendung',
-    'Anwendung',
-    '4a92661f-0367-4992-98ec-fb7cffa0d714',
-    '4a92661f-0367-4992-98ec-fb7cffa0d714',
-    48
-  ),
-  (
-    '6b4bd747-fce9-4e49-8af4-3fb4f1d3663c',
-    'Nan',
-    'Nichtanwendung',
-    '4a92661f-0367-4992-98ec-fb7cffa0d714',
-    '4a92661f-0367-4992-98ec-fb7cffa0d714',
-    49
-  );
+    (
+        '4e768071-1a19-43a1-8ab9-c185adec94bf',
+        'Anwendung',
+        'Anwendung',
+        '4a92661f-0367-4992-98ec-fb7cffa0d714',
+        '4a92661f-0367-4992-98ec-fb7cffa0d714',
+        48
+    ),
+    (
+        '6b4bd747-fce9-4e49-8af4-3fb4f1d3663c',
+        'Nan',
+        'Nichtanwendung',
+        '4a92661f-0367-4992-98ec-fb7cffa0d714',
+        '4a92661f-0367-4992-98ec-fb7cffa0d714',
+        49
+    );
 
 insert into
-  incremental_migration.court (
+    court (
     id,
     juris_id,
     location,
     type
-  )
+)
 values
-  (
-    '96301f85-9bd2-4690-a67f-f9fdfe725de3',
-    '1357',
-    'Karlsruhe',
-    'BGH'
-  );
+    (
+        '96301f85-9bd2-4690-a67f-f9fdfe725de3',
+        '1357',
+        'Karlsruhe',
+        'BGH'
+    );
 
 insert into
-  incremental_migration.document_type (id, abbreviation, label, document_category_id)
+    document_type (id, abbreviation, label, document_category_id)
 values
-  (
-    'b57e016e-665d-486c-902e-c191f5a7acf6',
-    'Bes',
-    'Beschluss',
-    '4a92661f-0367-4992-98ec-fb7cffa0d714'
-  );
+    (
+        'b57e016e-665d-486c-902e-c191f5a7acf6',
+        'Bes',
+        'Beschluss',
+        '4a92661f-0367-4992-98ec-fb7cffa0d714'
+    );
 
 
 
 insert into
-  incremental_migration.documentation_unit (id, document_number, documentation_office_id)
+    documentation_unit (id, document_number, documentation_office_id)
 values
-  (
-    '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
-    'documentnr001',
-    '6be0bb1a-c196-484a-addf-822f2ab557f7'
-  ),
-  (
-    'f13e7fe2-78a5-11ee-b962-0242ac120002',
-    'documentnr002',
-    '6be0bb1a-c196-484a-addf-822f2ab557f7'
-  );
+    (
+        '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
+        'documentnr001',
+        '6be0bb1a-c196-484a-addf-822f2ab557f7'
+    ),
+    (
+        'f13e7fe2-78a5-11ee-b962-0242ac120002',
+        'documentnr002',
+        '6be0bb1a-c196-484a-addf-822f2ab557f7'
+    );
 
 insert into
-    incremental_migration.decision (id)
+    decision (id)
 values
     (
         '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3'
@@ -77,14 +77,14 @@ values
     );
 
 insert into
-    incremental_migration.status (id, documentation_unit_id, publication_status, created_at, with_error)
+    status (id, documentation_unit_id, publication_status, created_at, with_error)
 values
     (
         '95988131-f355-414d-9da5-dcbcdbf4b98f',
         '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
         'PUBLISHED',
         current_timestamp,
-     false
+        false
     ),
     (
         '85988131-f355-414d-9da5-dcbcdbf4b98f',
@@ -94,11 +94,11 @@ values
         false
     );
 
-update incremental_migration.documentation_unit set current_status_id = '95988131-f355-414d-9da5-dcbcdbf4b98f' where id = '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
-update incremental_migration.documentation_unit set current_status_id = '85988131-f355-414d-9da5-dcbcdbf4b98f' where id = 'f13e7fe2-78a5-11ee-b962-0242ac120002';
+update documentation_unit set current_status_id = '95988131-f355-414d-9da5-dcbcdbf4b98f' where id = '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
+update documentation_unit set current_status_id = '85988131-f355-414d-9da5-dcbcdbf4b98f' where id = 'f13e7fe2-78a5-11ee-b962-0242ac120002';
 
 insert into
-  incremental_migration.active_citation_caselaw (
+    active_citation_caselaw (
     id,
     target_court_id,
     target_date,
@@ -108,27 +108,27 @@ insert into
     citation_type_id,
     source_id,
     rank
-  )
+)
 values
-  (
-    'f0232240-7416-11ee-b962-0242ac120002',
-    '96301f85-9bd2-4690-a67f-f9fdfe725de3',
-    '2011-01-21',
-    null,
-    'b57e016e-665d-486c-902e-c191f5a7acf6',
-    'abc',
-    '4e768071-1a19-43a1-8ab9-c185adec94bf',
-    '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
-    1
-  ),
-  (
-    'f0232240-7416-11ee-b962-0242ac120003',
-    null,
-    null,
-    'documentnr002',
-    null,
-    null,
-    '6b4bd747-fce9-4e49-8af4-3fb4f1d3663c',
-    '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
-    2
-  );
+    (
+        'f0232240-7416-11ee-b962-0242ac120002',
+        '96301f85-9bd2-4690-a67f-f9fdfe725de3',
+        '2011-01-21',
+        null,
+        'b57e016e-665d-486c-902e-c191f5a7acf6',
+        'abc',
+        '4e768071-1a19-43a1-8ab9-c185adec94bf',
+        '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
+        1
+    ),
+    (
+        'f0232240-7416-11ee-b962-0242ac120003',
+        null,
+        null,
+        'documentnr002',
+        null,
+        null,
+        '6b4bd747-fce9-4e49-8af4-3fb4f1d3663c',
+        '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
+        2
+    );

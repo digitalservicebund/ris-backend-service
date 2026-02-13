@@ -12,5 +12,5 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 @Entity
-@Table(schema = "incremental_migration", name = "appeal_revision_defendant")
+@Table(name = "appeal_revision_defendant")
 public class AppealRevisionDefendantDTO extends AppealAppealStatusDTO {}

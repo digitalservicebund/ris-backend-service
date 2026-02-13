@@ -28,7 +28,7 @@ import org.hibernate.proxy.HibernateProxy;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "documentation_office", schema = "incremental_migration")
+@Table(name = "documentation_office")
 public class DocumentationOfficeDTO {
   @Id private UUID id;
 
@@ -44,7 +44,6 @@ public class DocumentationOfficeDTO {
       fetch = FetchType.LAZY)
   @JoinTable(
       name = "process_step_documentation_office",
-      schema = "incremental_migration",
       joinColumns = @JoinColumn(name = "documentation_office_id"),
       inverseJoinColumns = @JoinColumn(name = "process_step_id"))
   @OrderColumn(name = "rank")

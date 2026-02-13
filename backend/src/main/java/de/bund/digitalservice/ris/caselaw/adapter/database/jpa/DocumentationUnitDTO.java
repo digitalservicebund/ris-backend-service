@@ -50,7 +50,7 @@ import org.hibernate.proxy.HibernateProxy;
 @ToString(onlyExplicitlyIncluded = true)
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "documentation_unit", schema = "incremental_migration")
+@Table(name = "documentation_unit")
 @SuppressWarnings(
     "java:S6539") // This class depends on many classes, because it's the key part and merging
 // everything.
@@ -118,7 +118,6 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
       fetch = FetchType.LAZY)
   @JoinTable(
       name = "documentation_unit_region",
-      schema = "incremental_migration",
       joinColumns = @JoinColumn(name = "documentation_unit_id"),
       inverseJoinColumns = @JoinColumn(name = "region_id"))
   @Builder.Default

@@ -30,7 +30,7 @@ import org.jspecify.annotations.Nullable;
 @Builder
 @EqualsAndHashCode
 @ToString
-@Table(name = "passive_citation_uli", schema = "incremental_migration")
+@Table(name = "passive_citation_uli")
 public class PassiveCitationUliDTO {
 
   @Id @GeneratedValue @UuidGenerator @EqualsAndHashCode.Exclude private UUID id;

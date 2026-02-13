@@ -15,7 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "correction_border_number", schema = "incremental_migration")
+@Table(name = "correction_border_number")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

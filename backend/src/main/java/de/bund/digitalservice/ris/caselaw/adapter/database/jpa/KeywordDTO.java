@@ -21,7 +21,7 @@ import lombok.Setter;
 @Builder
 @EqualsAndHashCode
 @Entity
-@Table(schema = "incremental_migration", name = "keyword")
+@Table(name = "keyword")
 public class KeywordDTO {
   @Id @GeneratedValue private UUID id;
 

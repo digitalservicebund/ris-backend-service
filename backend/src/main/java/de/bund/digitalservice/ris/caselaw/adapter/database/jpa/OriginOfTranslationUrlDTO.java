@@ -18,7 +18,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "origin_of_translation_external_link")
+@Table(name = "origin_of_translation_external_link")
 public class OriginOfTranslationUrlDTO {
   @Id @GeneratedValue private UUID id;
 

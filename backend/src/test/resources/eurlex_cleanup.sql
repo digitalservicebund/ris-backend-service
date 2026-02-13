@@ -1,5 +1,5 @@
 delete from
-  incremental_migration.eurlex;
+  eurlex;
 
 delete from
-  incremental_migration.court;
+  court;

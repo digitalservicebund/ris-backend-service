@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(schema = "incremental_migration", name = "api_key")
+@Table(name = "api_key")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)

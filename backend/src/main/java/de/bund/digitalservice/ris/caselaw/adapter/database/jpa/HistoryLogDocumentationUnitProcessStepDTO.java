@@ -23,7 +23,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "history_log_documentation_unit_process_step", schema = "incremental_migration")
+@Table(name = "history_log_documentation_unit_process_step")
 public class HistoryLogDocumentationUnitProcessStepDTO {
   @Id
   @GeneratedValue

@@ -1,4 +1,4 @@
-insert into incremental_migration.court (id,
+insert into court (id,
                                          juris_id,
                                          location,
                                          type)

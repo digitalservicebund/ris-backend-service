@@ -112,7 +112,7 @@ To repeat files downloading, remove the `../ris-data-migration/juris-xml-data` d
    RIS_MIGRATION_DB_NAME=neuris
    RIS_MIGRATION_DB_USER=migration
    RIS_MIGRATION_DB_PASSWORD=migration
-   RIS_MIGRATION_DB_SCHEMA=incremental_migration
+   RIS_MIGRATION_DB_SCHEMA=caselaw
    ```
 
 8. For console logging
@@ -141,11 +141,11 @@ To repeat files downloading, remove the `../ris-data-migration/juris-xml-data` d
 
 ### Update the Lookup Tables / Reimport for Backfilling
 
-1. Pull `ris-data-migration` 
+1. Pull `ris-data-migration`
 
 2. Download the new lookup tables and document units (see steps 4 and 5 above)
 
-3. If you need to fill new categories in all documentation units, truncate the `incremental_migration` schema
+3. If you need to fill new categories in all documentation units, truncate the `caselaw`/`incremental_migration` schema
 
 4. To update/reimport new data, repeat steps 9 - 12 above
 

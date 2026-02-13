@@ -1,2 +1,2 @@
 delete from
-  incremental_migration.ignored_text_check_word;
+  ignored_text_check_word;

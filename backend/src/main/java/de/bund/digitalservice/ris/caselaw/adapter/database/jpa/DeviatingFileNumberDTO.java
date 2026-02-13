@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "deviating_file_number")
+@Table(name = "deviating_file_number")
 public class DeviatingFileNumberDTO {
   @Id @GeneratedValue private UUID id;
 

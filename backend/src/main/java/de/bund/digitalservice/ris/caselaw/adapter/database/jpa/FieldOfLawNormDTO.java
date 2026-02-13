@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "field_of_law_norm")
+@Table(name = "field_of_law_norm")
 public class FieldOfLawNormDTO {
   @Id @GeneratedValue private UUID id;
 

@@ -1,2 +1,2 @@
 delete
-from incremental_migration.legal_periodical;
+from legal_periodical;

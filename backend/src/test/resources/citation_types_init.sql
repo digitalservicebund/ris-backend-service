@@ -1,5 +1,5 @@
 INSERT INTO
-  incremental_migration.citation_type (
+  citation_type (
     id,
     abbreviation,
     label,

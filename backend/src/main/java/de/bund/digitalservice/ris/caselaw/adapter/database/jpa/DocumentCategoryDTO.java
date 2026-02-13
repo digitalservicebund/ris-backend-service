@@ -18,7 +18,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "document_category", schema = "incremental_migration")
+@Table(name = "document_category")
 public class DocumentCategoryDTO {
   @Id @GeneratedValue private UUID id;
 

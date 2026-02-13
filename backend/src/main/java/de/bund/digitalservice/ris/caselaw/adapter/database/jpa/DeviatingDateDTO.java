@@ -20,7 +20,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration", name = "deviating_date")
+@Table(name = "deviating_date")
 public class DeviatingDateDTO {
   @Id @GeneratedValue private UUID id;
 
