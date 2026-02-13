@@ -384,6 +384,7 @@ test.describe("inbox", () => {
 
       await test.step("eu caselaw inbox can be accessed via top navbar", async () => {
         const tab = page.getByTestId("eu-tab")
+
         await navigateToInbox(page)
         await expect(tab).toBeVisible()
         await tab.click()
@@ -391,6 +392,14 @@ test.describe("inbox", () => {
       })
 
       await test.step("sorted by decision date, latest first", async () => {
+        const docNumber = page.getByLabel("Dokumentnummer Suche")
+        const searchButton = page.getByLabel(
+          "Nach Dokumentationseinheiten suchen",
+        )
+        await expect(docNumber).toBeVisible()
+        await docNumber.fill("YYTestDoc00")
+
+        await searchButton.click()
         const rows = page.locator("tr")
         const regex = new RegExp(`${documentNumber1}|${documentNumber2}`)
 
