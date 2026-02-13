@@ -1,5 +1,5 @@
 INSERT INTO
-    incremental_migration.citation_type (
+    citation_type (
     id,
     abbreviation,
     label,
@@ -26,7 +26,7 @@ VALUES
     );
 
 insert into
-    incremental_migration.court (
+    court (
     id,
     juris_id,
     location,
@@ -41,7 +41,7 @@ values
     );
 
 insert into
-    incremental_migration.document_type (id, abbreviation, label, document_category_id)
+    document_type (id, abbreviation, label, document_category_id)
 values
     (
         'b57e016e-665d-486c-902e-c191f5a7acf6',
@@ -53,7 +53,7 @@ values
 
 
 insert into
-    incremental_migration.documentation_unit (id, document_number, documentation_office_id)
+    documentation_unit (id, document_number, documentation_office_id)
 values
     (
         '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
@@ -67,7 +67,7 @@ values
     );
 
 insert into
-    incremental_migration.decision (id)
+    decision (id)
 values
     (
         '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3'
@@ -77,7 +77,7 @@ values
     );
 
 insert into
-    incremental_migration.status (id, documentation_unit_id, publication_status, created_at, with_error)
+    status (id, documentation_unit_id, publication_status, created_at, with_error)
 values
     (
         '95988131-f355-414d-9da5-dcbcdbf4b98f',
@@ -94,11 +94,11 @@ values
         false
     );
 
-update incremental_migration.documentation_unit set current_status_id = '95988131-f355-414d-9da5-dcbcdbf4b98f' where id = '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
-update incremental_migration.documentation_unit set current_status_id = '85988131-f355-414d-9da5-dcbcdbf4b98f' where id = 'f13e7fe2-78a5-11ee-b962-0242ac120002';
+update documentation_unit set current_status_id = '95988131-f355-414d-9da5-dcbcdbf4b98f' where id = '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
+update documentation_unit set current_status_id = '85988131-f355-414d-9da5-dcbcdbf4b98f' where id = 'f13e7fe2-78a5-11ee-b962-0242ac120002';
 
 insert into
-    incremental_migration.active_citation_caselaw (
+    active_citation_caselaw (
     id,
     target_court_id,
     target_date,
