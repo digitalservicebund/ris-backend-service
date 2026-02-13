@@ -1,17 +1,20 @@
 delete from
-  related_documentation;
+    active_citation_caselaw;
 
 delete from
-  documentation_unit;
+    related_documentation;
 
 delete from
-  decision;
+    documentation_unit;
 
 delete from
-  document_type;
+    decision;
 
 delete from
-  court;
+    document_type;
+
+delete from
+    court;
 
 delete from
   citation_type;

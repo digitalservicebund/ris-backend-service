@@ -1,70 +1,70 @@
 INSERT INTO
-  citation_type (
+    citation_type (
     id,
     abbreviation,
     label,
     documentation_unit_document_category_id,
     citation_document_category_id,
     juris_id
-  )
+)
 VALUES
-  (
-    '4e768071-1a19-43a1-8ab9-c185adec94bf',
-    'Anwendung',
-    'Anwendung',
-    '4a92661f-0367-4992-98ec-fb7cffa0d714',
-    '4a92661f-0367-4992-98ec-fb7cffa0d714',
-    48
-  ),
-  (
-    '6b4bd747-fce9-4e49-8af4-3fb4f1d3663c',
-    'Nan',
-    'Nichtanwendung',
-    '4a92661f-0367-4992-98ec-fb7cffa0d714',
-    '4a92661f-0367-4992-98ec-fb7cffa0d714',
-    49
-  );
+    (
+        '4e768071-1a19-43a1-8ab9-c185adec94bf',
+        'Anwendung',
+        'Anwendung',
+        '4a92661f-0367-4992-98ec-fb7cffa0d714',
+        '4a92661f-0367-4992-98ec-fb7cffa0d714',
+        48
+    ),
+    (
+        '6b4bd747-fce9-4e49-8af4-3fb4f1d3663c',
+        'Nan',
+        'Nichtanwendung',
+        '4a92661f-0367-4992-98ec-fb7cffa0d714',
+        '4a92661f-0367-4992-98ec-fb7cffa0d714',
+        49
+    );
 
 insert into
-  court (
+    court (
     id,
     juris_id,
     location,
     type
-  )
+)
 values
-  (
-    '96301f85-9bd2-4690-a67f-f9fdfe725de3',
-    '1357',
-    'Karlsruhe',
-    'BGH'
-  );
+    (
+        '96301f85-9bd2-4690-a67f-f9fdfe725de3',
+        '1357',
+        'Karlsruhe',
+        'BGH'
+    );
 
 insert into
-  document_type (id, abbreviation, label, document_category_id)
+    document_type (id, abbreviation, label, document_category_id)
 values
-  (
-    'b57e016e-665d-486c-902e-c191f5a7acf6',
-    'Bes',
-    'Beschluss',
-    '4a92661f-0367-4992-98ec-fb7cffa0d714'
-  );
+    (
+        'b57e016e-665d-486c-902e-c191f5a7acf6',
+        'Bes',
+        'Beschluss',
+        '4a92661f-0367-4992-98ec-fb7cffa0d714'
+    );
 
 
 
 insert into
-  documentation_unit (id, document_number, documentation_office_id)
+    documentation_unit (id, document_number, documentation_office_id)
 values
-  (
-    '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
-    'documentnr001',
-    '6be0bb1a-c196-484a-addf-822f2ab557f7'
-  ),
-  (
-    'f13e7fe2-78a5-11ee-b962-0242ac120002',
-    'documentnr002',
-    '6be0bb1a-c196-484a-addf-822f2ab557f7'
-  );
+    (
+        '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
+        'documentnr001',
+        '6be0bb1a-c196-484a-addf-822f2ab557f7'
+    ),
+    (
+        'f13e7fe2-78a5-11ee-b962-0242ac120002',
+        'documentnr002',
+        '6be0bb1a-c196-484a-addf-822f2ab557f7'
+    );
 
 insert into
     decision (id)
@@ -84,7 +84,7 @@ values
         '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
         'PUBLISHED',
         current_timestamp,
-     false
+        false
     ),
     (
         '85988131-f355-414d-9da5-dcbcdbf4b98f',
@@ -98,7 +98,7 @@ update documentation_unit set current_status_id = '95988131-f355-414d-9da5-dcbcd
 update documentation_unit set current_status_id = '85988131-f355-414d-9da5-dcbcdbf4b98f' where id = 'f13e7fe2-78a5-11ee-b962-0242ac120002';
 
 insert into
-  related_documentation (
+    related_documentation (
     id,
     court_id,
     date,
@@ -109,29 +109,29 @@ insert into
     dtype,
     documentation_unit_id,
     rank
-  )
+)
 values
-  (
-    'f0232240-7416-11ee-b962-0242ac120002',
-    '96301f85-9bd2-4690-a67f-f9fdfe725de3',
-    '2011-01-21',
-    null,
-    'b57e016e-665d-486c-902e-c191f5a7acf6',
-    'abc',
-    '4e768071-1a19-43a1-8ab9-c185adec94bf',
-    'caselaw_active_citation',
-    '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
-    1
-  ),
-  (
-    'f0232240-7416-11ee-b962-0242ac120003',
-    null,
-    null,
-    'documentnr002',
-    null,
-    null,
-    '6b4bd747-fce9-4e49-8af4-3fb4f1d3663c',
-    'caselaw_active_citation',
-    '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
-    2
-  );
+    (
+        'f0232240-7416-11ee-b962-0242ac120002',
+        '96301f85-9bd2-4690-a67f-f9fdfe725de3',
+        '2011-01-21',
+        null,
+        'b57e016e-665d-486c-902e-c191f5a7acf6',
+        'abc',
+        '4e768071-1a19-43a1-8ab9-c185adec94bf',
+        'caselaw_active_citation',
+        '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
+        1
+    ),
+    (
+        'f0232240-7416-11ee-b962-0242ac120003',
+        null,
+        null,
+        'documentnr002',
+        null,
+        null,
+        '6b4bd747-fce9-4e49-8af4-3fb4f1d3663c',
+        'caselaw_active_citation',
+        '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
+        2
+    );
