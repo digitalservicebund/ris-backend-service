@@ -98,7 +98,7 @@ update documentation_unit set current_status_id = '95988131-f355-414d-9da5-dcbcd
 update documentation_unit set current_status_id = '85988131-f355-414d-9da5-dcbcdbf4b98f' where id = 'f13e7fe2-78a5-11ee-b962-0242ac120002';
 
 insert into
-    related_documentation (
+    active_citation_caselaw (
     id,
     court_id,
     date,
