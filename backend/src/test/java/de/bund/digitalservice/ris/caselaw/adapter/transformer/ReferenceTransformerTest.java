@@ -68,16 +68,16 @@ class ReferenceTransformerTest {
 
   @Test
   void testTransformToDomainWithoutType_shouldThrowException() {
+    ReferenceDTO inputDto =
+        ReferenceDTO.builder()
+            .documentationUnitRank(1)
+            .citation("2024, 123")
+            .referenceSupplement("Klammerzusatz")
+            .documentationUnit(createTestDocumentationUnitDTO())
+            .build();
+
     assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            ReferenceTransformer.transformToDomain(
-                ReferenceDTO.builder()
-                    .documentationUnitRank(1)
-                    .citation("2024, 123")
-                    .referenceSupplement("Klammerzusatz")
-                    .documentationUnit(createTestDocumentationUnitDTO())
-                    .build()));
+        IllegalArgumentException.class, () -> ReferenceTransformer.transformToDomain(inputDto));
   }
 
   @ParameterizedTest
@@ -197,13 +197,9 @@ class ReferenceTransformerTest {
 
   @Test
   void testTransformToDTOWithoutLegalPeriodicalType_shouldThrowException() {
+    Reference reference =
+        Reference.builder().citation("2024, S.5").referenceType(ReferenceType.CASELAW).build();
     assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            ReferenceTransformer.transformToDTO(
-                Reference.builder()
-                    .citation("2024, S.5")
-                    .referenceType(ReferenceType.CASELAW)
-                    .build()));
+        IllegalArgumentException.class, () -> ReferenceTransformer.transformToDTO(reference));
   }
 }
