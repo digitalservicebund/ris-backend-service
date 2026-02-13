@@ -379,18 +379,6 @@ public class DecisionTransformer extends DocumentableTransformer {
       return;
     }
 
-    AtomicInteger i = new AtomicInteger(1);
-    builder.activeCitations(
-        contentRelatedIndexing.activeCitations().stream()
-            .map(ActiveCitationTransformer::transformToDTO)
-            .filter(Objects::nonNull)
-            .map(
-                previousDecisionDTO -> {
-                  previousDecisionDTO.setRank(i.getAndIncrement());
-                  return previousDecisionDTO;
-                })
-            .toList());
-
     AtomicInteger nextRank = new AtomicInteger(1);
     builder.activeCaselawCitations(
         contentRelatedIndexing.activeCitations().stream()
