@@ -13,37 +13,43 @@ jobs:
   bump-chainguard-images:
     runs-on: ubuntu-latest
     steps:
+      - name: Generate token
+        id: app_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.GITOPS_NEURIS_APP_ID }}
+          private-key: ${{ secrets.GITOPS_NEURIS_APP_PRIVATE_KEY }}
+
       - name: bump nginx image
         uses: digitalservicebund/bump-chainguard-digest@5c65d776ae05712c732d853ea4fcc07e74d3c398 # v1.1.1
         with:
           image_name: nginx
           file_path: frontend/Dockerfile.prod
-          github_token: ${{ github.token }}
+          github_token: ${{ steps.app_token.outputs.token }}
           branch: bump-nginx-image
+
       - name: bump redis image
         uses: digitalservicebund/bump-chainguard-digest@5c65d776ae05712c732d853ea4fcc07e74d3c398 # v1.1.1
         with:
           image_name: redis
           file_path: compose.yaml
-          github_token: ${{ github.token }}
+          github_token: ${{ steps.app_token.outputs.token }}
           branch: bump-redis-image
+
       - name: bump jre image
         uses: digitalservicebund/bump-chainguard-digest@5c65d776ae05712c732d853ea4fcc07e74d3c398 # v1.1.1
         with:
           image_name: jre
           file_path: backend/Dockerfile.prod
-          github_token: ${{ github.token }}
+          github_token: ${{ steps.app_token.outputs.token }}
           branch: bump-jre-image
 
-  trigger-pipeline:
-    needs: bump-chainguard-images
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-      - run: gh workflow run pipeline.yml
+      - name: Enable Auto-merge
+        # The '|| true' ensures the workflow doesn't fail if there was no new image (and thus no PR to merge).
+        run: |
+          for branch in bump-nginx-image bump-redis-image bump-jre-image; do
+            echo "Enabling auto-merge for $branch..."
+            gh pr merge --auto --squash --delete-branch "$branch" || echo "No active PR found for $branch, skipping."
+            done
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
