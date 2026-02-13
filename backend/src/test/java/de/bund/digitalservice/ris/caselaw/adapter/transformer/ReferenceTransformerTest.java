@@ -5,6 +5,7 @@ import static de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil.createTes
 import static de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil.createTestLegalPeriodicalDTO;
 import static de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil.createTestRelatedDocument;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
@@ -13,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -62,6 +64,20 @@ class ReferenceTransformerTest {
                 .primaryReference(true)
                 .documentationUnit(createTestRelatedDocument())
                 .build()));
+  }
+
+  @Test
+  void testTransformToDomainWithoutType_shouldThrowException() {
+    ReferenceDTO inputDto =
+        ReferenceDTO.builder()
+            .documentationUnitRank(1)
+            .citation("2024, 123")
+            .referenceSupplement("Klammerzusatz")
+            .documentationUnit(createTestDocumentationUnitDTO())
+            .build();
+
+    assertThrows(
+        IllegalArgumentException.class, () -> ReferenceTransformer.transformToDomain(inputDto));
   }
 
   @ParameterizedTest
@@ -177,5 +193,13 @@ class ReferenceTransformerTest {
 
     var referenceDTO = ReferenceTransformer.transformToDTO(reference);
     assertThat(referenceDTO).usingRecursiveComparison().isEqualTo(expected);
+  }
+
+  @Test
+  void testTransformToDTOWithoutLegalPeriodicalType_shouldThrowException() {
+    Reference reference =
+        Reference.builder().citation("2024, S.5").referenceType(ReferenceType.CASELAW).build();
+    assertThrows(
+        IllegalArgumentException.class, () -> ReferenceTransformer.transformToDTO(reference));
   }
 }
