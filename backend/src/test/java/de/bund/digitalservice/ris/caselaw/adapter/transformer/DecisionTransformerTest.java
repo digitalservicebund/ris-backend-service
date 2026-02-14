@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AbuseFeeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationCaselawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementIndustryDTO;
@@ -645,8 +645,8 @@ class DecisionTransformerTest {
                 .toList())
         .isEqualTo(List.of("This is a test deviatingFileNumber with spaces"));
     assertThat(
-            decisionDTO.getActiveCitations().stream()
-                .map(ActiveCitationDTO::getFileNumber)
+            decisionDTO.getActiveCaselawCitations().stream()
+                .map(ActiveCitationCaselawDTO::getTargetFileNumber)
                 .toList())
         .isEqualTo(List.of("This is a test fileNumber with spaces"));
     assertThat(
