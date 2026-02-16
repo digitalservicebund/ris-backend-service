@@ -703,6 +703,15 @@ public class DocumentationUnitService {
 
         DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
 
+        var validationResult = validator.validate(patchedDocumentationUnit);
+        if (!validationResult.isEmpty()) {
+          log.atInfo()
+              .setMessage("Patch Endpoint Validation Failure")
+              .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, patchedDocumentationUnit.documentNumber())
+              .addKeyValue("validationResult", validationResult)
+              .log();
+        }
+
         DocumentationUnit updatedDocumentationUnit =
             updateDocumentationUnit(user, patchedDocumentationUnit, duplicateCheckStatus);
 
