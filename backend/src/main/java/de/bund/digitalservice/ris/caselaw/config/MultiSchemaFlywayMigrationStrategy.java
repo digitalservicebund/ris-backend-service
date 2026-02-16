@@ -15,6 +15,13 @@ public class MultiSchemaFlywayMigrationStrategy implements FlywayMigrationStrate
 
     var schemaLocationForImportedCaselawMigrationSchema = "db";
 
+    /*
+     * When importing a dependent implementation
+     * implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.???")
+     * ??? - marks the latest schema version.
+     * Then we need to reference the location of the schema in that repo,
+     * and there it is in the "db" location.
+     */
     Flyway incrementalMigrationModule =
         Flyway.configure()
             .schemas(schemas)
