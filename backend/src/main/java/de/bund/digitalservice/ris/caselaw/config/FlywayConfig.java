@@ -31,6 +31,9 @@ public class FlywayConfig {
   @Value("${database.seed:false}")
   private boolean seed;
 
+  @Value("${database.schema:caselaw}")
+  private String schema;
+
   @Bean
   public Flyway flyway() {
     final String url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
@@ -39,6 +42,7 @@ public class FlywayConfig {
         .dataSource(url, user, password)
         .baselineOnMigrate(true)
         .baselineVersion("0.0")
+        .schemas(schema)
         .locations(locationsPath)
         .load();
   }
