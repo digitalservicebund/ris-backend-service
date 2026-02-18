@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   bump-chainguard-images:
@@ -34,16 +35,3 @@ jobs:
           file_path: backend/Dockerfile.prod
           github_token: ${{ github.token }}
           branch: bump-jre-image
-
-  trigger-pipeline:
-    needs: bump-chainguard-images
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-      - run: gh workflow run pipeline.yml
-        env:
-          GH_TOKEN: ${{ github.token }}
