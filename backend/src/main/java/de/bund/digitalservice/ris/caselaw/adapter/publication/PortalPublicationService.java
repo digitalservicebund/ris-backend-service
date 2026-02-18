@@ -7,15 +7,21 @@ import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedDocumentationSnapshotEntity;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedDocumentationSnapshotRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RelatedPendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.ManualPortalPublicationResult.RelatedPendingProceedingPublicationResult;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.PendingProceedingTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -26,7 +32,6 @@ import de.bund.digitalservice.ris.caselaw.domain.LoggingKeys;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
-import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
@@ -41,6 +46,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -51,6 +57,7 @@ import tools.jackson.databind.ObjectMapper;
 public class PortalPublicationService {
 
   private final DocumentationUnitRepository documentationUnitRepository;
+  private final DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
   private final S3Bucket portalBucket;
   private final ObjectMapper objectMapper;
   private final XmlUtilService xmlUtilService;
@@ -65,6 +72,7 @@ public class PortalPublicationService {
 
   public PortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
+      DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository,
       XmlUtilService xmlUtilService,
       S3Bucket portalBucket,
       ObjectMapper objectMapper,
@@ -75,6 +83,7 @@ public class PortalPublicationService {
       PublishedDocumentationSnapshotRepository snapshotRepository) {
 
     this.documentationUnitRepository = documentationUnitRepository;
+    this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
     this.portalBucket = portalBucket;
     this.objectMapper = objectMapper;
     this.xmlUtilService = xmlUtilService;
@@ -104,15 +113,17 @@ public class PortalPublicationService {
       return new ManualPortalPublicationResult(RelatedPendingProceedingPublicationResult.NO_ACTION);
     }
     try {
-      DocumentationUnit documentationUnit =
-          documentationUnitRepository.findByUuid(documentationUnitId);
+      DocumentationUnitDTO documentationUnit =
+          databaseDocumentationUnitRepository
+              .findById(documentationUnitId)
+              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentationUnitId));
       var result = publishToBucket(documentationUnit);
       uploadChangelogWithdrawOnFailure(documentationUnit, result);
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, user);
 
       var relatedPendingProceedingUpdateResult =
           RelatedPendingProceedingPublicationResult.NO_ACTION;
-      if (documentationUnit instanceof Decision decision) {
+      if (documentationUnit instanceof DecisionDTO decision) {
         relatedPendingProceedingUpdateResult =
             publishResolutionNoteOfRelatedPendingProceedings(decision, user);
       }
@@ -139,15 +150,19 @@ public class PortalPublicationService {
     AtomicInteger batchCounter = new AtomicInteger(0);
     documentationUnitIds.forEach(
         documentationUnitId -> {
-          DocumentationUnit documentationUnit = null;
+          DocumentationUnitDTO documentationUnit = null;
           try {
-            documentationUnit = documentationUnitRepository.findByUuid(documentationUnitId);
+            documentationUnit =
+                databaseDocumentationUnitRepository
+                    .findById(documentationUnitId)
+                    .orElseThrow(
+                        () -> new DocumentationUnitNotExistsException(documentationUnitId));
           } catch (Exception e) {
             return;
           }
 
           counter.incrementAndGet();
-          if (documentationUnit instanceof Decision decision) {
+          if (documentationUnit instanceof DecisionDTO decision) {
             decisionCounter.incrementAndGet();
             saveSnapshot(decision);
           }
@@ -176,21 +191,21 @@ public class PortalPublicationService {
     }
   }
 
-  private void saveSnapshot(DocumentationUnit documentationUnit) {
+  private void saveSnapshot(DocumentationUnitDTO documentationUnit) {
     Optional<PublishedDocumentationSnapshotEntity> snapshot =
-        snapshotRepository.findByDocumentationUnitId(documentationUnit.uuid());
+        snapshotRepository.findByDocumentationUnitId(documentationUnit.getId());
     PublishedDocumentationSnapshotEntity entity;
     if (snapshot.isPresent()) {
       entity =
           snapshot.get().toBuilder()
-              .json(documentationUnit)
+              .json(toDomain(documentationUnit))
               .publishedAt(LocalDateTime.now())
               .build();
     } else {
       entity =
           PublishedDocumentationSnapshotEntity.builder()
-              .documentationUnitId(documentationUnit.uuid())
-              .json(documentationUnit)
+              .documentationUnitId(documentationUnit.getId())
+              .json(toDomain(documentationUnit))
               .publishedAt(LocalDateTime.now())
               .build();
     }
@@ -211,11 +226,13 @@ public class PortalPublicationService {
    */
   public PortalPublicationResult publishDocumentationUnit(String documentNumber)
       throws DocumentationUnitNotExistsException {
-    DocumentationUnit documentationUnit =
-        documentationUnitRepository.findByDocumentNumber(documentNumber);
+    DocumentationUnitDTO documentationUnit =
+        databaseDocumentationUnitRepository
+            .findByDocumentNumber(documentNumber)
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
     var publicationResult = publishToBucket(documentationUnit);
     updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, null);
-    if (documentationUnit instanceof Decision decision)
+    if (documentationUnit instanceof DecisionDTO decision)
       publishResolutionNoteOfRelatedPendingProceedings(decision, null);
     return publicationResult;
   }
@@ -230,8 +247,10 @@ public class PortalPublicationService {
       throws DocumentationUnitNotExistsException {
     var result = withdraw(documentNumber);
     try {
-      DocumentationUnit documentationUnit =
-          documentationUnitRepository.findByDocumentNumber(documentNumber);
+      DocumentationUnitDTO documentationUnit =
+          databaseDocumentationUnitRepository
+              .findByDocumentNumber(documentNumber)
+              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.WITHDRAWN, null);
     } catch (DocumentationUnitNotExistsException e) {
       log.atInfo()
@@ -273,8 +292,11 @@ public class PortalPublicationService {
   public void withdrawDocumentationUnitWithChangelog(UUID documentationUnitId, User user)
       throws DocumentationUnitNotExistsException {
     try {
-      var documentationUnit = documentationUnitRepository.findByUuid(documentationUnitId);
-      var result = withdraw(documentationUnit.documentNumber());
+      var documentationUnit =
+          databaseDocumentationUnitRepository
+              .findById(documentationUnitId)
+              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentationUnitId));
+      var result = withdraw(documentationUnit.getDocumentNumber());
       uploadDeletionChangelog(result.deletedPaths());
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.WITHDRAWN, user);
     } catch (Exception e) {
@@ -348,10 +370,10 @@ public class PortalPublicationService {
     return LdmlTransformationResult.builder().success(true).ldml(fileContent.get()).build();
   }
 
-  private PortalPublicationResult publishToBucket(DocumentationUnit documentationUnit) {
+  private PortalPublicationResult publishToBucket(DocumentationUnitDTO documentationUnit) {
     List<AttachmentInlineDTO> inlineImages =
-        attachmentInlineRepository.findAllByDocumentationUnitId(documentationUnit.uuid());
-    CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);
+        attachmentInlineRepository.findAllByDocumentationUnitId(documentationUnit.getId());
+    CaseLawLdml ldml = ldmlTransformer.transformToLdml(toDomain(documentationUnit));
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     if (fileContent.isEmpty()) {
       throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);
@@ -362,7 +384,7 @@ public class PortalPublicationService {
 
     log.atInfo()
         .setMessage("Doc unit published to portal bucket.")
-        .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentationUnit.documentNumber())
+        .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentationUnit.getDocumentNumber())
         .log();
 
     return result;
@@ -396,12 +418,12 @@ public class PortalPublicationService {
   }
 
   private void uploadChangelogWithdrawOnFailure(
-      DocumentationUnit documentationUnit, PortalPublicationResult result) {
+      DocumentationUnitDTO documentationUnit, PortalPublicationResult result) {
     try {
       uploadChangelog(result.changedPaths(), result.deletedPaths());
     } catch (Exception e) {
       log.error("Could not upload changelog file.");
-      withdraw(documentationUnit.documentNumber());
+      withdraw(documentationUnit.getDocumentNumber());
       throw new PublishException("Could not save changelog to bucket.", e);
     }
   }
@@ -430,32 +452,31 @@ public class PortalPublicationService {
   }
 
   private void updatePortalPublicationStatus(
-      DocumentationUnit documentationUnit, PortalPublicationStatus newStatus, User user) {
+      DocumentationUnitDTO documentationUnit, PortalPublicationStatus newStatus, User user) {
 
-    boolean statusUnchanged = newStatus.equals(documentationUnit.portalPublicationStatus());
+    boolean statusUnchanged = newStatus.equals(documentationUnit.getPortalPublicationStatus());
     boolean isPublishAction = newStatus.equals(PortalPublicationStatus.PUBLISHED);
 
     if (isPublishAction) {
-      documentationUnitRepository.savePublicationDateTime(documentationUnit.uuid());
+      documentationUnitRepository.savePublicationDateTime(documentationUnit.getId());
     }
     if (!statusUnchanged) {
       documentationUnitRepository.updatePortalPublicationStatus(
-          documentationUnit.uuid(), newStatus);
+          documentationUnit.getId(), newStatus);
     }
 
     addHistoryLog(documentationUnit, newStatus, user);
   }
 
   private RelatedPendingProceedingPublicationResult
-      publishResolutionNoteOfRelatedPendingProceedings(Decision decision, User user) {
-    if (decision.contentRelatedIndexing() == null
-        || decision.contentRelatedIndexing().relatedPendingProceedings() == null) {
+      publishResolutionNoteOfRelatedPendingProceedings(DecisionDTO decision, User user) {
+    if (decision.getRelatedPendingProceedings() == null) {
       return RelatedPendingProceedingPublicationResult.NO_ACTION;
     }
 
-    var pendingProceedings = decision.contentRelatedIndexing().relatedPendingProceedings();
+    var pendingProceedings = decision.getRelatedPendingProceedings();
     Set<RelatedPendingProceedingPublicationResult> results = new HashSet<>();
-    for (RelatedPendingProceeding relatedPendingProceeding : pendingProceedings) {
+    for (RelatedPendingProceedingDTO relatedPendingProceeding : pendingProceedings) {
       try {
         var docUnit =
             documentationUnitRepository.findByDocumentNumber(
@@ -485,16 +506,16 @@ public class PortalPublicationService {
   }
 
   private RelatedPendingProceedingPublicationResult updateResolutionNoteOfPendingProceeding(
-      DocumentationUnit documentationUnit, PendingProceeding pendingProceeding, User user)
+      DocumentationUnitDTO documentationUnit, PendingProceeding pendingProceeding, User user)
       throws DocumentationUnitNotExistsException {
     if (pendingProceeding.coreData() != null && pendingProceeding.coreData().isResolved()) {
       log.atInfo()
-          .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentationUnit.documentNumber())
-          .addKeyValue("id", documentationUnit.uuid())
+          .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentationUnit.getDocumentNumber())
+          .addKeyValue("id", documentationUnit.getId())
           .setMessage(
               String.format(
                   "Do not mark pending proceeding %s as resolved. It already is resolved. A Documentation unit (%s) was published that contained it as a related pending proceeding",
-                  pendingProceeding.documentNumber(), documentationUnit.documentNumber()))
+                  pendingProceeding.documentNumber(), documentationUnit.getDocumentNumber()))
           .log();
       return RelatedPendingProceedingPublicationResult.NO_ACTION;
     }
@@ -527,7 +548,7 @@ public class PortalPublicationService {
         Optional.ofNullable(pendingProceeding.coreData().resolutionDate()).orElse(today);
     var resolutionNote =
         Optional.ofNullable(pendingProceeding.shortTexts().resolutionNote())
-            .orElse("Erledigt durch " + documentationUnit.documentNumber());
+            .orElse("Erledigt durch " + documentationUnit.getDocumentNumber());
 
     PendingProceeding updatedPendingProceeding =
         pendingProceeding.toBuilder()
@@ -545,17 +566,17 @@ public class PortalPublicationService {
     publishDocumentationUnitWithChangelog(pendingProceeding.uuid(), user);
 
     log.atInfo()
-        .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentationUnit.documentNumber())
-        .addKeyValue("id", documentationUnit.uuid())
+        .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentationUnit.getDocumentNumber())
+        .addKeyValue("id", documentationUnit.getId())
         .log(
             "Published pending proceeding {} as resolved. A Documentation unit ({}) was published that contained it as a related pending proceeding",
             pendingProceeding.documentNumber(),
-            documentationUnit.documentNumber());
+            documentationUnit.getDocumentNumber());
     return RelatedPendingProceedingPublicationResult.SUCCESS;
   }
 
   private void addHistoryLog(
-      DocumentationUnit documentationUnit, PortalPublicationStatus newStatus, User user) {
+      DocumentationUnitDTO documentationUnit, PortalPublicationStatus newStatus, User user) {
     String historyLogMessage;
     if (PortalPublicationStatus.PUBLISHED.equals(newStatus)) {
       historyLogMessage = "Dokeinheit im Portal veröffentlicht";
@@ -563,6 +584,17 @@ public class PortalPublicationService {
       historyLogMessage = "Dokeinheit wurde aus dem Portal zurückgezogen";
     }
     historyLogService.saveHistoryLog(
-        documentationUnit.uuid(), user, HistoryLogEventType.PORTAL_PUBLICATION, historyLogMessage);
+        documentationUnit.getId(), user, HistoryLogEventType.PORTAL_PUBLICATION, historyLogMessage);
+  }
+
+  @Nullable
+  private DocumentationUnit toDomain(DocumentationUnitDTO documentationUnit) {
+    if (documentationUnit instanceof DecisionDTO decisionDTO) {
+      return DecisionTransformer.transformToDomain(decisionDTO, null);
+    }
+    if (documentationUnit instanceof PendingProceedingDTO pendingProceedingDTO) {
+      return PendingProceedingTransformer.transformToDomain(pendingProceedingDTO, null);
+    }
+    return null;
   }
 }
