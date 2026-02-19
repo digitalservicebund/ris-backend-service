@@ -114,9 +114,7 @@ public class PortalPublicationService {
     }
     try {
       DocumentationUnitDTO documentationUnit =
-          databaseDocumentationUnitRepository
-              .findById(documentationUnitId)
-              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentationUnitId));
+          documentationUnitRepository.loadDocumentationUnitDTO(documentationUnitId);
       var result = publishToBucket(documentationUnit);
       uploadChangelogWithdrawOnFailure(documentationUnit, result);
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, user);
@@ -153,10 +151,7 @@ public class PortalPublicationService {
           DocumentationUnitDTO documentationUnit = null;
           try {
             documentationUnit =
-                databaseDocumentationUnitRepository
-                    .findById(documentationUnitId)
-                    .orElseThrow(
-                        () -> new DocumentationUnitNotExistsException(documentationUnitId));
+                documentationUnitRepository.loadDocumentationUnitDTO(documentationUnitId);
           } catch (Exception e) {
             return;
           }
@@ -227,9 +222,7 @@ public class PortalPublicationService {
   public PortalPublicationResult publishDocumentationUnit(String documentNumber)
       throws DocumentationUnitNotExistsException {
     DocumentationUnitDTO documentationUnit =
-        databaseDocumentationUnitRepository
-            .findByDocumentNumber(documentNumber)
-            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
+        documentationUnitRepository.loadDocumentationUnitDTO(documentNumber);
     var publicationResult = publishToBucket(documentationUnit);
     updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, null);
     if (documentationUnit instanceof DecisionDTO decision)
