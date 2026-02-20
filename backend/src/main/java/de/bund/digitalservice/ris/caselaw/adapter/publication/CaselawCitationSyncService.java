@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -31,6 +32,7 @@ public class CaselawCitationSyncService {
    * @return list Document numbers of all other documents that have been changed. These should be
    *     published again.
    */
+  @Transactional
   public Set<String> syncCitations(DocumentationUnitDTO documentationUnit) {
     Set<String> documentsToRepublish = new HashSet<>();
 
