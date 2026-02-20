@@ -186,6 +186,8 @@ public class EntityBuilderTestUtil {
     dtoBeforeSave.setAttachmentsInline(null);
     var processSteps = dtoBeforeSave.getProcessSteps();
     dtoBeforeSave.setProcessSteps(null);
+    var activeCaselawCitations = dtoBeforeSave.getActiveCaselawCitations();
+    dtoBeforeSave.setActiveCaselawCitations(null);
 
     DecisionDTO dto = repository.save(dtoBeforeSave);
 
@@ -194,12 +196,14 @@ public class EntityBuilderTestUtil {
     attachmentsInline.forEach(a -> a.setDocumentationUnit(dto));
     attachments.forEach(a -> a.setDocumentationUnit(dto));
     processSteps.forEach(p -> p.setDocumentationUnit(dto));
+    activeCaselawCitations.forEach(c -> c.setSource(dto));
 
     dto.setFileNumbers(fileNumbers);
     dto.setDeviatingFileNumbers(deviatingFileNumbers);
     dto.setAttachments(attachments);
     dto.setAttachmentsInline(attachmentsInline);
     dto.setProcessSteps(processSteps);
+    dto.setActiveCaselawCitations(activeCaselawCitations);
 
     return repository.save(
         dto.toBuilder()

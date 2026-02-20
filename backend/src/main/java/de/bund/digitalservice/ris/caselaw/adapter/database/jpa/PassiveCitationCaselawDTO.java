@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,6 +29,7 @@ import org.jspecify.annotations.Nullable;
 @Builder
 @Entity
 @Table(name = "passive_citation_caselaw", schema = "incremental_migration")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class PassiveCitationCaselawDTO {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -42,29 +44,35 @@ public class PassiveCitationCaselawDTO {
   private DecisionDTO target;
 
   @Column(name = "source_document_number")
+  @EqualsAndHashCode.Include
   @Nullable
   private String sourceDocumentNumber;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "source_court_id")
+  @EqualsAndHashCode.Include
   @Nullable
   private CourtDTO sourceCourt;
 
   @Column(name = "source_date")
+  @EqualsAndHashCode.Include
   @Nullable
   private LocalDate sourceDate;
 
   @Column(name = "source_file_number")
   @Nullable
+  @EqualsAndHashCode.Include
   private String sourceFileNumber;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "source_document_type_id")
+  @EqualsAndHashCode.Include
   @Nullable
   private DocumentTypeDTO sourceDocumentType;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "citation_type_id")
+  @EqualsAndHashCode.Include
   @Nullable
   private CitationTypeDTO citationType;
 
