@@ -1205,4 +1205,32 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       PublicationStatus publicationStatus, int page, int size) {
     return repository.findAllByStatus(publicationStatus, PageRequest.of(page, size));
   }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public DocumentationUnitDTO loadDocumentationUnitDTO(UUID uuid)
+      throws DocumentationUnitNotExistsException {
+    var documenatationUnit =
+        repository.findById(uuid).orElseThrow(() -> new DocumentationUnitNotExistsException(uuid));
+
+    // load the lazy properties so we can convert it later as well
+    getDocumentationUnit(documenatationUnit, null);
+
+    return documenatationUnit;
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public DocumentationUnitDTO loadDocumentationUnitDTO(String documentNumber)
+      throws DocumentationUnitNotExistsException {
+    var documenatationUnit =
+        repository
+            .findByDocumentNumber(documentNumber)
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
+
+    // load the lazy properties so we can convert it later as well
+    getDocumentationUnit(documenatationUnit, null);
+
+    return documenatationUnit;
+  }
 }
