@@ -4,13 +4,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Immutable;
 
 @Entity
 @Immutable
-@Table(name = "ref_view_active_citation_uli_caselaw", schema = "uli")
+@Table(name = "ref_view_active_citation_uli_caselaw", schema = "references_schema")
 @Getter
 @NoArgsConstructor
 public class UliActiveCitationRefView {
@@ -19,11 +20,11 @@ public class UliActiveCitationRefView {
   @Column(name = "id")
   private String id;
 
-  // ULI Document
-  @Column(name = "source_document_number")
-  private String sourceDocumentNumber;
+  // ULI document
+  @Column(name = "source_id")
+  private UUID sourceId;
 
-  // caselaw Document
-  @Column(name = "target_document_number")
-  private String targetDocumentNumber;
+  // caselaw document
+  @Column(name = "target_id")
+  private UUID targetId;
 }
