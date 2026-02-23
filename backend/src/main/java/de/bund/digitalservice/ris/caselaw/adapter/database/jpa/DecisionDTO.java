@@ -178,6 +178,17 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   private List<ActiveCitationUliDTO> activeUliCitations = new ArrayList<>();
 
+  /** Aktivzitierung ADM (Verwaltungsvorschriften) */
+  @OneToMany(
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true,
+      mappedBy = "source")
+  @Builder.Default
+  @OrderBy("rank")
+  private List<ActiveCitationAdministrativeRegulationDTO> activeAdministrativeRegulationCitations =
+      new ArrayList<>();
+
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
