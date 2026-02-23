@@ -374,19 +374,7 @@ public class PortalPublicationService {
         attachmentInlineRepository.findAllByDocumentationUnitId(documentationUnit.getId());
 
     if (documentationUnit instanceof DecisionDTO decision) {
-      decision.setActiveCaselawCitations(
-          decision.getActiveCaselawCitations().stream()
-              .map(
-                  caselawCitationPublishService
-                      ::updateActiveCitationTargetWithInformationFromTarget)
-              .toList());
-      decision.setPassiveCaselawCitations(
-          decision.getPassiveCaselawCitations().stream()
-              .map(
-                  caselawCitationPublishService
-                      ::updatePassiveCitationSourceWithInformationFromSource)
-              .flatMap(Optional::stream)
-              .toList());
+      validateAndEnrichCaselawCitations(decision);
     }
 
     CaseLawLdml ldml = ldmlTransformer.transformToLdml(toDomain(documentationUnit));
@@ -620,6 +608,19 @@ public class PortalPublicationService {
     }
     historyLogService.saveHistoryLog(
         documentationUnit.getId(), user, HistoryLogEventType.PORTAL_PUBLICATION, historyLogMessage);
+  }
+
+  private void validateAndEnrichCaselawCitations(DecisionDTO decision) {
+    decision.setActiveCaselawCitations(
+        decision.getActiveCaselawCitations().stream()
+            .map(caselawCitationPublishService::updateActiveCitationTargetWithInformationFromTarget)
+            .toList());
+    decision.setPassiveCaselawCitations(
+        decision.getPassiveCaselawCitations().stream()
+            .map(
+                caselawCitationPublishService::updatePassiveCitationSourceWithInformationFromSource)
+            .flatMap(Optional::stream)
+            .toList());
   }
 
   @Nullable
