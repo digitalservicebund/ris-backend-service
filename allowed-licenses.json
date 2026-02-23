@@ -70,8 +70,8 @@
       "moduleLicense": "ISC"
     },
     {
-      "moduleLicense": "Mozilla Public License Version 2.0",
-      "moduleName": "net.sf.saxon:Saxon-HE"
+      "moduleName": "net.sf.saxon:Saxon-HE",
+      "moduleLicense": "Mozilla Public License, Version 2.0",
     },
     {
       "moduleLicense": null,
