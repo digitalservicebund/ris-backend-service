@@ -12,11 +12,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UliCitationPublishService {
 
-  private final DatabaseDocumentationUnitRepository documentationUnitRepository;
+  private final DatabaseDocumentationUnitRepository caselawRepository;
+  private final UliActiveCitationRefViewRepository uliActiveCitationRefViewRepository;
+  private final UliRefViewRepository uliRefViewRepository;
 
   public UliCitationPublishService(
-      DatabaseDocumentationUnitRepository documentationUnitRepository) {
-    this.documentationUnitRepository = documentationUnitRepository;
+      DatabaseDocumentationUnitRepository caselawRepository,
+      UliActiveCitationRefViewRepository uliActiveCitationRefViewRepository,
+      UliRefViewRepository uliRefViewRepository) {
+    this.caselawRepository = caselawRepository;
+    this.uliActiveCitationRefViewRepository = uliActiveCitationRefViewRepository;
+    this.uliRefViewRepository = uliRefViewRepository;
   }
 
   /** Case 1: Validation and enrichment for ULI Passive Citations (Uli -> Caselaw) */
@@ -28,8 +34,16 @@ public class UliCitationPublishService {
       return Optional.of(passiveCitation);
     }
 
-    // todo: look in ULI schema and find actual match by getSourceLiteratureDocumentNumber
-    return Optional.of(new PassiveCitationUliDTO());
+    return uliRefViewRepository
+        .findByDocumentNumber(passiveCitation.getSourceLiteratureDocumentNumber())
+        .map(
+            uliRef -> {
+              passiveCitation.setSourceCitation(uliRef.getCitation());
+              passiveCitation.setSourceAuthor(uliRef.getAuthor());
+              passiveCitation.setSourceDocumentTypeRawValue(uliRef.getDocumentTypeRawValue());
+              passiveCitation.setSourceLegalPeriodicalRawValue(uliRef.getLegalPeriodicalRawValue());
+              return passiveCitation;
+            });
   }
 
   /** Case 1: Validation and enrichment for ULI Active Citations (Caselaw -> Uli) */
@@ -41,8 +55,17 @@ public class UliCitationPublishService {
       return activeCitation;
     }
 
-    // todo: look in ULI schema and find actual match, updating the targetLiteratureDocumentNumber
-    // activeCitation.setTargetLiteratureDocumentNumber(match.documentNumber);
+    uliRefViewRepository
+        .findByDocumentNumber(activeCitation.getTargetLiteratureDocumentNumber())
+        .ifPresentOrElse(
+            uliRef -> {
+              activeCitation.setTargetCitation(uliRef.getCitation());
+              activeCitation.setTargetAuthor(uliRef.getAuthor());
+              activeCitation.setTargetLegalPeriodicalRawValue(uliRef.getLegalPeriodicalRawValue());
+            },
+            () -> {
+              activeCitation.setTargetLiteratureDocumentNumber(null);
+            });
 
     return activeCitation;
   }
