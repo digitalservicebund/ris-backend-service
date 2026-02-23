@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,6 +25,7 @@ import org.jspecify.annotations.Nullable;
 @Builder
 @Entity
 @Table(name = "active_citation_caselaw", schema = "incremental_migration")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class ActiveCitationCaselawDTO {
   @Id
   @Column(name = "id", nullable = false)
@@ -38,29 +40,35 @@ public class ActiveCitationCaselawDTO {
 
   @Column(name = "target_document_number")
   @Nullable
+  @EqualsAndHashCode.Include
   private String targetDocumentNumber;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "target_court_id")
   @Nullable
+  @EqualsAndHashCode.Include
   private CourtDTO targetCourt;
 
   @Column(name = "target_date")
   @Nullable
+  @EqualsAndHashCode.Include
   private LocalDate targetDate;
 
   @Column(name = "target_file_number")
   @Nullable
+  @EqualsAndHashCode.Include
   private String targetFileNumber;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "target_document_type_id")
   @Nullable
+  @EqualsAndHashCode.Include
   private DocumentTypeDTO targetDocumentType;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "citation_type_id")
   @Nullable
+  @EqualsAndHashCode.Include
   private CitationTypeDTO citationType;
 
   @Column(name = "rank", nullable = false)

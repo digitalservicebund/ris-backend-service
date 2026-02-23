@@ -65,6 +65,8 @@ public class PortalPublicationService {
   private final FeatureToggleService featureToggleService;
   private final DocumentationUnitHistoryLogService historyLogService;
   private final PublishedDocumentationSnapshotRepository snapshotRepository;
+  private final CaselawCitationSyncService caselawCitationSyncService;
+  private final CaselawCitationPublishService caselawCitationPublishService;
 
   private static final String PUBLICATION_FEATURE_FLAG = "neuris.portal-publication";
   private static final String CHANGELOG_FEATURE_FLAG = "neuris.regular-changelogs";
@@ -80,7 +82,9 @@ public class PortalPublicationService {
       FeatureToggleService featureToggleService,
       DocumentationUnitHistoryLogService historyLogService,
       DatabaseAttachmentInlineRepository attachmentInlineRepository,
-      PublishedDocumentationSnapshotRepository snapshotRepository) {
+      PublishedDocumentationSnapshotRepository snapshotRepository,
+      CaselawCitationSyncService caselawCitationSyncService,
+      CaselawCitationPublishService caselawCitationPublishService) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
@@ -92,6 +96,8 @@ public class PortalPublicationService {
     this.historyLogService = historyLogService;
     this.attachmentInlineRepository = attachmentInlineRepository;
     this.snapshotRepository = snapshotRepository;
+    this.caselawCitationSyncService = caselawCitationSyncService;
+    this.caselawCitationPublishService = caselawCitationPublishService;
   }
 
   /**
@@ -366,6 +372,11 @@ public class PortalPublicationService {
   private PortalPublicationResult publishToBucket(DocumentationUnitDTO documentationUnit) {
     List<AttachmentInlineDTO> inlineImages =
         attachmentInlineRepository.findAllByDocumentationUnitId(documentationUnit.getId());
+
+    if (documentationUnit instanceof DecisionDTO decision) {
+      validateAndEnrichCaselawCitations(decision);
+    }
+
     CaseLawLdml ldml = ldmlTransformer.transformToLdml(toDomain(documentationUnit));
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     if (fileContent.isEmpty()) {
@@ -379,6 +390,25 @@ public class PortalPublicationService {
         .setMessage("Doc unit published to portal bucket.")
         .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, documentationUnit.getDocumentNumber())
         .log();
+
+    var documentsToRepublish = caselawCitationSyncService.syncCitations(documentationUnit);
+
+    documentsToRepublish.forEach(
+        documentNumber -> {
+          try {
+            log.atInfo()
+                .addKeyValue(
+                    "originalPublishedDocumentationUnit", documentationUnit.getDocumentNumber())
+                .addKeyValue("documentationUnit", documentNumber)
+                .setMessage(
+                    "Publish documentation unit changed during the publishing of another documentation unit.")
+                .log();
+            publishDocumentationUnit(documentNumber);
+          } catch (DocumentationUnitNotExistsException e) {
+            throw new PublishException(
+                "Couldn't find changed documentation unit that should be published as well", e);
+          }
+        });
 
     return result;
   }
@@ -578,6 +608,19 @@ public class PortalPublicationService {
     }
     historyLogService.saveHistoryLog(
         documentationUnit.getId(), user, HistoryLogEventType.PORTAL_PUBLICATION, historyLogMessage);
+  }
+
+  private void validateAndEnrichCaselawCitations(DecisionDTO decision) {
+    decision.setActiveCaselawCitations(
+        decision.getActiveCaselawCitations().stream()
+            .map(caselawCitationPublishService::updateActiveCitationTargetWithInformationFromTarget)
+            .toList());
+    decision.setPassiveCaselawCitations(
+        decision.getPassiveCaselawCitations().stream()
+            .map(
+                caselawCitationPublishService::updatePassiveCitationSourceWithInformationFromSource)
+            .flatMap(Optional::stream)
+            .toList());
   }
 
   @Nullable
