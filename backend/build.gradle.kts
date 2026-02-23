@@ -205,9 +205,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.135")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.138")
     // for local development:
-    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.135.jar"))
+    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.138.jar"))
 
     implementation("tools.jackson.core:jackson-core:3.0.4")
     implementation("tools.jackson.core:jackson-databind:3.0.4")
