@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UliActiveCitationRefViewRepository
+public interface ActiveCitationUliCaselawRepository
     extends JpaRepository<ActiveCitationUliCaselaw, String> {
   List<ActiveCitationUliCaselaw> findAllByTargetId(UUID targetId);
 

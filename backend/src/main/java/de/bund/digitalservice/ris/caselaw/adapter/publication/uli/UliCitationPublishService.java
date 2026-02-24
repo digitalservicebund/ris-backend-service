@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.publication.uli;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationUliDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationUliDTO;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -12,17 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UliCitationPublishService {
 
-  private final DatabaseDocumentationUnitRepository caselawRepository;
-  private final UliActiveCitationRefViewRepository uliActiveCitationRefViewRepository;
-  private final UliRefViewRepository uliRefViewRepository;
+  private final PublishedUliRepository publishedUliRepository;
 
-  public UliCitationPublishService(
-      DatabaseDocumentationUnitRepository caselawRepository,
-      UliActiveCitationRefViewRepository uliActiveCitationRefViewRepository,
-      UliRefViewRepository uliRefViewRepository) {
-    this.caselawRepository = caselawRepository;
-    this.uliActiveCitationRefViewRepository = uliActiveCitationRefViewRepository;
-    this.uliRefViewRepository = uliRefViewRepository;
+  public UliCitationPublishService(PublishedUliRepository publishedUliRepository) {
+    this.publishedUliRepository = publishedUliRepository;
   }
 
   /** Case 1: Validation and enrichment for ULI Passive Citations (Uli -> Caselaw) */
@@ -34,7 +26,7 @@ public class UliCitationPublishService {
       return Optional.of(passiveCitation);
     }
 
-    return uliRefViewRepository
+    return publishedUliRepository
         .findByDocumentNumber(passiveCitation.getSourceLiteratureDocumentNumber())
         .map(
             uliRef -> {
@@ -55,7 +47,7 @@ public class UliCitationPublishService {
       return activeCitation;
     }
 
-    uliRefViewRepository
+    publishedUliRepository
         .findByDocumentNumber(activeCitation.getTargetLiteratureDocumentNumber())
         .ifPresentOrElse(
             uliRef -> {

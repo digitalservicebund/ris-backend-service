@@ -3,8 +3,11 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication.uli;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationUliDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities.JobSyncStatus;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities.PublishedUli;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities.RevokedUli;
+import java.time.Instant;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -20,19 +23,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class UliCitationSyncService {
 
   private final DatabaseDocumentationUnitRepository caselawRepository;
-  private final UliActiveCitationRefViewRepository uliActiveCitationRefViewRepository;
-  private final UliRefViewRepository uliRefViewRepository;
-  private final UliRevokedRepository uliRevokedRepository;
+  private final ActiveCitationUliCaselawRepository activeCitationUliCaselawRepository;
+  private final PublishedUliRepository publishedUliRepository;
+  private final RevokedUliRepository revokedUliRepository;
+  private final JobSyncStatusRepository jobSyncStatusRepository;
 
   public UliCitationSyncService(
       DatabaseDocumentationUnitRepository caselawRepository,
-      UliActiveCitationRefViewRepository uliActiveCitationRefViewRepository,
-      UliRefViewRepository uliRefViewRepository,
-      UliRevokedRepository uliRevokedRepository) {
+      ActiveCitationUliCaselawRepository activeCitationUliCaselawRepository,
+      PublishedUliRepository publishedUliRepository,
+      RevokedUliRepository revokedUliRepository,
+      JobSyncStatusRepository jobSyncStatusRepository) {
     this.caselawRepository = caselawRepository;
-    this.uliActiveCitationRefViewRepository = uliActiveCitationRefViewRepository;
-    this.uliRefViewRepository = uliRefViewRepository;
-    this.uliRevokedRepository = uliRevokedRepository;
+    this.activeCitationUliCaselawRepository = activeCitationUliCaselawRepository;
+    this.publishedUliRepository = publishedUliRepository;
+    this.revokedUliRepository = revokedUliRepository;
+    this.jobSyncStatusRepository = jobSyncStatusRepository;
   }
 
   /**
@@ -43,7 +49,7 @@ public class UliCitationSyncService {
   public Set<String> syncUliPassiveCitations() {
     Set<String> documentsToRepublish = new HashSet<>();
 
-    var allUliToCaselawActiveCitations = uliActiveCitationRefViewRepository.findAll();
+    var allUliToCaselawActiveCitations = activeCitationUliCaselawRepository.findAll();
 
     for (var link : allUliToCaselawActiveCitations) {
       caselawRepository
@@ -52,7 +58,7 @@ public class UliCitationSyncService {
               documentationUnit -> {
                 if (documentationUnit instanceof DecisionDTO decision) {
 
-                  uliRefViewRepository
+                  publishedUliRepository
                       .findById(link.getSourceId())
                       .ifPresent(
                           uliRef -> {
@@ -68,6 +74,7 @@ public class UliCitationSyncService {
                             if (existingPassiveCitationOpt.isEmpty()) {
                               var newPassive =
                                   PassiveCitationUliDTO.builder()
+                                      .sourceId(uliRef.getId())
                                       .sourceLiteratureDocumentNumber(uliRef.getDocumentNumber())
                                       .sourceCitation(uliRef.getCitation())
                                       .sourceAuthor(uliRef.getAuthor())
@@ -111,25 +118,32 @@ public class UliCitationSyncService {
   }
 
   /** Case 3: Identify documents that point to repealed or deleted ULI documents. */
-  /** Case 3: Identify documents that point to repealed or deleted ULI documents. */
   @Transactional
   public Set<String> handleUliRevoked() {
-    log.info("Starting ULI revoked sync using UUIDs");
     Set<String> documentsToRepublish = new HashSet<>();
+    String jobName = "ULI_REVOKED_SYNC";
 
-    List<RevokedUli> revokedEntries = uliRevokedRepository.findAll();
+    Instant lastRun =
+        jobSyncStatusRepository
+            .findById(jobName)
+            .map(JobSyncStatus::getLastRun)
+            .orElse(Instant.EPOCH);
+
+    List<RevokedUli> revokedEntries = revokedUliRepository.findAllByRevokedAtAfter(lastRun);
+
     if (revokedEntries.isEmpty()) {
+      log.info("No new revoked entries since {}", lastRun);
       return documentsToRepublish;
     }
 
     Set<UUID> revokedUliIds =
         revokedEntries.stream().map(RevokedUli::getDocUnitId).collect(Collectors.toSet());
 
-    // delete passive citation, before publishing
-    List<DecisionDTO> documentsAffectedWithPassiveCitations =
+    // remove passive citations
+    List<DecisionDTO> documentsWithPassive =
         caselawRepository.findAllByPassiveUliCitationSourceId(revokedUliIds);
 
-    for (DecisionDTO decision : documentsAffectedWithPassiveCitations) {
+    for (DecisionDTO decision : documentsWithPassive) {
       boolean removed =
           decision
               .getPassiveUliCitations()
@@ -138,22 +152,35 @@ public class UliCitationSyncService {
       if (removed) {
         caselawRepository.save(decision);
         documentsToRepublish.add(decision.getDocumentNumber());
-        log.info(
-            "Removed revoked passive ULI citations from document {}", decision.getDocumentNumber());
       }
     }
 
-    // republish active citations, targetId will be deleted, metadata will stay
+    // active citations will be just republished, targetId is deleted and metadata stay
     List<DecisionDTO> affectedByActive =
         caselawRepository.findAllByActiveUliCitationTargetId(revokedUliIds);
 
     for (DecisionDTO decision : affectedByActive) {
       documentsToRepublish.add(decision.getDocumentNumber());
-      log.info(
-          "Marked document {} for republishing due to revoked active ULI target",
-          decision.getDocumentNumber());
     }
 
+    // get the highest timestamp of revoked entries and not Instant.now() because in the meantime a
+    // new entry
+    // could have been saved to the revoked table
+    Instant newestRevokedAt =
+        revokedEntries.stream()
+            .map(RevokedUli::getRevokedAt)
+            .max(Comparator.naturalOrder())
+            .orElse(lastRun);
+
+    updateJobStatus(jobName, newestRevokedAt);
+
     return documentsToRepublish;
+  }
+
+  private void updateJobStatus(String name, Instant time) {
+    JobSyncStatus status =
+        jobSyncStatusRepository.findById(name).orElse(new JobSyncStatus(name, time));
+    status.setLastRun(time);
+    jobSyncStatusRepository.save(status);
   }
 }

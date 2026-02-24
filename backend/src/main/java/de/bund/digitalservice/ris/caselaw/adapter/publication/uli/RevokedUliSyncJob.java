@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class UliRepealSyncJob {
+public class RevokedUliSyncJob {
 
   private final UliCitationSyncService uliCitationSyncService;
   private final PortalPublicationService portalPublicationService;
 
-  public UliRepealSyncJob(
+  public RevokedUliSyncJob(
       UliCitationSyncService uliCitationSyncService,
       PortalPublicationService portalPublicationService) {
     this.uliCitationSyncService = uliCitationSyncService;
