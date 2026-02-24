@@ -90,7 +90,7 @@ public class CaselawCitationSyncService {
                       documentsToRepublish.add(targetDecision.getDocumentNumber());
                     }
                   } else {
-                    targetDecision
+                    /* targetDecision
                         .getPassiveCaselawCitations()
                         .add(
                             createMatchingPassiveCitation(
@@ -108,7 +108,7 @@ public class CaselawCitationSyncService {
 
                     documentationUnitRepository.save(targetDecision);
 
-                    documentsToRepublish.add(targetDecision.getDocumentNumber());
+                    documentsToRepublish.add(targetDecision.getDocumentNumber());*/
                   }
                 }
               });
