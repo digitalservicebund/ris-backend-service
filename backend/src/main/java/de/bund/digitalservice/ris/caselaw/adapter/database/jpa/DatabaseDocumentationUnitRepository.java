@@ -69,4 +69,14 @@ SELECT d.documentNumber FROM DocumentationUnitDTO d
       value =
           "SELECT d.id FROM DocumentationUnitDTO d WHERE d.status.publicationStatus = :publicationStatus ORDER BY d.status.createdAt DESC")
   List<UUID> findAllByStatus(PublicationStatus publicationStatus, Pageable page);
+
+  @Query(
+      "SELECT DISTINCT d FROM DecisionDTO d JOIN d.passiveUliCitations p WHERE p.sourceLiteratureDocumentNumber IN :revokedDocNums")
+  List<DecisionDTO> findAllByPassiveUliCitationSourceDocumentNumber(
+      @Param("revokedDocNums") Set<String> revokedDocNums);
+
+  @Query(
+      "SELECT DISTINCT d FROM DecisionDTO d JOIN d.activeUliCitations a WHERE a.targetLiteratureDocumentNumber IN :revokedDocNums")
+  List<DecisionDTO> findAllByActiveUliCitationTargetDocumentNumber(
+      @Param("revokedDocNums") Set<String> revokedDocNums);
 }

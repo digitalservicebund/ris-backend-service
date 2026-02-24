@@ -21,32 +21,27 @@ public class UliRepealSyncJob {
   }
 
   /**
-   * Case 3: Sync for repealed or deleted documents. This job identifies all documents that point to
-   * a now withdrawn/deleted target and triggers a republishing for them.
+   * Case 3: Sync for revoked documents. This job identifies all documents that point to a now
+   * withdrawn/deleted target and triggers a republishing for them.
    */
   @Scheduled(
       cron = "${neuris.jobs.uli-repeal-sync.cron:0 0 3 * * *}") // Etwas versetzt zum normalen Sync
-  public void runRepealSync() {
-    log.info("Starting scheduled ULI Repeal Sync Job");
+  public void runRevokedSync() {
 
     try {
-      Set<String> affectedDocNumbers = uliCitationSyncService.handleUliRepeals();
-
-      log.info("Found {} documents affected by ULI repeals", affectedDocNumbers.size());
+      Set<String> affectedDocNumbers = uliCitationSyncService.handleUliRevoked();
 
       affectedDocNumbers.forEach(
           docNumber -> {
             try {
               portalPublicationService.publishDocumentationUnit(docNumber);
-              log.debug("Successfully republished {} after repeal check", docNumber);
+              log.debug("Successfully republished {} after revoked check", docNumber);
             } catch (Exception e) {
-              log.error("Failed to republish {} during ULI repeal sync", docNumber, e);
+              log.error("Failed to republish {} during ULI revoked sync", docNumber, e);
             }
           });
-
-      log.info("Finished ULI Repeal Sync Job");
     } catch (Exception e) {
-      log.error("Error during ULI Repeal Sync Job execution", e);
+      log.error("Error during ULI Revoked Sync Job execution", e);
     }
   }
 }

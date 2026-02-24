@@ -4,9 +4,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationUliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities.UliRefView;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities.UliRevoked;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,14 +22,17 @@ public class UliCitationSyncService {
   private final DatabaseDocumentationUnitRepository caselawRepository;
   private final UliActiveCitationRefViewRepository uliActiveCitationRefViewRepository;
   private final UliRefViewRepository uliRefViewRepository;
+  private final UliRevokedRepository uliRevokedRepository;
 
   public UliCitationSyncService(
       DatabaseDocumentationUnitRepository caselawRepository,
       UliActiveCitationRefViewRepository uliActiveCitationRefViewRepository,
-      UliRefViewRepository uliRefViewRepository) {
+      UliRefViewRepository uliRefViewRepository,
+      UliRevokedRepository uliRevokedRepository) {
     this.caselawRepository = caselawRepository;
     this.uliActiveCitationRefViewRepository = uliActiveCitationRefViewRepository;
     this.uliRefViewRepository = uliRefViewRepository;
+    this.uliRevokedRepository = uliRevokedRepository;
   }
 
   /**
@@ -103,20 +110,48 @@ public class UliCitationSyncService {
             existing.getSourceLegalPeriodicalRawValue(), ref.getLegalPeriodicalRawValue());
   }
 
-  /**
-   * Case 3: Identify documents that point to repealed or deleted ULI documents. * @return Set of
-   * document numbers (the sources of the links) that need to be republished to remove the links
-   * from the portal.
-   */
+  /** Case 3: Identify documents that point to repealed or deleted ULI documents. */
   @Transactional
-  public Set<String> handleUliRepeals() {
-    log.info("Starting ULI repeal sync");
+  public Set<String> handleUliRevoked() {
+    log.info("Starting ULI revoked sync");
     Set<String> documentsToRepublish = new HashSet<>();
 
-    // Find in repeal table all ULI documentNumbers, that are the target of an activecitation or the
-    // source of a passive citation in caselaw and republish them.
-    // TODO:
-    // documentsToRepublish.addAll(documentationUnitRepository.findDocumentsPointingToRepealedUli());
+    List<UliRevoked> revokedEntries = uliRevokedRepository.findAll();
+    if (revokedEntries.isEmpty()) {
+      return documentsToRepublish;
+    }
+
+    Set<UUID> revokedUliIds =
+        revokedEntries.stream().map(UliRevoked::getDocUnitId).collect(Collectors.toSet());
+
+    Set<String> revokedDocNumbers =
+        uliRefViewRepository.findAllById(revokedUliIds).stream()
+            .map(UliRefView::getDocumentNumber)
+            .collect(Collectors.toSet());
+
+    // delete passive citation, then republish
+    List<DecisionDTO> affectedPassiveCitations =
+        caselawRepository.findAllByPassiveUliCitationSourceDocumentNumber(revokedDocNumbers);
+
+    for (DecisionDTO decision : affectedPassiveCitations) {
+      boolean removed =
+          decision
+              .getPassiveUliCitations()
+              .removeIf(p -> revokedDocNumbers.contains(p.getSourceLiteratureDocumentNumber()));
+
+      if (removed) {
+        caselawRepository.save(decision);
+        documentsToRepublish.add(decision.getDocumentNumber());
+      }
+    }
+
+    // just republish active citations, the publish process will remove the docnumber from the
+    // active citation
+    List<DecisionDTO> affectedByActive =
+        caselawRepository.findAllByActiveUliCitationTargetDocumentNumber(revokedDocNumbers);
+    for (DecisionDTO decision : affectedByActive) {
+      documentsToRepublish.add(decision.getDocumentNumber());
+    }
 
     return documentsToRepublish;
   }
