@@ -41,6 +41,10 @@ public class ActiveCitationUliDTO {
   private DecisionDTO source;
 
   @Nullable
+  @Column(name = "target_id")
+  private UUID targetId;
+
+  @Nullable
   @Column(name = "target_literature_document_number")
   @Size(max = 255)
   private String targetLiteratureDocumentNumber;

@@ -111,9 +111,10 @@ public class UliCitationSyncService {
   }
 
   /** Case 3: Identify documents that point to repealed or deleted ULI documents. */
+  /** Case 3: Identify documents that point to repealed or deleted ULI documents. */
   @Transactional
   public Set<String> handleUliRevoked() {
-    log.info("Starting ULI revoked sync");
+    log.info("Starting ULI revoked sync using UUIDs");
     Set<String> documentsToRepublish = new HashSet<>();
 
     List<UliRevoked> revokedEntries = uliRevokedRepository.findAll();
@@ -124,33 +125,33 @@ public class UliCitationSyncService {
     Set<UUID> revokedUliIds =
         revokedEntries.stream().map(UliRevoked::getDocUnitId).collect(Collectors.toSet());
 
-    Set<String> revokedDocNumbers =
-        uliRefViewRepository.findAllById(revokedUliIds).stream()
-            .map(UliRefView::getDocumentNumber)
-            .collect(Collectors.toSet());
+    // delete passive citation, before publishing
+    List<DecisionDTO> documentsAffectedWithPassiveCitations =
+        caselawRepository.findAllByPassiveUliCitationSourceId(revokedUliIds);
 
-    // delete passive citation, then republish
-    List<DecisionDTO> affectedPassiveCitations =
-        caselawRepository.findAllByPassiveUliCitationSourceDocumentNumber(revokedDocNumbers);
-
-    for (DecisionDTO decision : affectedPassiveCitations) {
+    for (DecisionDTO decision : documentsAffectedWithPassiveCitations) {
       boolean removed =
           decision
               .getPassiveUliCitations()
-              .removeIf(p -> revokedDocNumbers.contains(p.getSourceLiteratureDocumentNumber()));
+              .removeIf(p -> p.getSourceId() != null && revokedUliIds.contains(p.getSourceId()));
 
       if (removed) {
         caselawRepository.save(decision);
         documentsToRepublish.add(decision.getDocumentNumber());
+        log.info(
+            "Removed revoked passive ULI citations from document {}", decision.getDocumentNumber());
       }
     }
 
-    // just republish active citations, the publish process will remove the docnumber from the
-    // active citation
+    // republish active citations, targetId will be deleted, metadata will stay
     List<DecisionDTO> affectedByActive =
-        caselawRepository.findAllByActiveUliCitationTargetDocumentNumber(revokedDocNumbers);
+        caselawRepository.findAllByActiveUliCitationTargetId(revokedUliIds);
+
     for (DecisionDTO decision : affectedByActive) {
       documentsToRepublish.add(decision.getDocumentNumber());
+      log.info(
+          "Marked document {} for republishing due to revoked active ULI target",
+          decision.getDocumentNumber());
     }
 
     return documentsToRepublish;
