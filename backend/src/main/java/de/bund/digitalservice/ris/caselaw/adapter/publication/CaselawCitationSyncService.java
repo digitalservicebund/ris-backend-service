@@ -89,26 +89,6 @@ public class CaselawCitationSyncService {
 
                       documentsToRepublish.add(targetDecision.getDocumentNumber());
                     }
-                  } else {
-                    /* targetDecision
-                        .getPassiveCaselawCitations()
-                        .add(
-                            createMatchingPassiveCitation(
-                                activeCitationCaselaw,
-                                targetDecision,
-                                decision,
-                                targetDecision.getPassiveCaselawCitations().size()));
-
-                    log.atInfo()
-                        .addKeyValue("publishedDocumentationUnit", decision.getDocumentNumber())
-                        .addKeyValue("targetDocumentationUnit", targetDecision.getDocumentNumber())
-                        .addKeyValue("activeCitation", activeCitationCaselaw)
-                        .setMessage("Creating passive citation for published active citation.")
-                        .log();
-
-                    documentationUnitRepository.save(targetDecision);
-
-                    documentsToRepublish.add(targetDecision.getDocumentNumber());*/
                   }
                 }
               });

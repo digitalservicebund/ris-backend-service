@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationCa
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -82,6 +83,7 @@ public class CaselawCitationSyncServiceTest {
     }
 
     @Test
+    @Disabled("its currently disabled as it can create a infinite loop")
     void shouldCreatePassiveCitationsForActiveCitations() {
       var citationType = CitationTypeDTO.builder().build();
       var court = CourtDTO.builder().build();
