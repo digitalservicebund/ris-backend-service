@@ -12,7 +12,7 @@ RUN --mount=type=secret,id=GH_PACKAGES_REPOSITORY_USER \
     ./gradlew build -x integrationTest -x test -x spotlessCheck
 
 
-FROM cgr.dev/chainguard/jre@sha256:cdfc3f84715f884689348a69ec526aa72c86715a277cc4f189164e4f8211b90c
+FROM cgr.dev/chainguard/jre@sha256:15b2a97d0e18d04e8c7b4d9cc5b05d986fbc6aad1f0e1a150abf282afb92d756
 COPY --from=backend-builder /app/build/libs/ris-backend-service-*.jar /app/app.jar
 ENV spring.cloud.bootstrap.enabled=true
 EXPOSE 8080

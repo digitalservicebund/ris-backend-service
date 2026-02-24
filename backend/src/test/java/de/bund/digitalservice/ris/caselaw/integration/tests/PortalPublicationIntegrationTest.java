@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.adapter.CaselawExceptionHandler;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationCaselawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
@@ -46,6 +47,7 @@ import java.util.UUID;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +56,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.transaction.TestTransaction;
+import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
@@ -662,5 +666,89 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
 
     assertThat(result.getResponseBody()).isEqualTo("ok");
     assertThat(snapshots).hasSize(1);
+  }
+
+  @Test
+  @Transactional
+  @Disabled("its currently disabled as it can create a infinite loop")
+  void testPublish_activeCitationTriggersPublishOfDifferentDocunit() {
+    TestTransaction.end();
+    UUID userId = UUID.randomUUID();
+    var dto =
+        EntityBuilderTestUtil.createAndSaveDecision(
+            repository,
+            buildValidDocumentationUnit()
+                .activeCaselawCitations(
+                    List.of(
+                        ActiveCitationCaselawDTO.builder()
+                            .targetDocumentNumber("XXRE000000001")
+                            .rank(1)
+                            .build())));
+    var dto2 =
+        EntityBuilderTestUtil.createAndSaveDecision(
+            repository, buildValidDocumentationUnit().documentNumber("XXRE000000001"));
+
+    risWebTestClient
+        .withDefaultLogin(userId)
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
+
+    verify(s3Client, times(3)).putObject(captor.capture(), any(RequestBody.class));
+
+    var capturedRequests = captor.getAllValues();
+    assertThat(capturedRequests.get(0).key()).isEqualTo("1234567890123/1234567890123.xml");
+    assertThat(capturedRequests.get(1).key()).isEqualTo("XXRE000000001/XXRE000000001.xml");
+    assertThat(capturedRequests.get(2).key()).contains("changelogs/");
+
+    var updatedDto = repository.findById(dto.getId()).get();
+    assertThat(updatedDto.getPortalPublicationStatus())
+        .isEqualTo(PortalPublicationStatus.PUBLISHED);
+    assertThat(updatedDto.getManagementData().getFirstPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
+        .isEqualTo(updatedDto.getManagementData().getFirstPublishedAtDateTime());
+
+    TestTransaction.start();
+    var updatedDto2 = repository.findById(dto2.getId()).get();
+    assertThat(updatedDto2.getPortalPublicationStatus())
+        .isEqualTo(PortalPublicationStatus.PUBLISHED);
+    assertThat(updatedDto2.getManagementData().getLastPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(updatedDto2).isInstanceOf(DecisionDTO.class);
+    assertThat(((DecisionDTO) updatedDto2).getPassiveCaselawCitations()).hasSize(1);
+    var passiveCitation = ((DecisionDTO) updatedDto2).getPassiveCaselawCitations().getFirst();
+    assertThat(passiveCitation.getSourceDocumentNumber()).isEqualTo(updatedDto.getDocumentNumber());
+    assertThat(passiveCitation.getSourceDate()).isEqualTo(updatedDto.getDate());
+    assertThat(passiveCitation.getTarget()).isEqualTo(updatedDto2);
+    TestTransaction.end();
+
+    var historyLogs =
+        historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
+    var userDbId = databaseUserRepository.findByExternalId(userId).get().getId();
+    assertThat(historyLogs)
+        .hasSize(2)
+        .satisfiesExactly(
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getUser().getId()).isEqualTo(userDbId);
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Dokeinheit im Portal veröffentlicht");
+            },
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getSystemName()).isEqualTo("NeuRIS");
+              assertThat(historyLog.getUser()).isNull();
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
+            });
   }
 }

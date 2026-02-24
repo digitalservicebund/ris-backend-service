@@ -379,18 +379,6 @@ public class DecisionTransformer extends DocumentableTransformer {
       return;
     }
 
-    AtomicInteger i = new AtomicInteger(1);
-    builder.activeCitations(
-        contentRelatedIndexing.activeCitations().stream()
-            .map(ActiveCitationTransformer::transformToDTO)
-            .filter(Objects::nonNull)
-            .map(
-                previousDecisionDTO -> {
-                  previousDecisionDTO.setRank(i.getAndIncrement());
-                  return previousDecisionDTO;
-                })
-            .toList());
-
     AtomicInteger nextRank = new AtomicInteger(1);
     builder.activeCaselawCitations(
         contentRelatedIndexing.activeCitations().stream()
@@ -909,10 +897,10 @@ public class DecisionTransformer extends DocumentableTransformer {
     ContentRelatedIndexing.ContentRelatedIndexingBuilder contentRelatedIndexingBuilder =
         DocumentableTransformer.buildContentRelatedIndexing(decisionDTO).toBuilder();
 
-    if (decisionDTO.getActiveCitations() != null) {
+    if (decisionDTO.getActiveCaselawCitations() != null) {
       contentRelatedIndexingBuilder.activeCitations(
-          decisionDTO.getActiveCitations().stream()
-              .map(ActiveCitationTransformer::transformToDomain)
+          decisionDTO.getActiveCaselawCitations().stream()
+              .map(ActiveCitationCaselawTransformer::transformToDomain)
               .toList());
     }
 

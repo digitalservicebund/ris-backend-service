@@ -29,6 +29,6 @@ public class PublishedDocumentationSnapshotEntity {
   @Type(DocumentationUnitType.class)
   private DocumentationUnit json;
 
-  @Column(name = "published_at")
+  @Column(name = "created_at")
   private LocalDateTime publishedAt;
 }

@@ -8,42 +8,30 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   bump-chainguard-images:
     runs-on: ubuntu-latest
     steps:
       - name: bump nginx image
-        uses: digitalservicebund/bump-chainguard-digest@5c65d776ae05712c732d853ea4fcc07e74d3c398 # v1.1.1
+        uses: digitalservicebund/bump-chainguard-digest@6c392e403902151e08a50ea2f9a03f2dc1bc75cf # v1.1.3
         with:
           image_name: nginx
           file_path: frontend/Dockerfile.prod
           github_token: ${{ github.token }}
           branch: bump-nginx-image
       - name: bump redis image
-        uses: digitalservicebund/bump-chainguard-digest@5c65d776ae05712c732d853ea4fcc07e74d3c398 # v1.1.1
+        uses: digitalservicebund/bump-chainguard-digest@6c392e403902151e08a50ea2f9a03f2dc1bc75cf # v1.1.3
         with:
           image_name: redis
           file_path: compose.yaml
           github_token: ${{ github.token }}
           branch: bump-redis-image
       - name: bump jre image
-        uses: digitalservicebund/bump-chainguard-digest@5c65d776ae05712c732d853ea4fcc07e74d3c398 # v1.1.1
+        uses: digitalservicebund/bump-chainguard-digest@6c392e403902151e08a50ea2f9a03f2dc1bc75cf # v1.1.3
         with:
           image_name: jre
           file_path: backend/Dockerfile.prod
           github_token: ${{ github.token }}
           branch: bump-jre-image
-
-  trigger-pipeline:
-    needs: bump-chainguard-images
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-      - run: gh workflow run pipeline.yml
-        env:
-          GH_TOKEN: ${{ github.token }}

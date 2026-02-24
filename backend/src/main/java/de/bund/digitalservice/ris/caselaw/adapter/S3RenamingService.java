@@ -54,7 +54,7 @@ public class S3RenamingService {
   @Scheduled(cron = "-", zone = "Europe/Berlin")
   @SchedulerLock(name = "adjust-s3-paths", lockAtMostFor = "PT12H")
   public void moveExistingFilesToNewPaths() {
-    if (!env.matchesProfiles("uat")) {
+    if (!env.matchesProfiles("production")) {
       return;
     }
     List<AttachmentDTO> attachmentsToMove =
@@ -157,10 +157,10 @@ public class S3RenamingService {
    * Moves files in the old s3 path pattern that were not moved in the previous step into the
    * 'unreferenced' prefix
    */
-  @Scheduled(cron = "0 0 15 * * *", zone = "Europe/Berlin")
+  @Scheduled(cron = "-", zone = "Europe/Berlin")
   @SchedulerLock(name = "move-unreferenced", lockAtMostFor = "PT1H")
   public void moveRemainingFilesToUnreferenced() {
-    if (!env.matchesProfiles("uat")) {
+    if (!env.matchesProfiles("production")) {
       return;
     }
     log.atInfo().setMessage("Starting to move unreferenced files").log();

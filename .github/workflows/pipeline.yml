@@ -87,7 +87,7 @@ jobs:
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
+        uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
           TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
@@ -120,7 +120,7 @@ jobs:
       - name: Generate cosign vulnerability scan record
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
+        uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
           TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
@@ -227,7 +227,7 @@ jobs:
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
+        uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
           TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
@@ -253,7 +253,7 @@ jobs:
       - name: Run Trivy vulnerability file scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
+        uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
           TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
@@ -281,7 +281,7 @@ jobs:
       - name: Generate cosign vulnerability scan record
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
+        uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
           TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
@@ -435,7 +435,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@eba358c567c5b091e34187d905258baebdd2a4ec
+      - uses: chainguard-dev/actions/setup-gitsign@4ed96e952ef2982fe89a50f3c40e9643bb9fe803
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4e758f584953506c571951ffcba33d6a6246e856 # v1.0.0
         with:
@@ -551,7 +551,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@eba358c567c5b091e34187d905258baebdd2a4ec
+      - uses: chainguard-dev/actions/setup-gitsign@4ed96e952ef2982fe89a50f3c40e9643bb9fe803
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4e758f584953506c571951ffcba33d6a6246e856 # v1.0.0
         with:
@@ -594,7 +594,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@eba358c567c5b091e34187d905258baebdd2a4ec
+      - uses: chainguard-dev/actions/setup-gitsign@4ed96e952ef2982fe89a50f3c40e9643bb9fe803
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4e758f584953506c571951ffcba33d6a6246e856 # v1.0.0
         with:

@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.util.List;
 import java.util.Map;
@@ -189,4 +190,9 @@ public interface DocumentationUnitRepository {
   void savePublicationDateTime(UUID documentationUnitId);
 
   List<UUID> findAllByCurrentStatus(PublicationStatus publicationStatus, int page, int size);
+
+  DocumentationUnitDTO loadDocumentationUnitDTO(UUID id) throws DocumentationUnitNotExistsException;
+
+  DocumentationUnitDTO loadDocumentationUnitDTO(String documentNumber)
+      throws DocumentationUnitNotExistsException;
 }
