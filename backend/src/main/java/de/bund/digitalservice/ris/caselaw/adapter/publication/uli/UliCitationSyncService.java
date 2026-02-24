@@ -164,8 +164,7 @@ public class UliCitationSyncService {
     }
 
     // get the highest timestamp of revoked entries and not Instant.now() because in the meantime a
-    // new entry
-    // could have been saved to the revoked table
+    // new entry could have been saved to the revoked table
     Instant newestRevokedAt =
         revokedEntries.stream()
             .map(RevokedUli::getRevokedAt)

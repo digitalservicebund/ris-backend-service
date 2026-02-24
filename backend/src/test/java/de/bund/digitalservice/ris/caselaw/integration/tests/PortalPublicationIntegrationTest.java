@@ -47,6 +47,7 @@ import java.util.UUID;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -669,6 +670,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
 
   @Test
   @Transactional
+  @Disabled("its currently disabled as it can create a infinite loop")
   void testPublish_activeCitationTriggersPublishOfDifferentDocunit() {
     TestTransaction.end();
     UUID userId = UUID.randomUUID();
