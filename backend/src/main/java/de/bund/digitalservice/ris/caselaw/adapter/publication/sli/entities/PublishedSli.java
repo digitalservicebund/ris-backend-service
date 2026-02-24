@@ -14,7 +14,7 @@ import org.hibernate.annotations.Immutable;
 @Table(name = "ref_view_sli", schema = "references_schema")
 @Getter
 @NoArgsConstructor
-public class SliRefView {
+public class PublishedSli {
 
   @Id private UUID id;
 

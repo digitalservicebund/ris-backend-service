@@ -3,8 +3,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication.uli;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationUliDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities.UliRefView;
-import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities.UliRevoked;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities.PublishedUli;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities.RevokedUli;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -102,7 +102,7 @@ public class UliCitationSyncService {
     return documentsToRepublish;
   }
 
-  private boolean existingCitationChanged(PassiveCitationUliDTO existing, UliRefView ref) {
+  private boolean existingCitationChanged(PassiveCitationUliDTO existing, PublishedUli ref) {
     return !Objects.equals(existing.getSourceCitation(), ref.getCitation())
         || !Objects.equals(existing.getSourceAuthor(), ref.getAuthor())
         || !Objects.equals(existing.getSourceDocumentTypeRawValue(), ref.getDocumentTypeRawValue())
@@ -117,13 +117,13 @@ public class UliCitationSyncService {
     log.info("Starting ULI revoked sync using UUIDs");
     Set<String> documentsToRepublish = new HashSet<>();
 
-    List<UliRevoked> revokedEntries = uliRevokedRepository.findAll();
+    List<RevokedUli> revokedEntries = uliRevokedRepository.findAll();
     if (revokedEntries.isEmpty()) {
       return documentsToRepublish;
     }
 
     Set<UUID> revokedUliIds =
-        revokedEntries.stream().map(UliRevoked::getDocUnitId).collect(Collectors.toSet());
+        revokedEntries.stream().map(RevokedUli::getDocUnitId).collect(Collectors.toSet());
 
     // delete passive citation, before publishing
     List<DecisionDTO> documentsAffectedWithPassiveCitations =

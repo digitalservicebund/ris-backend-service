@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
+package de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +14,7 @@ import org.hibernate.annotations.Immutable;
 @Table(name = "ref_view_active_citation_uli_caselaw", schema = "references_schema")
 @Getter
 @NoArgsConstructor
-public class UliActiveCitationRefView {
+public class ActiveCitationUliCaselaw {
 
   @Id
   @Column(name = "id")

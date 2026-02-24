@@ -15,7 +15,7 @@ import org.hibernate.annotations.Immutable;
 @Table(name = "revoked_uli", schema = "references_schema")
 @Getter
 @NoArgsConstructor
-public class UliRevoked {
+public class RevokedUli {
 
   @Id private UUID id;
 
