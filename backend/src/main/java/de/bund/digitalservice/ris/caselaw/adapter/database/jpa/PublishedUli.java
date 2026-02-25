@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities;
+package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,4 +36,6 @@ public class PublishedUli {
 
   @Column(name = "legal_periodical_raw_value")
   private String legalPeriodicalRawValue; // abbreviation
+
+  // last_published
 }

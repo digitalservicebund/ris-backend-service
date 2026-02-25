@@ -1,6 +1,5 @@
-package de.bund.digitalservice.ris.caselaw.adapter.publication.uli;
+package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities.RevokedUli;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;

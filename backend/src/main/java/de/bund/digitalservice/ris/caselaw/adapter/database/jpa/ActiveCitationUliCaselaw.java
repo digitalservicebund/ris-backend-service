@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities;
+package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,6 +1,5 @@
-package de.bund.digitalservice.ris.caselaw.adapter.publication.uli;
+package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities.JobSyncStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

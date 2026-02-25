@@ -1,11 +1,15 @@
 package de.bund.digitalservice.ris.caselaw.adapter.publication.uli;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationUliCaselawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobSyncStatus;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobSyncStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationUliDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities.JobSyncStatus;
-import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities.PublishedUli;
-import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities.RevokedUli;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedUli;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedUliRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUli;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUliRepository;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.HashSet;

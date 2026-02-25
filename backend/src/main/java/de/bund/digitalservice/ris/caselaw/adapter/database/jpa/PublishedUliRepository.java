@@ -1,6 +1,5 @@
-package de.bund.digitalservice.ris.caselaw.adapter.publication.uli;
+package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.entities.PublishedUli;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
