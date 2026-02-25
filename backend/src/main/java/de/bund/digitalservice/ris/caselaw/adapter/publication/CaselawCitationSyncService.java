@@ -79,7 +79,6 @@ public class CaselawCitationSyncService {
                           .get()
                           .setSourceFileNumber(
                               decision.getFileNumbers().stream()
-                                  .sorted()
                                   .findFirst()
                                   .map(FileNumberDTO::getValue)
                                   .orElse(null));
