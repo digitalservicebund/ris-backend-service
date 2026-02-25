@@ -670,7 +670,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
 
   @Test
   @Transactional
-  @Disabled("its currently disabled as it can create a infinite loop")
+  @Disabled("We skip the publication of changed doc units for the moment")
   void testPublish_activeCitationTriggersPublishOfDifferentDocunit() {
     TestTransaction.end();
     UUID userId = UUID.randomUUID();
