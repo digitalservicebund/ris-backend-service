@@ -135,26 +135,24 @@ public class CaselawCitationSyncServiceTest {
               .fileNumbers(List.of(FileNumberDTO.builder().value("XXX 0001").build()))
               .date(LocalDate.of(2020, 1, 1))
               .documentType(documentType)
-              .activeCaselawCitations(
-                  List.of(
-                      ActiveCitationCaselawDTO.builder()
-                          .citationType(citationType)
-                          .rank(1)
-                          .targetDocumentNumber("XXRE000000002")
-                          .build()))
               .build();
+      publishedDocUnit.setActiveCaselawCitations(
+          List.of(
+              ActiveCitationCaselawDTO.builder()
+                  .source(publishedDocUnit)
+                  .citationType(citationType)
+                  .rank(1)
+                  .targetDocumentNumber("XXRE000000002")
+                  .build()));
 
-      var docUnitXXRE000000002 =
-          DecisionDTO.builder()
-              .documentNumber("XXRE000000002")
-              .passiveCaselawCitations(
-                  List.of(
-                      PassiveCitationCaselawDTO.builder()
-                          .sourceDocumentNumber("XXRE000000001")
-                          .citationType(citationType)
-                          .rank(1)
-                          .build()))
-              .build();
+      var docUnitXXRE000000002 = DecisionDTO.builder().documentNumber("XXRE000000002").build();
+      docUnitXXRE000000002.setPassiveCaselawCitations(
+          List.of(
+              PassiveCitationCaselawDTO.builder()
+                  .sourceDocumentNumber("XXRE000000001")
+                  .citationType(citationType)
+                  .rank(1)
+                  .build()));
 
       when(documentationUnitRepository.findByDocumentNumber("XXRE000000002"))
           .thenReturn(Optional.of(docUnitXXRE000000002));
