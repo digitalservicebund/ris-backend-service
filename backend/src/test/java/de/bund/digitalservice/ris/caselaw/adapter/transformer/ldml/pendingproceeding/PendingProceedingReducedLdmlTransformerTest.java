@@ -123,6 +123,12 @@ class PendingProceedingReducedLdmlTransformerTest {
             <akn:p>Mitteilungsdatum: <akn:docDate date="2020-01-01"refersTo="#mitteilungsdatum">01.01.2020</akn:docDate></akn:p>
             <akn:p>Gericht:<akn:courtType refersTo="#gericht">courtType courtLocation</akn:courtType></akn:p>
             <akn:p>Dokumenttyp:<akn:doc Type refersTo="#dokumenttyp">Anhängiges Verfahren</akn:docType></akn:p>
+            <akn:p>Kurztitel: <akn:shortTitle>
+                <akn:embeddedStructure>
+                   <akn:p alternativeTo="textWrapper">courtType courtLocation, 01.01.2020, Aktenzeichen</akn:p>
+                </akn:embeddedStructure>
+             </akn:shortTitle>
+            </akn:p>
           </akn:header>
        """;
     PendingProceeding otherLongTextCaseLaw =

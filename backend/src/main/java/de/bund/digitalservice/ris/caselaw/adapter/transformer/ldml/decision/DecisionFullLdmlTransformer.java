@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
@@ -345,6 +346,25 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     var shortTexts = decision.shortTexts();
     var decisionNames = nullSafeGet(shortTexts, ShortTexts::decisionNames);
     var headline = nullSafeGet(shortTexts, ShortTexts::headline);
+    var refersToTitelzeile = false;
+    var hasFileNumber =
+        decision.coreData().fileNumbers() != null && !decision.coreData().fileNumbers().isEmpty();
+    var hasDecisionDate = decision.coreData().decisionDate() != null;
+    var hasCourt = decision.coreData().court() != null;
+
+    // fallback
+    if (isBlank(headline)) {
+      if (hasFileNumber && hasDecisionDate && hasCourt) {
+        headline =
+            decision.coreData().court().label()
+                + ", "
+                + DateUtils.toFormattedDateString(decision.coreData().decisionDate())
+                + ", "
+                + decision.coreData().fileNumbers().getFirst();
+      }
+    } else {
+      refersToTitelzeile = true;
+    }
 
     // Entscheidungsname
     if (!CollectionUtils.isEmpty(decisionNames)) {
@@ -366,7 +386,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
     // Titelzeile
     if (isNotBlank(headline)) {
-      buildHeadline(paragraphs, headline, htmlTransformer);
+      buildHeadline(paragraphs, headline, htmlTransformer, refersToTitelzeile);
     }
 
     return Header.builder().paragraphs(paragraphs).build();

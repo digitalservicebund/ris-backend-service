@@ -409,7 +409,7 @@
                 <akn:docTitle refersTo="#entscheidungsname">decisionName test</akn:docTitle>
                 <akn:docTitle refersTo="#entscheidungsname">decisionName2 test</akn:docTitle>
             </akn:p>
-            <akn:p>Titelzeile:
+            <akn:p>Kurztitel:
                 <akn:shortTitle refersTo="#titelzeile">
                     <akn:embeddedStructure>
                         <akn:p>headline test</akn:p>

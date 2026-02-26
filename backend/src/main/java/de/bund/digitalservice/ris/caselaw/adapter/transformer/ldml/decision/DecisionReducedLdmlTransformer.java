@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
+import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
@@ -51,8 +52,24 @@ public class DecisionReducedLdmlTransformer extends DecisionCommonLdmlTransforme
   @Override
   protected Header buildHeader(Decision decision) {
     List<Paragraph> paragraphs = new ArrayList<>();
+    var hasFileNumber =
+        decision.coreData().fileNumbers() != null && !decision.coreData().fileNumbers().isEmpty();
+    var hasDecisionDate = decision.coreData().decisionDate() != null;
+    var hasCourt = decision.coreData().court() != null;
 
     paragraphs = buildCommonHeader(decision, paragraphs);
+
+    if (hasFileNumber && hasDecisionDate && hasCourt) {
+      buildHeadline(
+          paragraphs,
+          decision.coreData().court().label()
+              + ", "
+              + DateUtils.toFormattedDateString(decision.coreData().decisionDate())
+              + ", "
+              + decision.coreData().fileNumbers().getFirst(),
+          htmlTransformer,
+          false);
+    }
 
     return Header.builder().paragraphs(paragraphs).build();
   }

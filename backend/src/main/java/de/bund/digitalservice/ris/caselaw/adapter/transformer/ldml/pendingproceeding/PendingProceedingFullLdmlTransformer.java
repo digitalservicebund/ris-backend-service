@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproceeding;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
@@ -157,9 +158,29 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
     paragraphs = buildCommonHeader(pendingProceeding, paragraphs);
     var shortTexts = pendingProceeding.shortTexts();
     var headline = nullSafeGet(shortTexts, PendingProceedingShortTexts::headline);
+    var refersToTitelzeile = false;
+    var hasFileNumber =
+        pendingProceeding.coreData().fileNumbers() != null
+            && !pendingProceeding.coreData().fileNumbers().isEmpty();
+    var hasDecisionDate = pendingProceeding.coreData().decisionDate() != null;
+    var hasCourt = pendingProceeding.coreData().court() != null;
+
+    // fallback
+    if (isBlank(headline)) {
+      if (hasCourt && hasDecisionDate && hasFileNumber) {
+        headline =
+            pendingProceeding.coreData().court().label()
+                + ", "
+                + DateUtils.toFormattedDateString(pendingProceeding.coreData().decisionDate())
+                + ", "
+                + pendingProceeding.coreData().fileNumbers().getFirst();
+      }
+    } else {
+      refersToTitelzeile = true;
+    }
 
     if (isNotBlank(headline)) {
-      buildHeadline(paragraphs, headline, htmlTransformer);
+      buildHeadline(paragraphs, headline, htmlTransformer, refersToTitelzeile);
     }
 
     return Header.builder().paragraphs(paragraphs).build();

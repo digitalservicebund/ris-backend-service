@@ -154,7 +154,7 @@
             </akn:p>
             <akn:p>Dokumenttyp: <akn:docType refersTo="#dokumenttyp">Anhängiges Verfahren</akn:docType>
             </akn:p>
-            <akn:p>Titelzeile: <akn:shortTitle refersTo="#titelzeile">
+            <akn:p>Kurztitel: <akn:shortTitle refersTo="#titelzeile">
                 <akn:embeddedStructure>
                     <akn:p alternativeTo="textWrapper">Titelzeile</akn:p>
                 </akn:embeddedStructure>

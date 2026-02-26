@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproceeding;
 
+import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
@@ -39,7 +40,26 @@ public class PendingProceedingReducedLdmlTransformer
   @Override
   protected Header buildHeader(PendingProceeding pendingProceeding) {
     List<Paragraph> paragraphs = new ArrayList<>();
+    var hasFileNumber =
+        pendingProceeding.coreData().fileNumbers() != null
+            && !pendingProceeding.coreData().fileNumbers().isEmpty();
+    var hasDecisionDate = pendingProceeding.coreData().decisionDate() != null;
+    var hasCourt = pendingProceeding.coreData().court() != null;
+
     paragraphs = buildCommonHeader(pendingProceeding, paragraphs);
+
+    if (hasFileNumber && hasDecisionDate && hasCourt) {
+      buildHeadline(
+          paragraphs,
+          pendingProceeding.coreData().court().label()
+              + ", "
+              + DateUtils.toFormattedDateString(pendingProceeding.coreData().decisionDate())
+              + ", "
+              + pendingProceeding.coreData().fileNumbers().getFirst(),
+          htmlTransformer,
+          false);
+    }
+
     return Header.builder().paragraphs(paragraphs).build();
   }
 

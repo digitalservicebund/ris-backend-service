@@ -81,7 +81,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -281,14 +280,15 @@ class DecisionFullLdmlTransformerTest {
   }
 
   @Test
-  @Disabled("Should be enabled with https://digitalservicebund.atlassian.net/browse/RISDEV-9358")
   @DisplayName("Headnote test")
   void headnoteTest() {
     String expected =
         """
-          <akn:introduction ris:domainTerm="Orientierungssatz">
-              <akn:p>headnote test</akn:p>
-          </akn:introduction>
+          <ris:dokumentarischeKurztexte domainTerm="Dokumentarische Kurztexte">
+             <ris:orientierungssatz ris:domainTerm="Orientierungssatz">
+                <akn:p>headnote test</akn:p>
+             </ris:orientierungssatz>
+          </ris:dokumentarischeKurztexte>
         """;
     Decision headnoteCaseLaw =
         testDocumentUnit.toBuilder()
@@ -305,14 +305,15 @@ class DecisionFullLdmlTransformerTest {
   }
 
   @Test
-  @Disabled("Should be enabled with https://digitalservicebund.atlassian.net/browse/RISDEV-9358")
   @DisplayName("OtherHeadnote test")
   void otherHeadnoteTest() {
     String expected =
         """
-         <akn:introduction ris:domainTerm="Sonstiger Orientierungssatz">
-            <akn:p>other headnote test</akn:p>
-         </akn:introduction>
+          <ris:dokumentarischeKurztexte domainTerm="Dokumentarische Kurztexte">
+             <ris:sonstigerOrientierungssatz ris:domainTerm="Sonstiger Orientierungssatz">
+                <akn:p>other headnote test</akn:p>
+             </ris:sonstigerOrientierungssatz>
+          </ris:dokumentarischeKurztexte>
          """;
     Decision otherHeadnoteCaseLaw =
         testDocumentUnit.toBuilder()
@@ -658,7 +659,7 @@ class DecisionFullLdmlTransformerTest {
           <akn:p>Dokumenttyp: <akn:docType refersTo="#dokumenttyp">testDocumentTypeAbbreviation</akn:docType></akn:p>
           <akn:p>Entscheidungsnamen:
           <akn:docTitle refersTo="#entscheidungsname">Entscheidungsname</akn:docTitle></akn:p>
-          <akn:p>Titelzeile:
+          <akn:p>Kurztitel:
           <akn:shortTitle refersTo="#titelzeile">
             <akn:embeddedStructure>
               <akn:p alternativeTo="textWrapper">Hello</akn:p>
@@ -680,6 +681,40 @@ class DecisionFullLdmlTransformerTest {
     CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
 
     Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+    assertThat(fileContent).isPresent();
+    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+        .contains(StringUtils.deleteWhitespace(expected));
+  }
+
+  @Test
+  @DisplayName("Header without Titelzeile (fallback)")
+  void testTransform_withFallbackShortTitle() {
+    String expected =
+        """
+          <akn:header>
+            <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">testFileNumber</akn:docNumber></akn:p>
+            <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01"refersTo="#entscheidungsdatum">01.01.2020</akn:docDate></akn:p>
+            <akn:p>Gericht:<akn:courtType refersTo="#gericht">AG Aachen</akn:courtType></akn:p>
+            <akn:p>Dokumenttyp:<akn:doc Type refersTo="#dokumenttyp">testDocumentTypeAbbreviation</akn:docType></akn:p>
+            <akn:p>Entscheidungsnamen:
+            <akn:docTitle refersTo="#entscheidungsname">Entscheidungsname</akn:docTitle></akn:p>
+            <akn:p>Kurztitel: <akn:shortTitle>
+               <akn:embeddedStructure>
+                  <akn:p alternativeTo="textWrapper">AG Aachen, 01.01.2020, testFileNumber</akn:p>
+               </akn:embeddedStructure>
+              </akn:shortTitle>
+             </akn:p>
+          </akn:header>
+        """;
+    Decision otherLongTextCaseLaw =
+        testDocumentUnit.toBuilder()
+            .shortTexts(ShortTexts.builder().decisionNames(List.of("Entscheidungsname")).build())
+            .build();
+
+    CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
+
+    assertThat(ldml).isNotNull();
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     assertThat(fileContent).isPresent();
     assertThat(StringUtils.deleteWhitespace(fileContent.get()))

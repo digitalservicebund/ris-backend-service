@@ -753,6 +753,12 @@ class DecisionReducedLdmlTransformerTest {
                    </akn:p>
                    <akn:p>Dokumenttyp: <akn:docType refersTo="#dokumenttyp">documentType test</akn:docType>
                    </akn:p>
+                  <akn:p>Kurztitel: <akn:shortTitle>
+                          <akn:embeddedStructure>
+                              <akn:p alternativeTo="textWrapper">courtLabel test, 01.01.2020, fileNumber test</akn:p>
+                          </akn:embeddedStructure>
+                      </akn:shortTitle>
+                  </akn:p>
                 </akn:header>
                """));
   }

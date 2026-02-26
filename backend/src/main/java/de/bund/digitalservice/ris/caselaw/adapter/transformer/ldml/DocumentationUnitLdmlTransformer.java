@@ -248,19 +248,23 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
   }
 
   default void buildHeadline(
-      List<Paragraph> paragraphs, String headline, HtmlTransformer htmlTransformer) {
+      List<Paragraph> paragraphs,
+      String headline,
+      HtmlTransformer htmlTransformer,
+      boolean refersToTitelzeile) {
     Paragraph headlineParagraph = Paragraph.builder().content(new ArrayList<>()).build();
-    headlineParagraph.getContent().add("Titelzeile: ");
-    headlineParagraph
-        .getContent()
-        .add(
-            ShortTitle.builder()
-                .refersTo("#titelzeile")
-                .content(
-                    EmbeddedStructure.builder()
-                        .content(htmlTransformer.htmlStringToObjectList(headline))
-                        .build())
-                .build());
+    headlineParagraph.getContent().add("Kurztitel: ");
+    var shortTitel =
+        ShortTitle.builder()
+            .content(
+                EmbeddedStructure.builder()
+                    .content(htmlTransformer.htmlStringToObjectList(headline))
+                    .build())
+            .build();
+    if (refersToTitelzeile) {
+      shortTitel.setRefersTo("#titelzeile");
+    }
+    headlineParagraph.getContent().add(shortTitel);
     paragraphs.add(headlineParagraph);
   }
 
