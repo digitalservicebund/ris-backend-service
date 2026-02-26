@@ -268,6 +268,14 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     paragraphs.add(headlineParagraph);
   }
 
+  default String buildFallbackHeadline(DocumentationUnit documentationUnit) {
+    return documentationUnit.coreData().court().label()
+        + ", "
+        + DateUtils.toFormattedDateString(documentationUnit.coreData().decisionDate())
+        + ", "
+        + documentationUnit.coreData().fileNumbers().getFirst();
+  }
+
   @Nonnull
   default List<ImplicitReference> buildCommonImplicitReferences(
       DocumentationUnit documentationUnit) {

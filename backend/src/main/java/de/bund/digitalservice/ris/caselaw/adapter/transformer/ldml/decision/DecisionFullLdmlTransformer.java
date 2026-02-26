@@ -347,21 +347,10 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     var decisionNames = nullSafeGet(shortTexts, ShortTexts::decisionNames);
     var headline = nullSafeGet(shortTexts, ShortTexts::headline);
     var refersToTitelzeile = false;
-    var hasFileNumber =
-        decision.coreData().fileNumbers() != null && !decision.coreData().fileNumbers().isEmpty();
-    var hasDecisionDate = decision.coreData().decisionDate() != null;
-    var hasCourt = decision.coreData().court() != null;
 
     // fallback
     if (isBlank(headline)) {
-      if (hasFileNumber && hasDecisionDate && hasCourt) {
-        headline =
-            decision.coreData().court().label()
-                + ", "
-                + DateUtils.toFormattedDateString(decision.coreData().decisionDate())
-                + ", "
-                + decision.coreData().fileNumbers().getFirst();
-      }
+      headline = buildFallbackHeadline(decision);
     } else {
       refersToTitelzeile = true;
     }

@@ -159,22 +159,9 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
     var shortTexts = pendingProceeding.shortTexts();
     var headline = nullSafeGet(shortTexts, PendingProceedingShortTexts::headline);
     var refersToTitelzeile = false;
-    var hasFileNumber =
-        pendingProceeding.coreData().fileNumbers() != null
-            && !pendingProceeding.coreData().fileNumbers().isEmpty();
-    var hasDecisionDate = pendingProceeding.coreData().decisionDate() != null;
-    var hasCourt = pendingProceeding.coreData().court() != null;
 
-    // fallback
     if (isBlank(headline)) {
-      if (hasCourt && hasDecisionDate && hasFileNumber) {
-        headline =
-            pendingProceeding.coreData().court().label()
-                + ", "
-                + DateUtils.toFormattedDateString(pendingProceeding.coreData().decisionDate())
-                + ", "
-                + pendingProceeding.coreData().fileNumbers().getFirst();
-      }
+      headline = buildFallbackHeadline(pendingProceeding);
     } else {
       refersToTitelzeile = true;
     }
