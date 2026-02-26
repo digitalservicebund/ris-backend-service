@@ -767,7 +767,7 @@ class DecisionFullLdmlTransformerTest {
                 <akn:p>Dokumenttyp:<akn:doc Type refersTo="#dokumenttyp">testDocumentTypeAbbreviation</akn:docType></akn:p>
                 <akn:p>Kurztitel: <akn:shortTitle refersTo="#titelzeile">
                    <akn:embeddedStructure>
-                      <akn:p alternativeTo="textWrapper">(This is a title (with in line) in brackets!)</akn:p>
+                      <akn:p alternativeTo="textWrapper">(This is a title) (with in line in brackets!)</akn:p>
                    </akn:embeddedStructure>
                   </akn:shortTitle>
                  </akn:p>
@@ -777,7 +777,7 @@ class DecisionFullLdmlTransformerTest {
             testDocumentUnit.toBuilder()
                 .shortTexts(
                     ShortTexts.builder()
-                        .headline("(This is a title (with in line) in brackets!)")
+                        .headline("(This is a title) (with in line in brackets!)")
                         .build())
                 .build();
 
