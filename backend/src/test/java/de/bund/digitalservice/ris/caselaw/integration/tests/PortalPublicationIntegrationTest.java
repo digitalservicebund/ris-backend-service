@@ -751,4 +751,110 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
                   .isEqualTo("Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
             });
   }
+
+  @Test
+  @Transactional
+  @Disabled("We skip the publication of changed doc units for the moment")
+  void testPublish_activeCitationTriggersPublishOfDifferentDocunit_infinite_loop_check() {
+    TestTransaction.end();
+    UUID userId = UUID.randomUUID();
+    var dto =
+        EntityBuilderTestUtil.createAndSaveDecision(
+            repository,
+            buildValidDocumentationUnit()
+                .documentNumber("XXRE000000001")
+                .activeCaselawCitations(
+                    List.of(
+                        ActiveCitationCaselawDTO.builder()
+                            .targetDocumentNumber("XXRE000000002")
+                            .rank(1)
+                            .build())));
+    var dto2 =
+        EntityBuilderTestUtil.createAndSaveDecision(
+            repository,
+            buildValidDocumentationUnit()
+                .documentNumber("XXRE000000002")
+                .activeCaselawCitations(
+                    List.of(
+                        ActiveCitationCaselawDTO.builder()
+                            .targetDocumentNumber("XXRE000000001")
+                            .rank(1)
+                            .build())));
+
+    risWebTestClient
+        .withDefaultLogin(userId)
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
+
+    verify(s3Client, times(4)).putObject(captor.capture(), any(RequestBody.class));
+
+    var capturedRequests = captor.getAllValues();
+    assertThat(capturedRequests.get(0).key()).isEqualTo("XXRE000000001/XXRE000000001.xml");
+    assertThat(capturedRequests.get(1).key()).isEqualTo("XXRE000000002/XXRE000000002.xml");
+    assertThat(capturedRequests.get(2).key()).isEqualTo("XXRE000000001/XXRE000000001.xml");
+    assertThat(capturedRequests.get(3).key()).contains("changelogs/");
+
+    var updatedDto = repository.findById(dto.getId()).get();
+    assertThat(updatedDto.getPortalPublicationStatus())
+        .isEqualTo(PortalPublicationStatus.PUBLISHED);
+    assertThat(updatedDto.getManagementData().getFirstPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
+        .isAfter(updatedDto.getManagementData().getFirstPublishedAtDateTime());
+
+    TestTransaction.start();
+    var updatedDto2 = repository.findById(dto2.getId()).get();
+    assertThat(updatedDto2.getPortalPublicationStatus())
+        .isEqualTo(PortalPublicationStatus.PUBLISHED);
+    assertThat(updatedDto2.getManagementData().getLastPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(updatedDto2).isInstanceOf(DecisionDTO.class);
+    assertThat(((DecisionDTO) updatedDto2).getPassiveCaselawCitations()).hasSize(1);
+    var passiveCitation = ((DecisionDTO) updatedDto2).getPassiveCaselawCitations().getFirst();
+    assertThat(passiveCitation.getSourceDocumentNumber()).isEqualTo(updatedDto.getDocumentNumber());
+    assertThat(passiveCitation.getSourceDate()).isEqualTo(updatedDto.getDate());
+    assertThat(passiveCitation.getTarget()).isEqualTo(updatedDto2);
+    TestTransaction.end();
+
+    var historyLogs =
+        historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
+    var userDbId = databaseUserRepository.findByExternalId(userId).get().getId();
+    assertThat(historyLogs)
+        .hasSize(4)
+        .satisfiesExactly(
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getUser().getId()).isEqualTo(userDbId);
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Dokeinheit im Portal veröffentlicht");
+            },
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getSystemName()).isEqualTo("NeuRIS");
+              assertThat(historyLog.getUser()).isNull();
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Status im Portal geändert: Veröffentlicht → Veröffentlicht");
+            },
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Dokeinheit im Portal veröffentlicht");
+            },
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
+            });
+  }
 }
