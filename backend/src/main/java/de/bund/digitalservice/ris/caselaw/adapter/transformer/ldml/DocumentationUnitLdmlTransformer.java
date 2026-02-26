@@ -269,11 +269,11 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
   }
 
   default String buildFallbackHeadline(DocumentationUnit documentationUnit) {
-    return documentationUnit.coreData().court().label()
-        + ", "
-        + DateUtils.toFormattedDateString(documentationUnit.coreData().decisionDate())
-        + ", "
-        + documentationUnit.coreData().fileNumbers().getFirst();
+    return String.format(
+        "%s, %s, %s",
+        documentationUnit.coreData().court().label(),
+        DateUtils.toFormattedDateString(documentationUnit.coreData().decisionDate()),
+        documentationUnit.coreData().fileNumbers().getFirst());
   }
 
   @Nonnull
