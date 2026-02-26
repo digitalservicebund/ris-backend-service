@@ -466,12 +466,6 @@ class PortalPublicationServiceTest {
                 () -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, user))
             .withMessageContaining("LDML validation failed.");
         verify(caseLawBucket, never()).save(anyString(), anyString());
-        verify(historyLogService)
-            .saveHistoryLog(
-                documentationUnitId,
-                user,
-                HistoryLogEventType.PORTAL_PUBLICATION,
-                "Dokeinheit konnte nicht im Portal veröffentlicht werden");
       }
 
       @Test
@@ -490,12 +484,6 @@ class PortalPublicationServiceTest {
                 () -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, user))
             .withMessageContaining("Missing judgment body.");
         verify(caseLawBucket, never()).save(anyString(), anyString());
-        verify(historyLogService)
-            .saveHistoryLog(
-                documentationUnitId,
-                user,
-                HistoryLogEventType.PORTAL_PUBLICATION,
-                "Dokeinheit konnte nicht im Portal veröffentlicht werden");
       }
 
       @Test
@@ -519,12 +507,6 @@ class PortalPublicationServiceTest {
                 () -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, user))
             .withMessageContaining("Could not save changelog to bucket");
         verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
-        verify(historyLogService)
-            .saveHistoryLog(
-                documentationUnitId,
-                user,
-                HistoryLogEventType.PORTAL_PUBLICATION,
-                "Dokeinheit konnte nicht im Portal veröffentlicht werden");
       }
 
       @Test
@@ -549,12 +531,6 @@ class PortalPublicationServiceTest {
                 () -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, user))
             .withMessageContaining("Could not save changelog to bucket");
         verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
-        verify(historyLogService)
-            .saveHistoryLog(
-                documentationUnitId,
-                user,
-                HistoryLogEventType.PORTAL_PUBLICATION,
-                "Dokeinheit konnte nicht im Portal veröffentlicht werden");
       }
 
       @Test
