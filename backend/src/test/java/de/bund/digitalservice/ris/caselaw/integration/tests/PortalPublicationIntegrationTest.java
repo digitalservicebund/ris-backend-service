@@ -682,11 +682,23 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
                     List.of(
                         ActiveCitationCaselawDTO.builder()
                             .targetDocumentNumber("XXRE000000001")
+                            .targetDate(LocalDate.of(1999, 1, 1))
                             .rank(1)
+                            .build(),
+                        ActiveCitationCaselawDTO.builder()
+                            .targetDocumentNumber("XXRE000000002")
+                            .targetDate(LocalDate.of(2000, 1, 1))
+                            .rank(2)
                             .build())));
     var dto2 =
         EntityBuilderTestUtil.createAndSaveDecision(
-            repository, buildValidDocumentationUnit().documentNumber("XXRE000000001"));
+            repository,
+            buildValidDocumentationUnit()
+                .documentNumber("XXRE000000001")
+                .portalPublicationStatus(PortalPublicationStatus.PUBLISHED));
+    var unpublishedDto =
+        EntityBuilderTestUtil.createAndSaveDecision(
+            repository, buildValidDocumentationUnit().documentNumber("XXRE000000002"));
 
     risWebTestClient
         .withDefaultLogin(userId)
