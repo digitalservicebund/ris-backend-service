@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Immutable;
@@ -14,6 +16,8 @@ import org.hibernate.annotations.Immutable;
 @Table(name = "ref_view_active_citation_uli_caselaw", schema = "references_schema")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder = true)
 public class ActiveCitationUliCaselaw {
 
   @Id

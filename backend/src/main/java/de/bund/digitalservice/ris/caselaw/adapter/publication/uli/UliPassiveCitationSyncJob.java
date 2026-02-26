@@ -29,7 +29,7 @@ public class UliPassiveCitationSyncJob {
     log.info("Starting scheduled ULI Passive Citation Sync");
 
     try {
-      Set<String> updatedDocNumbers = uliCitationSyncService.syncUliPassiveCitations();
+      Set<String> updatedDocNumbers = uliCitationSyncService.handleUliPassiveSync();
 
       if (updatedDocNumbers.isEmpty()) {
         log.info("ULI Passive Citation Sync finished: No documents required an update.");

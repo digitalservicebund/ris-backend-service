@@ -4,7 +4,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Immutable;
@@ -14,6 +17,8 @@ import org.hibernate.annotations.Immutable;
 @Table(name = "ref_view_uli", schema = "references_schema")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder = true)
 public class PublishedUli {
 
   @Id private UUID id;
@@ -37,5 +42,6 @@ public class PublishedUli {
   @Column(name = "legal_periodical_raw_value")
   private String legalPeriodicalRawValue; // abbreviation
 
-  // last_published
+  @Column(name = "published_at")
+  private Instant publishedAt;
 }
