@@ -348,10 +348,10 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     var headline = nullSafeGet(shortTexts, ShortTexts::headline);
     var refersToTitelzeile = false;
 
-    // fallback
     if (isBlank(headline)) {
       headline = buildFallbackHeadline(decision);
     } else {
+      headline = removeWrappingBrackets(headline);
       refersToTitelzeile = true;
     }
 
@@ -384,6 +384,21 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
   @Override
   public boolean isFullLDML() {
     return true;
+  }
+
+  private String removeWrappingBrackets(String headline) {
+    headline = headline.strip();
+
+    boolean startsWithBracket = headline.startsWith("(");
+    boolean endsWithBracket = headline.endsWith(")");
+
+    if (startsWithBracket && endsWithBracket) {
+      String cleanHeadline = headline.substring(1, headline.length() - 1);
+      if (!cleanHeadline.contains("(") && !cleanHeadline.contains(")")) {
+        return cleanHeadline;
+      }
+    }
+    return headline;
   }
 
   private Sachgebiete buildSachgebiete(ContentRelatedIndexing contentRelatedIndexing) {

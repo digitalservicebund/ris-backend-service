@@ -644,81 +644,152 @@ class DecisionFullLdmlTransformerTest {
     }
   }
 
-  @Test
-  @DisplayName("Mixed text in header")
-  void testTransform_mixedTextInHeader() {
-    String expected =
-        """
-       <akn:header>
-          <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">testFileNumber</akn:docNumber>
-          </akn:p>
-          <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
-          </akn:p>
-          <akn:p>Gericht: <akn:courtType refersTo="#gericht">AG Aachen</akn:courtType>
-          </akn:p>
-          <akn:p>Dokumenttyp: <akn:docType refersTo="#dokumenttyp">testDocumentTypeAbbreviation</akn:docType></akn:p>
-          <akn:p>Entscheidungsnamen:
-          <akn:docTitle refersTo="#entscheidungsname">Entscheidungsname</akn:docTitle></akn:p>
-          <akn:p>Kurztitel:
-          <akn:shortTitle refersTo="#titelzeile">
-            <akn:embeddedStructure>
-              <akn:p alternativeTo="textWrapper">Hello</akn:p>
-              <akn:p> paragraph</akn:p>
-              <akn:p alternativeTo="textWrapper"> world!</akn:p>
-            </akn:embeddedStructure>
-          </akn:shortTitle></akn:p>
-        </akn:header>
-       """;
-    Decision otherLongTextCaseLaw =
-        testDocumentUnit.toBuilder()
-            .shortTexts(
-                ShortTexts.builder()
-                    .decisionNames(List.of("Entscheidungsname"))
-                    .headline("Hello<p> paragraph</p> world!")
-                    .build())
-            .build();
-
-    CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
-
-    Assertions.assertNotNull(ldml);
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    assertThat(fileContent).isPresent();
-    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
-        .contains(StringUtils.deleteWhitespace(expected));
-  }
-
-  @Test
-  @DisplayName("Header without Titelzeile (fallback)")
-  void testTransform_withFallbackShortTitle() {
-    String expected =
-        """
-          <akn:header>
-            <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">testFileNumber</akn:docNumber></akn:p>
-            <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01"refersTo="#entscheidungsdatum">01.01.2020</akn:docDate></akn:p>
-            <akn:p>Gericht:<akn:courtType refersTo="#gericht">AG Aachen</akn:courtType></akn:p>
-            <akn:p>Dokumenttyp:<akn:doc Type refersTo="#dokumenttyp">testDocumentTypeAbbreviation</akn:docType></akn:p>
+  @Nested
+  class Header {
+    @Test
+    @DisplayName("Mixed text in header")
+    void testTransform_mixedTextInHeader() {
+      String expected =
+          """
+         <akn:header>
+            <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">testFileNumber</akn:docNumber>
+            </akn:p>
+            <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
+            </akn:p>
+            <akn:p>Gericht: <akn:courtType refersTo="#gericht">AG Aachen</akn:courtType>
+            </akn:p>
+            <akn:p>Dokumenttyp: <akn:docType refersTo="#dokumenttyp">testDocumentTypeAbbreviation</akn:docType></akn:p>
             <akn:p>Entscheidungsnamen:
             <akn:docTitle refersTo="#entscheidungsname">Entscheidungsname</akn:docTitle></akn:p>
-            <akn:p>Kurztitel: <akn:shortTitle>
-               <akn:embeddedStructure>
-                  <akn:p alternativeTo="textWrapper">AG Aachen, 01.01.2020, testFileNumber</akn:p>
-               </akn:embeddedStructure>
-              </akn:shortTitle>
-             </akn:p>
+            <akn:p>Kurztitel:
+            <akn:shortTitle refersTo="#titelzeile">
+              <akn:embeddedStructure>
+                <akn:p alternativeTo="textWrapper">Hello</akn:p>
+                <akn:p> paragraph</akn:p>
+                <akn:p alternativeTo="textWrapper"> world!</akn:p>
+              </akn:embeddedStructure>
+            </akn:shortTitle></akn:p>
           </akn:header>
-        """;
-    Decision otherLongTextCaseLaw =
-        testDocumentUnit.toBuilder()
-            .shortTexts(ShortTexts.builder().decisionNames(List.of("Entscheidungsname")).build())
-            .build();
+         """;
+      Decision otherLongTextCaseLaw =
+          testDocumentUnit.toBuilder()
+              .shortTexts(
+                  ShortTexts.builder()
+                      .decisionNames(List.of("Entscheidungsname"))
+                      .headline("Hello<p> paragraph</p> world!")
+                      .build())
+              .build();
 
-    CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
+      CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
 
-    assertThat(ldml).isNotNull();
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    assertThat(fileContent).isPresent();
-    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
-        .contains(StringUtils.deleteWhitespace(expected));
+      Assertions.assertNotNull(ldml);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      assertThat(fileContent).isPresent();
+      assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+          .contains(StringUtils.deleteWhitespace(expected));
+    }
+
+    @Nested
+    class ShortTitle {
+      @Test
+      void testTransform_withoutShortTitle_shouldUseFallback() {
+        String expected =
+            """
+              <akn:header>
+                <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">testFileNumber</akn:docNumber></akn:p>
+                <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01"refersTo="#entscheidungsdatum">01.01.2020</akn:docDate></akn:p>
+                <akn:p>Gericht:<akn:courtType refersTo="#gericht">AG Aachen</akn:courtType></akn:p>
+                <akn:p>Dokumenttyp:<akn:doc Type refersTo="#dokumenttyp">testDocumentTypeAbbreviation</akn:docType></akn:p>
+                <akn:p>Entscheidungsnamen:
+                <akn:docTitle refersTo="#entscheidungsname">Entscheidungsname</akn:docTitle></akn:p>
+                <akn:p>Kurztitel: <akn:shortTitle>
+                   <akn:embeddedStructure>
+                      <akn:p alternativeTo="textWrapper">AG Aachen, 01.01.2020, testFileNumber</akn:p>
+                   </akn:embeddedStructure>
+                  </akn:shortTitle>
+                 </akn:p>
+              </akn:header>
+            """;
+        Decision otherLongTextCaseLaw =
+            testDocumentUnit.toBuilder()
+                .shortTexts(
+                    ShortTexts.builder().decisionNames(List.of("Entscheidungsname")).build())
+                .build();
+
+        CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
+
+        assertThat(ldml).isNotNull();
+        Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+        assertThat(fileContent).isPresent();
+        assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+            .contains(StringUtils.deleteWhitespace(expected));
+      }
+
+      @Test
+      void testTransform_withShortTitleInBrackets_shouldRemoveBrackets() {
+        String expected =
+            """
+              <akn:header>
+                <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">testFileNumber</akn:docNumber></akn:p>
+                <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01"refersTo="#entscheidungsdatum">01.01.2020</akn:docDate></akn:p>
+                <akn:p>Gericht:<akn:courtType refersTo="#gericht">AG Aachen</akn:courtType></akn:p>
+                <akn:p>Dokumenttyp:<akn:doc Type refersTo="#dokumenttyp">testDocumentTypeAbbreviation</akn:docType></akn:p>
+                <akn:p>Kurztitel: <akn:shortTitle refersTo="#titelzeile">
+                   <akn:embeddedStructure>
+                      <akn:p alternativeTo="textWrapper">This is a title in brackets!</akn:p>
+                   </akn:embeddedStructure>
+                  </akn:shortTitle>
+                 </akn:p>
+              </akn:header>
+            """;
+        Decision otherLongTextCaseLaw =
+            testDocumentUnit.toBuilder()
+                .shortTexts(ShortTexts.builder().headline("(This is a title in brackets!)").build())
+                .build();
+
+        CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
+
+        assertThat(ldml).isNotNull();
+        Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+        assertThat(fileContent).isPresent();
+        assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+            .contains(StringUtils.deleteWhitespace(expected));
+      }
+
+      @Test
+      void testTransform_withShortTitleInInlineBrackets_shouldNotRemoveBrackets() {
+        String expected =
+            """
+              <akn:header>
+                <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">testFileNumber</akn:docNumber></akn:p>
+                <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01"refersTo="#entscheidungsdatum">01.01.2020</akn:docDate></akn:p>
+                <akn:p>Gericht:<akn:courtType refersTo="#gericht">AG Aachen</akn:courtType></akn:p>
+                <akn:p>Dokumenttyp:<akn:doc Type refersTo="#dokumenttyp">testDocumentTypeAbbreviation</akn:docType></akn:p>
+                <akn:p>Kurztitel: <akn:shortTitle refersTo="#titelzeile">
+                   <akn:embeddedStructure>
+                      <akn:p alternativeTo="textWrapper">(This is a title (with in line) in brackets!)</akn:p>
+                   </akn:embeddedStructure>
+                  </akn:shortTitle>
+                 </akn:p>
+              </akn:header>
+            """;
+        Decision otherLongTextCaseLaw =
+            testDocumentUnit.toBuilder()
+                .shortTexts(
+                    ShortTexts.builder()
+                        .headline("(This is a title (with in line) in brackets!)")
+                        .build())
+                .build();
+
+        CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
+
+        assertThat(ldml).isNotNull();
+        Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+        assertThat(fileContent).isPresent();
+        assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+            .contains(StringUtils.deleteWhitespace(expected));
+      }
+    }
   }
 
   @Test
