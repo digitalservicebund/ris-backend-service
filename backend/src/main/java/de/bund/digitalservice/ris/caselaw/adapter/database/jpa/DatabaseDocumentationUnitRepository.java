@@ -69,4 +69,41 @@ SELECT d.documentNumber FROM DocumentationUnitDTO d
       value =
           "SELECT d.id FROM DocumentationUnitDTO d WHERE d.status.publicationStatus = :publicationStatus ORDER BY d.status.createdAt DESC")
   List<UUID> findAllByStatus(PublicationStatus publicationStatus, Pageable page);
+
+  @Query(
+      "SELECT DISTINCT d FROM DecisionDTO d "
+          + "WHERE EXISTS (SELECT link FROM ActiveCitationUliCaselaw link "
+          + "              JOIN PublishedUli u ON link.sourceId = u.id "
+          + "              WHERE link.targetId = d.id "
+          + "              AND u.id IN :uliIds "
+          + "              AND NOT EXISTS (SELECT s FROM PublishedDocumentationSnapshotEntity s "
+          + "                              WHERE s.documentationUnitId = d.id "
+          + "                              AND s.publishedAt >= u.publishedAt) "
+          + "              AND NOT EXISTS (SELECT r FROM RevokedUli r "
+          + "                              WHERE r.docUnitId = u.id "
+          + "                              AND r.revokedAt > u.publishedAt)"
+          + ")")
+  List<DecisionDTO> findAllAffectedByUliUpdates(@Param("uliIds") Set<UUID> uliIds);
+
+  @Query(
+      "SELECT DISTINCT d FROM DecisionDTO d "
+          + "JOIN d.passiveUliCitations p "
+          + "JOIN RevokedUli r ON p.sourceId = r.docUnitId "
+          + "WHERE r.docUnitId IN :revokedIds "
+          + "AND NOT EXISTS (SELECT s FROM PublishedDocumentationSnapshotEntity s "
+          + "                WHERE s.documentationUnitId = d.id "
+          + "                AND s.publishedAt >= r.revokedAt)")
+  List<DecisionDTO> findAllByPassiveUliSourceIdInAndPendingRevocation(
+      @Param("revokedIds") Set<UUID> revokedIds);
+
+  @Query(
+      "SELECT DISTINCT d FROM DecisionDTO d "
+          + "JOIN d.activeUliCitations a "
+          + "JOIN RevokedUli r ON a.targetId = r.docUnitId "
+          + "WHERE r.docUnitId IN :revokedIds "
+          + "AND NOT EXISTS (SELECT s FROM PublishedDocumentationSnapshotEntity s "
+          + "                WHERE s.documentationUnitId = d.id "
+          + "                AND s.publishedAt >= r.revokedAt)")
+  List<DecisionDTO> findAllByActiveUliTargetIdInAndPendingRevocation(
+      @Param("revokedIds") Set<UUID> revokedIds);
 }

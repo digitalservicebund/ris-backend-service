@@ -45,6 +45,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.publication.CaselawCitationSyn
 import de.bund.digitalservice.ris.caselaw.adapter.publication.ManualPortalPublicationResult.RelatedPendingProceedingPublicationResult;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -100,6 +101,7 @@ class PortalPublicationServiceTest {
   @MockitoBean private PublishedDocumentationSnapshotRepository snapshotRepository;
   @MockitoBean private CaselawCitationPublishService caselawCitationPublishService;
   @MockitoBean private CaselawCitationSyncService caselawCitationSyncService;
+  @MockitoBean private UliCitationPublishService uliCitationPublishService;
 
   private ArgumentCaptor<PublishedDocumentationSnapshotEntity> snapshotCaptor =
       ArgumentCaptor.forClass(PublishedDocumentationSnapshotEntity.class);
@@ -231,7 +233,8 @@ class PortalPublicationServiceTest {
             attachmentInlineRepository,
             snapshotRepository,
             caselawCitationSyncService,
-            caselawCitationPublishService);
+            caselawCitationPublishService,
+            uliCitationPublishService);
     when(objectMapper.writeValueAsString(any())).thenReturn("");
     when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(true);
     when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(true);
@@ -463,12 +466,6 @@ class PortalPublicationServiceTest {
                 () -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, user))
             .withMessageContaining("LDML validation failed.");
         verify(caseLawBucket, never()).save(anyString(), anyString());
-        verify(historyLogService)
-            .saveHistoryLog(
-                documentationUnitId,
-                user,
-                HistoryLogEventType.PORTAL_PUBLICATION,
-                "Dokeinheit konnte nicht im Portal veröffentlicht werden");
       }
 
       @Test
@@ -487,12 +484,6 @@ class PortalPublicationServiceTest {
                 () -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, user))
             .withMessageContaining("Missing judgment body.");
         verify(caseLawBucket, never()).save(anyString(), anyString());
-        verify(historyLogService)
-            .saveHistoryLog(
-                documentationUnitId,
-                user,
-                HistoryLogEventType.PORTAL_PUBLICATION,
-                "Dokeinheit konnte nicht im Portal veröffentlicht werden");
       }
 
       @Test
@@ -516,12 +507,6 @@ class PortalPublicationServiceTest {
                 () -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, user))
             .withMessageContaining("Could not save changelog to bucket");
         verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
-        verify(historyLogService)
-            .saveHistoryLog(
-                documentationUnitId,
-                user,
-                HistoryLogEventType.PORTAL_PUBLICATION,
-                "Dokeinheit konnte nicht im Portal veröffentlicht werden");
       }
 
       @Test
@@ -546,12 +531,6 @@ class PortalPublicationServiceTest {
                 () -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, user))
             .withMessageContaining("Could not save changelog to bucket");
         verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
-        verify(historyLogService)
-            .saveHistoryLog(
-                documentationUnitId,
-                user,
-                HistoryLogEventType.PORTAL_PUBLICATION,
-                "Dokeinheit konnte nicht im Portal veröffentlicht werden");
       }
 
       @Test

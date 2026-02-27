@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.adapter.CaselawExceptionHandler;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationCaselawDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationUliCaselawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
@@ -24,10 +25,15 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobSyncStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedDocumentationSnapshotEntity;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedDocumentationSnapshotRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedUliRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationPublishService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationSyncService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -94,6 +100,18 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
 
   @MockitoBean(name = "portalS3Client")
   private S3Client s3Client;
+
+  @MockitoBean private PublishedUliRepository publishedUliRepository;
+
+  @MockitoBean private ActiveCitationUliCaselawRepository activeCitationUliCaselawRepository;
+
+  @MockitoBean private RevokedUliRepository revokedUliRepository;
+
+  @MockitoBean private JobSyncStatusRepository jobSyncStatusRepository;
+
+  @MockitoBean private UliCitationSyncService uliCitationSyncService;
+
+  @MockitoBean private UliCitationPublishService uliCitationPublishService;
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;
