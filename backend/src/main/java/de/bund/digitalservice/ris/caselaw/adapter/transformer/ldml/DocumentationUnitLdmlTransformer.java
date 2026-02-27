@@ -390,7 +390,7 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
       for (PreviousDecision previousDecision : previousDecisions) {
         if (previousDecision == null) continue;
 
-        var vorgehendBuilder = Rechtszug.Vorgehend.builder();
+        var vorgehendBuilder = Rechtszug.Vorgehend.builder(); // NOSONAR
         buildCaselawReference(previousDecision, vorgehendBuilder);
         vorhergehendeEntscheidungen.add(
             ImplicitReference.builder()
