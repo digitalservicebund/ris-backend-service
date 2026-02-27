@@ -47,12 +47,16 @@ public class UliCitationSyncService {
 
   /**
    * Case 2: Synchronizes ULI metadata and monitors citation consistency based on new ULI
-   * publications. 1. Metadata Refresh: Iterates through newly published ULI documents and updates
-   * existing passive counterparts in the referenced Caselaw documents. This ensures that metadata
-   * (author, citation, etc.) remains synchronized. 2. Inconsistency Monitoring: Detects missing
-   * links by checking if an Active Citation within a new ULI document has a corresponding Passive
-   * Citation in the targeted Caselaw document. If the counterpart is missing, a warning is logged
-   * for monitoring purposes. No citations are created automatically.
+   * publications.
+   *
+   * <p>1. Metadata Refresh: Iterates through newly published ULI documents and updates existing
+   * passive counterparts in the referenced Caselaw documents. This ensures that metadata (author,
+   * citation, etc.) remains synchronized.
+   *
+   * <p>2. Inconsistency Monitoring: Detects missing links by checking if an Active Citation within
+   * a new ULI document has a corresponding Passive Citation in the targeted Caselaw document. If
+   * the counterpart is missing, a warning is logged for monitoring purposes. No citations are
+   * created automatically.
    */
   @Transactional
   public Set<String> handleUliPassiveSync() {
