@@ -47,16 +47,12 @@ public class UliCitationSyncService {
 
   /**
    * Case 2: Synchronizes ULI metadata and monitors citation consistency based on new ULI
-   * publications.
-   *
-   * <p>1. Metadata Refresh: Iterates through newly published ULI documents and updates existing
-   * passive counterparts in the referenced Caselaw documents. This ensures that metadata (author,
-   * citation, etc.) remains synchronized.
-   *
-   * <p>2. Inconsistency Monitoring: Detects missing links by checking if an Active Citation within
-   * a new ULI document has a corresponding Passive Citation in the targeted Caselaw document. If
-   * the counterpart is missing, a warning is logged for monitoring purposes. No citations are
-   * created automatically.
+   * publications. 1. Metadata Refresh: Iterates through newly published ULI documents and updates
+   * existing passive counterparts in the referenced Caselaw documents. This ensures that metadata
+   * (author, citation, etc.) remains synchronized. 2. Inconsistency Monitoring: Detects missing
+   * links by checking if an Active Citation within a new ULI document has a corresponding Passive
+   * Citation in the targeted Caselaw document. If the counterpart is missing, a warning is logged
+   * for monitoring purposes. No citations are created automatically.
    */
   @Transactional
   public Set<String> handleUliPassiveSync() {
@@ -76,7 +72,6 @@ public class UliCitationSyncService {
     Set<UUID> uliIds = newUlis.stream().map(PublishedUli::getId).collect(Collectors.toSet());
 
     // Get all relevant links from ref_view_active_citation_uli_caselaw for the loop
-    // later
     List<ActiveCitationUliCaselaw> uliToCaselawActiveCitations =
         activeCitationUliCaselawRepository.findAllBySourceIdIn(uliIds);
 
@@ -188,7 +183,6 @@ public class UliCitationSyncService {
     }
 
     // active citations will be just republished, targetId is deleted and metadata
-    // stay
     List<DecisionDTO> affectedByActive =
         caselawRepository.findAllByActiveUliTargetIdInAndPendingRevocation(revokedUliIds);
 
@@ -197,8 +191,7 @@ public class UliCitationSyncService {
     }
 
     // get the highest timestamp of revoked entries and not Instant.now() because in
-    // the meantime a
-    // new entry could have been saved to the revoked table
+    // the meantime a new entry could have been saved to the revoked table
     Instant newestRevokedAt =
         revokedEntries.stream()
             .map(RevokedUli::getRevokedAt)
