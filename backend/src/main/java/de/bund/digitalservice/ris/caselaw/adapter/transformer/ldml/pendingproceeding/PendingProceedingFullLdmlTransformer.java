@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproceeding;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
@@ -160,15 +159,13 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
     var headline = nullSafeGet(shortTexts, PendingProceedingShortTexts::headline);
     var refersToTitelzeile = false;
 
-    if (isBlank(headline)) {
-      headline = buildFallbackHeadline(pendingProceeding);
-    } else {
+    if (isNotBlank(headline)) {
       refersToTitelzeile = true;
+    } else {
+      headline = buildFallbackHeadline(pendingProceeding);
     }
 
-    if (isNotBlank(headline)) {
-      buildHeadline(paragraphs, headline, htmlTransformer, refersToTitelzeile);
-    }
+    buildHeadline(paragraphs, headline, htmlTransformer, refersToTitelzeile);
 
     return Header.builder().paragraphs(paragraphs).build();
   }

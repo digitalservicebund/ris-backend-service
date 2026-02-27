@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
@@ -348,11 +347,11 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     var headline = nullSafeGet(shortTexts, ShortTexts::headline);
     var refersToTitelzeile = false;
 
-    if (isBlank(headline)) {
-      headline = buildFallbackHeadline(decision);
-    } else {
+    if (isNotBlank(headline)) {
       headline = removeWrappingBrackets(headline);
       refersToTitelzeile = true;
+    } else {
+      headline = buildFallbackHeadline(decision);
     }
 
     // Entscheidungsname
@@ -374,9 +373,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     }
 
     // Titelzeile
-    if (isNotBlank(headline)) {
-      buildHeadline(paragraphs, headline, htmlTransformer, refersToTitelzeile);
-    }
+    buildHeadline(paragraphs, headline, htmlTransformer, refersToTitelzeile);
 
     return Header.builder().paragraphs(paragraphs).build();
   }
