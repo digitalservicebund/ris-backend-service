@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationS
 import java.util.Collections;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,7 +24,7 @@ public class RevokedUliSyncJob {
    * Case 3: Sync for revoked documents. This job identifies all documents that point to a now
    * withdrawn/deleted target and triggers a republishing for them.
    */
-  @Scheduled(cron = "${neuris.jobs.uli-repeal-sync.cron:0 0 3 * * *}")
+  // @Scheduled(cron = "${neuris.jobs.uli-repeal-sync.cron:0 0 3 * * *}")
   public void runRevokedSync() {
     Set<String> affectedDocNumbers = fetchRevokedNumbers();
     affectedDocNumbers.forEach(this::publishSafe);

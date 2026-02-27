@@ -377,7 +377,7 @@ public class PortalPublicationService {
 
     if (documentationUnit instanceof DecisionDTO decision) {
       validateAndEnrichCaselawCitations(decision);
-      validateAndEnrichUliCitations(decision);
+      // validateAndEnrichUliCitations(decision);
     }
 
     CaseLawLdml ldml = ldmlTransformer.transformToLdml(toDomain(documentationUnit));

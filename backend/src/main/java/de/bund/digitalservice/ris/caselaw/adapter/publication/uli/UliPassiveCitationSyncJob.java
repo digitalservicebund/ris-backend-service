@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication.uli;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,7 +23,7 @@ public class UliPassiveCitationSyncJob {
    * Case 2: Synchronizes passive citations for ULI. It identifies missing or outdated passive links
    * in the database and republishes the affected documents to the portal.
    */
-  @Scheduled(cron = "${neuris.jobs.uli-sync.cron:0 0 2 * * *}")
+  // @Scheduled(cron = "${neuris.jobs.uli-sync.cron:0 0 2 * * *}")
   public void runSync() {
     log.info("Starting scheduled ULI Passive Citation Sync");
 
