@@ -354,7 +354,7 @@ jobs:
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Download cosign vulnerability scan record
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
         with:
           name: "vuln-backend.json"
       - name: Attest vulnerability scan
@@ -408,7 +408,7 @@ jobs:
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Download cosign vulnerability scan record
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
         with:
           name: "vuln-frontend.json"
       - name: Attest vulnerability scan
@@ -514,7 +514,7 @@ jobs:
           npm ci --ignore-scripts
         working-directory: ./frontend
       - name: Download blob reports from artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: ./frontend/all-blob-reports
           pattern: test-results-blob-*
@@ -758,7 +758,7 @@ jobs:
       #     destinationDir: entity-relationship-diagrams/ris-backend-service
       # Licence reports
       - name: Licence reports - Download
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           pattern: licence-reports-*
           path: tmp/licence-reports/
@@ -775,7 +775,7 @@ jobs:
           destinationDir: licence-reports/backend/ris-backend-service
       # Performance report
       - name: Performance reports - Download
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: performance-report
           path: tmp/performance-reports/
@@ -787,7 +787,7 @@ jobs:
           destinationDir: performance-reports/ris-backend-service
       # Backend code documentation
       - name: Backend Code Documentation - Download
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: backend-code-documentation
           path: tmp/backend-code-documentation/
@@ -799,7 +799,7 @@ jobs:
           reportIsDirectory: true
       # e2e test report
       - name: E2E test reports - Download
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: html-test-report
           path: tmp/html-test-report/
