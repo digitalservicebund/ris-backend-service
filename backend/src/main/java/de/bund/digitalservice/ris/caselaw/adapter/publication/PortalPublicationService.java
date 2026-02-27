@@ -395,19 +395,19 @@ public class PortalPublicationService {
 
     documentsToRepublish.forEach(
         documentNumber -> {
-          try {
-            log.atInfo()
-                .addKeyValue(
-                    "originalPublishedDocumentationUnit", documentationUnit.getDocumentNumber())
-                .addKeyValue("documentationUnit", documentNumber)
-                .setMessage(
-                    "SKIPPED: Publish documentation unit changed during the publishing of another documentation unit.")
-                .log();
-            publishDocumentationUnit(documentNumber);
-          } catch (DocumentationUnitNotExistsException e) {
-            throw new PublishException(
-                "Couldn't find changed documentation unit that should be published as well", e);
-          }
+          // try {
+          log.atInfo()
+              .addKeyValue(
+                  "originalPublishedDocumentationUnit", documentationUnit.getDocumentNumber())
+              .addKeyValue("documentationUnit", documentNumber)
+              .setMessage(
+                  "SKIPPED: Publish documentation unit changed during the publishing of another documentation unit.")
+              .log();
+          // publishDocumentationUnit(documentNumber);
+          // } catch (DocumentationUnitNotExistsException e) {
+          //   throw new PublishException(
+          //       "Couldn't find changed documentation unit that should be published as well", e);
+          // }
         });
 
     return result;
