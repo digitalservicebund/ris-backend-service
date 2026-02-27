@@ -73,7 +73,7 @@ public class CaselawCitationSyncServiceTest {
                           .build()))
               .build();
 
-      when(documentationUnitRepository.findByDocumentNumber("XXRE000000002"))
+      when(documentationUnitRepository.findPublishedByDocumentNumber("XXRE000000002"))
           .thenReturn(Optional.of(docUnitXXRE000000002));
 
       var result = caselawCitationSyncService.syncCitations(publishedDocUnit);
@@ -106,7 +106,7 @@ public class CaselawCitationSyncServiceTest {
 
       var docUnitXXRE000000002 = DecisionDTO.builder().documentNumber("XXRE000000002").build();
 
-      when(documentationUnitRepository.findByDocumentNumber("XXRE000000002"))
+      when(documentationUnitRepository.findPublishedByDocumentNumber("XXRE000000002"))
           .thenReturn(Optional.of(docUnitXXRE000000002));
 
       var result = caselawCitationSyncService.syncCitations(publishedDocUnit);
@@ -154,7 +154,7 @@ public class CaselawCitationSyncServiceTest {
                   .rank(1)
                   .build()));
 
-      when(documentationUnitRepository.findByDocumentNumber("XXRE000000002"))
+      when(documentationUnitRepository.findPublishedByDocumentNumber("XXRE000000002"))
           .thenReturn(Optional.of(docUnitXXRE000000002));
 
       var result = caselawCitationSyncService.syncCitations(publishedDocUnit);

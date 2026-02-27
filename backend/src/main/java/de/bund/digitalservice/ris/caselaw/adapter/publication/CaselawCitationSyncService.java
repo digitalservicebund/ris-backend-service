@@ -44,7 +44,7 @@ public class CaselawCitationSyncService {
           .forEach(
               activeCitationCaselaw -> {
                 var target =
-                    documentationUnitRepository.findByDocumentNumber(
+                    documentationUnitRepository.findPublishedByDocumentNumber(
                         activeCitationCaselaw.getTargetDocumentNumber());
 
                 if (target.isPresent() && target.get() instanceof DecisionDTO targetDecision) {
