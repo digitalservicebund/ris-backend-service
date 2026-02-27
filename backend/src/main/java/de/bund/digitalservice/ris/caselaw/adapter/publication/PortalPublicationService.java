@@ -380,7 +380,6 @@ public class PortalPublicationService {
       validateAndEnrichUliCitations(decision);
     }
 
-    // Todo: create valid ldml for references
     CaseLawLdml ldml = ldmlTransformer.transformToLdml(toDomain(documentationUnit));
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     if (fileContent.isEmpty()) {

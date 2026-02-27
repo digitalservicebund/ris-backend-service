@@ -94,10 +94,7 @@ public class UliCitationSyncService {
           newUlis.stream()
               .filter(u -> u.getId().equals(passive.getSourceId()))
               .findFirst()
-              .ifPresent(
-                  uliData -> {
-                    updateMetadata(passive, uliData);
-                  });
+              .ifPresent(uliData -> updateMetadata(passive, uliData));
           changed = true;
         }
       }
