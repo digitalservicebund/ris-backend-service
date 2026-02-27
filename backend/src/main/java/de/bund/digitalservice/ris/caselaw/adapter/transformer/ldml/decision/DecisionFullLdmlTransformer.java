@@ -345,6 +345,14 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     var shortTexts = decision.shortTexts();
     var decisionNames = nullSafeGet(shortTexts, ShortTexts::decisionNames);
     var headline = nullSafeGet(shortTexts, ShortTexts::headline);
+    var refersToTitelzeile = false;
+
+    if (isNotBlank(headline)) {
+      headline = removeWrappingBrackets(headline);
+      refersToTitelzeile = true;
+    } else {
+      headline = buildFallbackHeadline(decision);
+    }
 
     // Entscheidungsname
     if (!CollectionUtils.isEmpty(decisionNames)) {
@@ -365,9 +373,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
     }
 
     // Titelzeile
-    if (isNotBlank(headline)) {
-      buildHeadline(paragraphs, headline, htmlTransformer);
-    }
+    buildHeadline(paragraphs, headline, htmlTransformer, refersToTitelzeile);
 
     return Header.builder().paragraphs(paragraphs).build();
   }
@@ -375,6 +381,21 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
   @Override
   public boolean isFullLDML() {
     return true;
+  }
+
+  private String removeWrappingBrackets(String headline) {
+    headline = headline.strip();
+
+    boolean startsWithBracket = headline.startsWith("(");
+    boolean endsWithBracket = headline.endsWith(")");
+
+    if (startsWithBracket && endsWithBracket) {
+      String cleanHeadline = headline.substring(1, headline.length() - 1);
+      if (!cleanHeadline.contains("(") && !cleanHeadline.contains(")")) {
+        return cleanHeadline;
+      }
+    }
+    return headline;
   }
 
   private Sachgebiete buildSachgebiete(ContentRelatedIndexing contentRelatedIndexing) {

@@ -54,6 +54,8 @@ public class DecisionReducedLdmlTransformer extends DecisionCommonLdmlTransforme
 
     paragraphs = buildCommonHeader(decision, paragraphs);
 
+    buildHeadline(paragraphs, buildFallbackHeadline(decision), htmlTransformer, false);
+
     return Header.builder().paragraphs(paragraphs).build();
   }
 

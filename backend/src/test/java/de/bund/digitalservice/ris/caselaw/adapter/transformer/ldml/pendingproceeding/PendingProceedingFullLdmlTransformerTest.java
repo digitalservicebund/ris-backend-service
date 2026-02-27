@@ -140,7 +140,7 @@ class PendingProceedingFullLdmlTransformerTest {
             <akn:p>Mitteilungsdatum: <akn:docDate date="2020-01-01"refersTo="#mitteilungsdatum">01.01.2020</akn:docDate></akn:p>
             <akn:p>Gericht:<akn:courtType refersTo="#gericht">courtType courtLocation</akn:courtType></akn:p>
             <akn:p>Dokumenttyp:<akn:doc Type refersTo="#dokumenttyp">Anhängiges Verfahren</akn:docType></akn:p>
-            <akn:p>Titelzeile:<akn:shortTitle refersTo="#titelzeile">
+            <akn:p>Kurztitel:<akn:shortTitle refersTo="#titelzeile">
               <akn:embeddedStructure>
                 <akn:p alternativeTo="textWrapper">Hello</akn:p><akn:p>paragraph</akn:p><akn:p alternativeTo="textWrapper">world!</akn:p>
               </akn:embeddedStructure>
@@ -155,6 +155,38 @@ class PendingProceedingFullLdmlTransformerTest {
                     .headline("Hello<p> paragraph</p> world!")
                     .legalIssue("legal issue")
                     .build())
+            .build();
+
+    CaseLawLdml ldml = transformer.transformToLdml(otherLongTextCaseLaw);
+
+    assertThat(ldml).isNotNull();
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+    assertThat(fileContent).isPresent();
+    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+        .contains(StringUtils.deleteWhitespace(expected));
+  }
+
+  @Test
+  @DisplayName("Header without Titelzeile (fallback)")
+  void testTransform_withFallbackShortTitle() {
+    String expected =
+        """
+          <akn:header>
+            <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">Aktenzeichen</akn:docNumber></akn:p>
+            <akn:p>Mitteilungsdatum: <akn:docDate date="2020-01-01"refersTo="#mitteilungsdatum">01.01.2020</akn:docDate></akn:p>
+            <akn:p>Gericht:<akn:courtType refersTo="#gericht">courtType courtLocation</akn:courtType></akn:p>
+            <akn:p>Dokumenttyp:<akn:doc Type refersTo="#dokumenttyp">Anhängiges Verfahren</akn:docType></akn:p>
+            <akn:p>Kurztitel: <akn:shortTitle>
+               <akn:embeddedStructure>
+                  <akn:p alternativeTo="textWrapper">courtType courtLocation, 01.01.2020, Aktenzeichen</akn:p>
+               </akn:embeddedStructure>
+              </akn:shortTitle>
+             </akn:p>
+          </akn:header>
+        """;
+    PendingProceeding otherLongTextCaseLaw =
+        testDocumentUnit.toBuilder()
+            .shortTexts(PendingProceedingShortTexts.builder().legalIssue("legal issue").build())
             .build();
 
     CaseLawLdml ldml = transformer.transformToLdml(otherLongTextCaseLaw);

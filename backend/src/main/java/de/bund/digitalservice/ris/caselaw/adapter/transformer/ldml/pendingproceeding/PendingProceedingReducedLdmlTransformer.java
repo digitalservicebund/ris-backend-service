@@ -39,7 +39,11 @@ public class PendingProceedingReducedLdmlTransformer
   @Override
   protected Header buildHeader(PendingProceeding pendingProceeding) {
     List<Paragraph> paragraphs = new ArrayList<>();
+
     paragraphs = buildCommonHeader(pendingProceeding, paragraphs);
+
+    buildHeadline(paragraphs, buildFallbackHeadline(pendingProceeding), htmlTransformer, false);
+
     return Header.builder().paragraphs(paragraphs).build();
   }
 

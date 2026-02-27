@@ -157,10 +157,15 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
     paragraphs = buildCommonHeader(pendingProceeding, paragraphs);
     var shortTexts = pendingProceeding.shortTexts();
     var headline = nullSafeGet(shortTexts, PendingProceedingShortTexts::headline);
+    var refersToTitelzeile = false;
 
     if (isNotBlank(headline)) {
-      buildHeadline(paragraphs, headline, htmlTransformer);
+      refersToTitelzeile = true;
+    } else {
+      headline = buildFallbackHeadline(pendingProceeding);
     }
+
+    buildHeadline(paragraphs, headline, htmlTransformer, refersToTitelzeile);
 
     return Header.builder().paragraphs(paragraphs).build();
   }
