@@ -41,13 +41,7 @@ public class UliPassiveCitationSyncJob {
 
       int successCount = 0;
       for (String docNumber : updatedDocNumbers) {
-        try {
-          portalPublicationService.publishDocumentationUnit(docNumber);
-          log.debug("Successfully republished {} due to ULI sync", docNumber);
-          successCount++;
-        } catch (Exception e) {
-          log.error("Failed to republish {} after ULI sync", docNumber, e);
-        }
+        successCount = publishAndIncrementSuccessCount(docNumber, successCount);
       }
 
       log.info(
@@ -58,5 +52,16 @@ public class UliPassiveCitationSyncJob {
     } catch (Exception e) {
       log.error("Critical error during ULI Passive Citation Sync Job", e);
     }
+  }
+
+  private int publishAndIncrementSuccessCount(String docNumber, int successCount) {
+    try {
+      portalPublicationService.publishDocumentationUnit(docNumber);
+      log.debug("Successfully republished {} due to ULI sync", docNumber);
+      successCount++;
+    } catch (Exception e) {
+      log.error("Failed to republish {} after ULI sync", docNumber, e);
+    }
+    return successCount;
   }
 }
