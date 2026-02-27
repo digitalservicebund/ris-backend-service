@@ -105,7 +105,7 @@
     "autoprefixer": "^10.4.24",
     "axe-playwright": "^2.2.2",
     "axios-mock-adapter": "^2.1.0",
-    "eslint": "^9.39.2",
+    "eslint": "^10.0.2",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jest-dom": "^5.5.0",
