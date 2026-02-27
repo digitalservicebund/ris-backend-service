@@ -1,40 +1,73 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.Notation;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
+import de.bund.digitalservice.ris.caselaw.domain.AbuseFee;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.Addressee;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Correction;
+import de.bund.digitalservice.ris.caselaw.domain.CorrectionType;
+import de.bund.digitalservice.ris.caselaw.domain.CountryOfOrigin;
+import de.bund.digitalservice.ris.caselaw.domain.CurrencyCode;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.Definition;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
+import de.bund.digitalservice.ris.caselaw.domain.IncomeType;
 import de.bund.digitalservice.ris.caselaw.domain.LanguageCode;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
+import de.bund.digitalservice.ris.caselaw.domain.ObjectValue;
+import de.bund.digitalservice.ris.caselaw.domain.OriginOfTranslation;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
+import de.bund.digitalservice.ris.caselaw.domain.ProceedingType;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedPendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.TranslationType;
+import de.bund.digitalservice.ris.caselaw.domain.TypeOfIncome;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.Appeal;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealStatus;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.AppealWithdrawal;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.Appellant;
+import de.bund.digitalservice.ris.caselaw.domain.appeal.PkhPlaintiff;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.CourtBranchLocation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Year;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -50,6 +83,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 @ExtendWith(MockitoExtension.class)
 class DecisionReducedLdmlTransformerTest {
@@ -78,10 +113,9 @@ class DecisionReducedLdmlTransformerTest {
     // Assert
     Assertions.assertNotNull(ldml);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    Assertions.assertTrue(fileContent.isPresent());
-    Assertions.assertTrue(
-        StringUtils.deleteWhitespace(fileContent.get())
-            .contains(StringUtils.deleteWhitespace(expected)));
+    assertThat(fileContent).isPresent();
+    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+        .contains(StringUtils.deleteWhitespace(expected));
   }
 
   @ParameterizedTest(name = "{0}")
@@ -100,144 +134,10 @@ class DecisionReducedLdmlTransformerTest {
   }
 
   @Test
-  void testEntireLdml() {
+  void testEntireLdml() throws Exception {
     // Arrange
-    var expected =
-        String.format(
-            """
-                <?xml version="1.0" encoding="utf-8"?>
-                <akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/WD17"
-                                xmlns:ris="http://example.com/0.1/"
-                                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/WD17 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/csprd02/part2-specs/schemas/akomantoso30.xsd">
-                   <akn:judgment name="attributsemantik-noch-undefiniert">
-                      <akn:meta>
-                         <akn:identification source="attributsemantik-noch-undefiniert">
-                            <akn:FRBRWork>
-                               <akn:FRBRthis value="YYTestDoc0013"/>
-                               <akn:FRBRuri value="YYTestDoc0013"/>
-                               <akn:FRBRalias name="uebergreifende-id" value="%s"/>
-                               <akn:FRBRalias name="ecli" value="ecli test"/>
-                               <akn:FRBRalias name="celex" value="celex test"/>
-                               <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
-                               <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-                               <akn:FRBRcountry value="de"/>
-                            </akn:FRBRWork>
-                            <akn:FRBRExpression>
-                               <akn:FRBRthis value="YYTestDoc0013/dokument"/>
-                               <akn:FRBRuri value="YYTestDoc0013/dokument"/>
-                               <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
-                               <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-                               <akn:FRBRlanguage language="de"/>
-                            </akn:FRBRExpression>
-                            <akn:FRBRManifestation>
-                               <akn:FRBRthis value="YYTestDoc0013/dokument.xml"/>
-                               <akn:FRBRuri value="YYTestDoc0013/dokument.xml"/>
-                               <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
-                               <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-                            </akn:FRBRManifestation>
-                         </akn:identification>
-                         <akn:proprietary source="attributsemantik-noch-undefiniert">
-                            <ris:meta>
-                               <ris:previousDecisions>
-                                  <ris:previousDecision date="2020-01-01">
-                                     <ris:documentNumber>previous decision document number 1</ris:documentNumber>
-                                     <ris:fileNumber>previous decision file number</ris:fileNumber>
-                                     <ris:courtType>previous decision court type</ris:courtType>
-                                  </ris:previousDecision>
-                                  <ris:previousDecision date="2020-01-01">
-                                     <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                                     <ris:fileNumber>previous decision file number</ris:fileNumber>
-                                     <ris:courtType>previous decision court type</ris:courtType>
-                                  </ris:previousDecision>
-                               </ris:previousDecisions>
-                               <ris:ensuingDecisions>
-                                  <ris:ensuingDecision date="2022-10-01">
-                                     <ris:documentNumber>ensuing decision document number 1</ris:documentNumber>
-                                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                                     <ris:courtType>ensuing decision court type</ris:courtType>
-                                  </ris:ensuingDecision>
-                                  <ris:ensuingDecision date="2022-10-01">
-                                     <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                                     <ris:courtType>ensuing decision court type</ris:courtType>
-                                  </ris:ensuingDecision>
-                               </ris:ensuingDecisions>
-                               <ris:fileNumbers>
-                                  <ris:fileNumber>fileNumber test</ris:fileNumber>
-                               </ris:fileNumbers>
-                               <ris:documentType>documentType test</ris:documentType>
-                               <ris:courtLocation>courtLocation test</ris:courtLocation>
-                               <ris:courtType>courtType test</ris:courtType>
-                               <ris:legalForces>
-                                  <ris:legalForce>legalForce test</ris:legalForce>
-                               </ris:legalForces>
-                               <ris:judicialBody>appraisalBody test</ris:judicialBody>
-                               <ris:foreignLanguageVersions>
-                                  <ris:foreignLanguageVersion>
-                                     <akn:FRBRlanguage language="en"/>
-                                     <akn:documentRef href="https://ihre-url-zur-englischen-übersetzung" showAs="Englisch"/>
-                                  </ris:foreignLanguageVersion>
-                                  <ris:foreignLanguageVersion>
-                                     <akn:FRBRlanguage language="fr"/>
-                                     <akn:documentRef href="https://ihre-url-zur-französischen-übersetzung"
-                                                      showAs="Französisch"/>
-                                  </ris:foreignLanguageVersion>
-                               </ris:foreignLanguageVersions>
-                            </ris:meta>
-                         </akn:proprietary>
-                      </akn:meta>
-                      <akn:header>
-                         <akn:p>headline test</akn:p>
-                      </akn:header>
-                      <akn:judgmentBody>
-                         <akn:motivation>
-                            <akn:p>guidingPrinciple test</akn:p>
-                         </akn:motivation>
-                         <akn:introduction>
-                            <akn:block name="Gliederung">
-                               <akn:embeddedStructure>
-                                  <akn:p>outline test</akn:p>
-                               </akn:embeddedStructure>
-                            </akn:block>
-                            <akn:block name="Tenor">
-                               <akn:embeddedStructure>
-                                  <akn:p>tenor test</akn:p>
-                               </akn:embeddedStructure>
-                            </akn:block>
-                         </akn:introduction>
-                         <akn:background>
-                            <akn:p>caseFacts test</akn:p>
-                         </akn:background>
-                         <akn:decision>
-                            <akn:block name="Entscheidungsgründe">
-                               <akn:embeddedStructure>
-                                  <akn:p>decisionGrounds test</akn:p>
-                               </akn:embeddedStructure>
-                            </akn:block>
-                            <akn:block name="Gründe">
-                               <akn:embeddedStructure>
-                                  <akn:p>grounds test</akn:p>
-                               </akn:embeddedStructure>
-                            </akn:block>
-                            <akn:block name="Sonstiger Langtext">
-                               <akn:embeddedStructure>
-                                  <akn:p>otherLongText test</akn:p>
-                               </akn:embeddedStructure>
-                            </akn:block>
-                            <akn:block name="Abweichende Meinung">
-                               <akn:opinion>
-                                  <akn:embeddedStructure>
-                                     <akn:p>dissenting test</akn:p>
-                                  </akn:embeddedStructure>
-                               </akn:opinion>
-                            </akn:block>
-                         </akn:decision>
-                      </akn:judgmentBody>
-                   </akn:judgment>
-                </akn:akomaNtoso>
-                """,
-            documentationUnitId);
+    Path expectedFilePath = Paths.get("src/test/resources/testdata/decision_reduced_ldml.xml");
+    String expected = Files.readString(expectedFilePath, StandardCharsets.UTF_8);
 
     // Act
     CaseLawLdml ldml = subject.transformToLdml(testDocumentUnit);
@@ -246,14 +146,31 @@ class DecisionReducedLdmlTransformerTest {
     Assertions.assertNotNull(ldml);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     Assertions.assertTrue(fileContent.isPresent());
-    Assertions.assertEquals(expected, fileContent.get());
+
+    Diff diff =
+        DiffBuilder.compare(expected)
+            .withTest(fileContent.get())
+            .withDifferenceEvaluator(TestUtils.ignoreAttributeEvaluator)
+            .ignoreWhitespace()
+            .checkForIdentical()
+            .build();
+
+    if (diff.hasDifferences()) {
+      StringBuilder differences = new StringBuilder();
+      diff.getDifferences().forEach(d -> differences.append(d.toString()).append("\n"));
+      Assertions.fail("XMLs differ:\n" + differences);
+    }
   }
 
   private static void createTestDocumentationUnit() {
     PreviousDecision previousDecision1 =
         PreviousDecision.builder()
             .decisionDate(LocalDate.of(2020, 1, 1))
-            .court(Court.builder().type("previous decision court type").build())
+            .court(
+                Court.builder()
+                    .type("previous decision court type")
+                    .location("previous decision court location")
+                    .build())
             .documentType(DocumentType.builder().label("previous decision document type").build())
             .fileNumber("previous decision file number")
             .documentNumber("previous decision document number 1")
@@ -271,10 +188,15 @@ class DecisionReducedLdmlTransformerTest {
             .pending(true)
             .build();
     EnsuingDecision ensuingDecision2 =
-        ensuingDecision1.toBuilder().documentNumber("previous decision document number 2").build();
+        ensuingDecision1.toBuilder()
+            .documentNumber("ensuing decision document number 2")
+            .pending(true)
+            .note("ensuing decision note")
+            .build();
 
     testDocumentUnit =
-        Decision.builder()
+        // Use empty DTO as basis as it creates empty lists for everything.
+        DecisionTransformer.transformToDomain(new DecisionDTO()).toBuilder()
             .uuid(documentationUnitId)
             .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
             .note("note test")
@@ -283,20 +205,23 @@ class DecisionReducedLdmlTransformerTest {
                     .ecli("ecli test")
                     .celexNumber("celex test")
                     .documentationOffice(
-                        DocumentationOffice.builder()
-                            .abbreviation("documentationOffice test")
-                            .build())
+                        DocumentationOffice.builder().abbreviation("documentationOffice").build())
                     .creatingDocOffice(
                         DocumentationOffice.builder()
-                            .abbreviation("creatingDocumentationOffice test")
+                            .abbreviation("creatingDocumentationOffice")
                             .build())
                     .court(
                         Court.builder()
+                            .isSuperiorCourt(false)
+                            .isForeignCourt(false)
                             .label("courtLabel test")
-                            .type("courtType test")
-                            .location("courtLocation test")
-                            .regions(List.of("region test"))
+                            .type("courtType")
+                            .jurisdictionType("jurisdictionType")
+                            .location("courtLocation")
+                            .regions(List.of("NW"))
                             .build())
+                    .courtBranchLocation(
+                        CourtBranchLocation.builder().value("court branch location").build())
                     .sources(
                         List.of(
                             Source.builder()
@@ -312,12 +237,10 @@ class DecisionReducedLdmlTransformerTest {
                     .procedure(Procedure.builder().label("procedure test").build())
                     .previousProcedures(List.of("previous procedure test"))
                     .documentationOffice(
-                        DocumentationOffice.builder()
-                            .abbreviation("documentationOffice test")
-                            .build())
+                        DocumentationOffice.builder().abbreviation("documentationOffice").build())
                     .creatingDocOffice(
                         DocumentationOffice.builder()
-                            .abbreviation("documentationOffice test")
+                            .abbreviation("creatingDocumentationOffice")
                             .build())
                     .previousProcedures(List.of("previous procedure test"))
                     .procedure(Procedure.builder().label("procedure test").build())
@@ -343,8 +266,24 @@ class DecisionReducedLdmlTransformerTest {
                     .participatingJudges(
                         List.of(
                             ParticipatingJudge.builder()
-                                .name("participating judge test")
-                                .referencedOpinions("referenced opinions test")
+                                .name("Dr. Phil. Max Mustermann")
+                                .referencedOpinions("referenced opinions test 1")
+                                .build(),
+                            ParticipatingJudge.builder()
+                                .name("Richterin Maxima Mustermann")
+                                .referencedOpinions("referenced opinions test 2")
+                                .build()))
+                    .corrections(
+                        List.of(
+                            Correction.builder()
+                                .type(CorrectionType.BERICHTIGUNGSBESCHLUSS)
+                                .build(),
+                            Correction.builder()
+                                .type(CorrectionType.SCHREIBFEHLERBERICHTIGUNG)
+                                .description("Hauffen -> Haufen")
+                                .date(LocalDate.of(2020, 1, 20))
+                                .borderNumbers(List.of(1L, 3L))
+                                .content("<p>Ersetzen von 'Hauffen' mit 'Haufen'</p>")
                                 .build()))
                     .build())
             .shortTexts(
@@ -364,7 +303,12 @@ class DecisionReducedLdmlTransformerTest {
                                 .build()))
                     .keywords(List.of("keyword test"))
                     .fieldsOfLaw(
-                        List.of(FieldOfLaw.builder().identifier("fieldOfLaw test").build()))
+                        List.of(
+                            FieldOfLaw.builder()
+                                .identifier("AR-01-01-01")
+                                .notation(Notation.NEW.toString())
+                                .text("Verschulden bei Vertragsschluss (culpa in contrahendo)")
+                                .build()))
                     .norms(
                         List.of(
                             NormReference.builder()
@@ -372,17 +316,58 @@ class DecisionReducedLdmlTransformerTest {
                                     List.of(
                                         SingleNorm.builder()
                                             .singleNorm("singleNorm test")
+                                            .dateOfRelevance("2020")
+                                            .dateOfVersion(LocalDate.of(2021, 2, 5))
                                             .legalForce(
                                                 LegalForce.builder()
+                                                    .region(
+                                                        Region.builder()
+                                                            .code("legalForce region code")
+                                                            .longText("legalForce region longText")
+                                                            .build())
                                                     .type(
                                                         LegalForceType.builder()
-                                                            .label("legalForce test")
+                                                            .label("legalForceType label")
+                                                            .abbreviation(
+                                                                "legalForceType abbreviation")
                                                             .build())
                                                     .build())
+                                            .build(),
+                                        SingleNorm.builder()
+                                            .singleNorm("singleNorm 2 test")
+                                            .dateOfRelevance("2022")
+                                            .dateOfVersion(LocalDate.of(2022, 3, 6))
                                             .build()))
                                 .normAbbreviation(
                                     NormAbbreviation.builder()
                                         .abbreviation("normReference test")
+                                        .build())
+                                .build(),
+                            NormReference.builder()
+                                .normAbbreviation(
+                                    NormAbbreviation.builder()
+                                        .abbreviation("normReference without SingleNorms")
+                                        .decisionDate(
+                                            LocalDate.of(2019, 4, 7)
+                                                .atStartOfDay()
+                                                .atZone(ZoneId.of("Europe/Berlin"))
+                                                .toInstant())
+                                        .documentId(123L)
+                                        .documentNumber("KORE12345")
+                                        .documentTypes(
+                                            List.of(
+                                                DocumentType.builder()
+                                                    .label("documentType label")
+                                                    .build()))
+                                        .source("Source")
+                                        .officialLongTitle("officialLongTitle")
+                                        .officialShortTitle("officialShortTitle")
+                                        .officialLetterAbbreviation("officialLetterAbbreviation")
+                                        .region(
+                                            Region.builder()
+                                                .code("region code")
+                                                .longText("region longtext")
+                                                .build())
                                         .build())
                                 .build()))
                     .jobProfiles(List.of("jobProfile test"))
@@ -401,6 +386,7 @@ class DecisionReducedLdmlTransformerTest {
                                         .id(UUID.randomUUID())
                                         .label("Englisch")
                                         .isoCode("en")
+                                        .isoCode3Letters("eng")
                                         .build())
                                 .link("https://ihre-url-zur-englischen-übersetzung")
                                 .build(),
@@ -411,8 +397,25 @@ class DecisionReducedLdmlTransformerTest {
                                         .id(UUID.randomUUID())
                                         .label("Französisch")
                                         .isoCode("fr")
+                                        .isoCode3Letters("fra")
                                         .build())
                                 .link("https://ihre-url-zur-französischen-übersetzung")
+                                .build()))
+                    .originOfTranslations(
+                        List.of(
+                            OriginOfTranslation.builder()
+                                .id(UUID.randomUUID())
+                                .languageCode(
+                                    LanguageCode.builder()
+                                        .id(UUID.randomUUID())
+                                        .label("Englisch")
+                                        .isoCode("en")
+                                        .isoCode3Letters("eng")
+                                        .build())
+                                .translators(List.of("Maxi Muster", "Ursel Meier"))
+                                .borderNumbers(List.of(2L))
+                                .urls(List.of("https://ihre-url-zur-englischen-übersetzung"))
+                                .translationType(TranslationType.AMTLICH)
                                 .build()))
                     .definitions(
                         List.of(
@@ -422,6 +425,110 @@ class DecisionReducedLdmlTransformerTest {
                                 .build(),
                             Definition.builder().definedTerm("Sachgesamtheit").build()))
                     .evsf("evsf test")
+                    .appealAdmission(
+                        AppealAdmission.builder().admitted(true).by(AppealAdmitter.FG).build())
+                    .appeal(
+                        Appeal.builder()
+                            .appellants(
+                                List.of(
+                                    Appellant.builder().value("Kläger").build(),
+                                    Appellant.builder().value("Beklagter").build()))
+                            .revisionPlaintiffStatuses(
+                                List.of(AppealStatus.builder().value("unzulässig").build()))
+                            .revisionDefendantStatuses(
+                                List.of(AppealStatus.builder().value("unzulässig").build()))
+                            .jointRevisionPlaintiffStatuses(
+                                List.of(AppealStatus.builder().value("unzulässig").build()))
+                            .jointRevisionDefendantStatuses(
+                                List.of(AppealStatus.builder().value("unzulässig").build()))
+                            .nzbPlaintiffStatuses(
+                                List.of(AppealStatus.builder().value("unzulässig").build()))
+                            .nzbDefendantStatuses(
+                                List.of(AppealStatus.builder().value("unzulässig").build()))
+                            .appealWithdrawal(AppealWithdrawal.JA)
+                            .pkhPlaintiff(PkhPlaintiff.NEIN)
+                            .build())
+                    .objectValues(
+                        List.of(
+                            ObjectValue.builder()
+                                .currencyCode(
+                                    CurrencyCode.builder()
+                                        .id(UUID.randomUUID())
+                                        .isoCode("EUR")
+                                        .label("Euro (EUR)")
+                                        .build())
+                                .amount(9635)
+                                .proceedingType(ProceedingType.ORGANSTREITVERFAHREN)
+                                .build()))
+                    .abuseFees(
+                        List.of(
+                            AbuseFee.builder()
+                                .currencyCode(
+                                    CurrencyCode.builder()
+                                        .id(UUID.randomUUID())
+                                        .isoCode("USD")
+                                        .label("Dollar (USD)")
+                                        .build())
+                                .amount(1234)
+                                .addressee(Addressee.BESCHWERDEFUEHRER_ANTRAGSTELLER)
+                                .build()))
+                    .countriesOfOrigin(
+                        List.of(
+                            CountryOfOrigin.builder()
+                                .id(UUID.fromString("8bab996b-3e44-46c5-b588-52d4189d3da9"))
+                                .legacyValue("legacy value")
+                                .build(),
+                            CountryOfOrigin.builder()
+                                .id(UUID.fromString("5b202af2-6f77-47e0-8a9b-64e652845240"))
+                                .country(
+                                    FieldOfLaw.builder()
+                                        .notation("RE-07-DEU")
+                                        .text("Deutschland")
+                                        .build())
+                                .fieldOfLaw(
+                                    FieldOfLaw.builder()
+                                        .notation("AR-01-01-01")
+                                        .text(
+                                            "Verschulden bei Vertragsschluss (culpa in contrahendo)")
+                                        .build())
+                                .build()))
+                    .relatedPendingProceedings(
+                        List.of(
+                            RelatedPendingProceeding.builder()
+                                .uuid(UUID.fromString("b7f4d567-1ee4-4e72-b6d4-a1e56c77815a"))
+                                .court(
+                                    Court.builder()
+                                        .type("AG")
+                                        .location("Aachen")
+                                        .jurisdictionType("Ordentliche Gerichtsbarkeit")
+                                        .label("AG Aachen")
+                                        .build())
+                                .decisionDate(LocalDate.of(2022, 1, 23))
+                                .documentNumber("XXRE011158825")
+                                .documentType(
+                                    DocumentType.builder().label("Anhängiges Verfahren").build())
+                                .fileNumber("VIa ZR 339/22")
+                                .build()))
+                    .incomeTypes(
+                        List.of(
+                            IncomeType.builder()
+                                .typeOfIncome(TypeOfIncome.ESTG)
+                                .terminology("terminology test")
+                                .build(),
+                            IncomeType.builder().typeOfIncome(TypeOfIncome.GEWSTG).build()))
+                    .nonApplicationNorms(
+                        List.of(
+                            NormReference.builder()
+                                .singleNorms(
+                                    List.of(
+                                        SingleNorm.builder()
+                                            .singleNorm("§ 30")
+                                            .dateOfRelevance("2020")
+                                            .dateOfVersion(LocalDate.of(2021, 2, 5))
+                                            .build()))
+                                .normAbbreviation(
+                                    NormAbbreviation.builder().abbreviation("SeefBgV").build())
+                                .build()))
                     .build())
             .previousDecisions(List.of(previousDecision1, previousDecision2))
             .ensuingDecisions(List.of(ensuingDecision1, ensuingDecision2))
@@ -457,295 +564,230 @@ class DecisionReducedLdmlTransformerTest {
         Arguments.of(
             "'court' (Gericht)",
             """
-                <ris:courtLocation>courtLocation test</ris:courtLocation>
-                <ris:courtType>courtType test</ris:courtType>
+                <ris:gericht domainTerm="Gericht"akn:refersTo="#gericht">
+                  <ris:gerichtstyp domainTerm="Gerichtstyp">courtType</ris:gerichtstyp>
+                  <ris:gerichtsort domainTerm="Gerichtsort">courtLocation</ris:gerichtsort>
+                  <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBodytest</ris:spruchkoerper>
+                </ris:gericht>
                """),
         Arguments.of(
             "'decisionDate' (Entscheidungsdatum)",
             """
-                <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
+                <akn:FRBRdate date="2020-01-01" name="Entscheidungsdatum"/>
                """),
         Arguments.of(
             "'documentType' (Dokumenttyp)",
             """
-                <ris:documentType>documentType test</ris:documentType>
+                <ris:dokumenttyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">documentType test</ris:dokumenttyp>
                """),
         Arguments.of(
             "'ecli'",
             """
-               <akn:FRBRalias name="ecli" value="ecli test"/>
+               <akn:FRBRalias name="ECLI" value="ecli test"/>
                """),
         Arguments.of(
             "'fileNumber' (Aktenzeichen)",
             """
-              <ris:fileNumbers>
-                 <ris:fileNumber>fileNumber test</ris:fileNumber>
-              </ris:fileNumbers>
-               """),
+              <ris:aktenzeichenListe domainTerm="Liste der Aktenzeichen">
+                <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">fileNumber test</ris:aktenzeichen>
+              </ris:aktenzeichenListe>
+              """),
         Arguments.of(
             "'appraisalBody/judicialBody' (Spruchkörper)",
             """
-                <ris:judicialBody>appraisalBody test</ris:judicialBody>
+                <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBody test</ris:spruchkoerper>
                """),
-        // Fixme: should be included -->
-        //        Arguments.of(
-        //            "'region' (Region)",
-        //            """
-        //                <ris:region>region test</ris:region>
-        //               """),
+        Arguments.of(
+            "'region' (Region)",
+            """
+            <ris:regionen domainTerm="Regionen">
+              <ris:region domainTerm="Region">NW</ris:region>
+            </ris:regionen>
+            """),
         // Normen -->
-        // Fixme: Add elements for single norm and norm abbreviation once they are also transformed
         Arguments.of(
             "'normReferences' (Normen)",
             """
-              <ris:legalForces>
-                 <ris:legalForce>legalForce test</ris:legalForce>
-              </ris:legalForces>
+               <akn:implicitReference ris:domainTerm="Norm">
+                  <ris:norm domainTerm="Norm">
+                     <ris:abkuerzung domainTerm="Abkürzung">normReference test</ris:abkuerzung>
+                     <ris:einzelnorm domainTerm="Einzelnorm">
+                        <ris:bezeichnung domainTerm="Bezeichnung">singleNorm test</ris:bezeichnung>
+                        <ris:fassungsdatum domainTerm="Fassungsdatum">2021-02-05</ris:fassungsdatum>
+                        <ris:jahr domainTerm="Jahr">2020</ris:jahr>
+                     </ris:einzelnorm>
+                     <ris:einzelnorm domainTerm="Einzelnorm">
+                        <ris:bezeichnung domainTerm="Bezeichnung">singleNorm 2 test</ris:bezeichnung>
+                        <ris:fassungsdatum domainTerm="Fassungsdatum">2022-03-06</ris:fassungsdatum>
+                        <ris:jahr domainTerm="Jahr">2022</ris:jahr>
+                     </ris:einzelnorm>
+                  </ris:norm>
                """),
         // PreviousDecisions -->
         Arguments.of(
             "'previousDecisions' (Vorgehende Entscheidungen)",
             """
-              <ris:previousDecisions>
-                  <ris:previousDecision date="2020-01-01">
-                     <ris:documentNumber>previous decision document number 1</ris:documentNumber>
-                     <ris:fileNumber>previous decision file number</ris:fileNumber>
-                     <ris:courtType>previous decision court type</ris:courtType>
-                  </ris:previousDecision>
-                  <ris:previousDecision date="2020-01-01">
-                     <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                     <ris:fileNumber>previous decision file number</ris:fileNumber>
-                     <ris:courtType>previous decision court type</ris:courtType>
-                  </ris:previousDecision>
-               </ris:previousDecisions>
-               """),
+                 <akn:implicitReference ris:domainTerm="Rechtszug">
+                     <ris:vorgehend domainTerm="Vorgehende Entscheidung">
+                         <ris:dokumenttyp domainTerm="Dokumenttyp">previous decision document type</ris:dokumenttyp>
+                         <ris:entscheidungsdatum domainTerm="Entscheidungsdatum">2020-01-01</ris:entscheidungsdatum>
+                         <ris:dokumentnummer domainTerm="Dokumentnummer">previous decision document number 1</ris:dokumentnummer>
+                         <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
+                         <ris:gericht domainTerm="Gericht">
+                             <ris:gerichtstyp domainTerm="Gerichtstyp">previous decision court type</ris:gerichtstyp>
+                             <ris:gerichtsort domainTerm="Gerichtsort">previous decision court location</ris:gerichtsort>
+                         </ris:gericht>
+                     </ris:vorgehend>
+                 </akn:implicitReference>
+                 <akn:implicitReference ris:domainTerm="Rechtszug">
+                     <ris:vorgehend domainTerm="Vorgehende Entscheidung">
+                         <ris:dokumenttyp domainTerm="Dokumenttyp">previous decision document type</ris:dokumenttyp>
+                         <ris:entscheidungsdatum domainTerm="Entscheidungsdatum">2020-01-01</ris:entscheidungsdatum>
+                         <ris:dokumentnummer domainTerm="Dokumentnummer">previous decision document number 2</ris:dokumentnummer>
+                         <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
+                         <ris:gericht domainTerm="Gericht">
+                             <ris:gerichtstyp domainTerm="Gerichtstyp">previous decision court type</ris:gerichtstyp>
+                             <ris:gerichtsort domainTerm="Gerichtsort">previous decision court location</ris:gerichtsort>
+                         </ris:gericht>
+                     </ris:vorgehend>
+                 </akn:implicitReference>
+                 """),
         // EnsuingDecisions -->
         Arguments.of(
             "'ensuingDecisions' (Nachgehende Entscheidungen)",
             """
-              <ris:ensuingDecisions>
-                  <ris:ensuingDecision date="2022-10-01">
-                     <ris:documentNumber>ensuing decision document number 1</ris:documentNumber>
-                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                     <ris:courtType>ensuing decision court type</ris:courtType>
-                  </ris:ensuingDecision>
-                  <ris:ensuingDecision date="2022-10-01">
-                     <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
-                     <ris:courtType>ensuing decision court type</ris:courtType>
-                  </ris:ensuingDecision>
-               </ris:ensuingDecisions>
-               """),
+                <akn:implicitReference ris:domainTerm="Rechtszug">
+                    <ris:nachgehend domainTerm="Nachgehende Entscheidung" art="anhängig">
+                        <ris:dokumenttyp domainTerm="Dokumenttyp">ensuing decision document type</ris:dokumenttyp>
+                        <ris:entscheidungsdatum domainTerm="Entscheidungsdatum">2022-10-01</ris:entscheidungsdatum>
+                        <ris:dokumentnummer domainTerm="Dokumentnummer">ensuing decision document number 1</ris:dokumentnummer>
+                        <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
+                        <ris:gericht domainTerm="Gericht">
+                            <ris:gerichtstyp domainTerm="Gerichtstyp">ensuing decision court type</ris:gerichtstyp>
+                        </ris:gericht>
+                    </ris:nachgehend>
+                </akn:implicitReference>
+                <akn:implicitReference ris:domainTerm="Rechtszug">
+                    <ris:nachgehend domainTerm="Nachgehende Entscheidung" art="anhängig">
+                        <ris:dokumenttyp domainTerm="Dokumenttyp">ensuing decision document type</ris:dokumenttyp>
+                        <ris:entscheidungsdatum domainTerm="Entscheidungsdatum">2022-10-01</ris:entscheidungsdatum>
+                        <ris:dokumentnummer domainTerm="Dokumentnummer">ensuing decision document number 2</ris:dokumentnummer>
+                        <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
+                        <ris:gericht domainTerm="Gericht">
+                            <ris:gerichtstyp domainTerm="Gerichtstyp">ensuing decision court type</ris:gerichtstyp>
+                        </ris:gericht>
+                        <ris:vermerk domainTerm="Vermerk">ensuing decision note</ris:vermerk>
+                    </ris:nachgehend>
+                </akn:implicitReference>
+                """),
         // LongTexts/Langtexte -->
         Arguments.of(
             "'dissentingOpinion' (Abweichende Meinung)",
             """
-                   <akn:block name="Abweichende Meinung">
-                      <akn:opinion>
-                         <akn:embeddedStructure>
-                            <akn:p>dissenting test</akn:p>
-                         </akn:embeddedStructure>
-                      </akn:opinion>
-                   </akn:block>
-                   """),
+              <akn:motivation ris:domainTerm="Abweichende Meinung">
+                  <akn:p>dissenting test</akn:p>
+                  <akn:block name="Mitwirkende Richter">
+                      <akn:opinion ris:domainTerm="Art der Mitwirkung" type="dissenting" by="#dr-phil-max-mustermann">referenced opinions test 1</akn:opinion>
+                      <akn:opinion ris:domainTerm="Art der Mitwirkung" type="dissenting" by="#richterin-maxima-mustermann">referenced opinions test 2</akn:opinion>
+                  </akn:block>
+              </akn:motivation>
+              """),
         Arguments.of(
             "'caseFacts' (Tatbestand)",
             """
-                <akn:background>
+                <akn:background ris:domainTerm="Tatbestand">
                   <akn:p>caseFacts test</akn:p>
                 </akn:background>
                """),
         Arguments.of(
             "'decisionGrounds/decisionReasons' (Entscheidungsgründe)",
             """
-              <akn:block name="Entscheidungsgründe">
-                 <akn:embeddedStructure>
-                    <akn:p>decisionGrounds test</akn:p>
-                 </akn:embeddedStructure>
-              </akn:block>
-               """),
+            <akn:motivation ris:domainTerm="Entscheidungsgründe">
+                <akn:p>decisionGrounds test</akn:p>
+            </akn:motivation>
+            """),
         Arguments.of(
             "'grounds/reasons' (Gründe)",
             """
-              <akn:block name="Gründe">
-                 <akn:embeddedStructure>
-                    <akn:p>grounds test</akn:p>
-                 </akn:embeddedStructure>
-              </akn:block>
-               """),
+            <akn:motivation ris:domainTerm="Gründe">
+                <akn:p>grounds test</akn:p>
+            </akn:motivation>
+            """),
         Arguments.of(
             "'otherLongText' (Sonstiger Langtext)",
             """
-               <akn:block name="Sonstiger Langtext">
-                 <akn:embeddedStructure>
-                    <akn:p>otherLongText test</akn:p>
-                 </akn:embeddedStructure>
-               </akn:block>
-               """),
+            <akn:motivation ris:domainTerm="Sonstiger Langtext">
+                <akn:p>otherLongText test</akn:p>
+            </akn:motivation>
+            """),
         Arguments.of(
             "'tenor' (Tenor)",
             """
-               <akn:block name="Tenor">
-                   <akn:embeddedStructure>
-                      <akn:p>tenor test</akn:p>
-                   </akn:embeddedStructure>
-                </akn:block>
-               """),
+            <akn:decision ris:domainTerm="Tenor">
+                <akn:p>tenor test</akn:p>
+            </akn:decision>
+            """),
         Arguments.of(
             "'outline' (Gliederung)'",
             """
-                <akn:block name="Gliederung">
-                    <akn:embeddedStructure>
-                        <akn:p>outline test</akn:p>
-                    </akn:embeddedStructure>
-                </akn:block>
-                """),
-        // Fixme: should be included -->
-        //        Arguments.of(
-        //            "'participatingJudges' (Mitwirkende Richter)",
-        //            """
-        //               <akn:introduction>
-        //                  <akn:block name="Mitwirkende Richter">
-        //                     <akn:embeddedStructure>
-        //                        <akn:p>participating judge test</akn:p>
-        //                     </akn:embeddedStructure>
-        //                  </akn:block>
-        //               </akn:introduction>
-        //               """),
-        // ShortTexts/Kurztexte -->
+            <akn:introduction ris:domainTerm="Gliederung">
+                <akn:p>outline test</akn:p>
+            </akn:introduction>
+            """),
         Arguments.of(
             "'guidingPrinciple' (Leitsatz)",
             """
-               <akn:motivation>
-                 <akn:p>guidingPrinciple test</akn:p>
-               </akn:motivation>
-               """),
+            <akn:introduction ris:domainTerm="Leitsatz">
+                <akn:p>guidingPrinciple test</akn:p>
+            </akn:introduction>
+            """),
         Arguments.of(
             "'headline' (Titelzeile)",
             """
                 <akn:header>
-                   <akn:p>headline test</akn:p>
+                   <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">fileNumber test</akn:docNumber>
+                   </akn:p>
+                   <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
+                   </akn:p>
+                   <akn:p>Gericht: <akn:courtType refersTo="#gericht">courtLabel test</akn:courtType>
+                   </akn:p>
+                   <akn:p>Dokumenttyp: <akn:docType refersTo="#dokumenttyp">documentType test</akn:docType>
+                   </akn:p>
+                  <akn:p>Kurztitel: <akn:shortTitle>
+                          <akn:embeddedStructure>
+                              <akn:p alternativeTo="textWrapper">courtLabel test, 01.01.2020, fileNumber test</akn:p>
+                          </akn:embeddedStructure>
+                      </akn:shortTitle>
+                  </akn:p>
                 </akn:header>
                """));
   }
 
   static Stream<Arguments> testCasesForExcludedAttributes() {
     return Stream.of(
-        Arguments.of(
-            "'decisionNames' (Entscheidungsnamen)",
-            """
-            <ris:decisionNames>
-               <ris:decisionNames>decisionNames test</ris:decisionNames>
-            </ris:decisionNames>
-               """),
-        Arguments.of(
-            "'keywords' (Schlagworte)",
-            """
-        <akn:classification source="attributsemantik-noch-undefiniert">
-            <akn:keyword dictionary="attributsemantik-noch-undefiniert"
-                         showAs="attributsemantik-noch-undefiniert"
-                         value="keyword test"/>
-         </akn:classification>
-            """),
-        Arguments.of(
-            "'headnote' (Orientierungssatz)",
-            """
-                    <akn:block name="Orientierungssatz">
-                       <akn:embeddedStructure>
-                          <akn:p>headNote test</akn:p>
-                       </akn:embeddedStructure>
-                    </akn:block>
-                    """),
-        Arguments.of(
-            "'inputType' (Eingangsart)",
-            """
-            inputType test
-            """),
-        Arguments.of(
-            "'legalEffect' (Rechtskraft)",
-            """
-                <ris:legalEffect>ja</ris:legalEffect>
-                """),
-        Arguments.of(
-            "'otherHeadNote' (Sonstiger Orientierungssatz)",
-            """
-                    <akn:block name="Sonstiger Orientierungssatz">
-                       <akn:embeddedStructure>
-                          <akn:p>otherHeadNote test</akn:p>
-                       </akn:embeddedStructure>
-                    </akn:block>
-                    """),
-        Arguments.of(
-            "'procedures' (Vorgänge)",
-            """
-            <ris:procedures>
-              <ris:procedure>previous procedure test</ris:procedure>
-           </ris:procedures>
-            """),
-        Arguments.of(
-            "'fieldsOfLaw' (Sachgebiete)",
-            """
-            <ris:fieldOfLaws/>
-            """),
-        Arguments.of(
-            "'source' (Quelle)",
-            """
-            sourceRawValue test
-            """),
-        Arguments.of(
-            "'documentationOffice' (Dokumentationsstelle)",
-            """
-            <ris:documentationOffice>documentationOffice test</ris:documentationOffice>
-            """),
+        Arguments.of("'decisionNames' (Entscheidungsnamen)", "ris:decisionNames"),
+        Arguments.of("'keywords' (Schlagworte)", "akn:keyword"),
+        Arguments.of("'headnote' (Orientierungssatz)", "headNote test"),
+        Arguments.of("'inputType' (Eingangsart)", "inputType test"),
+        Arguments.of("'legalEffect' (Rechtskraft)", "ris:legalEffect"),
+        Arguments.of("'otherHeadNote' (Sonstiger Orientierungssatz)", "otherHeadNote test"),
+        Arguments.of("'procedures' (Vorgänge)", "ris:procedures"),
+        Arguments.of("'fieldsOfLaw' (Sachgebiete)", "ris:fieldOfLaws"),
+        Arguments.of("'source' (Quelle)", "sourceRawValue test"),
+        Arguments.of("'documentationOffice' (Dokumentationsstelle)", "ris:documentationOffice"),
         Arguments.of(
             "'creatingDocumentationOffice' (erstellende Dokumentationsstelle)",
-            """
-            documentationOffice test
-            """),
+            "creatingDocumentationOffice"),
+        Arguments.of("'activeCitations' (Aktivzitierung)", "citation test"),
+        Arguments.of("'deviatingCourts' (Abweichende Gerichte)", "ris:deviatingCourts"),
+        Arguments.of("'deviatingDates' (Abweichende Entscheidungsdatum)", "ris:deviatingDates"),
+        Arguments.of("'deviatingEclis' (Abweichende Eclis)", "ris:deviatingEclis"),
         Arguments.of(
-            "'status' (Veröffentlichungsstatus)",
-            """
-                 <ris:publicationStatus>PUBLISHED</ris:publicationStatus>
-                """),
-        Arguments.of(
-            "'activeCitations' (Aktivzitierung)",
-            """
-                 citation test
-                """),
-        Arguments.of(
-            "'deviatingCourts' (Abweichende Gerichte)",
-            """
-              <ris:deviatingCourts>
-                <ris:deviatingCourt>deviating court</ris:deviatingCourt>
-              </ris:deviatingCourts>
-            """),
-        Arguments.of(
-            "'deviatingDates' (Abweichende Entscheidungsdatum)",
-            """
-              <ris:deviatingDates>
-                  <ris:deviatingDate>2010-05-12</ris:deviatingDate>
-               </ris:deviatingDates>
-            """),
-        Arguments.of(
-            "'deviatingEclis' (Abweichende Eclis)",
-            """
-              <ris:deviatingEclis>
-                  <ris:deviatingEcli>deviating ecli test</ris:deviatingEcli>
-               </ris:deviatingEclis>
-            """),
-        Arguments.of(
-            "'deviatingFileNumbers' (Abweichende Aktenzeichen)",
-            """
-              <ris:deviatingFileNumbers>
-                  <ris:deviatingFileNumber>deviating fileNumber</ris:deviatingFileNumber>
-               </ris:deviatingFileNumbers>
-            """),
+            "'deviatingFileNumbers' (Abweichende Aktenzeichen)", "ris:deviatingFileNumbers"),
         Arguments.of(
             "'deviatingDocumentNumbers' (Abweichende Dokumentnummer)",
-            """
-              <ris:deviatingDocumentNumbers>
-                  <ris:deviatingDocumentNumber>deviating document number test</ris:deviatingDocumentNumber>
-               </ris:deviatingDocumentNumbers>
-            """));
+            "ris:deviatingDocumentNumbers"),
+        Arguments.of("'berichtigung' (Berichtigungen)", "ris:berichtigungen"),
+        Arguments.of("'herkunftslaender' (Herkunftsländer)", "ris:herkunftslaender"));
   }
 }

@@ -1,48 +1,49 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
-import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
-import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validate;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNotNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.DocumentRef;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.ForeignLanguageVersion;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrAlias;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrAuthor;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrCountry;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrDate;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrElement;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrLanguage;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Identification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JudgmentBody;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Opinions;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RelatedDecision;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Block;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Introduction;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.JudgmentBody;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Motivation;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Opinion;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Analysis;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.DokumentarischeKurztexte;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.ImplicitReference;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.OtherAnalysis;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.OtherReferences;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Rechtszug;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumentationsstelle;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumenttyp;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Gericht;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Regionen;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
-import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
+import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
-import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Abstract base class for transforming decisions into LDML case law format. Provides common
@@ -60,6 +61,10 @@ public abstract class DecisionCommonLdmlTransformer
 
   public CaseLawLdml transformToLdml(Decision decision) {
     try {
+      validateCoreData(decision);
+      validateNotNull(decision.documentNumber(), "Unique identifier missing");
+      validateNotNull(decision.uuid(), "Caselaw UUID missing");
+
       return CaseLawLdml.builder().judgment(buildJudgment(decision)).build();
     } catch (ValidationException e) {
       if (e.getMessage().contains("Empty judgment body")) {
@@ -70,252 +75,351 @@ public abstract class DecisionCommonLdmlTransformer
   }
 
   private Judgment buildJudgment(Decision decision) throws ValidationException {
-    return Judgment.builder()
-        .header(buildHeader(decision))
-        .meta(buildMeta(decision))
-        .judgmentBody(buildJudgmentBody(decision))
-        .build();
+    var judgmentBuilder =
+        Judgment.builder()
+            .header(buildHeader(decision))
+            .meta(buildMeta(decision))
+            .judgmentBody(buildJudgmentBody(decision));
+    if (decision.coreData() != null && decision.coreData().documentType() != null) {
+      judgmentBuilder.name(decision.coreData().documentType().label());
+    }
+    return judgmentBuilder.build();
   }
 
-  private JaxbHtml buildHeader(Decision decision) throws ValidationException {
-    validateCoreData(decision);
-    var coreData = decision.coreData();
-    String fallbackTitle =
-        "<p>"
-            + coreData.court().label()
-            + ", "
-            + DateUtils.toFormattedDateString(coreData.decisionDate())
-            + ", "
-            + coreData.fileNumbers().getFirst()
-            + "</p>";
-    String title =
-        ObjectUtils.getIfNull(
-            nullSafeGet(decision.shortTexts(), ShortTexts::headline), fallbackTitle);
+  protected abstract Header buildHeader(Decision decision);
 
-    validateNotNull(title, "Title missing");
-    return JaxbHtml.build(htmlTransformer.htmlStringToObjectList(title));
+  @Nullable
+  protected Analysis buildAnalysis(Decision decision) {
+    OtherAnalysis otherAnalysis = buildOtherAnalysis(decision);
+    OtherReferences otherReferences = buildOtherReferences(decision);
+
+    Analysis analysis =
+        Analysis.builder().otherAnalysis(otherAnalysis).otherReferences(otherReferences).build();
+    if (!analysis.isEmpty()) {
+      return analysis;
+    } else {
+      return null;
+    }
   }
 
-  protected abstract Meta buildMeta(Decision decision) throws ValidationException;
+  @Nullable
+  protected OtherReferences buildOtherReferences(Decision decision) {
+    List<ImplicitReference> implicitReferences = buildImplicitReferences(decision);
+    if (!implicitReferences.isEmpty()) {
+      return OtherReferences.builder().implicitReferences(implicitReferences).build();
+    } else {
+      return null;
+    }
+  }
 
-  protected abstract AknMultipleBlock buildIntroduction(Decision decision);
+  @Nullable
+  protected OtherAnalysis buildOtherAnalysis(Decision decision) {
+    DokumentarischeKurztexte kurztexte = buildKurztexte(decision);
 
+    OtherAnalysis otherAnalysis =
+        OtherAnalysis.builder().dokumentarischeKurztexte(kurztexte).build();
+    if (!otherAnalysis.isEmpty()) {
+      return otherAnalysis;
+    } else {
+      return null;
+    }
+  }
+
+  @Nullable
+  protected abstract DokumentarischeKurztexte buildKurztexte(Decision decision);
+
+  protected DokumentarischeKurztexte.DokumentarischeKurztexteBuilder getCommonKurztexteBuilder(
+      Decision decision) {
+    var builder = DokumentarischeKurztexte.builder();
+
+    ShortTexts shortTexts = decision.shortTexts();
+    // Titelzeile
+    if (shortTexts != null && isNotBlank(shortTexts.headline())) {
+      var titelzeile =
+          JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.headline()));
+      titelzeile.setDomainTerm("Titelzeile");
+      titelzeile.setEId("titelzeile");
+      builder.titelzeile(titelzeile);
+    }
+
+    return builder;
+  }
+
+  protected abstract Meta buildMeta(Decision decision);
+
+  @Nonnull
+  protected List<ImplicitReference> buildImplicitReferences(Decision decision) {
+    return Stream.concat(
+            buildCommonImplicitReferences(decision).stream(),
+            buildNachgehendeEntscheidungen(decision).stream())
+        .toList();
+  }
+
+  @Nonnull
+  private List<ImplicitReference> buildNachgehendeEntscheidungen(Decision decision) {
+    List<ImplicitReference> nachgehendeEntscheidungen = new ArrayList<>();
+    var ensuingDecisions = decision.ensuingDecisions();
+    if (ensuingDecisions != null) {
+      for (EnsuingDecision ensuingDecision : ensuingDecisions) {
+        if (ensuingDecision == null) continue;
+
+        var nachgehendBuilder = Rechtszug.Nachgehend.builder();
+        buildCaselawReference(ensuingDecision, nachgehendBuilder);
+
+        if (isNotBlank(ensuingDecision.getNote())) {
+          nachgehendBuilder.vermerk(
+              Rechtszug.Vermerk.builder().value(ensuingDecision.getNote()).build());
+        }
+
+        nachgehendBuilder.art(
+            ensuingDecision.isPending()
+                ? Rechtszug.ArtDerNachgehendenEntscheidung.ANHAENGIG
+                : Rechtszug.ArtDerNachgehendenEntscheidung.NACHGEHEND);
+
+        nachgehendeEntscheidungen.add(
+            ImplicitReference.builder()
+                .domainTerm("Rechtszug")
+                .nachgehend(nachgehendBuilder.build())
+                .build());
+      }
+    }
+    return nachgehendeEntscheidungen;
+  }
+
+  @SuppressWarnings("java:S3776")
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(Decision decision) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
 
-    if (decision.previousDecisions() != null) {
-      applyIfNotEmpty(
-          buildRelatedDecisions(decision.previousDecisions()), builder::previousDecision);
-    }
-    if (decision.ensuingDecisions() != null) {
-      applyIfNotEmpty(buildRelatedDecisions(decision.ensuingDecisions()), builder::ensuingDecision);
-    }
+    var coreData = decision.coreData();
+    if (coreData != null) {
+      // Dokumenttyp
+      builder.dokumenttyp(Dokumenttyp.builder().value(coreData.documentType().label()).build());
 
-    if (decision.contentRelatedIndexing() != null
-        && decision.contentRelatedIndexing().norms() != null) {
-      applyIfNotEmpty(
-          decision.contentRelatedIndexing().norms().stream()
-              .flatMap(normReference -> normReference.singleNorms().stream())
-              .filter(Objects::nonNull)
-              .map(
-                  singleNorm -> {
-                    var type = nullSafeGet(singleNorm.legalForce(), LegalForce::type);
-                    return type != null ? type.label() : null;
-                  })
-              .filter(Objects::nonNull)
-              .toList(),
-          builder::legalForce);
-    }
-    if (decision.contentRelatedIndexing() != null
-        && decision.contentRelatedIndexing().foreignLanguageVersions() != null) {
-      applyIfNotEmpty(
-          decision.contentRelatedIndexing().foreignLanguageVersions().stream()
-              .map(
-                  foreignLanguageVersion ->
-                      ForeignLanguageVersion.builder()
-                          .documentRef(
-                              DocumentRef.builder()
-                                  .href(foreignLanguageVersion.link())
-                                  .showAs(foreignLanguageVersion.languageCode().label())
-                                  .build())
-                          .frbrLanguage(
-                              new FrbrLanguage(foreignLanguageVersion.languageCode().isoCode()))
-                          .build())
-              .toList(),
-          builder::foreignLanguageVersions);
+      // Gericht
+      Court court = coreData.court();
+      if (court != null) {
+        Gericht.GerichtBuilder gerichtBuilder =
+            buildGericht(court).toBuilder().refersTo("#gericht");
+        if (isNotBlank(coreData.appraisalBody())) {
+          gerichtBuilder.spruchkoerper(
+              Gericht.Spruchkoerper.builder().value(coreData.appraisalBody()).build());
+        }
+        if (isFullLDML()
+            && coreData.courtBranchLocation() != null
+            && StringUtils.isNotBlank(coreData.courtBranchLocation().value())) {
+          gerichtBuilder.sitzDerAussenstelle(
+              Gericht.SitzDerAussenstelle.builder()
+                  .value(coreData.courtBranchLocation().value())
+                  .build());
+        }
+        builder.gericht(gerichtBuilder.build());
+      }
+
+      // Regionen
+      List<Regionen.Region> regionen = new ArrayList<>();
+      if (coreData.court() != null && !CollectionUtils.isEmpty(coreData.court().regions())) {
+        coreData
+            .court()
+            .regions()
+            .forEach(region -> regionen.add(Regionen.Region.builder().value(region).build()));
+      }
+      if (!regionen.isEmpty()) {
+        builder.regionen(Regionen.builder().regionen(regionen).build());
+      }
+
+      // Dokumentationsstelle
+      if (coreData.documentationOffice() != null) {
+        String docOffice = coreData.documentationOffice().abbreviation();
+        builder.dokumentationsstelle(
+            Dokumentationsstelle.builder()
+                .refersTo("#" + docOffice.toLowerCase() + "-dokumentationsstelle")
+                .value(docOffice)
+                .build());
+      }
+
+      // Aktenzeichenliste
+      List<AktenzeichenListe.Aktenzeichen> aktenzeichenListe = new ArrayList<>();
+      if (!CollectionUtils.isEmpty(coreData.fileNumbers())) {
+        coreData
+            .fileNumbers()
+            .forEach(
+                fileNumber ->
+                    aktenzeichenListe.add(
+                        AktenzeichenListe.Aktenzeichen.builder()
+                            .refersTo("#aktenzeichen")
+                            .value(fileNumber)
+                            .build()));
+      }
+      if (!aktenzeichenListe.isEmpty()) {
+        builder.aktenzeichenListe(
+            AktenzeichenListe.builder().aktenzeichen(aktenzeichenListe).build());
+      }
     }
 
     return builder;
   }
 
   private JudgmentBody buildJudgmentBody(Decision decision) throws ValidationException {
-
     JudgmentBody.JudgmentBodyBuilder builder = JudgmentBody.builder();
 
-    var shortTexts = decision.shortTexts();
-    var longTexts = decision.longTexts();
-
     builder
-        // set guidingPrinciple/Leitsatz
-        .motivation(
-            JaxbHtml.build(
-                htmlTransformer.htmlStringToObjectList(
-                    nullSafeGet(shortTexts, ShortTexts::guidingPrinciple))))
-        // set headnote/Orientierungssatz, "other headnote"/"Sonstiger Orientierungssatz",
-        // Outline/Gliederung, Tenor/Tenor
-        .introduction(buildIntroduction(decision))
-        // set caseFacts/Tatbestand
-        .background(
-            JaxbHtml.build(
-                htmlTransformer.htmlStringToObjectList(
-                    nullSafeGet(longTexts, LongTexts::caseFacts))))
-        // set decisionReasons/Entscheidungsgründe, reasons/Gründe, otherLongText/"Sonstiger,
-        // dissentingOpinion/"Abweichende Meinung"
-        // Langtext"
-        .decision(buildDecision(decision));
+        .introductions(buildIntroductions(decision))
+        .decision(buildDecision(decision))
+        .background(buildBackground(decision))
+        .motivations(buildMotivations(decision));
 
     var judgmentBody = builder.build();
 
-    if (judgmentBody.getIntroduction() == null
+    if (judgmentBody.getIntroductions().isEmpty()
         && judgmentBody.getBackground() == null
         && judgmentBody.getDecision() == null
-        && judgmentBody.getMotivation() == null) {
+        && judgmentBody.getMotivations().isEmpty()) {
       throw new ValidationException("Empty judgment body");
     }
 
     return judgmentBody;
   }
 
-  private AknMultipleBlock buildDecision(Decision decision) {
-    var longTexts = decision.longTexts();
+  protected List<Introduction> buildIntroductions(Decision decision) {
+    List<Introduction> introductions = new ArrayList<>();
 
-    var decisionReasons = nullSafeGet(longTexts, LongTexts::decisionReasons);
+    var longTexts = decision.longTexts();
+    var shortTexts = decision.shortTexts();
+    var guidingPrinciple = nullSafeGet(shortTexts, ShortTexts::guidingPrinciple);
+    var outline = nullSafeGet(longTexts, LongTexts::outline);
+
+    // Leitsatz
+    if (isNotBlank(guidingPrinciple)) {
+      var introduction =
+          Introduction.builder()
+              .content(htmlTransformer.htmlStringToObjectList(guidingPrinciple))
+              .build();
+      introduction.setDomainTerm("Leitsatz");
+      introductions.add(introduction);
+    }
+
+    // Gliederung
+    if (isNotBlank(outline)) {
+      var introduction =
+          Introduction.builder().content(htmlTransformer.htmlStringToObjectList(outline)).build();
+      introduction.setDomainTerm("Gliederung");
+      introductions.add(introduction);
+    }
+    return introductions;
+  }
+
+  private List<Motivation> buildMotivations(Decision decision) {
+    List<Motivation> motivations = new ArrayList<>();
+
+    var longTexts = decision.longTexts();
     var reasons = nullSafeGet(longTexts, LongTexts::reasons);
-    var otherLongText = nullSafeGet(longTexts, LongTexts::otherLongText);
+    var decisionReasons = nullSafeGet(longTexts, LongTexts::decisionReasons);
+    var otherLongTexts = nullSafeGet(longTexts, LongTexts::otherLongText);
     var dissentingOpinion = nullSafeGet(longTexts, LongTexts::dissentingOpinion);
 
-    if (StringUtils.isNotEmpty(decisionReasons)
-        || StringUtils.isNotEmpty(reasons)
-        || StringUtils.isNotEmpty(otherLongText)
-        || StringUtils.isNotEmpty(dissentingOpinion)) {
-      return new AknMultipleBlock()
-          .withBlock(
-              AknEmbeddedStructureInBlock.DecisionReasons.NAME,
-              AknEmbeddedStructureInBlock.DecisionReasons.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(decisionReasons))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.Reasons.NAME,
-              AknEmbeddedStructureInBlock.Reasons.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(reasons))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.OtherLongText.NAME,
-              AknEmbeddedStructureInBlock.OtherLongText.build(
-                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(otherLongText))))
-          .withBlock(
-              Opinions.NAME,
-              Opinions.build(htmlTransformer.htmlStringToObjectList(dissentingOpinion)));
+    // Gründe
+    if (isNotBlank(reasons)) {
+      var motivation =
+          Motivation.builder().content(htmlTransformer.htmlStringToObjectList(reasons)).build();
+      motivation.setDomainTerm("Gründe");
+      motivations.add(motivation);
+    }
+
+    // Entscheidungsgründe
+    if (isNotBlank(decisionReasons)) {
+      var motivation =
+          Motivation.builder()
+              .content(htmlTransformer.htmlStringToObjectList(decisionReasons))
+              .build();
+      motivation.setDomainTerm("Entscheidungsgründe");
+      motivations.add(motivation);
+    }
+
+    // Sonstiger Langtext
+    if (isNotBlank(otherLongTexts)) {
+      var motivation =
+          Motivation.builder()
+              .content(htmlTransformer.htmlStringToObjectList(otherLongTexts))
+              .build();
+      motivation.setDomainTerm("Sonstiger Langtext");
+      motivations.add(motivation);
+    }
+
+    // Abweichende Meinung + Mitwirkende Richter
+    if (isNotBlank(dissentingOpinion)) {
+      var motivation = buildDissentingOpinion(decision);
+      motivation.setDomainTerm("Abweichende Meinung");
+      motivations.add(motivation);
+    }
+    return motivations;
+  }
+
+  private Motivation buildDissentingOpinion(Decision decision) {
+    var longTexts = decision.longTexts();
+    var dissentingOpinion = nullSafeGet(longTexts, LongTexts::dissentingOpinion);
+    var participatingJudges = nullSafeGet(longTexts, LongTexts::participatingJudges);
+
+    List<Opinion> opinions = new ArrayList<>();
+
+    if (!CollectionUtils.isEmpty(participatingJudges)) {
+      for (var judge : participatingJudges) {
+        String byAttribute = "#" + toKebabCase(judge.name());
+        Opinion opinion;
+        if (judge.referencedOpinions() != null) {
+          opinion =
+              Opinion.builder()
+                  .type("dissenting")
+                  .by(byAttribute)
+                  .content(judge.referencedOpinions())
+                  .build();
+          opinion.setDomainTerm("Art der Mitwirkung");
+        } else {
+          opinion = Opinion.builder().by(byAttribute).build();
+        }
+        opinions.add(opinion);
+      }
+    }
+
+    Block block = null;
+    if (!opinions.isEmpty()) {
+      block = new Block("Mitwirkende Richter", opinions);
+    }
+
+    List<Object> content =
+        new ArrayList<>(htmlTransformer.htmlStringToObjectList(dissentingOpinion));
+
+    if (block != null) {
+      content.add(block);
+    }
+
+    Motivation motivation = new Motivation();
+    motivation.setDomainTerm("Abweichende Meinung");
+    motivation.setContent(content);
+
+    return motivation;
+  }
+
+  private JaxbHtml buildBackground(Decision decision) {
+    var longTexts = decision.longTexts();
+    var caseFacts = nullSafeGet(longTexts, LongTexts::caseFacts);
+
+    if (isNotBlank(caseFacts)) {
+      JaxbHtml html = JaxbHtml.build(htmlTransformer.htmlStringToObjectList(caseFacts));
+      html.setDomainTerm("Tatbestand");
+      return html;
     }
     return null;
   }
 
-  protected List<RelatedDecision> buildRelatedDecisions(
-      List<? extends RelatedDocumentationUnit> relatedDecisions) {
-    List<RelatedDecision> previousDecision = new ArrayList<>();
-    for (RelatedDocumentationUnit current : relatedDecisions) {
-      RelatedDecision decision =
-          RelatedDecision.builder()
-              .date(DateUtils.toDateString(current.getDecisionDate()))
-              .documentNumber(current.getDocumentNumber())
-              .fileNumber(current.getFileNumber())
-              .courtType(nullSafeGet(current.getCourt(), Court::type))
-              .build();
-      previousDecision.add(decision);
+  private JaxbHtml buildDecision(Decision decision) {
+    var longTexts = decision.longTexts();
+    var tenor = nullSafeGet(longTexts, LongTexts::tenor);
+
+    if (isNotBlank(tenor)) {
+      var tenorHtml = JaxbHtml.build(htmlTransformer.htmlStringToObjectList(tenor));
+      tenorHtml.setDomainTerm("Tenor");
+      return tenorHtml;
     }
-    return previousDecision;
-  }
-
-  protected Identification buildIdentification(Decision decision) throws ValidationException {
-    validateNotNull(decision.documentNumber(), "Unique identifier missing");
-    validateNotNull(decision.uuid(), "Caselaw UUID missing");
-    validateNotNull(
-        nullSafeGet(decision.coreData(), CoreData::decisionDate), "DecisionDate missing");
-
-    // Case law handover: When we always have an ecli, use that instead for the uniqueId
-    String uniqueId = decision.documentNumber();
-    FrbrDate frbrDate =
-        new FrbrDate(
-            DateUtils.toDateString(nullSafeGet(decision.coreData(), CoreData::decisionDate)),
-            "entscheidungsdatum");
-    FrbrAuthor frbrAuthor = new FrbrAuthor();
-
-    List<FrbrAlias> aliases = generateAliases(decision);
-
-    FrbrElement work =
-        FrbrElement.builder()
-            .frbrAlias(aliases)
-            .frbrDate(frbrDate)
-            .frbrAuthor(frbrAuthor)
-            .frbrCountry(new FrbrCountry())
-            .build()
-            .withFrbrThisAndUri(uniqueId);
-
-    FrbrElement expression =
-        FrbrElement.builder()
-            .frbrDate(frbrDate)
-            .frbrAuthor(frbrAuthor)
-            .frbrLanguage(new FrbrLanguage("de"))
-            .build()
-            .withFrbrThisAndUri(uniqueId + "/dokument");
-
-    FrbrElement manifestation =
-        FrbrElement.builder()
-            .frbrDate(frbrDate)
-            .frbrAuthor(frbrAuthor)
-            .build()
-            .withFrbrThisAndUri(uniqueId + "/dokument.xml");
-
-    return Identification.builder()
-        .frbrWork(work)
-        .frbrExpression(expression)
-        .frbrManifestation(manifestation)
-        .build();
-  }
-
-  protected List<FrbrAlias> generateAliases(Decision decision) {
-    List<FrbrAlias> aliases = new ArrayList<>();
-
-    aliases.add(new FrbrAlias("uebergreifende-id", decision.uuid().toString()));
-
-    if (decision.coreData() != null && decision.coreData().ecli() != null) {
-      aliases.add(new FrbrAlias("ecli", decision.coreData().ecli()));
-    }
-
-    if (decision.coreData() != null && decision.coreData().celexNumber() != null) {
-      aliases.add(new FrbrAlias("celex", decision.coreData().celexNumber()));
-    }
-
-    return aliases;
-  }
-
-  protected String nullIfEmpty(String input) {
-    if (StringUtils.isEmpty(input)) {
-      return null;
-    }
-    return input;
-  }
-
-  protected void validateCoreData(Decision decision) throws ValidationException {
-    if (decision.coreData() != null) {
-      validateNotNull(decision.coreData().court(), "Court missing");
-      if (decision.coreData().court() != null) {
-        validateNotNull(decision.coreData().court().type(), "CourtType missing");
-        validateNotNull(decision.coreData().court().type(), "CourtLabel missing");
-      }
-      validateNotNull(decision.coreData().documentType(), "DocumentType missing");
-      validate(!decision.coreData().fileNumbers().isEmpty(), "FileNumber missing");
-      validateNotNull(decision.coreData().decisionDate(), "DecisionDate missing");
-    } else {
-      throw new ValidationException("Core data is null");
-    }
+    return null;
   }
 }

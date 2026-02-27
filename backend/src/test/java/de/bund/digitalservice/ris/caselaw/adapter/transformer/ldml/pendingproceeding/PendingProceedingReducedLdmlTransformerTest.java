@@ -4,7 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.TestUtils;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmission;
+import de.bund.digitalservice.ris.caselaw.domain.AppealAdmitter;
 import de.bund.digitalservice.ris.caselaw.domain.CollectiveAgreement;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -20,24 +23,35 @@ import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.CourtBranchLocation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.xml.parsers.DocumentBuilderFactory;
 import net.sf.saxon.TransformerFactoryImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 @ExtendWith(MockitoExtension.class)
 class PendingProceedingReducedLdmlTransformerTest {
@@ -74,10 +88,12 @@ class PendingProceedingReducedLdmlTransformerTest {
                 CoreData.builder()
                     .court(
                         Court.builder()
-                            .type("Gerichtstyp")
-                            .location("Gerichtsort")
-                            .label("Gerichtstyp Gerichtsort")
+                            .type("courType")
+                            .location("courtLocation")
+                            .label("courtType courtLocation")
                             .build())
+                    .courtBranchLocation(
+                        CourtBranchLocation.builder().value("court branch location").build())
                     .documentType(DocumentType.builder().label("Anhängiges Verfahren").build())
                     .fileNumbers(List.of("Aktenzeichen"))
                     .decisionDate(LocalDate.of(2020, 1, 1))
@@ -98,33 +114,23 @@ class PendingProceedingReducedLdmlTransformerTest {
   }
 
   @Test
-  @DisplayName("Fallback title test")
-  void documentNumberIsFallbackTitleTest() {
-    String expected =
-        """
-          <akn:header>
-             <akn:p>Gerichtstyp Gerichtsort, 01.01.2020, Aktenzeichen</akn:p>
-          </akn:header>
-         """;
-    CaseLawLdml ldml = transformer.transformToLdml(testDocumentUnit);
-    assertThat(ldml).isNotNull();
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    assertThat(fileContent).isPresent();
-    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
-        .contains(StringUtils.deleteWhitespace(expected));
-  }
-
-  @Test
   @DisplayName("Mixed text in header")
   void testTransform_mixedTextInHeader() {
     String expected =
         """
-                                    <akn:header>
-                                      <akn:p alternativeTo="textWrapper">Hello</akn:p>
-                                      <akn:p> paragraph</akn:p>
-                                      <akn:p alternativeTo="textWrapper"> world!</akn:p>
-                                    </akn:header>
-                                    """;
+        <akn:header>
+            <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">Aktenzeichen</akn:docNumber></akn:p>
+            <akn:p>Mitteilungsdatum: <akn:docDate date="2020-01-01"refersTo="#mitteilungsdatum">01.01.2020</akn:docDate></akn:p>
+            <akn:p>Gericht:<akn:courtType refersTo="#gericht">courtType courtLocation</akn:courtType></akn:p>
+            <akn:p>Dokumenttyp:<akn:doc Type refersTo="#dokumenttyp">Anhängiges Verfahren</akn:docType></akn:p>
+            <akn:p>Kurztitel: <akn:shortTitle>
+                <akn:embeddedStructure>
+                   <akn:p alternativeTo="textWrapper">courtType courtLocation, 01.01.2020, Aktenzeichen</akn:p>
+                </akn:embeddedStructure>
+             </akn:shortTitle>
+            </akn:p>
+          </akn:header>
+       """;
     PendingProceeding otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
             .shortTexts(
@@ -161,99 +167,34 @@ class PendingProceedingReducedLdmlTransformerTest {
   }
 
   @Test
-  void testEntireLdml() {
+  void testEntireLdml() throws IOException {
+    // Arrange
     var documentationUnit = getEntireDocumentationUnit();
-    var expected =
-        String.format(
-            """
-        <?xml version="1.0" encoding="utf-8"?>
-        <akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/WD17"
-                        xmlns:ris="http://example.com/0.1/"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                        xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/WD17 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/csprd02/part2-specs/schemas/akomantoso30.xsd">
-           <akn:judgment name="attributsemantik-noch-undefiniert">
-              <akn:meta>
-                 <akn:identification source="attributsemantik-noch-undefiniert">
-                    <akn:FRBRWork>
-                       <akn:FRBRthis value="YYTestDoc0013"/>
-                       <akn:FRBRuri value="YYTestDoc0013"/>
-                       <akn:FRBRalias name="uebergreifende-id" value="%s"/>
-                       <akn:FRBRdate date="2020-01-01" name="Mitteilungsdatum"/>
-                       <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-                       <akn:FRBRcountry value="de"/>
-                    </akn:FRBRWork>
-                    <akn:FRBRExpression>
-                       <akn:FRBRthis value="YYTestDoc0013/dokument"/>
-                       <akn:FRBRuri value="YYTestDoc0013/dokument"/>
-                       <akn:FRBRdate date="2020-01-01" name="Mitteilungsdatum"/>
-                       <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-                       <akn:FRBRlanguage language="de"/>
-                    </akn:FRBRExpression>
-                    <akn:FRBRManifestation>
-                       <akn:FRBRthis value="YYTestDoc0013/dokument.xml"/>
-                       <akn:FRBRuri value="YYTestDoc0013/dokument.xml"/>
-                       <akn:FRBRdate date="2020-01-01" name="Mitteilungsdatum"/>
-                       <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-                    </akn:FRBRManifestation>
-                 </akn:identification>
-                 <akn:proprietary source="attributsemantik-noch-undefiniert">
-                    <ris:meta>
-                       <ris:previousDecisions>
-                          <ris:previousDecision date="2020-01-01">
-                             <ris:documentNumber>previous decision document number 1</ris:documentNumber>
-                             <ris:fileNumber>previous decision file number</ris:fileNumber>
-                             <ris:courtType>previous decision court type</ris:courtType>
-                          </ris:previousDecision>
-                          <ris:previousDecision date="2020-01-01">
-                             <ris:documentNumber>previous decision document number 2</ris:documentNumber>
-                             <ris:fileNumber>previous decision file number</ris:fileNumber>
-                             <ris:courtType>previous decision court type</ris:courtType>
-                          </ris:previousDecision>
-                       </ris:previousDecisions>
-                       <ris:fileNumbers>
-                          <ris:fileNumber>Aktenzeichen</ris:fileNumber>
-                       </ris:fileNumbers>
-                       <ris:documentType>Anhängiges Verfahren</ris:documentType>
-                       <ris:courtLocation>Gerichtsort</ris:courtLocation>
-                       <ris:courtType>Gerichtstyp</ris:courtType>
-                       <ris:legalForces>
-                          <ris:legalForce>legalForce test</ris:legalForce>
-                       </ris:legalForces>
-                    </ris:meta>
-                 </akn:proprietary>
-              </akn:meta>
-              <akn:header>
-                 <akn:p alternativeTo="textWrapper">Titelzeile</akn:p>
-              </akn:header>
-              <akn:judgmentBody>
-                 <akn:motivation>
-                    <akn:p alternativeTo="textWrapper">Rechtsfrage</akn:p>
-                 </akn:motivation>
-                 <akn:introduction>
-                    <akn:block name="Rechtsmittelführer">
-                       <akn:embeddedStructure>
-                          <akn:p alternativeTo="textWrapper">Rechtsmittelführer</akn:p>
-                       </akn:embeddedStructure>
-                    </akn:block>
-                    <akn:block name="Rechtsmittelzulassung">
-                       <akn:embeddedStructure>
-                          <akn:p alternativeTo="textWrapper">Rechtsmittelzulassung</akn:p>
-                       </akn:embeddedStructure>
-                    </akn:block>
-                 </akn:introduction>
-              </akn:judgmentBody>
-           </akn:judgment>
-        </akn:akomaNtoso>
-                   """,
-            documentationUnitId);
+    Path expectedFilePath =
+        Paths.get("src/test/resources/testdata/pending_proceeding_reduced_ldml.xml");
+    String expected = Files.readString(expectedFilePath, StandardCharsets.UTF_8);
 
     // Act
     CaseLawLdml ldml = transformer.transformToLdml(documentationUnit);
 
     // Assert
-    assertThat(ldml).isNotNull();
+    Assertions.assertNotNull(ldml);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    assertThat(fileContent).isPresent().contains(expected);
+    Assertions.assertTrue(fileContent.isPresent());
+
+    Diff diff =
+        DiffBuilder.compare(expected)
+            .withTest(fileContent.get())
+            .withDifferenceEvaluator(TestUtils.ignoreAttributeEvaluator)
+            .ignoreWhitespace()
+            .checkForIdentical()
+            .build();
+
+    if (diff.hasDifferences()) {
+      StringBuilder differences = new StringBuilder();
+      diff.getDifferences().forEach(d -> differences.append(d.toString()).append("\n"));
+      Assertions.fail("XMLs differ:\n" + differences);
+    }
   }
 
   PendingProceeding getEntireDocumentationUnit() {
@@ -275,9 +216,13 @@ class PendingProceedingReducedLdmlTransformerTest {
             CoreData.builder()
                 .court(
                     Court.builder()
-                        .type("Gerichtstyp")
-                        .location("Gerichtsort")
-                        .label("Gerichtstyp Gerichtsort")
+                        .isSuperiorCourt(false)
+                        .isForeignCourt(false)
+                        .type("courtType")
+                        .location("courtLocation")
+                        .label("courtType courtLocation")
+                        .jurisdictionType("jurisdictionType")
+                        .regions(List.of("NW"))
                         .build())
                 .documentType(DocumentType.builder().label("Anhängiges Verfahren").build())
                 .fileNumbers(List.of("Aktenzeichen"))
@@ -297,7 +242,7 @@ class PendingProceedingReducedLdmlTransformerTest {
                 .legalIssue("Rechtsfrage")
                 .appellant("Rechtsmittelführer")
                 .admissionOfAppeal("Rechtsmittelzulassung")
-                .resolutionNote(null)
+                .resolutionNote("<p>Erledigungsvermerk</p>")
                 .build())
         .contentRelatedIndexing(
             ContentRelatedIndexing.builder()
@@ -315,17 +260,57 @@ class PendingProceedingReducedLdmlTransformerTest {
                                 List.of(
                                     SingleNorm.builder()
                                         .singleNorm("singleNorm test")
+                                        .dateOfRelevance("2020")
+                                        .dateOfVersion(LocalDate.of(2021, 2, 5))
                                         .legalForce(
                                             LegalForce.builder()
+                                                .region(
+                                                    Region.builder()
+                                                        .code("legalForce region code")
+                                                        .longText("legalForce region longText")
+                                                        .build())
                                                 .type(
                                                     LegalForceType.builder()
-                                                        .label("legalForce test")
+                                                        .label("legalForceType label")
+                                                        .abbreviation("legalForceType abbreviation")
                                                         .build())
                                                 .build())
+                                        .build(),
+                                    SingleNorm.builder()
+                                        .singleNorm("singleNorm 2 test")
+                                        .dateOfRelevance("2022")
+                                        .dateOfVersion(LocalDate.of(2022, 3, 6))
                                         .build()))
                             .normAbbreviation(
                                 NormAbbreviation.builder()
                                     .abbreviation("normReference test")
+                                    .build())
+                            .build(),
+                        NormReference.builder()
+                            .normAbbreviation(
+                                NormAbbreviation.builder()
+                                    .abbreviation("normReference without SingleNorms")
+                                    .decisionDate(
+                                        LocalDate.of(2019, 4, 7)
+                                            .atStartOfDay()
+                                            .atZone(ZoneId.of("Europe/Berlin"))
+                                            .toInstant())
+                                    .documentId(123L)
+                                    .documentNumber("KORE12345")
+                                    .documentTypes(
+                                        List.of(
+                                            DocumentType.builder()
+                                                .label("documentType label")
+                                                .build()))
+                                    .source("Source")
+                                    .officialLongTitle("officialLongTitle")
+                                    .officialShortTitle("officialShortTitle")
+                                    .officialLetterAbbreviation("officialLetterAbbreviation")
+                                    .region(
+                                        Region.builder()
+                                            .code("region code")
+                                            .longText("region longtext")
+                                            .build())
                                     .build())
                             .build()))
                 .jobProfiles(List.of("jobProfile test"))
@@ -334,6 +319,8 @@ class PendingProceedingReducedLdmlTransformerTest {
                 .collectiveAgreements(
                     List.of(CollectiveAgreement.builder().name("collectiveAgreement test").build()))
                 .hasLegislativeMandate(true)
+                .appealAdmission(
+                    AppealAdmission.builder().admitted(true).by(AppealAdmitter.FG).build())
                 .build())
         .previousDecisions(List.of(previousDecision1, previousDecision2))
         .caselawReferences(

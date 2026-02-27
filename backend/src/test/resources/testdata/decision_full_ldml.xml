@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0" xmlns:ris="http://example.com/0.1/"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/os/part2-specs/schemas/akomantoso30.xsd">
+    <akn:judgment name="documentType test">
+        <akn:meta>
+            <akn:identification source="#ris">
+                <akn:FRBRWork>
+                    <akn:FRBRthis value="YYTestDoc0013"/>
+                    <akn:FRBRuri value="YYTestDoc0013"/>
+                    <akn:FRBRalias name="Übergreifende ID" value="5706fd85-94fe-4ee9-8c50-31aff10fc29a"/>
+                    <akn:FRBRalias name="Dokumentnummer" value="YYTestDoc0013"/>
+                    <akn:FRBRalias name="ECLI" value="ecli test"/>
+                    <akn:FRBRalias name="CELEX-Nummer" value="celex test"/>
+                    <akn:FRBRalias eId="aktenzeichen" name="Aktenzeichen" value="fileNumber test"/>
+                    <akn:FRBRdate eId="entscheidungsdatum" date="2020-01-01" name="Entscheidungsdatum"/>
+                    <akn:FRBRauthor href="#gericht"/>
+                    <akn:FRBRcountry value="deu"/>
+                </akn:FRBRWork>
+                <akn:FRBRExpression>
+                    <akn:FRBRthis value="YYTestDoc0013"/>
+                    <akn:FRBRuri value="YYTestDoc0013"/>
+                    <akn:FRBRdate date="2020-01-01" name="Entscheidungsdatum"/>
+                    <akn:FRBRauthor href="#gericht"/>
+                    <akn:FRBRlanguage language="deu"/>
+                </akn:FRBRExpression>
+                <akn:FRBRManifestation>
+                    <akn:FRBRthis value="YYTestDoc0013.xml"/>
+                    <akn:FRBRuri value="YYTestDoc0013.xml"/>
+                    <akn:FRBRdate date="2025-10-09" name="XML Transformation"/>
+                    <akn:FRBRauthor href="#documentationoffice-dokumentationsstelle"/>
+                </akn:FRBRManifestation>
+            </akn:identification>
+            <akn:classification source="#ris">
+                <akn:keyword dictionary="" ris:domainTerm="Schlagwort" showAs="keyword test" value="keyword test"/>
+            </akn:classification>
+            <akn:analysis source="#ris">
+                <akn:otherReferences source="#ris">
+                    <akn:implicitReference ris:domainTerm="Norm">
+                        <ris:norm domainTerm="Norm">
+                            <ris:abkuerzung domainTerm="Abkürzung">normReference test</ris:abkuerzung>
+                            <ris:einzelnorm domainTerm="Einzelnorm">
+                                <ris:bezeichnung domainTerm="Bezeichnung">singleNorm test</ris:bezeichnung>
+                                <ris:gesetzeskraft domainTerm="Gesetzeskraft">
+                                    <ris:gesetzeskraftTyp domainTerm="Typ der Gesetzeskraft">legalForceType label</ris:gesetzeskraftTyp>
+                                    <ris:geltungsbereich domainTerm="Geltungsbereich">legalForce region longText
+                                    </ris:geltungsbereich>
+                                </ris:gesetzeskraft>
+                                <ris:fassungsdatum domainTerm="Fassungsdatum">2021-02-05</ris:fassungsdatum>
+                                <ris:jahr domainTerm="Jahr">2020</ris:jahr>
+                            </ris:einzelnorm>
+                            <ris:einzelnorm domainTerm="Einzelnorm">
+                                <ris:bezeichnung domainTerm="Bezeichnung">singleNorm 2 test</ris:bezeichnung>
+                                <ris:fassungsdatum domainTerm="Fassungsdatum">2022-03-06</ris:fassungsdatum>
+                                <ris:jahr domainTerm="Jahr">2022</ris:jahr>
+                            </ris:einzelnorm>
+                        </ris:norm>
+                    </akn:implicitReference>
+                    <akn:implicitReference ris:domainTerm="Norm">
+                        <ris:norm domainTerm="Norm">
+                            <ris:abkuerzung domainTerm="Abkürzung">normReference without SingleNorms</ris:abkuerzung>
+                            <ris:titel domainTerm="Amtliche Langüberschrift">officialLongTitle</ris:titel>
+                        </ris:norm>
+                    </akn:implicitReference>
+                    <akn:implicitReference ris:domainTerm="Rechtszug">
+                        <ris:vorgehend domainTerm="Vorgehende Entscheidung">
+                            <ris:dokumenttyp domainTerm="Dokumenttyp">previous decision document type</ris:dokumenttyp>
+                            <ris:entscheidungsdatum domainTerm="Entscheidungsdatum">2020-01-01</ris:entscheidungsdatum>
+                            <ris:dokumentnummer domainTerm="Dokumentnummer">previous decision document number 1</ris:dokumentnummer>
+                            <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
+                            <ris:gericht domainTerm="Gericht">
+                                <ris:gerichtstyp domainTerm="Gerichtstyp">previous decision court type</ris:gerichtstyp>
+                                <ris:gerichtsort domainTerm="Gerichtsort">previous decision court location</ris:gerichtsort>
+                                <ris:gerichtsbarkeit domainTerm="Gerichtsbarkeit">previous decision jurisdiction type</ris:gerichtsbarkeit>
+                            </ris:gericht>
+                        </ris:vorgehend>
+                    </akn:implicitReference>
+                    <akn:implicitReference ris:domainTerm="Rechtszug">
+                        <ris:vorgehend domainTerm="Vorgehende Entscheidung">
+                            <ris:dokumenttyp domainTerm="Dokumenttyp">previous decision document type</ris:dokumenttyp>
+                            <ris:entscheidungsdatum domainTerm="Entscheidungsdatum">2020-01-01</ris:entscheidungsdatum>
+                            <ris:dokumentnummer domainTerm="Dokumentnummer">previous decision document number 2</ris:dokumentnummer>
+                            <ris:aktenzeichen domainTerm="Aktenzeichen">previous decision file number</ris:aktenzeichen>
+                            <ris:gericht domainTerm="Gericht">
+                                <ris:gerichtstyp domainTerm="Gerichtstyp">previous decision court type</ris:gerichtstyp>
+                                <ris:gerichtsort domainTerm="Gerichtsort">previous decision court location</ris:gerichtsort>
+                                <ris:gerichtsbarkeit domainTerm="Gerichtsbarkeit">previous decision jurisdiction type</ris:gerichtsbarkeit>
+                            </ris:gericht>
+                        </ris:vorgehend>
+                    </akn:implicitReference>
+                    <akn:implicitReference ris:domainTerm="Rechtszug">
+                        <ris:nachgehend art="nachgehend" domainTerm="Nachgehende Entscheidung">
+                            <ris:dokumenttyp domainTerm="Dokumenttyp">ensuing decision document type</ris:dokumenttyp>
+                            <ris:entscheidungsdatum domainTerm="Entscheidungsdatum">2022-10-01</ris:entscheidungsdatum>
+                            <ris:dokumentnummer domainTerm="Dokumentnummer">ensuing decision document number 1</ris:dokumentnummer>
+                            <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
+                            <ris:gericht domainTerm="Gericht">
+                                <ris:gerichtstyp domainTerm="Gerichtstyp">ensuing decision court type</ris:gerichtstyp>
+                            </ris:gericht>
+                        </ris:nachgehend>
+                    </akn:implicitReference>
+                    <akn:implicitReference ris:domainTerm="Rechtszug">
+                        <ris:nachgehend art="anhängig" domainTerm="Nachgehende Entscheidung">
+                            <ris:dokumenttyp domainTerm="Dokumenttyp">ensuing decision document type</ris:dokumenttyp>
+                            <ris:entscheidungsdatum domainTerm="Entscheidungsdatum">2022-10-01</ris:entscheidungsdatum>
+                            <ris:dokumentnummer domainTerm="Dokumentnummer">ensuing decision document number 2</ris:dokumentnummer>
+                            <ris:aktenzeichen domainTerm="Aktenzeichen">ensuing decision file number</ris:aktenzeichen>
+                            <ris:gericht domainTerm="Gericht">
+                                <ris:gerichtstyp domainTerm="Gerichtstyp">ensuing decision court type</ris:gerichtstyp>
+                            </ris:gericht>
+                            <ris:vermerk domainTerm="Vermerk">ensuing decision note</ris:vermerk>
+                        </ris:nachgehend>
+                    </akn:implicitReference>
+                    <akn:implicitReference ris:domainTerm="Fundstelle">
+                       <ris:fundstelle domainTerm="Fundstelle">
+                          <ris:periodikum domainTerm="Periodikum">
+                             <ris:abkuerzung domainTerm="Abkürzung">LegalPeriodical abbreviation</ris:abkuerzung>
+                             <ris:periodikumTyp domainTerm="Art der Fundstelle">amtlich</ris:periodikumTyp>
+                             <ris:titel domainTerm="Titel">LegalPeriodical Title</ris:titel>
+                             <ris:untertitel domainTerm="Untertitel">LegalPeriodical Subtitle</ris:untertitel>
+                          </ris:periodikum>
+                          <ris:zitatstelle domainTerm="Zitatstelle">citation</ris:zitatstelle>
+                       </ris:fundstelle>
+                    </akn:implicitReference>
+                    <akn:implicitReference ris:domainTerm="Fundstelle">
+                       <ris:fundstelleLiteraturUnselbststaendig domainTerm="Fundstelle unselbstständige Literatur">
+                          <ris:periodikum domainTerm="Periodikum">
+                             <ris:abkuerzung domainTerm="Abkürzung">LegalPeriodical RawValue</ris:abkuerzung>
+                             <ris:periodikumTyp domainTerm="Art der Fundstelle">nicht-amtlich</ris:periodikumTyp>
+                          </ris:periodikum>
+                          <ris:zitatstelle domainTerm="Zitatstelle">citation</ris:zitatstelle>
+                       </ris:fundstelleLiteraturUnselbststaendig>
+                    </akn:implicitReference>
+                    <akn:implicitReference ris:domainTerm="Anhängiges Verfahren">
+                        <ris:anhaengigesVerfahren domainTerm="Anhängiges Verfahren">
+                            <ris:dokumenttyp domainTerm="Dokumenttyp">Anhängiges Verfahren</ris:dokumenttyp>
+                            <ris:mitteilungsdatum domainTerm="Mitteilungsdatum">2022-01-23</ris:mitteilungsdatum>
+                            <ris:dokumentnummer domainTerm="Dokumentnummer">XXRE011158825</ris:dokumentnummer>
+                            <ris:aktenzeichen domainTerm="Aktenzeichen">VIa ZR 339/22</ris:aktenzeichen>
+                            <ris:gericht domainTerm="Gericht">
+                                <ris:gerichtstyp domainTerm="Gerichtstyp">AG</ris:gerichtstyp>
+                                <ris:gerichtsort domainTerm="Gerichtsort">Aachen</ris:gerichtsort>
+                                <ris:gerichtsbarkeit domainTerm="Gerichtsbarkeit">Ordentliche Gerichtsbarkeit</ris:gerichtsbarkeit>
+                            </ris:gericht>
+                        </ris:anhaengigesVerfahren>
+                    </akn:implicitReference>
+                    <akn:implicitReference ris:domainTerm="Nichtanwendungsgesetz">
+                       <ris:nichtanwendungsgesetz domainTerm="Nichtanwendungsgesetz">
+                          <ris:abkuerzung domainTerm="Abkürzung">SeefBgV</ris:abkuerzung>
+                          <ris:einzelnorm domainTerm="Einzelnorm">
+                             <ris:bezeichnung domainTerm="Bezeichnung">§ 30</ris:bezeichnung>
+                             <ris:fassungsdatum domainTerm="Fassungsdatum">2021-02-05</ris:fassungsdatum>
+                             <ris:jahr domainTerm="Jahr">2020</ris:jahr>
+                          </ris:einzelnorm>
+                          <ris:titel domainTerm="Amtliche Langüberschrift">OfficialLongTitle</ris:titel>
+                       </ris:nichtanwendungsgesetz>
+                   </akn:implicitReference>
+                </akn:otherReferences>
+                <akn:otherAnalysis source="#ris">
+                    <ris:dokumentarischeKurztexte domainTerm="Dokumentarische Kurztexte">
+                        <ris:entscheidungsnamen domainTerm="Entscheidungsnamen">
+                            <ris:entscheidungsname domainTerm="Entscheidungsname">
+                                decisionName test
+                            </ris:entscheidungsname>
+                            <ris:entscheidungsname domainTerm="Entscheidungsname">
+                                decisionName2 test
+                            </ris:entscheidungsname>
+                        </ris:entscheidungsnamen>
+                        <ris:titelzeile akn:eId="titelzeile" ris:domainTerm="Titelzeile">
+                            <akn:p>headline test</akn:p>
+                        </ris:titelzeile>
+                        <ris:orientierungssatz ris:domainTerm="Orientierungssatz">
+                            <akn:p>headNote test</akn:p>
+                        </ris:orientierungssatz>
+                        <ris:sonstigerOrientierungssatz ris:domainTerm="Sonstiger Orientierungssatz">
+                            <akn:p>otherHeadNote test</akn:p>
+                        </ris:sonstigerOrientierungssatz>
+                    </ris:dokumentarischeKurztexte>
+                </akn:otherAnalysis>
+            </akn:analysis>
+            <akn:references source="#ris">
+                <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
+                <akn:TLCOrganization eId="documentationoffice-dokumentationsstelle" href=""
+                                     showAs="documentationOffice"/>
+                <akn:TLCOrganization eId="gericht" href="" showAs="courtLabel test"/>
+                <akn:TLCOrganization eId="spruchkoerper" href="" showAs="appraisalBody test"/>
+                <akn:TLCPerson eId="dr-phil-max-mustermann" href="" showAs="Dr. Phil. Max Mustermann"/>
+                <akn:TLCPerson eId="richterin-maxima-mustermann" href="" showAs="Richterin Maxima Mustermann"/>
+                <akn:TLCLocation eId="gerichtsort" href="" showAs="courtLocation"/>
+            </akn:references>
+            <akn:proprietary source="#ris">
+                <ris:meta>
+                    <ris:dokumenttyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">documentType test</ris:dokumenttyp>
+                    <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+                        <ris:gerichtstyp domainTerm="Gerichtstyp">courtType</ris:gerichtstyp>
+                        <ris:gerichtsort domainTerm="Gerichtsort">courtLocation</ris:gerichtsort>
+                        <ris:gerichtsbarkeit domainTerm="Gerichtsbarkeit">jurisdictionType</ris:gerichtsbarkeit>
+                        <ris:spruchkoerper domainTerm="Spruchkörper" akn:refersTo="#spruchkoerper">appraisalBody test</ris:spruchkoerper>
+                        <ris:sitzDerAussenstelle domainTerm="Sitz der Außenstelle">court branch location</ris:sitzDerAussenstelle>
+                    </ris:gericht>
+                    <ris:fehlerhafteGerichte domainTerm="Fehlerhafte Gerichte">
+                        <ris:fehlerhaftesGericht domainTerm="Fehlerhaftes Gericht">deviating court 1</ris:fehlerhaftesGericht>
+                        <ris:fehlerhaftesGericht domainTerm="Fehlerhaftes Gericht">deviating court 2</ris:fehlerhaftesGericht>
+                    </ris:fehlerhafteGerichte>
+                    <ris:regionen domainTerm="Regionen">
+                        <ris:region domainTerm="Region">NW</ris:region>
+                    </ris:regionen>
+                    <ris:dokumentationsstelle domainTerm="Dokumentationsstelle" akn:refersTo="#documentationoffice-dokumentationsstelle">documentationOffice</ris:dokumentationsstelle>
+                    <ris:aktenzeichenListe domainTerm="Liste der Aktenzeichen">
+                        <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">fileNumber test
+                        </ris:aktenzeichen>
+                        <ris:aktenzeichen domainTerm="Abweichendes Aktenzeichen" >deviating fileNumber
+                        </ris:aktenzeichen>
+                    </ris:aktenzeichenListe>
+                    <ris:datenDerMuendlichenVerhandlung domainTerm="Daten der mündlichen Verhandlung">
+                       <ris:datumDerMuendlichenVerhandlung domainTerm="Datum der mündlichen Verhandlung">2021-02-03 </ris:datumDerMuendlichenVerhandlung>
+                       <ris:datumDerMuendlichenVerhandlung domainTerm="Datum der mündlichen Verhandlung">2020-01-02</ris:datumDerMuendlichenVerhandlung>
+                    </ris:datenDerMuendlichenVerhandlung>
+                    <ris:abweichendeDaten domainTerm="Abweichende Daten">
+                        <ris:abweichendesDatum domainTerm="Abweichendes Datum">2010-05-12</ris:abweichendesDatum>
+                    </ris:abweichendeDaten>
+                    <ris:abweichendeDokumentnummern domainTerm="Abweichende Dokumentnummern">
+                        <ris:abweichendeDokumentnummer domainTerm="Abweichende Dokumentnummer">deviating documentNumber</ris:abweichendeDokumentnummer>
+                    </ris:abweichendeDokumentnummern>
+                    <ris:abweichendeEclis domainTerm="Abweichende ECLIs">
+                        <ris:abweichenderEcli domainTerm="Abweichender ECLI">deviating ecli test</ris:abweichenderEcli>
+                    </ris:abweichendeEclis>
+                    <ris:sachgebiete domainTerm="Sachgebiete">
+                        <ris:sachgebiet domainTerm="Sachgebiet" notation="neu" sachgebiet-id="AR-01-01-01">fieldOfLaw test</ris:sachgebiet>
+                    </ris:sachgebiete>
+                    <ris:rechtskraft domainTerm="Rechtskraft">Ja</ris:rechtskraft>
+                    <ris:vorgaenge domainTerm="Vorgänge">
+                        <ris:vorgang domainTerm="Vorgang">procedure test</ris:vorgang>
+                        <ris:vorgang domainTerm="Vorgang">previous procedure test</ris:vorgang>
+                    </ris:vorgaenge>
+                    <ris:eingangsarten domainTerm="Eingangsarten">
+                        <ris:eingangsart domainTerm="Eingangsart">E-Mail</ris:eingangsart>
+                        <ris:eingangsart domainTerm="Eingangsart">Papier</ris:eingangsart>
+                    </ris:eingangsarten>
+                    <ris:definitionen ris:domainTerm="Definitionen">
+                        <ris:definition ris:domainTerm="Definition">
+                            <ris:definierterBegriff domainTerm="Definierter Begriff">indirekte Steuern</ris:definierterBegriff>
+                            <akn:ref ris:domainTerm="Stelle im Text (Randnummer)" href="#randnummer-2">2</akn:ref>
+                        </ris:definition>
+                        <ris:definition ris:domainTerm="Definition">
+                            <ris:definierterBegriff domainTerm="Definierter Begriff">Sachgesamtheit</ris:definierterBegriff>
+                        </ris:definition>
+                    </ris:definitionen>
+                    <ris:fremdsprachigeFassungen domainTerm="Fremdsprachige Fassungen">
+                        <ris:fremdsprachigeFassung domainTerm="Fremdsprachige Fassung">
+                            <akn:FRBRlanguage language="eng"/>
+                            <akn:documentRef href="https://ihre-url-zur-englischen-übersetzung" showAs="Englisch"/>
+                        </ris:fremdsprachigeFassung>
+                        <ris:fremdsprachigeFassung domainTerm="Fremdsprachige Fassung">
+                            <akn:FRBRlanguage language="fra"/>
+                            <akn:documentRef href="https://ihre-url-zur-französischen-übersetzung"
+                                               showAs="Französisch"/>
+                        </ris:fremdsprachigeFassung>
+                    </ris:fremdsprachigeFassungen>
+                    <ris:herkunftDerUebersetzungen domainTerm="Herkunft der Übersetzungen">
+                        <ris:herkunftDerUebersetzung domainTerm="Herkunft der Übersetzung">
+                            <akn:FRBRlanguage ris:domainTerm="Originalsprache" language="eng"/>
+                            <ris:uebersetzerinnen domainTerm="Übersetzer:innen">
+                                <ris:uebersetzerin domainTerm="Übersetzer:in">Maxi Muster</ris:uebersetzerin>
+                                <ris:uebersetzerin domainTerm="Übersetzer:in">Ursel Meier</ris:uebersetzerin>
+                            </ris:uebersetzerinnen>
+                            <ris:interneVerlinkungen domainTerm="Interne Verlinkungen">
+                                <akn:ref ris:domainTerm="Interne Verlinkung" href="#randnummer-2">2</akn:ref>
+                            </ris:interneVerlinkungen>
+                            <ris:externeVerlinkungen domainTerm="Externe Verlinkungen">
+                                <ris:externeVerlinkung domainTerm="Externe Verlinkung">
+                                    <akn:documentRef href="https://ihre-url-zur-englischen-übersetzung" showAs="Englisch"/>
+                                </ris:externeVerlinkung>
+                            </ris:externeVerlinkungen>
+                            <ris:herkunftDerUebersetzungTyp domainTerm="Übersetzungsart">amtlich</ris:herkunftDerUebersetzungTyp>
+                        </ris:herkunftDerUebersetzung>
+                    </ris:herkunftDerUebersetzungen>
+                    <ris:evsf domainTerm="Elektronische Vorschriftensammlung Bundesfinanzverwaltung (E-VSF)">evsf test</ris:evsf>
+                    <ris:rechtsmittelzulassung domainTerm="Rechtsmittelzulassung">
+                        <ris:rechtsmittelZugelassen domainTerm="Rechtsmittel zugelassen">true</ris:rechtsmittelZugelassen>
+                        <ris:rechtsmittelZugelassenDurch domainTerm="Rechtsmittel zugelassen durch">FG</ris:rechtsmittelZugelassenDurch>
+                    </ris:rechtsmittelzulassung>
+                    <ris:rechtsmittel domainTerm="Rechtsmittel">
+                        <ris:rechtsmittelfuehrerListe>
+                            <ris:rechtsmittelfuehrer domainTerm="Rechtsmittelführer">Kläger</ris:rechtsmittelfuehrer>
+                            <ris:rechtsmittelfuehrer domainTerm="Rechtsmittelführer">Beklagter</ris:rechtsmittelfuehrer>
+                        </ris:rechtsmittelfuehrerListe>
+                        <ris:revisionKlaegerListe>
+                            <ris:revisionKlaeger domainTerm="Revision (Kläger)">unzulässig</ris:revisionKlaeger>
+                        </ris:revisionKlaegerListe>
+                        <ris:revisionBeklagterListe>
+                            <ris:revisionBeklagter domainTerm="Revision (Beklagter)">unzulässig</ris:revisionBeklagter>
+                        </ris:revisionBeklagterListe>
+                        <ris:anschlussRevisionKlaegerListe>
+                            <ris:anschlussRevisionKlaeger domainTerm="Anschlussrevision (Kläger)">unzulässig</ris:anschlussRevisionKlaeger>
+                        </ris:anschlussRevisionKlaegerListe>
+                        <ris:anschlussRevisionBeklagterListe>
+                            <ris:anschlussRevisionBeklagter domainTerm="Anschlussrevision (Beklagter)">unzulässig</ris:anschlussRevisionBeklagter>
+                        </ris:anschlussRevisionBeklagterListe>
+                        <ris:nzbKlaegerListe>
+                            <ris:nzbKlaeger domainTerm="NZB (Kläger)">unzulässig</ris:nzbKlaeger>
+                        </ris:nzbKlaegerListe>
+                        <ris:nzbBeklagterListe>
+                            <ris:nzbBeklagter domainTerm="NZB (Beklagter)">unzulässig</ris:nzbBeklagter>
+                        </ris:nzbBeklagterListe>
+                        <ris:zuruecknahmeDerRevision domainTerm="Zurücknahme der Revision">Ja</ris:zuruecknahmeDerRevision>
+                        <ris:pkhAntragKlaeger domainTerm="PKH-Antrag (Kläger)">Nein</ris:pkhAntragKlaeger>
+                    </ris:rechtsmittel>
+                    <ris:tarifvertraege domainTerm="Tarifverträge">
+                        <ris:tarifvertrag domainTerm="Tarifvertrag">
+                            <ris:bezeichnung domainTerm="Bezeichnung des Tarifvertrag">Stehende Bühnen</ris:bezeichnung>
+                            <ris:tarifnorm domainTerm="Tarifnorm">§ 23</ris:tarifnorm>
+                            <ris:datum domainTerm="Datum">12.2001</ris:datum>
+                            <ris:branche domainTerm="Branche">Bühne, Theater, Orchester</ris:branche>
+                        </ris:tarifvertrag>
+                    </ris:tarifvertraege>
+                    <ris:quellen domainTerm="Quellen">
+                        <ris:quelle domainTerm="Quelle">Sonstige</ris:quelle>
+                        <ris:quelle domainTerm="Quelle">sourceRawValue test 2</ris:quelle>
+                    </ris:quellen>
+                    <ris:streitjahre domainTerm="Streitjahre">
+                        <ris:streitjahr domainTerm="Streitjahr">2024</ris:streitjahr>
+                    </ris:streitjahre>
+                    <ris:berufsbilder domainTerm="Berufsbilder">
+                        <ris:berufsbild domainTerm="Berufsbild">jobProfile test</ris:berufsbild>
+                    </ris:berufsbilder>
+                    <ris:kuendigungsgruende domainTerm="Kündigungsgründe">
+                        <ris:kuendigungsgrund domainTerm="Kündigungsgrund">dismissalGround test</ris:kuendigungsgrund>
+                    </ris:kuendigungsgruende>
+                    <ris:kuendigungsarten domainTerm="Kündigungsarten">
+                        <ris:kuendigungsart domainTerm="Kündigungsart">dismissalType test</ris:kuendigungsart>
+                    </ris:kuendigungsarten>
+                    <ris:gesetzgebungsauftrag domainTerm="Gesetzgebungsauftrag">Ja</ris:gesetzgebungsauftrag>
+                    <ris:notiz domainTerm="Notiz">note test</ris:notiz>
+                    <ris:gegenstandswerte domainTerm="Gegenstandswerte">
+                        <ris:gegenstandswert domainTerm="Gegenstandswert">
+                            <ris:betrag domainTerm="Betrag">9635</ris:betrag>
+                            <ris:waehrung domainTerm="Währung">EUR</ris:waehrung>
+                            <ris:verfahren domainTerm="Verfahren">Organstreitverfahren</ris:verfahren>
+                        </ris:gegenstandswert>
+                    </ris:gegenstandswerte>
+                    <ris:berichtigungen domainTerm="Berichtigungen">
+                       <ris:berichtigung domainTerm="Berichtigung">
+                           <ris:artDerEintragung domainTerm="Art der Eintragung">Berichtigungsbeschluss</ris:artDerEintragung>
+                       </ris:berichtigung>
+                       <ris:berichtigung domainTerm="Berichtigung">
+                           <ris:artDerEintragung domainTerm="Art der Eintragung">Schreibfehlerberichtigung</ris:artDerEintragung>
+                           <ris:artDerAenderung domainTerm="Art der Änderung">Hauffen -&gt; Haufen</ris:artDerAenderung>
+                           <ris:datumDerAenderung domainTerm="Datum der Änderung">2020-01-20</ris:datumDerAenderung>
+                           <ris:randnummern domainTerm="Randnummern">
+                               <akn:ref ris:domainTerm="Randnummer" href="#randnummer-1">1</akn:ref>
+                               <akn:ref ris:domainTerm="Randnummer" href="#randnummer-3">3</akn:ref>
+                           </ris:randnummern>
+                           <ris:inhaltDerAenderung domainTerm="Inhalt der Änderung">
+                               <akn:p>Ersetzen von 'Hauffen' mit 'Haufen'</akn:p>
+                           </ris:inhaltDerAenderung>
+                       </ris:berichtigung>
+                   </ris:berichtigungen>
+                    <ris:gebuehren domainTerm="Gebühren">
+                        <ris:gebuehr domainTerm="Gebühr">
+                            <ris:betrag domainTerm="Betrag">1234</ris:betrag>
+                            <ris:waehrung domainTerm="Währung">USD</ris:waehrung>
+                            <ris:adressat domainTerm="Adressat">Beschwerdeführer / Antragsteller</ris:adressat>
+                        </ris:gebuehr>
+                    </ris:gebuehren>
+                   <ris:herkunftslaender domainTerm="Herkunftsländer">
+                        <ris:herkunftsland domainTerm="Herkunftsland">
+                            <ris:altwert domainTerm="Altwert">legacy value</ris:altwert>
+                        </ris:herkunftsland>
+                        <ris:herkunftsland domainTerm="Herkunftsland">
+                             <ris:landbezeichnung domainTerm="Landbezeichnung"
+                                                               notation="neu"
+                                                               sachgebiet-id="RE-07-DEU">Deutschland</ris:landbezeichnung>
+                             <ris:rechtlicherRahmen domainTerm="Rechtlicher Rahmen"
+                                                                 notation="neu"
+                                                                 sachgebiet-id="AR-01-01-01">Verschulden bei Vertragsschluss (culpa in contrahendo)</ris:rechtlicherRahmen>
+                      </ris:herkunftsland>
+                   </ris:herkunftslaender>
+                    <ris:einkunftsarten domainTerm="Einkunftsarten">
+                        <ris:einkunftsart domainTerm="Einkunftsart">
+                            <ris:einkunftsartTyp domainTerm="Einkunftsart">EStG</ris:einkunftsartTyp>
+                            <ris:begrifflichkeit domainTerm="Begrifflichkeit">terminology test</ris:begrifflichkeit>
+                        </ris:einkunftsart>
+                        <ris:einkunftsart domainTerm="Einkunftsart">
+                            <ris:einkunftsartTyp domainTerm="Einkunftsart">GewStG</ris:einkunftsartTyp>
+                        </ris:einkunftsart>
+                    </ris:einkunftsarten>
+                </ris:meta>
+            </akn:proprietary>
+        </akn:meta>
+        <akn:header>
+            <akn:p>
+                Aktenzeichen:
+                <akn:docNumber refersTo="#aktenzeichen">fileNumber test</akn:docNumber>
+            </akn:p>
+            <akn:p>
+                Entscheidungsdatum:
+                <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
+            </akn:p>
+            <akn:p>
+                Gericht:
+                <akn:courtType refersTo="#gericht">courtLabel test</akn:courtType>
+            </akn:p>
+            <akn:p>
+                Dokumenttyp:
+                <akn:docType refersTo="#dokumenttyp">documentType test</akn:docType>
+            </akn:p>
+            <akn:p>Entscheidungsnamen:
+                <akn:docTitle refersTo="#entscheidungsname">decisionName test</akn:docTitle>
+                <akn:docTitle refersTo="#entscheidungsname">decisionName2 test</akn:docTitle>
+            </akn:p>
+            <akn:p>Kurztitel:
+                <akn:shortTitle refersTo="#titelzeile">
+                    <akn:embeddedStructure>
+                        <akn:p>headline test</akn:p>
+                    </akn:embeddedStructure>
+                </akn:shortTitle>
+            </akn:p>
+        </akn:header>
+        <akn:judgmentBody>
+            <akn:introduction ris:domainTerm="Leitsatz">
+                <akn:p>guidingPrinciple test</akn:p>
+            </akn:introduction>
+            <akn:introduction ris:domainTerm="Gliederung">
+                <akn:p>outline test</akn:p>
+            </akn:introduction>
+            <akn:decision ris:domainTerm="Tenor">
+                <akn:p>tenor test</akn:p>
+            </akn:decision>
+            <akn:background ris:domainTerm="Tatbestand">
+                <akn:p>caseFacts test</akn:p>
+            </akn:background>
+            <akn:motivation ris:domainTerm="Gründe">
+                <akn:p>grounds test</akn:p>
+            </akn:motivation>
+            <akn:motivation ris:domainTerm="Entscheidungsgründe">
+                <akn:p>decisionGrounds test</akn:p>
+            </akn:motivation>
+            <akn:motivation ris:domainTerm="Sonstiger Langtext">
+                <akn:p>otherLongText test</akn:p>
+            </akn:motivation>
+            <akn:motivation ris:domainTerm="Abweichende Meinung">
+                <akn:p>dissenting test</akn:p>
+                <akn:block name="Mitwirkende Richter">
+                    <akn:opinion ris:domainTerm="Art der Mitwirkung"
+                                 type="dissenting"
+                                 by="#dr-phil-max-mustermann">referenced opinions test 1</akn:opinion>
+                    <akn:opinion ris:domainTerm="Art der Mitwirkung"
+                                 type="dissenting"
+                                 by="#richterin-maxima-mustermann">referenced opinions test 2</akn:opinion>
+                </akn:block>
+            </akn:motivation>
+        </akn:judgmentBody>
+    </akn:judgment>
+</akn:akomaNtoso>

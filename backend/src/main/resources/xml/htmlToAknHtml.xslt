@@ -1,8 +1,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/WD17"
+                xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0"
                 xmlns:ris="http://example.com/0.1/"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/WD17 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/csprd02/part2-specs/schemas/akomantoso30.xsd">
+                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/os/part2-specs/schemas/akomantoso30.xsd">
     <xsl:output indent="yes" method="xml" encoding="utf-8"/>
     <xsl:strip-space elements="*"/>
 
@@ -185,7 +185,7 @@
     </xsl:template>
 
     <xsl:template name="borderNumberTemplate">
-        <akn:hcontainer  name="randnummer">
+        <akn:hcontainer ris:domainTerm="Randnummer" eId="randnummer-{number}"  name="Randnummer">
             <xsl:apply-templates select="@* | node()"/>
         </akn:hcontainer>
     </xsl:template>
@@ -208,9 +208,9 @@
 
     <xsl:template name="borderNumberLinkTemplate">
         <!--Any other existing attributes for border-number-link will be lost -->
-        <akn:a class="border-number-link" href="{concat('#border-number-link-',@nr)}">
+        <akn:ref ris:domainTerm="Randnummernverlinkung" class="border-number-link" href="{concat('#randnummer-',@nr)}">
             <xsl:apply-templates/>
-        </akn:a>
+        </akn:ref>
     </xsl:template>
 
     <!--Case Law team handover: akn doesn't support <pre>. Maybe something works better than adding foreign?
@@ -325,21 +325,45 @@
     </xsl:template>
 
     <!--Identity transformation for known cases-->
-    <xsl:template match="akn:akomaNtoso|akn:judgment|akn:judgmentBody|akn:meta|akn:header|akn:introduction
-    |akn:identification|akn:classification|akn:proprietary|akn:block|akn:keyword|akn:background
-    |akn:decision|akn:motivation|akn:opinion|akn:embeddedStructure|akn:subFlow
-    |akn:FRBRWork|akn:FRBRExpression|akn:FRBRManifestation
+    <xsl:template match="akn:akomaNtoso|akn:judgment|akn:judgmentBody|akn:meta|akn:header|akn:docNumber|akn:docDate
+    |akn:courtType|akn:docTitle|akn:shortTitle|akn:docType|akn:introduction
+    |akn:identification|akn:references|akn:TLCOrganization|akn:TLCPerson|akn:TLCLocation|akn:classification|akn:proprietary|akn:block
+    |akn:keyword|akn:background|akn:decision|akn:motivation|akn:opinion|akn:embeddedStructure|akn:subFlow
+    |akn:analysis|akn:otherAnalysis|akn:implicitReference|akn:ref
+    |akn:FRBRWork|akn:FRBRExpression|akn:FRBRManifestation|akn:p
     |akn:FRBRthis|akn:FRBRuri|akn:FRBRalias|akn:FRBRdate|akn:FRBRauthor|akn:FRBRcountry|akn:FRBRlanguage|akn:documentRef
-    |ris:meta|ris:fileNumbers|ris:fileNumber|ris:documentType|ris:courtLocation|ris:courtType|ris:legalEffect
-    |ris:fieldOfLaws|ris:fieldOfLaw|ris:judicialBody|ris:publicationStatus|ris:error|ris:documentationOffice
-    |ris:documentNumber|ris:previousDecisions|ris:previousDecision|ris:ensuingDecisions|ris:ensuingDecision
-    |ris:procedures|ris:procedure|ris:decisionNames|ris:decisionName|ris:deviatingFileNumbers
-    |ris:deviatingFileNumber|ris:deviatingDocumentNumbers|ris:deviatingDocumentNumber|ris:legalForces|ris:legalForce
-    |ris:yearOfDispute|ris:deviatingCourts|ris:deviatingCourt|ris:deviatingDates|ris:deviatingDate
-    |ris:deviatingEclis|ris:deviatingEcli|ris:inputTypes|ris:inputType|ris:foreignLanguageVersions|ris:foreignLanguageVersion|ris:evfs
-    |ris:definitions|ris:definition|@ris:definedTerm|@ris:definingBorderNumber
-    |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@value|@date|@href|@language|@class|@colspan|@rowspan
-    |@style|@alt|@height|@width|@src|@title|@xml:space|@border">
+    |ris:meta|ris:dokumenttyp|ris:gericht|ris:gerichtstyp|ris:gerichtsort|ris:gerichtsbarkeit
+    |ris:fehlerhafteGerichte|ris:fehlerhaftesGericht|ris:regionen|ris:region|ris:dokumentationsstelle
+    |ris:aktenzeichenListe|ris:aktenzeichen|ris:abweichendeDaten|ris:abweichendesDatum|ris:datenDerMuendlichenVerhandlung|ris:datumDerMuendlichenVerhandlung
+    |ris:abweichendeDokumentnummern|ris:abweichendeDokumentnummer|ris:abweichendeEclis|ris:abweichenderEcli
+    |ris:spruchkoerper|ris:sachgebiete|ris:sachgebiet|ris:rechtskraft|ris:vorgaenge|ris:vorgang
+    |ris:dokumentarischeKurztexte|ris:orientierungssatz|ris:sonstigerOrientierungssatz|ris:entscheidungsnamen|ris:entscheidungsname|ris:titelzeile
+    |ris:eingangsarten|ris:eingangsart|ris:definitionen|ris:definition|ris:definierterBegriff|ris:stelleImText
+    |ris:fremdsprachigeFassungen|ris:fremdsprachigeFassung|ris:evsf|ris:rechtsmittelzulassung|ris:rechtsmittelZugelassen|ris:rechtsmittelZugelassenDurch
+    |ris:vorgehend|ris:entscheidungsdatum|ris:dokumentnummer
+    |ris:nachgehend|ris:vermerk
+    |ris:datum|akn:otherReferences
+    |ris:norm|ris:abkuerzung|ris:einzelnorm|ris:fassungsdatum|ris:bezeichnung|ris:gesetzeskraft|ris:gesetzeskraftTyp|ris:geltungsbereich
+    |ris:jahr|ris:titel
+    |ris:fundstelle|ris:zitatstelle|ris:untertitel|ris:periodikum|ris:periodikumTyp|ris:fundstelleLiteraturUnselbststaendig
+    |ris:decisionNames|ris:decisionName|ris:herkunftDerUebersetzungen|ris:herkunftDerUebersetzung|ris:uebersetzerinnen|ris:uebersetzerin
+    |ris:interneVerlinkungen|ris:interneVerlinkung|ris:externeVerlinkungen|ris:externeVerlinkung|ris:herkunftDerUebersetzungTyp
+    |ris:tarifvertraege|ris:tarifvertrag|ris:tarifnorm|ris:branche|ris:notiz
+    |ris:berufsbilder|ris:berufsbild|ris:gesetzgebungsauftrag|ris:kuendigungsarten|ris:kuendigungsart|ris:kuendigungsgruende|ris:kuendigungsgrund|ris:quellen|ris:quelle
+    |ris:streitjahre|ris:streitjahr
+    |ris:rechtsmittel|ris:rechtsmittelfuehrerListe|ris:rechtsmittelfuehrer|ris:revisionKlaegerListe|ris:revisionKlaeger
+    |ris:revisionBeklagterListe|ris:revisionBeklagter|ris:anschlussRevisionKlaegerListe|ris:anschlussRevisionKlaeger
+    |ris:anschlussRevisionBeklagterListe|ris:anschlussRevisionBeklagter|ris:nzbKlaegerListe|ris:nzbKlaeger|ris:nzbBeklagterListe
+    |ris:nzbBeklagter|ris:zuruecknahmeDerRevision|ris:pkhAntragKlaeger|ris:sitzDerAussenstelle
+    |ris:gegenstandswerte|ris:gegenstandswert|ris:betrag|ris:waehrung|ris:verfahren
+    |ris:gebuehren|ris:gebuehr|ris:betrag|ris:waehrung|ris:adressat
+    |ris:einkunftsarten|ris:einkunftsart|ris:einkunftsartTyp|ris:begrifflichkeit
+    |ris:berichtigungen|ris:berichtigung|ris:artDerEintragung|ris:artDerAenderung|ris:datumDerAenderung|ris:randnummern|ris:inhaltDerAenderung|ris:berichtigungRandnummer
+    |ris:herkunftslaender|ris:herkunftsland|ris:altwert|ris:landbezeichnung|ris:rechtlicherRahmen
+    |ris:anhaengigesVerfahren|ris:mitteilungsdatum
+    |ris:nichtanwendungsgesetz
+    |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@akn:refersTo|@refersTo|@value|@date|@href|@language|@class|@colspan|@rowspan
+    |@style|@alt|@height|@width|@src|@title|@xml:space|@border|@eId|@akn:eId|@type|@by|@domainTerm|@notation|@ris:domainTerm|@art|@sachgebiet-id">
 
         <xsl:copy>
             <xsl:apply-templates select="@* | node()"/>

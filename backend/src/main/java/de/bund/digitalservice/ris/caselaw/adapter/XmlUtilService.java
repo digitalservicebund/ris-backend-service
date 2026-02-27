@@ -110,7 +110,7 @@ public class XmlUtilService {
       String ldmlAsXmlString = XmlUtilService.xsltTransform(htmlToAknHtml, jaxbOutput.toString());
       if (ldmlAsXmlString.contains("akn:unknownUseCaseDiscovered")) {
         int hintStart = Math.max(0, ldmlAsXmlString.indexOf("akn:unknownUseCaseDiscovered") - 10);
-        int hintEnd = Math.min(ldmlAsXmlString.length(), hintStart + 60);
+        int hintEnd = Math.min(ldmlAsXmlString.length(), hintStart + 120);
         String hint =
             "\"..." + ldmlAsXmlString.substring(hintStart, hintEnd).replace("\n", "") + "...\"";
         log.error(
