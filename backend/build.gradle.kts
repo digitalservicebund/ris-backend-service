@@ -169,7 +169,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:5.0.1")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.33.5")
+    implementation("com.google.protobuf:protobuf-java:4.34.0")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.6.0")
@@ -181,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.42.0"))
+    implementation(platform("software.amazon.awssdk:bom:2.42.3"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
