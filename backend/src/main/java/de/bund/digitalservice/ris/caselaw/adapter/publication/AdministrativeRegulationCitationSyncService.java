@@ -5,8 +5,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdministrativeReg
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCitationTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobSyncStatus;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobSyncStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdministrativeRegultationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedAdministrativeDirective;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedAdministrativeDirectiveRepository;
@@ -29,18 +27,18 @@ public class AdministrativeRegulationCitationSyncService {
 
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
   private final DatabaseCitationTypeRepository citationTypeRepository;
-  private final JobSyncStatusRepository jobSyncStatusRepository;
+  private final JobSyncStatusService jobSyncStatusService;
   private final RevokedAdministrativeDirectiveRepository revokedAdministrativeDirectiveRepository;
 
   public AdministrativeRegulationCitationSyncService(
       DatabaseDocumentationUnitRepository documentationUnitRepository,
       DatabaseCitationTypeRepository citationTypeRepository,
       RevokedAdministrativeDirectiveRepository revokedAdministrativeDirectiveRepository,
-      JobSyncStatusRepository jobSyncStatusRepository) {
+      JobSyncStatusService jobSyncStatusService) {
     this.documentationUnitRepository = documentationUnitRepository;
     this.citationTypeRepository = citationTypeRepository;
     this.revokedAdministrativeDirectiveRepository = revokedAdministrativeDirectiveRepository;
-    this.jobSyncStatusRepository = jobSyncStatusRepository;
+    this.jobSyncStatusService = jobSyncStatusService;
   }
 
   /**
@@ -165,13 +163,7 @@ public class AdministrativeRegulationCitationSyncService {
   /** Case 3: Identify documents that point to revoked ADM documents. */
   @Transactional
   public Set<String> handleRevoked() {
-    String jobName = "ADM_REVOKED_SYNC";
-
-    Instant lastRun =
-        jobSyncStatusRepository
-            .findById(jobName)
-            .map(JobSyncStatus::getLastRun)
-            .orElse(Instant.EPOCH);
+    Instant lastRun = jobSyncStatusService.getLastRun(SyncJob.ADM_REVOKED_SYNC);
 
     List<RevokedAdministrativeDirective> revokedEntries =
         revokedAdministrativeDirectiveRepository.findAllByRevokedAtAfter(lastRun);
@@ -195,7 +187,7 @@ public class AdministrativeRegulationCitationSyncService {
             .max(Comparator.naturalOrder())
             .orElse(lastRun);
 
-    updateJobStatus(jobName, newestRevokedAt);
+    jobSyncStatusService.updateLastRun(SyncJob.ADM_REVOKED_SYNC, newestRevokedAt);
 
     return documentsToRepublish;
   }
@@ -263,12 +255,5 @@ public class AdministrativeRegulationCitationSyncService {
     }
 
     return documentsToRepublish;
-  }
-
-  private void updateJobStatus(String name, Instant time) {
-    JobSyncStatus status =
-        jobSyncStatusRepository.findById(name).orElse(new JobSyncStatus(name, time));
-    status.setLastRun(time);
-    jobSyncStatusRepository.save(status);
   }
 }
