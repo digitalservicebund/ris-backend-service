@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.publication;
+package de.bund.digitalservice.ris.caselaw.adapter.publication.adm;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationAdministrativeRegulationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdministrativeRegulationDTO;

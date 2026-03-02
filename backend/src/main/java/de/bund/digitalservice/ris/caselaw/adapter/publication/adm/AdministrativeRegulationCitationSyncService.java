@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.publication;
+package de.bund.digitalservice.ris.caselaw.adapter.publication.adm;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdministrativeRegulationActiveCaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdministrativeRegulationDTO;
@@ -8,6 +8,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdministrativeRegultationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedAdministrativeDirective;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedAdministrativeDirectiveRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.JobSyncStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.SyncJob;
 import de.bund.digitalservice.ris.caselaw.domain.LoggingKeys;
 import java.time.Instant;
 import java.util.Comparator;
