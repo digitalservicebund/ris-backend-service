@@ -209,6 +209,9 @@ dependencies {
     // for local development:
     // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.142.jar"))
 
+    // GHSA-72hv-8253-57qq
+    implementation("com.fasterxml.jackson.core:jackson-core:2.21.1")
+
     implementation("tools.jackson.core:jackson-core:3.1.0")
     implementation("tools.jackson.core:jackson-databind:3.1.0")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.21")
