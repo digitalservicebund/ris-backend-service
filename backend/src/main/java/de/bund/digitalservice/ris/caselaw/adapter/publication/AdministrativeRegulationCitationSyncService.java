@@ -2,15 +2,23 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdministrativeRegulationActiveCaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdministrativeRegulationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAdministrativeRegulationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCitationTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobSyncStatus;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobSyncStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdministrativeRegultationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedAdministrativeDirective;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedAdministrativeDirectiveRepository;
+import de.bund.digitalservice.ris.caselaw.domain.LoggingKeys;
+import java.time.Instant;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,13 +29,18 @@ public class AdministrativeRegulationCitationSyncService {
 
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
   private final DatabaseCitationTypeRepository citationTypeRepository;
+  private final JobSyncStatusRepository jobSyncStatusRepository;
+  private final RevokedAdministrativeDirectiveRepository revokedAdministrativeDirectiveRepository;
 
   public AdministrativeRegulationCitationSyncService(
       DatabaseDocumentationUnitRepository documentationUnitRepository,
-      DatabaseAdministrativeRegulationRepository administrativeRegulationRepository,
-      DatabaseCitationTypeRepository citationTypeRepository) {
+      DatabaseCitationTypeRepository citationTypeRepository,
+      RevokedAdministrativeDirectiveRepository revokedAdministrativeDirectiveRepository,
+      JobSyncStatusRepository jobSyncStatusRepository) {
     this.documentationUnitRepository = documentationUnitRepository;
     this.citationTypeRepository = citationTypeRepository;
+    this.revokedAdministrativeDirectiveRepository = revokedAdministrativeDirectiveRepository;
+    this.jobSyncStatusRepository = jobSyncStatusRepository;
   }
 
   /**
@@ -52,7 +65,6 @@ public class AdministrativeRegulationCitationSyncService {
                     findMatchingPassiveCitation(
                         targetDecision, adm.getDocumentNumber(), activeCitation.getCitationType());
                 if (matchingPassiveCitation.isPresent()) {
-                  // TODO: (Malte Laukötter, 2026-02-27) add a propert matching method
                   if (updateOfMatchingCitationNeeded(
                       matchingPassiveCitation.get(), activeCitation)) {
                     log.atInfo()
@@ -148,5 +160,115 @@ public class AdministrativeRegulationCitationSyncService {
 
     return !Objects.equals(
         passive.getSourceDocumentNumber(), active.getSource().getDocumentNumber());
+  }
+
+  /** Case 3: Identify documents that point to revoked ADM documents. */
+  @Transactional
+  public Set<String> handleRevoked() {
+    String jobName = "ADM_REVOKED_SYNC";
+
+    Instant lastRun =
+        jobSyncStatusRepository
+            .findById(jobName)
+            .map(JobSyncStatus::getLastRun)
+            .orElse(Instant.EPOCH);
+
+    List<RevokedAdministrativeDirective> revokedEntries =
+        revokedAdministrativeDirectiveRepository.findAllByRevokedAtAfter(lastRun);
+
+    if (revokedEntries.isEmpty()) {
+      log.atInfo().addKeyValue("lastRun", lastRun).setMessage("No new revoked entries").log();
+      return Set.of();
+    }
+
+    var documentsToRepublish =
+        revokedEntries.stream()
+            .map(this::removeCitationsToRevokedAdministrativeDirective)
+            .flatMap(Set::stream)
+            .collect(Collectors.toSet());
+
+    // get the highest timestamp of revoked entries and not Instant.now() because in
+    // the meantime a new entry could have been saved to the revoked table
+    Instant newestRevokedAt =
+        revokedEntries.stream()
+            .map(RevokedAdministrativeDirective::getRevokedAt)
+            .max(Comparator.naturalOrder())
+            .orElse(lastRun);
+
+    updateJobStatus(jobName, newestRevokedAt);
+
+    return documentsToRepublish;
+  }
+
+  private Set<String> removeCitationsToRevokedAdministrativeDirective(
+      RevokedAdministrativeDirective revokedAdministrativeDirective) {
+    log.atInfo()
+        .addKeyValue(
+            LoggingKeys.REVOKED_ADMINISTRATIVE_DIRECTIVE,
+            revokedAdministrativeDirective.getDocUnitId())
+        .setMessage(
+            "Checking active and passive citations for references to revoked Administrative Directive.")
+        .log();
+
+    Set<String> documentsToRepublish = new HashSet<>();
+
+    List<DecisionDTO> documentsWithPassive =
+        documentationUnitRepository
+            .findAllByPassiveAdministrativeRegulationSourceIdAndPendingRevocation(
+                revokedAdministrativeDirective.getDocUnitId());
+
+    for (DecisionDTO decision : documentsWithPassive) {
+      boolean removed =
+          decision
+              .getPassiveUliCitations()
+              .removeIf(
+                  p ->
+                      p.getSourceId() != null
+                          && revokedAdministrativeDirective.getDocUnitId().equals(p.getSourceId()));
+
+      if (removed) {
+        documentationUnitRepository.save(decision);
+        documentsToRepublish.add(decision.getDocumentNumber());
+        log.atInfo()
+            .addKeyValue(
+                LoggingKeys.REVOKED_ADMINISTRATIVE_DIRECTIVE,
+                revokedAdministrativeDirective.getDocUnitId())
+            .addKeyValue("docunitWithPassiveCitation", decision.getDocumentNumber())
+            .setMessage(
+                "Passive Citation to Revoked Administrative Directive found and removed. Doc unit scheduled for republishing.")
+            .log();
+      } else {
+        // TODO: (Malte Laukötter, 2026-03-02) this shouldn't happen so maybe we should log
+        // something
+      }
+    }
+
+    // active citations will be just republished. This removes the target id and document number
+    // from the published data.
+    List<DecisionDTO> affectedByActive =
+        documentationUnitRepository
+            .findAllByActiveAdministrativeRegulationTargetIdAndPendingRevocation(
+                revokedAdministrativeDirective.getDocUnitId());
+
+    for (DecisionDTO decision : affectedByActive) {
+      documentsToRepublish.add(decision.getDocumentNumber());
+      log.atInfo()
+          .addKeyValue(
+              LoggingKeys.REVOKED_ADMINISTRATIVE_DIRECTIVE,
+              revokedAdministrativeDirective.getDocUnitId())
+          .addKeyValue("docunitWithActiveCitation", decision.getDocumentNumber())
+          .setMessage(
+              "Active Citation to Revoked Administrative Directive found. Doc unit scheduled for republishing.")
+          .log();
+    }
+
+    return documentsToRepublish;
+  }
+
+  private void updateJobStatus(String name, Instant time) {
+    JobSyncStatus status =
+        jobSyncStatusRepository.findById(name).orElse(new JobSyncStatus(name, time));
+    status.setLastRun(time);
+    jobSyncStatusRepository.save(status);
   }
 }
