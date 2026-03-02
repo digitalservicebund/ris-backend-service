@@ -2,17 +2,16 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication.adm;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdministrativeRegulationActiveCaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdministrativeRegulationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAdministrativeRegulationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCitationTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdministrativeRegultationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedAdministrativeDirective;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedAdministrativeDirectiveRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.publication.JobSyncStatusService;
-import de.bund.digitalservice.ris.caselaw.adapter.publication.SyncJob;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.domain.LoggingKeys;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -28,19 +27,47 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdministrativeRegulationCitationSyncService {
 
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
+  private final DatabaseAdministrativeRegulationRepository administrativeRegulationRepository;
   private final DatabaseCitationTypeRepository citationTypeRepository;
-  private final JobSyncStatusService jobSyncStatusService;
   private final RevokedAdministrativeDirectiveRepository revokedAdministrativeDirectiveRepository;
+  private final PortalPublicationService portalPublicationService;
 
   public AdministrativeRegulationCitationSyncService(
       DatabaseDocumentationUnitRepository documentationUnitRepository,
+      DatabaseAdministrativeRegulationRepository administrativeRegulationRepository,
       DatabaseCitationTypeRepository citationTypeRepository,
       RevokedAdministrativeDirectiveRepository revokedAdministrativeDirectiveRepository,
-      JobSyncStatusService jobSyncStatusService) {
+      PortalPublicationService portalPublicationService) {
     this.documentationUnitRepository = documentationUnitRepository;
+    this.administrativeRegulationRepository = administrativeRegulationRepository;
     this.citationTypeRepository = citationTypeRepository;
     this.revokedAdministrativeDirectiveRepository = revokedAdministrativeDirectiveRepository;
-    this.jobSyncStatusService = jobSyncStatusService;
+    this.portalPublicationService = portalPublicationService;
+  }
+
+  @Transactional
+  public void handleNewlyPublishedAfter(Instant after) {
+    administrativeRegulationRepository.findAllByPublishedAtAfter(after).stream()
+        .map(this::syncCitations)
+        .flatMap(Set::stream)
+        // documents that have changed and need to be republished
+        .distinct()
+        .forEach(
+            docNumber -> {
+              try {
+                portalPublicationService.publishDocumentationUnit(docNumber);
+                log.atDebug()
+                    .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
+                    .setMessage("Successfully republished after ADM newly published sync")
+                    .log();
+              } catch (Exception e) {
+                log.atDebug()
+                    .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
+                    .addKeyValue("exception", e)
+                    .setMessage("Failed to republish during ADM newly published sync")
+                    .log();
+              }
+            });
   }
 
   /**
@@ -49,8 +76,7 @@ public class AdministrativeRegulationCitationSyncService {
    * @return list Document numbers of all other documents that have been changed. These should be
    *     published again.
    */
-  @Transactional
-  public Set<String> syncCitations(AdministrativeRegulationDTO adm) {
+  private Set<String> syncCitations(AdministrativeRegulationDTO adm) {
     Set<String> documentsToRepublish = new HashSet<>();
 
     adm.getActiveCaselawReferences()
@@ -164,15 +190,13 @@ public class AdministrativeRegulationCitationSyncService {
 
   /** Case 3: Identify documents that point to revoked ADM documents. */
   @Transactional
-  public Set<String> handleRevoked() {
-    Instant lastRun = jobSyncStatusService.getLastRun(SyncJob.ADM_REVOKED_SYNC);
-
+  public void handleRevokedAfter(Instant after) {
     List<RevokedAdministrativeDirective> revokedEntries =
-        revokedAdministrativeDirectiveRepository.findAllByRevokedAtAfter(lastRun);
+        revokedAdministrativeDirectiveRepository.findAllByRevokedAtAfter(after);
 
     if (revokedEntries.isEmpty()) {
-      log.atInfo().addKeyValue("lastRun", lastRun).setMessage("No new revoked entries").log();
-      return Set.of();
+      log.atInfo().addKeyValue("after", after).setMessage("No new revoked entries").log();
+      return;
     }
 
     var documentsToRepublish =
@@ -181,17 +205,22 @@ public class AdministrativeRegulationCitationSyncService {
             .flatMap(Set::stream)
             .collect(Collectors.toSet());
 
-    // get the highest timestamp of revoked entries and not Instant.now() because in
-    // the meantime a new entry could have been saved to the revoked table
-    Instant newestRevokedAt =
-        revokedEntries.stream()
-            .map(RevokedAdministrativeDirective::getRevokedAt)
-            .max(Comparator.naturalOrder())
-            .orElse(lastRun);
-
-    jobSyncStatusService.updateLastRun(SyncJob.ADM_REVOKED_SYNC, newestRevokedAt);
-
-    return documentsToRepublish;
+    documentsToRepublish.forEach(
+        docNumber -> {
+          try {
+            portalPublicationService.publishDocumentationUnit(docNumber);
+            log.atDebug()
+                .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
+                .setMessage("Successfully republished after ADM revoked sync")
+                .log();
+          } catch (Exception e) {
+            log.atDebug()
+                .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
+                .addKeyValue("exception", e)
+                .setMessage("Failed to republish during ADM revoked sync")
+                .log();
+          }
+        });
   }
 
   private Set<String> removeCitationsToRevokedAdministrativeDirective(
