@@ -31,6 +31,9 @@ public class PassiveCitationAdministrativeRegultationDTO {
   @JoinColumn(name = "target_id")
   private DocumentationUnitDTO target;
 
+  @Column(name = "source_id")
+  private UUID sourceId;
+
   @Column(name = "source_document_number")
   private String sourceDocumentNumber;
 

@@ -31,6 +31,9 @@ public class ActiveCitationAdministrativeRegulationDTO {
   @JoinColumn(name = "source_id")
   private DocumentationUnitDTO source;
 
+  @Column(name = "target_id")
+  private UUID targetId;
+
   @Column(name = "target_document_number")
   private String targetDocumentNumber;
 
