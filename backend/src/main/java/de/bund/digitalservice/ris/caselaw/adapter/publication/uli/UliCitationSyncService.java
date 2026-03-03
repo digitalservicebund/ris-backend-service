@@ -209,6 +209,11 @@ public class UliCitationSyncService {
       if (removed) {
         caselawRepository.save(decision);
         documentsToRepublish.add(decision.getDocumentNumber());
+      } else {
+        log.error(
+            "Inconsistency during revocation: Document {} was fetched as 'affected' from revoked case, but no matching passive ULI citation was found for the revoked ULI IDs {}",
+            decision.getDocumentNumber(),
+            revokedUliIds);
       }
     }
 
