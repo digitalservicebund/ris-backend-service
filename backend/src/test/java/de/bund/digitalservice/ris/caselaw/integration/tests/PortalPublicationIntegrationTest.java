@@ -6,11 +6,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.adapter.CaselawExceptionHandler;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationCaselawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationUliCaselawRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationUliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
@@ -27,12 +29,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobSyncStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationUliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedDocumentationSnapshotEntity;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedDocumentationSnapshotRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationSyncService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
@@ -62,6 +63,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -101,8 +103,6 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   @MockitoBean(name = "portalS3Client")
   private S3Client s3Client;
 
-  @MockitoBean private PublishedUliRepository publishedUliRepository;
-
   @MockitoBean private ActiveCitationUliCaselawRepository activeCitationUliCaselawRepository;
 
   @MockitoBean private RevokedUliRepository revokedUliRepository;
@@ -110,8 +110,6 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   @MockitoBean private JobSyncStatusRepository jobSyncStatusRepository;
 
   @MockitoBean private UliCitationSyncService uliCitationSyncService;
-
-  @MockitoBean private UliCitationPublishService uliCitationPublishService;
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;
@@ -768,5 +766,89 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
               assertThat(historyLog.getDescription())
                   .isEqualTo("Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
             });
+  }
+
+  @Test
+  @Transactional
+  @Sql(scripts = "classpath:uli_publish_validation_init.sql")
+  @Sql(scripts = "classpath:uli_cleanup.sql", executionPhase = AFTER_TEST_METHOD)
+  @Disabled("disabled until we have access to the uli refs in references schema")
+  void testPublish_withUliActiveCitations_enrichesMetadata() {
+
+    TestTransaction.end();
+    UUID userId = UUID.randomUUID();
+    UUID uliId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+    var dto =
+        EntityBuilderTestUtil.createAndSaveDecision(
+            repository,
+            buildValidDocumentationUnit()
+                .activeUliCitations(
+                    List.of(
+                        ActiveCitationUliDTO.builder()
+                            .targetId(uliId)
+                            .targetLiteratureDocumentNumber("ULI-TEST-VALID-1")
+                            .targetAuthor("old author")
+                            .targetCitation("old citation")
+                            .rank(1)
+                            .build())));
+
+    risWebTestClient
+        .withDefaultLogin(userId)
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    TestTransaction.start();
+
+    var updatedDto = (DecisionDTO) repository.findById(dto.getId()).orElseThrow();
+    var activeCitation = updatedDto.getActiveUliCitations().getFirst();
+
+    assertThat(activeCitation.getTargetAuthor()).isEqualTo("ULI author");
+    assertThat(activeCitation.getTargetCitation()).isEqualTo("ULI citation");
+    TestTransaction.end();
+  }
+
+  @Test
+  @Transactional
+  @Sql(scripts = "classpath:uli_publish_validation_init.sql")
+  @Sql(scripts = "classpath:uli_cleanup.sql", executionPhase = AFTER_TEST_METHOD)
+  @Disabled("disabled until we have access to the uli refs in references schema")
+  void testPublish_withPassiveUliCitations_enrichesMetadata() {
+
+    TestTransaction.end();
+    UUID userId = UUID.randomUUID();
+    UUID uliId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+    var dto =
+        EntityBuilderTestUtil.createAndSaveDecision(
+            repository,
+            buildValidDocumentationUnit()
+                .passiveUliCitations(
+                    List.of(
+                        PassiveCitationUliDTO.builder()
+                            .sourceId(uliId)
+                            .sourceLiteratureDocumentNumber("ULI-TEST-VALID-1")
+                            .sourceAuthor("old author")
+                            .sourceCitation("old citation")
+                            .rank(1)
+                            .build())));
+
+    risWebTestClient
+        .withDefaultLogin(userId)
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    TestTransaction.start();
+
+    var updatedDto = (DecisionDTO) repository.findById(dto.getId()).orElseThrow();
+    var passive = updatedDto.getPassiveUliCitations().get(0);
+
+    assertThat(passive.getSourceAuthor()).isEqualTo("ULI author");
+    assertThat(passive.getSourceCitation()).isEqualTo("ULI citation");
+    TestTransaction.end();
   }
 }

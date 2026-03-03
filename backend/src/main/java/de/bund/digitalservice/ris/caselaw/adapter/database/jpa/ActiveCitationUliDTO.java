@@ -34,7 +34,6 @@ public class ActiveCitationUliDTO {
 
   @Id @GeneratedValue @EqualsAndHashCode.Exclude private UUID id;
 
-  @NonNull
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "source_id", nullable = false)
   @EqualsAndHashCode.Exclude
