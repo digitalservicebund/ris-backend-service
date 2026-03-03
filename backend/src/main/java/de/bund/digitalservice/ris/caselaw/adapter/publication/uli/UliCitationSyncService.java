@@ -15,6 +15,8 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -89,12 +91,14 @@ public class UliCitationSyncService {
       for (PassiveCitationUliDTO passive : decision.getPassiveUliCitations()) {
 
         if (uliIds.contains(passive.getSourceId())) {
+          Optional<PublishedUli> uliDataOpt =
+              newUlis.stream().filter(u -> u.getId().equals(passive.getSourceId())).findFirst();
 
-          newUlis.stream()
-              .filter(u -> u.getId().equals(passive.getSourceId()))
-              .findFirst()
-              .ifPresent(uliData -> updateMetadata(passive, uliData));
-          changed = true;
+          if (uliDataOpt.isPresent()) {
+            if (updateMetadataIfChanged(passive, uliDataOpt.get())) {
+              changed = true;
+            }
+          }
         }
       }
 
@@ -113,6 +117,35 @@ public class UliCitationSyncService {
         .ifPresent(ts -> updateJobStatus(jobName, ts));
 
     return documentsToRepublish;
+  }
+
+  /**
+   * Updates metadata only if values have actually changed.
+   *
+   * @return true if at least one field was updated.
+   */
+  private boolean updateMetadataIfChanged(PassiveCitationUliDTO passive, PublishedUli uli) {
+    boolean hasChanged = false;
+
+    if (!Objects.equals(passive.getSourceAuthor(), uli.getAuthor())) {
+      passive.setSourceAuthor(uli.getAuthor());
+      hasChanged = true;
+    }
+    if (!Objects.equals(passive.getSourceCitation(), uli.getCitation())) {
+      passive.setSourceCitation(uli.getCitation());
+      hasChanged = true;
+    }
+    if (!Objects.equals(passive.getSourceDocumentTypeRawValue(), uli.getDocumentTypeRawValue())) {
+      passive.setSourceDocumentTypeRawValue(uli.getDocumentTypeRawValue());
+      hasChanged = true;
+    }
+    if (!Objects.equals(
+        passive.getSourceLegalPeriodicalRawValue(), uli.getLegalPeriodicalRawValue())) {
+      passive.setSourceLegalPeriodicalRawValue(uli.getLegalPeriodicalRawValue());
+      hasChanged = true;
+    }
+
+    return hasChanged;
   }
 
   private void checkForMissingPassiveCitations(
@@ -139,13 +172,6 @@ public class UliCitationSyncService {
             decision.getId());
       }
     }
-  }
-
-  private void updateMetadata(PassiveCitationUliDTO passive, PublishedUli uli) {
-    passive.setSourceAuthor(uli.getAuthor());
-    passive.setSourceCitation(uli.getCitation());
-    passive.setSourceDocumentTypeRawValue(uli.getDocumentTypeRawValue());
-    passive.setSourceLegalPeriodicalRawValue(uli.getLegalPeriodicalRawValue());
   }
 
   /** Case 3: Identify documents that point to revoked ULI documents. */
