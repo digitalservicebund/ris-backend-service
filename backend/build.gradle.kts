@@ -20,7 +20,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.2.0"
-    id("org.flywaydb.flyway") version "12.0.2"
+    id("org.flywaydb.flyway") version "12.0.3"
     id("io.sentry.jvm.gradle") version "6.1.0"
 }
 
@@ -181,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.42.3"))
+    implementation(platform("software.amazon.awssdk:bom:2.42.4"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -247,10 +247,10 @@ dependencies {
     // CVE-2025-67735
     implementation("io.netty:netty-codec-http:4.2.10.Final")
 
-    val flywayCore = "org.flywaydb:flyway-core:12.0.2"
+    val flywayCore = "org.flywaydb:flyway-core:12.0.3"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:12.0.2")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:12.0.3")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -264,7 +264,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-security-test")
     testImplementation("org.springframework.boot:spring-boot-starter-security-oauth2-client-test")
     testImplementation("org.springframework.boot:spring-boot-starter-flyway-test")
-    testImplementation("org.mockito:mockito-junit-jupiter:5.21.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.22.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.8.3")
@@ -283,7 +283,7 @@ dependencies {
 
 buildscript {
     dependencies {
-        classpath("org.flywaydb:flyway-database-postgresql:12.0.2")
+        classpath("org.flywaydb:flyway-database-postgresql:12.0.3")
     }
 }
 
