@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RevokedAdministrativeDirectiveRepository
-    extends JpaRepository<RevokedAdministrativeDirective, UUID> {
-  List<RevokedAdministrativeDirective> findAllByRevokedAtAfter(Instant lastCheck);
+public interface RevokedAdmRepository extends JpaRepository<RevokedAdm, UUID> {
+  List<RevokedAdm> findAllByRevokedAtAfter(Instant lastCheck);
 }

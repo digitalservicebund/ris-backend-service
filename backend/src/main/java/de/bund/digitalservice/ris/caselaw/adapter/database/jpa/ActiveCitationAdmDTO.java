@@ -22,7 +22,7 @@ import lombok.Setter;
 @Builder
 @Entity
 @Table(name = "active_citation_adm", schema = "incremental_migration")
-public class ActiveCitationAdministrativeRegulationDTO {
+public class ActiveCitationAdmDTO {
   @Id
   @Column(name = "id", nullable = false)
   private UUID id;

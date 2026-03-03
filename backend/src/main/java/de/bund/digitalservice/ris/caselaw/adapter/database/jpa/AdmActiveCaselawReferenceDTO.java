@@ -20,14 +20,14 @@ import org.hibernate.annotations.Immutable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdministrativeRegulationActiveCaselawReferenceDTO {
+public class AdmActiveCaselawReferenceDTO {
   @Id
   @Column(name = "id")
   private UUID id;
 
   @ManyToOne()
   @JoinColumn(name = "source_documentation_unit_id")
-  private AdministrativeRegulationDTO source;
+  private AdmDTO source;
 
   @Column(name = "target_documentation_unit_id")
   private UUID targetDocumentationUnitId;

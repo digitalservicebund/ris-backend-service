@@ -12,14 +12,12 @@ public class AdmPassiveCitationSyncJob {
 
   private static final SyncJob job = SyncJob.ADM_PASSIVE_CITATION_SYNC;
 
-  private final AdministrativeRegulationCitationSyncService
-      administrativeRegulationCitationSyncService;
+  private final AdmCitationSyncService admCitationSyncService;
   private final JobSyncStatusService jobSyncStatusService;
 
   public AdmPassiveCitationSyncJob(
-      AdministrativeRegulationCitationSyncService administrativeRegulationCitationSyncService,
-      JobSyncStatusService jobSyncStatusService) {
-    this.administrativeRegulationCitationSyncService = administrativeRegulationCitationSyncService;
+      AdmCitationSyncService admCitationSyncService, JobSyncStatusService jobSyncStatusService) {
+    this.admCitationSyncService = admCitationSyncService;
     this.jobSyncStatusService = jobSyncStatusService;
   }
 
@@ -32,7 +30,7 @@ public class AdmPassiveCitationSyncJob {
     var startOfRun = Instant.now();
     var lastRun = jobSyncStatusService.getLastRun(job);
 
-    administrativeRegulationCitationSyncService.handleNewlyPublishedAfter(lastRun);
+    admCitationSyncService.handleNewlyPublishedAfter(lastRun);
 
     jobSyncStatusService.updateLastRun(job, startOfRun);
   }

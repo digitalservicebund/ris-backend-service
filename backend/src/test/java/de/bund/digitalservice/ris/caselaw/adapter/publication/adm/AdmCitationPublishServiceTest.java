@@ -3,10 +3,10 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication.adm;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationAdministrativeRegulationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdministrativeRegulationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAdministrativeRegulationRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdministrativeRegultationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationAdmDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdmDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAdmRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdmDTO;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Nested;
@@ -18,19 +18,19 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Import({AdministrativeRegulationCitationPublishService.class})
-public class AdministrativeRegulationCitationPublishServiceTest {
+@Import({AdmCitationPublishService.class})
+public class AdmCitationPublishServiceTest {
 
-  @Autowired AdministrativeRegulationCitationPublishService admCitationPublishService;
+  @Autowired AdmCitationPublishService admCitationPublishService;
 
-  @MockitoBean DatabaseAdministrativeRegulationRepository administrativeRegulationRepository;
+  @MockitoBean DatabaseAdmRepository admRepository;
 
   @Nested
   class updatePassiveCitationSourceWithInformationFromSource {
     @Test
     void shouldReturnSameReferenceIfNoDocumentNumberIsGiven() {
       var passiveCitation =
-          PassiveCitationAdministrativeRegultationDTO.builder()
+          PassiveCitationAdmDTO.builder()
               .sourceDirective("VV DEU BMF 1972-02-29 F/IV B 2-S 2000-5/72")
               .rank(1)
               .build();
@@ -49,14 +49,13 @@ public class AdministrativeRegulationCitationPublishServiceTest {
     @Test
     void shouldReturnEmptyIfDocumentNumberIsGivenButNoAdmIsFound() {
       var passiveCitation =
-          PassiveCitationAdministrativeRegultationDTO.builder()
+          PassiveCitationAdmDTO.builder()
               .sourceId(UUID.fromString("1027f2e0-82e3-41af-93f8-35dba142c46f"))
               .sourceDocumentNumber("KSNR150060010")
               .rank(1)
               .build();
 
-      when(administrativeRegulationRepository.findById(
-              UUID.fromString("1027f2e0-82e3-41af-93f8-35dba142c46f")))
+      when(admRepository.findById(UUID.fromString("1027f2e0-82e3-41af-93f8-35dba142c46f")))
           .thenReturn(Optional.empty());
 
       var result =
@@ -69,17 +68,16 @@ public class AdministrativeRegulationCitationPublishServiceTest {
     @Test
     void shouldReturnUpdatedPassiveCitationWhenAdmIsFound() {
       var uuid = UUID.fromString("8a0b92e8-2e89-4808-83da-4d85204f5cdc");
-      var passiveCitation =
-          PassiveCitationAdministrativeRegultationDTO.builder().sourceId(uuid).rank(1).build();
+      var passiveCitation = PassiveCitationAdmDTO.builder().sourceId(uuid).rank(1).build();
 
       var adm =
-          AdministrativeRegulationDTO.builder()
+          AdmDTO.builder()
               .id(uuid)
               .documentNumber("KSNR150060010")
               .jurisAbbreviation("VV DEU BMF 1972-02-29 F/IV B 2-S 2000-5/72")
               .build();
 
-      when(administrativeRegulationRepository.findById(uuid)).thenReturn(Optional.of(adm));
+      when(admRepository.findById(uuid)).thenReturn(Optional.of(adm));
 
       var result =
           admCitationPublishService.updatePassiveCitationSourceWithInformationFromSource(
@@ -98,7 +96,7 @@ public class AdministrativeRegulationCitationPublishServiceTest {
     @Test
     void shouldReturnSameReferenceIfNoIdIsGiven() {
       var activeCitation =
-          ActiveCitationAdministrativeRegulationDTO.builder()
+          ActiveCitationAdmDTO.builder()
               .targetDirective("VV DEU BMF 1972-02-29 F/IV B 2-S 2000-5/72")
               .rank(1)
               .build();
@@ -118,14 +116,14 @@ public class AdministrativeRegulationCitationPublishServiceTest {
     void shouldReturnSameReferenceWithNullDocumentNumberAndIdIfAdmIsNotFound() {
       var uuid = UUID.fromString("9e266182-f4c0-4f7f-9987-1e7b5603aa2b");
       var activeCitation =
-          ActiveCitationAdministrativeRegulationDTO.builder()
+          ActiveCitationAdmDTO.builder()
               .targetDirective("VV DEU BMF 1972-02-29 F/IV B 2-S 2000-5/72")
               .targetId(uuid)
               .targetDocumentNumber("KSNR150060010")
               .rank(1)
               .build();
 
-      when(administrativeRegulationRepository.findById(uuid)).thenReturn(Optional.empty());
+      when(admRepository.findById(uuid)).thenReturn(Optional.empty());
 
       var result =
           admCitationPublishService.updateActiveCitationTargetWithInformationFromTarget(
@@ -140,20 +138,20 @@ public class AdministrativeRegulationCitationPublishServiceTest {
     void shouldReturnUpdatedActiveCitationWhenAdmIsFound() {
       var uuid = UUID.fromString("82948f54-94c7-43f2-9562-7b9efc6ce4fb");
       var activeCitation =
-          ActiveCitationAdministrativeRegulationDTO.builder()
+          ActiveCitationAdmDTO.builder()
               .targetId(uuid)
               .targetDocumentNumber("KSNR150060010")
               .rank(1)
               .build();
 
       var adm =
-          AdministrativeRegulationDTO.builder()
+          AdmDTO.builder()
               .id(uuid)
               .documentNumber("KSNR150060010")
               .jurisAbbreviation("VV DEU BMF 1972-02-29 F/IV B 2-S 2000-5/72")
               .build();
 
-      when(administrativeRegulationRepository.findById(uuid)).thenReturn(Optional.of(adm));
+      when(admRepository.findById(uuid)).thenReturn(Optional.of(adm));
 
       var result =
           admCitationPublishService.updateActiveCitationTargetWithInformationFromTarget(

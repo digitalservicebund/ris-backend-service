@@ -12,14 +12,12 @@ public class RevokedAdmSyncJob {
 
   private static final SyncJob job = SyncJob.ADM_REVOKED_SYNC;
 
-  private final AdministrativeRegulationCitationSyncService
-      administrativeRegulationCitationSyncService;
+  private final AdmCitationSyncService admCitationSyncService;
   private final JobSyncStatusService jobSyncStatusService;
 
   public RevokedAdmSyncJob(
-      AdministrativeRegulationCitationSyncService administrativeRegulationCitationSyncService,
-      JobSyncStatusService jobSyncStatusService) {
-    this.administrativeRegulationCitationSyncService = administrativeRegulationCitationSyncService;
+      AdmCitationSyncService admCitationSyncService, JobSyncStatusService jobSyncStatusService) {
+    this.admCitationSyncService = admCitationSyncService;
     this.jobSyncStatusService = jobSyncStatusService;
   }
 
@@ -32,7 +30,7 @@ public class RevokedAdmSyncJob {
     var startOfRun = Instant.now();
     var lastRun = jobSyncStatusService.getLastRun(job);
 
-    administrativeRegulationCitationSyncService.handleRevokedAfter(lastRun);
+    admCitationSyncService.handleRevokedAfter(lastRun);
 
     jobSyncStatusService.updateLastRun(job, startOfRun);
   }

@@ -23,7 +23,7 @@ import org.hibernate.annotations.Immutable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdministrativeRegulationDTO {
+public class AdmDTO {
   @Id
   @Column(name = "id")
   private UUID id;
@@ -38,5 +38,5 @@ public class AdministrativeRegulationDTO {
   private Instant publishedAt;
 
   @OneToMany(mappedBy = "source")
-  private List<AdministrativeRegulationActiveCaselawReferenceDTO> activeCaselawReferences;
+  private List<AdmActiveCaselawReferenceDTO> activeCaselawReferences;
 }

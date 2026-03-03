@@ -19,7 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.ManualPortalPublicationResult.RelatedPendingProceedingPublicationResult;
-import de.bund.digitalservice.ris.caselaw.adapter.publication.adm.AdministrativeRegulationCitationPublishService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.adm.AdmCitationPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PendingProceedingTransformer;
@@ -71,8 +71,7 @@ public class PortalPublicationService {
   private final CaselawCitationSyncService caselawCitationSyncService;
   private final CaselawCitationPublishService caselawCitationPublishService;
   private final UliCitationPublishService uliCitationPublishService;
-  private final AdministrativeRegulationCitationPublishService
-      administrativeRegulationCitationPublishService;
+  private final AdmCitationPublishService admCitationPublishService;
 
   private static final String PUBLICATION_FEATURE_FLAG = "neuris.portal-publication";
   private static final String CHANGELOG_FEATURE_FLAG = "neuris.regular-changelogs";
@@ -92,8 +91,7 @@ public class PortalPublicationService {
       CaselawCitationSyncService caselawCitationSyncService,
       CaselawCitationPublishService caselawCitationPublishService,
       UliCitationPublishService uliCitationPublishService,
-      AdministrativeRegulationCitationPublishService
-          administrativeRegulationCitationPublishService) {
+      AdmCitationPublishService admCitationPublishService) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
@@ -108,8 +106,7 @@ public class PortalPublicationService {
     this.caselawCitationSyncService = caselawCitationSyncService;
     this.caselawCitationPublishService = caselawCitationPublishService;
     this.uliCitationPublishService = uliCitationPublishService;
-    this.administrativeRegulationCitationPublishService =
-        administrativeRegulationCitationPublishService;
+    this.admCitationPublishService = admCitationPublishService;
   }
 
   /**
@@ -385,7 +382,7 @@ public class PortalPublicationService {
     if (documentationUnit instanceof DecisionDTO decision) {
       validateAndEnrichCaselawCitations(decision);
       // validateAndEnrichUliCitations(decision);
-      validateAndEnrichAdministrativeRegulationCitations(decision);
+      validateAndEnrichAdmCitations(decision);
     }
 
     CaseLawLdml ldml = ldmlTransformer.transformToLdml(toDomain(documentationUnit));
@@ -474,18 +471,14 @@ public class PortalPublicationService {
     }
   }
 
-  private void validateAndEnrichAdministrativeRegulationCitations(DecisionDTO decision) {
-    decision.setActiveAdministrativeRegulationCitations(
-        decision.getActiveAdministrativeRegulationCitations().stream()
-            .map(
-                administrativeRegulationCitationPublishService
-                    ::updateActiveCitationTargetWithInformationFromTarget)
+  private void validateAndEnrichAdmCitations(DecisionDTO decision) {
+    decision.setActiveAdmCitations(
+        decision.getActiveAdmCitations().stream()
+            .map(admCitationPublishService::updateActiveCitationTargetWithInformationFromTarget)
             .toList());
-    decision.setPassiveAdministrativeRegulationCitations(
-        decision.getPassiveAdministrativeRegulationCitations().stream()
-            .map(
-                administrativeRegulationCitationPublishService
-                    ::updatePassiveCitationSourceWithInformationFromSource)
+    decision.setPassiveAdmCitations(
+        decision.getPassiveAdmCitations().stream()
+            .map(admCitationPublishService::updatePassiveCitationSourceWithInformationFromSource)
             .flatMap(Optional::stream)
             .toList());
   }

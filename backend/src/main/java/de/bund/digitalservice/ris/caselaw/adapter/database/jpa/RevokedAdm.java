@@ -19,7 +19,7 @@ import org.hibernate.annotations.Immutable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class RevokedAdministrativeDirective {
+public class RevokedAdm {
 
   @Id private UUID id;
 

@@ -21,7 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class AdmPassiveCitationSyncJobTest {
   @Autowired AdmPassiveCitationSyncJob admPassiveCitationSyncJob;
 
-  @MockitoBean AdministrativeRegulationCitationSyncService admCitationSyncService;
+  @MockitoBean AdmCitationSyncService admCitationSyncService;
   @MockitoBean JobSyncStatusService jobSyncStatusService;
 
   @Test

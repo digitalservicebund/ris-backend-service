@@ -98,23 +98,23 @@ SELECT d.documentNumber FROM DocumentationUnitDTO d
 
   @Query(
       "SELECT DISTINCT d FROM DecisionDTO d "
-          + "JOIN d.passiveAdministrativeRegulationCitations p "
-          + "JOIN RevokedAdministrativeDirective r ON p.sourceId = r.docUnitId "
+          + "JOIN d.passiveAdmCitations p "
+          + "JOIN RevokedAdm r ON p.sourceId = r.docUnitId "
           + "WHERE r.docUnitId = :revokedId "
           + "AND NOT EXISTS (SELECT s FROM PublishedDocumentationSnapshotEntity s "
           + "                WHERE s.documentationUnitId = d.id "
           + "                AND s.publishedAt >= r.revokedAt)")
-  List<DecisionDTO> findAllByPassiveAdministrativeRegulationSourceIdAndPendingRevocation(
+  List<DecisionDTO> findAllByPassiveAdmSourceIdAndPendingRevocation(
       @Param("revokedId") UUID revokedId);
 
   @Query(
       "SELECT DISTINCT d FROM DecisionDTO d "
-          + "JOIN d.activeAdministrativeRegulationCitations a "
-          + "JOIN RevokedAdministrativeDirective r ON a.targetId = r.docUnitId "
+          + "JOIN d.activeAdmCitations a "
+          + "JOIN RevokedAdm r ON a.targetId = r.docUnitId "
           + "WHERE r.docUnitId = :revokedId "
           + "AND NOT EXISTS (SELECT s FROM PublishedDocumentationSnapshotEntity s "
           + "                WHERE s.documentationUnitId = d.id "
           + "                AND s.publishedAt >= r.revokedAt)")
-  List<DecisionDTO> findAllByActiveAdministrativeRegulationTargetIdAndPendingRevocation(
+  List<DecisionDTO> findAllByActiveAdmTargetIdAndPendingRevocation(
       @Param("revokedId") UUID revokedId);
 }

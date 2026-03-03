@@ -1,9 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter.publication.adm;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationAdministrativeRegulationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdministrativeRegulationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAdministrativeRegulationRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdministrativeRegultationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationAdmDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdmDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAdmRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdmDTO;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,31 +11,28 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
-public class AdministrativeRegulationCitationPublishService {
+public class AdmCitationPublishService {
 
-  private final DatabaseAdministrativeRegulationRepository administrativeRegulationRepository;
+  private final DatabaseAdmRepository admRepository;
 
-  public AdministrativeRegulationCitationPublishService(
-      DatabaseAdministrativeRegulationRepository administrativeRegulationRepository) {
-    this.administrativeRegulationRepository = administrativeRegulationRepository;
+  public AdmCitationPublishService(DatabaseAdmRepository admRepository) {
+    this.admRepository = admRepository;
   }
 
-  private Optional<AdministrativeRegulationDTO> getPassiveCitationSource(
-      PassiveCitationAdministrativeRegultationDTO passiveCitation) {
+  private Optional<AdmDTO> getPassiveCitationSource(PassiveCitationAdmDTO passiveCitation) {
     if (passiveCitation.getSourceId() == null) {
       return Optional.empty();
     }
 
-    return administrativeRegulationRepository.findById(passiveCitation.getSourceId());
+    return admRepository.findById(passiveCitation.getSourceId());
   }
 
-  private Optional<AdministrativeRegulationDTO> getActiveCitationTarget(
-      ActiveCitationAdministrativeRegulationDTO activeCitation) {
+  private Optional<AdmDTO> getActiveCitationTarget(ActiveCitationAdmDTO activeCitation) {
     if (activeCitation.getTargetDocumentNumber() == null) {
       return Optional.empty();
     }
 
-    return administrativeRegulationRepository.findById(activeCitation.getTargetId());
+    return admRepository.findById(activeCitation.getTargetId());
   }
 
   /**
@@ -44,9 +41,8 @@ public class AdministrativeRegulationCitationPublishService {
    * document number).
    */
   @Transactional
-  public Optional<PassiveCitationAdministrativeRegultationDTO>
-      updatePassiveCitationSourceWithInformationFromSource(
-          PassiveCitationAdministrativeRegultationDTO passiveCitation) {
+  public Optional<PassiveCitationAdmDTO> updatePassiveCitationSourceWithInformationFromSource(
+      PassiveCitationAdmDTO passiveCitation) {
     if (passiveCitation.getSourceId() == null) {
       return Optional.of(passiveCitation);
     }
@@ -70,9 +66,8 @@ public class AdministrativeRegulationCitationPublishService {
 
   /** Update the citation target with the information from the actual target document. */
   @Transactional
-  public ActiveCitationAdministrativeRegulationDTO
-      updateActiveCitationTargetWithInformationFromTarget(
-          ActiveCitationAdministrativeRegulationDTO activeCitation) {
+  public ActiveCitationAdmDTO updateActiveCitationTargetWithInformationFromTarget(
+      ActiveCitationAdmDTO activeCitation) {
     var target = getActiveCitationTarget(activeCitation);
 
     if (target.isEmpty()) {

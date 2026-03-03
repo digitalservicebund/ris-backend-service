@@ -6,17 +6,17 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationAdministrativeRegulationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdministrativeRegulationActiveCaselawReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdministrativeRegulationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationAdmDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdmActiveCaselawReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdmDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CitationTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAdministrativeRegulationRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAdmRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCitationTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdministrativeRegultationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedAdministrativeDirective;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedAdministrativeDirectiveRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdmDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedAdm;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedAdmRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
@@ -33,14 +33,14 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Import({AdministrativeRegulationCitationSyncService.class})
-public class AdministrativeRegulationCitationSyncServiceTest {
+@Import({AdmCitationSyncService.class})
+public class AdmCitationSyncServiceTest {
 
-  @Autowired AdministrativeRegulationCitationSyncService admCitationSyncService;
+  @Autowired AdmCitationSyncService admCitationSyncService;
 
   @MockitoBean DatabaseDocumentationUnitRepository caselawRepository;
-  @MockitoBean DatabaseAdministrativeRegulationRepository administrativeRegulationRepository;
-  @MockitoBean RevokedAdministrativeDirectiveRepository revokedAdministrativeDirectiveRepository;
+  @MockitoBean DatabaseAdmRepository admRepository;
+  @MockitoBean RevokedAdmRepository revokedAdmRepository;
   @MockitoBean DatabaseCitationTypeRepository citationTypeRepository;
   @MockitoBean PortalPublicationService portalPublicationService;
 
@@ -55,22 +55,22 @@ public class AdministrativeRegulationCitationSyncServiceTest {
       Instant now = Instant.now();
 
       var adm =
-          AdministrativeRegulationDTO.builder()
+          AdmDTO.builder()
               .id(admId)
               .documentNumber("KSNR150060010")
               .jurisAbbreviation("VV DEU BMF 1972-02-29 F/IV B 2-S 2000-5/72")
               .publishedAt(now)
               .build();
       var admActiveCaselawReference =
-          AdministrativeRegulationActiveCaselawReferenceDTO.builder()
+          AdmActiveCaselawReferenceDTO.builder()
               .citationType("Vgl")
               .targetDocumentationUnitId(caselawId)
               .source(adm)
               .build();
       adm.setActiveCaselawReferences(List.of(admActiveCaselawReference));
 
-      PassiveCitationAdministrativeRegultationDTO passiveCitation =
-          PassiveCitationAdministrativeRegultationDTO.builder()
+      PassiveCitationAdmDTO passiveCitation =
+          PassiveCitationAdmDTO.builder()
               .sourceId(admId)
               .sourceDirective("VV DEU OLD 1900-00-00")
               .citationType(CitationTypeDTO.builder().abbreviation("Vgl").build())
@@ -80,20 +80,17 @@ public class AdministrativeRegulationCitationSyncServiceTest {
           DecisionDTO.builder()
               .id(caselawId)
               .documentNumber("WBRE410005137")
-              .passiveAdministrativeRegulationCitations(new ArrayList<>(List.of(passiveCitation)))
+              .passiveAdmCitations(new ArrayList<>(List.of(passiveCitation)))
               .build();
 
-      when(administrativeRegulationRepository.findAllByPublishedAtAfter(any()))
-          .thenReturn(List.of(adm));
+      when(admRepository.findAllByPublishedAtAfter(any())).thenReturn(List.of(adm));
       when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
 
       // Execute
       admCitationSyncService.handleNewlyPublishedAfter(Instant.now());
 
       // Verify
-      assertThat(decision.getPassiveAdministrativeRegulationCitations())
-          .hasSize(1)
-          .containsExactly(passiveCitation);
+      assertThat(decision.getPassiveAdmCitations()).hasSize(1).containsExactly(passiveCitation);
       assertThat(passiveCitation.getSourceId()).isEqualTo(admId);
       assertThat(passiveCitation.getSourceDocumentNumber()).isEqualTo("KSNR150060010");
       assertThat(passiveCitation.getSourceDirective())
@@ -110,14 +107,14 @@ public class AdministrativeRegulationCitationSyncServiceTest {
       Instant now = Instant.now();
 
       var adm =
-          AdministrativeRegulationDTO.builder()
+          AdmDTO.builder()
               .id(admId)
               .documentNumber("KSNR150060010")
               .jurisAbbreviation("VV DEU BMF 1972-02-29 F/IV B 2-S 2000-5/72")
               .publishedAt(now)
               .build();
       var admActiveCaselawReference =
-          AdministrativeRegulationActiveCaselawReferenceDTO.builder()
+          AdmActiveCaselawReferenceDTO.builder()
               .citationType("Vgl")
               .targetDocumentationUnitId(caselawId)
               .source(adm)
@@ -128,13 +125,12 @@ public class AdministrativeRegulationCitationSyncServiceTest {
           DecisionDTO.builder()
               .id(caselawId)
               .documentNumber("WBRE410005137")
-              .passiveAdministrativeRegulationCitations(new ArrayList<>())
+              .passiveAdmCitations(new ArrayList<>())
               .build();
 
       var citationType = CitationTypeDTO.builder().abbreviation("Vgl").build();
 
-      when(administrativeRegulationRepository.findAllByPublishedAtAfter(any()))
-          .thenReturn(List.of(adm));
+      when(admRepository.findAllByPublishedAtAfter(any())).thenReturn(List.of(adm));
       when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
       when(citationTypeRepository.findByAbbreviation("Vgl")).thenReturn(Optional.of(citationType));
 
@@ -142,8 +138,8 @@ public class AdministrativeRegulationCitationSyncServiceTest {
       admCitationSyncService.handleNewlyPublishedAfter(Instant.now());
 
       // Verify
-      assertThat(decision.getPassiveAdministrativeRegulationCitations()).hasSize(1);
-      var passiveCitation = decision.getPassiveAdministrativeRegulationCitations().getFirst();
+      assertThat(decision.getPassiveAdmCitations()).hasSize(1);
+      var passiveCitation = decision.getPassiveAdmCitations().getFirst();
       assertThat(passiveCitation.getSourceId()).isEqualTo(admId);
       assertThat(passiveCitation.getSourceDocumentNumber()).isEqualTo("KSNR150060010");
       assertThat(passiveCitation.getSourceDirective())
@@ -157,8 +153,7 @@ public class AdministrativeRegulationCitationSyncServiceTest {
 
     @Test
     void shouldDoNothingIfNoNewAdmsFound() throws DocumentationUnitNotExistsException {
-      when(administrativeRegulationRepository.findAllByPublishedAtAfter(any()))
-          .thenReturn(List.of());
+      when(admRepository.findAllByPublishedAtAfter(any())).thenReturn(List.of());
 
       admCitationSyncService.handleNewlyPublishedAfter(Instant.now());
 
@@ -176,38 +171,34 @@ public class AdministrativeRegulationCitationSyncServiceTest {
       Instant now = Instant.now();
 
       // Setup Delta for Revoked ADM
-      RevokedAdministrativeDirective revokedEntry =
-          RevokedAdministrativeDirective.builder().docUnitId(revokedUuid).revokedAt(now).build();
-      when(revokedAdministrativeDirectiveRepository.findAllByRevokedAtAfter(any()))
-          .thenReturn(List.of(revokedEntry));
+      RevokedAdm revokedEntry = RevokedAdm.builder().docUnitId(revokedUuid).revokedAt(now).build();
+      when(revokedAdmRepository.findAllByRevokedAtAfter(any())).thenReturn(List.of(revokedEntry));
 
       // Setup Decision that has this ADM as a passive citation
-      PassiveCitationAdministrativeRegultationDTO passiveToStay =
-          PassiveCitationAdministrativeRegultationDTO.builder().sourceId(UUID.randomUUID()).build();
-      PassiveCitationAdministrativeRegultationDTO passiveToRemove =
-          PassiveCitationAdministrativeRegultationDTO.builder().sourceId(revokedUuid).build();
+      PassiveCitationAdmDTO passiveToStay =
+          PassiveCitationAdmDTO.builder().sourceId(UUID.randomUUID()).build();
+      PassiveCitationAdmDTO passiveToRemove =
+          PassiveCitationAdmDTO.builder().sourceId(revokedUuid).build();
 
-      List<PassiveCitationAdministrativeRegultationDTO> passiveCitations =
+      List<PassiveCitationAdmDTO> passiveCitations =
           new ArrayList<>(List.of(passiveToStay, passiveToRemove));
 
       DecisionDTO decision =
           DecisionDTO.builder()
               .id(UUID.fromString("4eb14cae-7103-4c39-98f6-eff2e79de573"))
               .documentNumber("WBRE410005137")
-              .passiveAdministrativeRegulationCitations(passiveCitations)
+              .passiveAdmCitations(passiveCitations)
               .build();
 
-      when(caselawRepository.findAllByPassiveAdministrativeRegulationSourceIdAndPendingRevocation(
-              revokedUuid))
+      when(caselawRepository.findAllByPassiveAdmSourceIdAndPendingRevocation(revokedUuid))
           .thenReturn(List.of(decision));
 
       // Execute
       admCitationSyncService.handleRevokedAfter(Instant.now());
 
       // Verify
-      assertThat(decision.getPassiveAdministrativeRegulationCitations()).hasSize(1);
-      assertThat(decision.getPassiveAdministrativeRegulationCitations())
-          .containsExactly(passiveToStay);
+      assertThat(decision.getPassiveAdmCitations()).hasSize(1);
+      assertThat(decision.getPassiveAdmCitations()).containsExactly(passiveToStay);
 
       verify(caselawRepository).save(decision);
       verify(portalPublicationService).publishDocumentationUnit("WBRE410005137");
@@ -218,31 +209,22 @@ public class AdministrativeRegulationCitationSyncServiceTest {
         throws DocumentationUnitNotExistsException {
       UUID revokedUuid = UUID.randomUUID();
 
-      RevokedAdministrativeDirective revokedEntry =
-          RevokedAdministrativeDirective.builder()
-              .docUnitId(revokedUuid)
-              .revokedAt(Instant.now())
-              .build();
-      when(revokedAdministrativeDirectiveRepository.findAllByRevokedAtAfter(any()))
-          .thenReturn(List.of(revokedEntry));
+      RevokedAdm revokedEntry =
+          RevokedAdm.builder().docUnitId(revokedUuid).revokedAt(Instant.now()).build();
+      when(revokedAdmRepository.findAllByRevokedAtAfter(any())).thenReturn(List.of(revokedEntry));
 
       // Decision targets an ADM that was revoked (Active Citation)
       DecisionDTO decision =
           DecisionDTO.builder()
               .id(UUID.fromString("6c2447a7-e155-4c6b-9244-37f0d40d8435"))
               .documentNumber("WBRE410005137")
-              .activeAdministrativeRegulationCitations(
-                  List.of(
-                      ActiveCitationAdministrativeRegulationDTO.builder()
-                          .targetId(revokedUuid)
-                          .build()))
+              .activeAdmCitations(
+                  List.of(ActiveCitationAdmDTO.builder().targetId(revokedUuid).build()))
               .build();
 
-      when(caselawRepository.findAllByPassiveAdministrativeRegulationSourceIdAndPendingRevocation(
-              any()))
+      when(caselawRepository.findAllByPassiveAdmSourceIdAndPendingRevocation(any()))
           .thenReturn(List.of());
-      when(caselawRepository.findAllByActiveAdministrativeRegulationTargetIdAndPendingRevocation(
-              revokedUuid))
+      when(caselawRepository.findAllByActiveAdmTargetIdAndPendingRevocation(revokedUuid))
           .thenReturn(List.of(decision));
 
       // Execute
