@@ -45,6 +45,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.publication.CaselawCitationSyn
 import de.bund.digitalservice.ris.caselaw.adapter.publication.ManualPortalPublicationResult.RelatedPendingProceedingPublicationResult;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.adm.AdministrativeRegulationCitationPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
@@ -102,6 +103,10 @@ class PortalPublicationServiceTest {
   @MockitoBean private CaselawCitationPublishService caselawCitationPublishService;
   @MockitoBean private CaselawCitationSyncService caselawCitationSyncService;
   @MockitoBean private UliCitationPublishService uliCitationPublishService;
+
+  @MockitoBean
+  private AdministrativeRegulationCitationPublishService
+      administrativeRegulationCitationPublishService;
 
   private ArgumentCaptor<PublishedDocumentationSnapshotEntity> snapshotCaptor =
       ArgumentCaptor.forClass(PublishedDocumentationSnapshotEntity.class);
@@ -234,7 +239,8 @@ class PortalPublicationServiceTest {
             snapshotRepository,
             caselawCitationSyncService,
             caselawCitationPublishService,
-            uliCitationPublishService);
+            uliCitationPublishService,
+            administrativeRegulationCitationPublishService);
     when(objectMapper.writeValueAsString(any())).thenReturn("");
     when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(true);
     when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(true);

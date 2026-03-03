@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication.adm;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdministrativeRegulationActiveCaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdministrativeRegulationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CitationTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAdministrativeRegulationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCitationTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -89,7 +91,10 @@ public class AdministrativeRegulationCitationSyncService {
               if (target.isPresent() && target.get() instanceof DecisionDTO targetDecision) {
                 var matchingPassiveCitation =
                     findMatchingPassiveCitation(
-                        targetDecision, adm.getDocumentNumber(), activeCitation.getCitationType());
+                        targetDecision,
+                        adm.getId(),
+                        adm.getDocumentNumber(),
+                        activeCitation.getCitationType());
                 if (matchingPassiveCitation.isPresent()) {
                   if (updateOfMatchingCitationNeeded(
                       matchingPassiveCitation.get(), activeCitation)) {
@@ -100,6 +105,7 @@ public class AdministrativeRegulationCitationSyncService {
                         .addKeyValue("matchingPassiveCitation", matchingPassiveCitation.get())
                         .setMessage("Updating data of matching passive citation.")
                         .log();
+                    matchingPassiveCitation.get().setSourceId(adm.getId());
                     matchingPassiveCitation.get().setSourceDocumentNumber(adm.getDocumentNumber());
                     matchingPassiveCitation.get().setSourceDirective(adm.getJurisAbbreviation());
 
@@ -115,7 +121,7 @@ public class AdministrativeRegulationCitationSyncService {
                               activeCitation,
                               targetDecision,
                               adm,
-                              targetDecision.getPassiveCaselawCitations().size()));
+                              targetDecision.getPassiveCaselawCitations().size() + 1));
 
                   log.atInfo()
                       .addKeyValue("publishedAdm", adm.getDocumentNumber())
@@ -143,7 +149,7 @@ public class AdministrativeRegulationCitationSyncService {
         .target(target)
         .sourceId(source.getId())
         .sourceDocumentNumber(source.getDocumentNumber())
-        .sourceDirective(source.getDocumentNumber())
+        .sourceDirective(source.getJurisAbbreviation())
         .citationTypeRaw(activeCitation.getCitationType())
         .citationType(
             citationTypeRepository
@@ -155,16 +161,27 @@ public class AdministrativeRegulationCitationSyncService {
   }
 
   private Optional<PassiveCitationAdministrativeRegultationDTO> findMatchingPassiveCitation(
-      DecisionDTO decision, String documentNumber, String citationType) {
+      DecisionDTO decision, UUID admUuid, String documentNumber, String citationType) {
     return decision.getPassiveAdministrativeRegulationCitations().stream()
         .filter(
             passiveCitation -> {
-              if (passiveCitation.getSourceId() == null) {
-                return false;
+              if (passiveCitation.getSourceId() != null) {
+                return passiveCitation.getSourceId().equals(admUuid)
+                    && Objects.equals(
+                        Optional.ofNullable(passiveCitation.getCitationType())
+                            .map(CitationTypeDTO::getAbbreviation),
+                        Optional.ofNullable(citationType));
               }
 
-              return passiveCitation.getSourceDocumentNumber().equals(documentNumber)
-                  && Objects.equals(passiveCitation.getCitationTypeRaw(), citationType);
+              if (passiveCitation.getSourceDocumentNumber() != null) {
+                return passiveCitation.getSourceDocumentNumber().equals(documentNumber)
+                    && Objects.equals(
+                        Optional.ofNullable(passiveCitation.getCitationType())
+                            .map(CitationTypeDTO::getAbbreviation),
+                        Optional.ofNullable(citationType));
+              }
+
+              return false;
             })
         .findFirst();
   }
@@ -176,7 +193,7 @@ public class AdministrativeRegulationCitationSyncService {
       return false;
     }
 
-    if (!Objects.equals(passive.getCitationType().getLabel(), active.getCitationType())) {
+    if (!Objects.equals(passive.getSourceId(), active.getSource().getId())) {
       return true;
     }
 
@@ -243,7 +260,7 @@ public class AdministrativeRegulationCitationSyncService {
     for (DecisionDTO decision : documentsWithPassive) {
       boolean removed =
           decision
-              .getPassiveUliCitations()
+              .getPassiveAdministrativeRegulationCitations()
               .removeIf(
                   p ->
                       p.getSourceId() != null

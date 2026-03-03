@@ -28,7 +28,7 @@ public class AdmPassiveCitationSyncJob {
    * in the database and republishes the affected documents to the portal.
    */
   // @Scheduled(cron = "${neuris.jobs.adm-sync.cron:0 0 2 * * *}")
-  public void runRevokedSync() {
+  public void runSync() {
     var startOfRun = Instant.now();
     var lastRun = jobSyncStatusService.getLastRun(job);
 

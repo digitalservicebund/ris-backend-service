@@ -5,15 +5,24 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 
 @Getter
+@Setter
 @Entity
 @Immutable
 @Table(name = "ref_view_adm", schema = "references_schema")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AdministrativeRegulationDTO {
   @Id
   @Column(name = "id")
@@ -24,6 +33,9 @@ public class AdministrativeRegulationDTO {
 
   @Column(name = "juris_abbreviation")
   private String jurisAbbreviation;
+
+  @Column(name = "published_at")
+  private Instant publishedAt;
 
   @OneToMany(mappedBy = "source")
   private List<AdministrativeRegulationActiveCaselawReferenceDTO> activeCaselawReferences;

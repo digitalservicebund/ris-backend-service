@@ -76,6 +76,7 @@ public class AdministrativeRegulationCitationPublishService {
     var target = getActiveCitationTarget(activeCitation);
 
     if (target.isEmpty()) {
+      activeCitation.setTargetId(null);
       activeCitation.setTargetDocumentNumber(null);
     } else {
       activeCitation.setTargetDocumentNumber(target.get().getDocumentNumber());

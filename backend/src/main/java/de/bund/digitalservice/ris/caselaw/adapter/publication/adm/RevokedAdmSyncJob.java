@@ -28,7 +28,7 @@ public class RevokedAdmSyncJob {
    * withdrawn/deleted target and triggers a republishing for them.
    */
   // @Scheduled(cron = "${neuris.jobs.adm-repeal-sync.cron:0 0 3 * * *}")
-  public void runRevokedSync() {
+  public void runSync() {
     var startOfRun = Instant.now();
     var lastRun = jobSyncStatusService.getLastRun(job);
 
