@@ -659,8 +659,6 @@ class DecisionFullLdmlTransformerTest {
             <akn:p>Gericht: <akn:courtType refersTo="#gericht">AG Aachen</akn:courtType>
             </akn:p>
             <akn:p>Dokumenttyp: <akn:docType refersTo="#dokumenttyp">testDocumentTypeAbbreviation</akn:docType></akn:p>
-            <akn:p>Entscheidungsnamen:
-            <akn:docTitle refersTo="#entscheidungsname">Entscheidungsname</akn:docTitle></akn:p>
             <akn:p>Kurztitel:
             <akn:shortTitle refersTo="#titelzeile">
               <akn:embeddedStructure>
@@ -669,6 +667,8 @@ class DecisionFullLdmlTransformerTest {
                 <akn:p alternativeTo="textWrapper"> world!</akn:p>
               </akn:embeddedStructure>
             </akn:shortTitle></akn:p>
+            <akn:p>Entscheidungsnamen:
+            <akn:docTitle refersTo="#entscheidungsname">Entscheidungsname</akn:docTitle></akn:p>
           </akn:header>
          """;
       Decision otherLongTextCaseLaw =
@@ -700,14 +700,14 @@ class DecisionFullLdmlTransformerTest {
                 <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01"refersTo="#entscheidungsdatum">01.01.2020</akn:docDate></akn:p>
                 <akn:p>Gericht:<akn:courtType refersTo="#gericht">AG Aachen</akn:courtType></akn:p>
                 <akn:p>Dokumenttyp:<akn:doc Type refersTo="#dokumenttyp">testDocumentTypeAbbreviation</akn:docType></akn:p>
-                <akn:p>Entscheidungsnamen:
-                <akn:docTitle refersTo="#entscheidungsname">Entscheidungsname</akn:docTitle></akn:p>
                 <akn:p>Kurztitel: <akn:shortTitle>
                    <akn:embeddedStructure>
                       <akn:p alternativeTo="textWrapper">AG Aachen, 01.01.2020, testFileNumber</akn:p>
                    </akn:embeddedStructure>
                   </akn:shortTitle>
                  </akn:p>
+                 <akn:p>Entscheidungsnamen:
+                <akn:docTitle refersTo="#entscheidungsname">Entscheidungsname</akn:docTitle></akn:p>
               </akn:header>
             """;
         Decision otherLongTextCaseLaw =

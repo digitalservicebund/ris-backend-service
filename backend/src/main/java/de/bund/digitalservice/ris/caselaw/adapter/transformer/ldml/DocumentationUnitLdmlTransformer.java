@@ -128,8 +128,19 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
   }
 
   default List<Paragraph> buildCommonHeader(
-      DocumentationUnit documentationUnit, List<Paragraph> paragraphs) {
+      DocumentationUnit documentationUnit,
+      List<Paragraph> paragraphs,
+      HtmlTransformer htmlTransformer,
+      String headline) {
     var coreData = documentationUnit.coreData();
+    var refersToTitelzeile = false;
+
+    if (isNotBlank(headline)) {
+      headline = removeWrappingBrackets(headline);
+      refersToTitelzeile = true;
+    } else {
+      headline = buildFallbackHeadline(documentationUnit);
+    }
 
     // Aktenzeichen
     if (coreData.fileNumbers() != null && !coreData.fileNumbers().isEmpty()) {
@@ -182,6 +193,9 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
       documentTypeParagraph.getContent().add(docType);
       paragraphs.add(documentTypeParagraph);
     }
+
+    // Titelzeile
+    buildHeadline(paragraphs, headline, htmlTransformer, refersToTitelzeile);
 
     return paragraphs;
   }
@@ -304,6 +318,21 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     }
 
     return fundstellen;
+  }
+
+  private String removeWrappingBrackets(String headline) {
+    headline = headline.strip();
+
+    boolean startsWithBracket = headline.startsWith("(");
+    boolean endsWithBracket = headline.endsWith(")");
+
+    if (startsWithBracket && endsWithBracket) {
+      String cleanHeadline = headline.substring(1, headline.length() - 1);
+      if (!cleanHeadline.contains("(") && !cleanHeadline.contains(")")) {
+        return cleanHeadline;
+      }
+    }
+    return headline;
   }
 
   @Nonnull

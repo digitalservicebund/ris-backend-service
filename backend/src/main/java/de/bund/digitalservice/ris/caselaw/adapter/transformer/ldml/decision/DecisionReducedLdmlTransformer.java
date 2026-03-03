@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
+import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
+
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
@@ -7,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Doku
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
+import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -51,10 +54,10 @@ public class DecisionReducedLdmlTransformer extends DecisionCommonLdmlTransforme
   @Override
   protected Header buildHeader(Decision decision) {
     List<Paragraph> paragraphs = new ArrayList<>();
+    var shortTexts = decision.shortTexts();
+    var headline = nullSafeGet(shortTexts, ShortTexts::headline);
 
-    paragraphs = buildCommonHeader(decision, paragraphs);
-
-    buildHeadline(paragraphs, buildFallbackHeadline(decision), htmlTransformer, false);
+    paragraphs = buildCommonHeader(decision, paragraphs, htmlTransformer, headline);
 
     return Header.builder().paragraphs(paragraphs).build();
   }

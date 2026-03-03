@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Introduction;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.JudgmentBody;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Motivation;
@@ -74,7 +75,15 @@ public abstract class PendingProceedingCommonLdmlTransformer
         .build();
   }
 
-  protected abstract Header buildHeader(PendingProceeding pendingProceeding);
+  protected Header buildHeader(PendingProceeding pendingProceeding) {
+    List<Paragraph> paragraphs = new ArrayList<>();
+    var shortTexts = pendingProceeding.shortTexts();
+    var headline = nullSafeGet(shortTexts, PendingProceedingShortTexts::headline);
+
+    paragraphs = buildCommonHeader(pendingProceeding, paragraphs, htmlTransformer, headline);
+
+    return Header.builder().paragraphs(paragraphs).build();
+  }
 
   @Nullable
   protected Analysis buildAnalysis(PendingProceeding pendingProceeding) {

@@ -1,13 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproceeding;
 
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,17 +30,6 @@ public class PendingProceedingReducedLdmlTransformer
 
   private RisMeta buildRisMeta(PendingProceeding pendingProceeding) {
     return buildCommonRisMeta(pendingProceeding).build();
-  }
-
-  @Override
-  protected Header buildHeader(PendingProceeding pendingProceeding) {
-    List<Paragraph> paragraphs = new ArrayList<>();
-
-    paragraphs = buildCommonHeader(pendingProceeding, paragraphs);
-
-    buildHeadline(paragraphs, buildFallbackHeadline(pendingProceeding), htmlTransformer, false);
-
-    return Header.builder().paragraphs(paragraphs).build();
   }
 
   @Override

@@ -1,11 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproceeding;
 
-import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Header;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.header.Paragraph;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Classification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Keyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
@@ -19,8 +14,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.P
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Sachgebiete;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
-import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -148,26 +141,6 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
     }
 
     return builder.build();
-  }
-
-  @Override
-  protected Header buildHeader(PendingProceeding pendingProceeding) {
-    List<Paragraph> paragraphs = new ArrayList<>();
-
-    paragraphs = buildCommonHeader(pendingProceeding, paragraphs);
-    var shortTexts = pendingProceeding.shortTexts();
-    var headline = nullSafeGet(shortTexts, PendingProceedingShortTexts::headline);
-    var refersToTitelzeile = false;
-
-    if (isNotBlank(headline)) {
-      refersToTitelzeile = true;
-    } else {
-      headline = buildFallbackHeadline(pendingProceeding);
-    }
-
-    buildHeadline(paragraphs, headline, htmlTransformer, refersToTitelzeile);
-
-    return Header.builder().paragraphs(paragraphs).build();
   }
 
   @Nullable
