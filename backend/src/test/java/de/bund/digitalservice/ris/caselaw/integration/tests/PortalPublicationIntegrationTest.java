@@ -784,8 +784,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   @Transactional
   @Sql(scripts = "classpath:uli_publish_validation_init.sql")
   @Sql(scripts = "classpath:uli_cleanup.sql", executionPhase = AFTER_TEST_METHOD)
-  @Disabled("disabled until we have access to the uli refs in references schema")
-  void testPublish_withUliActiveCitations_enrichesMetadata() {
+  void testPublish_withUliActiveCitations_enrichesMetadata_but_doesnt_update_database() {
 
     TestTransaction.end();
     UUID userId = UUID.randomUUID();
@@ -812,13 +811,24 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
         .expectStatus()
         .isOk();
 
-    TestTransaction.start();
+    ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
 
+    verify(s3Client, times(2)).putObject(captor.capture(), any(RequestBody.class));
+
+    var capturedRequests = captor.getAllValues();
+    assertThat(capturedRequests.get(0).key()).isEqualTo("1234567890123/1234567890123.xml");
+    assertThat(capturedRequests.get(1).key()).contains("changelogs/");
+
+    // TODO: (Malte Laukötter, 2026-03-03) at some point we could check that the ldml includes the
+    // enriched metadata but
+    // currently we don't even include it in the ldml, so there is nothing to test here
+
+    TestTransaction.start();
     var updatedDto = (DecisionDTO) repository.findById(dto.getId()).orElseThrow();
     var activeCitation = updatedDto.getActiveUliCitations().getFirst();
 
-    assertThat(activeCitation.getTargetAuthor()).isEqualTo("ULI author");
-    assertThat(activeCitation.getTargetCitation()).isEqualTo("ULI citation");
+    assertThat(activeCitation.getTargetAuthor()).isEqualTo("old author");
+    assertThat(activeCitation.getTargetCitation()).isEqualTo("old citation");
     TestTransaction.end();
   }
 
@@ -826,8 +836,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   @Transactional
   @Sql(scripts = "classpath:uli_publish_validation_init.sql")
   @Sql(scripts = "classpath:uli_cleanup.sql", executionPhase = AFTER_TEST_METHOD)
-  @Disabled("disabled until we have access to the uli refs in references schema")
-  void testPublish_withPassiveUliCitations_enrichesMetadata() {
+  void testPublish_withPassiveUliCitations_enrichesMetadata_but_doesnt_update_database() {
 
     TestTransaction.end();
     UUID userId = UUID.randomUUID();
@@ -854,13 +863,23 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
         .expectStatus()
         .isOk();
 
-    TestTransaction.start();
+    ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
 
+    verify(s3Client, times(2)).putObject(captor.capture(), any(RequestBody.class));
+
+    var capturedRequests = captor.getAllValues();
+    assertThat(capturedRequests.get(0).key()).isEqualTo("1234567890123/1234567890123.xml");
+    assertThat(capturedRequests.get(1).key()).contains("changelogs/");
+
+    // TODO: (Malte Laukötter, 2026-03-03) at some point we could check that the ldml includes the
+    // enriched metadata but
+    // currently we don't even include it in the ldml, so there is nothing to test here
+
+    TestTransaction.start();
     var updatedDto = (DecisionDTO) repository.findById(dto.getId()).orElseThrow();
     var passive = updatedDto.getPassiveUliCitations().get(0);
-
-    assertThat(passive.getSourceAuthor()).isEqualTo("ULI author");
-    assertThat(passive.getSourceCitation()).isEqualTo("ULI citation");
+    assertThat(passive.getSourceAuthor()).isEqualTo("old author");
+    assertThat(passive.getSourceCitation()).isEqualTo("old citation");
     TestTransaction.end();
   }
 
