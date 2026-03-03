@@ -15,6 +15,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrElement;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrThis;
@@ -50,6 +51,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransfo
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
@@ -64,6 +66,8 @@ import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
+import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -78,13 +82,17 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class})
+@Import({PortalPublicationService.class, TestConfig.class})
 class PortalPublicationServiceTest {
 
   @MockitoBean private DocumentationUnitRepository documentationUnitRepository;
@@ -93,15 +101,18 @@ class PortalPublicationServiceTest {
   @MockitoBean private DatabaseAttachmentInlineRepository attachmentInlineRepository;
   @MockitoBean private PortalBucket caseLawBucket;
   @MockitoBean private XmlUtilService xmlUtilService;
-  @MockitoBean private ObjectMapper objectMapper;
+  @MockitoSpyBean private ObjectMapper objectMapper;
   @MockitoBean private PortalTransformer portalTransformer;
   @MockitoBean private FeatureToggleService featureToggleService;
   @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
   @MockitoBean private PublishedDocumentationSnapshotRepository snapshotRepository;
   @MockitoBean private CaselawCitationPublishService caselawCitationPublishService;
   @MockitoBean private CaselawCitationSyncService caselawCitationSyncService;
+  @MockitoBean private EntityManager entityManager;
 
-  private ArgumentCaptor<PublishedDocumentationSnapshotEntity> snapshotCaptor =
+  @MockitoBean private RisWebTestClient risWebTestClient;
+
+  private final ArgumentCaptor<PublishedDocumentationSnapshotEntity> snapshotCaptor =
       ArgumentCaptor.forClass(PublishedDocumentationSnapshotEntity.class);
 
   private static Decision testDocumentUnit;
@@ -109,7 +120,7 @@ class PortalPublicationServiceTest {
   private static String testDocumentNumber;
   private static CaseLawLdml testLdml;
 
-  private PortalPublicationService subject;
+  @Autowired private PortalPublicationService subject;
 
   private static PendingProceeding relatedPendingProceeding =
       PendingProceeding.builder()
@@ -218,21 +229,6 @@ class PortalPublicationServiceTest {
 
   @BeforeEach
   void mockReset() {
-    subject =
-        new PortalPublicationService(
-            documentationUnitRepository,
-            databaseDocumentationUnitRepository,
-            xmlUtilService,
-            caseLawBucket,
-            objectMapper,
-            portalTransformer,
-            featureToggleService,
-            historyLogService,
-            attachmentInlineRepository,
-            snapshotRepository,
-            caselawCitationSyncService,
-            caselawCitationPublishService);
-    when(objectMapper.writeValueAsString(any())).thenReturn("");
     when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(true);
     when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(true);
   }
@@ -1167,15 +1163,22 @@ class PortalPublicationServiceTest {
         .thenReturn(documentationUnitIds);
     when(documentationUnitRepository.loadDocumentationUnitDTO(testDocumentUnitDTO.getId()))
         .thenReturn(testDocumentUnitDTO);
+    when(databaseDocumentationUnitRepository.findById(testDocumentUnitDTO.getId()))
+        .thenReturn(Optional.of(testDocumentUnitDTO));
     when(snapshotRepository.findByDocumentationUnitId(testDocumentUnitDTO.getId()))
         .thenReturn(Optional.empty());
 
     subject.publishSnapshots(0, 10);
 
     verify(snapshotRepository, times(1)).save(snapshotCaptor.capture());
-    assertThat(snapshotCaptor.getValue())
-        .extracting("documentationUnitId", "json")
-        .containsExactly(testDocumentUnitDTO.getId(), testDocumentUnit);
+    PublishedDocumentationSnapshotEntity toSave = snapshotCaptor.getValue();
+    assertThat(toSave.getDocumentationUnitId()).isEqualTo(testDocumentUnitDTO.getId());
+    assertThat(toSave.getJson().toString()).contains("activeCitationUli");
+    assertThat(toSave.getJson().toString()).contains("activeCitationSli");
+    assertThat(toSave.getJson().toString()).contains("activeCitationAdm");
+    DocumentationUnit documentationUnit =
+        objectMapper.convertValue(toSave.getJson(), DocumentationUnit.class);
+    assertThat(documentationUnit).isEqualTo(testDocumentUnit);
   }
 
   @Test
@@ -1207,15 +1210,22 @@ class PortalPublicationServiceTest {
         .thenReturn(documentationUnits);
     when(documentationUnitRepository.loadDocumentationUnitDTO(testDocumentUnit.uuid()))
         .thenReturn(testDocumentUnitDTO);
+    when(databaseDocumentationUnitRepository.findById(testDocumentUnit.uuid()))
+        .thenReturn(Optional.of(testDocumentUnitDTO));
     when(snapshotRepository.findByDocumentationUnitId(testDocumentUnit.uuid()))
         .thenReturn(Optional.of(existingSnapshot));
 
     subject.publishSnapshots(0, 10);
 
     verify(snapshotRepository, times(1)).save(snapshotCaptor.capture());
-    assertThat(snapshotCaptor.getValue())
-        .extracting("documentationUnitId", "json")
-        .containsExactly(testDocumentUnit.uuid(), testDocumentUnit);
+    PublishedDocumentationSnapshotEntity toSave = snapshotCaptor.getValue();
+    assertThat(toSave.getDocumentationUnitId()).isEqualTo(testDocumentUnitDTO.getId());
+    assertThat(toSave.getJson().toString()).contains("activeCitationUli");
+    assertThat(toSave.getJson().toString()).contains("activeCitationSli");
+    assertThat(toSave.getJson().toString()).contains("activeCitationAdm");
+    DocumentationUnit documentationUnit =
+        objectMapper.convertValue(toSave.getJson(), DocumentationUnit.class);
+    assertThat(documentationUnit).isEqualTo(testDocumentUnit);
   }
 
   private String withPrefix(String documentNumber) {

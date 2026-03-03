@@ -109,7 +109,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
 
   @AfterEach
   void cleanUp() {
-    repository.deleteAll();
+    repository.deleteAllInBatch();
   }
 
   @Test
@@ -647,7 +647,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
     PublishedDocumentationSnapshotEntity snapshot =
         PublishedDocumentationSnapshotEntity.builder()
             .documentationUnitId(savedDecision.getId())
-            .publishedAt(LocalDateTime.now().minusDays(1))
+            .lastUpdatedAt(LocalDateTime.now().minusDays(1))
             .build();
     snapshotRepository.save(snapshot);
 
