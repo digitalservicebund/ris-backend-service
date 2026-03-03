@@ -38,22 +38,22 @@ public class ActiveCitationAdministrativeRegulationDTO {
   @Column(name = "target_directive", nullable = false)
   private String targetDirective;
 
-  @Column(name = "target_citation")
-  private String targetCitation;
+  @Column(name = "citation")
+  private String citation;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "target_citation_type_id")
-  private CitationTypeDTO targetCitationType;
+  @JoinColumn(name = "citation_type_id")
+  private CitationTypeDTO citationType;
 
-  @Column(name = "target_citation_type_raw")
-  private String targetCitationTypeRaw;
+  @Column(name = "citation_type_raw")
+  private String citationTypeRaw;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "target_legal_periodical_id")
-  private LegalPeriodicalDTO targetLegalPeriodical;
+  @JoinColumn(name = "legal_periodical_id")
+  private LegalPeriodicalDTO legalPeriodical;
 
-  @Column(name = "target_legal_periodical_raw")
-  private String targetLegalPeriodicalRaw;
+  @Column(name = "legal_periodical_raw")
+  private String legalPeriodicalRaw;
 
   @NotNull
   @Column(name = "rank", nullable = false)
