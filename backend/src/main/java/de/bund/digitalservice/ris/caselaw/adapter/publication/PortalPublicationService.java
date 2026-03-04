@@ -36,7 +36,6 @@ import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
-import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -122,7 +121,6 @@ public class PortalPublicationService {
    * @throws PublishException if the LDML could not be saved in the bucket
    * @throws ChangelogException if the changelog cannot be generated or saved
    */
-  @Transactional
   public ManualPortalPublicationResult publishDocumentationUnitWithChangelog(
       UUID documentationUnitId, User user) throws DocumentationUnitNotExistsException {
 
@@ -230,7 +228,6 @@ public class PortalPublicationService {
    *     LDML
    * @throws PublishException if the LDML file could not be saved in the bucket
    */
-  @Transactional
   public PortalPublicationResult publishDocumentationUnit(String documentNumber)
       throws DocumentationUnitNotExistsException {
     DocumentationUnitDTO documentationUnit =

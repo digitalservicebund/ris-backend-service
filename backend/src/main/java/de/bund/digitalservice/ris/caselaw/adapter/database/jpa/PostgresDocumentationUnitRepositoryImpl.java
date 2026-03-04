@@ -52,6 +52,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -162,6 +163,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private DocumentationUnit getDocumentationUnit(
       DocumentationUnitDTO documentationUnit, @Nullable User user) {
     if (documentationUnit instanceof DecisionDTO decisionDTO) {
+      // ensure the lazy properties we need are loaded
+      new HashSet<>(decisionDTO.getActiveAdmCitations());
+      new HashSet<>(decisionDTO.getPassiveAdmCitations());
+      new HashSet<>(decisionDTO.getActiveUliCitations());
+      new HashSet<>(decisionDTO.getPassiveUliCitations());
       return DecisionTransformer.transformToDomain(decisionDTO, user);
     }
     if (documentationUnit instanceof PendingProceedingDTO pendingProceedingDTO) {
