@@ -186,6 +186,7 @@ public class UliCitationSyncService {
             .map(JobSyncStatus::getLastRun)
             .orElse(Instant.EPOCH);
 
+    var currentRunTimestamp = Instant.now();
     List<RevokedUli> revokedEntries = revokedUliRepository.findAllByRevokedAtAfter(lastRun);
 
     if (revokedEntries.isEmpty()) {
@@ -225,15 +226,7 @@ public class UliCitationSyncService {
       documentsToRepublish.add(decision.getDocumentNumber());
     }
 
-    // get the highest timestamp of revoked entries and not Instant.now() because in
-    // the meantime a new entry could have been saved to the revoked table
-    Instant newestRevokedAt =
-        revokedEntries.stream()
-            .map(RevokedUli::getRevokedAt)
-            .max(Comparator.naturalOrder())
-            .orElse(lastRun);
-
-    updateJobStatus(jobName, newestRevokedAt);
+    updateJobStatus(jobName, currentRunTimestamp);
 
     return documentsToRepublish;
   }
