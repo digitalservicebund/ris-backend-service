@@ -198,6 +198,26 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   private List<ActiveCitationAdmDTO> activeAdmCitations = new ArrayList<>();
 
+  // Passivzitierung SLI
+  @OneToMany(
+      mappedBy = "target",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @Builder.Default
+  @OrderBy("rank")
+  private List<PassiveCitationSliEntity> passiveSliCitations = new ArrayList<>();
+
+  // Aktivzitierung SLI
+  @OneToMany(
+      mappedBy = "source",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @Builder.Default
+  @OrderBy("rank")
+  private List<ActiveCitationSliEntity> activeSliCitations = new ArrayList<>();
+
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
