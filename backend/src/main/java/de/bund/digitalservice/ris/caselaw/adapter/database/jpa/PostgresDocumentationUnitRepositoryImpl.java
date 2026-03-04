@@ -168,6 +168,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       new HashSet<>(decisionDTO.getPassiveAdmCitations());
       new HashSet<>(decisionDTO.getActiveUliCitations());
       new HashSet<>(decisionDTO.getPassiveUliCitations());
+      new HashSet<>(decisionDTO.getActiveSliCitations());
+      new HashSet<>(decisionDTO.getPassiveSliCitations());
       return DecisionTransformer.transformToDomain(decisionDTO, user);
     }
     if (documentationUnit instanceof PendingProceedingDTO pendingProceedingDTO) {
