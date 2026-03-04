@@ -34,7 +34,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew dependencies >> ../gradle-info.txt
       - name: Upload gradle info file
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: gradle-info
           path: gradle-info.txt

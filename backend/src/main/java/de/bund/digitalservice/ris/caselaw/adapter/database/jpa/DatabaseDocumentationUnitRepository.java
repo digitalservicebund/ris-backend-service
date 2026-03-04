@@ -14,6 +14,10 @@ public interface DatabaseDocumentationUnitRepository
     extends JpaRepository<DocumentationUnitDTO, UUID> {
   Optional<DocumentationUnitDTO> findByDocumentNumber(String documentNumber);
 
+  @Query(
+      "SELECT d FROM DocumentationUnitDTO d where d.documentNumber = :documentNumber AND d.portalPublicationStatus = de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus.PUBLISHED")
+  Optional<DocumentationUnitDTO> findPublishedByDocumentNumber(String documentNumber);
+
   @Query("SELECT d.id FROM DocumentationUnitDTO d where d.documentNumber = :documentNumber")
   Optional<UUID> findIdByDocumentNumber(@Param("documentNumber") String documentNumber);
 

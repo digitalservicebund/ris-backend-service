@@ -32,7 +32,7 @@ public class CaselawCitationPublishService {
       return Optional.empty();
     }
 
-    return documentationUnitRepository.findByDocumentNumber(
+    return documentationUnitRepository.findPublishedByDocumentNumber(
         passiveCitationCaselaw.getSourceDocumentNumber());
   }
 
@@ -42,7 +42,7 @@ public class CaselawCitationPublishService {
       return Optional.empty();
     }
 
-    return documentationUnitRepository.findByDocumentNumber(
+    return documentationUnitRepository.findPublishedByDocumentNumber(
         activeCitationCaselaw.getTargetDocumentNumber());
   }
 

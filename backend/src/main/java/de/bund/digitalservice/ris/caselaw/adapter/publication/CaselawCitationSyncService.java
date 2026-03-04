@@ -2,8 +2,10 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationCaselawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CitationTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationCaselawDTO;
@@ -42,7 +44,7 @@ public class CaselawCitationSyncService {
           .forEach(
               activeCitationCaselaw -> {
                 var target =
-                    documentationUnitRepository.findByDocumentNumber(
+                    documentationUnitRepository.findPublishedByDocumentNumber(
                         activeCitationCaselaw.getTargetDocumentNumber());
 
                 if (target.isPresent() && target.get() instanceof DecisionDTO targetDecision) {
@@ -52,11 +54,8 @@ public class CaselawCitationSyncService {
                           decision.getDocumentNumber(),
                           activeCitationCaselaw.getCitationType());
                   if (matchingPassiveCitation.isPresent()) {
-                    if (!matchingPassiveCitation
-                        .get()
-                        .equals(
-                            createMatchingPassiveCitation(
-                                activeCitationCaselaw, targetDecision, decision, 0))) {
+                    if (updateOfMatchingCitationNeeded(
+                        matchingPassiveCitation.get(), activeCitationCaselaw)) {
                       log.atInfo()
                           .addKeyValue("publishedDocumentationUnit", decision.getDocumentNumber())
                           .addKeyValue(
@@ -80,7 +79,6 @@ public class CaselawCitationSyncService {
                           .get()
                           .setSourceFileNumber(
                               decision.getFileNumbers().stream()
-                                  .sorted()
                                   .findFirst()
                                   .map(FileNumberDTO::getValue)
                                   .orElse(null));
@@ -89,6 +87,29 @@ public class CaselawCitationSyncService {
 
                       documentsToRepublish.add(targetDecision.getDocumentNumber());
                     }
+                  } else {
+                    // We skip the passive citation creation for now and only log about it until we
+                    // know that we really want to create them
+                    /*targetDecision
+                    .getPassiveCaselawCitations()
+                    .add(
+                        createMatchingPassiveCitation(
+                            activeCitationCaselaw,
+                            targetDecision,
+                            decision,
+                            targetDecision.getPassiveCaselawCitations().size()));*/
+
+                    log.atInfo()
+                        .addKeyValue("publishedDocumentationUnit", decision.getDocumentNumber())
+                        .addKeyValue("targetDocumentationUnit", targetDecision.getDocumentNumber())
+                        .addKeyValue("activeCitation", activeCitationCaselaw)
+                        .setMessage(
+                            "SKIPPED: Creating passive citation for published active caselaw citation.")
+                        .log();
+
+                    // documentationUnitRepository.save(targetDecision);
+
+                    documentsToRepublish.add(targetDecision.getDocumentNumber());
                   }
                 }
               });
@@ -128,5 +149,39 @@ public class CaselawCitationSyncService {
                   && Objects.equals(passiveCitationCaselaw.getCitationType(), citationType);
             })
         .findFirst();
+  }
+
+  private boolean updateOfMatchingCitationNeeded(
+      PassiveCitationCaselawDTO passive, ActiveCitationCaselawDTO active) {
+    if (active.getSource() == null) {
+      return false;
+    }
+
+    if (!Objects.equals(passive.getCitationType(), active.getCitationType())) {
+      return true;
+    }
+
+    if (active.getSource().getFileNumbers().stream()
+        .noneMatch(
+            fileNumberDTO ->
+                Objects.equals(passive.getSourceFileNumber(), fileNumberDTO.getValue()))) {
+      return true;
+    }
+
+    if (!Objects.equals(passive.getSourceDate(), active.getSource().getDate())) {
+      return true;
+    }
+
+    if (!Optional.ofNullable(passive.getSourceDocumentType())
+        .map(DocumentTypeDTO::getId)
+        .equals(
+            Optional.ofNullable(active.getSource().getDocumentType())
+                .map(DocumentTypeDTO::getId))) {
+      return true;
+    }
+
+    return !Optional.ofNullable(passive.getSourceCourt())
+        .map(CourtDTO::getId)
+        .equals(Optional.ofNullable(active.getSource().getCourt()).map(CourtDTO::getId));
   }
 }

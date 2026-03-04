@@ -58,7 +58,7 @@ public class CaselawCitationPublishServiceTest {
               .rank(1)
               .build();
 
-      when(documentationUnitRepository.findByDocumentNumber("XXRE000714526"))
+      when(documentationUnitRepository.findPublishedByDocumentNumber("XXRE000714526"))
           .thenReturn(Optional.empty());
 
       var result =
@@ -75,7 +75,7 @@ public class CaselawCitationPublishServiceTest {
       var court = CourtDTO.builder().build();
       var documentType = DocumentTypeDTO.builder().build();
 
-      when(documentationUnitRepository.findByDocumentNumber("XXRE000714526"))
+      when(documentationUnitRepository.findPublishedByDocumentNumber("XXRE000714526"))
           .thenReturn(
               Optional.of(
                   DecisionDTO.builder()
@@ -133,7 +133,7 @@ public class CaselawCitationPublishServiceTest {
               .rank(1)
               .build();
 
-      when(documentationUnitRepository.findByDocumentNumber("XXRE000714526"))
+      when(documentationUnitRepository.findPublishedByDocumentNumber("XXRE000714526"))
           .thenReturn(Optional.empty());
 
       var result =
@@ -156,7 +156,7 @@ public class CaselawCitationPublishServiceTest {
       var court = CourtDTO.builder().build();
       var documentType = DocumentTypeDTO.builder().build();
 
-      when(documentationUnitRepository.findByDocumentNumber("XXRE000714526"))
+      when(documentationUnitRepository.findPublishedByDocumentNumber("XXRE000714526"))
           .thenReturn(
               Optional.of(
                   DecisionDTO.builder()

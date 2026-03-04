@@ -38,22 +38,22 @@ public class PassiveCitationAdministrativeRegultationDTO {
   @Column(name = "source_directive", nullable = false)
   private String sourceDirective;
 
-  @Column(name = "source_citation")
-  private String sourceCitation;
+  @Column(name = "citation")
+  private String citation;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "source_citation_type_id")
-  private CitationTypeDTO sourceCitationType;
+  @JoinColumn(name = "citation_type_id")
+  private CitationTypeDTO citationType;
 
-  @Column(name = "source_citation_type_raw")
-  private String sourceCitationTypeRaw;
+  @Column(name = "citation_type_raw")
+  private String citationTypeRaw;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "source_legal_periodical_id")
-  private LegalPeriodicalDTO sourceLegalPeriodical;
+  @JoinColumn(name = "legal_periodical_id")
+  private LegalPeriodicalDTO legalPeriodical;
 
-  @Column(name = "source_legal_periodical_raw")
-  private String sourceLegalPeriodicalRaw;
+  @Column(name = "legal_periodical_raw")
+  private String legalPeriodicalRaw;
 
   @NotNull
   @Column(name = "rank", nullable = false)
