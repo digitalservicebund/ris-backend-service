@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -23,6 +24,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "active_citation_adm", schema = "incremental_migration")
 public class ActiveCitationAdmDTO {
+  @GeneratedValue
   @Id
   @Column(name = "id", nullable = false)
   private UUID id;
