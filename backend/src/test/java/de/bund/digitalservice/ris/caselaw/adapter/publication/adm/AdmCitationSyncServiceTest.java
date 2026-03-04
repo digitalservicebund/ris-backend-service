@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication.adm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,10 +33,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @ExtendWith(SpringExtension.class)
 @Import({AdmCitationSyncService.class})
-public class AdmCitationSyncServiceTest {
+class AdmCitationSyncServiceTest {
 
   @Autowired AdmCitationSyncService admCitationSyncService;
 
@@ -43,6 +48,17 @@ public class AdmCitationSyncServiceTest {
   @MockitoBean RevokedAdmRepository revokedAdmRepository;
   @MockitoBean DatabaseCitationTypeRepository citationTypeRepository;
   @MockitoBean PortalPublicationService portalPublicationService;
+  @MockitoBean TransactionTemplate transactionTemplate = new TransactionTemplate();
+
+  @BeforeEach
+  void beforeEach() {
+    when(transactionTemplate.execute(any()))
+        .thenAnswer(
+            invocation ->
+                invocation
+                    .<TransactionCallback<List<UUID>>>getArgument(0)
+                    .doInTransaction(mock(TransactionStatus.class)));
+  }
 
   @Nested
   class handleNewlyPublishedAfter {
@@ -97,7 +113,7 @@ public class AdmCitationSyncServiceTest {
           .isEqualTo("VV DEU BMF 1972-02-29 F/IV B 2-S 2000-5/72");
 
       verify(caselawRepository).save(decision);
-      verify(portalPublicationService).publishDocumentationUnit("WBRE410005137");
+      verify(portalPublicationService).publishDocumentationUnitWithChangelog(caselawId, null);
     }
 
     @Test
@@ -148,7 +164,7 @@ public class AdmCitationSyncServiceTest {
       assertThat(passiveCitation.getRank()).isEqualTo(1);
 
       verify(caselawRepository).save(decision);
-      verify(portalPublicationService).publishDocumentationUnit("WBRE410005137");
+      verify(portalPublicationService).publishDocumentationUnitWithChangelog(caselawId, null);
     }
 
     @Test
@@ -158,7 +174,7 @@ public class AdmCitationSyncServiceTest {
       admCitationSyncService.handleNewlyPublishedAfter(Instant.now());
 
       verify(caselawRepository, never()).save(any());
-      verify(portalPublicationService, never()).publishDocumentationUnit(any());
+      verify(portalPublicationService, never()).publishDocumentationUnitWithChangelog(any(), any());
     }
   }
 

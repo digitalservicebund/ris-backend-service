@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
 @Slf4j
@@ -33,53 +34,60 @@ public class AdmCitationSyncService {
   private final DatabaseCitationTypeRepository citationTypeRepository;
   private final RevokedAdmRepository revokedAdmRepository;
   private final PortalPublicationService portalPublicationService;
+  private final TransactionTemplate transactionTemplate;
 
   public AdmCitationSyncService(
       DatabaseDocumentationUnitRepository documentationUnitRepository,
       DatabaseAdmRepository admRepository,
       DatabaseCitationTypeRepository citationTypeRepository,
       RevokedAdmRepository revokedAdmRepository,
-      PortalPublicationService portalPublicationService) {
+      PortalPublicationService portalPublicationService,
+      TransactionTemplate transactionTemplate) {
     this.documentationUnitRepository = documentationUnitRepository;
     this.admRepository = admRepository;
     this.citationTypeRepository = citationTypeRepository;
     this.revokedAdmRepository = revokedAdmRepository;
     this.portalPublicationService = portalPublicationService;
+    this.transactionTemplate = transactionTemplate;
   }
 
-  @Transactional
   public void handleNewlyPublishedAfter(Instant after) {
-    admRepository.findAllByPublishedAtAfter(after).stream()
-        .map(this::syncCitations)
-        .flatMap(Set::stream)
-        // documents that have changed and need to be republished
-        .distinct()
-        .forEach(
-            docNumber -> {
-              try {
-                portalPublicationService.publishDocumentationUnit(docNumber);
-                log.atDebug()
-                    .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
-                    .setMessage("Successfully republished after ADM newly published sync")
-                    .log();
-              } catch (Exception e) {
-                log.atDebug()
-                    .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
-                    .addKeyValue("exception", e)
-                    .setMessage("Failed to republish during ADM newly published sync")
-                    .log();
-              }
-            });
+    var documentsToPublish =
+        transactionTemplate.execute(
+            (status) ->
+                admRepository.findAllByPublishedAtAfter(after).stream()
+                    .map(this::syncCitations)
+                    .flatMap(Set::stream)
+                    // documents that have changed and need to be republished
+                    .distinct()
+                    .toList());
+
+    documentsToPublish.forEach(
+        docNumber -> {
+          try {
+            portalPublicationService.publishDocumentationUnitWithChangelog(docNumber, null);
+            log.atInfo()
+                .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
+                .setMessage("Successfully republished after ADM newly published sync")
+                .log();
+          } catch (Exception e) {
+            log.atError()
+                .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
+                .addKeyValue("exception", e)
+                .setMessage("Failed to republish during ADM newly published sync")
+                .log();
+          }
+        });
   }
 
   /**
    * Create passive citations for all active citations of the doc unit.
    *
-   * @return list Document numbers of all other documents that have been changed. These should be
-   *     published again.
+   * @return list UUIDs of all other documents that have been changed. These should be published
+   *     again.
    */
-  private Set<String> syncCitations(AdmDTO adm) {
-    Set<String> documentsToRepublish = new HashSet<>();
+  private Set<UUID> syncCitations(AdmDTO adm) {
+    Set<UUID> documentsToRepublish = new HashSet<>();
 
     adm.getActiveCaselawReferences()
         .forEach(
@@ -111,7 +119,7 @@ public class AdmCitationSyncService {
 
                     documentationUnitRepository.save(targetDecision);
 
-                    documentsToRepublish.add(targetDecision.getDocumentNumber());
+                    documentsToRepublish.add(targetDecision.getId());
                   }
                 } else {
                   targetDecision
@@ -132,7 +140,7 @@ public class AdmCitationSyncService {
 
                   documentationUnitRepository.save(targetDecision);
 
-                  documentsToRepublish.add(targetDecision.getDocumentNumber());
+                  documentsToRepublish.add(targetDecision.getId());
                 }
               }
             });
