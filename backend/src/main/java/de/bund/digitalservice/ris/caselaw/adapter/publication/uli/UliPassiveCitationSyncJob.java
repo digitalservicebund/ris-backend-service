@@ -1,21 +1,23 @@
 package de.bund.digitalservice.ris.caselaw.adapter.publication.uli;
 
-import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.JobSyncStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.SyncJob;
+import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
 public class UliPassiveCitationSyncJob {
+  private static final SyncJob job = SyncJob.ULI_PASSIVE_CITATION_SYNC;
 
   private final UliCitationSyncService uliCitationSyncService;
-  private final PortalPublicationService portalPublicationService;
+  private final JobSyncStatusService jobSyncStatusService;
 
   public UliPassiveCitationSyncJob(
-      UliCitationSyncService uliCitationSyncService,
-      PortalPublicationService portalPublicationService) {
+      UliCitationSyncService uliCitationSyncService, JobSyncStatusService jobSyncStatusService) {
     this.uliCitationSyncService = uliCitationSyncService;
-    this.portalPublicationService = portalPublicationService;
+    this.jobSyncStatusService = jobSyncStatusService;
   }
 
   /**
@@ -23,10 +25,13 @@ public class UliPassiveCitationSyncJob {
    * in the database and republishes the affected documents to the portal.
    */
   // @Scheduled(cron = "${neuris.jobs.uli-sync.cron:0 0 2 * * *}")
+
   public void runSync() {
-    log.info("Starting scheduled ULI Passive Citation Sync");
+    var startOfRun = Instant.now();
     try {
-      uliCitationSyncService.handleUliPassiveSync();
+      var lastRun = jobSyncStatusService.getLastRun(job);
+      uliCitationSyncService.handleNewlyPublishedAfter(lastRun);
+      jobSyncStatusService.updateLastRun(job, startOfRun);
     } catch (Exception e) {
       log.error("Critical error during ULI Passive Citation Sync Job", e);
     }

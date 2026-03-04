@@ -7,8 +7,8 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationUliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationUliDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedUli;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedUliRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationPublishService;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
@@ -63,7 +63,7 @@ public class UliCitationPublishServiceTest {
       var passiveCitation =
           PassiveCitationUliDTO.builder().sourceLiteratureDocumentNumber("ULI-123").rank(1).build();
 
-      var publishedUli = mock(PublishedUli.class);
+      var publishedUli = mock(UliDTO.class);
       when(publishedUli.getAuthor()).thenReturn("Dr. Test");
       when(publishedUli.getCitation()).thenReturn("NJW 2026, 1");
       when(publishedUli.getDocumentTypeRawValue()).thenReturn("Aufsatz");
@@ -136,7 +136,7 @@ public class UliCitationPublishServiceTest {
               .rank(1)
               .build();
 
-      var publishedUli = mock(PublishedUli.class);
+      var publishedUli = mock(UliDTO.class);
       when(publishedUli.getAuthor()).thenReturn("Prof. Dr. ULI");
       when(publishedUli.getCitation()).thenReturn("JZ 2026, 500");
       when(publishedUli.getLegalPeriodicalRawValue()).thenReturn("JZ");

@@ -3,8 +3,10 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +21,7 @@ import org.hibernate.annotations.Immutable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class PublishedUli {
+public class UliDTO {
 
   @Id private UUID id;
 
@@ -44,4 +46,7 @@ public class PublishedUli {
 
   @Column(name = "published_at")
   private Instant publishedAt;
+
+  @OneToMany(mappedBy = "source")
+  private List<UliActiveCaselawReferenceDTO> activeCaselawReferences;
 }

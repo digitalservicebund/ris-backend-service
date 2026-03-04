@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -18,17 +20,21 @@ import org.hibernate.annotations.Immutable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class ActiveCitationUliCaselaw {
+public class UliActiveCaselawReferenceDTO {
 
   @Id
   @Column(name = "id")
-  private String id;
+  private UUID id;
 
   // ULI document
-  @Column(name = "source_id")
-  private UUID sourceId;
+  @ManyToOne()
+  @JoinColumn(name = "source_documentation_unit_id")
+  private UliDTO source;
 
   // caselaw document
-  @Column(name = "target_id")
-  private UUID targetId;
+  @Column(name = "target_documentation_unit_id")
+  private UUID targetDocumentationUnitId;
+
+  @Column(name = "citation_type")
+  private String citationType;
 }
