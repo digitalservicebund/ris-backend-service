@@ -26,11 +26,11 @@ public class RevokedUliSyncJob {
    */
   // @Scheduled(cron = "${neuris.jobs.uli-repeal-sync.cron:0 0 3 * * *}")
   public void runRevokedSync() {
-    Set<String> affectedDocNumbers = fetchRevokedNumbers();
+    Set<String> affectedDocNumbers = handleRevokedUliDocuments();
     affectedDocNumbers.forEach(this::publishSafe);
   }
 
-  private Set<String> fetchRevokedNumbers() {
+  private Set<String> handleRevokedUliDocuments() {
     try {
       return uliCitationSyncService.handleUliRevoked();
     } catch (Exception e) {

@@ -218,7 +218,7 @@ public class UliCitationSyncService {
       }
     }
 
-    // active citations will be just republished, targetId is deleted and metadata
+    // active citations will be just republished, targetId will be deleted
     List<DecisionDTO> affectedByActive =
         caselawRepository.findAllByActiveUliTargetIdInAndPendingRevocation(revokedUliIds);
 
