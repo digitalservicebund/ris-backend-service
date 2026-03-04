@@ -18,6 +18,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedUliRepos
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUli;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationSyncService;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,12 +44,14 @@ public class UliCitationSyncServiceTest {
   @MockitoBean RevokedUliRepository revokedUliRepository;
   @MockitoBean JobSyncStatusRepository jobSyncStatusRepository;
   @MockitoBean ActiveCitationUliCaselawRepository activeCitationUliCaselawRepository;
+  @MockitoBean PortalPublicationService portalPublicationService;
 
   @Nested
   class handleUliPassiveSync {
 
     @Test
-    void shouldUpdateMetadataWhenPassiveCitationExists() {
+    void shouldUpdateMetadataWhenPassiveCitationExists()
+        throws DocumentationUnitNotExistsException {
       UUID uliId = UUID.randomUUID();
       UUID caselawId = UUID.randomUUID();
       Instant now = Instant.now();
@@ -80,7 +83,7 @@ public class UliCitationSyncServiceTest {
       DecisionDTO decision =
           DecisionDTO.builder()
               .id(caselawId)
-              .documentNumber("RE001")
+              .documentNumber("XXRE123456789")
               .passiveUliCitations(new ArrayList<>(List.of(passiveCitation)))
               .build();
 
@@ -91,16 +94,18 @@ public class UliCitationSyncServiceTest {
       Set<String> result = uliCitationSyncService.handleUliPassiveSync();
 
       // Verify
-      assertThat(result).containsExactly("RE001");
+      assertThat(result).containsExactly("XXRE123456789");
       assertThat(passiveCitation.getSourceAuthor()).isEqualTo("New Author");
       assertThat(passiveCitation.getSourceCitation()).isEqualTo("New Citation");
 
       verify(caselawRepository).save(decision);
       verify(jobSyncStatusRepository).save(any(JobSyncStatus.class));
+      verify(portalPublicationService).publishDocumentationUnit("XXRE123456789");
     }
 
     @Test
-    void shouldOnlyLogWarningWhenPassiveCitationIsMissing() {
+    void shouldOnlyLogWarningWhenPassiveCitationIsMissing()
+        throws DocumentationUnitNotExistsException {
       UUID uliId = UUID.randomUUID();
       UUID caselawId = UUID.randomUUID();
 
@@ -122,7 +127,7 @@ public class UliCitationSyncServiceTest {
       DecisionDTO decision =
           DecisionDTO.builder()
               .id(caselawId)
-              .documentNumber("RE001")
+              .documentNumber("XXRE123456789")
               .passiveUliCitations(new ArrayList<>()) // empty!
               .build();
 
@@ -135,10 +140,11 @@ public class UliCitationSyncServiceTest {
       // Verify: No republish, no save, but status still updates
       assertThat(result).isEmpty();
       verify(caselawRepository, never()).save(any());
+      verify(portalPublicationService, never()).publishDocumentationUnit(any());
     }
 
     @Test
-    void shouldDoNothingIfNoNewUlisFound() {
+    void shouldDoNothingIfNoNewUlisFound() throws DocumentationUnitNotExistsException {
       when(jobSyncStatusRepository.findById("ULI_PASSIVE_CITATION_SYNC"))
           .thenReturn(Optional.empty());
       when(publishedUliRepository.findAllByPublishedAtAfter(any())).thenReturn(List.of());
@@ -148,6 +154,7 @@ public class UliCitationSyncServiceTest {
       assertThat(result).isEmpty();
       verify(activeCitationUliCaselawRepository, never()).findAllBySourceIdIn(any());
       verify(caselawRepository, never()).save(any());
+      verify(portalPublicationService, never()).publishDocumentationUnit(any());
     }
   }
 
@@ -155,7 +162,7 @@ public class UliCitationSyncServiceTest {
   class handleUliRevoked {
 
     @Test
-    void shouldRemovePassiveCitationsWhenUliIsRevoked() {
+    void shouldRemovePassiveCitationsWhenUliIsRevoked() throws DocumentationUnitNotExistsException {
       UUID revokedUliId = UUID.randomUUID();
       Instant now = Instant.now();
 
@@ -176,7 +183,7 @@ public class UliCitationSyncServiceTest {
 
       DecisionDTO decision =
           DecisionDTO.builder()
-              .documentNumber("RE-REV-001")
+              .documentNumber("XXRE123456789")
               .passiveUliCitations(passiveCitations)
               .build();
 
@@ -190,16 +197,18 @@ public class UliCitationSyncServiceTest {
       Set<String> result = uliCitationSyncService.handleUliRevoked();
 
       // Verify
-      assertThat(result).containsExactly("RE-REV-001");
+      assertThat(result).containsExactly("XXRE123456789");
       assertThat(decision.getPassiveUliCitations()).hasSize(1);
       assertThat(decision.getPassiveUliCitations()).containsExactly(passiveToStay);
 
       verify(caselawRepository).save(decision);
       verify(jobSyncStatusRepository).save(any(JobSyncStatus.class));
+      verify(portalPublicationService).publishDocumentationUnit("XXRE123456789");
     }
 
     @Test
-    void shouldRepublishDecisionWhenActiveUliTargetIsRevoked() {
+    void shouldRepublishDecisionWhenActiveUliTargetIsRevoked()
+        throws DocumentationUnitNotExistsException {
       UUID revokedUliId = UUID.randomUUID();
 
       when(jobSyncStatusRepository.findById("ULI_REVOKED_SYNC")).thenReturn(Optional.empty());
@@ -208,7 +217,7 @@ public class UliCitationSyncServiceTest {
       when(revokedUliRepository.findAllByRevokedAtAfter(any())).thenReturn(List.of(revokedEntry));
 
       // Decision targets a ULI that was revoked (Active Citation)
-      DecisionDTO decision = DecisionDTO.builder().documentNumber("RE-ACT-002").build();
+      DecisionDTO decision = DecisionDTO.builder().documentNumber("XXRE123456789").build();
 
       when(caselawRepository.findAllByPassiveUliSourceIdInAndPendingRevocation(any()))
           .thenReturn(List.of());
@@ -219,8 +228,9 @@ public class UliCitationSyncServiceTest {
       Set<String> result = uliCitationSyncService.handleUliRevoked();
 
       // Verify: Document is marked for republish, but nothing is removed/saved inside the doc
-      assertThat(result).containsExactly("RE-ACT-002");
+      assertThat(result).containsExactly("XXRE123456789");
       verify(caselawRepository, never()).save(any());
+      verify(portalPublicationService).publishDocumentationUnit("XXRE123456789");
     }
   }
 }

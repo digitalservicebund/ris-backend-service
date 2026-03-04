@@ -11,8 +11,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedUli;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUli;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUliRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 @Slf4j
@@ -33,18 +35,21 @@ public class UliCitationSyncService {
   private final PublishedUliRepository publishedUliRepository;
   private final RevokedUliRepository revokedUliRepository;
   private final JobSyncStatusRepository jobSyncStatusRepository;
+  private final PortalPublicationService portalPublicationService;
 
   public UliCitationSyncService(
       DatabaseDocumentationUnitRepository caselawRepository,
       ActiveCitationUliCaselawRepository activeCitationUliCaselawRepository,
       PublishedUliRepository publishedUliRepository,
       RevokedUliRepository revokedUliRepository,
-      JobSyncStatusRepository jobSyncStatusRepository) {
+      JobSyncStatusRepository jobSyncStatusRepository,
+      PortalPublicationService portalPublicationService) {
     this.caselawRepository = caselawRepository;
     this.activeCitationUliCaselawRepository = activeCitationUliCaselawRepository;
     this.publishedUliRepository = publishedUliRepository;
     this.revokedUliRepository = revokedUliRepository;
     this.jobSyncStatusRepository = jobSyncStatusRepository;
+    this.portalPublicationService = portalPublicationService;
   }
 
   /**
@@ -64,13 +69,9 @@ public class UliCitationSyncService {
   public Set<String> handleUliPassiveSync() {
     Set<String> documentsToRepublish = new HashSet<>();
     String jobName = "ULI_PASSIVE_CITATION_SYNC";
+    Instant lastRun = getJobLastRun(jobName);
 
-    Instant lastRun =
-        jobSyncStatusRepository
-            .findById(jobName)
-            .map(JobSyncStatus::getLastRun)
-            .orElse(Instant.EPOCH);
-
+    var currentRunTimestamp = Instant.now();
     // Delta of newly published ULI documents
     List<PublishedUli> newUlis = publishedUliRepository.findAllByPublishedAtAfter(lastRun);
     if (newUlis.isEmpty()) return documentsToRepublish;
@@ -85,38 +86,57 @@ public class UliCitationSyncService {
     List<DecisionDTO> affectedCaselawDecisions =
         caselawRepository.findAllAffectedByUliUpdates(uliIds);
 
+    documentsToRepublish =
+        processAffectedDecisions(
+            affectedCaselawDecisions, newUlis, uliIds, uliToCaselawActiveCitations);
+
+    updateJobStatus(jobName, currentRunTimestamp);
+    triggerRepublishing(documentsToRepublish);
+
+    return documentsToRepublish;
+  }
+
+  private Set<String> processAffectedDecisions(
+      List<DecisionDTO> affectedCaselawDecisions,
+      List<PublishedUli> newUlis,
+      Set<UUID> uliIds,
+      List<ActiveCitationUliCaselaw> uliToCaselawActiveCitations) {
+    Set<String> toRepublish = new HashSet<>();
     for (DecisionDTO decision : affectedCaselawDecisions) {
-      boolean changed = false;
-
-      for (PassiveCitationUliDTO passive : decision.getPassiveUliCitations()) {
-
-        if (uliIds.contains(passive.getSourceId())) {
-          Optional<PublishedUli> uliDataOpt =
-              newUlis.stream().filter(u -> u.getId().equals(passive.getSourceId())).findFirst();
-
-          if (uliDataOpt.isPresent()) {
-            if (updateMetadataIfChanged(passive, uliDataOpt.get())) {
-              changed = true;
-            }
-          }
-        }
-      }
+      boolean changed = checkIsChangedAndApplyUpdates(newUlis, uliIds, decision);
 
       checkForMissingPassiveCitations(decision, uliToCaselawActiveCitations);
 
       if (changed) {
         caselawRepository.save(decision);
-        documentsToRepublish.add(decision.getDocumentNumber());
+        toRepublish.add(decision.getDocumentNumber());
       }
     }
+    return toRepublish;
+  }
 
-    // Update status table with new timestamp
-    newUlis.stream()
-        .map(PublishedUli::getPublishedAt)
-        .max(Comparator.naturalOrder())
-        .ifPresent(ts -> updateJobStatus(jobName, ts));
+  private boolean checkIsChangedAndApplyUpdates(
+      List<PublishedUli> newUlis, Set<UUID> uliIds, DecisionDTO decision) {
+    boolean changed = false;
+    for (PassiveCitationUliDTO passive : decision.getPassiveUliCitations()) {
 
-    return documentsToRepublish;
+      if (uliIds.contains(passive.getSourceId())) {
+        Optional<PublishedUli> uliDataOpt =
+            newUlis.stream().filter(u -> u.getId().equals(passive.getSourceId())).findFirst();
+
+        if (uliDataOpt.isPresent() && updateMetadataIfChanged(passive, uliDataOpt.get())) {
+          changed = true;
+        }
+      }
+    }
+    return changed;
+  }
+
+  private Instant getJobLastRun(String jobName) {
+    return jobSyncStatusRepository
+        .findById(jobName)
+        .map(JobSyncStatus::getLastRun)
+        .orElse(Instant.EPOCH);
   }
 
   /**
@@ -174,17 +194,30 @@ public class UliCitationSyncService {
     }
   }
 
+  private void triggerRepublishing(Set<String> docNumbers) {
+    if (docNumbers.isEmpty()) return;
+
+    if (TransactionSynchronizationManager.isActualTransactionActive()) {
+      TransactionSynchronizationManager.registerSynchronization(
+          new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+              log.info(
+                  "ULI Passive Citation Sync: Committed. Republishing {} docs", docNumbers.size());
+              docNumbers.forEach(UliCitationSyncService.this::publishSafe);
+            }
+          });
+    } else {
+      docNumbers.forEach(this::publishSafe);
+    }
+  }
+
   /** Case 3: Identify documents that point to revoked ULI documents. */
   @Transactional
   public Set<String> handleUliRevoked() {
     Set<String> documentsToRepublish = new HashSet<>();
     String jobName = "ULI_REVOKED_SYNC";
-
-    Instant lastRun =
-        jobSyncStatusRepository
-            .findById(jobName)
-            .map(JobSyncStatus::getLastRun)
-            .orElse(Instant.EPOCH);
+    Instant lastRun = getJobLastRun(jobName);
 
     var currentRunTimestamp = Instant.now();
     List<RevokedUli> revokedEntries = revokedUliRepository.findAllByRevokedAtAfter(lastRun);
@@ -227,7 +260,7 @@ public class UliCitationSyncService {
     }
 
     updateJobStatus(jobName, currentRunTimestamp);
-
+    triggerRepublishing(documentsToRepublish);
     return documentsToRepublish;
   }
 
@@ -236,5 +269,14 @@ public class UliCitationSyncService {
         jobSyncStatusRepository.findById(name).orElse(new JobSyncStatus(name, time));
     status.setLastRun(time);
     jobSyncStatusRepository.save(status);
+  }
+
+  private void publishSafe(String docNumber) {
+    try {
+      portalPublicationService.publishDocumentationUnit(docNumber);
+      log.debug("Successfully republished {} after revoked check", docNumber);
+    } catch (Exception e) {
+      log.error("Failed to republish {} during ULI revoked sync", docNumber, e);
+    }
   }
 }
