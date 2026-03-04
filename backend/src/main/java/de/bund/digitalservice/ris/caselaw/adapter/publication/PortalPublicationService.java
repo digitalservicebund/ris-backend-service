@@ -20,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationEx
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.ManualPortalPublicationResult.RelatedPendingProceedingPublicationResult;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.adm.AdmCitationPublishService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.sli.SliCitationPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PendingProceedingTransformer;
@@ -71,6 +72,7 @@ public class PortalPublicationService {
   private final CaselawCitationPublishService caselawCitationPublishService;
   private final UliCitationPublishService uliCitationPublishService;
   private final AdmCitationPublishService admCitationPublishService;
+  private final SliCitationPublishService sliCitationPublishService;
 
   private static final String PUBLICATION_FEATURE_FLAG = "neuris.portal-publication";
   private static final String CHANGELOG_FEATURE_FLAG = "neuris.regular-changelogs";
@@ -90,7 +92,8 @@ public class PortalPublicationService {
       CaselawCitationSyncService caselawCitationSyncService,
       CaselawCitationPublishService caselawCitationPublishService,
       UliCitationPublishService uliCitationPublishService,
-      AdmCitationPublishService admCitationPublishService) {
+      AdmCitationPublishService admCitationPublishService,
+      SliCitationPublishService sliCitationPublishService) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
@@ -106,6 +109,7 @@ public class PortalPublicationService {
     this.caselawCitationPublishService = caselawCitationPublishService;
     this.uliCitationPublishService = uliCitationPublishService;
     this.admCitationPublishService = admCitationPublishService;
+    this.sliCitationPublishService = sliCitationPublishService;
   }
 
   /**
@@ -380,6 +384,7 @@ public class PortalPublicationService {
       validateAndEnrichCaselawCitations(decision);
       validateAndEnrichUliCitations(decision);
       validateAndEnrichAdmCitations(decision);
+      validateAndEnrichSliCitations(decision);
     }
 
     CaseLawLdml ldml = ldmlTransformer.transformToLdml(toDomain(documentationUnit));
@@ -476,6 +481,18 @@ public class PortalPublicationService {
     decision.setPassiveAdmCitations(
         decision.getPassiveAdmCitations().stream()
             .map(admCitationPublishService::updatePassiveCitationSourceWithInformationFromSource)
+            .flatMap(Optional::stream)
+            .toList());
+  }
+
+  private void validateAndEnrichSliCitations(DecisionDTO decision) {
+    decision.setActiveSliCitations(
+        decision.getActiveSliCitations().stream()
+            .map(sliCitationPublishService::updateActiveCitationTargetWithInformationFromTarget)
+            .toList());
+    decision.setPassiveSliCitations(
+        decision.getPassiveSliCitations().stream()
+            .map(sliCitationPublishService::updatePassiveCitationSourceWithInformationFromSource)
             .flatMap(Optional::stream)
             .toList());
   }
