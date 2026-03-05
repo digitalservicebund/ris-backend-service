@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS references_schema.ref_view_adm (
 
 DELETE FROM references_schema.ref_view_adm WHERE id = 'c5c6acf4-11d0-4586-9357-0913fa40d939';
 INSERT INTO references_schema.ref_view_adm (id, document_number, juris_abbreviation, published_at)
-VALUES ('c5c6acf4-11d0-4586-9357-0913fa40d939', 'KSNR004051608', 'VV DEU BMF 2004-11-03 IV B 2-S 2176-13/04', CURRENT_TIMESTAMP);
+VALUES ('c5c6acf4-11d0-4586-9357-0913fa40d939', 'KSNR004051608', 'VV DEU BMF 2004-11-03 IV B 2-S 2176-13/04', CURRENT_TIMESTAMP) ON CONFLICT DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS references_schema.ref_view_active_reference_adm_caselaw (
                                                               id UUID PRIMARY KEY,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS references_schema.ref_view_active_reference_adm_casel
 
 DELETE FROM references_schema.ref_view_active_reference_adm_caselaw WHERE id = 'c5ccb919-d544-4897-8eaf-234383ca6c96';
 INSERT INTO references_schema.ref_view_active_reference_adm_caselaw (id, source_documentation_unit_id, target_documentation_unit_id, citation_type)
-VALUES ('c5ccb919-d544-4897-8eaf-234383ca6c96', 'c5c6acf4-11d0-4586-9357-0913fa40d939', 'adb8408b-5a77-48f9-9ed0-b8dee4f2db02', 'Vgl');
+VALUES ('c5ccb919-d544-4897-8eaf-234383ca6c96', 'c5c6acf4-11d0-4586-9357-0913fa40d939', 'adb8408b-5a77-48f9-9ed0-b8dee4f2db02', 'Vgl') ON CONFLICT DO NOTHING;
 
 
 

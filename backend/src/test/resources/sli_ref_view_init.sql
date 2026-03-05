@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS references_schema.ref_view_sli (
 
 DELETE FROM references_schema.ref_view_sli WHERE id = 'c4c08674-c862-415c-afc6-ddc0dc185702';
 INSERT INTO references_schema.ref_view_sli (id, document_number, author, book_title, year_of_publication, published_at)
-VALUES ('c4c08674-c862-415c-afc6-ddc0dc185702', 'KSNR150060010', 'Beitel, Willibald', 'Rechtsprechung, Erlasse und Gesetzesänderungen (12)', '2005', CURRENT_TIMESTAMP);
+VALUES ('c4c08674-c862-415c-afc6-ddc0dc185702', 'KSNR150060010', 'Beitel, Willibald', 'Rechtsprechung, Erlasse und Gesetzesänderungen (12)', '2005', CURRENT_TIMESTAMP)  ON CONFLICT DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS references_schema.ref_view_active_reference_sli_caselaw (
                                                               id UUID PRIMARY KEY,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS references_schema.ref_view_active_reference_sli_casel
 
 DELETE FROM references_schema.ref_view_sli WHERE id = 'b70221da-81a7-4eb9-8cc9-dd66cd11aa37';
 INSERT INTO references_schema.ref_view_active_reference_sli_caselaw (id, source_documentation_unit_id, target_documentation_unit_id)
-VALUES ('b70221da-81a7-4eb9-8cc9-dd66cd11aa37', 'c4c08674-c862-415c-afc6-ddc0dc185702', 'adb8408b-5a77-48f9-9ed0-b8dee4f2db02');
+VALUES ('b70221da-81a7-4eb9-8cc9-dd66cd11aa37', 'c4c08674-c862-415c-afc6-ddc0dc185702', 'adb8408b-5a77-48f9-9ed0-b8dee4f2db02') ON CONFLICT DO NOTHING;
 
 
 
