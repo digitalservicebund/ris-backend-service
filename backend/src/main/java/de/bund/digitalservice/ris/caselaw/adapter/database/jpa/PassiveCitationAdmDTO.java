@@ -31,7 +31,7 @@ public class PassiveCitationAdmDTO {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "target_id")
-  private DocumentationUnitDTO target;
+  private DecisionDTO target;
 
   @Column(name = "source_id")
   private UUID sourceId;

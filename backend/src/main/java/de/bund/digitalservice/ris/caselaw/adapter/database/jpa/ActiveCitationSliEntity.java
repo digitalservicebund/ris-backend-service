@@ -39,7 +39,7 @@ public class ActiveCitationSliEntity {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "source_id", nullable = false)
   @EqualsAndHashCode.Exclude
-  private DocumentationUnitDTO source;
+  private DecisionDTO source;
 
   @Nullable
   @Column(name = "target_id")

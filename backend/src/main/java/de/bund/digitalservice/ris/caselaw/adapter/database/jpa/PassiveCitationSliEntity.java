@@ -39,7 +39,7 @@ public class PassiveCitationSliEntity {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "target_id", nullable = false)
   @EqualsAndHashCode.Exclude
-  private DocumentationUnitDTO target;
+  private DecisionDTO target;
 
   @Nullable
   @Column(name = "source_id")
