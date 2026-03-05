@@ -159,10 +159,9 @@ public class UliCitationSyncServiceTest {
               .passiveUliCitations(new ArrayList<>(List.of(passiveToRemove)))
               .build();
 
-      when(caselawRepository.findAllByPassiveUliSourceIdInAndPendingRevocation(
-              Set.of(revokedUliId)))
+      when(caselawRepository.findAllByPassiveUliSourceIdAndPendingRevocation(revokedUliId))
           .thenReturn(List.of(decision));
-      when(caselawRepository.findAllByActiveUliTargetIdInAndPendingRevocation(any()))
+      when(caselawRepository.findAllByActiveUliTargetIdAndPendingRevocation(any()))
           .thenReturn(List.of());
 
       // Execute
@@ -185,11 +184,10 @@ public class UliCitationSyncServiceTest {
 
       DecisionDTO decision = DecisionDTO.builder().documentNumber("XXRE123456789").build();
 
-      when(caselawRepository.findAllByPassiveUliSourceIdInAndPendingRevocation(
-              Set.of(revokedUliId)))
+      when(caselawRepository.findAllByPassiveUliSourceIdAndPendingRevocation(revokedUliId))
           .thenReturn(List.of());
 
-      when(caselawRepository.findAllByActiveUliTargetIdInAndPendingRevocation(Set.of(revokedUliId)))
+      when(caselawRepository.findAllByActiveUliTargetIdAndPendingRevocation(revokedUliId))
           .thenReturn(List.of(decision));
 
       uliCitationSyncService.handleRevokedAfter(lastRun);
