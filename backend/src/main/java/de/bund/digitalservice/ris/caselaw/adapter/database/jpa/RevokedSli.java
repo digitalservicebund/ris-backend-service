@@ -14,7 +14,7 @@ import org.hibernate.annotations.Immutable;
 
 @Entity
 @Immutable
-@Table(name = "revoked_uli", schema = "references_schema")
+@Table(name = "revoked_sli", schema = "references_schema")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
