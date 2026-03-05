@@ -22,7 +22,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
@@ -213,7 +212,6 @@ public class AdmCitationSyncService {
   }
 
   /** Case 3: Identify documents that point to revoked ADM documents. */
-  @Transactional
   public void handleRevokedAfter(Instant after) {
     List<RevokedAdm> revokedEntries = revokedAdmRepository.findAllByRevokedAtAfter(after);
 
@@ -223,21 +221,23 @@ public class AdmCitationSyncService {
     }
 
     var documentsToRepublish =
-        revokedEntries.stream()
-            .map(this::removeCitationsToRevokedAdministrativeDirective)
-            .flatMap(Set::stream)
-            .collect(Collectors.toSet());
+        transactionTemplate.execute(
+            (status) ->
+                revokedEntries.stream()
+                    .map(this::removeCitationsToRevokedAdministrativeDirective)
+                    .flatMap(Set::stream)
+                    .collect(Collectors.toSet()));
 
     documentsToRepublish.forEach(
         docId -> {
           try {
             portalPublicationService.publishDocumentationUnitWithChangelog(docId, null);
-            log.atDebug()
+            log.atInfo()
                 .addKeyValue(LoggingKeys.DOCUMENT_ID, docId)
                 .setMessage("Successfully republished after ADM revoked sync")
                 .log();
           } catch (Exception e) {
-            log.atDebug()
+            log.atError()
                 .addKeyValue(LoggingKeys.DOCUMENT_ID, docId)
                 .addKeyValue("exception", e)
                 .setMessage("Failed to republish during ADM revoked sync")

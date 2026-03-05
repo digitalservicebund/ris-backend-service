@@ -20,7 +20,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
@@ -201,7 +200,6 @@ public class SliCitationSyncService {
   }
 
   /** Case 3: Identify documents that point to revoked SLI documents. */
-  @Transactional
   public void handleRevokedAfter(Instant after) {
     List<RevokedSli> revokedEntries = revokedSliRepository.findAllByRevokedAtAfter(after);
 
@@ -211,10 +209,12 @@ public class SliCitationSyncService {
     }
 
     var documentsToRepublish =
-        revokedEntries.stream()
-            .map(this::removeCitationsToRevokedSli)
-            .flatMap(Set::stream)
-            .collect(Collectors.toSet());
+        transactionTemplate.execute(
+            (status) ->
+                revokedEntries.stream()
+                    .map(this::removeCitationsToRevokedSli)
+                    .flatMap(Set::stream)
+                    .collect(Collectors.toSet()));
 
     documentsToRepublish.forEach(
         docId -> {
