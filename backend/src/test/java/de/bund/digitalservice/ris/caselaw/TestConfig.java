@@ -17,6 +17,11 @@ import tools.jackson.databind.module.SimpleModule;
 public class TestConfig {
   @Bean
   public RisWebTestClient risWebTestClient(MockMvc mockMvc) {
+    return new RisWebTestClient(mockMvc, objectMapper());
+  }
+
+  @Bean
+  public JsonMapper objectMapper() {
     var legacyObjectMapper = new ObjectMapper();
     legacyObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     legacyObjectMapper.registerModule(new JavaTimeModule());
@@ -25,6 +30,6 @@ public class TestConfig {
     module.addDeserializer(JsonPatch.class, new JsonPatchDeserializer(legacyObjectMapper));
     module.addSerializer(JsonPatch.class, new JsonPatchSerializer(legacyObjectMapper));
 
-    return new RisWebTestClient(mockMvc, JsonMapper.builder().addModule(module).build());
+    return JsonMapper.builder().addModule(module).build();
   }
 }

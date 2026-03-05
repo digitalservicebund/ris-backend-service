@@ -175,6 +175,7 @@ dependencies {
     implementation("net.minidev:json-smart:2.6.0")
 
     implementation("org.postgresql:postgresql:42.7.10")
+    implementation("io.hypersistence:hypersistence-utils-hibernate-73:3.15.2")
 
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
 

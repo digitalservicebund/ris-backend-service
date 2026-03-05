@@ -34,6 +34,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,7 +51,10 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 @Service
 @Slf4j
@@ -67,6 +71,7 @@ public class PortalPublicationService {
   private final PublishedDocumentationSnapshotRepository snapshotRepository;
   private final CaselawCitationSyncService caselawCitationSyncService;
   private final CaselawCitationPublishService caselawCitationPublishService;
+  private final EntityManager entityManager;
 
   private static final String PUBLICATION_FEATURE_FLAG = "neuris.portal-publication";
   private static final String CHANGELOG_FEATURE_FLAG = "neuris.regular-changelogs";
@@ -84,7 +89,8 @@ public class PortalPublicationService {
       DatabaseAttachmentInlineRepository attachmentInlineRepository,
       PublishedDocumentationSnapshotRepository snapshotRepository,
       CaselawCitationSyncService caselawCitationSyncService,
-      CaselawCitationPublishService caselawCitationPublishService) {
+      CaselawCitationPublishService caselawCitationPublishService,
+      EntityManager entityManager) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
@@ -98,6 +104,7 @@ public class PortalPublicationService {
     this.snapshotRepository = snapshotRepository;
     this.caselawCitationSyncService = caselawCitationSyncService;
     this.caselawCitationPublishService = caselawCitationPublishService;
+    this.entityManager = entityManager;
   }
 
   /**
@@ -121,6 +128,7 @@ public class PortalPublicationService {
     try {
       DocumentationUnitDTO documentationUnit =
           documentationUnitRepository.loadDocumentationUnitDTO(documentationUnitId);
+      entityManager.detach(documentationUnit);
       var result = publishToBucket(documentationUnit);
       uploadChangelogWithdrawOnFailure(documentationUnit, result);
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, user);
@@ -143,6 +151,7 @@ public class PortalPublicationService {
   }
 
   @Async
+  @Transactional(transactionManager = "jpaTransactionManager")
   public void publishSnapshots(int page, int size) {
     List<UUID> documentationUnitIds =
         documentationUnitRepository.findAllByCurrentStatus(PublicationStatus.PUBLISHED, page, size);
@@ -150,64 +159,69 @@ public class PortalPublicationService {
     log.info("save {} documentation units as snapshots", documentationUnitIds.size());
 
     AtomicInteger counter = new AtomicInteger(0);
-    AtomicInteger decisionCounter = new AtomicInteger(0);
     AtomicInteger batchCounter = new AtomicInteger(0);
     documentationUnitIds.forEach(
         documentationUnitId -> {
-          DocumentationUnitDTO documentationUnit = null;
-          try {
-            documentationUnit =
-                documentationUnitRepository.loadDocumentationUnitDTO(documentationUnitId);
-          } catch (Exception e) {
-            return;
-          }
-
           counter.incrementAndGet();
-          if (documentationUnit instanceof DecisionDTO decision) {
-            decisionCounter.incrementAndGet();
-            saveSnapshot(decision);
-          }
+          saveSnapshot(documentationUnitId);
 
           if (counter.get() > 1000) {
-            log.info(
-                "save {} decisions of {} documentation units in batch {}",
-                decisionCounter.get(),
-                counter.get(),
-                batchCounter.get());
+            log.info("save {} documentation units in batch {}", counter.get(), batchCounter.get());
             counter.set(0);
-            decisionCounter.set(0);
             batchCounter.incrementAndGet();
           }
         });
 
     if (counter.get() > 0) {
-      log.info(
-          "save {} decisions of {} documentation units in batch {}",
-          decisionCounter.get(),
-          counter.get(),
-          batchCounter.get());
+      log.info("save {} documentation units in batch {}", counter.get(), batchCounter.get());
       if (!documentationUnitIds.isEmpty()) {
         log.info("last documentation units: {}", documentationUnitIds.getLast());
       }
     }
   }
 
-  private void saveSnapshot(DocumentationUnitDTO documentationUnit) {
+  private void saveSnapshot(UUID documentationUnitId) {
+    Optional<DocumentationUnitDTO> documentationUnitOptional =
+        databaseDocumentationUnitRepository.findById(documentationUnitId);
+    if (documentationUnitOptional.isEmpty()) {
+      return;
+    }
     Optional<PublishedDocumentationSnapshotEntity> snapshot =
-        snapshotRepository.findByDocumentationUnitId(documentationUnit.getId());
+        snapshotRepository.findByDocumentationUnitId(documentationUnitId);
+
+    DocumentationUnitDTO documentationUnit = documentationUnitOptional.get();
+
+    ObjectNode json = objectMapper.valueToTree(toDomain(documentationUnit));
+
+    if (documentationUnit instanceof DecisionDTO decision) {
+      ArrayNode arrayUliNode = json.putArray("activeCitationUli");
+      decision
+          .getActiveUliCitations()
+          .forEach(
+              activeCitationUliDTO -> arrayUliNode.add(activeCitationUliDTO.getId().toString()));
+
+      ArrayNode arraySliNode = json.putArray("activeCitationSli");
+      decision
+          .getActiveSliCitations()
+          .forEach(
+              activeCitationSliDTO -> arraySliNode.add(activeCitationSliDTO.getId().toString()));
+
+      ArrayNode arrayAdmNode = json.putArray("activeCitationAdm");
+      decision
+          .getActiveAdministrativeRegulationCitations()
+          .forEach(
+              activeCitationAdmDTO -> arrayAdmNode.add(activeCitationAdmDTO.getId().toString()));
+    }
+
     PublishedDocumentationSnapshotEntity entity;
     if (snapshot.isPresent()) {
-      entity =
-          snapshot.get().toBuilder()
-              .json(toDomain(documentationUnit))
-              .publishedAt(LocalDateTime.now())
-              .build();
+      entity = snapshot.get().toBuilder().json(json).lastUpdatedAt(LocalDateTime.now()).build();
     } else {
       entity =
           PublishedDocumentationSnapshotEntity.builder()
               .documentationUnitId(documentationUnit.getId())
-              .json(toDomain(documentationUnit))
-              .publishedAt(LocalDateTime.now())
+              .json(json)
+              .lastUpdatedAt(LocalDateTime.now())
               .build();
     }
 
@@ -225,14 +239,23 @@ public class PortalPublicationService {
    *     LDML
    * @throws PublishException if the LDML file could not be saved in the bucket
    */
+  @Transactional(transactionManager = "jpaTransactionManager")
   public PortalPublicationResult publishDocumentationUnit(String documentNumber)
       throws DocumentationUnitNotExistsException {
     DocumentationUnitDTO documentationUnit =
         documentationUnitRepository.loadDocumentationUnitDTO(documentNumber);
+    entityManager.detach(documentationUnit);
+
     var publicationResult = publishToBucket(documentationUnit);
+
     updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, null);
-    if (documentationUnit instanceof DecisionDTO decision)
+
+    if (documentationUnit instanceof DecisionDTO decision) {
       publishResolutionNoteOfRelatedPendingProceedings(decision, null);
+    }
+
+    saveSnapshot(documentationUnit.getId());
+
     return publicationResult;
   }
 
