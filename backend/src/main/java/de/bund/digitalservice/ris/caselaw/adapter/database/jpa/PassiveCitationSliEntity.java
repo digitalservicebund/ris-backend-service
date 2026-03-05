@@ -43,7 +43,6 @@ public class PassiveCitationSliEntity {
 
   @Nullable
   @Column(name = "source_id")
-  @Size(max = 255)
   private UUID sourceId;
 
   @Nullable
