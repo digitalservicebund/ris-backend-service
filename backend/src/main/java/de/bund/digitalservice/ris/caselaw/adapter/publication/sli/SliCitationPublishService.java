@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationSli
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseSliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationSliEntity;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SliDTO;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -76,10 +77,34 @@ public class SliCitationPublishService {
       activeCitation.setTargetId(null);
       activeCitation.setTargetDocumentNumber(null);
     } else {
-      activeCitation.setTargetDocumentNumber(target.get().getDocumentNumber());
-      activeCitation.setTargetAuthor(target.get().getAuthor());
-      activeCitation.setTargetBookTitle(target.get().getBookTitle());
-      activeCitation.setTargetYearOfPublication(target.get().getYearOfPublication());
+      // Commented out for now as we first want to just log about the differences to understand them
+      // better
+      // activeCitation.setTargetDocumentNumber(target.get().getDocumentNumber());
+      // activeCitation.setTargetAuthor(target.get().getAuthor());
+      // activeCitation.setTargetBookTitle(target.get().getBookTitle());
+      // activeCitation.setTargetYearOfPublication(target.get().getYearOfPublication());
+
+      if (!Objects.equals(
+              activeCitation.getTargetDocumentNumber(), target.get().getDocumentNumber())
+          || !Objects.equals(activeCitation.getTargetAuthor(), target.get().getAuthor())
+          || !Objects.equals(activeCitation.getTargetBookTitle(), target.get().getBookTitle())
+          || !Objects.equals(
+              activeCitation.getTargetYearOfPublication(), target.get().getYearOfPublication())) {
+        log.atInfo()
+            .addKeyValue(
+                "activeCitation.targetDocumentNumber", activeCitation.getTargetDocumentNumber())
+            .addKeyValue("activeCitation.targetAuthor", activeCitation.getTargetAuthor())
+            .addKeyValue("activeCitation.targetBookTitle", activeCitation.getTargetBookTitle())
+            .addKeyValue(
+                "activeCitation.targetYearOfPublication",
+                activeCitation.getTargetYearOfPublication())
+            .addKeyValue("target.documentNumber", target.get().getDocumentNumber())
+            .addKeyValue("target.author", target.get().getAuthor())
+            .addKeyValue("target.bookTitle", target.get().getBookTitle())
+            .addKeyValue("target.yearOfPublication", target.get().getYearOfPublication())
+            .setMessage("Difference between active citation and target")
+            .log();
+      }
     }
 
     return activeCitation;

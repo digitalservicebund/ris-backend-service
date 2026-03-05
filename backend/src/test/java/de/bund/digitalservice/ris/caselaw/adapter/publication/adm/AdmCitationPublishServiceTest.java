@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAdmReposi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdmDTO;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -135,6 +136,7 @@ public class AdmCitationPublishServiceTest {
     }
 
     @Test
+    @Disabled("we want to start by just logging in these cases so we don't update them yet")
     void shouldReturnUpdatedActiveCitationWhenAdmIsFound() {
       var uuid = UUID.fromString("82948f54-94c7-43f2-9562-7b9efc6ce4fb");
       var activeCitation =

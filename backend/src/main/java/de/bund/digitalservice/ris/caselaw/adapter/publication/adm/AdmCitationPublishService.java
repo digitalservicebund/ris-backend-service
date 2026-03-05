@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationAdm
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdmDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAdmRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdmDTO;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -74,8 +75,23 @@ public class AdmCitationPublishService {
       activeCitation.setTargetId(null);
       activeCitation.setTargetDocumentNumber(null);
     } else {
-      activeCitation.setTargetDocumentNumber(target.get().getDocumentNumber());
-      activeCitation.setTargetDirective(target.get().getJurisAbbreviation());
+      // Commented out for now as we first want to just log about the differences to understand them
+      // better
+      // activeCitation.setTargetDocumentNumber(target.get().getDocumentNumber());
+      // activeCitation.setTargetDirective(target.get().getJurisAbbreviation());
+      if (!Objects.equals(
+              activeCitation.getTargetDocumentNumber(), target.get().getDocumentNumber())
+          || !Objects.equals(
+              activeCitation.getTargetDirective(), target.get().getJurisAbbreviation())) {
+        log.atInfo()
+            .addKeyValue(
+                "activeCitation.targetDocumentNumber", activeCitation.getTargetDocumentNumber())
+            .addKeyValue("activeCitation.targetDirective", activeCitation.getTargetDirective())
+            .addKeyValue("target.documentNumber", target.get().getDocumentNumber())
+            .addKeyValue("target.jurisAbbreviation", target.get().getDocumentNumber())
+            .setMessage("Difference between active citation and target")
+            .log();
+      }
     }
 
     return activeCitation;
