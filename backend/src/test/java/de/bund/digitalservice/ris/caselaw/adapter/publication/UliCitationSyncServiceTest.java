@@ -8,10 +8,10 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationUliCaselawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobSyncStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationUliDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUli;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UliActiveCaselawReferenceDTO;
@@ -39,7 +39,7 @@ public class UliCitationSyncServiceTest {
   @Autowired UliCitationSyncService uliCitationSyncService;
 
   @MockitoBean DatabaseDocumentationUnitRepository caselawRepository;
-  @MockitoBean PublishedUliRepository publishedUliRepository;
+  @MockitoBean DatabaseUliRepository databaseUliRepository;
   @MockitoBean RevokedUliRepository revokedUliRepository;
   @MockitoBean JobSyncStatusRepository jobSyncStatusRepository;
   @MockitoBean ActiveCitationUliCaselawRepository activeCitationUliCaselawRepository;
@@ -66,7 +66,7 @@ public class UliCitationSyncServiceTest {
               .activeCaselawReferences(List.of(link))
               .build();
 
-      when(publishedUliRepository.findAllByPublishedAtAfter(lastRun)).thenReturn(List.of(uliDTO));
+      when(databaseUliRepository.findAllByPublishedAtAfter(lastRun)).thenReturn(List.of(uliDTO));
 
       // Setup decision with old metadata
       PassiveCitationUliDTO passiveCitation =
@@ -104,7 +104,7 @@ public class UliCitationSyncServiceTest {
           UliActiveCaselawReferenceDTO.builder().targetDocumentationUnitId(caselawId).build();
 
       UliDTO uliDTO = UliDTO.builder().id(uliId).activeCaselawReferences(List.of(link)).build();
-      when(publishedUliRepository.findAllByPublishedAtAfter(lastRun)).thenReturn(List.of(uliDTO));
+      when(databaseUliRepository.findAllByPublishedAtAfter(lastRun)).thenReturn(List.of(uliDTO));
 
       DecisionDTO decision =
           DecisionDTO.builder()
@@ -127,7 +127,7 @@ public class UliCitationSyncServiceTest {
     @Test
     void shouldDoNothingIfNoNewUlisFound() throws DocumentationUnitNotExistsException {
       Instant lastRun = Instant.now();
-      when(publishedUliRepository.findAllByPublishedAtAfter(lastRun)).thenReturn(List.of());
+      when(databaseUliRepository.findAllByPublishedAtAfter(lastRun)).thenReturn(List.of());
 
       Set<String> result = uliCitationSyncService.handleNewlyPublishedAfter(lastRun);
 

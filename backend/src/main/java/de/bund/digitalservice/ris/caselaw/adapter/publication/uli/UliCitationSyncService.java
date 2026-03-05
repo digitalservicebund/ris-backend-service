@@ -1,13 +1,14 @@
 package de.bund.digitalservice.ris.caselaw.adapter.publication.uli;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationUliDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUli;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
+import de.bund.digitalservice.ris.caselaw.domain.LoggingKeys;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -26,17 +27,17 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 public class UliCitationSyncService {
 
   private final DatabaseDocumentationUnitRepository caselawRepository;
-  private final PublishedUliRepository publishedUliRepository;
+  private final DatabaseUliRepository databaseUliRepository;
   private final RevokedUliRepository revokedUliRepository;
   private final PortalPublicationService portalPublicationService;
 
   public UliCitationSyncService(
       DatabaseDocumentationUnitRepository caselawRepository,
-      PublishedUliRepository publishedUliRepository,
+      DatabaseUliRepository databaseUliRepository,
       RevokedUliRepository revokedUliRepository,
       PortalPublicationService portalPublicationService) {
     this.caselawRepository = caselawRepository;
-    this.publishedUliRepository = publishedUliRepository;
+    this.databaseUliRepository = databaseUliRepository;
     this.revokedUliRepository = revokedUliRepository;
     this.portalPublicationService = portalPublicationService;
   }
@@ -55,53 +56,52 @@ public class UliCitationSyncService {
    * created automatically.
    */
   @Transactional
-  public Set<String> handleNewlyPublishedAfter(Instant lastRun) {
+  public void handleNewlyPublishedAfter(Instant lastRun) {
     // Delta of newly published ULI documents
-    Set<String> documentsToRepublish =
-        publishedUliRepository.findAllByPublishedAtAfter(lastRun).stream()
+    Set<UUID> documentsToRepublish =
+        databaseUliRepository.findAllByPublishedAtAfter(lastRun).stream()
             .map(this::syncPassiveCitationsForUli)
             .flatMap(Set::stream)
             .collect(Collectors.toSet());
 
     triggerRepublishing(documentsToRepublish);
-
-    return documentsToRepublish;
   }
 
-  private Set<String> syncPassiveCitationsForUli(UliDTO uli) {
-    Set<String> affectedDocNumbers = new HashSet<>();
+  private Set<UUID> syncPassiveCitationsForUli(UliDTO uli) {
+    Set<UUID> documentsToRepublish = new HashSet<>();
 
     uli.getActiveCaselawReferences()
         .forEach(
-            link -> {
-              caselawRepository
-                  .findById(link.getTargetDocumentationUnitId())
-                  .ifPresent(
-                      docUnit -> {
-                        if (docUnit instanceof DecisionDTO decision) {
+            link ->
+                caselawRepository
+                    .findById(link.getTargetDocumentationUnitId())
+                    .ifPresent(
+                        docUnit -> {
+                          if (docUnit instanceof DecisionDTO decision) {
 
-                          boolean changed = checkIsChangedAndUpdate(uli, decision);
+                            boolean changed = checkIsChangedAndUpdate(uli, decision);
 
-                          checkForMissingPassiveCitations(decision, uli.getId());
+                            checkForMissingPassiveCitations(decision, uli.getId());
 
-                          if (changed) {
-                            caselawRepository.save(decision);
-                            affectedDocNumbers.add(decision.getDocumentNumber());
+                            if (changed) {
+                              caselawRepository.save(decision);
+                              documentsToRepublish.add(decision.getId());
+                            }
                           }
-                        }
-                      });
-            });
+                        }));
 
-    return affectedDocNumbers;
+    return documentsToRepublish;
   }
 
   private boolean checkIsChangedAndUpdate(UliDTO uli, DecisionDTO decision) {
     boolean changed = false;
     for (PassiveCitationUliDTO passive : decision.getPassiveUliCitations()) {
-      if (uli.getId().equals(passive.getSourceId())) {
-        if (updateMetadataIfChanged(passive, uli)) {
-          changed = true;
-        }
+      boolean isSameSource =
+          Objects.equals(passive.getSourceId(), uli.getId())
+              || Objects.equals(
+                  passive.getSourceLiteratureDocumentNumber(), uli.getDocumentNumber());
+      if (isSameSource && updateMetadataIfChanged(passive, uli)) {
+        changed = true;
       }
     }
     return changed;
@@ -114,6 +114,11 @@ public class UliCitationSyncService {
    */
   private boolean updateMetadataIfChanged(PassiveCitationUliDTO passive, UliDTO uli) {
     boolean hasChanged = false;
+
+    if (!Objects.equals(passive.getSourceId(), uli.getId())) {
+      passive.setSourceId(uli.getId());
+      hasChanged = true;
+    }
 
     if (!Objects.equals(passive.getSourceAuthor(), uli.getAuthor())) {
       passive.setSourceAuthor(uli.getAuthor());
@@ -160,7 +165,7 @@ public class UliCitationSyncService {
       return;
     }
 
-    Set<String> documentsToRepublish =
+    Set<UUID> documentsToRepublish =
         revokedEntries.stream()
             .map(this::syncCitationsForRevokedUli)
             .flatMap(Set::stream)
@@ -169,31 +174,51 @@ public class UliCitationSyncService {
     triggerRepublishing(documentsToRepublish);
   }
 
-  private Set<String> syncCitationsForRevokedUli(RevokedUli revokedUli) {
-    log.info("Checking citations for revoked ULI: {}", revokedUli.getDocUnitId());
-    Set<String> affectedDocNumbers = new HashSet<>();
+  private Set<UUID> syncCitationsForRevokedUli(RevokedUli revokedUli) {
+    log.atInfo()
+        .addKeyValue(LoggingKeys.REVOKED_ULI, revokedUli.getDocUnitId())
+        .setMessage("Checking active and passive citations for references to revoked ULI.")
+        .log();
+
+    Set<UUID> documentsToRepublish = new HashSet<>();
     UUID revokedId = revokedUli.getDocUnitId();
+    if (revokedId == null) {
+      log.atError()
+          .addKeyValue("revokedUliEntry", revokedUli)
+          .setMessage("RevokedUli entry found without docUnitId. Skipping sync for this entry.")
+          .log();
+      return new HashSet<>();
+    }
 
     // remove passive citations that point to the revoked ULI
     List<DecisionDTO> documentsWithPassive =
         caselawRepository.findAllByPassiveUliSourceIdAndPendingRevocation(revokedId);
 
     for (DecisionDTO decision : documentsWithPassive) {
-      boolean removed =
-          decision.getPassiveUliCitations().removeIf(p -> revokedId.equals(p.getSourceId()));
+      // Todo: check if we want to remove affected passive citations automatically
+      //        boolean removed = decision.getPassiveUliCitations()
+      //                .removeIf(p -> Objects.equals(revokedId, p.getSourceId()));
+      boolean hasAffectedCitation =
+          decision.getPassiveUliCitations().stream()
+              .anyMatch(p -> Objects.equals(revokedId, p.getSourceId()));
 
-      if (removed) {
-        caselawRepository.save(decision);
-        affectedDocNumbers.add(decision.getDocumentNumber());
-        log.info(
-            "Removed passive citation to revoked ULI {} from doc {}",
-            revokedId,
-            decision.getDocumentNumber());
+      if (hasAffectedCitation) {
+        // Todo: uncomment when we want to remove affected passive citations automatically
+        // caselawRepository.save(decision);
+        documentsToRepublish.add(decision.getId());
+        log.atInfo()
+            .addKeyValue(LoggingKeys.REVOKED_ULI, revokedId)
+            .addKeyValue("affectedDocUnitNumber", decision.getDocumentNumber())
+            .setMessage(
+                "Passive Citation to revoked ULI detected. Document added to republishing queue for validation in publish step.")
+            .log();
       } else {
-        log.error(
-            "Inconsistency during revocation: Document {} was fetched as 'affected' from revoked case, but no matching passive ULI citation was found for the revoked ULI ID {}",
-            decision.getDocumentNumber(),
-            revokedId);
+        log.atError()
+            .addKeyValue(LoggingKeys.REVOKED_ULI, revokedId)
+            .addKeyValue("affectedDocUnitNumber", decision.getDocumentNumber())
+            .setMessage(
+                "Inconsistency during revocation: Document was fetched as 'affected', but no matching passive ULI citation ID was found.")
+            .log();
       }
     }
 
@@ -203,14 +228,20 @@ public class UliCitationSyncService {
         caselawRepository.findAllByActiveUliTargetIdAndPendingRevocation(revokedId);
 
     for (DecisionDTO decision : affectedByActive) {
-      affectedDocNumbers.add(decision.getDocumentNumber());
+      documentsToRepublish.add(decision.getId());
+      log.atInfo()
+          .addKeyValue(LoggingKeys.REVOKED_ULI, revokedId)
+          .addKeyValue("affectedDocUnitNumber", decision.getDocumentNumber())
+          .setMessage(
+              "Active Citation to revoked ULI detected. Document added to republishing queue for validation in publish step.")
+          .log();
     }
 
-    return affectedDocNumbers;
+    return documentsToRepublish;
   }
 
-  private void triggerRepublishing(Set<String> docNumbers) {
-    if (docNumbers.isEmpty()) return;
+  private void triggerRepublishing(Set<UUID> documentsToRepublish) {
+    if (documentsToRepublish.isEmpty()) return;
 
     if (TransactionSynchronizationManager.isActualTransactionActive()) {
       TransactionSynchronizationManager.registerSynchronization(
@@ -218,21 +249,35 @@ public class UliCitationSyncService {
             @Override
             public void afterCommit() {
               log.info(
-                  "ULI Passive Citation Sync: Committed. Republishing {} docs", docNumbers.size());
-              docNumbers.forEach(UliCitationSyncService.this::publishSafe);
+                  "ULI Citation Sync: Committed. Republishing {} docs",
+                  documentsToRepublish.size());
+              documentsToRepublish.forEach(
+                  docId -> {
+                    try {
+                      portalPublicationService.publishDocumentationUnitWithChangelog(docId, null);
+                      log.atDebug()
+                          .addKeyValue(LoggingKeys.DOCUMENT_ID, docId)
+                          .setMessage("Successfully republished after ULI revoked sync")
+                          .log();
+                    } catch (Exception e) {
+                      log.atError()
+                          .addKeyValue(LoggingKeys.DOCUMENT_ID, docId)
+                          .addKeyValue("exception", e.getMessage())
+                          .setMessage("Failed to republish during ULI revoked sync")
+                          .log();
+                    }
+                  });
             }
           });
     } else {
-      docNumbers.forEach(this::publishSafe);
-    }
-  }
-
-  private void publishSafe(String docNumber) {
-    try {
-      portalPublicationService.publishDocumentationUnit(docNumber);
-      log.debug("Successfully republished {} after revoked check", docNumber);
-    } catch (Exception e) {
-      log.error("Failed to republish {} during ULI revoked sync", docNumber, e);
+      documentsToRepublish.forEach(
+          docId -> {
+            try {
+              portalPublicationService.publishDocumentationUnitWithChangelog(docId, null);
+            } catch (Exception e) {
+              log.error("Failed to republish {} during ULI sync", docId, e);
+            }
+          });
     }
   }
 }

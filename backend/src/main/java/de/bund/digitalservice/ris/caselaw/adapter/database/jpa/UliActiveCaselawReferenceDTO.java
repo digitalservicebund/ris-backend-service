@@ -34,7 +34,4 @@ public class UliActiveCaselawReferenceDTO {
   // caselaw document
   @Column(name = "target_documentation_unit_id")
   private UUID targetDocumentationUnitId;
-
-  @Column(name = "citation_type")
-  private String citationType;
 }

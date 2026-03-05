@@ -5,9 +5,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationUliDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationUliDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationPublishService;
 import java.util.Optional;
@@ -25,7 +25,7 @@ public class UliCitationPublishServiceTest {
 
   @Autowired UliCitationPublishService uliCitationPublishService;
 
-  @MockitoBean PublishedUliRepository publishedUliRepository;
+  @MockitoBean DatabaseUliRepository databaseUliRepository;
 
   @Nested
   class updatePassiveUliCitationWithInformationFromSource {
@@ -49,7 +49,7 @@ public class UliCitationPublishServiceTest {
       var passiveCitation =
           PassiveCitationUliDTO.builder().sourceLiteratureDocumentNumber("ULI-123").rank(1).build();
 
-      when(publishedUliRepository.findByDocumentNumber("ULI-123")).thenReturn(Optional.empty());
+      when(databaseUliRepository.findByDocumentNumber("ULI-123")).thenReturn(Optional.empty());
 
       var result =
           uliCitationPublishService.updatePassiveUliCitationWithInformationFromSource(
@@ -69,7 +69,7 @@ public class UliCitationPublishServiceTest {
       when(publishedUli.getDocumentTypeRawValue()).thenReturn("Aufsatz");
       when(publishedUli.getLegalPeriodicalRawValue()).thenReturn("NJW");
 
-      when(publishedUliRepository.findByDocumentNumber("ULI-123"))
+      when(databaseUliRepository.findByDocumentNumber("ULI-123"))
           .thenReturn(Optional.of(publishedUli));
 
       var result =
@@ -116,7 +116,7 @@ public class UliCitationPublishServiceTest {
               .rank(1)
               .build();
 
-      when(publishedUliRepository.findByDocumentNumber("ULI-123")).thenReturn(Optional.empty());
+      when(databaseUliRepository.findByDocumentNumber("ULI-123")).thenReturn(Optional.empty());
 
       var result =
           uliCitationPublishService.updateActiveUliCitationWithInformationFromTarget(
@@ -141,7 +141,7 @@ public class UliCitationPublishServiceTest {
       when(publishedUli.getCitation()).thenReturn("JZ 2026, 500");
       when(publishedUli.getLegalPeriodicalRawValue()).thenReturn("JZ");
 
-      when(publishedUliRepository.findByDocumentNumber("ULI-123"))
+      when(databaseUliRepository.findByDocumentNumber("ULI-123"))
           .thenReturn(Optional.of(publishedUli));
 
       var result =

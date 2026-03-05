@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PublishedUliRepository extends JpaRepository<UliDTO, UUID> {
+public interface DatabaseUliRepository extends JpaRepository<UliDTO, UUID> {
   Optional<UliDTO> findByDocumentNumber(String documentNumber);
 
   List<UliDTO> findAllByPublishedAtAfter(Instant lastCheck);
