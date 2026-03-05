@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -42,6 +43,6 @@ public class SliDTO {
   @Column(name = "published_at")
   private Instant publishedAt;
 
-  @OneToMany(mappedBy = "source")
+  @OneToMany(mappedBy = "source", fetch = FetchType.EAGER)
   private List<SliActiveCaselawReferenceDTO> activeCaselawReferences;
 }

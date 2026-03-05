@@ -217,7 +217,9 @@ class AdmCitationSyncServiceTest {
       assertThat(decision.getPassiveAdmCitations()).containsExactly(passiveToStay);
 
       verify(caselawRepository).save(decision);
-      verify(portalPublicationService).publishDocumentationUnit("WBRE410005137");
+      verify(portalPublicationService)
+          .publishDocumentationUnitWithChangelog(
+              UUID.fromString("4eb14cae-7103-4c39-98f6-eff2e79de573"), null);
     }
 
     @Test
@@ -248,7 +250,9 @@ class AdmCitationSyncServiceTest {
 
       // Verify: Document is marked for republish, but nothing is removed/saved inside the doc
       verify(caselawRepository, never()).save(any());
-      verify(portalPublicationService).publishDocumentationUnit("WBRE410005137");
+      verify(portalPublicationService)
+          .publishDocumentationUnitWithChangelog(
+              UUID.fromString("6c2447a7-e155-4c6b-9244-37f0d40d8435"), null);
     }
   }
 }

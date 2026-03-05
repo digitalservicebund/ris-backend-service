@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication.sli;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,10 +33,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @ExtendWith(SpringExtension.class)
 @Import({SliCitationSyncService.class})
-public class SliCitationSyncServiceTest {
+class SliCitationSyncServiceTest {
 
   @Autowired SliCitationSyncService sliCitationSyncService;
 
@@ -43,6 +48,17 @@ public class SliCitationSyncServiceTest {
   @MockitoBean RevokedSliRepository revokedSliRepository;
   @MockitoBean DatabaseCitationTypeRepository citationTypeRepository;
   @MockitoBean PortalPublicationService portalPublicationService;
+  @MockitoBean TransactionTemplate transactionTemplate = new TransactionTemplate();
+
+  @BeforeEach
+  void beforeEach() {
+    when(transactionTemplate.execute(any()))
+        .thenAnswer(
+            invocation ->
+                invocation
+                    .<TransactionCallback<List<UUID>>>getArgument(0)
+                    .doInTransaction(mock(TransactionStatus.class)));
+  }
 
   @Nested
   class handleNewlyPublishedAfter {
@@ -100,7 +116,7 @@ public class SliCitationSyncServiceTest {
       assertThat(passiveCitation.getSourceYearOfPublication()).isEqualTo("2005");
 
       verify(caselawRepository).save(decision);
-      verify(portalPublicationService).publishDocumentationUnit("WBRE410005137");
+      verify(portalPublicationService).publishDocumentationUnitWithChangelog(caselawId, null);
     }
 
     @Test
@@ -153,7 +169,7 @@ public class SliCitationSyncServiceTest {
       assertThat(passiveCitation.getRank()).isEqualTo(1);
 
       verify(caselawRepository).save(decision);
-      verify(portalPublicationService).publishDocumentationUnit("WBRE410005137");
+      verify(portalPublicationService).publishDocumentationUnitWithChangelog(caselawId, null);
     }
 
     @Test
@@ -163,7 +179,7 @@ public class SliCitationSyncServiceTest {
       sliCitationSyncService.handleNewlyPublishedAfter(Instant.now());
 
       verify(caselawRepository, never()).save(any());
-      verify(portalPublicationService, never()).publishDocumentationUnit(any());
+      verify(portalPublicationService, never()).publishDocumentationUnitWithChangelog(any(), any());
     }
   }
 
@@ -204,7 +220,9 @@ public class SliCitationSyncServiceTest {
       assertThat(decision.getPassiveSliCitations()).containsExactly(passiveToStay);
 
       verify(caselawRepository).save(decision);
-      verify(portalPublicationService).publishDocumentationUnit("WBRE410005137");
+      verify(portalPublicationService)
+          .publishDocumentationUnitWithChangelog(
+              UUID.fromString("4eb14cae-7103-4c39-98f6-eff2e79de573"), null);
     }
 
     @Test
@@ -237,7 +255,9 @@ public class SliCitationSyncServiceTest {
 
       // Verify: Document is marked for republish, but nothing is removed/saved inside the doc
       verify(caselawRepository, never()).save(any());
-      verify(portalPublicationService).publishDocumentationUnit("WBRE410005137");
+      verify(portalPublicationService)
+          .publishDocumentationUnitWithChangelog(
+              UUID.fromString("6c2447a7-e155-4c6b-9244-37f0d40d8435"), null);
     }
   }
 }

@@ -28,7 +28,7 @@ public class SliCitationPublishService {
   }
 
   private Optional<SliDTO> getActiveCitationTarget(ActiveCitationSliEntity activeCitation) {
-    if (activeCitation.getTargetDocumentNumber() == null) {
+    if (activeCitation.getTargetId() == null) {
       return Optional.empty();
     }
 

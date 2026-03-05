@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
 @Slf4j
@@ -30,51 +31,58 @@ public class SliCitationSyncService {
   private final DatabaseSliRepository sliRepository;
   private final RevokedSliRepository revokedSliRepository;
   private final PortalPublicationService portalPublicationService;
+  private final TransactionTemplate transactionTemplate;
 
   public SliCitationSyncService(
       DatabaseDocumentationUnitRepository documentationUnitRepository,
       DatabaseSliRepository sliRepository,
       RevokedSliRepository revokedSliRepository,
-      PortalPublicationService portalPublicationService) {
+      PortalPublicationService portalPublicationService,
+      TransactionTemplate transactionTemplate) {
     this.documentationUnitRepository = documentationUnitRepository;
     this.sliRepository = sliRepository;
     this.revokedSliRepository = revokedSliRepository;
     this.portalPublicationService = portalPublicationService;
+    this.transactionTemplate = transactionTemplate;
   }
 
   @Transactional
   public void handleNewlyPublishedAfter(Instant after) {
-    sliRepository.findAllByPublishedAtAfter(after).stream()
-        .map(this::syncCitations)
-        .flatMap(Set::stream)
-        // documents that have changed and need to be republished
-        .distinct()
-        .forEach(
-            docNumber -> {
-              try {
-                portalPublicationService.publishDocumentationUnit(docNumber);
-                log.atDebug()
-                    .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
-                    .setMessage("Successfully republished after SLI newly published sync")
-                    .log();
-              } catch (Exception e) {
-                log.atDebug()
-                    .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
-                    .addKeyValue("exception", e)
-                    .setMessage("Failed to republish during SLI newly published sync")
-                    .log();
-              }
-            });
+    var documentsToPublish =
+        transactionTemplate.execute(
+            (status) ->
+                sliRepository.findAllByPublishedAtAfter(after).stream()
+                    .map(this::syncCitations)
+                    .flatMap(Set::stream)
+                    // documents that have changed and need to be republished
+                    .distinct()
+                    .toList());
+
+    documentsToPublish.forEach(
+        docId -> {
+          try {
+            portalPublicationService.publishDocumentationUnitWithChangelog(docId, null);
+            log.atInfo()
+                .addKeyValue(LoggingKeys.DOCUMENT_ID, docId)
+                .setMessage("Successfully republished after SLI newly published sync")
+                .log();
+          } catch (Exception e) {
+            log.atError()
+                .addKeyValue(LoggingKeys.DOCUMENT_ID, docId)
+                .addKeyValue("exception", e)
+                .setMessage("Failed to republish during SLI newly published sync")
+                .log();
+          }
+        });
   }
 
   /**
    * Create passive citations for all active citations of the doc unit.
    *
-   * @return list Document numbers of all other documents that have been changed. These should be
-   *     published again.
+   * @return ids of all other documents that have been changed. These should be published again.
    */
-  private Set<String> syncCitations(SliDTO sli) {
-    Set<String> documentsToRepublish = new HashSet<>();
+  private Set<UUID> syncCitations(SliDTO sli) {
+    Set<UUID> documentsToRepublish = new HashSet<>();
 
     sli.getActiveCaselawReferences()
         .forEach(
@@ -107,7 +115,7 @@ public class SliCitationSyncService {
 
                     documentationUnitRepository.save(targetDecision);
 
-                    documentsToRepublish.add(targetDecision.getDocumentNumber());
+                    documentsToRepublish.add(targetDecision.getId());
                   }
                 } else {
                   targetDecision
@@ -127,7 +135,7 @@ public class SliCitationSyncService {
 
                   documentationUnitRepository.save(targetDecision);
 
-                  documentsToRepublish.add(targetDecision.getDocumentNumber());
+                  documentsToRepublish.add(targetDecision.getId());
                 }
               }
             });
@@ -210,16 +218,16 @@ public class SliCitationSyncService {
             .collect(Collectors.toSet());
 
     documentsToRepublish.forEach(
-        docNumber -> {
+        docId -> {
           try {
-            portalPublicationService.publishDocumentationUnit(docNumber);
+            portalPublicationService.publishDocumentationUnitWithChangelog(docId, null);
             log.atDebug()
-                .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
+                .addKeyValue(LoggingKeys.DOCUMENT_ID, docId)
                 .setMessage("Successfully republished after SLI revoked sync")
                 .log();
           } catch (Exception e) {
             log.atDebug()
-                .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
+                .addKeyValue(LoggingKeys.DOCUMENT_ID, docId)
                 .addKeyValue("exception", e)
                 .setMessage("Failed to republish during SLI revoked sync")
                 .log();
@@ -227,13 +235,13 @@ public class SliCitationSyncService {
         });
   }
 
-  private Set<String> removeCitationsToRevokedSli(RevokedSli revokedSli) {
+  private Set<UUID> removeCitationsToRevokedSli(RevokedSli revokedSli) {
     log.atInfo()
         .addKeyValue(LoggingKeys.REVOKED_SLI, revokedSli.getDocUnitId())
         .setMessage("Checking active and passive citations for references to revoked SLI.")
         .log();
 
-    Set<String> documentsToRepublish = new HashSet<>();
+    Set<UUID> documentsToRepublish = new HashSet<>();
 
     List<DecisionDTO> documentsWithPassive =
         documentationUnitRepository.findAllByPassiveSliSourceIdAndPendingRevocation(
@@ -249,7 +257,7 @@ public class SliCitationSyncService {
 
       if (removed) {
         documentationUnitRepository.save(decision);
-        documentsToRepublish.add(decision.getDocumentNumber());
+        documentsToRepublish.add(decision.getId());
         log.atInfo()
             .addKeyValue(LoggingKeys.REVOKED_SLI, revokedSli.getDocUnitId())
             .addKeyValue("docunitWithPassiveCitation", decision.getDocumentNumber())
@@ -269,7 +277,7 @@ public class SliCitationSyncService {
             revokedSli.getDocUnitId());
 
     for (DecisionDTO decision : affectedByActive) {
-      documentsToRepublish.add(decision.getDocumentNumber());
+      documentsToRepublish.add(decision.getId());
       log.atInfo()
           .addKeyValue(LoggingKeys.REVOKED_SLI, revokedSli.getDocUnitId())
           .addKeyValue("docunitWithActiveCitation", decision.getDocumentNumber())

@@ -63,16 +63,16 @@ public class AdmCitationSyncService {
                     .toList());
 
     documentsToPublish.forEach(
-        docNumber -> {
+        docId -> {
           try {
-            portalPublicationService.publishDocumentationUnitWithChangelog(docNumber, null);
+            portalPublicationService.publishDocumentationUnitWithChangelog(docId, null);
             log.atInfo()
-                .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
+                .addKeyValue(LoggingKeys.DOCUMENT_ID, docId)
                 .setMessage("Successfully republished after ADM newly published sync")
                 .log();
           } catch (Exception e) {
             log.atError()
-                .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
+                .addKeyValue(LoggingKeys.DOCUMENT_ID, docId)
                 .addKeyValue("exception", e)
                 .setMessage("Failed to republish during ADM newly published sync")
                 .log();
@@ -229,16 +229,16 @@ public class AdmCitationSyncService {
             .collect(Collectors.toSet());
 
     documentsToRepublish.forEach(
-        docNumber -> {
+        docId -> {
           try {
-            portalPublicationService.publishDocumentationUnit(docNumber);
+            portalPublicationService.publishDocumentationUnitWithChangelog(docId, null);
             log.atDebug()
-                .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
+                .addKeyValue(LoggingKeys.DOCUMENT_ID, docId)
                 .setMessage("Successfully republished after ADM revoked sync")
                 .log();
           } catch (Exception e) {
             log.atDebug()
-                .addKeyValue(LoggingKeys.DOCUMENT_NUMBER, docNumber)
+                .addKeyValue(LoggingKeys.DOCUMENT_ID, docId)
                 .addKeyValue("exception", e)
                 .setMessage("Failed to republish during ADM revoked sync")
                 .log();
@@ -246,14 +246,14 @@ public class AdmCitationSyncService {
         });
   }
 
-  private Set<String> removeCitationsToRevokedAdministrativeDirective(RevokedAdm revokedAdm) {
+  private Set<UUID> removeCitationsToRevokedAdministrativeDirective(RevokedAdm revokedAdm) {
     log.atInfo()
         .addKeyValue(LoggingKeys.REVOKED_ADMINISTRATIVE_DIRECTIVE, revokedAdm.getDocUnitId())
         .setMessage(
             "Checking active and passive citations for references to revoked Administrative Directive.")
         .log();
 
-    Set<String> documentsToRepublish = new HashSet<>();
+    Set<UUID> documentsToRepublish = new HashSet<>();
 
     List<DecisionDTO> documentsWithPassive =
         documentationUnitRepository.findAllByPassiveAdmSourceIdAndPendingRevocation(
@@ -269,7 +269,7 @@ public class AdmCitationSyncService {
 
       if (removed) {
         documentationUnitRepository.save(decision);
-        documentsToRepublish.add(decision.getDocumentNumber());
+        documentsToRepublish.add(decision.getId());
         log.atInfo()
             .addKeyValue(LoggingKeys.REVOKED_ADMINISTRATIVE_DIRECTIVE, revokedAdm.getDocUnitId())
             .addKeyValue("docunitWithPassiveCitation", decision.getDocumentNumber())
@@ -289,7 +289,7 @@ public class AdmCitationSyncService {
             revokedAdm.getDocUnitId());
 
     for (DecisionDTO decision : affectedByActive) {
-      documentsToRepublish.add(decision.getDocumentNumber());
+      documentsToRepublish.add(decision.getId());
       log.atInfo()
           .addKeyValue(LoggingKeys.REVOKED_ADMINISTRATIVE_DIRECTIVE, revokedAdm.getDocUnitId())
           .addKeyValue("docunitWithActiveCitation", decision.getDocumentNumber())
