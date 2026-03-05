@@ -46,7 +46,6 @@ public class SliCitationSyncService {
     this.transactionTemplate = transactionTemplate;
   }
 
-  @Transactional
   public void handleNewlyPublishedAfter(Instant after) {
     var documentsToPublish =
         transactionTemplate.execute(
