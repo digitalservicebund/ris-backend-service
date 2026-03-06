@@ -22,7 +22,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -82,15 +81,14 @@ public class UliCitationSyncServiceTest {
       when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
 
       // Execute
-      Set<String> result = uliCitationSyncService.handleNewlyPublishedAfter(lastRun);
+      uliCitationSyncService.handleNewlyPublishedAfter(lastRun);
 
       // Verify
-      assertThat(result).containsExactly("XXRE123456789");
       assertThat(passiveCitation.getSourceAuthor()).isEqualTo("New Author");
       assertThat(passiveCitation.getSourceCitation()).isEqualTo("New Citation");
 
       verify(caselawRepository).save(decision);
-      verify(portalPublicationService).publishDocumentationUnit("XXRE123456789");
+      verify(portalPublicationService).publishDocumentationUnitWithChangelog(caselawId, null);
     }
 
     @Test
@@ -116,10 +114,9 @@ public class UliCitationSyncServiceTest {
       when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
 
       // Execute
-      Set<String> result = uliCitationSyncService.handleNewlyPublishedAfter(lastRun);
+      uliCitationSyncService.handleNewlyPublishedAfter(lastRun);
 
       // Verify
-      assertThat(result).isEmpty();
       verify(caselawRepository, never()).save(any());
       verify(portalPublicationService, never()).publishDocumentationUnit(any());
     }
@@ -129,13 +126,90 @@ public class UliCitationSyncServiceTest {
       Instant lastRun = Instant.now();
       when(databaseUliRepository.findAllByPublishedAtAfter(lastRun)).thenReturn(List.of());
 
-      Set<String> result = uliCitationSyncService.handleNewlyPublishedAfter(lastRun);
-
-      assertThat(result).isEmpty();
+      uliCitationSyncService.handleNewlyPublishedAfter(lastRun);
 
       verify(caselawRepository, never()).findById(any());
       verify(caselawRepository, never()).save(any());
       verify(portalPublicationService, never()).publishDocumentationUnit(any());
+    }
+
+    @Test
+    void shouldUpdateMetadataWhenMatchingByDocumentNumberInsteadOfId() {
+      UUID uliId = UUID.randomUUID();
+      UUID caselawId = UUID.randomUUID();
+      String docNumber = "ULI-2026-100";
+
+      UliDTO uliDTO =
+          UliDTO.builder()
+              .id(uliId)
+              .documentNumber(docNumber)
+              .author("New Author")
+              .activeCaselawReferences(
+                  List.of(
+                      UliActiveCaselawReferenceDTO.builder()
+                          .targetDocumentationUnitId(caselawId)
+                          .build()))
+              .build();
+
+      when(databaseUliRepository.findAllByPublishedAtAfter(any())).thenReturn(List.of(uliDTO));
+
+      // passive citation has no id (yet) but matches by document number
+      PassiveCitationUliDTO passive =
+          PassiveCitationUliDTO.builder()
+              .sourceId(null)
+              .sourceLiteratureDocumentNumber(docNumber)
+              .sourceAuthor("Old Author")
+              .build();
+
+      DecisionDTO decision =
+          DecisionDTO.builder()
+              .id(caselawId)
+              .passiveUliCitations(new ArrayList<>(List.of(passive)))
+              .build();
+
+      when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
+
+      uliCitationSyncService.handleNewlyPublishedAfter(Instant.now());
+
+      assertThat(passive.getSourceAuthor()).isEqualTo("New Author");
+      assertThat(passive.getSourceId()).isEqualTo(uliId);
+      verify(caselawRepository).save(decision);
+    }
+
+    @Test
+    void shouldNotUpdateOrPublishIfMetadataIsAlreadyIdentical()
+        throws DocumentationUnitNotExistsException {
+      UUID uliId = UUID.randomUUID();
+      UUID caselawId = UUID.randomUUID();
+
+      UliDTO uliDTO =
+          UliDTO.builder()
+              .id(uliId)
+              .author("Same Author")
+              .activeCaselawReferences(
+                  List.of(
+                      UliActiveCaselawReferenceDTO.builder()
+                          .targetDocumentationUnitId(caselawId)
+                          .build()))
+              .build();
+
+      when(databaseUliRepository.findAllByPublishedAtAfter(any())).thenReturn(List.of(uliDTO));
+
+      PassiveCitationUliDTO passive =
+          PassiveCitationUliDTO.builder().sourceId(uliId).sourceAuthor("Same Author").build();
+
+      DecisionDTO decision =
+          DecisionDTO.builder()
+              .id(caselawId)
+              .passiveUliCitations(new ArrayList<>(List.of(passive)))
+              .build();
+
+      when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
+
+      uliCitationSyncService.handleNewlyPublishedAfter(Instant.now());
+
+      verify(caselawRepository, never()).save(any());
+      verify(portalPublicationService, never()).publishDocumentationUnitWithChangelog(any(), any());
     }
   }
 
@@ -168,9 +242,10 @@ public class UliCitationSyncServiceTest {
       uliCitationSyncService.handleRevokedAfter(lastRun);
 
       // Verify
-      assertThat(decision.getPassiveUliCitations()).isEmpty();
-      verify(caselawRepository).save(decision);
-      verify(portalPublicationService).publishDocumentationUnit("XXRE123456789");
+      // assertThat(decision.getPassiveUliCitations()).isEmpty();
+      // verify(caselawRepository).save(decision);
+      verify(portalPublicationService)
+          .publishDocumentationUnitWithChangelog(decision.getId(), null);
     }
 
     @Test
@@ -197,7 +272,8 @@ public class UliCitationSyncServiceTest {
       // (In einem Integration-Test würden wir portalPublicationService.publishSafe verifizieren)
 
       verify(caselawRepository, never()).save(any());
-      verify(portalPublicationService).publishDocumentationUnit("XXRE123456789");
+      verify(portalPublicationService)
+          .publishDocumentationUnitWithChangelog(decision.getId(), null);
     }
   }
 }

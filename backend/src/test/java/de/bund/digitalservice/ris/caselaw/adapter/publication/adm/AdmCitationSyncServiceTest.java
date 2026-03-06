@@ -176,6 +176,51 @@ class AdmCitationSyncServiceTest {
       verify(caselawRepository, never()).save(any());
       verify(portalPublicationService, never()).publishDocumentationUnitWithChangelog(any(), any());
     }
+
+    @Test
+    void shouldIdentifyMatchingCitationByDocumentNumberWhenIdIsNull() {
+      UUID admId = UUID.randomUUID();
+      UUID caselawId = UUID.randomUUID();
+      String docNumber = "KSNR150060010";
+
+      var adm =
+          AdmDTO.builder()
+              .id(admId)
+              .documentNumber(docNumber)
+              .jurisAbbreviation("NEW-ABBR")
+              .build();
+
+      var activeRef =
+          AdmActiveCaselawReferenceDTO.builder()
+              .citationType("Vgl")
+              .targetDocumentationUnitId(caselawId)
+              .source(adm)
+              .build();
+      adm.setActiveCaselawReferences(List.of(activeRef));
+
+      PassiveCitationAdmDTO passive =
+          PassiveCitationAdmDTO.builder()
+              .sourceId(null)
+              .sourceDocumentNumber(docNumber)
+              .sourceDirective("OLD-ABBR")
+              .citationType(CitationTypeDTO.builder().abbreviation("Vgl").build())
+              .build();
+
+      DecisionDTO decision =
+          DecisionDTO.builder()
+              .id(caselawId)
+              .passiveAdmCitations(new ArrayList<>(List.of(passive)))
+              .build();
+
+      when(admRepository.findAllByPublishedAtAfter(any())).thenReturn(List.of(adm));
+      when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
+
+      admCitationSyncService.handleNewlyPublishedAfter(Instant.now());
+
+      assertThat(passive.getSourceId()).isEqualTo(admId);
+      assertThat(passive.getSourceDirective()).isEqualTo("NEW-ABBR");
+      verify(caselawRepository).save(decision);
+    }
   }
 
   @Nested
@@ -253,6 +298,15 @@ class AdmCitationSyncServiceTest {
       verify(portalPublicationService)
           .publishDocumentationUnitWithChangelog(
               UUID.fromString("6c2447a7-e155-4c6b-9244-37f0d40d8435"), null);
+    }
+
+    @Test
+    void handleRevokedAfter_shouldReturnImmediatelyIfNoEntriesFound() {
+      when(revokedAdmRepository.findAllByRevokedAtAfter(any())).thenReturn(List.of());
+
+      admCitationSyncService.handleRevokedAfter(Instant.now());
+
+      verify(caselawRepository, never()).findAllByPassiveAdmSourceIdAndPendingRevocation(any());
     }
   }
 }

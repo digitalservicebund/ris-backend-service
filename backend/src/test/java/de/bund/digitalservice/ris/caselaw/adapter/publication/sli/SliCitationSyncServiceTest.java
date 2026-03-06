@@ -181,6 +181,56 @@ class SliCitationSyncServiceTest {
       verify(caselawRepository, never()).save(any());
       verify(portalPublicationService, never()).publishDocumentationUnitWithChangelog(any(), any());
     }
+
+    @Test
+    void shouldIdentifyMatchingCitationByDocumentNumberWhenIdIsNull()
+        throws DocumentationUnitNotExistsException {
+      UUID sliId = UUID.randomUUID();
+      UUID caselawId = UUID.randomUUID();
+      String docNumber = "SLI-2026-001";
+
+      var sli =
+          SliDTO.builder()
+              .id(sliId)
+              .documentNumber(docNumber)
+              .author("Neuer Autor")
+              .bookTitle("Neues Buch")
+              .yearOfPublication("2026")
+              .build();
+
+      var activeRef =
+          SliActiveCaselawReferenceDTO.builder()
+              .targetDocumentationUnitId(caselawId)
+              .source(sli)
+              .build();
+      sli.setActiveCaselawReferences(List.of(activeRef));
+
+      // Passive Zitation hat noch keine technische ID, aber die richtige Nummer
+      PassiveCitationSliEntity passive =
+          PassiveCitationSliEntity.builder()
+              .sourceId(null)
+              .sourceDocumentNumber(docNumber)
+              .sourceAuthor("Alter Autor")
+              .target(DecisionDTO.builder().id(caselawId).build())
+              .build();
+
+      DecisionDTO decision =
+          DecisionDTO.builder()
+              .id(caselawId)
+              .passiveSliCitations(new ArrayList<>(List.of(passive)))
+              .build();
+
+      when(sliRepository.findAllByPublishedAtAfter(any())).thenReturn(List.of(sli));
+      when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
+
+      sliCitationSyncService.handleNewlyPublishedAfter(Instant.now());
+
+      // Verifikation: ID wurde nachgetragen und Metadaten aktualisiert
+      assertThat(passive.getSourceId()).isEqualTo(sliId);
+      assertThat(passive.getSourceAuthor()).isEqualTo("Neuer Autor");
+      verify(caselawRepository).save(decision);
+      verify(portalPublicationService).publishDocumentationUnitWithChangelog(caselawId, null);
+    }
   }
 
   @Nested
@@ -258,6 +308,93 @@ class SliCitationSyncServiceTest {
       verify(portalPublicationService)
           .publishDocumentationUnitWithChangelog(
               UUID.fromString("6c2447a7-e155-4c6b-9244-37f0d40d8435"), null);
+    }
+
+    @Test
+    void shouldNotUpdateIfMetadataIsAlreadyIdentical() throws DocumentationUnitNotExistsException {
+      UUID sliId = UUID.randomUUID();
+      UUID caselawId = UUID.randomUUID();
+      String docNumber = "STAY-SAME-123";
+
+      var sli =
+          SliDTO.builder()
+              .id(sliId)
+              .documentNumber(docNumber)
+              .author("Autor")
+              .bookTitle("Titel")
+              .yearOfPublication("2024")
+              .build();
+
+      var activeRef =
+          SliActiveCaselawReferenceDTO.builder()
+              .targetDocumentationUnitId(caselawId)
+              .source(sli)
+              .build();
+      sli.setActiveCaselawReferences(List.of(activeRef));
+
+      PassiveCitationSliEntity passive =
+          PassiveCitationSliEntity.builder()
+              .sourceId(sliId)
+              .sourceDocumentNumber(docNumber)
+              .sourceAuthor("Autor")
+              .sourceBookTitle("Titel")
+              .sourceYearOfPublication("2024")
+              .target(DecisionDTO.builder().id(caselawId).build())
+              .build();
+
+      DecisionDTO decision =
+          DecisionDTO.builder()
+              .id(caselawId)
+              .passiveSliCitations(new ArrayList<>(List.of(passive)))
+              .build();
+
+      when(sliRepository.findAllByPublishedAtAfter(any())).thenReturn(List.of(sli));
+      when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
+
+      sliCitationSyncService.handleNewlyPublishedAfter(Instant.now());
+
+      verify(caselawRepository, never()).save(any());
+      verify(portalPublicationService, never()).publishDocumentationUnitWithChangelog(any(), any());
+    }
+
+    @Test
+    void handleRevokedAfter_shouldContinueWhenPublishingSingleDocumentFails()
+        throws DocumentationUnitNotExistsException {
+      UUID revokedId = UUID.randomUUID();
+      UUID docId1 = UUID.randomUUID();
+      UUID docId2 = UUID.randomUUID();
+
+      RevokedSli entry = RevokedSli.builder().docUnitId(revokedId).build();
+      when(revokedSliRepository.findAllByRevokedAtAfter(any())).thenReturn(List.of(entry));
+
+      DecisionDTO doc1 = DecisionDTO.builder().id(docId1).documentNumber("DOC-1").build();
+      DecisionDTO doc2 = DecisionDTO.builder().id(docId2).documentNumber("DOC-2").build();
+
+      doc1.setPassiveSliCitations(
+          new ArrayList<>(
+              List.of(
+                  PassiveCitationSliEntity.builder()
+                      .sourceId(revokedId)
+                      .target(DecisionDTO.builder().id(UUID.randomUUID()).build())
+                      .build())));
+      doc2.setPassiveSliCitations(
+          new ArrayList<>(
+              List.of(
+                  PassiveCitationSliEntity.builder()
+                      .sourceId(revokedId)
+                      .target(DecisionDTO.builder().id(UUID.randomUUID()).build())
+                      .build())));
+
+      when(caselawRepository.findAllByPassiveSliSourceIdAndPendingRevocation(revokedId))
+          .thenReturn(List.of(doc1, doc2));
+
+      when(portalPublicationService.publishDocumentationUnitWithChangelog(docId1, null))
+          .thenThrow(new RuntimeException("Portal Error"));
+
+      sliCitationSyncService.handleRevokedAfter(Instant.now());
+
+      verify(portalPublicationService).publishDocumentationUnitWithChangelog(docId1, null);
+      verify(portalPublicationService).publishDocumentationUnitWithChangelog(docId2, null);
     }
   }
 }
