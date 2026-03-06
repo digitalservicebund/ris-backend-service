@@ -13,7 +13,7 @@ plugins {
     jacoco
     id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.diffplug.spotless") version "8.2.1"
+    id("com.diffplug.spotless") version "8.3.0"
     id("org.sonarqube") version "7.2.2.6593"
     id("com.github.jk1.dependency-license-report") version "3.1.1"
     id("com.adarshr.test-logger") version "4.0.0"
@@ -225,7 +225,7 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260102.1")
 
-    implementation("io.getunleash:unleash-client-java:12.1.2")
+    implementation("io.getunleash:unleash-client-java:12.2.0")
     implementation("org.apache.commons:commons-text:1.15.0")
     implementation("org.jsoup:jsoup:1.22.1")
 
