@@ -19,6 +19,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.ManualPortalPublicationResult.RelatedPendingProceedingPublicationResult;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.adm.AdmCitationPublishService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.sli.SliCitationPublishService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PendingProceedingTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
@@ -67,6 +70,9 @@ public class PortalPublicationService {
   private final PublishedDocumentationSnapshotRepository snapshotRepository;
   private final CaselawCitationSyncService caselawCitationSyncService;
   private final CaselawCitationPublishService caselawCitationPublishService;
+  private final UliCitationPublishService uliCitationPublishService;
+  private final AdmCitationPublishService admCitationPublishService;
+  private final SliCitationPublishService sliCitationPublishService;
 
   private static final String PUBLICATION_FEATURE_FLAG = "neuris.portal-publication";
   private static final String CHANGELOG_FEATURE_FLAG = "neuris.regular-changelogs";
@@ -84,7 +90,10 @@ public class PortalPublicationService {
       DatabaseAttachmentInlineRepository attachmentInlineRepository,
       PublishedDocumentationSnapshotRepository snapshotRepository,
       CaselawCitationSyncService caselawCitationSyncService,
-      CaselawCitationPublishService caselawCitationPublishService) {
+      CaselawCitationPublishService caselawCitationPublishService,
+      UliCitationPublishService uliCitationPublishService,
+      AdmCitationPublishService admCitationPublishService,
+      SliCitationPublishService sliCitationPublishService) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
@@ -98,6 +107,9 @@ public class PortalPublicationService {
     this.snapshotRepository = snapshotRepository;
     this.caselawCitationSyncService = caselawCitationSyncService;
     this.caselawCitationPublishService = caselawCitationPublishService;
+    this.uliCitationPublishService = uliCitationPublishService;
+    this.admCitationPublishService = admCitationPublishService;
+    this.sliCitationPublishService = sliCitationPublishService;
   }
 
   /**
@@ -115,31 +127,26 @@ public class PortalPublicationService {
    */
   public ManualPortalPublicationResult publishDocumentationUnitWithChangelog(
       UUID documentationUnitId, User user) throws DocumentationUnitNotExistsException {
+
     if (!featureToggleService.isEnabled(PUBLICATION_FEATURE_FLAG)) {
       return new ManualPortalPublicationResult(RelatedPendingProceedingPublicationResult.NO_ACTION);
     }
-    try {
-      DocumentationUnitDTO documentationUnit =
-          documentationUnitRepository.loadDocumentationUnitDTO(documentationUnitId);
-      var result = publishToBucket(documentationUnit);
-      uploadChangelogWithdrawOnFailure(documentationUnit, result);
-      updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, user);
 
-      var relatedPendingProceedingUpdateResult =
-          RelatedPendingProceedingPublicationResult.NO_ACTION;
-      if (documentationUnit instanceof DecisionDTO decision) {
-        relatedPendingProceedingUpdateResult =
-            publishResolutionNoteOfRelatedPendingProceedings(decision, user);
-      }
-      return new ManualPortalPublicationResult(relatedPendingProceedingUpdateResult);
-    } catch (Exception exception) {
-      historyLogService.saveHistoryLog(
-          documentationUnitId,
-          user,
-          HistoryLogEventType.PORTAL_PUBLICATION,
-          "Dokeinheit konnte nicht im Portal veröffentlicht werden");
-      throw exception;
+    DocumentationUnitDTO documentationUnit =
+        documentationUnitRepository.loadDocumentationUnitDTO(documentationUnitId);
+
+    var result = publishToBucket(documentationUnit);
+    uploadChangelogWithdrawOnFailure(documentationUnit, result);
+    updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, user);
+
+    var relatedPendingProceedingUpdateResult = RelatedPendingProceedingPublicationResult.NO_ACTION;
+
+    if (documentationUnit instanceof DecisionDTO decision) {
+      relatedPendingProceedingUpdateResult =
+          publishResolutionNoteOfRelatedPendingProceedings(decision, user);
     }
+
+    return new ManualPortalPublicationResult(relatedPendingProceedingUpdateResult);
   }
 
   @Async
@@ -375,6 +382,9 @@ public class PortalPublicationService {
 
     if (documentationUnit instanceof DecisionDTO decision) {
       validateAndEnrichCaselawCitations(decision);
+      validateAndEnrichUliCitations(decision);
+      validateAndEnrichAdmCitations(decision);
+      validateAndEnrichSliCitations(decision);
     }
 
     CaseLawLdml ldml = ldmlTransformer.transformToLdml(toDomain(documentationUnit));
@@ -411,6 +421,80 @@ public class PortalPublicationService {
         });
 
     return result;
+  }
+
+  private void validateAndEnrichCaselawCitations(DecisionDTO decision) {
+    if (decision.getActiveCaselawCitations() != null) {
+      var enriched =
+          decision.getActiveCaselawCitations().stream()
+              .map(
+                  caselawCitationPublishService
+                      ::updateActiveCitationTargetWithInformationFromTarget)
+              .toList();
+
+      decision.getActiveCaselawCitations().clear();
+      decision.getActiveCaselawCitations().addAll(enriched);
+    }
+
+    if (decision.getPassiveCaselawCitations() != null) {
+      var enriched =
+          decision.getPassiveCaselawCitations().stream()
+              .map(
+                  caselawCitationPublishService
+                      ::updatePassiveCitationSourceWithInformationFromSource)
+              .flatMap(Optional::stream)
+              .toList();
+
+      decision.getPassiveCaselawCitations().clear();
+      decision.getPassiveCaselawCitations().addAll(enriched);
+    }
+  }
+
+  private void validateAndEnrichUliCitations(DecisionDTO decision) {
+    if (decision.getActiveUliCitations() != null) {
+      var enriched =
+          decision.getActiveUliCitations().stream()
+              .map(uliCitationPublishService::updateActiveUliCitationWithInformationFromTarget)
+              .toList();
+
+      decision.getActiveUliCitations().clear();
+      decision.getActiveUliCitations().addAll(enriched);
+    }
+
+    if (decision.getPassiveUliCitations() != null) {
+      var enriched =
+          decision.getPassiveUliCitations().stream()
+              .map(uliCitationPublishService::updatePassiveUliCitationWithInformationFromSource)
+              .flatMap(Optional::stream)
+              .toList();
+
+      decision.getPassiveUliCitations().clear();
+      decision.getPassiveUliCitations().addAll(enriched);
+    }
+  }
+
+  private void validateAndEnrichAdmCitations(DecisionDTO decision) {
+    decision.setActiveAdmCitations(
+        decision.getActiveAdmCitations().stream()
+            .map(admCitationPublishService::updateActiveCitationTargetWithInformationFromTarget)
+            .toList());
+    decision.setPassiveAdmCitations(
+        decision.getPassiveAdmCitations().stream()
+            .map(admCitationPublishService::updatePassiveCitationSourceWithInformationFromSource)
+            .flatMap(Optional::stream)
+            .toList());
+  }
+
+  private void validateAndEnrichSliCitations(DecisionDTO decision) {
+    decision.setActiveSliCitations(
+        decision.getActiveSliCitations().stream()
+            .map(sliCitationPublishService::updateActiveCitationTargetWithInformationFromTarget)
+            .toList());
+    decision.setPassiveSliCitations(
+        decision.getPassiveSliCitations().stream()
+            .map(sliCitationPublishService::updatePassiveCitationSourceWithInformationFromSource)
+            .flatMap(Optional::stream)
+            .toList());
   }
 
   private PortalPublicationResult saveToBucket(
@@ -608,19 +692,6 @@ public class PortalPublicationService {
     }
     historyLogService.saveHistoryLog(
         documentationUnit.getId(), user, HistoryLogEventType.PORTAL_PUBLICATION, historyLogMessage);
-  }
-
-  private void validateAndEnrichCaselawCitations(DecisionDTO decision) {
-    decision.setActiveCaselawCitations(
-        decision.getActiveCaselawCitations().stream()
-            .map(caselawCitationPublishService::updateActiveCitationTargetWithInformationFromTarget)
-            .toList());
-    decision.setPassiveCaselawCitations(
-        decision.getPassiveCaselawCitations().stream()
-            .map(
-                caselawCitationPublishService::updatePassiveCitationSourceWithInformationFromSource)
-            .flatMap(Optional::stream)
-            .toList());
   }
 
   @Nullable

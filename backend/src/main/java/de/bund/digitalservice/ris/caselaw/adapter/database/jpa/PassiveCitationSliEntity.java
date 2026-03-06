@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.UUID;
@@ -29,45 +30,43 @@ import org.jspecify.annotations.Nullable;
 @Builder
 @EqualsAndHashCode
 @ToString
-@Table(name = "active_citation_uli", schema = "incremental_migration")
-public class ActiveCitationUliDTO {
+@Table(name = "passive_citation_sli", schema = "incremental_migration")
+public class PassiveCitationSliEntity {
 
   @Id @GeneratedValue @EqualsAndHashCode.Exclude private UUID id;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "source_id", nullable = false)
-  @EqualsAndHashCode.Exclude
-  private DecisionDTO source;
-
-  @Nullable
-  @Column(name = "target_id")
-  private UUID targetId;
-
-  @Nullable
-  @Column(name = "target_literature_document_number")
-  @Size(max = 255)
-  private String targetLiteratureDocumentNumber;
-
-  @Nullable
-  @Column(name = "target_author")
-  @Size(max = 255)
-  private String targetAuthor;
-
   @NonNull
-  @Column(name = "target_citation", columnDefinition = "TEXT")
-  @Size(max = 255)
-  private String targetCitation;
-
-  @Nullable
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "target_legal_periodical_id")
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "target_id", nullable = false)
   @EqualsAndHashCode.Exclude
-  private LegalPeriodicalDTO targetLegalPeriodical;
+  private DecisionDTO target;
 
   @Nullable
-  @Column(name = "target_legal_periodical_raw_value")
-  @Size(max = 255)
-  private String targetLegalPeriodicalRawValue;
+  @Column(name = "source_id")
+  private UUID sourceId;
 
-  @Column @NotNull @EqualsAndHashCode.Exclude private Integer rank;
+  @Nullable
+  @Column(name = "source_literature_document_number")
+  @Size(max = 255)
+  private String sourceDocumentNumber;
+
+  @NotBlank
+  @Column(name = "source_author")
+  @Size(max = 255)
+  private String sourceAuthor;
+
+  @NotBlank
+  @Column(name = "source_book_title")
+  @Size(max = 1000)
+  private String sourceBookTitle;
+
+  @NotBlank
+  @Column(name = "source_year_of_publication", nullable = false)
+  @Size(max = 255)
+  private String sourceYearOfPublication;
+
+  @NotNull
+  @Column(name = "rank")
+  @EqualsAndHashCode.Exclude
+  private Integer rank;
 }

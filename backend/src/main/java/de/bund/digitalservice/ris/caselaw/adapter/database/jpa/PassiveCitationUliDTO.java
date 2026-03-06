@@ -41,6 +41,10 @@ public class PassiveCitationUliDTO {
   private DecisionDTO target;
 
   @Nullable
+  @Column(name = "source_id")
+  private UUID sourceId;
+
+  @Nullable
   @Size(max = 255)
   @Column(name = "source_literature_document_number")
   private String sourceLiteratureDocumentNumber;
