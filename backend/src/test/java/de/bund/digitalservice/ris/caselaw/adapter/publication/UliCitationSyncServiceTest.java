@@ -6,6 +6,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationUliCaselawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUliRepository;
@@ -17,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUliReposit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UliActiveCaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationSyncService;
+import de.bund.digitalservice.ris.caselaw.domain.LoggingKeys;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -50,6 +53,7 @@ public class UliCitationSyncServiceTest {
     @Test
     void shouldUpdateMetadataWhenPassiveCitationExists()
         throws DocumentationUnitNotExistsException {
+      var memoryAppender = new TestMemoryAppender(UliCitationSyncService.class);
       UUID uliId = UUID.randomUUID();
       UUID caselawId = UUID.randomUUID();
       Instant lastRun = Instant.now().minusSeconds(3600);
@@ -66,17 +70,21 @@ public class UliCitationSyncServiceTest {
               .build();
 
       when(databaseUliRepository.findAllByPublishedAtAfter(lastRun)).thenReturn(List.of(uliDTO));
-
-      // Setup decision with old metadata
-      PassiveCitationUliDTO passiveCitation =
-          PassiveCitationUliDTO.builder().sourceId(uliId).sourceAuthor("Old Author").build();
-
       DecisionDTO decision =
           DecisionDTO.builder()
               .id(caselawId)
               .documentNumber("XXRE123456789")
-              .passiveUliCitations(new ArrayList<>(List.of(passiveCitation)))
+              .passiveUliCitations(new ArrayList<>())
               .build();
+
+      PassiveCitationUliDTO passiveCitation =
+          PassiveCitationUliDTO.builder()
+              .sourceId(uliId)
+              .sourceAuthor("Old Author")
+              .target(decision)
+              .build();
+
+      decision.getPassiveUliCitations().add(passiveCitation);
 
       when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
 
@@ -87,13 +95,23 @@ public class UliCitationSyncServiceTest {
       assertThat(passiveCitation.getSourceAuthor()).isEqualTo("New Author");
       assertThat(passiveCitation.getSourceCitation()).isEqualTo("New Citation");
 
+      assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1L);
+      assertThat(memoryAppender.getKeyValuePairs(Level.INFO, 0))
+          .anyMatch(
+              kv -> kv.key.equals(LoggingKeys.SOURCE_DOCUMENT_NUMBER) && kv.value.equals(uliId))
+          .anyMatch(kv -> kv.key.equals("caselawDocNumber") && kv.value.equals("XXRE123456789"));
+
+      assertThat(memoryAppender.getMessage(Level.INFO, 0))
+          .contains("Updating metadata of matching passive citation");
+
       verify(caselawRepository).save(decision);
       verify(portalPublicationService).publishDocumentationUnitWithChangelog(caselawId, null);
+      memoryAppender.detachLoggingTestAppender();
     }
 
     @Test
-    void shouldOnlyLogWarningWhenPassiveCitationIsMissing()
-        throws DocumentationUnitNotExistsException {
+    void shouldLogWarningWhenPassiveCitationIsMissing() throws DocumentationUnitNotExistsException {
+      var memoryAppender = new TestMemoryAppender(UliCitationSyncService.class);
       UUID uliId = UUID.randomUUID();
       UUID caselawId = UUID.randomUUID();
       Instant lastRun = Instant.now();
@@ -108,7 +126,7 @@ public class UliCitationSyncServiceTest {
           DecisionDTO.builder()
               .id(caselawId)
               .documentNumber("XXRE123456789")
-              .passiveUliCitations(new ArrayList<>()) // leer
+              .passiveUliCitations(new ArrayList<>()) // empty
               .build();
 
       when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
@@ -119,10 +137,21 @@ public class UliCitationSyncServiceTest {
       // Verify
       verify(caselawRepository, never()).save(any());
       verify(portalPublicationService, never()).publishDocumentationUnit(any());
+      assertThat(memoryAppender.count(Level.WARN)).isEqualTo(1L);
+      assertThat(memoryAppender.getKeyValuePairs(Level.WARN, 0))
+          .anyMatch(
+              kv -> kv.key.equals(LoggingKeys.SOURCE_DOCUMENT_NUMBER) && kv.value.equals(uliId))
+          .anyMatch(kv -> kv.key.equals(LoggingKeys.DOCUMENT_ID) && kv.value.equals(caselawId));
+      assertThat(memoryAppender.getMessage(Level.WARN, 0))
+          .contains(
+              "Inconsistency: Active citation in ULI points to caselaw, but passive counterpart is missing in caselaw document.");
+
+      memoryAppender.detachLoggingTestAppender();
     }
 
     @Test
     void shouldDoNothingIfNoNewUlisFound() throws DocumentationUnitNotExistsException {
+      var memoryAppender = new TestMemoryAppender(UliCitationSyncService.class);
       Instant lastRun = Instant.now();
       when(databaseUliRepository.findAllByPublishedAtAfter(lastRun)).thenReturn(List.of());
 
@@ -131,6 +160,12 @@ public class UliCitationSyncServiceTest {
       verify(caselawRepository, never()).findById(any());
       verify(caselawRepository, never()).save(any());
       verify(portalPublicationService, never()).publishDocumentationUnit(any());
+
+      assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1L);
+      assertThat(memoryAppender.getMessage(Level.INFO, 0))
+          .contains("No documents found for republishing. Skipping sync step.");
+
+      memoryAppender.detachLoggingTestAppender();
     }
 
     @Test
@@ -153,19 +188,18 @@ public class UliCitationSyncServiceTest {
 
       when(databaseUliRepository.findAllByPublishedAtAfter(any())).thenReturn(List.of(uliDTO));
 
+      DecisionDTO decision =
+          DecisionDTO.builder().id(caselawId).passiveUliCitations(new ArrayList<>()).build();
       // passive citation has no id (yet) but matches by document number
       PassiveCitationUliDTO passive =
           PassiveCitationUliDTO.builder()
               .sourceId(null)
               .sourceLiteratureDocumentNumber(docNumber)
               .sourceAuthor("Old Author")
+              .target(decision)
               .build();
 
-      DecisionDTO decision =
-          DecisionDTO.builder()
-              .id(caselawId)
-              .passiveUliCitations(new ArrayList<>(List.of(passive)))
-              .build();
+      decision.getPassiveUliCitations().add(passive);
 
       when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
 
@@ -215,9 +249,56 @@ public class UliCitationSyncServiceTest {
 
   @Nested
   class handleRevokedAfter {
+    @Test
+    void shouldDoNothingWhenNoUliRevokedAndLog() throws DocumentationUnitNotExistsException {
+      var memoryAppender = new TestMemoryAppender(UliCitationSyncService.class);
+      Instant lastRun = Instant.now();
+
+      when(revokedUliRepository.findAllByRevokedAtAfter(lastRun)).thenReturn(List.of());
+
+      uliCitationSyncService.handleRevokedAfter(lastRun);
+
+      verify(caselawRepository, never()).findAllByPassiveUliSourceIdAndPendingRevocation(any());
+      verify(caselawRepository, never()).findAllByActiveUliTargetIdAndPendingRevocation(any());
+      verify(portalPublicationService, never()).publishDocumentationUnitWithChangelog(any(), any());
+
+      assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1L);
+      assertThat(memoryAppender.getMessage(Level.INFO, 0)).contains("No new revoked entries");
+      assertThat(memoryAppender.getKeyValuePairs(Level.INFO, 0))
+          .anyMatch(kv -> kv.key.equals("lastRun") && kv.value.equals(lastRun));
+
+      memoryAppender.detachLoggingTestAppender();
+    }
 
     @Test
-    void shouldRemovePassiveCitationsWhenUliIsRevoked() throws DocumentationUnitNotExistsException {
+    void syncCitationsForRevokedUli_shouldLogErrorAndSkipWhenDocUnitIdIsNull()
+        throws DocumentationUnitNotExistsException {
+      var memoryAppender = new TestMemoryAppender(UliCitationSyncService.class);
+      Instant lastRun = Instant.now();
+
+      RevokedUli invalidEntry = RevokedUli.builder().docUnitId(null).build();
+      when(revokedUliRepository.findAllByRevokedAtAfter(lastRun)).thenReturn(List.of(invalidEntry));
+
+      uliCitationSyncService.handleRevokedAfter(lastRun);
+
+      verify(caselawRepository, never()).findAllByPassiveUliSourceIdAndPendingRevocation(any());
+      verify(caselawRepository, never()).findAllByActiveUliTargetIdAndPendingRevocation(any());
+      verify(portalPublicationService, never()).publishDocumentationUnitWithChangelog(any(), any());
+
+      assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(1L);
+      assertThat(memoryAppender.getMessage(Level.ERROR, 0))
+          .contains("RevokedUli entry found without docUnitId. Skipping sync for this entry.");
+
+      assertThat(memoryAppender.getKeyValuePairs(Level.ERROR, 0))
+          .anyMatch(kv -> kv.key.equals("revokedUliEntry") && kv.value.equals(invalidEntry));
+
+      memoryAppender.detachLoggingTestAppender();
+    }
+
+    @Test
+    void shouldLogAndRepublishAffectedPassiveCitationsWhenUliIsRevoked()
+        throws DocumentationUnitNotExistsException {
+      var memoryAppender = new TestMemoryAppender(UliCitationSyncService.class);
       UUID revokedUliId = UUID.randomUUID();
       Instant lastRun = Instant.now().minusSeconds(60);
 
@@ -242,15 +323,29 @@ public class UliCitationSyncServiceTest {
       uliCitationSyncService.handleRevokedAfter(lastRun);
 
       // Verify
-      // assertThat(decision.getPassiveUliCitations()).isEmpty();
-      // verify(caselawRepository).save(decision);
+      // For now we just log and add for republish to unlink the targetId
+      assertThat(memoryAppender.count(Level.INFO)).isGreaterThanOrEqualTo(2L);
+
+      assertThat(memoryAppender.getKeyValuePairs(Level.INFO, 1))
+          .anyMatch(kv -> kv.key.equals(LoggingKeys.REVOKED_ULI) && kv.value.equals(revokedUliId))
+          .anyMatch(
+              kv -> kv.key.equals("affectedDocUnitNumber") && kv.value.equals("XXRE123456789"));
+
+      assertThat(memoryAppender.getMessage(Level.INFO, 1))
+          .contains("Passive Citation to revoked ULI detected");
+
+      verify(caselawRepository, never()).save(any());
       verify(portalPublicationService)
           .publishDocumentationUnitWithChangelog(decision.getId(), null);
+
+      memoryAppender.detachLoggingTestAppender();
     }
 
     @Test
-    void shouldRepublishDecisionWhenActiveUliTargetIsRevoked()
+    void shouldLogAndRepublishAffectedActiveCitationsWhenUliIsRevoked()
         throws DocumentationUnitNotExistsException {
+      var memoryAppender = new TestMemoryAppender(UliCitationSyncService.class);
+
       UUID revokedUliId = UUID.randomUUID();
       Instant lastRun = Instant.now();
 
@@ -267,13 +362,20 @@ public class UliCitationSyncServiceTest {
 
       uliCitationSyncService.handleRevokedAfter(lastRun);
 
-      // Verify: Das Dokument muss in der Liste für das Republishing landen
-      // Da der Service intern triggerRepublishing aufruft, prüfen wir die Logik
-      // (In einem Integration-Test würden wir portalPublicationService.publishSafe verifizieren)
+      assertThat(memoryAppender.count(Level.INFO)).isGreaterThanOrEqualTo(2L);
+
+      assertThat(memoryAppender.getKeyValuePairs(Level.INFO, 1))
+          .anyMatch(kv -> kv.key.equals(LoggingKeys.REVOKED_ULI) && kv.value.equals(revokedUliId))
+          .anyMatch(
+              kv -> kv.key.equals("affectedDocUnitNumber") && kv.value.equals("XXRE123456789"));
+
+      assertThat(memoryAppender.getMessage(Level.INFO, 1))
+          .contains("Active Citation to revoked ULI detected");
 
       verify(caselawRepository, never()).save(any());
       verify(portalPublicationService)
           .publishDocumentationUnitWithChangelog(decision.getId(), null);
+      memoryAppender.detachLoggingTestAppender();
     }
   }
 }

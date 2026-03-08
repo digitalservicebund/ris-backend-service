@@ -138,6 +138,15 @@ public class UliCitationSyncService {
       hasChanged = true;
     }
 
+    if (hasChanged) {
+      log.atInfo()
+          .addKeyValue(LoggingKeys.SOURCE_DOCUMENT_NUMBER, uli.getId())
+          .addKeyValue("caselawDocNumber", passive.getTarget().getDocumentNumber())
+          .setMessage(
+              "Updating metadata of matching passive citation due to changes in ULI source.")
+          .log();
+    }
+
     return hasChanged;
   }
 
@@ -147,11 +156,13 @@ public class UliCitationSyncService {
             .anyMatch(passive -> uliId.equals(passive.getSourceId()));
 
     if (!hasPassiveCounterpart) {
-      log.warn(
-          "Inconsistency: Active citation in ULI {} points to Caselaw doc {}, with id {} but passive counterpart is missing in Caselaw document.",
-          uliId,
-          decision.getDocumentNumber(),
-          decision.getId());
+      log.atWarn()
+          .addKeyValue(LoggingKeys.SOURCE_DOCUMENT_NUMBER, uliId)
+          .addKeyValue("caselawDocNumber", decision.getDocumentNumber())
+          .addKeyValue(LoggingKeys.DOCUMENT_ID, decision.getId())
+          .setMessage(
+              "Inconsistency: Active citation in ULI points to caselaw, but passive counterpart is missing in caselaw document.")
+          .log();
     }
   }
 
@@ -191,43 +202,23 @@ public class UliCitationSyncService {
     }
 
     // remove passive citations that point to the revoked ULI
-    List<DecisionDTO> documentsWithPassive =
+    List<DecisionDTO> decisionsWithAffectedPassiveCitations =
         caselawRepository.findAllByPassiveUliSourceIdAndPendingRevocation(revokedId);
 
-    for (DecisionDTO decision : documentsWithPassive) {
-      // Todo: check if we want to remove affected passive citations automatically
-      //        boolean removed = decision.getPassiveUliCitations()
-      //                .removeIf(p -> Objects.equals(revokedId, p.getSourceId()));
-      boolean hasAffectedCitation =
-          decision.getPassiveUliCitations().stream()
-              .anyMatch(p -> Objects.equals(revokedId, p.getSourceId()));
-
-      if (hasAffectedCitation) {
-        // Todo: uncomment when we want to remove affected passive citations automatically
-        // caselawRepository.save(decision);
-        documentsToRepublish.add(decision.getId());
-        log.atInfo()
-            .addKeyValue(LoggingKeys.REVOKED_ULI, revokedId)
-            .addKeyValue("affectedDocUnitNumber", decision.getDocumentNumber())
-            .setMessage(
-                "Passive Citation to revoked ULI detected. Document added to republishing queue for validation in publish step.")
-            .log();
-      } else {
-        log.atError()
-            .addKeyValue(LoggingKeys.REVOKED_ULI, revokedId)
-            .addKeyValue("affectedDocUnitNumber", decision.getDocumentNumber())
-            .setMessage(
-                "Inconsistency during revocation: Document was fetched as 'affected', but no matching passive ULI citation ID was found.")
-            .log();
-      }
+    for (DecisionDTO decision : decisionsWithAffectedPassiveCitations) {
+      documentsToRepublish.add(decision.getId());
+      log.atInfo()
+          .addKeyValue(LoggingKeys.REVOKED_ULI, revokedId)
+          .addKeyValue("affectedDocUnitNumber", decision.getDocumentNumber())
+          .setMessage(
+              "Passive Citation to revoked ULI detected. Document added to republishing queue for validation in publish step.")
+          .log();
     }
 
-    // active citations will be just republished. This removes the target id and document number
-    // from the published data.
-    List<DecisionDTO> affectedByActive =
+    List<DecisionDTO> decisionsWithAffectedActiveCitations =
         caselawRepository.findAllByActiveUliTargetIdAndPendingRevocation(revokedId);
 
-    for (DecisionDTO decision : affectedByActive) {
+    for (DecisionDTO decision : decisionsWithAffectedActiveCitations) {
       documentsToRepublish.add(decision.getId());
       log.atInfo()
           .addKeyValue(LoggingKeys.REVOKED_ULI, revokedId)
@@ -241,16 +232,19 @@ public class UliCitationSyncService {
   }
 
   private void triggerRepublishing(Set<UUID> documentsToRepublish) {
-    if (documentsToRepublish.isEmpty()) return;
-
+    if (documentsToRepublish.isEmpty()) {
+      log.atInfo().setMessage("No documents found for republishing. Skipping sync step.").log();
+      return;
+    }
     if (TransactionSynchronizationManager.isActualTransactionActive()) {
       TransactionSynchronizationManager.registerSynchronization(
           new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-              log.info(
-                  "ULI Citation Sync: Committed. Republishing {} docs",
-                  documentsToRepublish.size());
+              log.atInfo()
+                  .addKeyValue("count", documentsToRepublish.size())
+                  .setMessage("ULI Citation Sync: Committed. Republishing docs")
+                  .log();
               documentsToRepublish.forEach(
                   docId -> {
                     try {
@@ -275,7 +269,11 @@ public class UliCitationSyncService {
             try {
               portalPublicationService.publishDocumentationUnitWithChangelog(docId, null);
             } catch (Exception e) {
-              log.error("Failed to republish {} during ULI sync", docId, e);
+              log.atError()
+                  .addKeyValue(LoggingKeys.DOCUMENT_ID, docId)
+                  .addKeyValue("exception", e.getMessage())
+                  .setMessage("Failed to republish during ULI sync")
+                  .log();
             }
           });
     }
