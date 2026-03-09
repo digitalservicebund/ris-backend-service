@@ -320,16 +320,30 @@ public interface DocumentationUnitLdmlTransformer<T extends DocumentationUnit> {
     return fundstellen;
   }
 
+  /**
+   * Removes wrapping brackets from headline: {@code (text)} → {@code text}, {@code <p>(text)</p>} →
+   * {@code <p>text</p>}. Only if there are no nested brackets inside. Preserves all other content.
+   *
+   * @param headline input string
+   * @return processed string without wrapping brackets
+   */
   private String removeWrappingBrackets(String headline) {
     headline = headline.strip();
 
-    boolean startsWithBracket = headline.startsWith("(");
-    boolean endsWithBracket = headline.endsWith(")");
+    boolean startsWithOpen = headline.startsWith("(") || headline.startsWith("<p>(");
+    boolean endsWithClose = headline.endsWith(")") || headline.endsWith(")</p>");
 
-    if (startsWithBracket && endsWithBracket) {
-      String cleanHeadline = headline.substring(1, headline.length() - 1);
-      if (!cleanHeadline.contains("(") && !cleanHeadline.contains(")")) {
-        return cleanHeadline;
+    if (startsWithOpen && endsWithClose) {
+      String headlineWithoutBrackets;
+
+      if (headline.startsWith("(")) {
+        headlineWithoutBrackets = headline.substring(1, headline.length() - 1);
+      } else {
+        headlineWithoutBrackets = headline.substring(4, headline.length() - 5);
+      }
+
+      if (!headlineWithoutBrackets.contains("(") && !headlineWithoutBrackets.contains(")")) {
+        return headlineWithoutBrackets;
       }
     }
     return headline;
