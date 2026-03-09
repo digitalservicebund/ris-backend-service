@@ -22,19 +22,21 @@ public class SliCitationPublishService {
   }
 
   private Optional<SliDTO> getPassiveCitationSource(PassiveCitationSliEntity passiveCitation) {
-    if (passiveCitation.getSourceId() == null) {
+    var sourceId = passiveCitation.getSourceId();
+    if (sourceId == null) {
       return Optional.empty();
     }
 
-    return sliRepository.findById(passiveCitation.getSourceId());
+    return sliRepository.findById(sourceId);
   }
 
   private Optional<SliDTO> getActiveCitationTarget(ActiveCitationSliEntity activeCitation) {
-    if (activeCitation.getTargetId() == null) {
+    var targetId = activeCitation.getTargetId();
+    if (targetId == null) {
       return Optional.empty();
     }
 
-    return sliRepository.findById(activeCitation.getTargetId());
+    return sliRepository.findById(targetId);
   }
 
   /**

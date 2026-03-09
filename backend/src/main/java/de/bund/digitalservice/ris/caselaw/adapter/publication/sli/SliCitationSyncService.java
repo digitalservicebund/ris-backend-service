@@ -48,7 +48,7 @@ public class SliCitationSyncService {
   public void handleNewlyPublishedAfter(Instant after) {
     var documentsToPublish =
         transactionTemplate.execute(
-            (status) ->
+            status ->
                 sliRepository.findAllByPublishedAtAfter(after).stream()
                     .map(this::syncCitations)
                     .flatMap(Set::stream)
@@ -215,7 +215,7 @@ public class SliCitationSyncService {
 
     var documentsToRepublish =
         transactionTemplate.execute(
-            (status) ->
+            status ->
                 revokedEntries.stream()
                     .map(this::removeCitationsToRevokedSli)
                     .flatMap(Set::stream)

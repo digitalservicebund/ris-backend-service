@@ -53,7 +53,7 @@ public class AdmCitationSyncService {
   public void handleNewlyPublishedAfter(Instant after) {
     var documentsToPublish =
         transactionTemplate.execute(
-            (status) ->
+            status ->
                 admRepository.findAllByPublishedAtAfter(after).stream()
                     .map(this::syncCitations)
                     .flatMap(Set::stream)
@@ -228,7 +228,7 @@ public class AdmCitationSyncService {
 
     var documentsToRepublish =
         transactionTemplate.execute(
-            (status) ->
+            status ->
                 revokedEntries.stream()
                     .map(this::removeCitationsToRevokedAdministrativeDirective)
                     .flatMap(Set::stream)
