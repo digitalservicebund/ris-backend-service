@@ -74,6 +74,8 @@ public class SliCitationPublishServiceTest {
     }
 
     @Test
+    @Disabled(
+        "this tests the functionality including the updating of references, but at the moment we do not want to update any data yet")
     void shouldReturnUpdatedPassiveCitationWhenSliIsFound() {
       var uuid = UUID.fromString("8a0b92e8-2e89-4808-83da-4d85204f5cdc");
       var passiveCitation =

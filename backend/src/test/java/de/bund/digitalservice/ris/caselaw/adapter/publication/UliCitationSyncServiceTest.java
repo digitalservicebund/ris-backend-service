@@ -99,7 +99,8 @@ public class UliCitationSyncServiceTest {
       assertThat(memoryAppender.getKeyValuePairs(Level.INFO, 0))
           .anyMatch(
               kv -> kv.key.equals(LoggingKeys.SOURCE_DOCUMENT_NUMBER) && kv.value.equals(uliId))
-          .anyMatch(kv -> kv.key.equals("caselawDocNumber") && kv.value.equals("XXRE123456789"));
+          .anyMatch(
+              kv -> kv.key.equals("targetDocumentNumber") && kv.value.equals("XXRE123456789"));
 
       assertThat(memoryAppender.getMessage(Level.INFO, 0))
           .contains("Updating metadata of matching passive citation");
@@ -144,7 +145,7 @@ public class UliCitationSyncServiceTest {
           .anyMatch(kv -> kv.key.equals(LoggingKeys.DOCUMENT_ID) && kv.value.equals(caselawId));
       assertThat(memoryAppender.getMessage(Level.WARN, 0))
           .contains(
-              "Inconsistency: Active citation in ULI points to caselaw, but passive counterpart is missing in caselaw document.");
+              "DISABLED: Creating missing passive citation for published active citation in ULI document.");
 
       memoryAppender.detachLoggingTestAppender();
     }
@@ -329,7 +330,7 @@ public class UliCitationSyncServiceTest {
       assertThat(memoryAppender.getKeyValuePairs(Level.INFO, 1))
           .anyMatch(kv -> kv.key.equals(LoggingKeys.REVOKED_ULI) && kv.value.equals(revokedUliId))
           .anyMatch(
-              kv -> kv.key.equals("affectedDocUnitNumber") && kv.value.equals("XXRE123456789"));
+              kv -> kv.key.equals("affectedDocumentNumber") && kv.value.equals("XXRE123456789"));
 
       assertThat(memoryAppender.getMessage(Level.INFO, 1))
           .contains("Passive Citation to revoked ULI detected");
@@ -367,7 +368,7 @@ public class UliCitationSyncServiceTest {
       assertThat(memoryAppender.getKeyValuePairs(Level.INFO, 1))
           .anyMatch(kv -> kv.key.equals(LoggingKeys.REVOKED_ULI) && kv.value.equals(revokedUliId))
           .anyMatch(
-              kv -> kv.key.equals("affectedDocUnitNumber") && kv.value.equals("XXRE123456789"));
+              kv -> kv.key.equals("affectedDocumentNumber") && kv.value.equals("XXRE123456789"));
 
       assertThat(memoryAppender.getMessage(Level.INFO, 1))
           .contains("Active Citation to revoked ULI detected");

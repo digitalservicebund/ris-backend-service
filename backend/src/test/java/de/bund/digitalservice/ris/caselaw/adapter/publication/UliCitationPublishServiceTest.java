@@ -181,15 +181,14 @@ public class UliCitationPublishServiceTest {
 
       uliCitationPublishService.updateActiveUliCitationWithInformationFromTarget(activeCitation);
 
-      assertThat(memoryAppender.count(Level.WARN)).isEqualTo(1L);
-      assertThat(memoryAppender.getMessage(Level.WARN, 0))
+      assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1L);
+      assertThat(memoryAppender.getMessage(Level.INFO, 0))
           .contains(
               "Metadata divergence detected between caselaw active citation and target uli document.");
-      assertThat(memoryAppender.getKeyValuePairs(Level.WARN, 0))
+      assertThat(memoryAppender.getKeyValuePairs(Level.INFO, 0))
           .anyMatch(kv -> kv.key.equals("sourceDocumentNumber") && kv.value.equals("CAS-123"))
-          .anyMatch(kv -> kv.key.equals("targetUliDocumentNumber") && kv.value.equals("ULI-123"))
-          .anyMatch(
-              kv -> kv.key.equals("authorFromUliDocument") && kv.value.equals("Prof. Dr. ULI"));
+          .anyMatch(kv -> kv.key.equals("target.documentNumber") && kv.value.equals("ULI-123"))
+          .anyMatch(kv -> kv.key.equals("target.author") && kv.value.equals("Prof. Dr. ULI"));
 
       memoryAppender.detachLoggingTestAppender();
     }

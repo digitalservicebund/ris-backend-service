@@ -161,7 +161,7 @@ public class UliCitationSyncService {
           .addKeyValue(LoggingKeys.TARGET_DOCUMENT_NUMBER, decision.getDocumentNumber())
           .addKeyValue(LoggingKeys.DOCUMENT_ID, decision.getId())
           .setMessage(
-              "DISABLED: Creating missing passive citation for published active citation in ADM document.")
+              "DISABLED: Creating missing passive citation for published active citation in ULI document.")
           .log();
     }
   }

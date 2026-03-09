@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationAdmDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdmDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAdmRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdmDTO;
 import java.util.Optional;
 import java.util.UUID;
@@ -100,6 +101,10 @@ public class AdmCitationPublishServiceTest {
     void shouldReturnSameReferenceIfNoIdIsGiven() {
       var activeCitation =
           ActiveCitationAdmDTO.builder()
+              .source(
+                  DecisionDTO.builder()
+                      .id(UUID.fromString("3314d0d0-936b-4832-a71b-19c7131de0db"))
+                      .build())
               .targetDirective("VV DEU BMF 1972-02-29 F/IV B 2-S 2000-5/72")
               .rank(1)
               .build();
@@ -120,6 +125,10 @@ public class AdmCitationPublishServiceTest {
       var uuid = UUID.fromString("9e266182-f4c0-4f7f-9987-1e7b5603aa2b");
       var activeCitation =
           ActiveCitationAdmDTO.builder()
+              .source(
+                  DecisionDTO.builder()
+                      .id(UUID.fromString("3314d0d0-936b-4832-a71b-19c7131de0db"))
+                      .build())
               .targetDirective("VV DEU BMF 1972-02-29 F/IV B 2-S 2000-5/72")
               .targetId(uuid)
               .targetDocumentNumber("KSNR150060010")
