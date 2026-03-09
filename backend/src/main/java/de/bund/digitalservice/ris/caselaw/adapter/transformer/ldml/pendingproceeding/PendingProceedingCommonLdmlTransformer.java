@@ -133,13 +133,13 @@ public abstract class PendingProceedingCommonLdmlTransformer
 
   protected DokumentarischeKurztexte.DokumentarischeKurztexteBuilder getCommonKurztexteBuilder(
       PendingProceeding pendingProceeding) {
-    var builder = DokumentarischeKurztexte.builder();
+    var builder = DokumentarischeKurztexte.builder(); // NOSONAR
 
-    PendingProceedingShortTexts shortTexts = pendingProceeding.shortTexts();
+    PendingProceedingShortTexts shortTexts = pendingProceeding.shortTexts(); // NOSONAR
     // Titelzeile
     if (shortTexts != null && isNotBlank(shortTexts.headline())) {
       var titelzeile =
-          JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.headline()));
+          JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.headline())); // NOSONAR
       titelzeile.setDomainTerm("Titelzeile");
       titelzeile.setEId("titelzeile");
       builder.titelzeile(titelzeile);

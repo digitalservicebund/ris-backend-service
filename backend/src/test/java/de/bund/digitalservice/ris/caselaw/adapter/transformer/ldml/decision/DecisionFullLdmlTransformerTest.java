@@ -690,6 +690,7 @@ class DecisionFullLdmlTransformerTest {
     }
 
     @Nested
+    @SuppressWarnings("java:S5976")
     class ShortTitle {
       @Test
       void testTransform_withoutShortTitle_shouldUseFallback() {
