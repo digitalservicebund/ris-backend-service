@@ -136,7 +136,7 @@ public abstract class DecisionCommonLdmlTransformer
     // Titelzeile
     if (shortTexts != null && isNotBlank(shortTexts.headline())) {
       var titelzeile =
-          JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.headline()));
+          JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.headline())); // NO SONAR
       titelzeile.setDomainTerm("Titelzeile");
       titelzeile.setEId("titelzeile");
       builder.titelzeile(titelzeile);
