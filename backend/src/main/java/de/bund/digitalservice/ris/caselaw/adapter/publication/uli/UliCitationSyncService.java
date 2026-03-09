@@ -141,7 +141,7 @@ public class UliCitationSyncService {
     if (hasChanged) {
       log.atInfo()
           .addKeyValue(LoggingKeys.SOURCE_DOCUMENT_NUMBER, uli.getId())
-          .addKeyValue("caselawDocNumber", passive.getTarget().getDocumentNumber())
+          .addKeyValue(LoggingKeys.TARGET_DOCUMENT_NUMBER, passive.getTarget().getDocumentNumber())
           .setMessage(
               "Updating metadata of matching passive citation due to changes in ULI source.")
           .log();
@@ -158,10 +158,10 @@ public class UliCitationSyncService {
     if (!hasPassiveCounterpart) {
       log.atWarn()
           .addKeyValue(LoggingKeys.SOURCE_DOCUMENT_NUMBER, uliId)
-          .addKeyValue("caselawDocNumber", decision.getDocumentNumber())
+          .addKeyValue(LoggingKeys.TARGET_DOCUMENT_NUMBER, decision.getDocumentNumber())
           .addKeyValue(LoggingKeys.DOCUMENT_ID, decision.getId())
           .setMessage(
-              "Inconsistency: Active citation in ULI points to caselaw, but passive counterpart is missing in caselaw document.")
+              "DISABLED: Creating missing passive citation for published active citation in ADM document.")
           .log();
     }
   }
@@ -209,7 +209,7 @@ public class UliCitationSyncService {
       documentsToRepublish.add(decision.getId());
       log.atInfo()
           .addKeyValue(LoggingKeys.REVOKED_ULI, revokedId)
-          .addKeyValue("affectedDocUnitNumber", decision.getDocumentNumber())
+          .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
           .setMessage(
               "Passive Citation to revoked ULI detected. Document added to republishing queue for validation in publish step.")
           .log();
@@ -222,7 +222,7 @@ public class UliCitationSyncService {
       documentsToRepublish.add(decision.getId());
       log.atInfo()
           .addKeyValue(LoggingKeys.REVOKED_ULI, revokedId)
-          .addKeyValue("affectedDocUnitNumber", decision.getDocumentNumber())
+          .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
           .setMessage(
               "Active Citation to revoked ULI detected. Document added to republishing queue for validation in publish step.")
           .log();

@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.Immutable;
 
 @Getter
@@ -20,9 +21,11 @@ import org.hibernate.annotations.Immutable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(onlyExplicitlyIncluded = true)
 public class SliActiveCaselawReferenceDTO {
   @Id
   @Column(name = "id")
+  @ToString.Include
   private UUID id;
 
   @ManyToOne()
@@ -30,5 +33,6 @@ public class SliActiveCaselawReferenceDTO {
   private SliDTO source;
 
   @Column(name = "target_documentation_unit_id")
+  @ToString.Include
   private UUID targetDocumentationUnitId;
 }

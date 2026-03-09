@@ -29,11 +29,11 @@ import org.jspecify.annotations.Nullable;
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode
-@ToString
+@ToString(onlyExplicitlyIncluded = true)
 @Table(name = "passive_citation_sli", schema = "incremental_migration")
 public class PassiveCitationSliEntity {
 
-  @Id @GeneratedValue @EqualsAndHashCode.Exclude private UUID id;
+  @Id @GeneratedValue @EqualsAndHashCode.Exclude @ToString.Include private UUID id;
 
   @NonNull
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -43,26 +43,31 @@ public class PassiveCitationSliEntity {
 
   @Nullable
   @Column(name = "source_id")
+  @ToString.Include
   private UUID sourceId;
 
   @Nullable
   @Column(name = "source_literature_document_number")
   @Size(max = 255)
+  @ToString.Include
   private String sourceDocumentNumber;
 
   @NotBlank
   @Column(name = "source_author")
   @Size(max = 255)
+  @ToString.Include
   private String sourceAuthor;
 
   @NotBlank
   @Column(name = "source_book_title")
   @Size(max = 1000)
+  @ToString.Include
   private String sourceBookTitle;
 
   @NotBlank
   @Column(name = "source_year_of_publication", nullable = false)
   @Size(max = 255)
+  @ToString.Include
   private String sourceYearOfPublication;
 
   @NotNull

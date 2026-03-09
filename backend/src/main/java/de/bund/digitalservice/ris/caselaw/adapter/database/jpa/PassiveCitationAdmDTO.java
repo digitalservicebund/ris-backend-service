@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
@@ -23,10 +24,12 @@ import lombok.Setter;
 @Builder
 @Entity
 @Table(name = "passive_citation_adm", schema = "incremental_migration")
+@ToString(onlyExplicitlyIncluded = true)
 public class PassiveCitationAdmDTO {
   @GeneratedValue
   @Id
   @Column(name = "id", nullable = false)
+  @ToString.Include
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -34,16 +37,20 @@ public class PassiveCitationAdmDTO {
   private DecisionDTO target;
 
   @Column(name = "source_id")
+  @ToString.Include
   private UUID sourceId;
 
   @Column(name = "source_document_number")
+  @ToString.Include
   private String sourceDocumentNumber;
 
   @NotNull
   @Column(name = "source_directive", nullable = false)
+  @ToString.Include
   private String sourceDirective;
 
   @Column(name = "citation")
+  @ToString.Include
   private String citation;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -51,6 +58,7 @@ public class PassiveCitationAdmDTO {
   private CitationTypeDTO citationType;
 
   @Column(name = "citation_type_raw")
+  @ToString.Include
   private String citationTypeRaw;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -58,6 +66,7 @@ public class PassiveCitationAdmDTO {
   private LegalPeriodicalDTO legalPeriodical;
 
   @Column(name = "legal_periodical_raw")
+  @ToString.Include
   private String legalPeriodicalRaw;
 
   @NotNull

@@ -106,11 +106,13 @@ public class AdmCitationSyncService {
                   if (updateOfMatchingCitationNeeded(
                       matchingPassiveCitation.get(), activeCitation)) {
                     log.atInfo()
-                        .addKeyValue("publishedAdm", adm.getDocumentNumber())
-                        .addKeyValue("targetDocumentationUnit", targetDecision.getDocumentNumber())
+                        .addKeyValue(LoggingKeys.SOURCE_DOCUMENT_NUMBER, adm.getDocumentNumber())
+                        .addKeyValue(
+                            LoggingKeys.TARGET_DOCUMENT_NUMBER, targetDecision.getDocumentNumber())
                         .addKeyValue("activeCitation", activeCitation)
                         .addKeyValue("matchingPassiveCitation", matchingPassiveCitation.get())
-                        .setMessage("Updating data of matching passive citation.")
+                        .setMessage(
+                            "Updating metadata of matching passive citation due to changes in ADM document.")
                         .log();
                     matchingPassiveCitation.get().setSourceId(adm.getId());
                     // matchingPassiveCitation.get().setSourceDocumentNumber(adm.getDocumentNumber());
@@ -131,13 +133,16 @@ public class AdmCitationSyncService {
                           targetDecision.getPassiveCaselawCitations().size() + 1));*/
 
                   log.atInfo()
-                      .addKeyValue("publishedAdm", adm.getDocumentNumber())
-                      .addKeyValue("targetDocumentationUnit", targetDecision.getDocumentNumber())
+                      .addKeyValue(LoggingKeys.SOURCE_DOCUMENT_NUMBER, adm.getDocumentNumber())
+                      .addKeyValue(
+                          LoggingKeys.TARGET_DOCUMENT_NUMBER, targetDecision.getDocumentNumber())
+                      .addKeyValue(LoggingKeys.DOCUMENT_ID, targetDecision.getId())
                       .addKeyValue("activeCitation", activeCitation)
-                      .setMessage("Creating passive citation for published active citation.")
+                      .setMessage(
+                          "DISABLED: Creating missing passive citation for published active citation in ADM document.")
                       .log();
 
-                  documentationUnitRepository.save(targetDecision);
+                  // documentationUnitRepository.save(targetDecision);
 
                   documentsToRepublish.add(targetDecision.getId());
                 }
@@ -249,9 +254,8 @@ public class AdmCitationSyncService {
 
   private Set<UUID> removeCitationsToRevokedAdministrativeDirective(RevokedAdm revokedAdm) {
     log.atInfo()
-        .addKeyValue(LoggingKeys.REVOKED_ADMINISTRATIVE_DIRECTIVE, revokedAdm.getDocUnitId())
-        .setMessage(
-            "Checking active and passive citations for references to revoked Administrative Directive.")
+        .addKeyValue(LoggingKeys.REVOKED_ADM, revokedAdm.getDocUnitId())
+        .setMessage("Checking active and passive citations for references to revoked ADM.")
         .log();
 
     Set<UUID> documentsToRepublish = new HashSet<>();
@@ -272,14 +276,18 @@ public class AdmCitationSyncService {
         documentationUnitRepository.save(decision);
         documentsToRepublish.add(decision.getId());
         log.atInfo()
-            .addKeyValue(LoggingKeys.REVOKED_ADMINISTRATIVE_DIRECTIVE, revokedAdm.getDocUnitId())
-            .addKeyValue("docunitWithPassiveCitation", decision.getDocumentNumber())
+            .addKeyValue(LoggingKeys.REVOKED_ADM, revokedAdm.getDocUnitId())
+            .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
             .setMessage(
-                "Passive Citation to Revoked Administrative Directive found and removed. Doc unit scheduled for republishing.")
+                "Passive Citation to revoked ADM found and removed. Document added to republishing queue for validation in publish step.")
             .log();
       } else {
-        // TODO: (Malte Laukötter, 2026-03-02) this shouldn't happen so maybe we should log
-        // something
+        log.atError()
+            .addKeyValue(LoggingKeys.REVOKED_ADM, revokedAdm.getDocUnitId())
+            .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
+            .setMessage(
+                "No Passive Citation to revoked ADM couldn't be found and removed. This is inconsistent as the document was only found because it is supposed to have such a reference.")
+            .log();
       }
     }
 
@@ -292,10 +300,10 @@ public class AdmCitationSyncService {
     for (DecisionDTO decision : affectedByActive) {
       documentsToRepublish.add(decision.getId());
       log.atInfo()
-          .addKeyValue(LoggingKeys.REVOKED_ADMINISTRATIVE_DIRECTIVE, revokedAdm.getDocUnitId())
-          .addKeyValue("docunitWithActiveCitation", decision.getDocumentNumber())
+          .addKeyValue(LoggingKeys.REVOKED_ADM, revokedAdm.getDocUnitId())
+          .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
           .setMessage(
-              "Active Citation to Revoked Administrative Directive found. Doc unit scheduled for republishing.")
+              "Active Citation to revoked ADM found. Document added to republishing queue for validation in publish step.")
           .log();
     }
 
