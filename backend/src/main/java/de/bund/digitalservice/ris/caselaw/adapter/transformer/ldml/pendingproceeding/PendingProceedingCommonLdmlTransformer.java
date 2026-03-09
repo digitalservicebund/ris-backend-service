@@ -14,7 +14,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Judg
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.judgementbody.Motivation;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.Analysis;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.DokumentarischeKurztexte;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.ImplicitReference;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.OtherAnalysis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.analysis.OtherReferences;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.AktenzeichenListe;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.meta.proprietary.Dokumentationsstelle;
@@ -87,9 +89,11 @@ public abstract class PendingProceedingCommonLdmlTransformer
 
   @Nullable
   protected Analysis buildAnalysis(PendingProceeding pendingProceeding) {
+    OtherAnalysis otherAnalysis = buildOtherAnalysis(pendingProceeding);
     OtherReferences otherReferences = buildOtherReferences(pendingProceeding);
 
-    Analysis analysis = Analysis.builder().otherReferences(otherReferences).build();
+    Analysis analysis =
+        Analysis.builder().otherAnalysis(otherAnalysis).otherReferences(otherReferences).build();
     if (!analysis.isEmpty()) {
       return analysis;
     } else {
@@ -105,6 +109,43 @@ public abstract class PendingProceedingCommonLdmlTransformer
     } else {
       return null;
     }
+  }
+
+  @Nullable
+  protected OtherAnalysis buildOtherAnalysis(PendingProceeding pendingProceeding) {
+    DokumentarischeKurztexte kurztexte = buildKurztexte(pendingProceeding);
+
+    OtherAnalysis otherAnalysis =
+        OtherAnalysis.builder().dokumentarischeKurztexte(kurztexte).build();
+    if (!otherAnalysis.isEmpty()) {
+      return otherAnalysis;
+    } else {
+      return null;
+    }
+  }
+
+  protected DokumentarischeKurztexte buildKurztexte(PendingProceeding pendingProceeding) {
+    var builder = getCommonKurztexteBuilder(pendingProceeding);
+
+    DokumentarischeKurztexte kurztexte = builder.build();
+    return kurztexte.isEmpty() ? null : kurztexte;
+  }
+
+  protected DokumentarischeKurztexte.DokumentarischeKurztexteBuilder getCommonKurztexteBuilder(
+      PendingProceeding pendingProceeding) {
+    var builder = DokumentarischeKurztexte.builder();
+
+    PendingProceedingShortTexts shortTexts = pendingProceeding.shortTexts();
+    // Titelzeile
+    if (shortTexts != null && isNotBlank(shortTexts.headline())) {
+      var titelzeile =
+          JaxbHtml.build(htmlTransformer.htmlStringToObjectList(shortTexts.headline()));
+      titelzeile.setDomainTerm("Titelzeile");
+      titelzeile.setEId("titelzeile");
+      builder.titelzeile(titelzeile);
+    }
+
+    return builder;
   }
 
   @SuppressWarnings({"java:S3776", "java:S1854"})

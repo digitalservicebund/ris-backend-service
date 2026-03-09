@@ -48,6 +48,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -422,5 +423,91 @@ class PendingProceedingFullLdmlTransformerTest {
                     .documentType(DocumentType.builder().label("doc type").build())
                     .build()))
         .build();
+  }
+
+  @Nested
+  class Titelzeile {
+    @Test
+    void testTransform_withoutTitelzeile_shouldNotTransformTitelzeile() {
+      PendingProceeding otherLongTextCaseLaw =
+          testDocumentUnit.toBuilder()
+              .shortTexts(
+                  PendingProceedingShortTexts.builder()
+                      .legalIssue("Rechtsfrage")
+                      .appellant("Rechtsmittelführer")
+                      .admissionOfAppeal("Rechtsmittelzulassung")
+                      .resolutionNote("Erledigungsmitteilung")
+                      .build())
+              .build();
+
+      CaseLawLdml ldml = transformer.transformToLdml(otherLongTextCaseLaw);
+
+      assertThat(ldml).isNotNull();
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      assertThat(fileContent).isPresent();
+      assertThat(StringUtils.deleteWhitespace(fileContent.get())).doesNotContain("titelzeile");
+    }
+
+    @Test
+    void testTransform_withTitelzeileWithoutP_shouldTransformTitelzeile() {
+      String expected =
+          """
+              <akn:otherAnalysis source="#ris">
+                  <ris:dokumentarischeKurztexte domainTerm="Dokumentarische Kurztexte">
+                     <ris:titelzeile akn:eId="titelzeile" ris:domainTerm="Titelzeile">Headline</ris:titelzeile>
+                  </ris:dokumentarischeKurztexte>
+               </akn:otherAnalysis>
+           """;
+      PendingProceeding otherLongTextCaseLaw =
+          testDocumentUnit.toBuilder()
+              .shortTexts(
+                  PendingProceedingShortTexts.builder()
+                      .headline("Headline")
+                      .legalIssue("Rechtsfrage")
+                      .appellant("Rechtsmittelführer")
+                      .admissionOfAppeal("Rechtsmittelzulassung")
+                      .resolutionNote("Erledigungsmitteilung")
+                      .build())
+              .build();
+
+      CaseLawLdml ldml = transformer.transformToLdml(otherLongTextCaseLaw);
+
+      assertThat(ldml).isNotNull();
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      assertThat(fileContent).isPresent();
+      assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+          .contains(StringUtils.deleteWhitespace(expected));
+    }
+
+    @Test
+    void testTransform_withTitelzeileWithinP_shouldTransformTitelzeile() {
+      String expected =
+          """
+              <akn:otherAnalysis source="#ris">
+                  <ris:dokumentarischeKurztexte domainTerm="Dokumentarische Kurztexte">
+                     <ris:titelzeile akn:eId="titelzeile" ris:domainTerm="Titelzeile"><akn:p>Headline</akn:p></ris:titelzeile>
+                  </ris:dokumentarischeKurztexte>
+               </akn:otherAnalysis>
+           """;
+      PendingProceeding otherLongTextCaseLaw =
+          testDocumentUnit.toBuilder()
+              .shortTexts(
+                  PendingProceedingShortTexts.builder()
+                      .headline("<p>Headline</p>")
+                      .legalIssue("Rechtsfrage")
+                      .appellant("Rechtsmittelführer")
+                      .admissionOfAppeal("Rechtsmittelzulassung")
+                      .resolutionNote("Erledigungsmitteilung")
+                      .build())
+              .build();
+
+      CaseLawLdml ldml = transformer.transformToLdml(otherLongTextCaseLaw);
+
+      assertThat(ldml).isNotNull();
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      assertThat(fileContent).isPresent();
+      assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+          .contains(StringUtils.deleteWhitespace(expected));
+    }
   }
 }

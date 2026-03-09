@@ -105,6 +105,13 @@
                   </ris:fundstelleLiteraturUnselbststaendig>
                     </akn:implicitReference>
                 </akn:otherReferences>
+                <akn:otherAnalysis source="#ris">
+                    <ris:dokumentarischeKurztexte domainTerm="Dokumentarische Kurztexte">
+                        <ris:titelzeile akn:eId="titelzeile" ris:domainTerm="Titelzeile">
+                            Titelzeile
+                        </ris:titelzeile>
+                    </ris:dokumentarischeKurztexte>
+                </akn:otherAnalysis>
             </akn:analysis>
             <akn:references source="#ris">
                 <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
