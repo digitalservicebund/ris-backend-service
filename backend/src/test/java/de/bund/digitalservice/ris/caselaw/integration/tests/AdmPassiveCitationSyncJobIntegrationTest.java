@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobSyncStatus;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobSyncStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdmDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.SyncJob;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.adm.AdmPassiveCitationSyncJob;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTransformer;
@@ -197,5 +199,67 @@ class AdmPassiveCitationSyncJobIntegrationTest extends BaseIntegrationTest {
     var capturedRequests = captor.getAllValues();
     assertThat(capturedRequests.get(0).key()).isEqualTo("YYTestDoc2000/YYTestDoc2000.xml");
     assertThat(capturedRequests.get(1).key()).contains("changelogs/");
+  }
+
+  @Test
+  @Sql(scripts = "classpath:adm_ref_view_init.sql")
+  @Transactional
+  void testRun_doesNotAddNewPassiveCitationIfItAlreadyExists() {
+    TestTransaction.end();
+    jobSyncStatusRepository.save(
+        new JobSyncStatus(
+            SyncJob.ADM_PASSIVE_CITATION_SYNC.getName(), Instant.now().minusSeconds(300)));
+
+    CourtDTO court =
+        databaseCourtRepository.saveAndFlush(
+            CourtDTO.builder()
+                .type("AG")
+                .location("Aachen")
+                .isSuperiorCourt(false)
+                .isForeignCourt(false)
+                .jurisId(new Random().nextInt())
+                .build());
+    var docType =
+        databaseDocumentTypeRepository.saveAndFlush(
+            DocumentTypeDTO.builder().abbreviation("test").multiple(true).build());
+
+    DecisionDTO decision =
+        (DecisionDTO)
+            databaseDocumentationUnitRepository
+                .findById(UUID.fromString("adb8408b-5a77-48f9-9ed0-b8dee4f2db02"))
+                .orElseThrow();
+    decision.setDocumentType(docType);
+    decision.setCourt(court);
+    decision.setDate(LocalDate.now());
+    decision.setFileNumbers(
+        List.of(FileNumberDTO.builder().documentationUnit(decision).value("123").rank(0L).build()));
+    decision.setGrounds("lorem ipsum dolor sit amet");
+    decision.setLegalEffect(LegalEffectDTO.JA);
+    decision.setPassiveAdmCitations(
+        List.of(
+            PassiveCitationAdmDTO.builder()
+                .sourceId(UUID.fromString("c5c6acf4-11d0-4586-9357-0913fa40d939"))
+                .sourceDirective("VV DEU BMF 2004-11-03 IV B 2-S 2176-13/04")
+                .sourceDocumentNumber("KSNR004051608")
+                .citationTypeRaw("Vgl")
+                .target(decision)
+                .rank(1)
+                .build()));
+    databaseDocumentationUnitRepository.save(decision);
+
+    syncJob.runSync();
+
+    // The passive citation is still there
+    TestTransaction.start();
+    DecisionDTO updatedDecision =
+        (DecisionDTO)
+            databaseDocumentationUnitRepository
+                .findById(UUID.fromString("adb8408b-5a77-48f9-9ed0-b8dee4f2db02"))
+                .orElseThrow();
+    assertThat(updatedDecision.getPassiveAdmCitations()).hasSize(1);
+    TestTransaction.end();
+
+    // Does not publish anything
+    verify(s3Client, never()).putObject(any(PutObjectRequest.class), any(RequestBody.class));
   }
 }
