@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,6 +65,8 @@ class AdmCitationSyncServiceTest {
   class handleNewlyPublishedAfter {
 
     @Test
+    @Disabled(
+        "this the functionality including the updating of references, but at the moment we do not want to update any data yet")
     void shouldUpdateMetadataWhenPassiveCitationExists()
         throws DocumentationUnitNotExistsException {
       UUID admId = UUID.fromString("7475e016-082d-49e9-9b22-a275c9f65934");
@@ -117,6 +120,8 @@ class AdmCitationSyncServiceTest {
     }
 
     @Test
+    @Disabled(
+        "this the functionality including the updating of references, but at the moment we do not want to update any data yet")
     void shouldCreateMissingPassiveCitation() throws DocumentationUnitNotExistsException {
       UUID admId = UUID.fromString("7475e016-082d-49e9-9b22-a275c9f65934");
       UUID caselawId = UUID.fromString("2fb43fd9-6414-4407-b705-1c474f0a1c7f");
@@ -178,6 +183,8 @@ class AdmCitationSyncServiceTest {
     }
 
     @Test
+    @Disabled(
+        "this the functionality including the updating of references, but at the moment we do not want to update any data yet")
     void shouldIdentifyMatchingCitationByDocumentNumberWhenIdIsNull() {
       UUID admId = UUID.randomUUID();
       UUID caselawId = UUID.randomUUID();

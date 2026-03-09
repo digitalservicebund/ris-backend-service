@@ -59,8 +59,16 @@ public class AdmCitationPublishService {
       return Optional.empty();
     }
 
-    passiveCitation.setSourceDocumentNumber(source.get().getDocumentNumber());
-    passiveCitation.setSourceDirective(source.get().getJurisAbbreviation());
+    // passiveCitation.setSourceDocumentNumber(source.get().getDocumentNumber());
+    // passiveCitation.setSourceDirective(source.get().getJurisAbbreviation());
+    if (!Objects.equals(
+        passiveCitation.getSourceDocumentNumber(), source.get().getDocumentNumber())) {
+      // TODO: (Malte Laukötter, 2026-03-09) log something
+    }
+    if (!Objects.equals(
+        passiveCitation.getSourceDirective(), source.get().getJurisAbbreviation())) {
+      // TODO: (Malte Laukötter, 2026-03-09) log something
+    }
 
     return Optional.of(passiveCitation);
   }

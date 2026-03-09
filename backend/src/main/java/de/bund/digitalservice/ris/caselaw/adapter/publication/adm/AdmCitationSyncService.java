@@ -113,22 +113,22 @@ public class AdmCitationSyncService {
                         .setMessage("Updating data of matching passive citation.")
                         .log();
                     matchingPassiveCitation.get().setSourceId(adm.getId());
-                    matchingPassiveCitation.get().setSourceDocumentNumber(adm.getDocumentNumber());
-                    matchingPassiveCitation.get().setSourceDirective(adm.getJurisAbbreviation());
+                    // matchingPassiveCitation.get().setSourceDocumentNumber(adm.getDocumentNumber());
+                    // matchingPassiveCitation.get().setSourceDirective(adm.getJurisAbbreviation());
 
                     documentationUnitRepository.save(targetDecision);
 
                     documentsToRepublish.add(targetDecision.getId());
                   }
                 } else {
-                  targetDecision
-                      .getPassiveAdmCitations()
-                      .add(
-                          createMatchingPassiveCitation(
-                              activeCitation,
-                              targetDecision,
-                              adm,
-                              targetDecision.getPassiveCaselawCitations().size() + 1));
+                  /*targetDecision
+                  .getPassiveAdmCitations()
+                  .add(
+                      createMatchingPassiveCitation(
+                          activeCitation,
+                          targetDecision,
+                          adm,
+                          targetDecision.getPassiveCaselawCitations().size() + 1));*/
 
                   log.atInfo()
                       .addKeyValue("publishedAdm", adm.getDocumentNumber())
