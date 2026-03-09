@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS references_schema.ref_view_sli (
 
 DELETE FROM references_schema.ref_view_sli WHERE id = 'c4c08674-c862-415c-afc6-ddc0dc185702';
 INSERT INTO references_schema.ref_view_sli (id, document_number, author, book_title, year_of_publication, published_at)
-VALUES ('c4c08674-c862-415c-afc6-ddc0dc185702', 'KSNR150060010', 'Beitel, Willibald', 'Rechtsprechung, Erlasse und Gesetzesänderungen (12)', '2005', CURRENT_TIMESTAMP)  ON CONFLICT DO NOTHING;
+VALUES ('c4c08674-c862-415c-afc6-ddc0dc185702', 'KSNR150060010', 'Beitel, Willibald', 'Rechtsprechung, Erlasse und Gesetzesänderungen (12)', '2005', now() at time zone 'utc')  ON CONFLICT DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS references_schema.ref_view_active_reference_sli_caselaw (
                                                               id UUID PRIMARY KEY,

@@ -133,4 +133,69 @@ class AdmPassiveCitationSyncJobIntegrationTest extends BaseIntegrationTest {
     assertThat(capturedRequests.get(0).key()).isEqualTo("YYTestDoc2000/YYTestDoc2000.xml");
     assertThat(capturedRequests.get(1).key()).contains("changelogs/");
   }
+
+  @Test
+  @Sql(scripts = "classpath:adm_ref_view_init.sql")
+  @Transactional
+  void testRun_run_twice() {
+    TestTransaction.end();
+    jobSyncStatusRepository.save(
+        new JobSyncStatus(
+            SyncJob.ADM_PASSIVE_CITATION_SYNC.getName(), Instant.now().minusSeconds(300)));
+
+    CourtDTO court =
+        databaseCourtRepository.saveAndFlush(
+            CourtDTO.builder()
+                .type("AG")
+                .location("Aachen")
+                .isSuperiorCourt(false)
+                .isForeignCourt(false)
+                .jurisId(new Random().nextInt())
+                .build());
+    var docType =
+        databaseDocumentTypeRepository.saveAndFlush(
+            DocumentTypeDTO.builder().abbreviation("test").multiple(true).build());
+
+    DecisionDTO decision =
+        (DecisionDTO)
+            databaseDocumentationUnitRepository
+                .findById(UUID.fromString("adb8408b-5a77-48f9-9ed0-b8dee4f2db02"))
+                .orElseThrow();
+    decision.setDocumentType(docType);
+    decision.setCourt(court);
+    decision.setDate(LocalDate.now());
+    decision.setFileNumbers(
+        List.of(FileNumberDTO.builder().documentationUnit(decision).value("123").rank(0L).build()));
+    decision.setGrounds("lorem ipsum dolor sit amet");
+    decision.setLegalEffect(LegalEffectDTO.JA);
+    databaseDocumentationUnitRepository.save(decision);
+
+    syncJob.runSync();
+    var afterSyncOne = Instant.now();
+    syncJob.runSync();
+
+    // Updates the sync status
+    var statusAfterSync =
+        jobSyncStatusRepository.findById(SyncJob.ADM_PASSIVE_CITATION_SYNC.getName());
+    assertThat(statusAfterSync).isNotEmpty();
+    assertThat(statusAfterSync.get().getLastRun()).isAfter(afterSyncOne);
+
+    // The passive citations are updated
+    TestTransaction.start();
+    DecisionDTO updatedDecision =
+        (DecisionDTO)
+            databaseDocumentationUnitRepository
+                .findById(UUID.fromString("adb8408b-5a77-48f9-9ed0-b8dee4f2db02"))
+                .orElseThrow();
+    assertThat(updatedDecision.getPassiveAdmCitations()).hasSize(1);
+    TestTransaction.end();
+
+    // Publishes the document with a new passive citation, but only once
+    ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
+    verify(s3Client, times(2)).putObject(captor.capture(), any(RequestBody.class));
+
+    var capturedRequests = captor.getAllValues();
+    assertThat(capturedRequests.get(0).key()).isEqualTo("YYTestDoc2000/YYTestDoc2000.xml");
+    assertThat(capturedRequests.get(1).key()).contains("changelogs/");
+  }
 }
