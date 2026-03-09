@@ -3,11 +3,14 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication.sli;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationSliEntity;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseSliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationSliEntity;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SliDTO;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Disabled;
@@ -197,6 +200,61 @@ public class SliCitationPublishServiceTest {
       assertThat(result.getTargetBookTitle())
           .isEqualTo("Rechtsprechung, Erlasse und Gesetzesänderungen (12)");
       assertThat(result.getTargetYearOfPublication()).isEqualTo("2005");
+    }
+
+    @Test
+    void shouldLogDivergentStatesOfActiveCitationWhenSliIsFound() {
+      var memoryAppender = new TestMemoryAppender(SliCitationPublishService.class);
+      var uuid = UUID.fromString("82948f54-94c7-43f2-9562-7b9efc6ce4fb");
+
+      var activeCitation =
+          ActiveCitationSliEntity.builder()
+              .targetId(uuid)
+              .targetDocumentNumber("KSNR150060010")
+              .rank(1)
+              .source(DecisionDTO.builder().documentNumber("XXRE200000001").build())
+              .build();
+
+      var sli =
+          SliDTO.builder()
+              .id(uuid)
+              .documentNumber("KSNR150060010")
+              .author("Beitel, Willibald")
+              .bookTitle("Rechtsprechung, Erlasse und Gesetzesänderungen (12)")
+              .yearOfPublication("2005")
+              .build();
+
+      when(sliRepository.findById(uuid)).thenReturn(Optional.of(sli));
+
+      sliCitationPublishService.updateActiveCitationTargetWithInformationFromTarget(activeCitation);
+
+      assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1L);
+      assertThat(memoryAppender.getMessage(Level.INFO, 0))
+          .contains(
+              "Metadata divergence detected between caselaw active citation and target sli document.");
+      assertThat(memoryAppender.getKeyValuePairs(Level.INFO, 0))
+          .anyMatch(kv -> kv.key.equals("sourceDocumentNumber") && kv.value.equals("XXRE200000001"))
+          .anyMatch(
+              kv ->
+                  kv.key.equals("activeCitation.targetDocumentNumber")
+                      && kv.value.equals("KSNR150060010"))
+          .anyMatch(
+              kv -> kv.key.equals("target.documentNumber") && kv.value.equals("KSNR150060010"))
+          .anyMatch(kv -> kv.key.equals("activeCitation.targetAuthor") && Objects.isNull(kv.value))
+          .anyMatch(kv -> kv.key.equals("target.author") && kv.value.equals("Beitel, Willibald"))
+          .anyMatch(
+              kv -> kv.key.equals("activeCitation.targetBookTitle") && Objects.isNull(kv.value))
+          .anyMatch(
+              kv ->
+                  kv.key.equals("target.bookTitle")
+                      && kv.value.equals("Rechtsprechung, Erlasse und Gesetzesänderungen (12)"))
+          .anyMatch(
+              kv ->
+                  kv.key.equals("activeCitation.targetYearOfPublication")
+                      && Objects.isNull(kv.value))
+          .anyMatch(kv -> kv.key.equals("target.yearOfPublication") && kv.value.equals("2005"));
+
+      memoryAppender.detachLoggingTestAppender();
     }
   }
 }

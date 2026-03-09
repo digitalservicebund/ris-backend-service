@@ -3,11 +3,14 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication.adm;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationAdmDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdmDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAdmRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdmDTO;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Disabled;
@@ -175,6 +178,51 @@ public class AdmCitationPublishServiceTest {
       assertThat(result.getTargetDocumentNumber()).isEqualTo("KSNR150060010");
       assertThat(result.getTargetDirective())
           .isEqualTo("VV DEU BMF 1972-02-29 F/IV B 2-S 2000-5/72");
+    }
+
+    @Test
+    void shouldLogDivergentStatesOfActiveCitationWhenAdmIsFound() {
+      var memoryAppender = new TestMemoryAppender(AdmCitationPublishService.class);
+      var uuid = UUID.fromString("82948f54-94c7-43f2-9562-7b9efc6ce4fb");
+      var activeCitation =
+          ActiveCitationAdmDTO.builder()
+              .targetId(uuid)
+              .targetDocumentNumber("KSNR150060010")
+              .rank(1)
+              .source(DecisionDTO.builder().documentNumber("XXRE200000001").build())
+              .build();
+
+      var adm =
+          AdmDTO.builder()
+              .id(uuid)
+              .documentNumber("KSNR150060010")
+              .jurisAbbreviation("VV DEU BMF 1972-02-29 F/IV B 2-S 2000-5/72")
+              .build();
+
+      when(admRepository.findById(uuid)).thenReturn(Optional.of(adm));
+
+      admCitationPublishService.updateActiveCitationTargetWithInformationFromTarget(activeCitation);
+
+      assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1L);
+      assertThat(memoryAppender.getMessage(Level.INFO, 0))
+          .contains(
+              "Metadata divergence detected between caselaw active citation and target adm document.");
+      assertThat(memoryAppender.getKeyValuePairs(Level.INFO, 0))
+          .anyMatch(kv -> kv.key.equals("sourceDocumentNumber") && kv.value.equals("XXRE200000001"))
+          .anyMatch(
+              kv ->
+                  kv.key.equals("activeCitation.targetDocumentNumber")
+                      && kv.value.equals("KSNR150060010"))
+          .anyMatch(
+              kv -> kv.key.equals("target.documentNumber") && kv.value.equals("KSNR150060010"))
+          .anyMatch(
+              kv -> kv.key.equals("activeCitation.targetDirective") && Objects.isNull(kv.value))
+          .anyMatch(
+              kv ->
+                  kv.key.equals("target.jurisAbbreviation")
+                      && kv.value.equals("VV DEU BMF 1972-02-29 F/IV B 2-S 2000-5/72"));
+
+      memoryAppender.detachLoggingTestAppender();
     }
   }
 }

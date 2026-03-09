@@ -112,7 +112,7 @@ public class AdmCitationPublishService {
                 "activeCitation.targetDocumentNumber", activeCitation.getTargetDocumentNumber())
             .addKeyValue("target.documentNumber", target.get().getDocumentNumber())
             .addKeyValue("activeCitation.targetDirective", activeCitation.getTargetDirective())
-            .addKeyValue("target.jurisAbbreviation", target.get().getDocumentNumber())
+            .addKeyValue("target.jurisAbbreviation", target.get().getJurisAbbreviation())
             .setMessage(
                 "Metadata divergence detected between caselaw active citation and target adm document.")
             .log();
