@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationAdm
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AdmDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAdmRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationAdmDTO;
+import de.bund.digitalservice.ris.caselaw.domain.LoggingKeys;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +52,8 @@ public class AdmCitationPublishService {
     var source = getPassiveCitationSource(passiveCitation);
     if (source.isEmpty()) {
       log.atDebug()
-          .addKeyValue("sourceDocumentNumber", passiveCitation.getSourceDocumentNumber())
+          .addKeyValue(
+              LoggingKeys.SOURCE_DOCUMENT_NUMBER, passiveCitation.getSourceDocumentNumber())
           .addKeyValue("passiveCitationCaselawId", passiveCitation.getId())
           .setMessage(
               "Skipping publishing of a passive citation adm as the source document can not be found")
@@ -61,13 +63,19 @@ public class AdmCitationPublishService {
 
     // passiveCitation.setSourceDocumentNumber(source.get().getDocumentNumber());
     // passiveCitation.setSourceDirective(source.get().getJurisAbbreviation());
-    if (!Objects.equals(
-        passiveCitation.getSourceDocumentNumber(), source.get().getDocumentNumber())) {
-      // TODO: (Malte Laukötter, 2026-03-09) log something
-    }
-    if (!Objects.equals(
-        passiveCitation.getSourceDirective(), source.get().getJurisAbbreviation())) {
-      // TODO: (Malte Laukötter, 2026-03-09) log something
+    if (!Objects.equals(passiveCitation.getSourceDocumentNumber(), source.get().getDocumentNumber())
+        || !Objects.equals(
+            passiveCitation.getSourceDirective(), source.get().getJurisAbbreviation())) {
+      log.atInfo()
+          .addKeyValue(LoggingKeys.SOURCE_DOCUMENT_NUMBER, source.get().getDocumentNumber())
+          .addKeyValue(
+              "passiveCitation.sourceDocumentNumber", passiveCitation.getSourceDocumentNumber())
+          .addKeyValue("source.documentNumber", source.get().getDocumentNumber())
+          .addKeyValue("passiveCitation.sourceDirective", passiveCitation.getSourceDirective())
+          .addKeyValue("source.jurisAbbreviation", source.get().getJurisAbbreviation())
+          .setMessage(
+              "Metadata divergence detected between caselaw passive citation and source adm document.")
+          .log();
     }
 
     return Optional.of(passiveCitation);
@@ -80,6 +88,12 @@ public class AdmCitationPublishService {
     var target = getActiveCitationTarget(activeCitation);
 
     if (target.isEmpty()) {
+      log.atInfo()
+          .addKeyValue(
+              LoggingKeys.SOURCE_DOCUMENT_NUMBER, activeCitation.getSource().getDocumentNumber())
+          .addKeyValue("missingTargetAdmDocumentNumber", activeCitation.getTargetDocumentNumber())
+          .setMessage("Unlinking active citation: target ADM document not found in database.")
+          .log();
       activeCitation.setTargetId(null);
       activeCitation.setTargetDocumentNumber(null);
     } else {
@@ -93,11 +107,14 @@ public class AdmCitationPublishService {
               activeCitation.getTargetDirective(), target.get().getJurisAbbreviation())) {
         log.atInfo()
             .addKeyValue(
+                LoggingKeys.SOURCE_DOCUMENT_NUMBER, activeCitation.getSource().getDocumentNumber())
+            .addKeyValue(
                 "activeCitation.targetDocumentNumber", activeCitation.getTargetDocumentNumber())
-            .addKeyValue("activeCitation.targetDirective", activeCitation.getTargetDirective())
             .addKeyValue("target.documentNumber", target.get().getDocumentNumber())
+            .addKeyValue("activeCitation.targetDirective", activeCitation.getTargetDirective())
             .addKeyValue("target.jurisAbbreviation", target.get().getDocumentNumber())
-            .setMessage("Difference between active citation and target")
+            .setMessage(
+                "Metadata divergence detected between caselaw active citation and target adm document.")
             .log();
       }
     }

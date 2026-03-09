@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationSli
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseSliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationSliEntity;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SliDTO;
+import de.bund.digitalservice.ris.caselaw.domain.LoggingKeys;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +52,8 @@ public class SliCitationPublishService {
     var source = getPassiveCitationSource(passiveCitation);
     if (source.isEmpty()) {
       log.atDebug()
-          .addKeyValue("sourceDocumentNumber", passiveCitation.getSourceDocumentNumber())
+          .addKeyValue(
+              LoggingKeys.SOURCE_DOCUMENT_NUMBER, passiveCitation.getSourceDocumentNumber())
           .addKeyValue("passiveCitationCaselawId", passiveCitation.getId())
           .setMessage(
               "Skipping publishing of a passive citation sli as the source document can not be found")
@@ -59,10 +61,32 @@ public class SliCitationPublishService {
       return Optional.empty();
     }
 
-    passiveCitation.setSourceDocumentNumber(source.get().getDocumentNumber());
-    passiveCitation.setSourceAuthor(source.get().getAuthor());
-    passiveCitation.setSourceBookTitle(source.get().getBookTitle());
-    passiveCitation.setSourceYearOfPublication(source.get().getYearOfPublication());
+    // passiveCitation.setSourceDocumentNumber(source.get().getDocumentNumber());
+    // passiveCitation.setSourceAuthor(source.get().getAuthor());
+    // passiveCitation.setSourceBookTitle(source.get().getBookTitle());
+    // passiveCitation.setSourceYearOfPublication(source.get().getYearOfPublication());
+    if (!Objects.equals(passiveCitation.getSourceDocumentNumber(), source.get().getDocumentNumber())
+        || !Objects.equals(passiveCitation.getSourceAuthor(), source.get().getAuthor())
+        || !Objects.equals(passiveCitation.getSourceBookTitle(), source.get().getBookTitle())
+        || !Objects.equals(
+            passiveCitation.getSourceYearOfPublication(), source.get().getYearOfPublication())) {
+      log.atInfo()
+          .addKeyValue(LoggingKeys.SOURCE_DOCUMENT_NUMBER, source.get().getDocumentNumber())
+          .addKeyValue(
+              "passiveCitation.sourceDocumentNumber", passiveCitation.getSourceDocumentNumber())
+          .addKeyValue("passiveCitation.sourceAuthor", passiveCitation.getSourceAuthor())
+          .addKeyValue("passiveCitation.sourceBookTitle", passiveCitation.getSourceBookTitle())
+          .addKeyValue(
+              "passiveCitation.sourceYearOfPublication",
+              passiveCitation.getSourceYearOfPublication())
+          .addKeyValue("target.documentNumber", source.get().getDocumentNumber())
+          .addKeyValue("target.author", source.get().getAuthor())
+          .addKeyValue("target.bookTitle", source.get().getBookTitle())
+          .addKeyValue("target.yearOfPublication", source.get().getYearOfPublication())
+          .setMessage(
+              "Metadata divergence detected between caselaw passive citation and source sli document.")
+          .log();
+    }
 
     return Optional.of(passiveCitation);
   }
@@ -74,6 +98,12 @@ public class SliCitationPublishService {
     var target = getActiveCitationTarget(activeCitation);
 
     if (target.isEmpty()) {
+      log.atInfo()
+          .addKeyValue(
+              LoggingKeys.SOURCE_DOCUMENT_NUMBER, activeCitation.getSource().getDocumentNumber())
+          .addKeyValue("missingTargetSliDocumentNumber", activeCitation.getTargetDocumentNumber())
+          .setMessage("Unlinking active citation: target SLI document not found in database.")
+          .log();
       activeCitation.setTargetId(null);
       activeCitation.setTargetDocumentNumber(null);
     } else {
@@ -92,6 +122,8 @@ public class SliCitationPublishService {
               activeCitation.getTargetYearOfPublication(), target.get().getYearOfPublication())) {
         log.atInfo()
             .addKeyValue(
+                LoggingKeys.SOURCE_DOCUMENT_NUMBER, activeCitation.getSource().getDocumentNumber())
+            .addKeyValue(
                 "activeCitation.targetDocumentNumber", activeCitation.getTargetDocumentNumber())
             .addKeyValue("activeCitation.targetAuthor", activeCitation.getTargetAuthor())
             .addKeyValue("activeCitation.targetBookTitle", activeCitation.getTargetBookTitle())
@@ -102,7 +134,8 @@ public class SliCitationPublishService {
             .addKeyValue("target.author", target.get().getAuthor())
             .addKeyValue("target.bookTitle", target.get().getBookTitle())
             .addKeyValue("target.yearOfPublication", target.get().getYearOfPublication())
-            .setMessage("Difference between active citation and target")
+            .setMessage(
+                "Metadata divergence detected between caselaw active citation and target sli document.")
             .log();
       }
     }
