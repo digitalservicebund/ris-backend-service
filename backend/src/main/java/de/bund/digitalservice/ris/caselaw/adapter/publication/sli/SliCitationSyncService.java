@@ -106,25 +106,25 @@ public class SliCitationSyncService {
                             "Updating metadata of matching passive citation due to changes in SLI document.")
                         .log();
                     matchingPassiveCitation.get().setSourceId(sli.getId());
-                    matchingPassiveCitation.get().setSourceDocumentNumber(sli.getDocumentNumber());
-                    matchingPassiveCitation.get().setSourceAuthor(sli.getAuthor());
-                    matchingPassiveCitation.get().setSourceBookTitle(sli.getBookTitle());
-                    matchingPassiveCitation
-                        .get()
-                        .setSourceYearOfPublication(sli.getYearOfPublication());
+                    // matchingPassiveCitation.get().setSourceDocumentNumber(sli.getDocumentNumber());
+                    // matchingPassiveCitation.get().setSourceAuthor(sli.getAuthor());
+                    // matchingPassiveCitation.get().setSourceBookTitle(sli.getBookTitle());
+                    // matchingPassiveCitation
+                    //    .get()
+                    //    .setSourceYearOfPublication(sli.getYearOfPublication());
 
                     documentationUnitRepository.save(targetDecision);
 
                     documentsToRepublish.add(targetDecision.getId());
                   }
                 } else {
-                  targetDecision
-                      .getPassiveSliCitations()
-                      .add(
-                          createMatchingPassiveCitation(
-                              targetDecision,
-                              sli,
-                              targetDecision.getPassiveCaselawCitations().size() + 1));
+                  /*targetDecision
+                  .getPassiveSliCitations()
+                  .add(
+                      createMatchingPassiveCitation(
+                          targetDecision,
+                          sli,
+                          targetDecision.getPassiveCaselawCitations().size() + 1));*/
 
                   log.atInfo()
                       .addKeyValue(LoggingKeys.SOURCE_DOCUMENT_NUMBER, sli.getDocumentNumber())
@@ -136,7 +136,7 @@ public class SliCitationSyncService {
                           "DISABLED: Creating missing passive citation for published active citation in ADM document.")
                       .log();
 
-                  documentationUnitRepository.save(targetDecision);
+                  // documentationUnitRepository.save(targetDecision);
 
                   documentsToRepublish.add(targetDecision.getId());
                 }
@@ -252,7 +252,7 @@ public class SliCitationSyncService {
             revokedSli.getDocUnitId());
 
     for (DecisionDTO decision : documentsWithPassive) {
-      boolean removed =
+      /* boolean removed =
           decision
               .getPassiveSliCitations()
               .removeIf(
@@ -260,22 +260,22 @@ public class SliCitationSyncService {
                       p.getSourceId() != null && revokedSli.getDocUnitId().equals(p.getSourceId()));
 
       if (removed) {
-        documentationUnitRepository.save(decision);
-        documentsToRepublish.add(decision.getId());
-        log.atInfo()
-            .addKeyValue(LoggingKeys.REVOKED_SLI, revokedSli.getDocUnitId())
-            .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
-            .setMessage(
-                "Passive Citation to revoked SLI found and removed. Document added to republishing queue for validation in publish step.")
-            .log();
-      } else {
+        documentationUnitRepository.save(decision);*/
+      documentsToRepublish.add(decision.getId());
+      log.atInfo()
+          .addKeyValue(LoggingKeys.REVOKED_SLI, revokedSli.getDocUnitId())
+          .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
+          .setMessage(
+              "Passive Citation to revoked SLI found and removed. Document added to republishing queue for validation in publish step.")
+          .log();
+      /*} else {
         log.atError()
             .addKeyValue(LoggingKeys.REVOKED_SLI, revokedSli.getDocUnitId())
             .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
             .setMessage(
                 "No Passive Citation to revoked SLI couldn't be found and removed. This is inconsistent as the document was only found because it is supposed to have such a reference.")
             .log();
-      }
+      }*/
     }
 
     // active citations will be just republished. This removes the target id and document number

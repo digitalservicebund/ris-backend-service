@@ -265,7 +265,7 @@ public class AdmCitationSyncService {
             revokedAdm.getDocUnitId());
 
     for (DecisionDTO decision : documentsWithPassive) {
-      boolean removed =
+      /*boolean removed =
           decision
               .getPassiveAdmCitations()
               .removeIf(
@@ -273,22 +273,22 @@ public class AdmCitationSyncService {
                       p.getSourceId() != null && revokedAdm.getDocUnitId().equals(p.getSourceId()));
 
       if (removed) {
-        documentationUnitRepository.save(decision);
-        documentsToRepublish.add(decision.getId());
-        log.atInfo()
-            .addKeyValue(LoggingKeys.REVOKED_ADM, revokedAdm.getDocUnitId())
-            .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
-            .setMessage(
-                "Passive Citation to revoked ADM found and removed. Document added to republishing queue for validation in publish step.")
-            .log();
-      } else {
+        documentationUnitRepository.save(decision);*/
+      documentsToRepublish.add(decision.getId());
+      log.atInfo()
+          .addKeyValue(LoggingKeys.REVOKED_ADM, revokedAdm.getDocUnitId())
+          .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
+          .setMessage(
+              "Passive Citation to revoked ADM found and removed. Document added to republishing queue for validation in publish step.")
+          .log();
+      /*} else {
         log.atError()
             .addKeyValue(LoggingKeys.REVOKED_ADM, revokedAdm.getDocUnitId())
             .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
             .setMessage(
                 "No Passive Citation to revoked ADM couldn't be found and removed. This is inconsistent as the document was only found because it is supposed to have such a reference.")
             .log();
-      }
+      }*/
     }
 
     // active citations will be just republished. This removes the target id and document number

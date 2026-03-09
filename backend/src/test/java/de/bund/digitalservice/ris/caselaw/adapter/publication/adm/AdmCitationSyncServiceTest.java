@@ -234,6 +234,8 @@ class AdmCitationSyncServiceTest {
   class handleRevokedAfter {
 
     @Test
+    @Disabled(
+        "this tests the functionality including the updating of references, but at the moment we do not want to update any data yet")
     void shouldRemovePassiveCitationsWhenAdmIsRevoked() throws DocumentationUnitNotExistsException {
       UUID revokedUuid = UUID.randomUUID();
       Instant now = Instant.now();

@@ -28,6 +28,7 @@ import java.util.Random;
 import java.util.UUID;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,8 @@ class SliPassiveCitationSyncJobIntegrationTest extends BaseIntegrationTest {
   @Test
   @Sql(scripts = "classpath:sli_ref_view_init.sql")
   @Transactional
+  @Disabled(
+      "this tests the functionality including the updating of references, but at the moment we do not want to update any data yet")
   void testRun() {
     TestTransaction.end();
     jobSyncStatusRepository.save(
