@@ -176,7 +176,8 @@ public class AdmCitationSyncService {
                 return passiveCitation.getSourceId().equals(admUuid)
                     && Objects.equals(
                         Optional.ofNullable(passiveCitation.getCitationType())
-                            .map(CitationTypeDTO::getAbbreviation),
+                            .map(CitationTypeDTO::getAbbreviation)
+                            .or(() -> Optional.ofNullable(passiveCitation.getCitationTypeRaw())),
                         Optional.ofNullable(citationType));
               }
 
