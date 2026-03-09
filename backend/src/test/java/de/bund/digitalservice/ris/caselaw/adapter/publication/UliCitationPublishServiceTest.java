@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationPublishService;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,12 +57,14 @@ public class UliCitationPublishServiceTest {
 
       assertThat(memoryAppender.count(Level.WARN)).isEqualTo(1L);
       assertThat(memoryAppender.getMessage(Level.WARN, 0))
-          .contains("Unlinking passive citation: target ULI document not found in database.");
+          .contains("Unlinking passive citation: source ULI document not found in database.");
 
       memoryAppender.detachLoggingTestAppender();
     }
 
     @Test
+    @Disabled(
+        "Currently enrichment is disabled in UliCitationPublishService; only metadata divergence is logged. Re-enable once the service updates the DTO fields again.")
     void shouldFindUliByDocumentNumberIfIdMatchesNothing() {
       UUID unknownId = UUID.randomUUID();
       UUID foundId = UUID.randomUUID();
@@ -69,6 +72,7 @@ public class UliCitationPublishServiceTest {
           PassiveCitationUliDTO.builder()
               .sourceId(unknownId)
               .sourceLiteratureDocumentNumber("ULI-123")
+              .target(DecisionDTO.builder().documentNumber("CASELAW-123").build())
               .build();
 
       UliDTO uli =
@@ -87,6 +91,8 @@ public class UliCitationPublishServiceTest {
     }
 
     @Test
+    @Disabled(
+        "Currently enrichment is disabled in UliCitationPublishService; only metadata divergence is logged. Re-enable once the service updates the DTO fields again.")
     void shouldEnrichPassiveCitationWhenUliIsFound() {
       var memoryAppender = new TestMemoryAppender(UliCitationPublishService.class);
       UUID uliId = UUID.randomUUID();

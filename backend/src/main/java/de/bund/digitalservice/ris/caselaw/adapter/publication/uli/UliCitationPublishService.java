@@ -26,32 +26,60 @@ public class UliCitationPublishService {
   public Optional<PassiveCitationUliDTO> updatePassiveUliCitationWithInformationFromSource(
       PassiveCitationUliDTO passiveCitation) {
 
-    Optional<UliDTO> uliRefOptional = Optional.empty();
+    Optional<UliDTO> uliOptional = Optional.empty();
     if (passiveCitation.getSourceId() != null) {
-      uliRefOptional = databaseUliRepository.findById(passiveCitation.getSourceId());
+      uliOptional = databaseUliRepository.findById(passiveCitation.getSourceId());
     }
 
-    if (uliRefOptional.isEmpty() && passiveCitation.getSourceLiteratureDocumentNumber() != null) {
-      uliRefOptional =
+    if (uliOptional.isEmpty() && passiveCitation.getSourceLiteratureDocumentNumber() != null) {
+      uliOptional =
           databaseUliRepository.findByDocumentNumber(
               passiveCitation.getSourceLiteratureDocumentNumber());
     }
-    if (uliRefOptional.isPresent()) {
-      var uliRef = uliRefOptional.get();
+    if (uliOptional.isPresent()) {
 
-      // Enrichment
-      passiveCitation.setSourceId(uliRef.getId());
-      passiveCitation.setSourceLiteratureDocumentNumber(uliRef.getDocumentNumber());
-      passiveCitation.setSourceAuthor(uliRef.getAuthor());
-      passiveCitation.setSourceCitation(uliRef.getCitation());
-      passiveCitation.setSourceDocumentTypeRawValue(uliRef.getDocumentTypeRawValue());
-      passiveCitation.setSourceLegalPeriodicalRawValue(uliRef.getLegalPeriodicalRawValue());
+      // for now, we only log the metadata divergence, later we enrich the passive citation
+      var target = uliOptional.get();
+      //      passiveCitation.setSourceId(target.getId());
+      //      passiveCitation.setSourceLiteratureDocumentNumber(target.getDocumentNumber());
+      //      passiveCitation.setSourceAuthor(target.getAuthor());
+      //      passiveCitation.setSourceCitation(target.getCitation());
+      //      passiveCitation.setSourceDocumentTypeRawValue(target.getDocumentTypeRawValue());
+      //      passiveCitation.setSourceLegalPeriodicalRawValue(target.getLegalPeriodicalRawValue());
 
-      log.atInfo()
-          .addKeyValue(LoggingKeys.SOURCE_DOCUMENT_NUMBER, uliRef.getDocumentNumber())
-          .addKeyValue("passiveCitationId", passiveCitation.getId())
-          .setMessage("Enriched passive citation with metadata from ULI source document.")
-          .log();
+      //        log.atInfo()
+      //                .addKeyValue(LoggingKeys.SOURCE_DOCUMENT_NUMBER, target.getDocumentNumber())
+      //                .addKeyValue("passiveCitationId", passiveCitation.getId())
+      //                .setMessage("Enriched passive citation with metadata from ULI source
+      // document.")
+      //                .log();
+
+      if (!Objects.equals(passiveCitation.getSourceCitation(), target.getCitation())
+          || !Objects.equals(passiveCitation.getSourceCitation(), target.getAuthor())
+          || !Objects.equals(
+              passiveCitation.getSourceLegalPeriodicalRawValue(),
+              target.getLegalPeriodicalRawValue())) {
+
+        log.atInfo()
+            .addKeyValue(
+                LoggingKeys.SOURCE_DOCUMENT_NUMBER, passiveCitation.getTarget().getDocumentNumber())
+            .addKeyValue(
+                "activeCitation.sourceLiteratureDocumentNumber",
+                passiveCitation.getSourceLiteratureDocumentNumber())
+            .addKeyValue("target.documentNumber", target.getDocumentNumber())
+            .addKeyValue("activeCitation.sourceAuthor", passiveCitation.getSourceAuthor())
+            .addKeyValue("target.author", target.getAuthor())
+            .addKeyValue("passiveCitation.sourceCitation", passiveCitation.getSourceCitation())
+            .addKeyValue("target.citation", target.getCitation())
+            .addKeyValue(
+                "passiveCitation.sourceLegalPeriodicalRawValue",
+                passiveCitation.getSourceLegalPeriodicalRawValue())
+            .addKeyValue("target.legalPeriodicalRawValue", target.getLegalPeriodicalRawValue())
+            .setMessage(
+                "Metadata divergence detected between caselaw passive citation and source uli document.")
+            .log();
+      }
+
     } else {
       log.atWarn()
           .addKeyValue(
@@ -60,7 +88,7 @@ public class UliCitationPublishService {
           .addKeyValue("sourceId", passiveCitation.getSourceId())
           .addKeyValue(
               "missingSourceUliDocumentNumber", passiveCitation.getSourceLiteratureDocumentNumber())
-          .setMessage("Unlinking passive citation: target ULI document not found in database.")
+          .setMessage("Unlinking passive citation: source ULI document not found in database.")
           .log();
 
       passiveCitation.setSourceId(null);
@@ -81,12 +109,38 @@ public class UliCitationPublishService {
         databaseUliRepository.findByDocumentNumber(
             activeCitation.getTargetLiteratureDocumentNumber());
     if (uliOptional.isPresent()) {
-      // for now, we only log the metadata divergence
-      // var uliRef = uliOptional.get();
-      // activeCitation.setTargetCitation(uliRef.getCitation());
-      // activeCitation.setTargetAuthor(uliRef.getAuthor());
-      // activeCitation.setTargetLegalPeriodicalRawValue(uliRef.getLegalPeriodicalRawValue());
-      checkAndLogMetadataDivergence(activeCitation, uliOptional.get());
+      // for now, we only log the metadata divergence, later we enrich the active citation
+      var target = uliOptional.get();
+      // activeCitation.setTargetCitation(target.getCitation());
+      // activeCitation.setTargetAuthor(target.getAuthor());
+      // activeCitation.setTargetLegalPeriodicalRawValue(target.getLegalPeriodicalRawValue());
+
+      if (!Objects.equals(activeCitation.getTargetCitation(), target.getCitation())
+          || !Objects.equals(activeCitation.getTargetAuthor(), target.getAuthor())
+          || !Objects.equals(
+              activeCitation.getTargetLegalPeriodicalRawValue(),
+              target.getLegalPeriodicalRawValue())) {
+
+        log.atInfo()
+            .addKeyValue(
+                LoggingKeys.SOURCE_DOCUMENT_NUMBER, activeCitation.getSource().getDocumentNumber())
+            .addKeyValue(
+                "activeCitation.targetLiteratureDocumentNumber",
+                activeCitation.getTargetLiteratureDocumentNumber())
+            .addKeyValue("target.documentNumber", target.getDocumentNumber())
+            .addKeyValue("activeCitation.targetAuthor", activeCitation.getTargetAuthor())
+            .addKeyValue("target.author", target.getAuthor())
+            .addKeyValue("activeCitation.targetCitation", activeCitation.getTargetCitation())
+            .addKeyValue("target.citation", target.getCitation())
+            .addKeyValue(
+                "activeCitation.targetLegalPeriodicalRawValue",
+                activeCitation.getTargetLegalPeriodicalRawValue())
+            .addKeyValue("target.legalPeriodicalRawValue", target.getLegalPeriodicalRawValue())
+            .setMessage(
+                "Metadata divergence detected between caselaw active citation and target uli document.")
+            .log();
+      }
+
     } else {
       log.atInfo()
           .addKeyValue(
@@ -95,35 +149,10 @@ public class UliCitationPublishService {
               "missingTargetUliDocumentNumber", activeCitation.getTargetLiteratureDocumentNumber())
           .setMessage("Unlinking active citation: target ULI document not found in database.")
           .log();
+      activeCitation.setTargetId(null);
       activeCitation.setTargetLiteratureDocumentNumber(null);
     }
 
     return activeCitation;
-  }
-
-  private void checkAndLogMetadataDivergence(ActiveCitationUliDTO active, UliDTO target) {
-    if (!Objects.equals(active.getTargetCitation(), target.getCitation())
-        || !Objects.equals(active.getTargetAuthor(), target.getAuthor())
-        || !Objects.equals(
-            active.getTargetLegalPeriodicalRawValue(), target.getLegalPeriodicalRawValue())) {
-
-      log.atInfo()
-          .addKeyValue(LoggingKeys.SOURCE_DOCUMENT_NUMBER, active.getSource().getDocumentNumber())
-          .addKeyValue(
-              "activeCitation.targetLiteratureDocumentNumber",
-              active.getTargetLiteratureDocumentNumber())
-          .addKeyValue("target.documentNumber", target.getDocumentNumber())
-          .addKeyValue("activeCitation.targetAuthor", active.getTargetAuthor())
-          .addKeyValue("target.author", target.getAuthor())
-          .addKeyValue("activeCitation.targetCitation", active.getTargetCitation())
-          .addKeyValue("target.citation", target.getCitation())
-          .addKeyValue(
-              "activeCitation.targetLegalPeriodicalRawValue",
-              active.getTargetLegalPeriodicalRawValue())
-          .addKeyValue("target.legalPeriodicalRawValue", target.getLegalPeriodicalRawValue())
-          .setMessage(
-              "Metadata divergence detected between caselaw active citation and target uli document.")
-          .log();
-    }
   }
 }
