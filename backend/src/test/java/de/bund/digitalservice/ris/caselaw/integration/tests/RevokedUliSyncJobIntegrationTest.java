@@ -31,6 +31,7 @@ import java.util.Random;
 import java.util.UUID;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +78,8 @@ class UliRevokedSyncJobIntegrationTest extends BaseIntegrationTest {
 
   @Test
   @Transactional
+  @Disabled(
+      "This tests the functionality including the updating of references, but at the moment we do not want to update any data yet")
   void
       handleRevokedAfter_withAffectedPassiveCitations_shouldRemovePassiveCitationsAndTriggerRepublish() {
     TestTransaction.end();
@@ -123,7 +126,7 @@ class UliRevokedSyncJobIntegrationTest extends BaseIntegrationTest {
 
     Instant beforeSync = Instant.now();
 
-    syncJob.runRevokedSync();
+    syncJob.runSync();
 
     var statusAfterSync = jobSyncStatusRepository.findById(SyncJob.ULI_REVOKED_SYNC.getName());
     assertThat(statusAfterSync).isNotEmpty();
@@ -191,7 +194,7 @@ class UliRevokedSyncJobIntegrationTest extends BaseIntegrationTest {
 
     Instant beforeSync = Instant.now();
 
-    syncJob.runRevokedSync();
+    syncJob.runSync();
 
     var statusAfterSync = jobSyncStatusRepository.findById(SyncJob.ULI_REVOKED_SYNC.getName());
     assertThat(statusAfterSync).isNotEmpty();

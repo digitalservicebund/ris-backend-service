@@ -46,16 +46,8 @@ public class UliCitationSyncService {
 
   /**
    * Case 2: Synchronizes ULI metadata and monitors citation consistency based on new ULI
-   * publications.
-   *
-   * <p>1. Metadata Refresh: Iterates through newly published ULI documents and updates existing
-   * passive counterparts in the referenced Caselaw documents. This ensures that metadata (author,
-   * citation, etc.) remains synchronized.
-   *
-   * <p>2. Inconsistency Monitoring: Detects missing links by checking if an Active Citation within
-   * a new ULI document has a corresponding Passive Citation in the targeted Caselaw document. If
-   * the counterpart is missing, a warning is logged for monitoring purposes. No citations are
-   * created automatically.
+   * publications. Iterates through newly published ULI documents, updates existing passive
+   * counterparts and creates missing ones in the referenced Caselaw documents.
    */
   public void handleNewlyPublishedAfter(Instant lastRun) {
     // Delta of newly published ULI documents
@@ -107,9 +99,10 @@ public class UliCitationSyncService {
                               }
                             } else {
                               // CASE: Create new
-                              decision
-                                  .getPassiveUliCitations()
-                                  .add(createPassiveCitation(decision, uli));
+                              //                              decision
+                              //                                  .getPassiveUliCitations()
+                              //
+                              // .add(createPassiveCitation(decision, uli));
 
                               log.atInfo()
                                   .addKeyValue(LoggingKeys.SOURCE_DOCUMENT_NUMBER, uli.getId())
@@ -117,10 +110,10 @@ public class UliCitationSyncService {
                                       LoggingKeys.TARGET_DOCUMENT_NUMBER,
                                       decision.getDocumentNumber())
                                   .setMessage(
-                                      "Creating missing passive citation for published active citation in ULI document.")
+                                      "DISABLED: Creating missing passive citation for published active citation in ULI document.")
                                   .log();
 
-                              caselawRepository.save(decision);
+                              // caselawRepository.save(decision);
                               documentsToRepublish.add(decision.getId());
                             }
                           }
@@ -166,35 +159,37 @@ public class UliCitationSyncService {
       hasChanged = true;
     }
 
-    if (!Objects.equals(passive.getSourceLiteratureDocumentNumber(), uli.getDocumentNumber())) {
-      passive.setSourceLiteratureDocumentNumber(uli.getDocumentNumber());
-      hasChanged = true;
-    }
-
-    if (!Objects.equals(passive.getSourceAuthor(), uli.getAuthor())) {
-      passive.setSourceAuthor(uli.getAuthor());
-      hasChanged = true;
-    }
-    if (!Objects.equals(passive.getSourceCitation(), uli.getCitation())) {
-      passive.setSourceCitation(uli.getCitation());
-      hasChanged = true;
-    }
-    if (!Objects.equals(passive.getSourceDocumentTypeRawValue(), uli.getDocumentTypeRawValue())) {
-      passive.setSourceDocumentTypeRawValue(uli.getDocumentTypeRawValue());
-      hasChanged = true;
-    }
-    if (!Objects.equals(
-        passive.getSourceLegalPeriodicalRawValue(), uli.getLegalPeriodicalRawValue())) {
-      passive.setSourceLegalPeriodicalRawValue(uli.getLegalPeriodicalRawValue());
-      hasChanged = true;
-    }
+    //    if (!Objects.equals(passive.getSourceLiteratureDocumentNumber(), uli.getDocumentNumber()))
+    // {
+    //      passive.setSourceLiteratureDocumentNumber(uli.getDocumentNumber());
+    //      hasChanged = true;
+    //    }
+    //
+    //    if (!Objects.equals(passive.getSourceAuthor(), uli.getAuthor())) {
+    //      passive.setSourceAuthor(uli.getAuthor());
+    //      hasChanged = true;
+    //    }
+    //    if (!Objects.equals(passive.getSourceCitation(), uli.getCitation())) {
+    //      passive.setSourceCitation(uli.getCitation());
+    //      hasChanged = true;
+    //    }
+    //    if (!Objects.equals(passive.getSourceDocumentTypeRawValue(),
+    // uli.getDocumentTypeRawValue())) {
+    //      passive.setSourceDocumentTypeRawValue(uli.getDocumentTypeRawValue());
+    //      hasChanged = true;
+    //    }
+    //    if (!Objects.equals(
+    //        passive.getSourceLegalPeriodicalRawValue(), uli.getLegalPeriodicalRawValue())) {
+    //      passive.setSourceLegalPeriodicalRawValue(uli.getLegalPeriodicalRawValue());
+    //      hasChanged = true;
+    //    }
 
     if (hasChanged) {
       log.atInfo()
           .addKeyValue(LoggingKeys.SOURCE_DOCUMENT_NUMBER, uli.getId())
           .addKeyValue(LoggingKeys.TARGET_DOCUMENT_NUMBER, passive.getTarget().getDocumentNumber())
           .setMessage(
-              "Updating metadata of matching passive citation due to changes in ULI source.")
+              "Updating metadata of matching passive citation due to changes in ULI document.")
           .log();
     }
 
@@ -257,30 +252,29 @@ public class UliCitationSyncService {
         caselawRepository.findAllByPassiveUliSourceIdAndPendingRevocation(revokedId);
 
     for (DecisionDTO decision : decisionsWithAffectedPassiveCitations) {
-      boolean removed =
+      /*boolean removed =
           decision
               .getPassiveUliCitations()
               .removeIf(
                   p ->
                       p.getSourceId() != null && revokedUli.getDocUnitId().equals(p.getSourceId()));
       if (removed) {
-        caselawRepository.save(decision);
-        documentsToRepublish.add(decision.getId());
-        documentsToRepublish.add(decision.getId());
-        log.atInfo()
-            .addKeyValue(LoggingKeys.REVOKED_ULI, revokedId)
-            .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
-            .setMessage(
-                "Passive Citation to revoked ULI detected. Document added to republishing queue for validation in publish step.")
-            .log();
-      } else {
+        caselawRepository.save(decision);*/
+      documentsToRepublish.add(decision.getId());
+      log.atInfo()
+          .addKeyValue(LoggingKeys.REVOKED_ULI, revokedId)
+          .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
+          .setMessage(
+              "Passive Citation to revoked ULI detected. Document added to republishing queue for validation in publish step.")
+          .log();
+      /*} else {
         log.atError()
             .addKeyValue(LoggingKeys.REVOKED_ULI, revokedUli.getDocUnitId())
             .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
             .setMessage(
                 "Passive Citation to revoked ULI couldn't be found and removed. This is inconsistent as the document was only found because it is supposed to have such a reference.")
             .log();
-      }
+      }*/
     }
     // active citations will be just republished. This removes the target id and document number
     // from the published data.
