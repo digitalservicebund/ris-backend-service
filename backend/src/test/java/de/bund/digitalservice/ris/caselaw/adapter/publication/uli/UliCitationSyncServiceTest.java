@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication.uli;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +35,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @ExtendWith(SpringExtension.class)
 @Import({UliCitationSyncService.class})
@@ -46,6 +51,17 @@ public class UliCitationSyncServiceTest {
   @MockitoBean JobSyncStatusRepository jobSyncStatusRepository;
   @MockitoBean ActiveCitationUliCaselawRepository activeCitationUliCaselawRepository;
   @MockitoBean PortalPublicationService portalPublicationService;
+  @MockitoBean TransactionTemplate transactionTemplate = new TransactionTemplate();
+
+  @BeforeEach
+  void beforeEach() {
+    when(transactionTemplate.execute(any()))
+        .thenAnswer(
+            invocation ->
+                invocation
+                    .<TransactionCallback<List<UUID>>>getArgument(0)
+                    .doInTransaction(mock(TransactionStatus.class)));
+  }
 
   @Nested
   class handleUliPassiveSync {
