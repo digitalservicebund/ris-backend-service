@@ -46,6 +46,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
@@ -56,6 +57,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.LdmlTransformationResult;
@@ -133,6 +135,7 @@ class DocumentationUnitControllerTest {
   @MockitoBean DatabaseDocumentationOfficeRepository officeRepository;
   @MockitoBean private PatchMapperService patchMapperService;
   @MockitoBean private ProcedureService procedureService;
+  @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
   @MockitoBean private OidcUser oidcUser;
   @MockitoBean private UserGroupService userGroupService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
@@ -1603,6 +1606,7 @@ class DocumentationUnitControllerTest {
           .isNotFound();
 
       verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID, null);
+      verify(historyLogService, never()).saveHistoryLog(any(), any(), any(), any());
     }
 
     @Test
@@ -1622,6 +1626,12 @@ class DocumentationUnitControllerTest {
           .isBadRequest();
 
       verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID, null);
+      verify(historyLogService)
+          .saveHistoryLog(
+              TEST_UUID,
+              null,
+              HistoryLogEventType.PORTAL_PUBLICATION,
+              "Dokeinheit konnte nicht im Portal veröffentlicht werden");
     }
 
     @Test
@@ -1641,6 +1651,12 @@ class DocumentationUnitControllerTest {
           .is5xxServerError();
 
       verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID, null);
+      verify(historyLogService)
+          .saveHistoryLog(
+              TEST_UUID,
+              null,
+              HistoryLogEventType.PORTAL_PUBLICATION,
+              "Dokeinheit konnte nicht im Portal veröffentlicht werden");
     }
 
     @Test

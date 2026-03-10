@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -14,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
@@ -21,24 +23,34 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "active_citation_adm", schema = "incremental_migration")
-public class ActiveCitationAdministrativeRegulationDTO {
+@Table(name = "passive_citation_adm", schema = "incremental_migration")
+@ToString(onlyExplicitlyIncluded = true)
+public class PassiveCitationAdmDTO {
+  @GeneratedValue
   @Id
   @Column(name = "id", nullable = false)
+  @ToString.Include
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "source_id")
-  private DocumentationUnitDTO source;
+  @JoinColumn(name = "target_id")
+  private DecisionDTO target;
 
-  @Column(name = "target_document_number")
-  private String targetDocumentNumber;
+  @Column(name = "source_id")
+  @ToString.Include
+  private UUID sourceId;
+
+  @Column(name = "source_document_number")
+  @ToString.Include
+  private String sourceDocumentNumber;
 
   @NotNull
-  @Column(name = "target_directive", nullable = false)
-  private String targetDirective;
+  @Column(name = "source_directive", nullable = false)
+  @ToString.Include
+  private String sourceDirective;
 
   @Column(name = "citation")
+  @ToString.Include
   private String citation;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -46,6 +58,7 @@ public class ActiveCitationAdministrativeRegulationDTO {
   private CitationTypeDTO citationType;
 
   @Column(name = "citation_type_raw")
+  @ToString.Include
   private String citationTypeRaw;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -53,6 +66,7 @@ public class ActiveCitationAdministrativeRegulationDTO {
   private LegalPeriodicalDTO legalPeriodical;
 
   @Column(name = "legal_periodical_raw")
+  @ToString.Include
   private String legalPeriodicalRaw;
 
   @NotNull

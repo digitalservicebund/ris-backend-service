@@ -34,11 +34,14 @@ public class ActiveCitationUliDTO {
 
   @Id @GeneratedValue @EqualsAndHashCode.Exclude private UUID id;
 
-  @NonNull
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "source_id", nullable = false)
   @EqualsAndHashCode.Exclude
   private DecisionDTO source;
+
+  @Nullable
+  @Column(name = "target_id")
+  private UUID targetId;
 
   @Nullable
   @Column(name = "target_literature_document_number")

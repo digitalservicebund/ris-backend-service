@@ -18,6 +18,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
@@ -29,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverNotAllowedException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Kind;
@@ -98,6 +100,7 @@ public class DocumentationUnitController {
   private final ConverterService converterService;
   private final HandoverService handoverService;
   private final PortalPublicationService portalPublicationService;
+  private final DocumentationUnitHistoryLogService historyLogService;
   private final DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
   private final DuplicateCheckService duplicateCheckService;
@@ -116,7 +119,8 @@ public class DocumentationUnitController {
           documentationUnitDocxMetadataInitializationService,
       DuplicateCheckService duplicateCheckService,
       EurLexSOAPSearchService eurLexSOAPSearchService,
-      AttachmentRepository attachmentRepository) {
+      AttachmentRepository attachmentRepository,
+      DocumentationUnitHistoryLogService historyLogService) {
     this.service = service;
     this.userService = userService;
     this.attachmentService = attachmentService;
@@ -129,6 +133,7 @@ public class DocumentationUnitController {
     this.eurLexSOAPSearchService = eurLexSOAPSearchService;
     this.abstractService = abstractService;
     this.attachmentRepository = attachmentRepository;
+    this.historyLogService = historyLogService;
   }
 
   /**
@@ -748,10 +753,13 @@ public class DocumentationUnitController {
   @PreAuthorize("@userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<ManualPortalPublicationResult> publishDocumentationUnit(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
+
     User user = userService.getUser(oidcUser);
+
     try {
       var result = portalPublicationService.publishDocumentationUnitWithChangelog(uuid, user);
       return ResponseEntity.ok(result);
+
     } catch (DocumentationUnitNotExistsException e) {
       log.atError()
           .setMessage("Could not find documentation unit to publish to portal")
@@ -759,6 +767,14 @@ public class DocumentationUnitController {
           .addKeyValue("id", uuid)
           .log();
       return ResponseEntity.notFound().build();
+
+    } catch (Exception e) {
+      historyLogService.saveHistoryLog(
+          uuid,
+          user,
+          HistoryLogEventType.PORTAL_PUBLICATION,
+          "Dokeinheit konnte nicht im Portal veröffentlicht werden");
+      throw e;
     }
   }
 

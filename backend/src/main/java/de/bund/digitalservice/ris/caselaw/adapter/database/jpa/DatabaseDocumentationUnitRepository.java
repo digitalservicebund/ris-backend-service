@@ -73,4 +73,70 @@ SELECT d.documentNumber FROM DocumentationUnitDTO d
       value =
           "SELECT d.id FROM DocumentationUnitDTO d WHERE d.status.publicationStatus = :publicationStatus ORDER BY d.status.createdAt DESC")
   List<UUID> findAllByStatus(PublicationStatus publicationStatus, Pageable page);
+
+  @Query(
+      "SELECT DISTINCT d FROM DecisionDTO d "
+          + "JOIN d.passiveUliCitations p "
+          + "JOIN RevokedUli r ON p.sourceId = r.docUnitId "
+          + "WHERE r.docUnitId = :revokedId "
+          + "AND NOT EXISTS (SELECT s FROM PublishedDocumentationSnapshotEntity s "
+          + "                WHERE s.documentationUnitId = d.id "
+          + "                AND s.publishedAt >= r.revokedAt)")
+  List<DecisionDTO> findAllByPassiveUliSourceIdAndPendingRevocation(
+      @Param("revokedId") UUID revokedId);
+
+  @Query(
+      "SELECT DISTINCT d FROM DecisionDTO d "
+          + "JOIN d.activeUliCitations a "
+          + "JOIN RevokedUli r ON a.targetId = r.docUnitId "
+          + "WHERE r.docUnitId = :revokedId "
+          + "AND NOT EXISTS (SELECT s FROM PublishedDocumentationSnapshotEntity s "
+          + "                WHERE s.documentationUnitId = d.id "
+          + "                AND s.publishedAt >= r.revokedAt)")
+  List<DecisionDTO> findAllByActiveUliTargetIdAndPendingRevocation(
+      @Param("revokedId") UUID revokedId);
+
+  @Query(
+      "SELECT DISTINCT d FROM DecisionDTO d "
+          + "JOIN d.passiveAdmCitations p "
+          + "JOIN RevokedAdm r ON p.sourceId = r.docUnitId "
+          + "WHERE r.docUnitId = :revokedId "
+          + "AND NOT EXISTS (SELECT s FROM PublishedDocumentationSnapshotEntity s "
+          + "                WHERE s.documentationUnitId = d.id "
+          + "                AND s.publishedAt >= r.revokedAt)")
+  List<DecisionDTO> findAllByPassiveAdmSourceIdAndPendingRevocation(
+      @Param("revokedId") UUID revokedId);
+
+  @Query(
+      "SELECT DISTINCT d FROM DecisionDTO d "
+          + "JOIN d.activeAdmCitations a "
+          + "JOIN RevokedAdm r ON a.targetId = r.docUnitId "
+          + "WHERE r.docUnitId = :revokedId "
+          + "AND NOT EXISTS (SELECT s FROM PublishedDocumentationSnapshotEntity s "
+          + "                WHERE s.documentationUnitId = d.id "
+          + "                AND s.publishedAt >= r.revokedAt)")
+  List<DecisionDTO> findAllByActiveAdmTargetIdAndPendingRevocation(
+      @Param("revokedId") UUID revokedId);
+
+  @Query(
+      "SELECT DISTINCT d FROM DecisionDTO d "
+          + "JOIN d.passiveSliCitations p "
+          + "JOIN RevokedSli r ON p.sourceId = r.docUnitId "
+          + "WHERE r.docUnitId = :revokedId "
+          + "AND NOT EXISTS (SELECT s FROM PublishedDocumentationSnapshotEntity s "
+          + "                WHERE s.documentationUnitId = d.id "
+          + "                AND s.publishedAt >= r.revokedAt)")
+  List<DecisionDTO> findAllByPassiveSliSourceIdAndPendingRevocation(
+      @Param("revokedId") UUID revokedId);
+
+  @Query(
+      "SELECT DISTINCT d FROM DecisionDTO d "
+          + "JOIN d.activeSliCitations a "
+          + "JOIN RevokedSli r ON a.targetId = r.docUnitId "
+          + "WHERE r.docUnitId = :revokedId "
+          + "AND NOT EXISTS (SELECT s FROM PublishedDocumentationSnapshotEntity s "
+          + "                WHERE s.documentationUnitId = d.id "
+          + "                AND s.publishedAt >= r.revokedAt)")
+  List<DecisionDTO> findAllByActiveSliTargetIdAndPendingRevocation(
+      @Param("revokedId") UUID revokedId);
 }

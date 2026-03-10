@@ -6,10 +6,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
+import ch.qos.logback.classic.Level;
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
+import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.adapter.CaselawExceptionHandler;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationCaselawDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationUliCaselawRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationUliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentInlineDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseAttachmentInlineRepository;
@@ -24,10 +29,15 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobSyncStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationUliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedDocumentationSnapshotEntity;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublishedDocumentationSnapshotRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationPublishService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationSyncService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -48,6 +58,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +67,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -94,6 +106,14 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
 
   @MockitoBean(name = "portalS3Client")
   private S3Client s3Client;
+
+  @MockitoBean private ActiveCitationUliCaselawRepository activeCitationUliCaselawRepository;
+
+  @MockitoBean private RevokedUliRepository revokedUliRepository;
+
+  @MockitoBean private JobSyncStatusRepository jobSyncStatusRepository;
+
+  @MockitoBean private UliCitationSyncService uliCitationSyncService;
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;
@@ -762,6 +782,190 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
               assertThat(historyLog.getDescription())
                   .isEqualTo("Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
             });
+  }
+
+  @Nested
+  @Sql(scripts = {"classpath:uli_ref_view_init.sql"})
+  @Sql(
+      scripts = {"classpath:uli_ref_view_cleanup.sql"},
+      executionPhase = AFTER_TEST_METHOD)
+  class UliCitationPublishing {
+
+    @Test
+    @Transactional
+    void publishUliActiveCitation_shouldLogMetadataDivergenceWhenUliIsFound() {
+      var memoryAppender = new TestMemoryAppender(UliCitationPublishService.class);
+      TestTransaction.end();
+
+      UUID userId = UUID.randomUUID();
+      UUID uliId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+
+      var dto =
+          EntityBuilderTestUtil.createAndSaveDecision(
+              repository,
+              buildValidDocumentationUnit()
+                  .activeUliCitations(
+                      List.of(
+                          ActiveCitationUliDTO.builder()
+                              .targetId(uliId)
+                              .targetLiteratureDocumentNumber("ULI-TEST-1")
+                              .targetAuthor("divergent author")
+                              .targetCitation("divergent citation")
+                              .rank(1)
+                              .build())));
+
+      risWebTestClient
+          .withDefaultLogin(userId)
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+          .exchange()
+          .expectStatus()
+          .isOk();
+
+      assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1L);
+      assertThat(memoryAppender.getMessage(Level.INFO, 0))
+          .contains(
+              "Metadata divergence detected between caselaw active citation and target uli document.");
+
+      // DB remains unchanged (transient enrichment only)
+      TestTransaction.start();
+      var dbDto = (DecisionDTO) repository.findById(dto.getId()).orElseThrow();
+      assertThat(dbDto.getActiveUliCitations().getFirst().getTargetAuthor())
+          .isEqualTo("divergent author");
+      TestTransaction.end();
+
+      memoryAppender.detachLoggingTestAppender();
+    }
+
+    @Test
+    @Transactional
+    void publishUliActiveCitation_shouldLogAndUnlinkWhenUliIsNotFound() {
+      var memoryAppender = new TestMemoryAppender(UliCitationPublishService.class);
+      TestTransaction.end();
+
+      UUID userId = UUID.randomUUID();
+      var dto =
+          EntityBuilderTestUtil.createAndSaveDecision(
+              repository,
+              buildValidDocumentationUnit()
+                  .activeUliCitations(
+                      List.of(
+                          ActiveCitationUliDTO.builder()
+                              .targetLiteratureDocumentNumber("ULI-TEST-INVALID")
+                              .targetAuthor("divergent author")
+                              .targetCitation("divergent citation")
+                              .rank(1)
+                              .build())));
+
+      risWebTestClient
+          .withDefaultLogin(userId)
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+          .exchange()
+          .expectStatus()
+          .isOk();
+
+      assertThat(memoryAppender.getMessage(Level.INFO, 0))
+          .contains("Unlinking active citation: target ULI document not found in database.");
+
+      // DB remains unchanged - the DTO was unlinked in memory for LDML only
+      TestTransaction.start();
+      var dbDto = (DecisionDTO) repository.findById(dto.getId()).orElseThrow();
+      assertThat(dbDto.getActiveUliCitations().getFirst().getTargetLiteratureDocumentNumber())
+          .isEqualTo("ULI-TEST-INVALID");
+      TestTransaction.end();
+
+      memoryAppender.detachLoggingTestAppender();
+    }
+
+    @Test
+    @Transactional
+    void publishUliPassiveCitation_shouldLogMetadataDivergenceWhenUliIsFound() {
+      var memoryAppender = new TestMemoryAppender(UliCitationPublishService.class);
+      TestTransaction.end();
+
+      UUID userId = UUID.randomUUID();
+      UUID uliId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+
+      var dto =
+          EntityBuilderTestUtil.createAndSaveDecision(
+              repository,
+              buildValidDocumentationUnit()
+                  .passiveUliCitations(
+                      List.of(
+                          PassiveCitationUliDTO.builder()
+                              .sourceId(uliId)
+                              .sourceLiteratureDocumentNumber("ULI-TEST-1")
+                              .sourceAuthor("divergent author")
+                              .sourceCitation("divergent citation")
+                              .rank(1)
+                              .build())));
+
+      risWebTestClient
+          .withDefaultLogin(userId)
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+          .exchange()
+          .expectStatus()
+          .isOk();
+
+      // New logic: Case found -> Log Divergence instead of Enrichment
+      assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1L);
+      assertThat(memoryAppender.getMessage(Level.INFO, 0))
+          .contains(
+              "Metadata divergence detected between caselaw passive citation and source uli document.");
+
+      // DB remains unchanged
+      TestTransaction.start();
+      var dbDto = (DecisionDTO) repository.findById(dto.getId()).orElseThrow();
+      assertThat(dbDto.getPassiveUliCitations().getFirst().getSourceAuthor())
+          .isEqualTo("divergent author");
+      TestTransaction.end();
+
+      memoryAppender.detachLoggingTestAppender();
+    }
+
+    @Test
+    @Transactional
+    void publishUliPassiveCitation_shouldLogWarningAndUnlinkWhenUliIsNotFound() {
+      var memoryAppender = new TestMemoryAppender(UliCitationPublishService.class);
+      TestTransaction.end();
+
+      UUID userId = UUID.randomUUID();
+      var dto =
+          EntityBuilderTestUtil.createAndSaveDecision(
+              repository,
+              buildValidDocumentationUnit()
+                  .passiveUliCitations(
+                      List.of(
+                          PassiveCitationUliDTO.builder()
+                              .sourceLiteratureDocumentNumber("ULI-TEST-INVALID")
+                              .sourceAuthor("old author")
+                              .sourceCitation("old citation")
+                              .rank(1)
+                              .build())));
+
+      risWebTestClient
+          .withDefaultLogin(userId)
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+          .exchange()
+          .expectStatus()
+          .isOk();
+
+      assertThat(memoryAppender.count(Level.WARN)).isEqualTo(1L);
+      assertThat(memoryAppender.getMessage(Level.WARN, 0))
+          .contains("Unlinking passive citation: source ULI document not found in database.");
+
+      // DB remains unchanged
+      TestTransaction.start();
+      var dbDto = (DecisionDTO) repository.findById(dto.getId()).orElseThrow();
+      assertThat(dbDto.getPassiveUliCitations().getFirst().getSourceLiteratureDocumentNumber())
+          .isEqualTo("ULI-TEST-INVALID");
+      TestTransaction.end();
+
+      memoryAppender.detachLoggingTestAppender();
+    }
   }
 
   @Test
