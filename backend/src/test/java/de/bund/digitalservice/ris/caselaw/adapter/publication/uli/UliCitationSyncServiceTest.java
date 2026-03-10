@@ -205,6 +205,79 @@ public class UliCitationSyncServiceTest {
       verify(caselawRepository, never()).save(any());
       verify(portalPublicationService, never()).publishDocumentationUnitWithChangelog(any(), any());
     }
+
+    @Test
+    void shouldLogSuccessWhenRepublishSucceeds() throws DocumentationUnitNotExistsException {
+      var memoryAppender = new TestMemoryAppender(UliCitationSyncService.class);
+      UUID uliId = UUID.randomUUID();
+      UUID caselawId = UUID.randomUUID();
+
+      UliDTO uliDTO =
+          UliDTO.builder()
+              .id(uliId)
+              .activeCaselawReferences(
+                  List.of(
+                      UliActiveCaselawReferenceDTO.builder()
+                          .targetDocumentationUnitId(caselawId)
+                          .build()))
+              .build();
+
+      when(databaseUliRepository.findAllByPublishedAtAfter(any())).thenReturn(List.of(uliDTO));
+      when(caselawRepository.findById(caselawId))
+          .thenReturn(
+              Optional.of(
+                  DecisionDTO.builder()
+                      .id(caselawId)
+                      .passiveUliCitations(new ArrayList<>())
+                      .build()));
+
+      uliCitationSyncService.handleNewlyPublishedAfter(Instant.now());
+
+      verify(portalPublicationService).publishDocumentationUnitWithChangelog(caselawId, null);
+
+      assertThat(memoryAppender.getMessage(Level.INFO, 1))
+          .isEqualTo("Successfully republished after ULI newly published sync");
+
+      memoryAppender.detachLoggingTestAppender();
+    }
+
+    @Test
+    void shouldLogErrorWhenRepublishFails() throws DocumentationUnitNotExistsException {
+      var memoryAppender = new TestMemoryAppender(UliCitationSyncService.class);
+      UUID caselawId = UUID.randomUUID();
+
+      UliDTO uliDTO =
+          UliDTO.builder()
+              .id(UUID.randomUUID())
+              .activeCaselawReferences(
+                  List.of(
+                      UliActiveCaselawReferenceDTO.builder()
+                          .targetDocumentationUnitId(caselawId)
+                          .build()))
+              .build();
+
+      when(databaseUliRepository.findAllByPublishedAtAfter(any())).thenReturn(List.of(uliDTO));
+      when(caselawRepository.findById(caselawId))
+          .thenReturn(
+              Optional.of(
+                  DecisionDTO.builder()
+                      .id(caselawId)
+                      .passiveUliCitations(new ArrayList<>())
+                      .build()));
+
+      when(portalPublicationService.publishDocumentationUnitWithChangelog(caselawId, null))
+          .thenThrow(new RuntimeException("S3 Connection Failed"));
+
+      uliCitationSyncService.handleNewlyPublishedAfter(Instant.now());
+
+      assertThat(memoryAppender.getMessage(Level.ERROR, 0))
+          .isEqualTo("Failed to republish during ULI newly published sync");
+
+      assertThat(memoryAppender.getKeyValuePairs(Level.ERROR, 0))
+          .anyMatch(kv -> kv.key.equals("exception"));
+
+      memoryAppender.detachLoggingTestAppender();
+    }
   }
 
   @Nested
