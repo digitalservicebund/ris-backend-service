@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,13 +11,16 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
+import tools.jackson.databind.JsonNode;
 
 @Entity
 @Table(name = "published_documentation_snapshot", schema = "incremental_migration")
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 @Builder(toBuilder = true)
 public class PublishedDocumentationSnapshotEntity {
   @Id @GeneratedValue private UUID id;
@@ -26,9 +29,10 @@ public class PublishedDocumentationSnapshotEntity {
   @Column(name = "documentation_unit_id")
   private UUID documentationUnitId;
 
-  @Type(DocumentationUnitType.class)
-  private DocumentationUnit json;
+  @Column(name = "json", columnDefinition = "jsonb")
+  @Type(JsonType.class)
+  private JsonNode json;
 
   @Column(name = "last_updated_at")
-  private LocalDateTime publishedAt;
+  private LocalDateTime lastUpdatedAt;
 }
