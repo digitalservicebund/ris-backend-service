@@ -228,6 +228,51 @@ class AdmCitationSyncServiceTest {
       assertThat(passive.getSourceDirective()).isEqualTo("NEW-ABBR");
       verify(caselawRepository).save(decision);
     }
+
+    @Test
+    void shouldNotUpdateIfMetadataIsAlreadyIdentical() throws DocumentationUnitNotExistsException {
+      UUID admId = UUID.fromString("7475e016-082d-49e9-9b22-a275c9f65934");
+      UUID caselawId = UUID.fromString("2fb43fd9-6414-4407-b705-1c474f0a1c7f");
+      Instant now = Instant.now();
+
+      var adm =
+          AdmDTO.builder()
+              .id(admId)
+              .documentNumber("KSNR150060010")
+              .jurisAbbreviation("VV DEU BMF 1972-02-29 F/IV B 2-S 2000-5/72")
+              .publishedAt(now)
+              .build();
+      var admActiveCaselawReference =
+          AdmActiveCaselawReferenceDTO.builder()
+              .citationType("Vgl")
+              .targetDocumentationUnitId(caselawId)
+              .source(adm)
+              .build();
+      adm.setActiveCaselawReferences(List.of(admActiveCaselawReference));
+
+      PassiveCitationAdmDTO passiveCitation =
+          PassiveCitationAdmDTO.builder()
+              .sourceId(admId)
+              .sourceDocumentNumber("KSNR150060010")
+              .sourceDirective("VV DEU BMF 1972-02-29 F/IV B 2-S 2000-5/72")
+              .citationType(CitationTypeDTO.builder().abbreviation("Vgl").build())
+              .build();
+
+      DecisionDTO decision =
+          DecisionDTO.builder()
+              .id(caselawId)
+              .documentNumber("WBRE410005137")
+              .passiveAdmCitations(new ArrayList<>(List.of(passiveCitation)))
+              .build();
+
+      when(admRepository.findAllByPublishedAtAfter(any())).thenReturn(List.of(adm));
+      when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
+
+      admCitationSyncService.handleNewlyPublishedAfter(Instant.now());
+
+      verify(caselawRepository, never()).save(any());
+      verify(portalPublicationService, never()).publishDocumentationUnitWithChangelog(any(), any());
+    }
   }
 
   @Nested
@@ -310,12 +355,50 @@ class AdmCitationSyncServiceTest {
     }
 
     @Test
-    void handleRevokedAfter_shouldReturnImmediatelyIfNoEntriesFound() {
+    void shouldReturnImmediatelyIfNoEntriesFound() {
       when(revokedAdmRepository.findAllByRevokedAtAfter(any())).thenReturn(List.of());
 
       admCitationSyncService.handleRevokedAfter(Instant.now());
 
       verify(caselawRepository, never()).findAllByPassiveAdmSourceIdAndPendingRevocation(any());
+    }
+
+    @Test
+    void shouldContinueWhenPublishingSingleDocumentFails()
+        throws DocumentationUnitNotExistsException {
+      UUID revokedId = UUID.randomUUID();
+      UUID docId1 = UUID.randomUUID();
+      UUID docId2 = UUID.randomUUID();
+
+      RevokedAdm entry = RevokedAdm.builder().docUnitId(revokedId).build();
+      when(revokedAdmRepository.findAllByRevokedAtAfter(any())).thenReturn(List.of(entry));
+
+      DecisionDTO doc1 = DecisionDTO.builder().id(docId1).documentNumber("WBRE410000001").build();
+      DecisionDTO doc2 = DecisionDTO.builder().id(docId2).documentNumber("WBRE410000002").build();
+
+      doc1.setPassiveAdmCitations(
+          List.of(
+              PassiveCitationAdmDTO.builder()
+                  .sourceId(revokedId)
+                  .target(DecisionDTO.builder().id(UUID.randomUUID()).build())
+                  .build()));
+      doc2.setPassiveAdmCitations(
+          List.of(
+              PassiveCitationAdmDTO.builder()
+                  .sourceId(revokedId)
+                  .target(DecisionDTO.builder().id(UUID.randomUUID()).build())
+                  .build()));
+
+      when(caselawRepository.findAllByPassiveAdmSourceIdAndPendingRevocation(revokedId))
+          .thenReturn(List.of(doc1, doc2));
+
+      when(portalPublicationService.publishDocumentationUnitWithChangelog(docId1, null))
+          .thenThrow(new RuntimeException("Portal Error"));
+
+      admCitationSyncService.handleRevokedAfter(Instant.now());
+
+      verify(portalPublicationService).publishDocumentationUnitWithChangelog(docId1, null);
+      verify(portalPublicationService).publishDocumentationUnitWithChangelog(docId2, null);
     }
   }
 }

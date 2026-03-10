@@ -238,6 +238,53 @@ class SliCitationSyncServiceTest {
       verify(caselawRepository).save(decision);
       verify(portalPublicationService).publishDocumentationUnitWithChangelog(caselawId, null);
     }
+
+    @Test
+    void shouldNotUpdateIfMetadataIsAlreadyIdentical() throws DocumentationUnitNotExistsException {
+      UUID sliId = UUID.randomUUID();
+      UUID caselawId = UUID.randomUUID();
+      String docNumber = "STAY-SAME-123";
+
+      var sli =
+          SliDTO.builder()
+              .id(sliId)
+              .documentNumber(docNumber)
+              .author("Autor")
+              .bookTitle("Titel")
+              .yearOfPublication("2024")
+              .build();
+
+      var activeRef =
+          SliActiveCaselawReferenceDTO.builder()
+              .targetDocumentationUnitId(caselawId)
+              .source(sli)
+              .build();
+      sli.setActiveCaselawReferences(List.of(activeRef));
+
+      PassiveCitationSliEntity passive =
+          PassiveCitationSliEntity.builder()
+              .sourceId(sliId)
+              .sourceDocumentNumber(docNumber)
+              .sourceAuthor("Autor")
+              .sourceBookTitle("Titel")
+              .sourceYearOfPublication("2024")
+              .target(DecisionDTO.builder().id(caselawId).build())
+              .build();
+
+      DecisionDTO decision =
+          DecisionDTO.builder()
+              .id(caselawId)
+              .passiveSliCitations(new ArrayList<>(List.of(passive)))
+              .build();
+
+      when(sliRepository.findAllByPublishedAtAfter(any())).thenReturn(List.of(sli));
+      when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
+
+      sliCitationSyncService.handleNewlyPublishedAfter(Instant.now());
+
+      verify(caselawRepository, never()).save(any());
+      verify(portalPublicationService, never()).publishDocumentationUnitWithChangelog(any(), any());
+    }
   }
 
   @Nested
@@ -320,54 +367,7 @@ class SliCitationSyncServiceTest {
     }
 
     @Test
-    void shouldNotUpdateIfMetadataIsAlreadyIdentical() throws DocumentationUnitNotExistsException {
-      UUID sliId = UUID.randomUUID();
-      UUID caselawId = UUID.randomUUID();
-      String docNumber = "STAY-SAME-123";
-
-      var sli =
-          SliDTO.builder()
-              .id(sliId)
-              .documentNumber(docNumber)
-              .author("Autor")
-              .bookTitle("Titel")
-              .yearOfPublication("2024")
-              .build();
-
-      var activeRef =
-          SliActiveCaselawReferenceDTO.builder()
-              .targetDocumentationUnitId(caselawId)
-              .source(sli)
-              .build();
-      sli.setActiveCaselawReferences(List.of(activeRef));
-
-      PassiveCitationSliEntity passive =
-          PassiveCitationSliEntity.builder()
-              .sourceId(sliId)
-              .sourceDocumentNumber(docNumber)
-              .sourceAuthor("Autor")
-              .sourceBookTitle("Titel")
-              .sourceYearOfPublication("2024")
-              .target(DecisionDTO.builder().id(caselawId).build())
-              .build();
-
-      DecisionDTO decision =
-          DecisionDTO.builder()
-              .id(caselawId)
-              .passiveSliCitations(new ArrayList<>(List.of(passive)))
-              .build();
-
-      when(sliRepository.findAllByPublishedAtAfter(any())).thenReturn(List.of(sli));
-      when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
-
-      sliCitationSyncService.handleNewlyPublishedAfter(Instant.now());
-
-      verify(caselawRepository, never()).save(any());
-      verify(portalPublicationService, never()).publishDocumentationUnitWithChangelog(any(), any());
-    }
-
-    @Test
-    void handleRevokedAfter_shouldContinueWhenPublishingSingleDocumentFails()
+    void shouldContinueWhenPublishingSingleDocumentFails()
         throws DocumentationUnitNotExistsException {
       UUID revokedId = UUID.randomUUID();
       UUID docId1 = UUID.randomUUID();
