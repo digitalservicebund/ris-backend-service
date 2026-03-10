@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,8 +66,6 @@ class UliCitationSyncServiceTest {
   class handleNewlyPublishedAfter {
 
     @Test
-    @Disabled(
-        "This tests the functionality including the updating of references, but at the moment we do not want to update any data yet")
     void shouldUpdateMetadataWhenPassiveCitationExists()
         throws DocumentationUnitNotExistsException {
       var memoryAppender = new TestMemoryAppender(UliCitationSyncService.class);
@@ -97,8 +94,9 @@ class UliCitationSyncServiceTest {
 
       PassiveCitationUliDTO passiveCitation =
           PassiveCitationUliDTO.builder()
-              .sourceId(uliId)
+              .sourceId(null)
               .sourceAuthor("Old Author")
+              .sourceCitation("Old Citation")
               .target(decision)
               .build();
 
@@ -107,9 +105,10 @@ class UliCitationSyncServiceTest {
       when(caselawRepository.findById(caselawId)).thenReturn(Optional.of(decision));
 
       uliCitationSyncService.handleNewlyPublishedAfter(lastRun);
-
-      assertThat(passiveCitation.getSourceAuthor()).isEqualTo("New Author");
-      assertThat(passiveCitation.getSourceCitation()).isEqualTo("New Citation");
+      // Todo: uncomment this, when we want to update the metadata
+      //      assertThat(passiveCitation.getSourceAuthor()).isEqualTo("New Author");
+      //      assertThat(passiveCitation.getSourceCitation()).isEqualTo("New Citation");
+      assertThat(passiveCitation.getSourceId()).isEqualTo(uliId);
 
       verify(caselawRepository).save(decision);
       verify(portalPublicationService).publishDocumentationUnitWithChangelog(caselawId, null);
@@ -121,8 +120,6 @@ class UliCitationSyncServiceTest {
     }
 
     @Test
-    @Disabled(
-        "This tests the functionality including the updating of references, but at the moment we do not want to update any data yet")
     void shouldCreateNewPassiveCitationWhenMissing() throws DocumentationUnitNotExistsException {
       var memoryAppender = new TestMemoryAppender(UliCitationSyncService.class);
       UUID uliId = UUID.randomUUID();
@@ -154,12 +151,14 @@ class UliCitationSyncServiceTest {
 
       uliCitationSyncService.handleNewlyPublishedAfter(lastRun);
 
-      assertThat(decision.getPassiveUliCitations()).hasSize(1);
-      PassiveCitationUliDTO created = decision.getPassiveUliCitations().get(0);
-      assertThat(created.getSourceAuthor()).isEqualTo("New Author");
-      assertThat(created.getSourceLiteratureDocumentNumber()).isEqualTo("ULI-DOC-1");
+      // Todo: uncomment this, when we want to update the metadata
 
-      verify(caselawRepository).save(decision);
+      //      assertThat(decision.getPassiveUliCitations()).hasSize(1);
+      //      PassiveCitationUliDTO created = decision.getPassiveUliCitations().get(0);
+      //      assertThat(created.getSourceAuthor()).isEqualTo("New Author");
+      //      assertThat(created.getSourceLiteratureDocumentNumber()).isEqualTo("ULI-DOC-1");
+      //
+      //      verify(caselawRepository).save(decision);
       verify(portalPublicationService).publishDocumentationUnitWithChangelog(caselawId, null);
 
       assertThat(memoryAppender.getMessage(Level.INFO, 0))
@@ -284,8 +283,6 @@ class UliCitationSyncServiceTest {
   class handleRevokedAfter {
 
     @Test
-    @Disabled(
-        "This tests the functionality including the updating of references, but at the moment we do not want to update any data yet")
     void shouldRemovePassiveCitationAndRepublishWhenUliIsRevoked()
         throws DocumentationUnitNotExistsException {
       var memoryAppender = new TestMemoryAppender(UliCitationSyncService.class);
@@ -312,9 +309,9 @@ class UliCitationSyncServiceTest {
           .thenReturn(List.of());
 
       uliCitationSyncService.handleRevokedAfter(lastRun);
-
-      assertThat(decision.getPassiveUliCitations()).isEmpty();
-      verify(caselawRepository).save(decision);
+      // Todo: uncomment this, when we want to update the metadata
+      //      assertThat(decision.getPassiveUliCitations()).isEmpty();
+      //      verify(caselawRepository).save(decision);
       verify(portalPublicationService).publishDocumentationUnitWithChangelog(caselawId, null);
 
       assertThat(memoryAppender.getMessage(Level.INFO, 1))
