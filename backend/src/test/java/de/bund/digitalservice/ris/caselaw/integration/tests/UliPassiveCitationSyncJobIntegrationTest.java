@@ -141,8 +141,7 @@ class UliPassiveCitationSyncJobIntegrationTest extends BaseIntegrationTest {
             .findFirst()
             .orElseThrow();
     assertThat(updated.getSourceAuthor()).isEqualTo("ULI author"); // from the first uli document
-    assertThat(updated.getSourceCitation())
-        .isEqualTo("ULI citation"); // from the first uli document
+    assertThat(updated.getCitation()).isEqualTo("ULI citation"); // from the first uli document
 
     // 2. Check: Create Missing
     UUID uliIdToCreate =

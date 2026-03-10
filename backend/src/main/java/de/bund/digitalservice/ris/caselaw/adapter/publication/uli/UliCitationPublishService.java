@@ -54,11 +54,10 @@ public class UliCitationPublishService {
       // document.")
       //                .log();
 
-      if (!Objects.equals(passiveCitation.getSourceCitation(), target.getCitation())
-          || !Objects.equals(passiveCitation.getSourceCitation(), target.getAuthor())
+      if (!Objects.equals(passiveCitation.getCitation(), target.getCitation())
+          || !Objects.equals(passiveCitation.getCitation(), target.getAuthor())
           || !Objects.equals(
-              passiveCitation.getSourceLegalPeriodicalRawValue(),
-              target.getLegalPeriodicalRawValue())) {
+              passiveCitation.getLegalPeriodicalRawValue(), target.getLegalPeriodicalRawValue())) {
 
         log.atInfo()
             .addKeyValue(
@@ -69,11 +68,11 @@ public class UliCitationPublishService {
             .addKeyValue("target.documentNumber", target.getDocumentNumber())
             .addKeyValue("activeCitation.sourceAuthor", passiveCitation.getSourceAuthor())
             .addKeyValue("target.author", target.getAuthor())
-            .addKeyValue("passiveCitation.sourceCitation", passiveCitation.getSourceCitation())
+            .addKeyValue("passiveCitation.sourceCitation", passiveCitation.getCitation())
             .addKeyValue("target.citation", target.getCitation())
             .addKeyValue(
                 "passiveCitation.sourceLegalPeriodicalRawValue",
-                passiveCitation.getSourceLegalPeriodicalRawValue())
+                passiveCitation.getLegalPeriodicalRawValue())
             .addKeyValue("target.legalPeriodicalRawValue", target.getLegalPeriodicalRawValue())
             .setMessage(
                 "Metadata divergence detected between caselaw passive citation and source uli document.")
@@ -115,11 +114,10 @@ public class UliCitationPublishService {
       // activeCitation.setTargetAuthor(target.getAuthor());
       // activeCitation.setTargetLegalPeriodicalRawValue(target.getLegalPeriodicalRawValue());
 
-      if (!Objects.equals(activeCitation.getTargetCitation(), target.getCitation())
+      if (!Objects.equals(activeCitation.getCitation(), target.getCitation())
           || !Objects.equals(activeCitation.getTargetAuthor(), target.getAuthor())
           || !Objects.equals(
-              activeCitation.getTargetLegalPeriodicalRawValue(),
-              target.getLegalPeriodicalRawValue())) {
+              activeCitation.getLegalPeriodicalRawValue(), target.getLegalPeriodicalRawValue())) {
 
         log.atInfo()
             .addKeyValue(
@@ -130,11 +128,11 @@ public class UliCitationPublishService {
             .addKeyValue("target.documentNumber", target.getDocumentNumber())
             .addKeyValue("activeCitation.targetAuthor", activeCitation.getTargetAuthor())
             .addKeyValue("target.author", target.getAuthor())
-            .addKeyValue("activeCitation.targetCitation", activeCitation.getTargetCitation())
+            .addKeyValue("activeCitation.targetCitation", activeCitation.getCitation())
             .addKeyValue("target.citation", target.getCitation())
             .addKeyValue(
                 "activeCitation.targetLegalPeriodicalRawValue",
-                activeCitation.getTargetLegalPeriodicalRawValue())
+                activeCitation.getLegalPeriodicalRawValue())
             .addKeyValue("target.legalPeriodicalRawValue", target.getLegalPeriodicalRawValue())
             .setMessage(
                 "Metadata divergence detected between caselaw active citation and target uli document.")

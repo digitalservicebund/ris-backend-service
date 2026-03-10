@@ -54,20 +54,20 @@ public class ActiveCitationUliDTO {
   private String targetAuthor;
 
   @NonNull
-  @Column(name = "target_citation", columnDefinition = "TEXT")
+  @Column(name = "citation", columnDefinition = "TEXT")
   @Size(max = 255)
-  private String targetCitation;
+  private String citation;
 
   @Nullable
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "target_legal_periodical_id")
+  @JoinColumn(name = "legal_periodical_id")
   @EqualsAndHashCode.Exclude
-  private LegalPeriodicalDTO targetLegalPeriodical;
+  private LegalPeriodicalDTO legalPeriodical;
 
   @Nullable
-  @Column(name = "target_legal_periodical_raw_value")
+  @Column(name = "legal_periodical_raw_value")
   @Size(max = 255)
-  private String targetLegalPeriodicalRawValue;
+  private String legalPeriodicalRawValue;
 
   @Column @NotNull @EqualsAndHashCode.Exclude private Integer rank;
 }

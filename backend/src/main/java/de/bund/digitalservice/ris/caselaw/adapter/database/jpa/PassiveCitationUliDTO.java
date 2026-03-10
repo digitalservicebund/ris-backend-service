@@ -54,11 +54,6 @@ public class PassiveCitationUliDTO {
   @Column(name = "source_author")
   private String sourceAuthor;
 
-  @NotBlank
-  @Size(max = 255)
-  @Column(name = "source_citation")
-  private String sourceCitation;
-
   @Nullable
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "source_document_type_id")
@@ -70,16 +65,21 @@ public class PassiveCitationUliDTO {
   @Column(name = "source_document_type_raw_value")
   private String sourceDocumentTypeRawValue;
 
+  @NotBlank
+  @Size(max = 255)
+  @Column(name = "citation")
+  private String citation;
+
   @Nullable
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "source_legal_periodical_id")
+  @JoinColumn(name = "legal_periodical_id")
   @EqualsAndHashCode.Exclude
-  private LegalPeriodicalDTO sourceLegalPeriodical;
+  private LegalPeriodicalDTO legalPeriodical;
 
   @Nullable
   @Size(max = 255)
-  @Column(name = "source_legal_periodical_raw_value")
-  private String sourceLegalPeriodicalRawValue;
+  @Column(name = "legal_periodical_raw_value")
+  private String legalPeriodicalRawValue;
 
   @ManyToOne
   @Nullable

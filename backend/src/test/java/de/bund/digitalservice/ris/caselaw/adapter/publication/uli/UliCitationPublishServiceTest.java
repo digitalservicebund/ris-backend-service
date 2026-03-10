@@ -115,7 +115,7 @@ public class UliCitationPublishServiceTest {
 
       assertThat(result).isPresent();
       assertThat(result.get().getSourceAuthor()).isEqualTo("Dr. Test");
-      assertThat(result.get().getSourceCitation()).isEqualTo("NJW 2026, 1");
+      assertThat(result.get().getCitation()).isEqualTo("NJW 2026, 1");
       assertThat(result.get().getSourceLiteratureDocumentNumber()).isEqualTo("ULI-123");
 
       assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1L);

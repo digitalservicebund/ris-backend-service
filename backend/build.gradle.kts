@@ -205,9 +205,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.143")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.144")
     // for local development:
-    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.143.jar"))
+    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.144.jar"))
 
     // GHSA-72hv-8253-57qq
     implementation("com.fasterxml.jackson.core:jackson-core:2.21.1")
