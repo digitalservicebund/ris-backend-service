@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.publication;
+package de.bund.digitalservice.ris.caselaw.adapter.publication.uli;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -10,7 +10,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUliReposi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationUliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UliDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationPublishService;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Disabled;

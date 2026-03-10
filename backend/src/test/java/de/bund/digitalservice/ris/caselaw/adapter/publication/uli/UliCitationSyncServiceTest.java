@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.publication;
+package de.bund.digitalservice.ris.caselaw.adapter.publication.uli;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -18,7 +18,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUli;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RevokedUliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UliActiveCaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UliDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationSyncService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.domain.LoggingKeys;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
