@@ -19,7 +19,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
@@ -203,7 +202,6 @@ public class UliCitationSyncService {
   }
 
   /** Case 3: Identify documents that point to revoked ULI documents. */
-  @Transactional
   public void handleRevokedAfter(Instant lastRun) {
     List<RevokedUli> revokedEntries = revokedUliRepository.findAllByRevokedAtAfter(lastRun);
 
@@ -213,10 +211,12 @@ public class UliCitationSyncService {
     }
 
     Set<UUID> documentsToRepublish =
-        revokedEntries.stream()
-            .map(this::syncCitationsForRevokedUli)
-            .flatMap(Set::stream)
-            .collect(Collectors.toSet());
+        transactionTemplate.execute(
+            status ->
+                revokedEntries.stream()
+                    .map(this::syncCitationsForRevokedUli)
+                    .flatMap(Set::stream)
+                    .collect(Collectors.toSet()));
 
     documentsToRepublish.forEach(
         docId -> {
@@ -257,15 +257,33 @@ public class UliCitationSyncService {
         caselawRepository.findAllByPassiveUliSourceIdAndPendingRevocation(revokedId);
 
     for (DecisionDTO decision : decisionsWithAffectedPassiveCitations) {
-      documentsToRepublish.add(decision.getId());
-      log.atInfo()
-          .addKeyValue(LoggingKeys.REVOKED_ULI, revokedId)
-          .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
-          .setMessage(
-              "Passive Citation to revoked ULI detected. Document added to republishing queue for validation in publish step.")
-          .log();
+      boolean removed =
+          decision
+              .getPassiveUliCitations()
+              .removeIf(
+                  p ->
+                      p.getSourceId() != null && revokedUli.getDocUnitId().equals(p.getSourceId()));
+      if (removed) {
+        caselawRepository.save(decision);
+        documentsToRepublish.add(decision.getId());
+        documentsToRepublish.add(decision.getId());
+        log.atInfo()
+            .addKeyValue(LoggingKeys.REVOKED_ULI, revokedId)
+            .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
+            .setMessage(
+                "Passive Citation to revoked ULI detected. Document added to republishing queue for validation in publish step.")
+            .log();
+      } else {
+        log.atError()
+            .addKeyValue(LoggingKeys.REVOKED_ULI, revokedUli.getDocUnitId())
+            .addKeyValue(LoggingKeys.AFFECTED_DOCUMENT_NUMBER, decision.getDocumentNumber())
+            .setMessage(
+                "Passive Citation to revoked ULI couldn't be found and removed. This is inconsistent as the document was only found because it is supposed to have such a reference.")
+            .log();
+      }
     }
-
+    // active citations will be just republished. This removes the target id and document number
+    // from the published data.
     List<DecisionDTO> decisionsWithAffectedActiveCitations =
         caselawRepository.findAllByActiveUliTargetIdAndPendingRevocation(revokedId);
 

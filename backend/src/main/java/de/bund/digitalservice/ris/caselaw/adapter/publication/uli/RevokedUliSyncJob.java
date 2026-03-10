@@ -25,7 +25,7 @@ public class RevokedUliSyncJob {
    * withdrawn/deleted target and triggers a republishing for them.
    */
   // @Scheduled(cron = "${neuris.jobs.uli-repeal-sync.cron:0 0 3 * * *}")
-  public void runSync() {
+  public void runRevokedSync() {
     var startOfRun = Instant.now();
     var lastRun = jobSyncStatusService.getLastRun(job);
     try {

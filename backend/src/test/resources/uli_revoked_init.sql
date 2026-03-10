@@ -1,23 +1,11 @@
 CREATE SCHEMA IF NOT EXISTS references_schema;
 
-CREATE TABLE IF NOT EXISTS references_schema.ref_view_uli (
+CREATE TABLE IF NOT EXISTS references_schema.revoked_uli (
                                                               id UUID PRIMARY KEY,
-                                                              document_number VARCHAR(255),
-                                                              author VARCHAR(255),
-                                                              citation VARCHAR(255),
-                                                              document_type_raw_value VARCHAR(255),
-                                                              legal_periodical_raw_value VARCHAR(255),
-                                                              published_at TIMESTAMP
+                                                              doc_unit_id UUID,
+                                                              revoked_at TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS references_schema.ref_view_active_citation_uli_caselaw (
-                                                                                      id VARCHAR(255) PRIMARY KEY,
-                                                                                      source_documentation_unit_id UUID,
-                                                                                      target_documentation_unit_id UUID
-);
-
-INSERT INTO references_schema.ref_view_uli (id, document_number, author, citation, published_at)
-VALUES ('550e8400-e29b-41d4-a716-446655440000', 'ULI-TEST-001', 'Autor A', 'NJW 2024, 1', now() at time zone 'utc');
-
-INSERT INTO references_schema.ref_view_active_citation_uli_caselaw (id, source_documentation_unit_id, target_documentation_unit_id)
-VALUES ('link-1', '550e8400-e29b-41d4-a716-446655440000', 'f13e7fe2-78a5-11ee-b962-0242ac120002');
+DELETE FROM references_schema.revoked_uli WHERE id = 'f0f4d34b-1685-4548-9076-3b68b5d285b2';
+INSERT INTO references_schema.revoked_uli (id, doc_unit_id, revoked_at)
+VALUES ('f0f4d34b-1685-4548-9076-3b68b5d285b2', '41519069-ae24-4dd9-a412-32f2d594fb86', now() at time zone 'utc');
