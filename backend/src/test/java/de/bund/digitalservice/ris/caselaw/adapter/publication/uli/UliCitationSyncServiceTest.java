@@ -41,7 +41,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 @ExtendWith(SpringExtension.class)
 @Import({UliCitationSyncService.class})
-public class UliCitationSyncServiceTest {
+class UliCitationSyncServiceTest {
 
   @Autowired UliCitationSyncService uliCitationSyncService;
 
