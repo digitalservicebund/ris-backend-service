@@ -136,8 +136,8 @@ public class UliCitationPublishServiceTest {
           ActiveCitationUliDTO.builder()
               .source(DecisionDTO.builder().documentNumber("CAS-123").build())
               .targetLiteratureDocumentNumber("MISSING-404")
-              .targetLegalPeriodicalRawValue("AB")
-              .targetCitation("Citation from caselaw document")
+              .legalPeriodicalRawValue("AB")
+              .citation("Citation from caselaw document")
               .build();
 
       when(databaseUliRepository.findByDocumentNumber("MISSING-404")).thenReturn(Optional.empty());
@@ -170,8 +170,8 @@ public class UliCitationPublishServiceTest {
               .source(DecisionDTO.builder().id(caselawId).documentNumber("CAS-123").build())
               .targetAuthor("Author from caselaw document")
               .targetLiteratureDocumentNumber("ULI-123")
-              .targetCitation("Citation from caselaw document")
-              .targetLegalPeriodicalRawValue("AB")
+              .citation("Citation from caselaw document")
+              .legalPeriodicalRawValue("AB")
               .build();
 
       UliDTO uli =

@@ -96,7 +96,7 @@ class UliCitationSyncServiceTest {
           PassiveCitationUliDTO.builder()
               .sourceId(null)
               .sourceAuthor("Old Author")
-              .sourceCitation("Old Citation")
+              .citation("Old Citation")
               .target(decision)
               .build();
 

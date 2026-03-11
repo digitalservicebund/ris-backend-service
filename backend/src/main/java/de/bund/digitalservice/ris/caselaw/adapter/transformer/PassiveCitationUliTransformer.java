@@ -48,9 +48,9 @@ public class PassiveCitationUliTransformer {
     return PassiveCitationUliDTO.builder()
         .id(reference.id())
         .sourceAuthor(reference.author())
-        .sourceCitation(reference.citation())
-        .sourceLegalPeriodical(legalPeriodicalDTO)
-        .sourceLegalPeriodicalRawValue(
+        .citation(reference.citation())
+        .legalPeriodical(legalPeriodicalDTO)
+        .legalPeriodicalRawValue(
             legalPeriodicalRawValue != null
                 ? legalPeriodicalRawValue
                 : reference.legalPeriodicalRawValue())

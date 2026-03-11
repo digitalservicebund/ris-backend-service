@@ -194,8 +194,8 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                     List.of(
                         PassiveCitationUliDTO.builder()
                             .rank(1)
-                            .sourceCitation("Literature Reference Citation from Docunit")
-                            .sourceLegalPeriodicalRawValue("A")
+                            .citation("Literature Reference Citation from Docunit")
+                            .legalPeriodicalRawValue("A")
                             .sourceAuthor("author 1")
                             .sourceDocumentType(
                                 DocumentTypeDTO.builder()
@@ -211,14 +211,14 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
                         PassiveCitationUliDTO.builder()
                             .id(null) // Generierung triggern
                             .rank(2)
-                            .sourceCitation("Original Literature Reference Citation from Docunit")
+                            .citation("Original Literature Reference Citation from Docunit")
                             .sourceAuthor("author 2")
                             .sourceDocumentType(
                                 DocumentTypeDTO.builder()
                                     .id(UUID.fromString("198b276e-8e6d-4df6-8692-44d74ed4fcba"))
                                     .abbreviation("Ebs")
                                     .build())
-                            .sourceLegalPeriodicalRawValue("B")
+                            .legalPeriodicalRawValue("B")
                             .target(
                                 DecisionDTO.builder()
                                     .id(docUnit.getId())
@@ -694,11 +694,11 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
     var literatureReference =
         PassiveCitationUliDTO.builder()
             .rank(1)
-            .sourceLegalPeriodicalRawValue("ABC")
-            .sourceCitation("ABC 2024, 3")
+            .legalPeriodicalRawValue("ABC")
+            .citation("ABC 2024, 3")
             .sourceAuthor("author")
             .target(docUnit)
-            .sourceLegalPeriodical(LegalPeriodicalTransformer.transformToDTO(legalPeriodical))
+            .legalPeriodical(LegalPeriodicalTransformer.transformToDTO(legalPeriodical))
             .build();
 
     // Reference needs to be saved manually as the source has no full cascading.
