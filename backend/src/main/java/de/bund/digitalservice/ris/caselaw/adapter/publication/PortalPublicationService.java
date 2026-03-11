@@ -20,6 +20,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationEx
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.ManualPortalPublicationResult.RelatedPendingProceedingPublicationResult;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.adm.AdmCitationPublishService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.caselaw.CaselawCitationPublishService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.caselaw.CaselawCitationSyncService;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.sli.SliCitationPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;

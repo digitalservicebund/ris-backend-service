@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.publication;
+package de.bund.digitalservice.ris.caselaw.adapter.publication.caselaw;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
