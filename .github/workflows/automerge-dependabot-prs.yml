@@ -13,7 +13,7 @@ permissions:
 jobs:
   dependabot:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && false # disabled for now as it is not running the pipeline after merge
     steps:
       - name: Dependabot metadata
         id: metadata
