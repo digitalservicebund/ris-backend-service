@@ -3,10 +3,13 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication.caselaw;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationCaselawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationCaselawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RelatedDocumentationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PendingProceedingTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -44,6 +47,16 @@ public class CaselawCitationPublishService {
 
     return documentationUnitRepository.findPublishedByDocumentNumber(
         activeCitationCaselaw.getTargetDocumentNumber());
+  }
+
+  private Optional<DocumentationUnitDTO> getRelatedDocumentationTarget(
+      RelatedDocumentationDTO relatedDocumentation) {
+    if (relatedDocumentation.getDocumentNumber() == null) {
+      return Optional.empty();
+    }
+
+    return documentationUnitRepository.findPublishedByDocumentNumber(
+        relatedDocumentation.getDocumentNumber());
   }
 
   /**
@@ -121,5 +134,40 @@ public class CaselawCitationPublishService {
     }
 
     return activeCitationCaselaw;
+  }
+
+  /** Update the citation target with the information from the actual target document. */
+  @Transactional
+  public <T extends RelatedDocumentationDTO> T updateActiveCitationTargetWithInformationFromTarget(
+      T relatedDocumentation) {
+    var target = getRelatedDocumentationTarget(relatedDocumentation);
+
+    if (target.isEmpty()) {
+      relatedDocumentation.setDocumentNumber(null);
+    } else {
+      toDomain(
+          target.get()); // load the lazy properties of the target, we need them later on after the
+      // transaction is closed
+
+      relatedDocumentation.setDocumentNumber(target.get().getDocumentNumber());
+      relatedDocumentation.setCourt(target.get().getCourt());
+      relatedDocumentation.setDate(target.get().getDate());
+      relatedDocumentation.setFileNumber(
+          target.get().getFileNumbers().stream()
+              .findFirst()
+              .map(FileNumberDTO::getValue)
+              .orElse(null));
+      relatedDocumentation.setDocumentType(target.get().getDocumentType());
+
+      if (relatedDocumentation instanceof PreviousDecisionDTO previousDecision) {
+        previousDecision.setDeviatingFileNumber(
+            target.get().getDeviatingFileNumbers().stream()
+                .findFirst()
+                .map(DeviatingFileNumberDTO::getValue)
+                .orElse(null));
+      }
+    }
+
+    return relatedDocumentation;
   }
 }

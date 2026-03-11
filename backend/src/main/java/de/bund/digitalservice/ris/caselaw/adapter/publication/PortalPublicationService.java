@@ -450,6 +450,30 @@ public class PortalPublicationService {
       decision.getPassiveCaselawCitations().clear();
       decision.getPassiveCaselawCitations().addAll(enriched);
     }
+
+    if (decision.getEnsuingDecisions() != null) {
+      var enriched =
+          decision.getEnsuingDecisions().stream()
+              .map(
+                  caselawCitationPublishService
+                      ::updateActiveCitationTargetWithInformationFromTarget)
+              .toList();
+
+      decision.getEnsuingDecisions().clear();
+      decision.getEnsuingDecisions().addAll(enriched);
+    }
+
+    if (decision.getPreviousDecisions() != null) {
+      var enriched =
+          decision.getPreviousDecisions().stream()
+              .map(
+                  caselawCitationPublishService
+                      ::updateActiveCitationTargetWithInformationFromTarget)
+              .toList();
+
+      decision.getPreviousDecisions().clear();
+      decision.getPreviousDecisions().addAll(enriched);
+    }
   }
 
   private void validateAndEnrichUliCitations(DecisionDTO decision) {
