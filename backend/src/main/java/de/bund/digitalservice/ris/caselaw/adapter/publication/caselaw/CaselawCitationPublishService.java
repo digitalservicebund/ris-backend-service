@@ -138,7 +138,7 @@ public class CaselawCitationPublishService {
 
   /** Update the citation target with the information from the actual target document. */
   @Transactional
-  public <T extends RelatedDocumentationDTO> T updateActiveCitationTargetWithInformationFromTarget(
+  public <T extends RelatedDocumentationDTO> T updateRelatedDocumentationWithInformationFromTarget(
       T relatedDocumentation) {
     var target = getRelatedDocumentationTarget(relatedDocumentation);
 

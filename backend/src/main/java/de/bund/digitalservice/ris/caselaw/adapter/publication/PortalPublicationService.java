@@ -456,7 +456,7 @@ public class PortalPublicationService {
           decision.getEnsuingDecisions().stream()
               .map(
                   caselawCitationPublishService
-                      ::updateActiveCitationTargetWithInformationFromTarget)
+                      ::updateRelatedDocumentationWithInformationFromTarget)
               .toList();
 
       decision.getEnsuingDecisions().clear();
@@ -468,7 +468,7 @@ public class PortalPublicationService {
           decision.getPreviousDecisions().stream()
               .map(
                   caselawCitationPublishService
-                      ::updateActiveCitationTargetWithInformationFromTarget)
+                      ::updateRelatedDocumentationWithInformationFromTarget)
               .toList();
 
       decision.getPreviousDecisions().clear();
