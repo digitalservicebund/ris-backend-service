@@ -789,6 +789,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   @Sql(
       scripts = {"classpath:uli_ref_view_cleanup.sql"},
       executionPhase = AFTER_TEST_METHOD)
+  @Disabled("We disabled the enrichment until the ref views exists")
   class UliCitationPublishing {
 
     @Test

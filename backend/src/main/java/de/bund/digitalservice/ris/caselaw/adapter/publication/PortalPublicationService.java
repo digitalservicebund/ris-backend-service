@@ -382,9 +382,9 @@ public class PortalPublicationService {
 
     if (documentationUnit instanceof DecisionDTO decision) {
       validateAndEnrichCaselawCitations(decision);
-      validateAndEnrichUliCitations(decision);
-      validateAndEnrichAdmCitations(decision);
-      validateAndEnrichSliCitations(decision);
+      // validateAndEnrichUliCitations(decision);
+      // validateAndEnrichAdmCitations(decision);
+      // validateAndEnrichSliCitations(decision);
     }
 
     CaseLawLdml ldml = ldmlTransformer.transformToLdml(toDomain(documentationUnit));
