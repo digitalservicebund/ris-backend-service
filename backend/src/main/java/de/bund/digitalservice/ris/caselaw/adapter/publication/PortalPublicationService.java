@@ -474,6 +474,18 @@ public class PortalPublicationService {
       decision.getPreviousDecisions().clear();
       decision.getPreviousDecisions().addAll(enriched);
     }
+
+    if (decision.getPendingDecisions() != null) {
+      var enriched =
+          decision.getPendingDecisions().stream()
+              .map(
+                  caselawCitationPublishService
+                      ::updateRelatedDocumentationWithInformationFromTarget)
+              .toList();
+
+      decision.getPendingDecisions().clear();
+      decision.getPendingDecisions().addAll(enriched);
+    }
   }
 
   private void validateAndEnrichUliCitations(DecisionDTO decision) {
