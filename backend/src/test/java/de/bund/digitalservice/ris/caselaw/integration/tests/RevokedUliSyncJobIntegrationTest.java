@@ -118,7 +118,7 @@ class UliRevokedSyncJobIntegrationTest extends BaseIntegrationTest {
                 .sourceId(revokedUliId)
                 .sourceLiteratureDocumentNumber("ULI-REVOKED-001")
                 .sourceAuthor("ULI author")
-                .sourceCitation("ULI citation")
+                .citation("ULI citation")
                 .target(decision)
                 .rank(1)
                 .build()));
@@ -186,7 +186,7 @@ class UliRevokedSyncJobIntegrationTest extends BaseIntegrationTest {
                 .targetId(revokedUliId)
                 .targetLiteratureDocumentNumber("ULI-REVOKED-001")
                 .targetAuthor("ULI author")
-                .targetCitation("ULI citation")
+                .citation("ULI citation")
                 .source(decision)
                 .rank(1)
                 .build()));

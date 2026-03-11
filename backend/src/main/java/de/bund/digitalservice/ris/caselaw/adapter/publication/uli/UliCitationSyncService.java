@@ -139,9 +139,9 @@ public class UliCitationSyncService {
         .sourceId(uli.getId())
         .sourceLiteratureDocumentNumber(uli.getDocumentNumber())
         .sourceAuthor(uli.getAuthor())
-        .sourceCitation(uli.getCitation())
+        .citation(uli.getCitation())
         .sourceDocumentTypeRawValue(uli.getDocumentTypeRawValue())
-        .sourceLegalPeriodicalRawValue(uli.getLegalPeriodicalRawValue())
+        .legalPeriodicalRawValue(uli.getLegalPeriodicalRawValue())
         .rank(decision.getPassiveUliCitations().size() + 1)
         .build();
   }

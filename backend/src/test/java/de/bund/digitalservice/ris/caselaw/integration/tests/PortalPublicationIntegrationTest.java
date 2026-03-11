@@ -811,7 +811,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
                               .targetId(uliId)
                               .targetLiteratureDocumentNumber("ULI-TEST-1")
                               .targetAuthor("divergent author")
-                              .targetCitation("divergent citation")
+                              .citation("divergent citation")
                               .rank(1)
                               .build())));
 
@@ -854,7 +854,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
                           ActiveCitationUliDTO.builder()
                               .targetLiteratureDocumentNumber("ULI-TEST-INVALID")
                               .targetAuthor("divergent author")
-                              .targetCitation("divergent citation")
+                              .citation("divergent citation")
                               .rank(1)
                               .build())));
 
@@ -898,7 +898,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
                               .sourceId(uliId)
                               .sourceLiteratureDocumentNumber("ULI-TEST-1")
                               .sourceAuthor("divergent author")
-                              .sourceCitation("divergent citation")
+                              .citation("divergent citation")
                               .rank(1)
                               .build())));
 
@@ -942,7 +942,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
                           PassiveCitationUliDTO.builder()
                               .sourceLiteratureDocumentNumber("ULI-TEST-INVALID")
                               .sourceAuthor("old author")
-                              .sourceCitation("old citation")
+                              .citation("old citation")
                               .rank(1)
                               .build())));
 

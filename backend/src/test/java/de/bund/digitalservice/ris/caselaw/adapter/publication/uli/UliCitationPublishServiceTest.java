@@ -115,7 +115,7 @@ public class UliCitationPublishServiceTest {
 
       assertThat(result).isPresent();
       assertThat(result.get().getSourceAuthor()).isEqualTo("Dr. Test");
-      assertThat(result.get().getSourceCitation()).isEqualTo("NJW 2026, 1");
+      assertThat(result.get().getCitation()).isEqualTo("NJW 2026, 1");
       assertThat(result.get().getSourceLiteratureDocumentNumber()).isEqualTo("ULI-123");
 
       assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1L);
@@ -136,8 +136,8 @@ public class UliCitationPublishServiceTest {
           ActiveCitationUliDTO.builder()
               .source(DecisionDTO.builder().documentNumber("CAS-123").build())
               .targetLiteratureDocumentNumber("MISSING-404")
-              .targetLegalPeriodicalRawValue("AB")
-              .targetCitation("Citation from caselaw document")
+              .legalPeriodicalRawValue("AB")
+              .citation("Citation from caselaw document")
               .build();
 
       when(databaseUliRepository.findByDocumentNumber("MISSING-404")).thenReturn(Optional.empty());
@@ -170,8 +170,8 @@ public class UliCitationPublishServiceTest {
               .source(DecisionDTO.builder().id(caselawId).documentNumber("CAS-123").build())
               .targetAuthor("Author from caselaw document")
               .targetLiteratureDocumentNumber("ULI-123")
-              .targetCitation("Citation from caselaw document")
-              .targetLegalPeriodicalRawValue("AB")
+              .citation("Citation from caselaw document")
+              .legalPeriodicalRawValue("AB")
               .build();
 
       UliDTO uli =

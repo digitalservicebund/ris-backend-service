@@ -119,7 +119,7 @@ class UliPassiveCitationSyncJobIntegrationTest extends BaseIntegrationTest {
             PassiveCitationUliDTO.builder()
                 .sourceId(uliIdToUpdate)
                 .sourceAuthor("Old Author")
-                .sourceCitation("Old Citation")
+                .citation("Old Citation")
                 .target(decision)
                 .rank(1)
                 .build()));
@@ -141,8 +141,7 @@ class UliPassiveCitationSyncJobIntegrationTest extends BaseIntegrationTest {
             .findFirst()
             .orElseThrow();
     assertThat(updated.getSourceAuthor()).isEqualTo("ULI author"); // from the first uli document
-    assertThat(updated.getSourceCitation())
-        .isEqualTo("ULI citation"); // from the first uli document
+    assertThat(updated.getCitation()).isEqualTo("ULI citation"); // from the first uli document
 
     // 2. Check: Create Missing
     UUID uliIdToCreate =
@@ -198,7 +197,7 @@ class UliPassiveCitationSyncJobIntegrationTest extends BaseIntegrationTest {
             PassiveCitationUliDTO.builder()
                 .sourceId(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"))
                 .sourceAuthor("ULI author")
-                .sourceCitation("ULI citation")
+                .citation("ULI citation")
                 .sourceLiteratureDocumentNumber("ULI-TEST-1")
                 .target(decision)
                 .rank(1)
@@ -206,7 +205,7 @@ class UliPassiveCitationSyncJobIntegrationTest extends BaseIntegrationTest {
             PassiveCitationUliDTO.builder()
                 .sourceId(UUID.fromString("661f9511-f30c-52e5-b827-557766551111"))
                 .sourceAuthor("Second ULI author")
-                .sourceCitation("Second citation")
+                .citation("Second citation")
                 .sourceLiteratureDocumentNumber("ULI-TEST-2")
                 .target(decision)
                 .rank(2)
