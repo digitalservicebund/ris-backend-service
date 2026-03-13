@@ -459,8 +459,7 @@ public class PortalPublicationService {
                       ::updateRelatedDocumentationWithInformationFromTarget)
               .toList();
 
-      decision.getEnsuingDecisions().clear();
-      decision.getEnsuingDecisions().addAll(enriched);
+      decision.setEnsuingDecisions(enriched);
     }
 
     if (decision.getPreviousDecisions() != null) {
@@ -471,8 +470,7 @@ public class PortalPublicationService {
                       ::updateRelatedDocumentationWithInformationFromTarget)
               .toList();
 
-      decision.getPreviousDecisions().clear();
-      decision.getPreviousDecisions().addAll(enriched);
+      decision.setPreviousDecisions(enriched);
     }
 
     if (decision.getPendingDecisions() != null) {
@@ -483,8 +481,7 @@ public class PortalPublicationService {
                       ::updateRelatedDocumentationWithInformationFromTarget)
               .toList();
 
-      decision.getPendingDecisions().clear();
-      decision.getPendingDecisions().addAll(enriched);
+      decision.setPendingDecisions(enriched);
     }
   }
 

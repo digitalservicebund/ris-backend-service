@@ -244,6 +244,8 @@ class PortalPublicationServiceTest {
     when(objectMapper.writeValueAsString(any())).thenReturn("");
     when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(true);
     when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(true);
+    when(caselawCitationPublishService.updateRelatedDocumentationWithInformationFromTarget(any()))
+        .thenAnswer(a -> a.getArguments()[0]);
   }
 
   @Nested
