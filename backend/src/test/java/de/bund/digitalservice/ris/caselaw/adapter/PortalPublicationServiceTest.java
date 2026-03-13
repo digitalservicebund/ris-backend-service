@@ -40,12 +40,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
-import de.bund.digitalservice.ris.caselaw.adapter.publication.CaselawCitationPublishService;
-import de.bund.digitalservice.ris.caselaw.adapter.publication.CaselawCitationSyncService;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.ManualPortalPublicationResult.RelatedPendingProceedingPublicationResult;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.adm.AdmCitationPublishService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.caselaw.CaselawCitationPublishService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.caselaw.CaselawCitationSyncService;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.sli.SliCitationPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
@@ -244,6 +244,8 @@ class PortalPublicationServiceTest {
     when(objectMapper.writeValueAsString(any())).thenReturn("");
     when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(true);
     when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(true);
+    when(caselawCitationPublishService.updateRelatedDocumentationWithInformationFromTarget(any()))
+        .thenAnswer(a -> a.getArguments()[0]);
   }
 
   @Nested

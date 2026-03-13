@@ -20,6 +20,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationEx
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.ManualPortalPublicationResult.RelatedPendingProceedingPublicationResult;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.adm.AdmCitationPublishService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.caselaw.CaselawCitationPublishService;
+import de.bund.digitalservice.ris.caselaw.adapter.publication.caselaw.CaselawCitationSyncService;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.sli.SliCitationPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.publication.uli.UliCitationPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
@@ -381,7 +383,7 @@ public class PortalPublicationService {
         attachmentInlineRepository.findAllByDocumentationUnitId(documentationUnit.getId());
 
     if (documentationUnit instanceof DecisionDTO decision) {
-      validateAndEnrichCaselawCitations(decision);
+      validateAndEnrichCaselawRelatedDocuments(decision);
       // validateAndEnrichUliCitations(decision);
       // validateAndEnrichAdmCitations(decision);
       // validateAndEnrichSliCitations(decision);
@@ -423,7 +425,7 @@ public class PortalPublicationService {
     return result;
   }
 
-  private void validateAndEnrichCaselawCitations(DecisionDTO decision) {
+  private void validateAndEnrichCaselawRelatedDocuments(DecisionDTO decision) {
     if (decision.getActiveCaselawCitations() != null) {
       var enriched =
           decision.getActiveCaselawCitations().stream()
@@ -447,6 +449,39 @@ public class PortalPublicationService {
 
       decision.getPassiveCaselawCitations().clear();
       decision.getPassiveCaselawCitations().addAll(enriched);
+    }
+
+    if (decision.getEnsuingDecisions() != null) {
+      var enriched =
+          decision.getEnsuingDecisions().stream()
+              .map(
+                  caselawCitationPublishService
+                      ::updateRelatedDocumentationWithInformationFromTarget)
+              .toList();
+
+      decision.setEnsuingDecisions(enriched);
+    }
+
+    if (decision.getPreviousDecisions() != null) {
+      var enriched =
+          decision.getPreviousDecisions().stream()
+              .map(
+                  caselawCitationPublishService
+                      ::updateRelatedDocumentationWithInformationFromTarget)
+              .toList();
+
+      decision.setPreviousDecisions(enriched);
+    }
+
+    if (decision.getPendingDecisions() != null) {
+      var enriched =
+          decision.getPendingDecisions().stream()
+              .map(
+                  caselawCitationPublishService
+                      ::updateRelatedDocumentationWithInformationFromTarget)
+              .toList();
+
+      decision.setPendingDecisions(enriched);
     }
   }
 
