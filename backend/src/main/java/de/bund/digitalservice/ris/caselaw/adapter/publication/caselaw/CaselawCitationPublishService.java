@@ -117,15 +117,17 @@ public class CaselawCitationPublishService {
                   ? passiveCitationCaselaw.getTarget().getDocumentNumber()
                   : null)
           .addKeyValue(
-              "activeCitation.sourceDocumentNumber",
+              "passiveCitationCaselaw.sourceDocumentNumber",
               passiveCitationCaselaw.getSourceDocumentNumber())
           .addKeyValue("source.documentNumber", source.get().getDocumentNumber())
-          .addKeyValue("activeCitation.sourceCourt", passiveCitationCaselaw.getSourceCourt())
+          .addKeyValue(
+              "passiveCitationCaselaw.sourceCourt", passiveCitationCaselaw.getSourceCourt())
           .addKeyValue("source.court", source.get().getCourt())
-          .addKeyValue("activeCitation.sourceDate", passiveCitationCaselaw.getSourceDate())
+          .addKeyValue("passiveCitationCaselaw.sourceDate", passiveCitationCaselaw.getSourceDate())
           .addKeyValue("source.date", source.get().getDate())
           .addKeyValue(
-              "activeCitation.sourceFileNumber", passiveCitationCaselaw.getSourceFileNumber())
+              "passiveCitationCaselaw.sourceFileNumber",
+              passiveCitationCaselaw.getSourceFileNumber())
           .addKeyValue(
               "source.fileNumber[0]",
               source.get().getFileNumbers().stream()
@@ -133,10 +135,11 @@ public class CaselawCitationPublishService {
                   .map(FileNumberDTO::getValue)
                   .orElse(null))
           .addKeyValue(
-              "activeCitation.sourceDocumentType", passiveCitationCaselaw.getSourceDocumentType())
+              "passiveCitationCaselaw.sourceDocumentType",
+              passiveCitationCaselaw.getSourceDocumentType())
           .addKeyValue("source.documentType", source.get().getDocumentType())
           .setMessage(
-              "Metadata divergence detected between caselaw active citation and source caselaw document.")
+              "Metadata divergence detected between caselaw passive citation and source caselaw document.")
           .log();
     }
 
