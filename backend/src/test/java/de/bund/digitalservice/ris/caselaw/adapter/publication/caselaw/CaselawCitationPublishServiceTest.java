@@ -27,7 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @Import({CaselawCitationPublishService.class})
-public class CaselawCitationPublishServiceTest {
+class CaselawCitationPublishServiceTest {
 
   @Autowired CaselawCitationPublishService caselawCitationPublishService;
 
