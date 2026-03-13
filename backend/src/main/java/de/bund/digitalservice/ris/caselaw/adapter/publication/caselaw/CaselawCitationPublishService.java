@@ -11,6 +11,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RelatedDocumentat
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PendingProceedingTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.LoggingKeys;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -75,24 +77,68 @@ public class CaselawCitationPublishService {
           .addKeyValue("sourceDocumentNumber", passiveCitationCaselaw.getSourceDocumentNumber())
           .addKeyValue("passiveCitationCaselawId", passiveCitationCaselaw.getId())
           .setMessage(
-              "Skipping publishing of a passive citation caselaw as the source document can not be found")
+              "SKIPPED: Skipping publishing of a passive citation caselaw as the source document can not be found")
           .log();
-      return Optional.empty();
+      // return Optional.empty();
+      return Optional.of(passiveCitationCaselaw);
     }
 
     toDomain(
         source.get()); // load the lazy properties of the source, we need them later on after the
     // transaction is closed
 
-    passiveCitationCaselaw.setSourceDocumentNumber(source.get().getDocumentNumber());
-    passiveCitationCaselaw.setSourceCourt(source.get().getCourt());
-    passiveCitationCaselaw.setSourceDate(source.get().getDate());
-    passiveCitationCaselaw.setSourceFileNumber(
-        source.get().getFileNumbers().stream()
-            .findFirst()
-            .map(FileNumberDTO::getValue)
-            .orElse(null));
-    passiveCitationCaselaw.setSourceDocumentType(source.get().getDocumentType());
+    //    passiveCitationCaselaw.setSourceDocumentNumber(source.get().getDocumentNumber());
+    //    passiveCitationCaselaw.setSourceCourt(source.get().getCourt());
+    //    passiveCitationCaselaw.setSourceDate(source.get().getDate());
+    //    passiveCitationCaselaw.setSourceFileNumber(
+    //        source.get().getFileNumbers().stream()
+    //            .findFirst()
+    //            .map(FileNumberDTO::getValue)
+    //            .orElse(null));
+    //    passiveCitationCaselaw.setSourceDocumentType(source.get().getDocumentType());
+
+    if (!Objects.equals(
+            passiveCitationCaselaw.getSourceDocumentNumber(), source.get().getDocumentNumber())
+        || !Objects.equals(passiveCitationCaselaw.getSourceCourt(), source.get().getCourt())
+        || !Objects.equals(passiveCitationCaselaw.getSourceDate(), source.get().getDate())
+        || !Objects.equals(
+            passiveCitationCaselaw.getSourceFileNumber(),
+            source.get().getFileNumbers().stream()
+                .findFirst()
+                .map(FileNumberDTO::getValue)
+                .orElse(null))
+        || !Objects.equals(
+            passiveCitationCaselaw.getSourceDocumentType(), source.get().getDocumentType())) {
+
+      log.atInfo()
+          .addKeyValue(
+              LoggingKeys.SOURCE_DOCUMENT_NUMBER,
+              passiveCitationCaselaw.getTarget() != null
+                  ? passiveCitationCaselaw.getTarget().getDocumentNumber()
+                  : null)
+          .addKeyValue(
+              "activeCitation.sourceDocumentNumber",
+              passiveCitationCaselaw.getSourceDocumentNumber())
+          .addKeyValue("source.documentNumber", source.get().getDocumentNumber())
+          .addKeyValue("activeCitation.sourceCourt", passiveCitationCaselaw.getSourceCourt())
+          .addKeyValue("source.court", source.get().getCourt())
+          .addKeyValue("activeCitation.sourceDate", passiveCitationCaselaw.getSourceDate())
+          .addKeyValue("source.date", source.get().getDate())
+          .addKeyValue(
+              "activeCitation.sourceFileNumber", passiveCitationCaselaw.getSourceFileNumber())
+          .addKeyValue(
+              "source.fileNumber[0]",
+              source.get().getFileNumbers().stream()
+                  .findFirst()
+                  .map(FileNumberDTO::getValue)
+                  .orElse(null))
+          .addKeyValue(
+              "activeCitation.sourceDocumentType", passiveCitationCaselaw.getSourceDocumentType())
+          .addKeyValue("source.documentType", source.get().getDocumentType())
+          .setMessage(
+              "Metadata divergence detected between caselaw active citation and source caselaw document.")
+          .log();
+    }
 
     return Optional.of(passiveCitationCaselaw);
   }
@@ -114,21 +160,63 @@ public class CaselawCitationPublishService {
     var target = getActiveCitationTarget(activeCitationCaselaw);
 
     if (target.isEmpty()) {
-      activeCitationCaselaw.setTargetDocumentNumber(null);
+      // activeCitationCaselaw.setTargetDocumentNumber(null);
     } else {
       toDomain(
           target.get()); // load the lazy properties of the target, we need them later on after the
       // transaction is closed
 
-      activeCitationCaselaw.setTargetDocumentNumber(target.get().getDocumentNumber());
-      activeCitationCaselaw.setTargetCourt(target.get().getCourt());
-      activeCitationCaselaw.setTargetDate(target.get().getDate());
-      activeCitationCaselaw.setTargetFileNumber(
-          target.get().getFileNumbers().stream()
-              .findFirst()
-              .map(FileNumberDTO::getValue)
-              .orElse(null));
-      activeCitationCaselaw.setTargetDocumentType(target.get().getDocumentType());
+      //      activeCitationCaselaw.setTargetDocumentNumber(target.get().getDocumentNumber());
+      //      activeCitationCaselaw.setTargetCourt(target.get().getCourt());
+      //      activeCitationCaselaw.setTargetDate(target.get().getDate());
+      //      activeCitationCaselaw.setTargetFileNumber(
+      //          target.get().getFileNumbers().stream()
+      //              .findFirst()
+      //              .map(FileNumberDTO::getValue)
+      //              .orElse(null));
+      //      activeCitationCaselaw.setTargetDocumentType(target.get().getDocumentType());
+      if (!Objects.equals(
+              activeCitationCaselaw.getTargetDocumentNumber(), target.get().getDocumentNumber())
+          || !Objects.equals(activeCitationCaselaw.getTargetCourt(), target.get().getCourt())
+          || !Objects.equals(activeCitationCaselaw.getTargetDate(), target.get().getDate())
+          || !Objects.equals(
+              activeCitationCaselaw.getTargetFileNumber(),
+              target.get().getFileNumbers().stream()
+                  .findFirst()
+                  .map(FileNumberDTO::getValue)
+                  .orElse(null))
+          || !Objects.equals(
+              activeCitationCaselaw.getTargetDocumentType(), target.get().getDocumentType())) {
+
+        log.atInfo()
+            .addKeyValue(
+                LoggingKeys.SOURCE_DOCUMENT_NUMBER,
+                activeCitationCaselaw.getSource() != null
+                    ? activeCitationCaselaw.getSource().getDocumentNumber()
+                    : null)
+            .addKeyValue(
+                "activeCitation.targetDocumentNumber",
+                activeCitationCaselaw.getTargetDocumentNumber())
+            .addKeyValue("target.documentNumber", target.get().getDocumentNumber())
+            .addKeyValue("activeCitation.targetCourt", activeCitationCaselaw.getTargetCourt())
+            .addKeyValue("target.court", target.get().getCourt())
+            .addKeyValue("activeCitation.targetDate", activeCitationCaselaw.getTargetDate())
+            .addKeyValue("target.date", target.get().getDate())
+            .addKeyValue(
+                "activeCitation.targetFileNumber", activeCitationCaselaw.getTargetFileNumber())
+            .addKeyValue(
+                "target.fileNumber[0]",
+                target.get().getFileNumbers().stream()
+                    .findFirst()
+                    .map(FileNumberDTO::getValue)
+                    .orElse(null))
+            .addKeyValue(
+                "activeCitation.targetDocumentType", activeCitationCaselaw.getTargetDocumentType())
+            .addKeyValue("target.documentType", target.get().getDocumentType())
+            .setMessage(
+                "Metadata divergence detected between caselaw active citation and target caselaw document.")
+            .log();
+      }
     }
 
     return activeCitationCaselaw;
@@ -141,21 +229,58 @@ public class CaselawCitationPublishService {
     var target = getRelatedDocumentationTarget(relatedDocumentation);
 
     if (target.isEmpty()) {
-      relatedDocumentation.setDocumentNumber(null);
+      // relatedDocumentation.setDocumentNumber(null);
     } else {
       toDomain(
           target.get()); // load the lazy properties of the target, we need them later on after the
       // transaction is closed
 
-      relatedDocumentation.setDocumentNumber(target.get().getDocumentNumber());
-      relatedDocumentation.setCourt(target.get().getCourt());
-      relatedDocumentation.setDate(target.get().getDate());
-      relatedDocumentation.setFileNumber(
-          target.get().getFileNumbers().stream()
-              .findFirst()
-              .map(FileNumberDTO::getValue)
-              .orElse(null));
-      relatedDocumentation.setDocumentType(target.get().getDocumentType());
+      //      relatedDocumentation.setDocumentNumber(target.get().getDocumentNumber());
+      //      relatedDocumentation.setCourt(target.get().getCourt());
+      //      relatedDocumentation.setDate(target.get().getDate());
+      //      relatedDocumentation.setFileNumber(
+      //          target.get().getFileNumbers().stream()
+      //              .findFirst()
+      //              .map(FileNumberDTO::getValue)
+      //              .orElse(null));
+      //      relatedDocumentation.setDocumentType(target.get().getDocumentType());
+
+      if (!Objects.equals(
+              relatedDocumentation.getDocumentNumber(), target.get().getDocumentNumber())
+          || !Objects.equals(relatedDocumentation.getCourt(), target.get().getCourt())
+          || !Objects.equals(relatedDocumentation.getDate(), target.get().getDate())
+          || !Objects.equals(
+              relatedDocumentation.getFileNumber(),
+              target.get().getFileNumbers().stream()
+                  .findFirst()
+                  .map(FileNumberDTO::getValue)
+                  .orElse(null))
+          || !Objects.equals(
+              relatedDocumentation.getDocumentType(), target.get().getDocumentType())) {
+
+        log.atInfo()
+            .addKeyValue("relatedDocumentation.id", relatedDocumentation.getId())
+            .addKeyValue(
+                "relatedDocumentation.documentNumber", relatedDocumentation.getDocumentNumber())
+            .addKeyValue("target.documentNumber", target.get().getDocumentNumber())
+            .addKeyValue("relatedDocumentation.court", relatedDocumentation.getCourt())
+            .addKeyValue("target.court", target.get().getCourt())
+            .addKeyValue("relatedDocumentation.date", relatedDocumentation.getDate())
+            .addKeyValue("target.date", target.get().getDate())
+            .addKeyValue("relatedDocumentation.fileNumber", relatedDocumentation.getFileNumber())
+            .addKeyValue(
+                "target.fileNumber[0]",
+                target.get().getFileNumbers().stream()
+                    .findFirst()
+                    .map(FileNumberDTO::getValue)
+                    .orElse(null))
+            .addKeyValue(
+                "relatedDocumentation.documentType", relatedDocumentation.getDocumentType())
+            .addKeyValue("target.documentType", target.get().getDocumentType())
+            .setMessage(
+                "Metadata divergence detected between caselaw related document and target caselaw document.")
+            .log();
+      }
     }
 
     return relatedDocumentation;

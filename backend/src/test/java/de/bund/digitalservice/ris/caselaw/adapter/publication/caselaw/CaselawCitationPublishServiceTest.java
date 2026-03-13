@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationCa
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,6 +52,8 @@ public class CaselawCitationPublishServiceTest {
     }
 
     @Test
+    @Disabled(
+        "We are not yet enriching the refs as we first want to know how often that would change data")
     void shouldReturnEmptyIfDocumentNumberIsGivenButNoDocumentIsFound() {
       var passiveCitation =
           PassiveCitationCaselawDTO.builder()
@@ -70,6 +73,8 @@ public class CaselawCitationPublishServiceTest {
     }
 
     @Test
+    @Disabled(
+        "We are not yet enriching the refs as we first want to know how often that would change data")
     void shouldReturnUpdatedPassiveCitationWhenDocumentIsFound() {
       var passiveCitation =
           PassiveCitationCaselawDTO.builder().sourceDocumentNumber("XXRE000714526").rank(1).build();
@@ -125,6 +130,8 @@ public class CaselawCitationPublishServiceTest {
     }
 
     @Test
+    @Disabled(
+        "We are not yet enriching the refs as we first want to know how often that would change data")
     void
         shouldReturnSameReferenceWithoutDocumentNumberIfDocumentNumberIsGivenButNoDocumentIsFound() {
       var activeCitation =
@@ -151,6 +158,8 @@ public class CaselawCitationPublishServiceTest {
     }
 
     @Test
+    @Disabled(
+        "We are not yet enriching the refs as we first want to know how often that would change data")
     void shouldReturnUpdatedActiveCitationWhenDocumentIsFound() {
       var activeCitation =
           ActiveCitationCaselawDTO.builder().targetDocumentNumber("XXRE000714526").rank(1).build();
@@ -204,6 +213,8 @@ public class CaselawCitationPublishServiceTest {
     }
 
     @Test
+    @Disabled(
+        "We are not yet enriching the refs as we first want to know how often that would change data")
     void
         shouldReturnSameRelatedDocumentWithoutDocumentNumberIfDocumentNumberIsGivenButNoDocumentIsFound() {
       var ensuingDecision =
@@ -229,6 +240,8 @@ public class CaselawCitationPublishServiceTest {
     }
 
     @Test
+    @Disabled(
+        "We are not yet enriching the refs as we first want to know how often that would change data")
     void shouldReturnUpdatedRelatedDocumentWhenDocumentIsFound() {
       var ensuingDecision =
           EnsuingDecisionDTO.builder()
