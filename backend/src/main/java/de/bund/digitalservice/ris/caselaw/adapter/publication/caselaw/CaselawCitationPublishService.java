@@ -3,12 +3,10 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication.caselaw;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationCaselawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PassiveCitationCaselawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RelatedDocumentationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PendingProceedingTransformer;
@@ -158,14 +156,6 @@ public class CaselawCitationPublishService {
               .map(FileNumberDTO::getValue)
               .orElse(null));
       relatedDocumentation.setDocumentType(target.get().getDocumentType());
-
-      if (relatedDocumentation instanceof PreviousDecisionDTO previousDecision) {
-        previousDecision.setDeviatingFileNumber(
-            target.get().getDeviatingFileNumbers().stream()
-                .findFirst()
-                .map(DeviatingFileNumberDTO::getValue)
-                .orElse(null));
-      }
     }
 
     return relatedDocumentation;
