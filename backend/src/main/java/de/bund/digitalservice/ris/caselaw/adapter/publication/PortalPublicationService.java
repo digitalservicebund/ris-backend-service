@@ -383,7 +383,7 @@ public class PortalPublicationService {
         attachmentInlineRepository.findAllByDocumentationUnitId(documentationUnit.getId());
 
     if (documentationUnit instanceof DecisionDTO decision) {
-      validateAndEnrichCaselawCitations(decision);
+      validateAndEnrichCaselawRelatedDocuments(decision);
       // validateAndEnrichUliCitations(decision);
       // validateAndEnrichAdmCitations(decision);
       // validateAndEnrichSliCitations(decision);
@@ -425,7 +425,7 @@ public class PortalPublicationService {
     return result;
   }
 
-  private void validateAndEnrichCaselawCitations(DecisionDTO decision) {
+  private void validateAndEnrichCaselawRelatedDocuments(DecisionDTO decision) {
     if (decision.getActiveCaselawCitations() != null) {
       var enriched =
           decision.getActiveCaselawCitations().stream()
