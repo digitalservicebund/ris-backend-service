@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.publication.caselaw;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationCaselawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
@@ -107,6 +109,39 @@ public class CaselawCitationPublishServiceTest {
       assertThat(result.get().getSourceDocumentType()).isEqualTo(documentType);
       assertThat(result.get().getCitationType()).isNull();
     }
+
+    @Test
+    void shouldLogInfoIfInformationDiffers() {
+      var memoryAppender = new TestMemoryAppender(CaselawCitationPublishService.class);
+      var passiveCitation =
+          PassiveCitationCaselawDTO.builder().sourceDocumentNumber("XXRE000714526").rank(1).build();
+      var court = CourtDTO.builder().build();
+      var documentType = DocumentTypeDTO.builder().build();
+
+      when(documentationUnitRepository.findPublishedByDocumentNumber("XXRE000714526"))
+          .thenReturn(
+              Optional.of(
+                  DecisionDTO.builder()
+                      .documentNumber("XXRE000714526")
+                      .date(LocalDate.parse("2026-01-01"))
+                      .court(court)
+                      .fileNumbers(
+                          List.of(
+                              FileNumberDTO.builder().value("XXX 0001").build(),
+                              FileNumberDTO.builder().value("XXX 0002").build()))
+                      .documentType(documentType)
+                      .build()));
+
+      caselawCitationPublishService.updatePassiveCitationSourceWithInformationFromSource(
+          passiveCitation);
+
+      assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1L);
+      assertThat(memoryAppender.getMessage(Level.INFO, 0))
+          .contains(
+              "Metadata divergence detected between caselaw passive citation and source caselaw document.");
+
+      memoryAppender.detachLoggingTestAppender();
+    }
   }
 
   @Nested
@@ -191,6 +226,39 @@ public class CaselawCitationPublishServiceTest {
       assertThat(result.getTargetFileNumber()).isEqualTo("XXX 0001");
       assertThat(result.getTargetDocumentType()).isEqualTo(documentType);
       assertThat(result.getCitationType()).isNull();
+    }
+
+    @Test
+    void shouldLogInfoIfInformationDiffers() {
+      var memoryAppender = new TestMemoryAppender(CaselawCitationPublishService.class);
+      var activeCitation =
+          ActiveCitationCaselawDTO.builder().targetDocumentNumber("XXRE000714526").rank(1).build();
+      var court = CourtDTO.builder().build();
+      var documentType = DocumentTypeDTO.builder().build();
+
+      when(documentationUnitRepository.findPublishedByDocumentNumber("XXRE000714526"))
+          .thenReturn(
+              Optional.of(
+                  DecisionDTO.builder()
+                      .documentNumber("XXRE000714526")
+                      .date(LocalDate.parse("2026-01-01"))
+                      .court(court)
+                      .fileNumbers(
+                          List.of(
+                              FileNumberDTO.builder().value("XXX 0001").build(),
+                              FileNumberDTO.builder().value("XXX 0002").build()))
+                      .documentType(documentType)
+                      .build()));
+
+      caselawCitationPublishService.updateActiveCitationTargetWithInformationFromTarget(
+          activeCitation);
+
+      assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1L);
+      assertThat(memoryAppender.getMessage(Level.INFO, 0))
+          .contains(
+              "Metadata divergence detected between caselaw active citation and target caselaw document.");
+
+      memoryAppender.detachLoggingTestAppender();
     }
   }
 
@@ -277,5 +345,42 @@ public class CaselawCitationPublishServiceTest {
       assertThat(result.getDate()).isEqualTo(LocalDate.parse("2026-01-01"));
       assertThat(result.getDocumentType()).isEqualTo(documentType);
     }
+  }
+
+  @Test
+  void shouldLogInfoIfInformationDiffers() {
+    var memoryAppender = new TestMemoryAppender(CaselawCitationPublishService.class);
+    var ensuingDecision =
+        EnsuingDecisionDTO.builder()
+            .documentNumber("XXRE000714526")
+            .fileNumber("XXX 2313")
+            .rank(1)
+            .build();
+    var court = CourtDTO.builder().build();
+    var documentType = DocumentTypeDTO.builder().build();
+
+    when(documentationUnitRepository.findPublishedByDocumentNumber("XXRE000714526"))
+        .thenReturn(
+            Optional.of(
+                DecisionDTO.builder()
+                    .documentNumber("XXRE000714526")
+                    .date(LocalDate.parse("2026-01-01"))
+                    .court(court)
+                    .fileNumbers(
+                        List.of(
+                            FileNumberDTO.builder().value("XXX 0001").build(),
+                            FileNumberDTO.builder().value("XXX 0002").build()))
+                    .documentType(documentType)
+                    .build()));
+
+    caselawCitationPublishService.updateRelatedDocumentationWithInformationFromTarget(
+        ensuingDecision);
+
+    assertThat(memoryAppender.count(Level.INFO)).isEqualTo(1L);
+    assertThat(memoryAppender.getMessage(Level.INFO, 0))
+        .contains(
+            "Metadata divergence detected between caselaw related document and target caselaw document.");
+
+    memoryAppender.detachLoggingTestAppender();
   }
 }
