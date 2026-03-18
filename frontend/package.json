@@ -109,7 +109,7 @@
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jest-dom": "^5.5.0",
-    "eslint-plugin-playwright": "^2.8.0",
+    "eslint-plugin-playwright": "^2.10.0",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-testing-library": "7.6.3",
     "eslint-plugin-vue": "^10.8.0",
