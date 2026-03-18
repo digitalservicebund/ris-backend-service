@@ -223,7 +223,7 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:1.16.4")
     implementation("io.micrometer:micrometer-core:1.16.4")
 
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260102.1")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260313.1")
 
     implementation("io.getunleash:unleash-client-java:12.2.0")
     implementation("org.apache.commons:commons-text:1.15.0")
