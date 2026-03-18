@@ -438,7 +438,7 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@7440e20e3e0bb180a2f6e330bcd53504e2ac8980
       - name: Deploy new images
-        uses: digitalservicebund/argocd-deploy@4e758f584953506c571951ffcba33d6a6246e856 # v1.0.0
+        uses: digitalservicebund/argocd-deploy@19708d480aa35161125e04e2e5147bec1a9322ad # v1.0.0
         with:
           environment: staging
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
@@ -554,7 +554,7 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@7440e20e3e0bb180a2f6e330bcd53504e2ac8980
       - name: Deploy new images
-        uses: digitalservicebund/argocd-deploy@4e758f584953506c571951ffcba33d6a6246e856 # v1.0.0
+        uses: digitalservicebund/argocd-deploy@19708d480aa35161125e04e2e5147bec1a9322ad # v1.0.0
         with:
           environment: production
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
@@ -597,7 +597,7 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@7440e20e3e0bb180a2f6e330bcd53504e2ac8980
       - name: Deploy new images
-        uses: digitalservicebund/argocd-deploy@4e758f584953506c571951ffcba33d6a6246e856 # v1.0.0
+        uses: digitalservicebund/argocd-deploy@19708d480aa35161125e04e2e5147bec1a9322ad # v1.0.0
         with:
           environment: uat
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
