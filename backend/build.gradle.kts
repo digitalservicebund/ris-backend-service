@@ -163,7 +163,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:7.0.3")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:7.0.4")
     implementation("org.springframework.boot:spring-boot-starter-flyway")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:5.0.1")
@@ -181,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.42.13"))
+    implementation(platform("software.amazon.awssdk:bom:2.42.14"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -268,7 +268,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.8.4")
-    testImplementation("org.springframework.security:spring-security-test:7.0.3")
+    testImplementation("org.springframework.security:spring-security-test:7.0.4")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter:$testContainersVersion")
@@ -276,7 +276,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.2.7.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.3.0.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
