@@ -20,6 +20,9 @@ updates:
       # later versions have a bug that reports false positives
       - dependency-name: "eslint-plugin-testing-library"
         versions: [ ">7.6.3" ]
+      # we won't fix new eslint rule violations for deprecated e2e tests
+      - dependency-name: "eslint-plugin-playwright"
+        versions: [ ">=2.9.0" ]
 
   - package-ecosystem: "docker"
     directory: "/"
