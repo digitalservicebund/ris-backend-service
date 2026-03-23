@@ -11,17 +11,17 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "4.0.3"
+    id("org.springframework.boot") version "4.0.4"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.diffplug.spotless") version "8.3.0"
+    id("com.diffplug.spotless") version "8.4.0"
     id("org.sonarqube") version "7.2.3.7755"
     id("com.github.jk1.dependency-license-report") version "3.1.1"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.2.0"
-    id("org.flywaydb.flyway") version "12.1.0"
-    id("io.sentry.jvm.gradle") version "6.1.0"
+    id("org.flywaydb.flyway") version "12.1.1"
+    id("io.sentry.jvm.gradle") version "6.2.0"
 }
 
 group = "de.bund.digitalservice"
@@ -151,7 +151,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "2.0.3"
+    val testContainersVersion = "2.0.4"
 
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -163,7 +163,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:7.0.3")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:7.0.4")
     implementation("org.springframework.boot:spring-boot-starter-flyway")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:5.0.1")
@@ -181,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.42.13"))
+    implementation(platform("software.amazon.awssdk:bom:2.42.17"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -229,8 +229,8 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.15.0")
     implementation("org.jsoup:jsoup:1.22.1")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:7.6.0")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.6.0")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:7.7.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.7.0")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.17.0")
@@ -247,10 +247,10 @@ dependencies {
     // CVE-2025-67735
     implementation("io.netty:netty-codec-http:4.2.10.Final")
 
-    val flywayCore = "org.flywaydb:flyway-core:12.1.0"
+    val flywayCore = "org.flywaydb:flyway-core:12.1.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:12.1.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:12.1.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -268,7 +268,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.8.4")
-    testImplementation("org.springframework.security:spring-security-test:7.0.3")
+    testImplementation("org.springframework.security:spring-security-test:7.0.4")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter:$testContainersVersion")
@@ -276,14 +276,14 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.2.7.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.3.0.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
 buildscript {
     dependencies {
-        classpath("org.flywaydb:flyway-database-postgresql:12.1.0")
+        classpath("org.flywaydb:flyway-database-postgresql:12.1.1")
     }
 }
 
