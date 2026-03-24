@@ -169,7 +169,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:5.0.1")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.34.0")
+    implementation("com.google.protobuf:protobuf-java:4.34.1")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.6.0")
@@ -181,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.42.17"))
+    implementation(platform("software.amazon.awssdk:bom:2.42.18"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -210,13 +210,13 @@ dependencies {
     // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.145.jar"))
 
     // GHSA-72hv-8253-57qq
-    implementation("com.fasterxml.jackson.core:jackson-core:2.21.1")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.21.2")
 
     implementation("tools.jackson.core:jackson-core:3.1.0")
     implementation("tools.jackson.core:jackson-databind:3.1.0")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.21")
     implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.1.0")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.1")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.2")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
