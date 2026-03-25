@@ -23,6 +23,10 @@ updates:
       # we won't fix new eslint rule violations for deprecated e2e tests
       - dependency-name: "eslint-plugin-playwright"
         versions: [ ">=2.9.0" ]
+      - dependency-name: "eslint"
+        versions: [ ">=10.0.0" ]
+      - dependency-name: "vite"
+        versions: [ ">=8.0.0" ]
 
   - package-ecosystem: "docker"
     directory: "/"
