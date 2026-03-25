@@ -25,6 +25,8 @@ updates:
         versions: [ ">=2.9.0" ]
       - dependency-name: "eslint"
         versions: [ ">=10.0.0" ]
+      - dependency-name: "@eslint/js"
+        versions: [ ">=10.0.0" ]
       - dependency-name: "vite"
         versions: [ ">=8.0.0" ]
 
