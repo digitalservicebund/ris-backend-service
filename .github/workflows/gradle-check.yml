@@ -8,7 +8,7 @@ jobs:
   log-gradle-version-and-dependencies:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Get Gradle version
         working-directory: ./backend
         run: |
@@ -34,7 +34,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew dependencies >> ../gradle-info.txt
       - name: Upload gradle info file
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         with:
           name: gradle-info
           path: gradle-info.txt
