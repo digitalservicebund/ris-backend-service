@@ -189,7 +189,7 @@ dependencies {
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
-    implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.9")
+    implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:5.0.0")
     implementation("net.sf.saxon:Saxon-HE:12.9")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.5")
