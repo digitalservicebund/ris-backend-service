@@ -12,7 +12,7 @@ jobs:
     outputs:
       frontend: ${{ steps.filter.outputs.frontend }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: dorny/paths-filter@v4
         id: filter
         with:
@@ -25,16 +25,16 @@ jobs:
     if: ${{ needs.scan-frontend-changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: "24.11.1"
           # node-version-file: ./frontend/package.json
           cache: npm
           cache-dependency-path: ./frontend/package-lock.json
       - name: Cache node_modules
-        uses: actions/cache@v5
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
         id: node-modules-cache
         with:
           path: |
@@ -62,23 +62,23 @@ jobs:
     if: ${{ needs.scan-frontend-changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: "24.11.1"
           # node-version-file: ./frontend/package.json
           cache: npm
           cache-dependency-path: ./frontend/package-lock.json
       - name: Cache node_modules
-        uses: actions/cache@v5
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
         id: node-modules-cache
         with:
           path: |
             ./frontend/node_modules
           key: modules-${{ hashFiles('./frontend/package-lock.json') }}
       - name: Cache style checks
-        uses: actions/cache@v5
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
         id: style-check-cache
         with:
           path: ./frontend/.cache
@@ -108,11 +108,11 @@ jobs:
     if: ${{  needs.scan-frontend-changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: "24.11.1"
           # node-version-file: ./frontend/package.json
