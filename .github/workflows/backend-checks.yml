@@ -1,7 +1,7 @@
 on:
   workflow_call:
     secrets:
-      SLACK_WEBHOOK_URL:
+      SLACK_BOT_TOKEN:
         required: false
       SONAR_TOKEN:
         required: false
@@ -9,6 +9,8 @@ on:
         required: true
       GH_PACKAGES_REPOSITORY_TOKEN:
         required: true
+env:
+  SLACK_CHANNEL_ID: C0A7G7ACW3Y
 jobs:
   scan-backend-changes:
     runs-on: ubuntu-latest
@@ -55,7 +57,8 @@ jobs:
         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 # v1.6.1
         if: ${{ failure() && github.ref == 'refs/heads/main' }}
         with:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ env.SLACK_CHANNEL_ID }}
 
   backend-integration-tests:
     needs: scan-backend-changes
@@ -89,7 +92,8 @@ jobs:
         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 # v1.6.1
         if: ${{ failure() && github.ref == 'refs/heads/main' }}
         with:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ env.SLACK_CHANNEL_ID }}
 
 
   backend-tests-and-code-quality:
@@ -137,4 +141,5 @@ jobs:
         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 # v1.6.1
         if: ${{ failure() && github.ref == 'refs/heads/main' }}
         with:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ env.SLACK_CHANNEL_ID }}
