@@ -11,7 +11,7 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "4.0.4"
+    id("org.springframework.boot") version "4.0.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "8.4.0"
     id("org.sonarqube") version "7.2.3.7755"
@@ -20,8 +20,8 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.2.0"
-    id("org.flywaydb.flyway") version "12.1.1"
-    id("io.sentry.jvm.gradle") version "6.2.0"
+    id("org.flywaydb.flyway") version "12.2.0"
+    id("io.sentry.jvm.gradle") version "6.3.0"
 }
 
 group = "de.bund.digitalservice"
@@ -179,9 +179,9 @@ dependencies {
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
 
     // CVE-2022-4244
-    implementation("org.codehaus.plexus:plexus-utils:4.0.2")
+    implementation("org.codehaus.plexus:plexus-utils:4.0.3")
 
-    implementation(platform("software.amazon.awssdk:bom:2.42.18"))
+    implementation(platform("software.amazon.awssdk:bom:2.42.23"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -212,10 +212,10 @@ dependencies {
     // GHSA-72hv-8253-57qq
     implementation("com.fasterxml.jackson.core:jackson-core:2.21.2")
 
-    implementation("tools.jackson.core:jackson-core:3.1.0")
-    implementation("tools.jackson.core:jackson-databind:3.1.0")
+    implementation("tools.jackson.core:jackson-core:3.1.1")
+    implementation("tools.jackson.core:jackson-databind:3.1.1")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.21")
-    implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.1.0")
+    implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.1.1")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.2")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
@@ -245,12 +245,12 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.20.0")
 
     // CVE-2025-67735
-    implementation("io.netty:netty-codec-http:4.2.10.Final")
+    implementation("io.netty:netty-codec-http:4.2.12.Final")
 
-    val flywayCore = "org.flywaydb:flyway-core:12.1.1"
+    val flywayCore = "org.flywaydb:flyway-core:12.2.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:12.1.1")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:12.2.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -283,7 +283,7 @@ dependencies {
 
 buildscript {
     dependencies {
-        classpath("org.flywaydb:flyway-database-postgresql:12.1.1")
+        classpath("org.flywaydb:flyway-database-postgresql:12.2.0")
     }
 }
 
