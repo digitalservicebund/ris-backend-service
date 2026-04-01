@@ -130,7 +130,7 @@
     "stylelint-config-recommended-vue": "^1.6.1",
     "stylelint-config-standard": "^40.0.0",
     "tailwindcss": "^4.1.17",
-    "typescript": "5.9.3",
+    "typescript": "6.0.2",
     "typescript-eslint": "^8.57.2",
     "unplugin-icons": "^23.0.1",
     "vite": "^7.3.1",
