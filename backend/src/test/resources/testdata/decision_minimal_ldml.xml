@@ -1,0 +1,79 @@
+<akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0"
+                xmlns:ris="http://example.com/0.1/"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/os/part2-specs/schemas/akomantoso30.xsd">
+    <akn:judgment name="testDocumentTypeAbbreviation">
+        <akn:meta>
+            <akn:identification source="#ris">
+                <akn:FRBRWork>
+                    <akn:FRBRthis value="testDocumentNumber"/>
+                    <akn:FRBRuri value="testDocumentNumber"/>
+                    <akn:FRBRalias name="Übergreifende ID" value="13dffd6f-45e8-447e-a35b-f119b1301579"/>
+                    <akn:FRBRalias name="Dokumentnummer" value="testDocumentNumber"/>
+                    <akn:FRBRalias eId="aktenzeichen" name="Aktenzeichen" value="testFileNumber"/>
+                    <akn:FRBRdate eId="entscheidungsdatum" date="2020-01-01" name="Entscheidungsdatum"/>
+                    <akn:FRBRauthor href="#gericht"/>
+                    <akn:FRBRcountry value="fra"/>
+                </akn:FRBRWork>
+                <akn:FRBRExpression>
+                    <akn:FRBRthis value="testDocumentNumber"/>
+                    <akn:FRBRuri value="testDocumentNumber"/>
+                    <akn:FRBRdate date="2020-01-01" name="Entscheidungsdatum"/>
+                    <akn:FRBRauthor href="#gericht"/>
+                    <akn:FRBRlanguage language="deu"/>
+                </akn:FRBRExpression>
+                <akn:FRBRManifestation>
+                    <akn:FRBRthis value="testDocumentNumber.xml"/>
+                    <akn:FRBRuri value="testDocumentNumber.xml"/>
+                    <akn:FRBRdate date="2025-10-09" name="XML Transformation"/>
+                    <akn:FRBRauthor href="#dokumentationsstelle"/>
+                </akn:FRBRManifestation>
+            </akn:identification>
+            <akn:references source="#ris">
+                <akn:TLCOrganization eId="ris" href="" showAs="Rechtsinformationssystem des Bundes"/>
+                <akn:TLCOrganization eId="gericht"
+                                     href=""
+                                     showAs="Tribunal Administratif Nantes"/>
+                <akn:TLCLocation eId="gerichtsort" href="" showAs="Nantes"/>
+            </akn:references>
+            <akn:proprietary source="#ris">
+                <ris:meta>
+                    <ris:dokumenttyp akn:eId="dokumenttyp" domainTerm="Dokumenttyp">testDocumentTypeAbbreviation</ris:dokumenttyp>
+                    <ris:gericht domainTerm="Gericht" akn:refersTo="#gericht">
+                        <ris:gerichtstyp domainTerm="Gerichtstyp">Tribunal Administratif</ris:gerichtstyp>
+                        <ris:gerichtsort domainTerm="Gerichtsort">Nantes</ris:gerichtsort>
+                    </ris:gericht>
+                    <ris:regionen domainTerm="Regionen">
+                        <ris:region domainTerm="Region">FRA</ris:region>
+                    </ris:regionen>
+                    <ris:aktenzeichenListe domainTerm="Liste der Aktenzeichen">
+                        <ris:aktenzeichen domainTerm="Aktenzeichen" akn:refersTo="#aktenzeichen">testFileNumber</ris:aktenzeichen>
+                    </ris:aktenzeichenListe>
+                </ris:meta>
+            </akn:proprietary>
+        </akn:meta>
+        <akn:header>
+            <akn:p>Aktenzeichen: <akn:docNumber refersTo="#aktenzeichen">testFileNumber</akn:docNumber>
+            </akn:p>
+            <akn:p>Entscheidungsdatum: <akn:docDate date="2020-01-01" refersTo="#entscheidungsdatum">01.01.2020</akn:docDate>
+            </akn:p>
+            <akn:p>Gericht: <akn:courtType refersTo="#gericht">Tribunal Administratif Nantes</akn:courtType>
+            </akn:p>
+            <akn:p>Dokumenttyp: <akn:docType refersTo="#dokumenttyp">testDocumentTypeAbbreviation</akn:docType>
+            </akn:p>
+            <akn:p>Kurztitel:
+                <akn:shortTitle>
+                    <akn:embeddedStructure>
+                        <akn:p alternativeTo="textWrapper">Tribunal Administratif Nantes, 01.01.2020, testFileNumber
+                        </akn:p>
+                    </akn:embeddedStructure>
+                </akn:shortTitle>
+            </akn:p>
+        </akn:header>
+        <akn:judgmentBody>
+            <akn:background ris:domainTerm="Tatbestand">
+                <akn:p>Example content 1</akn:p>
+            </akn:background>
+        </akn:judgmentBody>
+    </akn:judgment>
+</akn:akomaNtoso>
