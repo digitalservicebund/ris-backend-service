@@ -15,13 +15,13 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "8.4.0"
     id("org.sonarqube") version "7.2.3.7755"
-    id("com.github.jk1.dependency-license-report") version "3.1.1"
+    id("com.github.jk1.dependency-license-report") version "3.1.2"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.2.0"
-    id("org.flywaydb.flyway") version "12.2.0"
-    id("io.sentry.jvm.gradle") version "6.3.0"
+    id("org.flywaydb.flyway") version "12.3.0"
+    id("io.sentry.jvm.gradle") version "6.4.0"
 }
 
 group = "de.bund.digitalservice"
@@ -181,11 +181,11 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.3")
 
-    implementation(platform("software.amazon.awssdk:bom:2.42.23"))
+    implementation(platform("software.amazon.awssdk:bom:2.42.33"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
-    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.11")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.12")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
@@ -247,10 +247,10 @@ dependencies {
     // CVE-2025-67735
     implementation("io.netty:netty-codec-http:4.2.12.Final")
 
-    val flywayCore = "org.flywaydb:flyway-core:12.2.0"
+    val flywayCore = "org.flywaydb:flyway-core:12.3.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:12.2.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:12.3.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -276,14 +276,14 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.3.0.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.3.1.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
 buildscript {
     dependencies {
-        classpath("org.flywaydb:flyway-database-postgresql:12.2.0")
+        classpath("org.flywaydb:flyway-database-postgresql:12.3.0")
     }
 }
 
