@@ -212,10 +212,10 @@ dependencies {
     // GHSA-72hv-8253-57qq
     implementation("com.fasterxml.jackson.core:jackson-core:2.21.2")
 
-    implementation("tools.jackson.core:jackson-core:3.1.1")
-    implementation("tools.jackson.core:jackson-databind:3.1.1")
+    implementation("tools.jackson.core:jackson-core:3.1.2")
+    implementation("tools.jackson.core:jackson-databind:3.1.2")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.21")
-    implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.1.1")
+    implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.1.2")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.2")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
