@@ -29,6 +29,9 @@ updates:
         versions: [ ">=10.0.0" ]
       - dependency-name: "vite"
         versions: [ ">=8.0.0" ]
+      # 3.1.2 for @guardian/prosemirror-invisibles introduces issues in the tests
+      - dependency-name: "@guardian/prosemirror-invisibles"
+        versions: [ ">= 3.1.1"]
 
   - package-ecosystem: "docker"
     directory: "/"
