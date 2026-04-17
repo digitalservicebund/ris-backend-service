@@ -247,6 +247,10 @@ dependencies {
     // CVE-2025-67735
     implementation("io.netty:netty-codec-http:4.2.12.Final")
 
+    // CVE-2026-34483 + CVE-2026-34487
+    implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.21")
+    implementation("org.apache.tomcat:tomcat-annotations-api:11.0.21")
+
     val flywayCore = "org.flywaydb:flyway-core:12.3.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
