@@ -20,7 +20,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("io.freefair.lombok") version "9.2.0"
-    id("org.flywaydb.flyway") version "12.3.0"
+    id("org.flywaydb.flyway") version "12.4.0"
     id("io.sentry.jvm.gradle") version "6.4.0"
 }
 
@@ -181,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.3")
 
-    implementation(platform("software.amazon.awssdk:bom:2.42.34"))
+    implementation(platform("software.amazon.awssdk:bom:2.42.35"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -236,7 +236,7 @@ dependencies {
     implementation("com.squareup.okio:okio-jvm:3.17.0")
 
     // CVE-2025-8916
-    implementation("org.bouncycastle:bcpkix-jdk18on:1.83")
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.84")
 
     // CVE-2025-51775, CVE-2024-29371
     implementation("org.bitbucket.b_c:jose4j:0.9.6")
@@ -251,10 +251,10 @@ dependencies {
     implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.21")
     implementation("org.apache.tomcat:tomcat-annotations-api:11.0.21")
 
-    val flywayCore = "org.flywaydb:flyway-core:12.3.0"
+    val flywayCore = "org.flywaydb:flyway-core:12.4.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:12.3.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:12.4.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -271,7 +271,7 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.23.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.8.4")
+    testImplementation("io.projectreactor:reactor-test:3.8.5")
     testImplementation("org.springframework.security:spring-security-test:7.0.4")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
@@ -287,7 +287,7 @@ dependencies {
 
 buildscript {
     dependencies {
-        classpath("org.flywaydb:flyway-database-postgresql:12.3.0")
+        classpath("org.flywaydb:flyway-database-postgresql:12.4.0")
     }
 }
 
