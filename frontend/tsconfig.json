@@ -23,10 +23,9 @@
       "vitest/globals",
       "unplugin-icons/types/vue"
     ],
-    "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"],
-      "~/*": ["test/*"]
+      "@/*": ["./src/*"],
+      "~/*": ["./test/*"]
     }
   },
   "include": ["src", "src/**/*.vue", "test/**/*.ts", "vite.config.ts"],

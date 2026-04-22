@@ -16,21 +16,20 @@ public class PassiveCitationUliTransformer {
     }
 
     LegalPeriodical legalPeriodical = null;
-    if (dto.getSourceLegalPeriodical() != null) {
-      legalPeriodical =
-          LegalPeriodicalTransformer.transformToDomain(dto.getSourceLegalPeriodical());
+    if (dto.getLegalPeriodical() != null) {
+      legalPeriodical = LegalPeriodicalTransformer.transformToDomain(dto.getLegalPeriodical());
     }
 
     return Reference.builder()
         .id(dto.getId())
         .author(dto.getSourceAuthor())
-        .citation(dto.getSourceCitation())
+        .citation(dto.getCitation())
         .documentationUnit(RelatedDocumentationUnitTransformer.transformToDomain(dto.getTarget()))
         .legalPeriodical(legalPeriodical)
         .legalPeriodicalRawValue(
             legalPeriodical != null
                 ? legalPeriodical.abbreviation()
-                : dto.getSourceLegalPeriodicalRawValue())
+                : dto.getLegalPeriodicalRawValue())
         .documentType(DocumentTypeTransformer.transformToDomain(dto.getSourceDocumentType()))
         .referenceType(ReferenceType.LITERATURE)
         .build();
@@ -49,9 +48,9 @@ public class PassiveCitationUliTransformer {
     return PassiveCitationUliDTO.builder()
         .id(reference.id())
         .sourceAuthor(reference.author())
-        .sourceCitation(reference.citation())
-        .sourceLegalPeriodical(legalPeriodicalDTO)
-        .sourceLegalPeriodicalRawValue(
+        .citation(reference.citation())
+        .legalPeriodical(legalPeriodicalDTO)
+        .legalPeriodicalRawValue(
             legalPeriodicalRawValue != null
                 ? legalPeriodicalRawValue
                 : reference.legalPeriodicalRawValue())

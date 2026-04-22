@@ -215,13 +215,13 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
                         PassiveCitationUliDTO.builder()
                             .rank(1)
                             .target(dto)
-                            .sourceCitation("2024, S.3")
+                            .citation("2024, S.3")
                             .sourceAuthor("Curie, Marie")
-                            .sourceLegalPeriodicalRawValue("BVerwGE")
+                            .legalPeriodicalRawValue("BVerwGE")
                             .sourceDocumentTypeRawValue("Ean")
                             .sourceDocumentType(
                                 DocumentTypeDTO.builder().id(eanDocumentType.uuid()).build())
-                            .sourceLegalPeriodical(
+                            .legalPeriodical(
                                 LegalPeriodicalDTO.builder()
                                     .id(bverwgeLegalPeriodical.uuid())
                                     .build())

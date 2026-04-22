@@ -20,6 +20,7 @@ function authenticateUser(user: {
 
   setup(`authenticate ${user.name}`, async ({ page, browser }) => {
     const cookieFilePath = `test/e2e/caselaw/.auth/${user.name}.json`
+    // eslint-disable-next-line playwright/no-conditional-in-test
     if (fs.existsSync(cookieFilePath)) {
       const context = await browser.newContext({
         storageState: cookieFilePath,
@@ -33,6 +34,7 @@ function authenticateUser(user: {
         }
       })
 
+      // eslint-disable-next-line playwright/no-conditional-in-test
       if (sessionCookie !== null) {
         return
       }

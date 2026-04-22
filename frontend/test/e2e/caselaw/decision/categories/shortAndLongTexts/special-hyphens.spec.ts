@@ -10,6 +10,12 @@ import {
   uploadTestfile,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
+// eslint-disable-next-line playwright/no-skipped-test
+test.skip(
+  ({ browserName }) => browserName !== "chromium",
+  "Skipping in engines other than chromium, reason playwright diriven for firefox and safari does not support copy paste type='text/html' from clipboard",
+)
+
 test.describe(
   "transform special hyphen characters correctly",
   {

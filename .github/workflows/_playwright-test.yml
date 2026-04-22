@@ -23,24 +23,27 @@ on:
     secrets:
       STAGING_URL:
         required: true
-      SLACK_WEBHOOK_URL:
+      SLACK_BOT_TOKEN:
         required: false
+
+env:
+  SLACK_CHANNEL_ID: C0A7G7ACW3Y
 
 jobs:
   playwright-test:
     name: ${{ inputs.project }} (${{ inputs.shard_index }}, ${{ inputs.shard_total }})
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version-file: ./frontend/package.json
           cache: npm
           cache-dependency-path: ./frontend/package-lock.json
       - name: cache node modules
         id: cache-node
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           path: |
             ./frontend/node_modules
@@ -55,7 +58,7 @@ jobs:
         run: echo "PLAYWRIGHT_VERSION=$(jq -r '.packages["node_modules/@playwright/test"].version' package-lock.json)" >> $GITHUB_ENV
       - name: Cache browser binaries
         id: cache-browser-binaries
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
@@ -99,7 +102,7 @@ jobs:
           npx playwright test --project ${{ inputs.project }} --repeat-each ${{ inputs.runs}} $reporter_config $workers_config --retries=3 --max-failures=5 --shard=${{ inputs.shard_index }}/${{ inputs.shard_total }}
         working-directory: ./frontend
       - name: Upload screenshots and traces of failed tests
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: ${{ failure() }}
         with:
           name: failed-${{ inputs.project }}-tests
@@ -133,14 +136,14 @@ jobs:
           done
         working-directory: ./frontend
       - name: Upload json reports
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: ${{ always() }}
         with:
           name: test-results-${{ inputs.project }}-${{ inputs.shard_index }}
           path: ./frontend/test-results.json
           retention-days: 1
       - name: Upload test result blobs reports
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: ${{ !cancelled() }}
         with:
           name: test-results-blob-${{ inputs.project }}-${{ inputs.shard_index }}
@@ -149,7 +152,8 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/notify-on-failure-gha@814d0c4b2ad6a3443e89c991f8657b10126510bf # v1.5.0
+        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 # v1.6.1
         if: ${{ failure() && github.ref == 'refs/heads/main' }}
         with:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ env.SLACK_CHANNEL_ID }}

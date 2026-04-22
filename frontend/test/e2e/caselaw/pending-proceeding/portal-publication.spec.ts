@@ -4,7 +4,6 @@ import {
   expectHistoryLogRow,
   navigateToManagementData,
   navigateToPublication,
-  requestHtmlFromPortalApi,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe(
@@ -49,7 +48,7 @@ test.describe(
       {
         tag: ["@RISDEV-7896", "@RISDEV-8460"],
       },
-      async ({ page, prefilledPendingProceeding, baseURL, browser }) => {
+      async ({ page, prefilledPendingProceeding, baseURL }) => {
         await navigateToPublication(
           page,
           prefilledPendingProceeding.documentNumber,
@@ -89,6 +88,8 @@ test.describe(
         // Portal is not available in local environment
         // eslint-disable-next-line playwright/no-conditional-in-test
         if (baseURL !== "http://127.0.0.1") {
+          // skipeed as the portal is no longer available in the same environment
+          /*
           await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
             const portalResponse = await requestHtmlFromPortalApi(
               browser,
@@ -100,6 +101,7 @@ test.describe(
             // eslint-disable-next-line playwright/no-conditional-expect
             expect(portalResponse.content).toContain("test headline")
           })
+          */
         }
 
         await test.step("Eine veröffentlichte Dokumentationseinheit kann nicht gelöscht werden", async () => {
@@ -143,6 +145,8 @@ test.describe(
         // Portal is not available in local environment
         // eslint-disable-next-line playwright/no-conditional-in-test
         if (baseURL !== "http://127.0.0.1") {
+          // skipeed as the portal is no longer available in the same environment
+          /*
           await test.step("Die Entscheidung ist nicht per Portal-API abrufbar", async () => {
             const portalResponse = await requestHtmlFromPortalApi(
               browser,
@@ -152,6 +156,7 @@ test.describe(
             // eslint-disable-next-line playwright/no-conditional-expect
             expect(portalResponse.status).toBe(404)
           })
+          */
         }
 
         await test.step("Veröffentlichen und Zurückziehen wird in der Historie geloggt", async () => {

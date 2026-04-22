@@ -14,4 +14,6 @@ public interface DatabaseCitationTypeRepository extends JpaRepository<CitationTy
           + "AND ct.documentationUnitDocumentCategory.label = 'R' AND ct.citationDocumentCategory.label = 'R' "
           + "ORDER BY ct.label")
   List<CitationTypeDTO> findBySearchStr(@Param("searchStr") Optional<String> searchStr);
+
+  Optional<CitationTypeDTO> findByAbbreviation(String abbreviation);
 }

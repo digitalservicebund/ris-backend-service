@@ -2,7 +2,6 @@ import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   expectHistoryLogRow,
-  requestHtmlFromPortalApi,
   navigateToCategories,
   navigateToManagementData,
   navigateToPublication,
@@ -67,7 +66,7 @@ test.describe(
       {
         tag: ["@RISDEV-8456", "@RISDEV-8460"],
       },
-      async ({ page, prefilledDocumentUnit, baseURL, browser }) => {
+      async ({ page, prefilledDocumentUnit, baseURL }) => {
         await navigateToPublication(page, prefilledDocumentUnit.documentNumber)
 
         await test.step("Anzeige einer unveröffentlichten Entscheidung mit allen Checks und ohne Fehler", async () => {
@@ -151,6 +150,8 @@ test.describe(
         // Portal is not available in local environment
         // eslint-disable-next-line playwright/no-conditional-in-test
         if (baseURL !== "http://127.0.0.1") {
+          // skipped as the portal is no longer available in the same environment
+          /*
           await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
             const portalResponse = await requestHtmlFromPortalApi(
               browser,
@@ -162,6 +163,7 @@ test.describe(
             // eslint-disable-next-line playwright/no-conditional-expect
             expect(portalResponse.content).toContain("testHeadline")
           })
+          */
         }
 
         await test.step("Eine veröffentlichte Dokumentationseinheit kann nicht gelöscht werden", async () => {
@@ -216,6 +218,8 @@ test.describe(
         // Portal is not available in local environment
         // eslint-disable-next-line playwright/no-conditional-in-test
         if (baseURL !== "http://127.0.0.1") {
+          // skipped as the portal is no longer available in the same environment
+          /*
           await test.step("Die Entscheidung ist nicht mehr per Portal-API abrufbar", async () => {
             const portalResponse = await requestHtmlFromPortalApi(
               browser,
@@ -225,6 +229,7 @@ test.describe(
             // eslint-disable-next-line playwright/no-conditional-expect
             expect(portalResponse.status).toBe(404)
           })
+           */
         }
 
         await test.step("Veröffentlichen und Zurückziehen wird in der Historie geloggt", async () => {
