@@ -181,7 +181,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.3")
 
-    implementation(platform("software.amazon.awssdk:bom:2.42.35"))
+    implementation(platform("software.amazon.awssdk:bom:2.42.36"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -225,7 +225,7 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260313.1")
 
-    implementation("io.getunleash:unleash-client-java:12.2.0")
+    implementation("io.getunleash:unleash-client-java:12.2.1")
     implementation("org.apache.commons:commons-text:1.15.0")
     implementation("org.jsoup:jsoup:1.22.1")
 
@@ -273,7 +273,7 @@ dependencies {
 
     testImplementation("io.projectreactor:reactor-test:3.8.5")
     testImplementation("org.springframework.security:spring-security-test:7.0.4")
-    testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
+    testImplementation("com.tngtech.archunit:archunit-junit5:1.4.2")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter:$testContainersVersion")
     testImplementation("org.testcontainers:testcontainers-postgresql:$testContainersVersion")
