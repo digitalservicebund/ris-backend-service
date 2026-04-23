@@ -18,7 +18,7 @@ plugins {
     id("com.github.jk1.dependency-license-report") version "3.1.2"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
-    id("com.github.ben-manes.versions") version "0.53.0"
+    id("com.github.ben-manes.versions") version "0.54.0"
     id("io.freefair.lombok") version "9.2.0"
     id("org.flywaydb.flyway") version "12.4.0"
     id("io.sentry.jvm.gradle") version "6.4.0"
