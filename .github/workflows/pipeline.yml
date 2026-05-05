@@ -21,7 +21,6 @@ env:
   GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-  REPORTS_REPOSITORY: digitalservicebund/ris-reports
   SLACK_CHANNEL_ID: C0A7G7ACW3Y
 
 jobs:
@@ -736,16 +735,6 @@ jobs:
       - generate-test-reports
     if: ${{ github.ref == 'refs/heads/main' }}
     steps:
-      # Setup
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-        with:
-          repository: ${{ env.REPORTS_REPOSITORY }}
-          ssh-key: ${{ secrets.REPORTS_DEPLOY_KEY }}
-      - name: Setup git config
-        run: |
-          git config user.name "${{ github.repository }}"
-          # This email identifies the commit as GitHub Actions - see https://github.com/orgs/community/discussions/26560
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       # First checkout ris-backend-service because of ADRs
       - name: Checkout ris-backend-service repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -776,15 +765,19 @@ jobs:
           path: tmp/licence-reports/
           merge-multiple: true
       - name: Frontend licence report - git add report
-        uses: digitalservicebund/add-ris-report@c6c8735d23295c36a271c75e7dedc9b6b9a9ef5e
+        uses: digitalservicebund/add-ris-report@3fafb0fb08714549c748eb44ac69d2099c7cbb47
         with:
           filePath: tmp/licence-reports/frontend-licence-report.csv
           destinationDir: licence-reports/frontend/ris-backend-service
+          BUCKET_ACCESS_KEY_ID: ${{ secrets.REPORTS_BUCKET_ACCESS_KEY_ID }}
+          BUCKET_SECRET_ACCESS_KEY: ${{ secrets.REPORTS_BUCKET_SECRET_ACCESS_KEY }}
       - name: Backend licence report - git add report
-        uses: digitalservicebund/add-ris-report@c6c8735d23295c36a271c75e7dedc9b6b9a9ef5e
+        uses: digitalservicebund/add-ris-report@3fafb0fb08714549c748eb44ac69d2099c7cbb47
         with:
           filePath: tmp/licence-reports/backend-licence-report.csv
           destinationDir: licence-reports/backend/ris-backend-service
+          BUCKET_ACCESS_KEY_ID: ${{ secrets.REPORTS_BUCKET_ACCESS_KEY_ID }}
+          BUCKET_SECRET_ACCESS_KEY: ${{ secrets.REPORTS_BUCKET_SECRET_ACCESS_KEY }}
       # Performance report
       - name: Performance reports - Download
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
@@ -793,10 +786,12 @@ jobs:
           path: tmp/performance-reports/
       - run: mv tmp/performance-reports/profile*.html tmp/performance-reports/profile-report.html
       - name: Performance report - git add report
-        uses: digitalservicebund/add-ris-report@c6c8735d23295c36a271c75e7dedc9b6b9a9ef5e
+        uses: digitalservicebund/add-ris-report@3fafb0fb08714549c748eb44ac69d2099c7cbb47
         with:
           filePath: tmp/performance-reports/profile-report.html
           destinationDir: performance-reports/ris-backend-service
+          BUCKET_ACCESS_KEY_ID: ${{ secrets.REPORTS_BUCKET_ACCESS_KEY_ID }}
+          BUCKET_SECRET_ACCESS_KEY: ${{ secrets.REPORTS_BUCKET_SECRET_ACCESS_KEY }}
       # Backend code documentation
       - name: Backend Code Documentation - Download
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
@@ -804,11 +799,13 @@ jobs:
           name: backend-code-documentation
           path: tmp/backend-code-documentation/
       - name: Java - git add report
-        uses: digitalservicebund/add-ris-report@c6c8735d23295c36a271c75e7dedc9b6b9a9ef5e
+        uses: digitalservicebund/add-ris-report@3fafb0fb08714549c748eb44ac69d2099c7cbb47
         with:
           filePath: tmp/backend-code-documentation
           destinationDir: backend-code-documentation/java
           reportIsDirectory: true
+          BUCKET_ACCESS_KEY_ID: ${{ secrets.REPORTS_BUCKET_ACCESS_KEY_ID }}
+          BUCKET_SECRET_ACCESS_KEY: ${{ secrets.REPORTS_BUCKET_SECRET_ACCESS_KEY }}
       # e2e test report
       - name: E2E test reports - Download
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
@@ -816,26 +813,20 @@ jobs:
           name: html-test-report
           path: tmp/html-test-report/
       - name: E2E test reports - git add report
-        uses: digitalservicebund/add-ris-report@c6c8735d23295c36a271c75e7dedc9b6b9a9ef5e
+        uses: digitalservicebund/add-ris-report@3fafb0fb08714549c748eb44ac69d2099c7cbb47
         with:
           filePath: tmp/html-test-report/
           destinationDir: test-reports/ris-backend-service
           reportIsDirectory: true
+          BUCKET_ACCESS_KEY_ID: ${{ secrets.REPORTS_BUCKET_ACCESS_KEY_ID }}
+          BUCKET_SECRET_ACCESS_KEY: ${{ secrets.REPORTS_BUCKET_SECRET_ACCESS_KEY }}
       # ADRs
       - name: add ADRs to report
-        uses: digitalservicebund/add-ris-report@c6c8735d23295c36a271c75e7dedc9b6b9a9ef5e
+        uses: digitalservicebund/add-ris-report@3fafb0fb08714549c748eb44ac69d2099c7cbb47
         with:
           filePath: tmp/adr-source
           destinationDir: adr/caselaw
           reportIsDirectory: true
           keepAllVersions: false
-      # Push reports
-      - name: Push reports
-        # we use `toJSON(...)` below to escape double quotation marks
-        run: |
-          git diff-index --cached --quiet HEAD ||
-            git commit \
-              -m ${{ toJSON(github.event.head_commit.message) }} \
-              -m "From commit: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}" &&
-            git push origin main &&
-            echo "Pushed reports to ${{ github.server_url }}/${{ env.REPORTS_REPOSITORY }}" >> $GITHUB_STEP_SUMMARY
+          BUCKET_ACCESS_KEY_ID: ${{ secrets.REPORTS_BUCKET_ACCESS_KEY_ID }}
+          BUCKET_SECRET_ACCESS_KEY: ${{ secrets.REPORTS_BUCKET_SECRET_ACCESS_KEY }}
