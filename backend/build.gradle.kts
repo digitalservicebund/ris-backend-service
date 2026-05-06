@@ -11,17 +11,17 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "4.0.5"
+    id("org.springframework.boot") version "4.0.6"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "8.4.0"
-    id("org.sonarqube") version "7.2.3.7755"
+    id("org.sonarqube") version "7.3.0.8198"
     id("com.github.jk1.dependency-license-report") version "3.1.2"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
-    id("com.github.ben-manes.versions") version "0.53.0"
-    id("io.freefair.lombok") version "9.2.0"
-    id("org.flywaydb.flyway") version "12.4.0"
-    id("io.sentry.jvm.gradle") version "6.4.0"
+    id("com.github.ben-manes.versions") version "0.54.0"
+    id("io.freefair.lombok") version "9.5.0"
+    id("org.flywaydb.flyway") version "12.5.0"
+    id("io.sentry.jvm.gradle") version "6.6.0"
 }
 
 group = "de.bund.digitalservice"
@@ -151,7 +151,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "2.0.4"
+    val testContainersVersion = "2.0.5"
 
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -163,7 +163,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:7.0.4")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:7.0.5")
     implementation("org.springframework.boot:spring-boot-starter-flyway")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:5.0.1")
@@ -174,14 +174,14 @@ dependencies {
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.6.0")
 
-    implementation("org.postgresql:postgresql:42.7.10")
+    implementation("org.postgresql:postgresql:42.7.11")
 
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
 
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.3")
 
-    implementation(platform("software.amazon.awssdk:bom:2.42.36"))
+    implementation(platform("software.amazon.awssdk:bom:2.44.0"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -210,13 +210,13 @@ dependencies {
     // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.145.jar"))
 
     // GHSA-72hv-8253-57qq
-    implementation("com.fasterxml.jackson.core:jackson-core:2.21.2")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.21.3")
 
-    implementation("tools.jackson.core:jackson-core:3.1.2")
-    implementation("tools.jackson.core:jackson-databind:3.1.2")
+    implementation("tools.jackson.core:jackson-core:3.1.3")
+    implementation("tools.jackson.core:jackson-databind:3.1.3")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.21")
-    implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.1.2")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.2")
+    implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.1.3")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
@@ -227,7 +227,7 @@ dependencies {
 
     implementation("io.getunleash:unleash-client-java:12.2.1")
     implementation("org.apache.commons:commons-text:1.15.0")
-    implementation("org.jsoup:jsoup:1.22.1")
+    implementation("org.jsoup:jsoup:1.22.2")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:7.7.0")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.7.0")
@@ -251,10 +251,10 @@ dependencies {
     implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.21")
     implementation("org.apache.tomcat:tomcat-annotations-api:11.0.21")
 
-    val flywayCore = "org.flywaydb:flyway-core:12.4.0"
+    val flywayCore = "org.flywaydb:flyway-core:12.5.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:12.4.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:12.5.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -272,7 +272,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.8.5")
-    testImplementation("org.springframework.security:spring-security-test:7.0.4")
+    testImplementation("org.springframework.security:spring-security-test:7.0.5")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.2")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter:$testContainersVersion")
@@ -280,14 +280,14 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.3.1.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.3.2.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
 buildscript {
     dependencies {
-        classpath("org.flywaydb:flyway-database-postgresql:12.4.0")
+        classpath("org.flywaydb:flyway-database-postgresql:12.5.0")
     }
 }
 
