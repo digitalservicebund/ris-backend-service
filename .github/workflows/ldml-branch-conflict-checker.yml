@@ -1,8 +1,7 @@
 name: Check for Conflicts of LDML branch with main
 
 on:
-  schedule:
-    - cron: '0 9 * * 1-5'
+  workflow_dispatch:
 
 permissions:
   contents: read
