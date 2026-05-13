@@ -142,7 +142,7 @@ jobs:
           args: >
             -Dsonar.qualitygate.wait=true
       - name: Check SonarQube Quality Gate
-        uses: sonarsource/sonarqube-quality-gate-action@cb3ed20f9fec62b4c3b8ad9e77656c6adaade913
+        uses: sonarsource/sonarqube-quality-gate-action@8e9b0ca0a7273d6f16986388d98393efdfcf56fd
         if: ${{  github.actor != 'dependabot[bot]' }}
         with:
           scanMetadataReportFile: frontend/.scannerwork/report-task.txt
