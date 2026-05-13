@@ -1,3 +1,5 @@
+Archived because not used anymore.
+
 # RIS Caselaw
 
 [![Pipeline](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/pipeline.yml/badge.svg)](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/pipeline.yml)
